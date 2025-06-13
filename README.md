@@ -69,15 +69,29 @@
 ------
 
 ### 🚀 快速开始
-- **Docker安装**
-```bash
+- **Docker安装（推荐）**
 
-```
+1. 首次运行前
+    ```bash
+    cp .env.bak .env
+    docker network create wanwu-net
+    ```
 
-- **从源码安装**
-```bash
+2. 启动服务
+    ```bash
+    docker-compose --env-file .env --env-file .env.image.amd64 up -d
+    ```
 
-```
+3. 登录系统：http://localhost:8081
+    ```
+    默认用户：admin
+    默认密码：Wanwu123456
+    ```
+
+4. 关闭服务
+    ```bash
+    docker-compose --env-file .env --env-file .env.image.amd64 down
+    ```
 
 ------
 
