@@ -31,3 +31,4 @@ cache
 cmd/*-client
 configs/microservice/bff-service/configs/a2pp-i18n.xlsx
 frontend
+project
