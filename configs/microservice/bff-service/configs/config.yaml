@@ -32,7 +32,7 @@ decrypt-passwd:
 
 i18n:
   type: jsonl
-  xlsxPath: configs/microservice/bff-service/configs/a2pp-i18n.xlsx
+  xlsxPath: configs/microservice/bff-service/configs/wanwu-i18n.xlsx
   xlsxSheets:
     - bff-service
     - bff-custom
@@ -40,7 +40,7 @@ i18n:
     - model-service
     - rag-service
     - assistant-service
-  jsonlPath: configs/microservice/bff-service/configs/a2pp-i18n.jsonl
+  jsonlPath: configs/microservice/bff-service/configs/wanwu-i18n.jsonl
   langs:
     - code: zh
       name: 中文
