@@ -2,7 +2,7 @@
   <div class="page-wrapper">
     <div class="table-wrap list-common wrap-fullheight">
       <div class="page-title">
-        <img class="page-title-img" src="@/assets/imgs/modelAccess.png" alt="" />
+        <img class="page-title-img" src="@/assets/imgs/model.png" alt="" />
         <span class="page-title-name">{{$t('modelAccess.title')}}</span>
       </div>
       <div class="table-box">

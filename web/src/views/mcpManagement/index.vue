@@ -2,7 +2,7 @@
   <div class="page-wrapper mcp-management">
     <div class="common_bg">
       <div class="page-title">
-        <img class="page-title-img" src="@/assets/imgs/modelAccess.png" alt="" />
+        <img class="page-title-img" src="@/assets/imgs/mcp.png" alt="" />
         <span class="page-title-name">MCP广场</span>
       </div>
       <!--<h2 class="title">
