@@ -9,7 +9,7 @@ import (
 
 // AssistantCreate
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		创建智能体
 //	@Description	创建智能体，填写基本信息，创建完成为草稿状态
 //	@Security		JWT
@@ -30,7 +30,7 @@ func AssistantCreate(ctx *gin.Context) {
 
 // AssistantUpdate
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		修改智能体基本信息
 //	@Description	修改智能体基本信息，名称，头像，简介
 //	@Security		JWT
@@ -51,7 +51,7 @@ func AssistantUpdate(ctx *gin.Context) {
 
 // AssistantConfigUpdate
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		修改智能体配置信息
 //	@Description	修改智能体配置信息，模型配置，知识库配置等等
 //	@Security		JWT
@@ -72,7 +72,7 @@ func AssistantConfigUpdate(ctx *gin.Context) {
 
 // GetAssistantInfo
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		查看智能体详情
 //	@Description	查看智能体详情
 //	@Security		JWT
@@ -93,7 +93,7 @@ func GetAssistantInfo(ctx *gin.Context) {
 
 // AssistantWorkFlowCreate
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		添加工作流
 //	@Description	为智能体绑定已发布的工作流
 //	@Security		JWT
@@ -114,7 +114,7 @@ func AssistantWorkFlowCreate(ctx *gin.Context) {
 
 // AssistantWorkFlowDelete
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		删除工作流
 //	@Description	为智能体解绑工作流
 //	@Security		JWT
@@ -135,7 +135,7 @@ func AssistantWorkFlowDelete(ctx *gin.Context) {
 
 // AssistantWorkFlowEnableSwitch
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		启用/停用工作流
 //	@Description	修改智能体绑定的工作流的启用状态
 //	@Security		JWT
@@ -156,7 +156,7 @@ func AssistantWorkFlowEnableSwitch(ctx *gin.Context) {
 
 // AssistantActionCreate
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		添加action
 //	@Description	为智能体绑定action
 //	@Security		JWT
@@ -177,7 +177,7 @@ func AssistantActionCreate(ctx *gin.Context) {
 
 // AssistantActionDelete
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		删除action
 //	@Description	为智能体解绑action
 //	@Security		JWT
@@ -198,7 +198,7 @@ func AssistantActionDelete(ctx *gin.Context) {
 
 // AssistantActionUpdate
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		编辑action
 //	@Description	为智能体修改action参数
 //	@Security		JWT
@@ -219,7 +219,7 @@ func AssistantActionUpdate(ctx *gin.Context) {
 
 // GetAssistantActionInfo
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		查看智能体action详情
 //	@Description	查看智能体action详情
 //	@Security		JWT
@@ -240,7 +240,7 @@ func GetAssistantActionInfo(ctx *gin.Context) {
 
 // AssistantActionEnableSwitch
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		启用/停用action
 //	@Description	修改智能体绑定的action的启用状态
 //	@Security		JWT
@@ -261,7 +261,7 @@ func AssistantActionEnableSwitch(ctx *gin.Context) {
 
 // ConversationCreate
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		创建智能体对话
 //	@Description	创建智能体对话
 //	@Security		JWT
@@ -282,7 +282,7 @@ func ConversationCreate(ctx *gin.Context) {
 
 // ConversationDelete
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		删除智能体对话
 //	@Description	删除智能体对话
 //	@Security		JWT
@@ -303,7 +303,7 @@ func ConversationDelete(ctx *gin.Context) {
 
 // GetConversationList
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		智能体对话列表
 //	@Description	智能体对话列表
 //	@Security		JWT
@@ -326,7 +326,7 @@ func GetConversationList(ctx *gin.Context) {
 
 // GetConversationDetailList
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		智能体对话详情历史列表
 //	@Description	智能体对话详情历史列表
 //	@Security		JWT
@@ -349,7 +349,7 @@ func GetConversationDetailList(ctx *gin.Context) {
 
 // AssistantConversionStream
 //
-//	@Tags			workspace.appspace.agent
+//	@Tags			agent
 //	@Summary		智能体流式问答
 //	@Description	智能体流式问答
 //	@Security		JWT

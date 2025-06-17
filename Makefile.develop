@@ -25,7 +25,7 @@ unzip-frontend:
 	done
 
 update-frontend:
-	rm -r $(WANWU_PROJECT_DIR)/nginx/html/*
+	rm -rf $(WANWU_PROJECT_DIR)/nginx/html/*
 	cp -r frontend/* $(WANWU_PROJECT_DIR)/nginx/html
 
 # --- nginx ---
