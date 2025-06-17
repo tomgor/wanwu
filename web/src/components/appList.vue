@@ -1,9 +1,13 @@
 <template>
   <div class="app-card-container">
     <div class="app-card">
-      <div class="smart rl" v-if="isShowTool">
+      <div class="smart rl smart-create" v-if="isShowTool">
         <div class="app-card-create" @click="showCreate">
-          <img src="@/assets/imgs/totalCreate.png" alt="" />
+          <div class="create-img-wrap">
+            <img class="create-type" :src="require(`@/assets/imgs/create_${type}.png`)" alt="" />
+            <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
+            <div class="create-filter"></div>
+          </div>
           <span>{{`创建${apptype[type]}`}}</span>
         </div>
       </div>

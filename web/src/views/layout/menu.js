@@ -21,8 +21,8 @@ export const menuList = [
     {
         name: i18n.t('menu.mcp'),
         key: 'mcpManage',
-        img: require('@/assets/imgs/knowledge.png'),
-        imgActive: require('@/assets/imgs/knowledge_active.png'),
+        img: require('@/assets/imgs/mcp.png'),
+        imgActive: require('@/assets/imgs/mcp_active.png'),
         path: '/mcp',
         perm: PERMS.MCP,
     },
@@ -32,24 +32,24 @@ export const menuList = [
     {
         name: i18n.t('menu.app.rag'),
         key: 'rag',
-        img: require('@/assets/imgs/task.png'),
-        imgActive: require('@/assets/imgs/task_active.png'),
+        img: require('@/assets/imgs/rag.png'),
+        imgActive: require('@/assets/imgs/rag_active.png'),
         path: '/appSpace/rag',
         perm: PERMS.RAG
     },
     {
         name: i18n.t('menu.app.workflow'),
         key: 'workflow',
-        img: require('@/assets/imgs/task.png'),
-        imgActive: require('@/assets/imgs/task_active.png'),
+        img: require('@/assets/imgs/workflow_icon.png'),
+        imgActive: require('@/assets/imgs/workflow_icon_active.png'),
         path: '/appSpace/workflow',
         perm: PERMS.WORKFLOW
     },
     {
         name: i18n.t('menu.app.agent'),
         key: 'agent',
-        img: require('@/assets/imgs/task.png'),
-        imgActive: require('@/assets/imgs/task_active.png'),
+        img: require('@/assets/imgs/agent.png'),
+        imgActive: require('@/assets/imgs/agent_active.png'),
         path: '/appSpace/agent',
         perm: PERMS.AGENT
     },

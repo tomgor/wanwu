@@ -77,7 +77,7 @@
                 {{$t('header.logout')}}
               </div>
               <div slot="reference">
-                <img class="left-menu-width" src="@/assets/imgs/head.png" alt="" />
+                <img class="left-menu-width" src="@/assets/imgs/account.png" alt="" />
               </div>
             </el-popover>
           </div>
