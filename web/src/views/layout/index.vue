@@ -46,7 +46,13 @@
               width="220"
               trigger="click"
             >
-              <div v-for="item in popoverList" :key="item.name" class="menu--popover-item" @click="menuClick(item)">
+              <div
+                v-if="checkPerm(item.perm)"
+                v-for="item in popoverList"
+                :key="item.name"
+                class="menu--popover-item"
+                @click="menuClick(item)"
+              >
                 {{item.name}}
               </div>
               <div class="menu--popover-item" :title="getCurrentOrgName()">
@@ -193,7 +199,7 @@
 <script>
 // import { start } from 'qiankun'
 import { mapActions, mapGetters } from 'vuex'
-import { checkPerm } from "@/router/permission"
+import { checkPerm, PERMS } from "@/router/permission"
 import { menuList } from './menu'
 import { changeLang } from "@/api/user"
 import { fetchPermFirPath, fetchCurrentPathIndex, replaceIcon, replaceTitle } from "@/utils/util"
@@ -221,7 +227,7 @@ export default {
       isShowNav: true,
       popoverList: [
         {name: this.$t('menu.account'), path: '/userInfo'},
-        {name: this.$t('menu.setting'), path: '/permission'}
+        {name: this.$t('menu.setting'), path: '/permission', perm: PERMS.PERMISSION}
       ]
     }
   },
