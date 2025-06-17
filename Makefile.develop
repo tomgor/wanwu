@@ -19,6 +19,15 @@ stop-all-middleware:
 	make stop-mysql-worker
 	make stop-mysql
 
+unzip-frontend:
+	@find frontend -maxdepth 1 -type f -name "*.tar.gz" | while read gzfile; do \
+		tar -zxvf $$gzfile -C frontend; \
+	done
+
+update-frontend:
+	rm -r $(WANWU_PROJECT_DIR)/nginx/html/*
+	cp -r frontend/* $(WANWU_PROJECT_DIR)/nginx/html
+
 # --- nginx ---
 run-nginx:
 	docker-compose -f docker-compose-develop.yaml \
