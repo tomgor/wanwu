@@ -1,7 +1,14 @@
 <template>
   <div class="app-card-container">
-    <div class="app-card" v-if="listData && listData.length">
+    <div class="app-card">
+      <div class="smart rl" v-if="isShowTool">
+        <div class="app-card-create" @click="showCreate">
+          <img src="@/assets/imgs/totalCreate.png" alt="" />
+          <span>{{`创建${apptype[type]}`}}</span>
+        </div>
+      </div>
       <div
+        v-if="listData && listData.length"
         class="smart rl"
         v-for="(n,i) in listData"
         :key="`${i}sm`"
@@ -103,7 +110,7 @@
         </div>
       </div>
     </div>
-    <el-empty class="noData" v-else :description="$t('common.noData')"></el-empty>
+    <el-empty class="noData" v-if="!(listData && listData.length)" :description="$t('common.noData')"></el-empty>
   </div>
 </template>
 
@@ -115,6 +122,8 @@ import { copyWorkFlow, publishWorkFlow } from "@/api/workflow";
 import { setFavorite } from "@/api/explore";
 export default {
   props:{
+    type: String,
+    showCreate: Function,
     appData:{
       type:Array,
       required:true,
@@ -349,4 +358,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/style/appCard.scss";
+.noData {
+  padding: 30px 0;
+}
 </style>

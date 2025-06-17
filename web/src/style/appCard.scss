@@ -4,6 +4,24 @@
     -webkit-flex-wrap: wrap;
     flex-wrap: wrap;
     padding-top: 20px;
+    .app-card-create {
+        width: 100%;
+        text-align: center;
+        line-height: 100px;
+        img {
+            width: 16px;
+            vertical-align: middle;
+            margin-right: 5px;
+            padding-top: 1px;
+        }
+        span {
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 16px;
+            color: $color_title;
+            font-weight: bold;
+        }
+    }
     .smart{
         position: relative;
         display: inline-flex;

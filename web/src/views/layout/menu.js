@@ -27,24 +27,24 @@ export const menuList = [
     {
         name: i18n.t('menu.app.workflow'),
         key: 'workflow',
-        img: require('@/assets/imgs/workspace.png'),
-        imgActive: require('@/assets/imgs/workspace_active.png'),
+        img: require('@/assets/imgs/task.png'),
+        imgActive: require('@/assets/imgs/task_active.png'),
         path: '/appSpace/workflow',
         perm: PERMS.WORKSPACE_APP
     },
     {
         name: i18n.t('menu.app.agent'),
         key: 'agent',
-        img: require('@/assets/imgs/workspace.png'),
-        imgActive: require('@/assets/imgs/workspace_active.png'),
+        img: require('@/assets/imgs/task.png'),
+        imgActive: require('@/assets/imgs/task_active.png'),
         path: '/appSpace/agent',
         perm: PERMS.WORKSPACE_APP
     },
     {
         name: i18n.t('menu.app.rag'),
         key: 'rag',
-        img: require('@/assets/imgs/workspace.png'),
-        imgActive: require('@/assets/imgs/workspace_active.png'),
+        img: require('@/assets/imgs/task.png'),
+        imgActive: require('@/assets/imgs/task_active.png'),
         path: '/appSpace/rag',
         perm: PERMS.WORKSPACE_APP
     },
