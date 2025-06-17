@@ -28,13 +28,27 @@ func (c *Client) ImportModel(ctx context.Context, tab *model_client.ModelImporte
 		sqlopt.WithOrgID(tab.OrgID),
 		sqlopt.WithUserID(tab.UserID),
 	).Apply(db).Select("id").First(&model_client.ModelImported{}).Error; err == nil {
-		// 存在
-		return toErrStatus("model_create_err", "exist")
+		return toErrStatus("model_create_err", "model with same identifier exist")
 	} else if err != gorm.ErrRecordNotFound {
 		// 其他错误
 		return toErrStatus("model_create_err", err.Error())
 	}
-	// 不存在则创建
+
+	if tab.DisplayName != "" {
+		if err := sqlopt.SQLOptions(
+			sqlopt.WithProvider(tab.Provider),
+			sqlopt.WithModelType(tab.ModelType),
+			sqlopt.WithDisplayName(tab.DisplayName),
+			sqlopt.WithOrgID(tab.OrgID),
+			sqlopt.WithUserID(tab.UserID),
+		).Apply(db).Select("id").First(&model_client.ModelImported{}).Error; err == nil {
+			return toErrStatus("model_create_err", "model with same display name exist")
+		} else if err != gorm.ErrRecordNotFound {
+			// 其他错误
+			return toErrStatus("model_create_err", err.Error())
+		}
+	}
+
 	if err = db.Create(tab).Error; err != nil {
 		return toErrStatus("model_create_err", err.Error())
 	}
