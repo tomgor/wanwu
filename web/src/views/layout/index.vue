@@ -1,41 +1,81 @@
 <template>
   <div class="layout full-menu">
     <el-container class="outer-container">
-      <div class="left-nav">
+      <div class="left-nav" v-if="isShowNav">
         <div style="padding: 0 15px">
           <div style="padding: 2px 0 14px; border-bottom: 1px solid #D9D9D9">
             <img v-if="homeLogoPath" style="width: 36px; margin: 0 auto" :src="basePath + '/user/api' + homeLogoPath"/>
           </div>
         </div>
-        <div style="padding: 15px 5px">
+        <div style="padding: 6px 5px 10px">
           <div
             :class="['nav-item', {'is-active': currentNavMenu.key === item.key}]"
             v-for="item in navList"
-            :key="item.key" @click="clickNavMenu(item)"
+            :key="item.key"
+            @click="clickNavMenu(item)"
             v-if="checkPerm(item.perm)"
           >
-            <img class="left-menu-width left-nav-img" :src="currentNavMenu.key === item.key ? item.imgActive : item.img" alt="" />
+            <div class="left-nav-img-wrap">
+              <img class="left-menu-width left-nav-img" :src="currentNavMenu.key === item.key ? item.imgActive : item.img" alt="" />
+            </div>
             <div class="nav-menu-name">{{item.name}}</div>
+            <div v-if="['mcpManage', 'rag'].includes(item.key)" style="padding: 0 10px">
+              <div style="padding-bottom: 12px; border-bottom: 1px solid #D9D9D9"></div>
+            </div>
           </div>
         </div>
-        <div style="padding: 0 15px">
+        <!--取消整体的新建展示-->
+        <!--<div style="padding: 0 15px">
           <div style="padding: 14px 0 10px; border-top: 1px solid #D9D9D9">
             <img class="total-create" src="@/assets/imgs/totalCreate.png" alt="" @click="showCreateTotalDialog">
             <CreateTotalDialog ref="createTotalDialog" />
           </div>
-        </div>
+        </div>-->
         <div class="nav-bottom">
           <div>
             <img class="left-menu-width" src="@/assets/imgs/doc.png" alt="" @click="showDocDownloadDialog" />
             <DocDownloadDialog ref="docDownloadDialog" />
           </div>
-          <div style="margin-top: 15px; margin-left: 5px">
-            <img class="left-menu-width" src="@/assets/imgs/logout.png" alt="" @click="logout" />
+
+          <div style="margin-top: 15px;">
+            <el-popover
+              placement="right"
+              width="220"
+              trigger="click"
+            >
+              <div v-for="item in popoverList" :key="item.name" class="menu--popover-item" @click="menuClick(item)">
+                {{item.name}}
+              </div>
+              <div class="menu--popover-item" :title="getCurrentOrgName()">
+                <el-select
+                  v-model="org.orgId"
+                  :placeholder="$t('header.org.placeholder')"
+                  filterable
+                  class="menu__org_select"
+                  v-if="orgList && orgList.length"
+                  @change="changeOrg"
+                >
+                  <el-option
+                    v-for="(item, index) in orgList"
+                    :command="index"
+                    :key="item.id + index"
+                    :label="item.name"
+                    :value="item.id"
+                  />
+                </el-select>
+              </div>
+              <div class="menu--popover-item" @click="logout">
+                {{$t('header.logout')}}
+              </div>
+              <div slot="reference">
+                <img class="left-menu-width" src="@/assets/imgs/head.png" alt="" />
+              </div>
+            </el-popover>
           </div>
         </div>
       </div>
       <!-- 导航 -->
-      <el-container :class="['inner-container']">
+      <el-container :class="['inner-container']" :style="`margin-left: ${isShowNav ? 0 : '20px'}`">
         <el-aside v-if="isShowMenu && menuList && menuList.length" class="full-menu-aside">
           <el-menu
             :default-openeds="defaultOpeneds"
@@ -172,14 +212,20 @@ export default {
       menuList: [],
       menuKey: 'menu_key',
       activeIndex: '0',
-      isShowMenu: true,
+      isShowMenu: false,
       userName: accessCert ? JSON.parse(accessCert).user.userInfo.userName : '',
+      isShowNav: true,
+      popoverList: [
+        {name: this.$t('menu.account'), path: '/userInfo'},
+        {name: this.$t('menu.setting'), path: '/permission'}
+      ]
     }
   },
   watch: {
     $route: {
       handler (val) {
-        this.justifyIsShowMenu(val.path)
+        // this.justifyIsShowMenu(val.path)
+        this.justifyIsShowNav(val.path)
         this.getMenuList(val.path)
       },
       // 深度观察监听
@@ -206,7 +252,9 @@ export default {
   },
   async created() {
     // 判断是否展示左侧菜单
-    this.justifyIsShowMenu(this.$route.path)
+    this.justifyIsShowNav(this.$route.path)
+    // this.justifyIsShowMenu(this.$route.path)
+
     // 设置语言
     // await this.setLanguage()
 
@@ -234,6 +282,23 @@ export default {
       window.localStorage.removeItem('access_cert')
       window.location.href = window.location.origin + this.$basePath +'/aibase/login'
     },
+    getCurrentOrgName() {
+      const currentOrg = this.orgList.filter(item => item.id === this.org.orgId)[0] || {}
+      console.log(currentOrg,'--------------------getCurrentOrgName')
+      return currentOrg.name
+    },
+    justifyIsShowNav(path) {
+      console.log(path, '-------------------234')
+      const notShowArr = ['/userInfo', '/permission']
+      let isShowNav = true
+      for (let item of notShowArr) {
+        if (item === path) {
+          isShowNav = false
+          break
+        }
+      }
+      this.isShowNav = isShowNav
+    },
     justifyIsShowMenu(path) {
       const notShowArr = ['/workflow', '/agent/test', '/rag/test','/explore']
       let isShowMenu = true
@@ -245,9 +310,9 @@ export default {
       }
       this.isShowMenu = isShowMenu
     },
-    showCreateTotalDialog() {
+    /*showCreateTotalDialog() {
       this.$refs.createTotalDialog.openDialog()
-    },
+    },*/
     showDocDownloadDialog() {
       this.$refs.docDownloadDialog.openDialog()
     },
@@ -255,6 +320,7 @@ export default {
       this.currentNavMenu = item || {}
       const menus = item.children || []
       this.menuList = menus
+      console.log(item, menus, '-----------------------------123')
 
       if (menus && menus.length) {
         // 切换 nav 菜单跳转有权限的第一个
@@ -286,7 +352,10 @@ export default {
     getCurrentNav(path) {
       // 获取一级路由
       const pathArray = path.split('/') || []
-      const firstLevelPath = '/' + (pathArray[1] || '')
+      const firstLevelPath = pathArray[1] === 'appSpace'
+        ? `/${pathArray[1] || ''}/${pathArray[2] || ''}`
+        : `/${pathArray[1] || ''}`
+      console.log(firstLevelPath, '--------------------23')
 
       const currentNav = menuList.find(item => JSON.stringify(item).includes(firstLevelPath))
       return currentNav || {}
@@ -296,6 +365,7 @@ export default {
       this.currentNavMenu = currentNavMenu
       // 获取当前菜单列表
       const menus = currentNavMenu.children || []
+      if (!menus.length) return
 
       this.menuList = menus
       this.defaultOpeneds = menus.map(item => item.index)
@@ -304,7 +374,6 @@ export default {
       this.changeMenuIndex(fetchCurrentPathIndex(path, menus))
     },
     changeMenuIndex(index) {
-      // this.menuKey = 'menu_' + new Date().getTime()
       this.activeIndex = index
     },
     async changeOrg(orgId) {
@@ -348,10 +417,11 @@ export default {
       }
       .left-menu-width {
         width: 20px;
+        height: 20px;
+        object-fit: contain;
       }
       .nav-item {
-        margin: 10px 0;
-        padding: 5px 0px;
+        margin: 14px 0;
         color: #77869E;
         font-weight: bold;
         cursor: pointer;
@@ -365,11 +435,17 @@ export default {
       .nav-item.is-active {
         color: $color;
         .left-nav-img {
-          width: 36px;
+          width: 100%;
+          height: 100%;
           padding: 8px;
+        }
+        .left-nav-img-wrap {
+          width: 36px;
+          height: 36px;
+          display: inline-block;
           border-radius: 50%;
           background: #fff;
-          box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
         }
       }
       .nav-bottom {
@@ -427,7 +503,7 @@ export default {
         height: 100%;
         overflow: auto;
         background: linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%);
-        border-radius: 8px 8px 8px 0;
+        border-radius: 8px 8px 8px 8px;
         border-left: 0.5px solid #e6e6e6;
       }
       /deep/ .el-menu-item {
@@ -505,7 +581,7 @@ export default {
 .header__org_active {
   color: $color !important;
 }
-.header__org_select /deep/ {
+.header__org_select, .menu__org_select /deep/ {
   width: calc(100% - 37px);
   .el-input__inner:focus,
   .el-input__inner:hover,
@@ -527,6 +603,32 @@ export default {
       color: #aaa;
       font-size: 15px;
     }
+  }
+}
+.menu__org_select /deep/{
+  width: 190px;
+  .el-input__inner {
+    background-color: rgba(255, 255, 255, 0);
+    border: none !important;
+    color: #606266 !important;
+    font-weight: normal;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+  }
+}
+.menu--popover-item {
+  font-size: 13px;
+  color: #606266;
+  height: 34px;
+  line-height: 34px;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0 8px;
+}
+.menu--popover-item:hover /deep/ {
+  background: #F5F7FA !important;
+  .el-input .el-input__inner {
+    border: none !important;
   }
 }
 </style>

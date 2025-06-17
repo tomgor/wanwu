@@ -355,8 +355,8 @@
   }
 }
 .card-item:hover {
-  background-image: url('../../assets/imgs/cardBg.png');
-  background-size: cover;
+  /*background-image: url('../../assets/imgs/cardBg.png');
+  background-size: cover;*/
   border: 1px solid $color;
 }
 /deep/ .el-dropdown-menu__item.card-delete:hover {

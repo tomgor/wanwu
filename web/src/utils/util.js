@@ -122,3 +122,13 @@ export function getQueryString(val, href) {
     }
     return null;
 }
+
+// 是否是有效的URL
+export function isValidURL(string) {
+    const res = string.match(/(https?|ftp|file|ssh):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]/i);
+    return res !== null;
+}
+
+export function isExternal(path) {
+    return /^(https?:|mailto:|tel:)/.test(path);
+}

@@ -2,7 +2,7 @@
     <div class="routerview-container rl">
         <div class="info page-wrapper hide-loading-bg">
             <p class="page-title form-header rl">
-                <!--<i class="el-icon-back" @click="preBack"></i>-->
+                <i class="el-icon-arrow-left" @click="$router.go(-1)" />
                 <img class="page-title-img" src="@/assets/imgs/userInfo.png" alt="" />
                 <span class="page-title-name">{{$t('userInfo.title')}}</span>
             </p>
@@ -32,11 +32,6 @@
                 this.$refs['info'].setData(res.data)
             }
         },
-        methods:{
-            preBack(){
-                this.$router.go(-1)
-            }
-        }
     }
 </script>
 
@@ -56,5 +51,13 @@
             cursor: pointer;
         }
     }
+}
+.page-title {
+  .el-icon-arrow-left {
+    margin-right: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    color: $color_title;
+  }
 }
 </style>

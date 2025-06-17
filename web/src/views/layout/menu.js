@@ -3,6 +3,52 @@ import { i18n } from '@/lang'
 
 export const menuList = [
     {
+        name: i18n.t('menu.modelAccess'),
+        key: 'modelAccess',
+        img: require('@/assets/imgs/model.png'),
+        imgActive: require('@/assets/imgs/model_active.png'),
+        path: '/modelAccess',
+    },
+    {
+        name: i18n.t('menu.knowledge'),
+        key: 'knowledge',
+        img: require('@/assets/imgs/knowledge.png'),
+        imgActive: require('@/assets/imgs/knowledge_active.png'),
+        path: '/knowledge',
+        perm: PERMS.WORKSPACE_KNOWLEDGE,
+    },
+    {
+        name: i18n.t('menu.mcp'),
+        key: 'mcpManage',
+        img: require('@/assets/imgs/knowledge.png'),
+        imgActive: require('@/assets/imgs/knowledge_active.png'),
+        path: '/mcp',
+    },
+    {
+        name: i18n.t('menu.app.workflow'),
+        key: 'workflow',
+        img: require('@/assets/imgs/workspace.png'),
+        imgActive: require('@/assets/imgs/workspace_active.png'),
+        path: '/appSpace/workflow',
+        perm: PERMS.WORKSPACE_APP
+    },
+    {
+        name: i18n.t('menu.app.agent'),
+        key: 'agent',
+        img: require('@/assets/imgs/workspace.png'),
+        imgActive: require('@/assets/imgs/workspace_active.png'),
+        path: '/appSpace/agent',
+        perm: PERMS.WORKSPACE_APP
+    },
+    {
+        name: i18n.t('menu.app.rag'),
+        key: 'rag',
+        img: require('@/assets/imgs/workspace.png'),
+        imgActive: require('@/assets/imgs/workspace_active.png'),
+        path: '/appSpace/rag',
+        perm: PERMS.WORKSPACE_APP
+    },
+    {
         name: i18n.t('menu.explore'),
         key: 'explore',
         img: require('@/assets/imgs/explore.png'),
@@ -10,7 +56,7 @@ export const menuList = [
         path: '/explore',
         perm: PERMS.EXPLORE
     },
-    {
+   /* {
         name: i18n.t('menu.workspace'),
         key: 'workspace',
         img: require('@/assets/imgs/workspace.png'),
@@ -50,15 +96,6 @@ export const menuList = [
                     }
                 ]
             },
-            {
-                name: i18n.t('menu.knowledge'),
-                routeName: 'knowledge',
-                path: '/knowledge',
-                img: require('@/assets/imgs/knowledge.png'),
-                imgActive: require('@/assets/imgs/knowledge_active.png'),
-                index: 'workspace-2',
-                perm: PERMS.WORKSPACE_KNOWLEDGE,
-            },
         ]
     },
     {
@@ -84,14 +121,6 @@ export const menuList = [
                 imgActive: require('@/assets/imgs/org_active.png'),
                 perm: PERMS.PERMISSION
             },
-            {
-                name: i18n.t('menu.modelAccess'),
-                routeName: 'modelAccess',
-                path: '/modelAccess',
-                img: require('@/assets/imgs/model.png'),
-                imgActive: require('@/assets/imgs/model_active.png'),
-                index: 'account-3',
-            },
         ]
-    }
+    }*/
 ]

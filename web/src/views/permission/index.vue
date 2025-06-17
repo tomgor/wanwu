@@ -1,8 +1,9 @@
 <template>
   <div class="page-wrapper" style="margin: 0">
     <div class="page-title">
+      <i class="el-icon-arrow-left" @click="$router.go(-1)" />
       <img class="page-title-img" src="@/assets/imgs/org.png" alt="" />
-      <span class="page-title-name">{{$t('org.title')}}</span>
+      <span class="page-title-name">{{$t('menu.setting')}}</span>
     </div>
     <div style="margin: 10px 20px 0 20px;">
       <div style="margin-bottom: -50px">
@@ -74,5 +75,13 @@ export default {
   color: $color;
   background: #fff;
   font-weight: bold;
+}
+.page-title {
+  .el-icon-arrow-left {
+    margin-right: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    color: $color_title;
+  }
 }
 </style>
