@@ -1264,7 +1264,7 @@ export default {
     },
     handleClick(val) {
       this.mcpSquareId = val.mcpSquareId;
-      this.$router.push({path:`/publicMCP/detail/${val.mcpSquareId}/${val.hosted?1:0}`})
+      this.$router.push({path:`/mcp/public/detail/${val.mcpSquareId}/${val.hosted?1:0}`})
     },
   },
 };

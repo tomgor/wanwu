@@ -2,25 +2,28 @@
   <div class="layout full-menu">
     <el-container class="outer-container">
       <div class="left-nav" v-if="isShowNav">
-        <div style="padding: 0 15px">
+        <!--不展示平台的图标-->
+        <!--<div style="padding: 0 15px">
           <div style="padding: 2px 0 14px; border-bottom: 1px solid #D9D9D9">
             <img v-if="homeLogoPath" style="width: 36px; margin: 0 auto" :src="basePath + '/user/api' + homeLogoPath"/>
           </div>
-        </div>
+        </div>-->
         <div style="padding: 6px 5px 10px">
           <div
             :class="['nav-item', {'is-active': currentNavMenu.key === item.key}]"
-            v-for="item in navList"
-            :key="item.key"
+            v-for="(item, index) in navList"
+            :key="item.key + index"
             @click="clickNavMenu(item)"
             v-if="checkPerm(item.perm)"
           >
-            <div class="left-nav-img-wrap">
-              <img class="left-menu-width left-nav-img" :src="currentNavMenu.key === item.key ? item.imgActive : item.img" alt="" />
+            <div v-if="item.key !== 'line'">
+              <div class="left-nav-img-wrap">
+                <img class="left-menu-width left-nav-img" :src="currentNavMenu.key === item.key ? item.imgActive : item.img" alt="" />
+              </div>
+              <div class="nav-menu-name">{{item.name}}</div>
             </div>
-            <div class="nav-menu-name">{{item.name}}</div>
-            <div v-if="['mcpManage', 'rag'].includes(item.key)" style="padding: 0 10px">
-              <div style="padding-bottom: 12px; border-bottom: 1px solid #D9D9D9"></div>
+            <div v-if="item.key === 'line'" style="padding: 0 10px">
+              <div style="border-bottom: 1px solid #D9D9D9"></div>
             </div>
           </div>
         </div>
@@ -76,6 +79,7 @@
       </div>
       <!-- 导航 -->
       <el-container :class="['inner-container']" :style="`margin-left: ${isShowNav ? 0 : '20px'}`">
+        <!--取消整体的菜单展示 isShowMenu 一直为 false-->
         <el-aside v-if="isShowMenu && menuList && menuList.length" class="full-menu-aside">
           <el-menu
             :default-openeds="defaultOpeneds"
@@ -381,15 +385,20 @@ export default {
       // 切换组织更新权限，跳转有权限的页面；如果是用模型跳转用模型，其他跳转模型开发平台
       await this.getPermissionInfo()
 
-      const {path} = fetchPermFirPath()
-      // 切换组织, 根据当前路径有权限的第一个路径找到对应的 menu
-      this.getMenuList(path)
-      this.menuClick({path})
-
       // 更新 storage 用户信息中组织 id
       const info = JSON.parse(localStorage.getItem("access_cert"))
       info.user.userInfo.orgId = orgId
       localStorage.setItem('access_cert', JSON.stringify(info))
+
+      const {path} = fetchPermFirPath()
+      // 如果当前页面 path 与第一个有权限的 path 相同，需要刷新页面以确保数据为新切换组织的
+      if (path === this.$route.path) {
+        location.reload()
+        return
+      }
+      // 切换组织, 根据当前路径有权限的第一个路径找到对应的 menu
+      this.getMenuList(path)
+      this.menuClick({path})
     }
   }
 }
@@ -408,7 +417,7 @@ export default {
     .left-nav {
       width: 70px;
       text-align: center;
-      padding: 12px 0;
+      padding: 8px 0;
       position: relative;
       min-height: 450px;
       .total-create {

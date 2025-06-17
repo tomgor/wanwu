@@ -248,7 +248,7 @@
                     .catch((err) => {});
             },
             handleClick(val){
-                this.$router.push(`/publicMCP/detail/${val.mcpSquareId}/${val.hosted?1:0}`)
+                this.$router.push(`/mcp/public/detail/${val.mcpSquareId}/${val.hosted?1:0}`)
             },
             fold(){
                 this.foldStatus = !this.foldStatus

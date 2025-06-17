@@ -210,7 +210,7 @@
                     .catch((err) => {});
             },
             handleClick(val){
-                this.$router.push(`/publicMCP/detail/${val.mcpSquareId}/${val.hosted?1:0}`)
+                this.$router.push(`/mcp/public/detail/${val.mcpSquareId}/${val.hosted?1:0}`)
             },
             //解析文本，遇到.换行等
             parseTxt(txt){
