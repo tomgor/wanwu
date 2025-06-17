@@ -9,7 +9,7 @@ import (
 
 // DeleteAppSapceApp
 //
-//	@Tags			workspace.appspace
+//	@Tags			app
 //	@Summary		刪除应用
 //	@Description	刪除智能体、工作流、文本问答等应用
 //	@Security		JWT
@@ -29,7 +29,7 @@ func DeleteAppSapceApp(ctx *gin.Context) {
 
 // GetAppSpaceAppList
 //
-//	@Tags			workspace.appspace
+//	@Tags			app
 //	@Summary		获取应用列表
 //	@Description	获取智能体、工作流、文本问答等应用
 //	@Security		JWT
@@ -50,7 +50,7 @@ func GetAppSpaceAppList(ctx *gin.Context) {
 
 // PublishApp
 //
-//	@Tags			workspace.appspace
+//	@Tags			app
 //	@Summary		发布应用
 //	@Description	发布应用
 //	@Security		JWT

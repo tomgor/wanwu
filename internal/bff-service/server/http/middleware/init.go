@@ -25,7 +25,25 @@ func Init() {
 	mid.NewSub("common", "", route.PermNeedEnable, false, false, JWTUser, CheckUserEnable)
 
 	// --- model ---
-	mid.NewSub("model", "模型管理", route.PermNeedEnable, false, false, JWTUser, CheckUserEnable)
+	mid.NewSub("model", "模型管理", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
+
+	// --- knowledge ---
+	mid.NewSub("knowledge", "知识库", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
+
+	// --- mcp ---
+	mid.NewSub("mcp", "MCP广场", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
+
+	// --- rag ---
+	mid.NewSub("rag", "文本问答", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
+
+	// --- workflow ---
+	mid.NewSub("workflow", "工作流", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
+
+	// --- agent ---
+	mid.NewSub("agent", "智能体", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
+
+	// --- exploration ---
+	mid.NewSub("exploration", "探索广场", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
 
 	// --- permission ---
 	mid.NewSub("permission", "组织管理", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
@@ -38,16 +56,4 @@ func Init() {
 
 	// permission.role
 	mid.Sub("permission").NewSub("role", "角色", route.PermNeedCheck, true, true)
-
-	// --- exploration ---
-	mid.NewSub("exploration", "探索广场", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
-
-	// --- workspace ---
-	mid.NewSub("workspace", "工作室", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
-
-	// workspace.appspace
-	mid.Sub("workspace").NewSub("appspace", "应用空间", route.PermNeedCheck, true, true)
-
-	// workspace.knowledge
-	mid.Sub("workspace").NewSub("knowledgebase", "知识库", route.PermNeedCheck, true, true)
 }

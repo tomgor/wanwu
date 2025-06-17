@@ -2011,7 +2011,7 @@ paths:
       - JWT: []
       summary: 刪除应用
       tags:
-      - workspace.appspace
+      - app
   /appspace/app/key:
     delete:
       consumes:
@@ -2033,7 +2033,7 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: 删除ApiKey
       tags:
-      - workspace.appspace
+      - app
     post:
       consumes:
       - application/json
@@ -2059,7 +2059,7 @@ paths:
               type: object
       summary: 生成ApiKey
       tags:
-      - workspace.appspace
+      - app
   /appspace/app/key/list:
     get:
       consumes:
@@ -2092,7 +2092,7 @@ paths:
               type: object
       summary: 获取ApiKey
       tags:
-      - workspace.appspace
+      - app
   /appspace/app/list:
     get:
       consumes:
@@ -2134,7 +2134,7 @@ paths:
       - JWT: []
       summary: 获取应用列表
       tags:
-      - workspace.appspace
+      - app
   /appspace/app/publish:
     post:
       consumes:
@@ -2158,7 +2158,7 @@ paths:
       - JWT: []
       summary: 发布应用
       tags:
-      - workspace.appspace
+      - app
   /appspace/app/url:
     get:
       consumes:
@@ -2191,7 +2191,7 @@ paths:
       - JWT: []
       summary: 获取Api根地址
       tags:
-      - workspace.appspace
+      - app
   /appspace/rag:
     delete:
       consumes:
@@ -2214,7 +2214,7 @@ paths:
       - JWT: []
       summary: 删除RAG
       tags:
-      - workspace.appspace.rag
+      - rag
     get:
       consumes:
       - application/json
@@ -2239,7 +2239,7 @@ paths:
       - JWT: []
       summary: 获取RAG信息
       tags:
-      - workspace.appspace.rag
+      - rag
     post:
       consumes:
       - application/json
@@ -2266,7 +2266,7 @@ paths:
       - JWT: []
       summary: 创建RAG
       tags:
-      - workspace.appspace.rag
+      - rag
     put:
       consumes:
       - application/json
@@ -2288,7 +2288,7 @@ paths:
       - JWT: []
       summary: 更新RAG基本信息
       tags:
-      - workspace.appspace.rag
+      - rag
   /appspace/rag/config:
     put:
       consumes:
@@ -2311,7 +2311,7 @@ paths:
       - JWT: []
       summary: 更新RAG配置信息
       tags:
-      - workspace.appspace.rag
+      - rag
   /assistant:
     get:
       consumes:
@@ -2339,7 +2339,7 @@ paths:
       - JWT: []
       summary: 查看智能体详情
       tags:
-      - workspace.appspace.agent
+      - agent
     post:
       consumes:
       - application/json
@@ -2362,7 +2362,7 @@ paths:
       - JWT: []
       summary: 创建智能体
       tags:
-      - workspace.appspace.agent
+      - agent
     put:
       consumes:
       - application/json
@@ -2385,7 +2385,7 @@ paths:
       - JWT: []
       summary: 修改智能体基本信息
       tags:
-      - workspace.appspace.agent
+      - agent
   /assistant/action:
     delete:
       consumes:
@@ -2409,7 +2409,7 @@ paths:
       - JWT: []
       summary: 删除action
       tags:
-      - workspace.appspace.agent
+      - agent
     get:
       consumes:
       - application/json
@@ -2436,7 +2436,7 @@ paths:
       - JWT: []
       summary: 查看智能体action详情
       tags:
-      - workspace.appspace.agent
+      - agent
     post:
       consumes:
       - application/json
@@ -2459,7 +2459,7 @@ paths:
       - JWT: []
       summary: 添加action
       tags:
-      - workspace.appspace.agent
+      - agent
     put:
       consumes:
       - application/json
@@ -2482,7 +2482,7 @@ paths:
       - JWT: []
       summary: 编辑action
       tags:
-      - workspace.appspace.agent
+      - agent
   /assistant/action/enable:
     put:
       consumes:
@@ -2506,7 +2506,7 @@ paths:
       - JWT: []
       summary: 启用/停用action
       tags:
-      - workspace.appspace.agent
+      - agent
   /assistant/config:
     put:
       consumes:
@@ -2530,7 +2530,7 @@ paths:
       - JWT: []
       summary: 修改智能体配置信息
       tags:
-      - workspace.appspace.agent
+      - agent
   /assistant/conversation:
     delete:
       consumes:
@@ -2554,7 +2554,7 @@ paths:
       - JWT: []
       summary: 删除智能体对话
       tags:
-      - workspace.appspace.agent
+      - agent
     post:
       consumes:
       - application/json
@@ -2582,7 +2582,7 @@ paths:
       - JWT: []
       summary: 创建智能体对话
       tags:
-      - workspace.appspace.agent
+      - agent
   /assistant/conversation/detail:
     get:
       consumes:
@@ -2627,7 +2627,7 @@ paths:
       - JWT: []
       summary: 智能体对话详情历史列表
       tags:
-      - workspace.appspace.agent
+      - agent
   /assistant/conversation/list:
     get:
       consumes:
@@ -2672,7 +2672,7 @@ paths:
       - JWT: []
       summary: 智能体对话列表
       tags:
-      - workspace.appspace.agent
+      - agent
   /assistant/stream:
     post:
       consumes:
@@ -2696,7 +2696,7 @@ paths:
       - JWT: []
       summary: 智能体流式问答
       tags:
-      - workspace.appspace.agent
+      - agent
   /assistant/workflow:
     delete:
       consumes:
@@ -2720,7 +2720,7 @@ paths:
       - JWT: []
       summary: 删除工作流
       tags:
-      - workspace.appspace.agent
+      - agent
     post:
       consumes:
       - application/json
@@ -2743,7 +2743,7 @@ paths:
       - JWT: []
       summary: 添加工作流
       tags:
-      - workspace.appspace.agent
+      - agent
   /assistant/workflow/enable:
     put:
       consumes:
@@ -2767,7 +2767,7 @@ paths:
       - JWT: []
       summary: 启用/停用工作流
       tags:
-      - workspace.appspace.agent
+      - agent
   /avatar:
     post:
       consumes:
@@ -3994,7 +3994,7 @@ paths:
       - JWT: []
       summary: 私域 RAG 问答
       tags:
-      - workspace.appspace.rag
+      - rag
   /role:
     delete:
       consumes:

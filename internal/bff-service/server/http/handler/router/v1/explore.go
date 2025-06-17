@@ -13,11 +13,6 @@ func registerExploration(apiV1 *gin.RouterGroup) {
 	mid.Sub("exploration").Reg(apiV1, "/exploration/app/list", http.MethodGet, v1.GetExplorationAppList, "获取探索广场应用")
 	mid.Sub("exploration").Reg(apiV1, "/exploration/app/favorite", http.MethodPost, v1.ChangeExplorationAppFavorite, "更改App收藏状态")
 
-	// app 相关接口
-	mid.Sub("exploration").Reg(apiV1, "/appspace/app/url", http.MethodGet, v1.GetApiBaseUrl, "获取Api根地址")
-	mid.Sub("exploration").Reg(apiV1, "/appspace/app/key", http.MethodPost, v1.GenApiKey, "生成ApiKey")
-	mid.Sub("exploration").Reg(apiV1, "/appspace/app/key", http.MethodDelete, v1.DelApiKey, "删除ApiKey")
-	mid.Sub("exploration").Reg(apiV1, "/appspace/app/key/list", http.MethodGet, v1.GetApiKeyList, "获取ApiKey列表")
 	// rag 相关接口
 	mid.Sub("exploration").Reg(apiV1, "/appspace/rag", http.MethodGet, v1.GetRag, "获取rag详情")
 	// agent 相关接口

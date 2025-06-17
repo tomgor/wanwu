@@ -9,7 +9,7 @@ import (
 
 // ChatRag
 //
-//	@Tags		workspace.appspace.rag
+//	@Tags		rag
 //	@Summary	私域 RAG 问答
 //	@Description
 //	@Security	JWT
@@ -31,7 +31,7 @@ func ChatRag(ctx *gin.Context) {
 
 // CreateRag
 //
-//	@Tags		workspace.appspace.rag
+//	@Tags		rag
 //	@Summary	创建RAG
 //	@Description
 //	@Security	JWT
@@ -52,7 +52,7 @@ func CreateRag(ctx *gin.Context) {
 
 // UpdateRag
 //
-//	@Tags		workspace.appspace.rag
+//	@Tags		rag
 //	@Summary	更新RAG基本信息
 //	@Description
 //	@Security	JWT
@@ -72,7 +72,7 @@ func UpdateRag(ctx *gin.Context) {
 
 // UpdateRagConfig
 //
-//	@Tags		workspace.appspace.rag
+//	@Tags		rag
 //	@Summary	更新RAG配置信息
 //	@Description
 //	@Security	JWT
@@ -92,7 +92,7 @@ func UpdateRagConfig(ctx *gin.Context) {
 
 // DeleteRag
 //
-//	@Tags		workspace.appspace.rag
+//	@Tags		rag
 //	@Summary	删除RAG
 //	@Description
 //	@Security	JWT
@@ -112,7 +112,7 @@ func DeleteRag(ctx *gin.Context) {
 
 // GetRag
 //
-//	@Tags		workspace.appspace.rag
+//	@Tags		rag
 //	@Summary	获取RAG信息
 //	@Description
 //	@Security	JWT

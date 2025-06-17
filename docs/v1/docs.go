@@ -30,7 +30,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace"
+                    "app"
                 ],
                 "summary": "刪除应用",
                 "parameters": [
@@ -64,7 +64,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace"
+                    "app"
                 ],
                 "summary": "生成ApiKey",
                 "parameters": [
@@ -108,7 +108,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace"
+                    "app"
                 ],
                 "summary": "删除ApiKey",
                 "parameters": [
@@ -142,7 +142,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace"
+                    "app"
                 ],
                 "summary": "获取ApiKey",
                 "parameters": [
@@ -201,7 +201,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace"
+                    "app"
                 ],
                 "summary": "获取应用列表",
                 "parameters": [
@@ -275,7 +275,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace"
+                    "app"
                 ],
                 "summary": "发布应用",
                 "parameters": [
@@ -314,7 +314,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace"
+                    "app"
                 ],
                 "summary": "获取Api根地址",
                 "parameters": [
@@ -369,7 +369,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.rag"
+                    "rag"
                 ],
                 "summary": "获取RAG信息",
                 "parameters": [
@@ -414,7 +414,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.rag"
+                    "rag"
                 ],
                 "summary": "更新RAG基本信息",
                 "parameters": [
@@ -450,7 +450,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.rag"
+                    "rag"
                 ],
                 "summary": "创建RAG",
                 "parameters": [
@@ -498,7 +498,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.rag"
+                    "rag"
                 ],
                 "summary": "删除RAG",
                 "parameters": [
@@ -536,7 +536,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.rag"
+                    "rag"
                 ],
                 "summary": "更新RAG配置信息",
                 "parameters": [
@@ -575,7 +575,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "查看智能体详情",
                 "parameters": [
@@ -622,7 +622,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "修改智能体基本信息",
                 "parameters": [
@@ -659,7 +659,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "创建智能体",
                 "parameters": [
@@ -698,7 +698,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "查看智能体action详情",
                 "parameters": [
@@ -745,7 +745,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "编辑action",
                 "parameters": [
@@ -782,7 +782,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "添加action",
                 "parameters": [
@@ -819,7 +819,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "删除action",
                 "parameters": [
@@ -858,7 +858,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "启用/停用action",
                 "parameters": [
@@ -897,7 +897,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "修改智能体配置信息",
                 "parameters": [
@@ -936,7 +936,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "创建智能体对话",
                 "parameters": [
@@ -985,7 +985,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "删除智能体对话",
                 "parameters": [
@@ -1024,7 +1024,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "智能体对话详情历史列表",
                 "parameters": [
@@ -1102,7 +1102,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "智能体对话列表",
                 "parameters": [
@@ -1180,7 +1180,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "智能体流式问答",
                 "parameters": [
@@ -1219,7 +1219,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "添加工作流",
                 "parameters": [
@@ -1256,7 +1256,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "删除工作流",
                 "parameters": [
@@ -1295,7 +1295,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.agent"
+                    "agent"
                 ],
                 "summary": "启用/停用工作流",
                 "parameters": [
@@ -3414,7 +3414,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "workspace.appspace.rag"
+                    "rag"
                 ],
                 "summary": "私域 RAG 问答",
                 "parameters": [
