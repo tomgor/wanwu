@@ -85,6 +85,15 @@ func WithModel(model string) SQLOption {
 	})
 }
 
+func WithDisplayName(DisplayName string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if DisplayName != "" {
+			return db.Where("display_name = ?", DisplayName)
+		}
+		return db
+	})
+}
+
 func WithIsActive(isActive bool) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		return db.Where("is_active = ?", isActive)
