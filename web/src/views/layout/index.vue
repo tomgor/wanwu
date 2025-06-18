@@ -3,11 +3,14 @@
     <el-container class="outer-container">
       <div class="left-nav" v-if="isShowNav">
         <!--不展示平台的图标-->
-        <!--<div style="padding: 0 15px">
-          <div style="padding: 2px 0 14px; border-bottom: 1px solid #D9D9D9">
-            <img v-if="homeLogoPath" style="width: 36px; margin: 0 auto" :src="basePath + '/user/api' + homeLogoPath"/>
+        <div style="padding: 0 15px">
+          <div style="padding: 10px 0 14px; border-bottom: 1px solid #D9D9D9">
+            <img
+              style="width: 36px; margin: 0 auto"
+              :src="homeLogoPath ? (basePath + '/user/api' + homeLogoPath) : require('@/assets/imgs/wanwu.svg')"
+            />
           </div>
-        </div>-->
+        </div>
         <div style="padding: 6px 5px 10px">
           <div
             :class="['nav-item', {'is-active': currentNavMenu.key === item.key}]"

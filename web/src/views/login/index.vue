@@ -3,8 +3,11 @@
     <overview :login="login" />
     <div class="login-modal">
       <div class="header__left">
-        <!--<img v-if="home.logoPath" style="height: 30px; margin: 0 15px 0 22px" :src="basePath + '/user/api' + home.logoPath"/>
-        <span style="font-size: 16px;">{{home.title || ''}}</span>-->
+        <!--<img
+          style="height: 26px; margin: 0 15px 0 22px"
+          :src="home.logoPath ? (basePath + '/user/api' + home.logoPath) : require('@/assets/imgs/wanwu.svg')"
+        />
+         <span style="font-size: 16px;">{{home.title || ''}}</span>-->
         <!--<div style="margin-left: 10px">
           <ChangeLang :isLogin="true" />
         </div>-->
