@@ -796,10 +796,10 @@
   }
 
   .desc {
-    background: rgba(255, 246, 246, 1);
+    background: #F4F5FF; // rgba(255, 246, 246, 1);
     padding: 10px 15px;
     border-radius: 6px;
-    border: 1px solid #f5cbcb;
+    border: 1px solid #98A6E9; // #f5cbcb;
   }
 
   .params {
