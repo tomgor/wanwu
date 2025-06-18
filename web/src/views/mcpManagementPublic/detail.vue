@@ -79,15 +79,15 @@
                         <p class="title">SSE URL:</p>
                         <div class="sse-url" style="display: flex">
                             <div class="tool-item-bg sse-url__input">{{detail.sseUrl}}</div>
-                            <el-button class="sse-url__bt" type="primary" @click="preSendToCustomize">发送到自定义</el-button>
+                            <el-button class="sse-url__bt" type="primary" :disabled="!detail.isCanSendCustomMcp" @click="preSendToCustomize">发送到自定义</el-button>
                         </div>
                         <p style="line-height: 40px;color: #666;">* 将MCP发送到自定义后，您可在工作流或智能体中直接调用。</p>
                     </div>
                     <div class="tool-item" v-if="detail.tools">
                         <p class="title">工具介绍:</p>
                         <div class="tool-item-bg tool-intro">
-                            <el-collapse>
-                                <el-collapse-item v-for="(n,i) in detail.tools" :title="n.toolName" :name="i" :key="n.toolName + i">
+                            <el-collapse class="mcp-el-collapse">
+                                <el-collapse-item v-for="(n,i) in detail.tools" :title="n.toolName" :name="i">
                                     <div class="desc">描述：{{detail.description}}</div>
                                     <div class="params">
                                         <p>参数说明:</p>
@@ -139,13 +139,13 @@
             </div>
         </div>
 
-        <sendDialog ref="dialog" :dialogVisible="dialogVisible" :detail="detail" @handleClose="handleClose"/>
+        <sendDialog ref="dialog" :dialogVisible="dialogVisible" :detail="detail" @handleClose="handleClose" @getIsCanSendStatus="getIsCanSendStatus"/>
     </div>
 </template>
 <script>
     import sendDialog from './sendDialog'
     import {md} from '../../mixins/marksown-it'
-    import { getPublicMcpList, getMarkDownContent, getTools, getRecommendsList } from "@/api/mcp";
+    import { getPublicMcpList, getMarkDownContent, getTools, getRecommendsList, getPublicMcpInfo } from "@/api/mcp";
     export default {
         data() {
             return {
@@ -160,6 +160,7 @@
                     whereToUse:'',
                     useCases:'',
                     howToUse:'',
+                    isCanSendCustomMcp:false
                 },
                 foldStatus:false,
                 tabActive:0,
@@ -192,10 +193,262 @@
                 document.getElementById("timeScroll").scrollTop = 0
             },
             getDataFromSquare(){
-                getPublicMcpList({mcpSquareId:this.mcpSquareId,pageNo: 1, pageSize: 1,})
+                getPublicMcpInfo({mcpSquareId:this.mcpSquareId})
                     .then((res) => {
-                        this.detail = res.data.list[0];
+                        this.detail = res.data;
                         this.loadMarkDown()
+                    })
+                    .catch((err) => {
+                      this.detail = {
+                        "mcpSquareId": "67ff4974764487b6b9e11c21",
+                        "alias": "",
+                        "name": "Amap 高德地图",
+                        "by": "高德开放平台",
+                        "createdAt": "2025-06-11 16:08:35",
+                        "description": "高德地图 MCP Server 现已覆盖12大核心服务接口，提供全场景覆盖的地图服务，包括地理编码、逆地理编码、IP 定位、天气查询、骑行路径规划、步行路径规划、驾车路径规划、公交路径规划、距离测量、关键词搜索、周边搜索、详情搜索等。",
+                        "hosted": true,
+                        "logo": "https://obs-nmhhht6.cucloud.cn/maas-public/mcp_square/logo/67ff4974764487b6b9e11c21.png",
+                        "modifiedBy": "admin",
+                        "orderWeight": 6,
+                        "port": 18000,
+                        "sseUrl": "https://mcpmarket.cn/sse/67ff4974764487b6b9e11c21",
+                        "howToUse": "\t•\t获取开发者 Key：登录高德开放平台并创建应用获取 Key\nhttps://lbs.amap.com/?ref=https://console.amap.com/dev/index\n\t•\t配置 MCP Server：在支持 MCP 的客户端（如 Cursor）中设置 SSE 或 Node.js 接入方式\n\t•\t连接模型：选择大模型（如 Claude），使用 Agent 模式进行交互\n\t•\t直接调用服务：通过快捷键打开交互窗口开始使用，如路线规划、美食推荐等",
+                        "keyFeatures": "\t•\t零部署，易使用：无需本地服务器部署，仅通过配置 URL 即可使用。\n\t•\t语义优化结果：对返回 JSON 数据进行语义增强，便于大模型理解。\n\t•\t自动升级：平台持续迭代更新，无需用户手动操作。\n\t•\t全托管云服务：无需用户关注服务器维护或扩容。\n\t•\t协议兼容性强：支持标准 SSE 长连接协议，适配多种场景。",
+                        "useCases": "\t•\t城市出行路线规划（骑行、步行、驾车、公交）\n\t•\t获取实时天气信息\n\t•\tIP 定位与地理编码/逆地理编码\n\t•\t地点搜索与 POI 信息查询\n\t•\t测量两点间距离",
+                        "whatIs": "高德地图 MCP Server 是基于 SSE（Server-Sent Events）技术的地理服务接口集合，允许开发者通过 MCP 协议调用地图服务，如路径规划、天气查询、地点搜索等。它支持与如 Cursor、Claude 等大模型工具无缝集成。",
+                        "whereToUse": "\t•\t在支持 MCP 协议的客户端中使用（如：Cursor、Claude、Cline）\n\t•\t可嵌入到企业应用、AI 助手系统、智能出行方案中\n\t•\t适用于城市交通服务平台、天气播报系统、位置服务 App 等",
+                        "categories": [
+                          "搜索",
+                          "官方"
+                        ],
+                        "tags": [],
+                        "contentPath": "https://obs-nmhhht6.cucloud.cn/maas-public/resource/mcp_square/content_md/67ff4974764487b6b9e11c21.md",
+                        "tools": [
+                          {
+                            "toolName": "maps_regeocode",
+                            "description": "描述：将一个高德经纬度坐标转换为行政区划地址信息",
+                            "params": [
+                              {
+                                "name": "location",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 经纬度"
+                              }
+                            ]
+                          },
+                          {
+                            "toolName": "maps_geo",
+                            "description": "描述：将详细的结构化地址转换为经纬度坐标。支持对地标性名胜景区、建筑物名称解析为经纬度坐标",
+                            "params": [
+                              {
+                                "name": "address",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 待解析的结构化地址信息"
+                              },
+                              {
+                                "name": "city",
+                                "type": "类型: string",
+                                "description": "描述: 指定查询的城市"
+                              }
+                            ]
+                          },
+                          {
+                            "toolName": "maps_ip_location",
+                            "description": "描述：IP 定位根据用户输入的 IP 地址，定位 IP 的所在位置",
+                            "params": [
+                              {
+                                "name": "ip",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: IP地址"
+                              }
+                            ]
+                          },
+                          {
+                            "toolName": "maps_weather",
+                            "description": "描述：根据城市名称或者标准adcode查询指定城市的天气",
+                            "params": [
+                              {
+                                "name": "city",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 城市名称或者adcode"
+                              }
+                            ]
+                          },
+                          {
+                            "toolName": "maps_search_detail",
+                            "description": "描述：查询关键词搜或者周边搜获取到的POI ID的详细信息",
+                            "params": [
+                              {
+                                "name": "id",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 关键词搜或者周边搜获取到的POI ID"
+                              }
+                            ]
+                          },
+                          {
+                            "toolName": "maps_bicycling",
+                            "description": "描述：骑行路径规划用于规划骑行通勤方案，规划时会考虑天桥、单行线、封路等情况。最大支持 500km 的骑行路线规划",
+                            "params": [
+                              {
+                                "name": "origin",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 出发点经纬度，坐标格式为：经度，纬度"
+                              },
+                              {
+                                "name": "destination",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 目的地经纬度，坐标格式为：经度，纬度"
+                              }
+                            ]
+                          },
+                          {
+                            "toolName": "maps_direction_walking",
+                            "description": "描述：步行路径规划 API 可以根据输入起点终点经纬度坐标规划100km 以内的步行通勤方案，并且返回通勤方案的数据",
+                            "params": [
+                              {
+                                "name": "origin",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 出发点经度，纬度，坐标格式为：经度，纬度"
+                              },
+                              {
+                                "name": "destination",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 目的地经度，纬度，坐标格式为：经度，纬度"
+                              }
+                            ]
+                          },
+                          {
+                            "toolName": "maps_direction_driving",
+                            "description": "描述：驾车路径规划 API 可以根据用户起终点经纬度坐标规划以小客车、轿车通勤出行的方案，并且返回通勤方案的数据。",
+                            "params": [
+                              {
+                                "name": "origin",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 出发点经度，纬度，坐标格式为：经度，纬度"
+                              },
+                              {
+                                "name": "destination",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 目的地经度，纬度，坐标格式为：经度，纬度"
+                              }
+                            ]
+                          },
+                          {
+                            "toolName": "maps_direction_transit_integrated",
+                            "description": "描述：公交路径规划 API 可以根据用户起终点经纬度坐标规划综合各类公共（火车、公交、地铁）交通方式的通勤方案，并且返回通勤方案的数据，跨城场景下必须传起点城市与终点城市",
+                            "params": [
+                              {
+                                "name": "origin",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 出发点经度，纬度，坐标格式为：经度，纬度"
+                              },
+                              {
+                                "name": "destination",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 目的地经度，纬度，坐标格式为：经度，纬度"
+                              },
+                              {
+                                "name": "city",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 公共交通规划起点城市"
+                              },
+                              {
+                                "name": "cityd",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 公共交通规划终点城市"
+                              }
+                            ]
+                          },
+                          {
+                            "toolName": "maps_distance",
+                            "description": "描述：距离测量 API 可以测量两个经纬度坐标之间的距离,支持驾车、步行以及球面距离测量",
+                            "params": [
+                              {
+                                "name": "origins",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 起点经度，纬度，可以传多个坐标，使用竖线隔离，比如120,30|120,31，坐标格式为：经度，纬度"
+                              },
+                              {
+                                "name": "destination",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 终点经度，纬度，坐标格式为：经度，纬度"
+                              },
+                              {
+                                "name": "type",
+                                "type": "类型: string",
+                                "description": "描述: 距离测量类型,1代表驾车距离测量，0代表直线距离测量，3步行距离测量"
+                              }
+                            ]
+                          },
+                          {
+                            "toolName": "maps_text_search",
+                            "description": "描述：关键词搜，根据用户传入关键词，搜索出相关的POI",
+                            "params": [
+                              {
+                                "name": "keywords",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 搜索关键词"
+                              },
+                              {
+                                "name": "city",
+                                "type": "类型: string",
+                                "description": "描述: 查询城市"
+                              },
+                              {
+                                "name": "types",
+                                "type": "类型: string",
+                                "description": "描述: POI类型，比如加油站"
+                              }
+                            ]
+                          },
+                          {
+                            "toolName": "maps_around_search",
+                            "description": "描述：周边搜，根据用户传入关键词以及坐标location，搜索出radius半径范围的POI",
+                            "params": [
+                              {
+                                "name": "keywords",
+                                "type": "类型: string",
+                                "description": "描述: 搜索关键词"
+                              },
+                              {
+                                "name": "location",
+                                "requiredBadge": "必填",
+                                "type": "类型: string",
+                                "description": "描述: 中心点经度纬度"
+                              },
+                              {
+                                "name": "radius",
+                                "type": "类型: string",
+                                "description": "描述: 搜索半径"
+                              }
+                            ]
+                          }
+                        ],
+                        "isCanSendCustomMcp": true
+                      }
+                    });
+            },
+            getIsCanSendStatus(){
+                getPublicMcpInfo({mcpSquareId:this.mcpSquareId})
+                    .then((res) => {
+                        this.detail.isCanSendCustomMcp = res.data.isCanSendCustomMcp;
                     })
                     .catch((err) => {});
             },
@@ -210,7 +463,7 @@
                     .catch((err) => {});
             },
             handleClick(val){
-                this.$router.push(`/mcp/public/detail/${val.mcpSquareId}/${val.hosted?1:0}`)
+                this.$router.push(`/publicMCP/detail/${val.mcpSquareId}/${val.hosted?1:0}`)
             },
             //解析文本，遇到.换行等
             parseTxt(txt){
@@ -224,6 +477,7 @@
             },
             preSendToCustomize(){
                 this.dialogVisible = true
+                this.$refs.dialog.ruleForm.serverUrl = this.detail.sseUrl
             },
             handleClose(){
                 this.dialogVisible = false
@@ -377,8 +631,8 @@
       }
       .sse-url{
         .sse-url__input{
-          width: calc(100% - 150px);
-          margin-right: 30px;
+          flex:1;
+          margin-right: 20px;
           padding: 12px;
           color: $color;
         }
@@ -449,59 +703,70 @@
 .overview-item .item-desc{
   line-height: 28px;
 }
-.tool-item-bg /deep/ {
-  .el-collapse{
+
+
+.mcp-el-collapse.el-collapse {
+  border: none;
+}
+.mcp-el-collapse .el-collapse-item {
+  margin: 10px 0;
+  border: none;
+
+  .el-collapse-item__header {
+    border: none;
+    color: $color;
+    font-weight: bold;
+    padding: 0 20px;
+  }
+
+  .el-collapse-item__wrap {
+    padding: 0 20px;
     border: none;
   }
-  .el-collapse-item{
-    margin: 10px 0;
-    border: none;
-    .el-collapse-item__header{
-      border: none;
-      color: $color;
-      font-weight: bold;
-      padding: 0 20px;
-    }
-    .el-collapse-item__wrap{
-      padding: 0 20px;
-      border: none;
-    }
-    .desc{
-      background: rgba(255, 246, 246, 1);
-      padding: 10px 15px;
+
+  .desc {
+    background: rgba(255, 246, 246, 1);
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid #f5cbcb;
+  }
+
+  .params {
+    margin-top: 12px;
+
+    .params-table {
       border-radius: 6px;
-      border: 1px solid #f5cbcb;
-    }
-    .params{
-      margin-top: 12px;
-      .params-table{
-        border-radius: 6px;
-        border: 1px solid #ddd;
-        padding: 10px 12px;
-        background-color: #fff;
-        margin-top: 6px;
-        .tr{
-          display: flex;
-          .td{
-            padding: 0 30px 0 0;
-          }
-          .color{
-            color: $color;
-          }
+      border: 1px solid #ddd;
+      padding: 10px 12px;
+      background-color: #fff;
+      margin-top: 6px;
+
+      .tr {
+        display: flex;
+
+        .td {
+          padding: 0 30px 0 0;
         }
-        .params-desc{
-          margin-top: 4px;
-          color: #999;
+
+        .color {
+          color: $color;
         }
+      }
+
+      .params-desc {
+        margin-top: 4px;
+        color: #999;
       }
     }
   }
 }
-
 .mcp-markdown {
   /deep/.code-header{
     height: 0!important;
     padding:0;
   }
+}
+.el-button.is-disabled {
+  background: #f9f9f9 !important;
 }
 </style>

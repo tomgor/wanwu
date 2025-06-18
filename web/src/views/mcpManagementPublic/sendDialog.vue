@@ -43,15 +43,14 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button
-                type="primary"
-                size="mini"
-                :disabled="mcpList.length === 0"
-                @click="submitForm('ruleForm')"
-        >确定发送</el-button
+          type="primary"
+          size="mini"
+          :disabled="mcpList.length === 0"
+          @click="submitForm('ruleForm')"
         >
-        <el-button @click="handleCancel" size="mini"
-          >取 消</el-button
-        >
+          确定发送
+        </el-button>
+        <el-button @click="handleCancel" size="mini">取 消</el-button>
       </span>
     </el-dialog>
   </div>
@@ -113,7 +112,8 @@ export default {
                         this.clearForm()
                         this.$refs["ruleForm"].clearValidate();
                         this.handleCancel();
-
+                        //更新发送按钮状态
+                        this.$emit("getIsCanSendStatus", false);
                     }
                 })
                 .catch((err) => {});

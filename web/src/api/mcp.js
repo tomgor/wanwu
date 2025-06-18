@@ -80,6 +80,14 @@ export const getPublicMcpList = (data)=>{
         params: data
     })
 };
+export const getPublicMcpInfo = (data)=>{
+    return request({
+        url: '/use/model/api/v1/mcpSquare/info',
+        method: 'get',
+        params: data
+    })
+};
+
 export const getMarkDownContent = (path)=>{
     return request({
         //url: '/file/api/' + path,

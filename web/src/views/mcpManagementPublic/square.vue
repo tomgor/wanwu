@@ -35,8 +35,9 @@
             <div class="card-box"
               v-loading="listLoading"
               v-infinite-scroll="loadList"
-              infinite-scroll-delay="200"
+              infinite-scroll-delay="100"
               :infinite-scroll-disabled="disabled"
+              infinite-scroll-distance="20"
             >
               <div
                 class="card"
@@ -58,9 +59,9 @@
                 <div class="card-des">{{ item.description }}</div>
                 <!--<div :class="['hosted',item.hosted?'sse':'local']">{{item.hosted?'云部署':'本地化'}}</div>-->
               </div>
+              <p class="loading-tips" v-if="loading"><i class="el-icon-loading"></i></p>
+              <p class="loading-tips" v-if="noMore">没有更多了</p>
             </div>
-            <p class="loading-tips" v-if="loading">加载中...</p>
-            <!--<p class="loading-tips" v-if="noMore">没有更多了</p>-->
           </div>
           <div v-else class="empty"><el-empty description="暂无数据"></el-empty></div>
         </div>
@@ -1210,9 +1211,7 @@ export default {
     },
     loadList(){
       this.loading = true
-      setTimeout(()=>{
-        this.doGetPublicMcpList()
-      },400)
+      this.doGetPublicMcpList()
     },
     doGetPublicMcpList(){
       const searchInput = this.$refs.searchInput
@@ -1229,8 +1228,6 @@ export default {
 
       getPublicMcpList(params)
         .then((res) => {
-          //this.list = res.data.list;
-
           //懒加载
           this.list = this.list.concat(res.data.list);
           this.count += res.data.list.length
@@ -1327,7 +1324,10 @@ export default {
          /* height: calc(100% - 200px);
           overflow: auto;*/
           .card-box {
-            /*height: calc(100% - 34px);*/
+            /*height: calc(100vh - 340px);*/
+            align-content: start;
+            padding-bottom: 20px;
+            /* height: 460px;*/
             .hosted{
               position: absolute;
               right: -8px;
@@ -1344,17 +1344,21 @@ export default {
               background: #555;
               color: #fff;
             }
-          }
-          .loading-tips{
-            height: 30px;
-            color: #999;
-            text-align: center;
+            .loading-tips{
+              height: 20px;
+              color: #999;
+              text-align: center;
+              display: block;
+              width: 100%;
+              i{
+                font-size: 18px;
+              }
+            }
           }
         }
       }
     }
   }
-
   .card-logo{
     width: 50px;
     height: 50px;
