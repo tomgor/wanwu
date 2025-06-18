@@ -2039,7 +2039,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../../style/workflow.scss";
+@import "@/style/workflow.scss";
 .workflow-list {
   padding: 0 !important;
 }

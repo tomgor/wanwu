@@ -458,50 +458,48 @@
 .overview-item .item-desc{
   line-height: 28px;
 }
-.tool-item-bg /deep/ {
-  .el-collapse{
+.mcp-el-collapse.el-collapse{
+  border: none;
+}
+.mcp-el-collapse .el-collapse-item{
+  margin: 10px 0;
+  border: none;
+  .el-collapse-item__header{
+    border: none;
+    color: $color;
+    font-weight: bold;
+    padding: 0 20px;
+  }
+  .el-collapse-item__wrap{
+    padding: 0 20px;
     border: none;
   }
-  .el-collapse-item{
-    margin: 10px 0;
-    border: none;
-    .el-collapse-item__header{
-      border: none;
-      color: $color;
-      font-weight: bold;
-      padding: 0 20px;
-    }
-    .el-collapse-item__wrap{
-      padding: 0 20px;
-      border: none;
-    }
-    .desc{
-      background: rgba(255, 246, 246, 1);
-      padding: 10px 15px;
+  .desc{
+    background: rgba(255, 246, 246, 1);
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid #f5cbcb;
+  }
+  .params{
+    margin-top: 12px;
+    .params-table{
       border-radius: 6px;
-      border: 1px solid #f5cbcb;
-    }
-    .params{
-      margin-top: 12px;
-      .params-table{
-        border-radius: 6px;
-        border: 1px solid #ddd;
-        padding: 10px 12px;
-        background-color: #fff;
-        margin-top: 6px;
-        .tr{
-          display: flex;
-          .td{
-            padding: 0 30px 0 0;
-          }
-          .color{
-            color: $color;
-          }
+      border: 1px solid #ddd;
+      padding: 10px 12px;
+      background-color: #fff;
+      margin-top: 6px;
+      .tr{
+        display: flex;
+        .td{
+          padding: 0 30px 0 0;
         }
-        .params-desc{
-          margin-top: 4px;
-          color: #999;
+        .color{
+          color: $color;
         }
+      }
+      .params-desc{
+        margin-top: 4px;
+        color: #999;
       }
     }
   }

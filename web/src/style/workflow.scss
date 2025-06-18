@@ -1,6 +1,5 @@
 $fontSize: 12px;
 
-
 /deep/.el-button--primary {
     background-color: $btn_bg;
     border-color: $btn_bg;
@@ -227,7 +226,7 @@ $fontSize: 12px;
         font-size: 12px;
     }
 }
-.el-collapse {
+.workflow .el-collapse {
     border: 0 !important;
 
     .el-collapse-item__header {
