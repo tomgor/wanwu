@@ -88,31 +88,31 @@
       />
 
       <!--文件生成-->
-      <!--<FilegenerateSetting
+      <FilegenerateSetting
         v-show="nodeData.type === 'FileGenerateNode'"
         ref="filegenerate"
         :graph="graph"
         :node="node"
         :key="datekey"
-      />-->
+      />
 
       <!--文件解析-->
-      <!--<FileparseSetting
+      <FileparseSetting
         v-show="nodeData.type === 'FileParseNode'"
         ref="fileparse"
         :graph="graph"
         :node="node"
         :key="datekey"
-      />-->
+      />
 
       <!--mcp-->
-      <!--<McpSetting
+      <McpSetting
         v-show="nodeData.type === 'MCPClientNode'"
         ref="mcp"
         :graph="graph"
         :node="node"
         :key="datekey"
-      />-->
+      />
 
       <!--意图识别-->
       <IntentionSetting
@@ -167,9 +167,9 @@ export default {
     RagSetting,
     // GuiSetting,
     ModelStreamSetting,
-    // FilegenerateSetting,
-    // FileparseSetting,
-    // McpSetting,
+    FilegenerateSetting,
+    FileparseSetting,
+    McpSetting,
     IntentionSetting,
   },
   data() {
