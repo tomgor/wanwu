@@ -1269,7 +1269,7 @@ export default {
   },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .mcp-management .mcp-third{
   min-height: 600px;
   .el-radio-button__inner{

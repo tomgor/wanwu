@@ -199,7 +199,7 @@ export default {
   },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .card-search-cust {
   text-align: left !important;
 

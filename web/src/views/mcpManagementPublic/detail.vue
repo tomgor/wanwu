@@ -254,7 +254,7 @@
 }
 .mcp-detail{
   padding: 20px;
-  height: calc(100vh - 88px);
+  /*height: calc(100vh - 88px);*/
   overflow: auto;
   margin: 20px;
   /*background: linear-gradient(180deg, hsla(0, 0%, 94.5%, .83), hsla(0, 0%, 94.5%, .1) 91%);

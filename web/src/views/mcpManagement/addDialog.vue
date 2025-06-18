@@ -153,7 +153,7 @@ export default {
   },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .add-dialog {
   .el-button.is-disabled {
     &:active {

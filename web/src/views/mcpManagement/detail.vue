@@ -268,8 +268,8 @@
   /*height: calc(100vh - 88px);*/
   overflow: auto;
   margin: 20px;
-  background: linear-gradient(180deg, hsla(0, 0%, 94.5%, .83), hsla(0, 0%, 94.5%, .1) 91%);
-  box-shadow: 0 3px 8px 0 rgba(0, 0, 0, .1);
+  /*background: linear-gradient(180deg, hsla(0, 0%, 94.5%, .83), hsla(0, 0%, 94.5%, .1) 91%);
+  box-shadow: 0 3px 8px 0 rgba(0, 0, 0, .1);*/
   .back {
     color: $color;
     cursor: pointer;

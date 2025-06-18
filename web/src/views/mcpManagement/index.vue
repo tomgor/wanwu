@@ -60,7 +60,7 @@ export default {
   },
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
   .mcp-management {
     height: calc(100% - 50px);
     .common_bg{
