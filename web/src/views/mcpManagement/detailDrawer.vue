@@ -159,7 +159,7 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .mcp-detail {
   .el-drawer__header > :first-child {
     font-size: 16px;

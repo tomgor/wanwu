@@ -1269,7 +1269,7 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .mcp-management .mcp-third{
   min-height: 600px;
   .el-radio-button__inner{
@@ -1361,8 +1361,8 @@ export default {
     object-fit: cover;
   }
 }
-.el-radio-button:first-child .el-radio-button__inner,
+/*.el-radio-button:first-child .el-radio-button__inner,
 .el-radio-button:last-child .el-radio-button__inner{
   border-radius: 0!important;
-}
+}*/
 </style>
