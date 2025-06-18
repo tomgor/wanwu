@@ -20,7 +20,7 @@ export const fetchPermFirPath = (list = menuList) => {
     for (let i in list) {
         const item = list[i]
 
-        if (checkPerm(item.perm)) {
+        if (item.path && checkPerm(item.perm)) {
             if (item.children && item.children.length) {
                 path = fetchPermFirPath(item.children).path
                 break

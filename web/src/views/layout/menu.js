@@ -27,7 +27,8 @@ export const menuList = [
         perm: PERMS.MCP,
     },
     {
-        key: 'line'
+        key: 'line',
+        perm: [PERMS.MODEL, PERMS.KNOWLEDGE, PERMS.MCP]
     },
     {
         name: i18n.t('menu.app.rag'),
@@ -54,7 +55,8 @@ export const menuList = [
         perm: PERMS.AGENT
     },
     {
-        key: 'line'
+        key: 'line',
+        perm: [PERMS.RAG, PERMS.WORKFLOW, PERMS.AGENT]
     },
     {
         name: i18n.t('menu.explore'),
