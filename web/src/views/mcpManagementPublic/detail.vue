@@ -164,7 +164,78 @@
                 },
                 foldStatus:false,
                 tabActive:0,
-                recommendList:[],
+                recommendList: [
+                  {
+                    "mcpSquareId": "67e5dc0848048b1e353cb6af",
+                    "name": "mcp-obsidian",
+                    "description": "读取和搜索包含Markdown笔记的目录，专门为Obsidian vault设计。",
+                    "logo": "https://obs-nmhhht6.cucloud.cn/maas-public/mcp_square/logo/67e5dc0848048b1e353cb6af.png",
+                    "hosted": false
+                  },
+                  {
+                    "mcpSquareId": "67e5dc0848048b1e353cb6c1",
+                    "name": "mcp-server-browserbase",
+                    "description": "允许大型语言模型通过Browserbase和Stagehand控制浏览器",
+                    "logo": "https://obs-nmhhht6.cucloud.cn/maas-public/mcp_square/logo/67e5dc0848048b1e353cb6c1.png",
+                    "hosted": false
+                  },
+                  {
+                    "mcpSquareId": "67e5dc0a48048b1e353cb6eb",
+                    "name": "mcp-jetbrains",
+                    "description": "促进客户端与JetBrains IDE（如IntelliJ、PyCharm、WebStorm和Android Studio）之间的通信。",
+                    "logo": "https://obs-nmhhht6.cucloud.cn/maas-public/mcp_square/logo/67e5dc0a48048b1e353cb6eb.png",
+                    "hosted": false
+                  },
+                  {
+                    "mcpSquareId": "67e5dc0a48048b1e353cb6ed",
+                    "name": "mcp-send-email",
+                    "description": "通过Resend的API直接从Cursor发送电子邮件",
+                    "logo": "https://obs-nmhhht6.cucloud.cn/maas-public/mcp_square/logo/67e5dc0a48048b1e353cb6ed.png",
+                    "hosted": false
+                  },
+                  {
+                    "mcpSquareId": "67e5dc2448048b1e353cb99c",
+                    "name": "playwright-mcp",
+                    "description": "微软官方的Playwright工具",
+                    "logo": "https://obs-nmhhht6.cucloud.cn/maas-public/mcp_square/logo/67e5dc2448048b1e353cb99c.png",
+                    "hosted": true
+                  },
+                  {
+                    "mcpSquareId": "67e5dc2e48048b1e353cba91",
+                    "name": "mcp-ical",
+                    "description": "管理 macOS 日历, 包括安排会议、检查可用性、修改事件",
+                    "logo": "https://obs-nmhhht6.cucloud.cn/maas-public/mcp_square/logo/67e5dc2e48048b1e353cba91.png",
+                    "hosted": false
+                  },
+                  {
+                    "mcpSquareId": "67e5ddb748048b1e353cd81b",
+                    "name": "paddle-mcp-server",
+                    "description": "管理产品目录、账单和订阅，以及报告。",
+                    "logo": "https://obs-nmhhht6.cucloud.cn/maas-public/mcp_square/logo/67e5ddb748048b1e353cd81b.png",
+                    "hosted": false
+                  },
+                  {
+                    "mcpSquareId": "67f1294690965e7bf66c5e93",
+                    "name": "brave-search",
+                    "description": "Brave Search MCP Server集成了灵活过滤的网页和本地搜索功能。",
+                    "logo": "https://obs-nmhhht6.cucloud.cn/maas-public/mcp_square/logo/67f1294690965e7bf66c5e93.png",
+                    "hosted": true
+                  },
+                  {
+                    "mcpSquareId": "67f41180b66f446c3d8f8d7f",
+                    "name": "elevenlabs-mcp",
+                    "description": "官方 ElevenLabs MCP Server",
+                    "logo": "https://obs-nmhhht6.cucloud.cn/maas-public/mcp_square/logo/67f41180b66f446c3d8f8d7f.png",
+                    "hosted": false
+                  },
+                  {
+                    "mcpSquareId": "67f77bf1d6110df54f87a6e6",
+                    "name": "MiniMax-MCP",
+                    "description": " MiniMax官方MCP Server，支持高质量的视频生成、图像生成、语音生成、和声音克隆等多项能力",
+                    "logo": "https://obs-nmhhht6.cucloud.cn/maas-public/mcp_square/logo/67f77bf1d6110df54f87a6e6.png",
+                    "hosted": true
+                  }
+                ],
                 dialogVisible:false,
                 markdownHtml:''
             };
@@ -660,8 +731,8 @@
     padding: 20px;
     .recommend-item{
       position: relative;
-      border: 1px solid rgba(208, 167, 167, 1);
-      background: rgba(255, 247, 247, 1);
+      border: 1px solid $border_color; // rgba(208, 167, 167, 1);
+      background: #F4F5FF; // rgba(255, 247, 247, 1);
       margin-bottom: 15px;
       border-radius: 10px;
       padding: 20px 20px 20px 80px;
@@ -682,7 +753,7 @@
       }
       .intro{
         height: 34px;
-        color: #915151;
+        color: #5D5D5D;
         margin-top: 8px;
         font-size: 13px;
         overflow: hidden;

@@ -416,8 +416,8 @@
     padding: 20px;
     .recommend-item{
       position: relative;
-      border: 1px solid rgba(208, 167, 167, 1);
-      background: rgba(255, 247, 247, 1);
+      border: 1px solid $border_color; // rgba(208, 167, 167, 1);
+      background: #F4F5FF; // rgba(255, 247, 247, 1);
       margin-bottom: 15px;
       border-radius: 10px;
       padding: 20px 20px 20px 80px;
@@ -437,7 +437,7 @@
       }
       .intro{
         height: 34px;
-        color: #915151;
+        color: #5D5D5D;
         margin-top: 8px;
         font-size: 13px;
         overflow: hidden;
