@@ -54,7 +54,7 @@ custom-info:
     login_button_color: "#384BF7"
     welcome_text: bff_custom_login_welcome_text
   home:
-    logo_path: "/v1/static/logo/title_logo.png"
+    logo_path: "/v1/static/logo/title_logo.svg"
     title: bff_custom_home_title
   tab:
     tab_title: bff_custom_tab_title
