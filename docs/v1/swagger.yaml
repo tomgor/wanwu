@@ -1688,13 +1688,6 @@ definitions:
         description: sseUrl
         type: string
     type: object
-  response.MCPSelectList:
-    properties:
-      tools:
-        items:
-          $ref: '#/definitions/response.MCPSelect'
-        type: array
-    type: object
   response.MCPSquareDetail:
     properties:
       avatar:
@@ -1802,6 +1795,13 @@ definitions:
       type:
         description: 字段类型
         type: string
+    type: object
+  response.MCPToolList:
+    properties:
+      tools:
+        items:
+          $ref: '#/definitions/response.MCPTool'
+        type: array
     type: object
   response.MergeFileResp:
     properties:
@@ -3823,7 +3823,14 @@ paths:
             - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/response.MCPSelectList'
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.MCPSelect'
+                        type: array
+                    type: object
               type: object
       summary: 获取自定义MCP列表（用于下拉选择）
       tags:
@@ -3955,14 +3962,7 @@ paths:
             - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  allOf:
-                  - $ref: '#/definitions/response.ListResult'
-                  - properties:
-                      list:
-                        items:
-                          $ref: '#/definitions/response.MCPTool'
-                        type: array
-                    type: object
+                  $ref: '#/definitions/response.MCPToolList'
               type: object
       summary: 获取MCP Tool列表
       tags:

@@ -109,7 +109,7 @@ func GetMCPList(ctx *gin.Context) {
 //	@Description	获取自定义MCP列表（用于下拉选择）
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{object}	response.Response{data=response.MCPSelectList}
+//	@Success		200	{object}	response.Response{data=response.ListResult{list=[]response.MCPSelect}}
 //	@Router			/mcp/select [get]
 func GetMCPSelect(ctx *gin.Context) {
 
@@ -124,7 +124,7 @@ func GetMCPSelect(ctx *gin.Context) {
 //	@Produce		json
 //	@Param			mcpId		query		string	false	"mcpId(和serverUrl传一个)"
 //	@Param			serverUrl	query		string	false	"serverUrl,就是sseUrl(和mcpId传一个)"
-//	@Success		200			{object}	response.Response{data=response.ListResult{list=[]response.MCPTool}}
+//	@Success		200			{object}	response.Response{data=response.MCPToolList}
 //	@Router			/mcp/tool/list [get]
 func GetMCPTools(ctx *gin.Context) {
 
