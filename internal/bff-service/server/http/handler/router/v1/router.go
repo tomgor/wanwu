@@ -21,6 +21,7 @@ func Register(apiV1 *gin.RouterGroup) {
 	registerKnowledge(apiV1)
 
 	// mcp
+	registerMCP(apiV1)
 
 	// rag
 	registerRag(apiV1)
