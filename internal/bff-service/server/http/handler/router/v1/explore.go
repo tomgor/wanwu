@@ -9,7 +9,6 @@ import (
 )
 
 func registerExploration(apiV1 *gin.RouterGroup) {
-	mid.Sub("exploration").Reg(apiV1, "/exploration/app/history", http.MethodGet, v1.GetExplorationHistoryAppList, "获取历史应用")
 	mid.Sub("exploration").Reg(apiV1, "/exploration/app/list", http.MethodGet, v1.GetExplorationAppList, "获取探索广场应用")
 	mid.Sub("exploration").Reg(apiV1, "/exploration/app/favorite", http.MethodPost, v1.ChangeExplorationAppFavorite, "更改App收藏状态")
 

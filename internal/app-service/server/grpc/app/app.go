@@ -10,20 +10,6 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *Service) GetExplorationHistoryAppList(ctx context.Context, req *app_service.GetExplorationHistoryAppListReq) (*app_service.ExplorationHistoryAppList, error) {
-	historyAppList, err := s.cli.GetExplorationHistoryAppList(ctx, req.UserId)
-	if err != nil {
-		return nil, errStatus(errs.Code_AppExploration, err)
-	}
-	ret := &app_service.ExplorationHistoryAppList{
-		Total: int64(len(historyAppList)),
-	}
-	for _, historyApp := range historyAppList {
-		ret.Infos = append(ret.Infos, toProtoHistoryApp(historyApp))
-	}
-	return ret, nil
-}
-
 func (s *Service) GetExplorationAppList(ctx context.Context, req *app_service.GetExplorationAppListReq) (*app_service.ExplorationAppList, error) {
 	appList, err := s.cli.GetExplorationAppList(ctx, req.UserId, req.Name, req.AppType, req.SearchType)
 	if err != nil {
@@ -99,15 +85,6 @@ func (s *Service) RecordAppHistory(ctx context.Context, req *app_service.RecordA
 }
 
 // --- internal ---
-func toProtoHistoryApp(record *model.AppHistory) *app_service.ExplorationAppInfo {
-	return &app_service.ExplorationAppInfo{
-		AppId:     record.AppID,
-		AppType:   record.AppType,
-		CreatedAt: record.CreatedAt,
-		UpdatedAt: record.UpdatedAt,
-	}
-}
-
 func toProtoExpApp(record *orm.ExplorationAppInfo) *app_service.ExplorationAppInfo {
 	return &app_service.ExplorationAppInfo{
 		AppId:       record.AppId,

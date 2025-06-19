@@ -11,19 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func (c *Client) GetExplorationHistoryAppList(ctx context.Context, userId string) ([]*model.AppHistory, *errs.Status) {
-	var historyApps []*model.AppHistory
-	oneMonthAgo := time.Now().AddDate(0, -1, 0).UnixMilli()
-	if err := sqlopt.SQLOptions(
-		sqlopt.WithUserID(userId),
-		sqlopt.StartUpdatedAt(oneMonthAgo),
-	).Apply(c.db.WithContext(ctx)).
-		Order("updated_at DESC").Find(&historyApps).Error; err != nil {
-		return nil, toErrStatus("app_history_apps_get", err.Error())
-	}
-	return historyApps, nil
-}
-
 func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appType, searchType string) ([]*ExplorationAppInfo, *errs.Status) {
 	var apps []*model.App
 	var ret []*ExplorationAppInfo
@@ -34,7 +21,8 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 	).Apply(c.db.WithContext(ctx)).Find(&favoriteApps).Error; err != nil {
 		return nil, toErrStatus("app_explore_favorite_apps_get", err.Error())
 	}
-	if searchType != "favorite" {
+	switch searchType {
+	case "", "all", "private":
 		query := sqlopt.SQLOptions(
 			sqlopt.WithAppType(appType),
 			sqlopt.WithSearchType(userId, searchType),
@@ -60,16 +48,45 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 			ret = append(ret, appInfo)
 		}
 		return ret, nil
-	}
-	for _, app := range favoriteApps {
-		ret = append(ret, &ExplorationAppInfo{
-			AppId:       app.AppID,
-			AppType:     app.AppType,
-			CreatedAt:   app.CreatedAt,
-			UpdatedAt:   app.UpdatedAt,
-			IsFavorite:  true,
-			PublishType: "",
-		})
+	case "favorite":
+		for _, app := range favoriteApps {
+			ret = append(ret, &ExplorationAppInfo{
+				AppId:       app.AppID,
+				AppType:     app.AppType,
+				CreatedAt:   app.CreatedAt,
+				UpdatedAt:   app.UpdatedAt,
+				IsFavorite:  true,
+				PublishType: "",
+			})
+		}
+	case "history":
+		var historyApps []*model.AppHistory
+		oneMonthAgo := time.Now().AddDate(0, -1, 0).UnixMilli()
+		if err := sqlopt.SQLOptions(
+			sqlopt.WithUserID(userId),
+			sqlopt.StartUpdatedAt(oneMonthAgo),
+		).Apply(c.db.WithContext(ctx)).
+			Order("updated_at DESC").Find(&historyApps).Error; err != nil {
+			return nil, toErrStatus("app_history_apps_get", err.Error())
+		}
+		for _, historyApp := range historyApps {
+			appInfo := &ExplorationAppInfo{
+				AppId:      historyApp.AppID,
+				AppType:    historyApp.AppType,
+				CreatedAt:  historyApp.CreatedAt,
+				UpdatedAt:  historyApp.UpdatedAt,
+				IsFavorite: false,
+			}
+			for _, favoriteApp := range favoriteApps {
+				if favoriteApp.AppID == historyApp.AppID && favoriteApp.AppType == historyApp.AppType {
+					appInfo.IsFavorite = true
+					break
+				}
+			}
+			ret = append(ret, appInfo)
+		}
+		return ret, nil
+
 	}
 	return ret, nil
 }

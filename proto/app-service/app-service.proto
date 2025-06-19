@@ -13,7 +13,6 @@ service AppService {
   rpc DelApiKey(DelApiKeyReq) returns (google.protobuf.Empty) {}
   rpc GetApiKeyByKey(GetApiKeyByKeyReq) returns (ApiKeyInfo) {}
   // --- exploration ---
-  rpc GetExplorationHistoryAppList(GetExplorationHistoryAppListReq) returns (ExplorationHistoryAppList){}
   rpc GetExplorationAppList(GetExplorationAppListReq) returns (ExplorationAppList){}
   rpc ChangeExplorationAppFavorite(ChangeExplorationAppFavoriteReq) returns (google.protobuf.Empty){}
   rpc RecordAppHistory(RecordAppHistoryReq) returns (google.protobuf.Empty) {}
@@ -61,20 +60,11 @@ message GetApiKeyByKeyReq {
   string apiKey = 1;
 }
 
-message GetExplorationHistoryAppListReq{
-  string userId = 1;
-}
-
 message GetExplorationAppListReq{
   string name = 1;
   string appType = 2;
   string searchType = 3;
   string userId = 4;
-}
-
-message ExplorationHistoryAppList{
-  repeated ExplorationAppInfo infos = 1;
-  int64 total = 2;
 }
 
 message ExplorationAppList{

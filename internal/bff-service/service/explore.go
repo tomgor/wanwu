@@ -14,31 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetExplorationHistoryApp(ctx *gin.Context, userId string) (*response.ListResult, error) {
-	historyApp, err := app.GetExplorationHistoryAppList(ctx.Request.Context(), &app_service.GetExplorationHistoryAppListReq{
-		UserId: userId,
-	})
-	if err != nil {
-		return nil, err
-	}
-	rags, err := explorerationFilterRag(ctx, historyApp.Infos, false)
-	if err != nil {
-		return nil, err
-	}
-	agents, err := explorerationFilterAgent(ctx, historyApp.Infos, false)
-	if err != nil {
-		return nil, err
-	}
-	apps := append(rags, agents...)
-	sort.SliceStable(apps, func(i, j int) bool {
-		return apps[i].UpdatedAt > apps[j].UpdatedAt
-	})
-	return &response.ListResult{
-		List:  apps,
-		Total: historyApp.Total,
-	}, nil
-}
-
 func GetExplorationAppList(ctx *gin.Context, userId string, req request.GetExplorationAppListRequest) (*response.ListResult, error) {
 	explorationApp, err := app.GetExplorationAppList(ctx.Request.Context(), &app_service.GetExplorationAppListReq{
 		Name:       req.Name,
@@ -49,11 +24,11 @@ func GetExplorationAppList(ctx *gin.Context, userId string, req request.GetExplo
 	if err != nil {
 		return nil, err
 	}
-	rags, err := explorerationFilterRag(ctx, explorationApp.Infos, true)
+	rags, err := explorerationFilterRag(ctx, explorationApp.Infos)
 	if err != nil {
 		return nil, err
 	}
-	agents, err := explorerationFilterAgent(ctx, explorationApp.Infos, true)
+	agents, err := explorerationFilterAgent(ctx, explorationApp.Infos)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +67,7 @@ func AddAppHistoryRecord(ctx *gin.Context, userId, appId, appType string) error 
 
 // --- internal ---
 
-func explorerationFilterRag(ctx *gin.Context, explorationApp []*app_service.ExplorationAppInfo, needDetail bool) ([]*response.ExplorationAppInfo, error) {
+func explorerationFilterRag(ctx *gin.Context, explorationApp []*app_service.ExplorationAppInfo) ([]*response.ExplorationAppInfo, error) {
 	// 首先收集所有rag类型的appId
 	var ids []string
 	for _, info := range explorationApp {
@@ -127,10 +102,8 @@ func explorerationFilterRag(ctx *gin.Context, explorationApp []*app_service.Expl
 				}
 				appInfo.CreatedAt = util.Time2Str(expApp.CreatedAt)
 				appInfo.UpdatedAt = util.Time2Str(expApp.UpdatedAt)
-				if needDetail {
-					appInfo.PublishType = expApp.PublishType
-					appInfo.IsFavorite = expApp.IsFavorite
-				}
+				appInfo.PublishType = expApp.PublishType
+				appInfo.IsFavorite = expApp.IsFavorite
 				retAppList = append(retAppList, appInfo)
 				break
 			}
@@ -139,7 +112,7 @@ func explorerationFilterRag(ctx *gin.Context, explorationApp []*app_service.Expl
 	return retAppList, nil
 }
 
-func explorerationFilterAgent(ctx *gin.Context, apps []*app_service.ExplorationAppInfo, needDetail bool) ([]*response.ExplorationAppInfo, error) {
+func explorerationFilterAgent(ctx *gin.Context, apps []*app_service.ExplorationAppInfo) ([]*response.ExplorationAppInfo, error) {
 	// 首先收集所有agent类型的appId
 	var ids []string
 	for _, info := range apps {
@@ -174,10 +147,8 @@ func explorerationFilterAgent(ctx *gin.Context, apps []*app_service.ExplorationA
 				}
 				appInfo.CreatedAt = util.Time2Str(expApp.CreatedAt)
 				appInfo.UpdatedAt = util.Time2Str(expApp.UpdatedAt)
-				if needDetail {
-					appInfo.PublishType = expApp.PublishType
-					appInfo.IsFavorite = expApp.IsFavorite
-				}
+				appInfo.PublishType = expApp.PublishType
+				appInfo.IsFavorite = expApp.IsFavorite
 				retAppList = append(retAppList, appInfo)
 				break
 			}

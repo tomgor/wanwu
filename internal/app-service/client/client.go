@@ -17,7 +17,6 @@ type IClient interface {
 
 	// --- explore ---
 	GetExplorationAppList(ctx context.Context, userId, name, appType, searchType string) ([]*orm.ExplorationAppInfo, *err_code.Status)
-	GetExplorationHistoryAppList(ctx context.Context, userId string) ([]*model.AppHistory, *err_code.Status)
 	ChangeExplorationAppFavorite(ctx context.Context, userId, orgId, appId, appType string, isFavorite bool) *err_code.Status
 
 	// --- app ---

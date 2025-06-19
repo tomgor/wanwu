@@ -3165,31 +3165,6 @@ paths:
       summary: 更改App收藏状态
       tags:
       - exploration
-  /exploration/app/history:
-    get:
-      description: 获取历史应用
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  allOf:
-                  - $ref: '#/definitions/response.ListResult'
-                  - properties:
-                      list:
-                        items:
-                          $ref: '#/definitions/response.ExplorationAppInfo'
-                        type: array
-                    type: object
-              type: object
-      summary: 获取历史应用
-      tags:
-      - exploration
   /exploration/app/list:
     get:
       consumes:
@@ -3204,7 +3179,7 @@ paths:
         in: query
         name: name
         type: string
-      - description: 搜索类型(all(全部),favorite(显示收藏的),private(显示私密发布的))
+      - description: 搜索类型(all(全部),favorite(显示收藏的),private(显示私密发布的),history(历史应用))
         in: query
         name: searchType
         type: string
