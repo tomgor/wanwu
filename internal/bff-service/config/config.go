@@ -36,6 +36,7 @@ type ServerConfig struct {
 	Port         int    `json:"port" mapstructure:"port"`
 	ExternalIP   string `json:"external_ip" mapstructure:"external_ip"`
 	ExternalPort int    `json:"external_port" mapstructure:"external_port"`
+	WebBaseUrl   string `json:"web_base_url" mapstructure:"web_base_url"`
 	ApiBaseUrl   string `json:"api_base_url" mapstructure:"api_base_url"`
 	CallbackUrl  string `json:"callback_url" mapstructure:"callback_url"`
 }
