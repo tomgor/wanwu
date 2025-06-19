@@ -24,7 +24,6 @@ const (
 	AppService_GetApiKeyList_FullMethodName                = "/app_service.AppService/GetApiKeyList"
 	AppService_DelApiKey_FullMethodName                    = "/app_service.AppService/DelApiKey"
 	AppService_GetApiKeyByKey_FullMethodName               = "/app_service.AppService/GetApiKeyByKey"
-	AppService_GetExplorationHistoryAppList_FullMethodName = "/app_service.AppService/GetExplorationHistoryAppList"
 	AppService_GetExplorationAppList_FullMethodName        = "/app_service.AppService/GetExplorationAppList"
 	AppService_ChangeExplorationAppFavorite_FullMethodName = "/app_service.AppService/ChangeExplorationAppFavorite"
 	AppService_RecordAppHistory_FullMethodName             = "/app_service.AppService/RecordAppHistory"
@@ -44,7 +43,6 @@ type AppServiceClient interface {
 	DelApiKey(ctx context.Context, in *DelApiKeyReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetApiKeyByKey(ctx context.Context, in *GetApiKeyByKeyReq, opts ...grpc.CallOption) (*ApiKeyInfo, error)
 	// --- exploration ---
-	GetExplorationHistoryAppList(ctx context.Context, in *GetExplorationHistoryAppListReq, opts ...grpc.CallOption) (*ExplorationHistoryAppList, error)
 	GetExplorationAppList(ctx context.Context, in *GetExplorationAppListReq, opts ...grpc.CallOption) (*ExplorationAppList, error)
 	ChangeExplorationAppFavorite(ctx context.Context, in *ChangeExplorationAppFavoriteReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RecordAppHistory(ctx context.Context, in *RecordAppHistoryReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -97,16 +95,6 @@ func (c *appServiceClient) GetApiKeyByKey(ctx context.Context, in *GetApiKeyByKe
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ApiKeyInfo)
 	err := c.cc.Invoke(ctx, AppService_GetApiKeyByKey_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *appServiceClient) GetExplorationHistoryAppList(ctx context.Context, in *GetExplorationHistoryAppListReq, opts ...grpc.CallOption) (*ExplorationHistoryAppList, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ExplorationHistoryAppList)
-	err := c.cc.Invoke(ctx, AppService_GetExplorationHistoryAppList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +181,6 @@ type AppServiceServer interface {
 	DelApiKey(context.Context, *DelApiKeyReq) (*emptypb.Empty, error)
 	GetApiKeyByKey(context.Context, *GetApiKeyByKeyReq) (*ApiKeyInfo, error)
 	// --- exploration ---
-	GetExplorationHistoryAppList(context.Context, *GetExplorationHistoryAppListReq) (*ExplorationHistoryAppList, error)
 	GetExplorationAppList(context.Context, *GetExplorationAppListReq) (*ExplorationAppList, error)
 	ChangeExplorationAppFavorite(context.Context, *ChangeExplorationAppFavoriteReq) (*emptypb.Empty, error)
 	RecordAppHistory(context.Context, *RecordAppHistoryReq) (*emptypb.Empty, error)
@@ -223,9 +210,6 @@ func (UnimplementedAppServiceServer) DelApiKey(context.Context, *DelApiKeyReq) (
 }
 func (UnimplementedAppServiceServer) GetApiKeyByKey(context.Context, *GetApiKeyByKeyReq) (*ApiKeyInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetApiKeyByKey not implemented")
-}
-func (UnimplementedAppServiceServer) GetExplorationHistoryAppList(context.Context, *GetExplorationHistoryAppListReq) (*ExplorationHistoryAppList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetExplorationHistoryAppList not implemented")
 }
 func (UnimplementedAppServiceServer) GetExplorationAppList(context.Context, *GetExplorationAppListReq) (*ExplorationAppList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetExplorationAppList not implemented")
@@ -337,24 +321,6 @@ func _AppService_GetApiKeyByKey_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppServiceServer).GetApiKeyByKey(ctx, req.(*GetApiKeyByKeyReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AppService_GetExplorationHistoryAppList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetExplorationHistoryAppListReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AppServiceServer).GetExplorationHistoryAppList(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AppService_GetExplorationHistoryAppList_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).GetExplorationHistoryAppList(ctx, req.(*GetExplorationHistoryAppListReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -507,10 +473,6 @@ var AppService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetApiKeyByKey",
 			Handler:    _AppService_GetApiKeyByKey_Handler,
-		},
-		{
-			MethodName: "GetExplorationHistoryAppList",
-			Handler:    _AppService_GetExplorationHistoryAppList_Handler,
 		},
 		{
 			MethodName: "GetExplorationAppList",

@@ -1606,53 +1606,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/exploration/app/history": {
-            "get": {
-                "description": "获取历史应用",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "exploration"
-                ],
-                "summary": "获取历史应用",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/definitions/response.ListResult"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "list": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "$ref": "#/definitions/response.ExplorationAppInfo"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
         "/exploration/app/list": {
             "get": {
                 "description": "获取探索广场应用",
@@ -1681,7 +1634,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "搜索类型(all(全部),favorite(显示收藏的),private(显示私密发布的))",
+                        "description": "搜索类型(all(全部),favorite(显示收藏的),private(显示私密发布的),history(历史应用))",
                         "name": "searchType",
                         "in": "query"
                     }

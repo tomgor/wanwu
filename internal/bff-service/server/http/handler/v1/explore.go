@@ -7,19 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetExplorationHistoryAppList
-//
-//	@Tags			exploration
-//	@Summary		获取历史应用
-//	@Description	获取历史应用
-//	@Produce		json
-//	@Success		200	{object}	response.Response{data=response.ListResult{list=[]response.ExplorationAppInfo}}
-//	@Router			/exploration/app/history [get]
-func GetExplorationHistoryAppList(ctx *gin.Context) {
-	resp, err := service.GetExplorationHistoryApp(ctx, getUserID(ctx))
-	gin_util.Response(ctx, resp, err)
-}
-
 // GetExplorationAppList
 //
 //	@Tags			exploration
