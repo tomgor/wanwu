@@ -733,6 +733,29 @@ definitions:
     - password
     - username
     type: object
+  request.MCPCreate:
+    properties:
+      desc:
+        description: 描述
+        type: string
+      from:
+        description: 来源
+        type: string
+      mcpSquareId:
+        description: 广场mcpId(非空表示来源于广场)
+        type: string
+      name:
+        description: 名称
+        type: string
+      sseUrl:
+        description: SSE URL
+        type: string
+    required:
+    - desc
+    - from
+    - name
+    - sseUrl
+    type: object
   request.MergeFileReq:
     properties:
       chunkName:
@@ -1573,6 +1596,213 @@ definitions:
         - $ref: '#/definitions/response.CustomTab'
         description: 标签页信息
     type: object
+  response.MCPDetail:
+    properties:
+      avatar:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 图标
+      category:
+        description: 类型(data:数据,create:创作,search:搜索)
+        type: string
+      desc:
+        description: 描述
+        type: string
+      detail:
+        description: 详情
+        type: string
+      feature:
+        description: 特性说明
+        type: string
+      from:
+        description: 来源
+        type: string
+      manual:
+        description: 使用说明
+        type: string
+      mcpId:
+        description: mcpId
+        type: string
+      mcpSquareId:
+        description: 广场mcpId(非空表示来源于广场)
+        type: string
+      name:
+        description: 名称
+        type: string
+      scenario:
+        description: 应用场景
+        type: string
+      sseUrl:
+        description: SSE URL
+        type: string
+      summary:
+        description: 使用概述
+        type: string
+    type: object
+  response.MCPInfo:
+    properties:
+      avatar:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 图标
+      category:
+        description: 类型(data:数据,create:创作,search:搜索)
+        type: string
+      desc:
+        description: 描述
+        type: string
+      from:
+        description: 来源
+        type: string
+      mcpId:
+        description: mcpId
+        type: string
+      mcpSquareId:
+        description: 广场mcpId(非空表示来源于广场)
+        type: string
+      name:
+        description: 名称
+        type: string
+      sseUrl:
+        description: SSE URL
+        type: string
+    type: object
+  response.MCPSelect:
+    properties:
+      description:
+        description: 描述
+        type: string
+      mcpId:
+        description: mcpId
+        type: string
+      mcpSquareId:
+        description: 广场mcpId(非空表示来源于广场)
+        type: string
+      name:
+        description: 名称
+        type: string
+      serverFrom:
+        description: 来源
+        type: string
+      serverUrl:
+        description: sseUrl
+        type: string
+    type: object
+  response.MCPSquareDetail:
+    properties:
+      avatar:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 图标
+      category:
+        description: 类型(data:数据,create:创作,search:搜索)
+        type: string
+      desc:
+        description: 描述
+        type: string
+      detail:
+        description: 详情
+        type: string
+      feature:
+        description: 特性说明
+        type: string
+      from:
+        description: 来源
+        type: string
+      hasCustom:
+        description: 是否已经发送到自定义
+        type: boolean
+      manual:
+        description: 使用说明
+        type: string
+      mcpSquareId:
+        description: 广场mcpId(非空表示来源于广场)
+        type: string
+      name:
+        description: 名称
+        type: string
+      scenario:
+        description: 应用场景
+        type: string
+      sseUrl:
+        description: SSE URL
+        type: string
+      summary:
+        description: 使用概述
+        type: string
+      tools:
+        description: 工具列表
+        items:
+          $ref: '#/definitions/response.MCPTool'
+        type: array
+    type: object
+  response.MCPSquareInfo:
+    properties:
+      avatar:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 图标
+      category:
+        description: 类型(data:数据,create:创作,search:搜索)
+        type: string
+      desc:
+        description: 描述
+        type: string
+      from:
+        description: 来源
+        type: string
+      mcpSquareId:
+        description: 广场mcpId(非空表示来源于广场)
+        type: string
+      name:
+        description: 名称
+        type: string
+    type: object
+  response.MCPTool:
+    properties:
+      description:
+        description: 工具描述
+        type: string
+      inputSchema:
+        allOf:
+        - $ref: '#/definitions/response.MCPToolInputSchema'
+        description: 工具参数
+      name:
+        description: 工具名
+        type: string
+    type: object
+  response.MCPToolInputSchema:
+    properties:
+      properties:
+        additionalProperties:
+          $ref: '#/definitions/response.MCPToolInputSchemaValue'
+        description: 字段名 -> 字段信息
+        type: object
+      required:
+        description: 必填字段
+        items:
+          type: string
+        type: array
+      type:
+        description: '固定值: object'
+        type: string
+    type: object
+  response.MCPToolInputSchemaValue:
+    properties:
+      description:
+        description: 字段描述
+        type: string
+      type:
+        description: 字段类型
+        type: string
+    type: object
+  response.MCPToolList:
+    properties:
+      tools:
+        items:
+          $ref: '#/definitions/response.MCPTool'
+        type: array
+    type: object
   response.MergeFileResp:
     properties:
       fileName:
@@ -1935,6 +2165,8 @@ definitions:
   response.WorkFlowInfos:
     properties:
       apiName:
+        type: string
+      id:
         type: string
       workFlowId:
         type: string
@@ -3477,6 +3709,264 @@ paths:
       summary: 查询知识库列表
       tags:
       - knowledge
+  /mcp:
+    delete:
+      consumes:
+      - application/json
+      description: 删除自定义MCP
+      parameters:
+      - description: mcpId
+        in: query
+        name: mcpId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除自定义MCP
+      tags:
+      - mcp
+    get:
+      consumes:
+      - application/json
+      description: 获取自定义MCP详情
+      parameters:
+      - description: mcpId
+        in: query
+        name: mcpId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.MCPDetail'
+              type: object
+      summary: 获取自定义MCP详情
+      tags:
+      - mcp
+    post:
+      consumes:
+      - application/json
+      description: 创建自定义MCP
+      parameters:
+      - description: 自定义MCP信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.MCPCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 创建自定义MCP
+      tags:
+      - mcp
+  /mcp/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取自定义MCP列表
+      parameters:
+      - description: mcp名称
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.MCPInfo'
+                        type: array
+                    type: object
+              type: object
+      summary: 获取自定义MCP列表
+      tags:
+      - mcp
+  /mcp/select:
+    get:
+      consumes:
+      - application/json
+      description: 获取自定义MCP列表（用于下拉选择）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.MCPSelect'
+                        type: array
+                    type: object
+              type: object
+      summary: 获取自定义MCP列表（用于下拉选择）
+      tags:
+      - mcp
+  /mcp/square:
+    get:
+      consumes:
+      - application/json
+      description: 获取广场MCP详情
+      parameters:
+      - description: mcpSquareId
+        in: query
+        name: mcpSquareId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.MCPSquareDetail'
+              type: object
+      summary: 获取广场MCP详情
+      tags:
+      - mcp.square
+  /mcp/square/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取广场MCP列表
+      parameters:
+      - description: mcp类型
+        enum:
+        - all
+        - data
+        - create
+        - search
+        in: query
+        name: category
+        type: string
+      - description: mcp名称
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.MCPSquareInfo'
+                        type: array
+                    type: object
+              type: object
+      summary: 获取广场MCP列表
+      tags:
+      - mcp.square
+  /mcp/square/recommend:
+    get:
+      consumes:
+      - application/json
+      description: 获取广场MCP推荐列表
+      parameters:
+      - description: mcpId
+        in: query
+        name: mcpId
+        type: string
+      - description: mcpSquareId
+        in: query
+        name: mcpSquareId
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.MCPSquareInfo'
+                        type: array
+                    type: object
+              type: object
+      summary: 获取广场MCP推荐列表
+      tags:
+      - mcp.square
+  /mcp/tool/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取MCP Tool列表
+      parameters:
+      - description: mcpId(和serverUrl传一个)
+        in: query
+        name: mcpId
+        type: string
+      - description: serverUrl,就是sseUrl(和mcpId传一个)
+        in: query
+        name: serverUrl
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.MCPToolList'
+              type: object
+      summary: 获取MCP Tool列表
+      tags:
+      - mcp
   /model:
     delete:
       consumes:

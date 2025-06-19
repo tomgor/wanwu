@@ -15,6 +15,7 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/db"
 	"github.com/UnicomAI/wanwu/pkg/es"
 	"github.com/UnicomAI/wanwu/pkg/log"
+	"github.com/UnicomAI/wanwu/pkg/minio"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 	"github.com/UnicomAI/wanwu/pkg/redis"
 )
@@ -61,6 +62,14 @@ func main() {
 
 	if err := es.InitESIndexTemplate(ctx); err != nil {
 		log.Fatalf("init es index template err: %v", err)
+	}
+
+	if err := minio.InitAssistant(ctx, minio.Config{
+		Endpoint: config.Cfg().Minio.EndPoint,
+		User:     config.Cfg().Minio.User,
+		Password: config.Cfg().Minio.Password,
+	}, config.Cfg().Minio.Bucket); err != nil {
+		log.Fatalf("init minio err: %v", err)
 	}
 
 	db, err := db.New(config.Cfg().DB)

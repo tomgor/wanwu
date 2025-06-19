@@ -7,9 +7,7 @@ import (
 
 	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
-	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
-	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	sse_util "github.com/UnicomAI/wanwu/pkg/sse-util"
 	"github.com/UnicomAI/wanwu/pkg/util"
@@ -23,12 +21,12 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 	if err != nil {
 		return nil, err
 	}
-	if len(appList.Infos) == 0 {
-		return nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, "app not found")
+
+	var publishType string
+	if len(appList.Infos) > 0 {
+		publishType = appList.Infos[0].PublishType
 	}
-	if appList.Infos[0].PublishType == "" {
-		return nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, "app publish type not found")
-	}
+
 	stream, err := assistant.AssistantConversionStream(ctx.Request.Context(), &assistant_service.AssistantConversionStreamReq{
 		AssistantId:    req.AssistantId,
 		ConversationId: req.ConversationId,
@@ -39,7 +37,7 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 		},
 		Trial:          req.Trial,
 		Prompt:         req.Prompt,
-		AppPublishType: appList.Infos[0].PublishType,
+		AppPublishType: publishType,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,

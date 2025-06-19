@@ -2539,6 +2539,447 @@ const docTemplate = `{
                 }
             }
         },
+        "/mcp": {
+            "get": {
+                "description": "获取自定义MCP详情",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mcp"
+                ],
+                "summary": "获取自定义MCP详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mcpId",
+                        "name": "mcpId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.MCPDetail"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建自定义MCP",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mcp"
+                ],
+                "summary": "创建自定义MCP",
+                "parameters": [
+                    {
+                        "description": "自定义MCP信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MCPCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除自定义MCP",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mcp"
+                ],
+                "summary": "删除自定义MCP",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mcpId",
+                        "name": "mcpId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/mcp/list": {
+            "get": {
+                "description": "获取自定义MCP列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mcp"
+                ],
+                "summary": "获取自定义MCP列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mcp名称",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.MCPInfo"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/mcp/select": {
+            "get": {
+                "description": "获取自定义MCP列表（用于下拉选择）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mcp"
+                ],
+                "summary": "获取自定义MCP列表（用于下拉选择）",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.MCPSelect"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/mcp/square": {
+            "get": {
+                "description": "获取广场MCP详情",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mcp.square"
+                ],
+                "summary": "获取广场MCP详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mcpSquareId",
+                        "name": "mcpSquareId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.MCPSquareDetail"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/mcp/square/list": {
+            "get": {
+                "description": "获取广场MCP列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mcp.square"
+                ],
+                "summary": "获取广场MCP列表",
+                "parameters": [
+                    {
+                        "enum": [
+                            "all",
+                            "data",
+                            "create",
+                            "search"
+                        ],
+                        "type": "string",
+                        "description": "mcp类型",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "mcp名称",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.MCPSquareInfo"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/mcp/square/recommend": {
+            "get": {
+                "description": "获取广场MCP推荐列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mcp.square"
+                ],
+                "summary": "获取广场MCP推荐列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mcpId",
+                        "name": "mcpId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "mcpSquareId",
+                        "name": "mcpSquareId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.MCPSquareInfo"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/mcp/tool/list": {
+            "get": {
+                "description": "获取MCP Tool列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mcp"
+                ],
+                "summary": "获取MCP Tool列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mcpId(和serverUrl传一个)",
+                        "name": "mcpId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "serverUrl,就是sseUrl(和mcpId传一个)",
+                        "name": "serverUrl",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.MCPToolList"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/model": {
             "get": {
                 "security": [
@@ -5291,6 +5732,37 @@ const docTemplate = `{
                 }
             }
         },
+        "request.MCPCreate": {
+            "type": "object",
+            "required": [
+                "desc",
+                "from",
+                "name",
+                "sseUrl"
+            ],
+            "properties": {
+                "desc": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "from": {
+                    "description": "来源",
+                    "type": "string"
+                },
+                "mcpSquareId": {
+                    "description": "广场mcpId(非空表示来源于广场)",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "sseUrl": {
+                    "description": "SSE URL",
+                    "type": "string"
+                }
+            }
+        },
         "request.MergeFileReq": {
             "type": "object",
             "required": [
@@ -6542,6 +7014,306 @@ const docTemplate = `{
                 }
             }
         },
+        "response.MCPDetail": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "category": {
+                    "description": "类型(data:数据,create:创作,search:搜索)",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "detail": {
+                    "description": "详情",
+                    "type": "string"
+                },
+                "feature": {
+                    "description": "特性说明",
+                    "type": "string"
+                },
+                "from": {
+                    "description": "来源",
+                    "type": "string"
+                },
+                "manual": {
+                    "description": "使用说明",
+                    "type": "string"
+                },
+                "mcpId": {
+                    "description": "mcpId",
+                    "type": "string"
+                },
+                "mcpSquareId": {
+                    "description": "广场mcpId(非空表示来源于广场)",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "scenario": {
+                    "description": "应用场景",
+                    "type": "string"
+                },
+                "sseUrl": {
+                    "description": "SSE URL",
+                    "type": "string"
+                },
+                "summary": {
+                    "description": "使用概述",
+                    "type": "string"
+                }
+            }
+        },
+        "response.MCPInfo": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "category": {
+                    "description": "类型(data:数据,create:创作,search:搜索)",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "from": {
+                    "description": "来源",
+                    "type": "string"
+                },
+                "mcpId": {
+                    "description": "mcpId",
+                    "type": "string"
+                },
+                "mcpSquareId": {
+                    "description": "广场mcpId(非空表示来源于广场)",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "sseUrl": {
+                    "description": "SSE URL",
+                    "type": "string"
+                }
+            }
+        },
+        "response.MCPSelect": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "mcpId": {
+                    "description": "mcpId",
+                    "type": "string"
+                },
+                "mcpSquareId": {
+                    "description": "广场mcpId(非空表示来源于广场)",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "serverFrom": {
+                    "description": "来源",
+                    "type": "string"
+                },
+                "serverUrl": {
+                    "description": "sseUrl",
+                    "type": "string"
+                }
+            }
+        },
+        "response.MCPSquareDetail": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "category": {
+                    "description": "类型(data:数据,create:创作,search:搜索)",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "detail": {
+                    "description": "详情",
+                    "type": "string"
+                },
+                "feature": {
+                    "description": "特性说明",
+                    "type": "string"
+                },
+                "from": {
+                    "description": "来源",
+                    "type": "string"
+                },
+                "hasCustom": {
+                    "description": "是否已经发送到自定义",
+                    "type": "boolean"
+                },
+                "manual": {
+                    "description": "使用说明",
+                    "type": "string"
+                },
+                "mcpSquareId": {
+                    "description": "广场mcpId(非空表示来源于广场)",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "scenario": {
+                    "description": "应用场景",
+                    "type": "string"
+                },
+                "sseUrl": {
+                    "description": "SSE URL",
+                    "type": "string"
+                },
+                "summary": {
+                    "description": "使用概述",
+                    "type": "string"
+                },
+                "tools": {
+                    "description": "工具列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MCPTool"
+                    }
+                }
+            }
+        },
+        "response.MCPSquareInfo": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "category": {
+                    "description": "类型(data:数据,create:创作,search:搜索)",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "from": {
+                    "description": "来源",
+                    "type": "string"
+                },
+                "mcpSquareId": {
+                    "description": "广场mcpId(非空表示来源于广场)",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                }
+            }
+        },
+        "response.MCPTool": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "工具描述",
+                    "type": "string"
+                },
+                "inputSchema": {
+                    "description": "工具参数",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.MCPToolInputSchema"
+                        }
+                    ]
+                },
+                "name": {
+                    "description": "工具名",
+                    "type": "string"
+                }
+            }
+        },
+        "response.MCPToolInputSchema": {
+            "type": "object",
+            "properties": {
+                "properties": {
+                    "description": "字段名 -\u003e 字段信息",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/response.MCPToolInputSchemaValue"
+                    }
+                },
+                "required": {
+                    "description": "必填字段",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "type": {
+                    "description": "固定值: object",
+                    "type": "string"
+                }
+            }
+        },
+        "response.MCPToolInputSchemaValue": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "字段描述",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "字段类型",
+                    "type": "string"
+                }
+            }
+        },
+        "response.MCPToolList": {
+            "type": "object",
+            "properties": {
+                "tools": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MCPTool"
+                    }
+                }
+            }
+        },
         "response.MergeFileResp": {
             "type": "object",
             "properties": {
@@ -7096,6 +7868,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "apiName": {
+                    "type": "string"
+                },
+                "id": {
                     "type": "string"
                 },
                 "workFlowId": {

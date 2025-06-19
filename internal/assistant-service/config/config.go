@@ -19,6 +19,7 @@ type Config struct {
 	Redis     redis.Config `json:"redis" mapstructure:"redis"`
 	ES        es.Config    `json:"es" mapstructure:"es"`
 	Assistant Assistant    `json:"assistant" mapstructure:"assistant"`
+	Minio     *MinioConfig `mapstructure:"minio" json:"minio"`
 }
 
 type ServerConfig struct {
@@ -39,6 +40,13 @@ type DBConfig struct {
 
 type Assistant struct {
 	SseUrl string `mapstructure:"sse-url" json:"sse-url" yaml:"sse-url"`
+}
+
+type MinioConfig struct {
+	EndPoint string `json:"endpoint" mapstructure:"endpoint"`
+	User     string `mapstructure:"user" json:"user"`
+	Password string `mapstructure:"password" json:"password"`
+	Bucket   string `mapstructure:"bucket" json:"bucket"`
 }
 
 func LoadConfig(in string) error {
