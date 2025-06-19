@@ -409,6 +409,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		workFlowInfos = make([]*response.WorkFlowInfos, 0, len(resp.WorkFlowInfos))
 		for _, wf := range resp.WorkFlowInfos {
 			workFlowInfos = append(workFlowInfos, &response.WorkFlowInfos{
+				Id:         wf.Id,
 				WorkFlowId: wf.WorkFlowId,
 				ApiName:    wf.ApiName,
 			})

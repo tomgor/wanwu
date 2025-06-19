@@ -116,8 +116,9 @@ message ActionInfos{
 }
 
 message WorkFlowInfos{
-  string workFlowId = 1;
-  string apiName = 2;
+  string id = 1;
+  string workFlowId = 2;
+  string apiName = 3;
 }
 
 message GetAssistantInfoReq {

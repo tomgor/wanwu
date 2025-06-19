@@ -101,6 +101,7 @@ func parseActionApiInfo(req *assistant_service.AssistantActionCreateReq) (tab *m
 		Path:             strings.Join(paths, ","),
 		Name:             strings.Join(names, ","),
 		Method:           strings.Join(methods, ","),
+		Enable:           true,
 		UserId:           userId,
 		OrgId:            orgId,
 	}

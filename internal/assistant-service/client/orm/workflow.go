@@ -16,13 +16,8 @@ func (c *Client) UpdateAssistantWorkflow(ctx context.Context, workflow *model.As
 	}
 	return c.transaction(ctx, func(tx *gorm.DB) *err_code.Status {
 		if err := tx.Model(workflow).Updates(map[string]interface{}{
-			"workflow_name": workflow.WorkflowName,
-			"api_schema":    workflow.APISchema,
-			"name":          workflow.Name,
-			"method":        workflow.Method,
-			"path":          workflow.Path,
-			"enable":        workflow.Enable,
-			"updated_at":    time.Now().UnixMilli(),
+			"enable":     workflow.Enable,
+			"updated_at": time.Now().UnixMilli(),
 		}).Error; err != nil {
 			return toErrStatus("assistant_workflow_update", err.Error())
 		}
