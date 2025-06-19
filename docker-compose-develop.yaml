@@ -179,6 +179,9 @@ services:
       REDIS_HOST: ${WANWU_REDIS_HOST}
       REDIS_PORT: ${WANWU_REDIS_PORT}
       REDIS_PASSWORD: ${WANWU_REDIS_PASSWORD}
+      MINIO_ENDPOINT: ${WANWU_MINIO_ENDPOINT}
+      MINIO_USER: ${WANWU_MINIO_USER}
+      MINIO_PASSWORD: ${WANWU_MINIO_PASSWORD}
     working_dir: /app
     command: ./bin/assistant-service
 
