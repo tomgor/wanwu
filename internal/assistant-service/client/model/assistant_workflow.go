@@ -3,7 +3,7 @@ package model
 type AssistantWorkflow struct {
 	ID               uint32 `gorm:"primarykey;column:id"`
 	AssistantId      uint32 `gorm:"column:assistant_id;comment:智能体id"`
-	WorkflowName     string `gorm:"column:workflow_name;comment:工作流名称"`
+	WorkflowId       string `gorm:"column:workflow_id;comment:工作流id"`
 	APISchema        string `gorm:"column:api_schema;type:longtext;comment:schema配置"`
 	Name             string
 	Method           string

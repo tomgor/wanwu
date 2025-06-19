@@ -26,6 +26,7 @@ type ActionInfos struct {
 }
 
 type WorkFlowInfos struct {
+	Id         string `json:"id"`
 	WorkFlowId string `json:"workFlowId"`
 	ApiName    string `json:"apiName"`
 }
