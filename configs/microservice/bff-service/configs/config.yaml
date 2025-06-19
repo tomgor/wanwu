@@ -3,6 +3,7 @@ server:
   port: 6668
   external_ip: localhost
   external_port: 6668
+  web_base_url: http://localhost:8081
   api_base_url: http://localhost:6668
   callback_url: http://172.17.0.1:6668
 
