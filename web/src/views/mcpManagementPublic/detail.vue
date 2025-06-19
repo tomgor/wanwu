@@ -82,7 +82,9 @@
               <div class="tool-item-bg sse-url__input">{{detail.sseUrl}}</div>
               <el-button v-if="isFromSquare" class="sse-url__bt" type="primary" :disabled="detail.hasCustom" @click="preSendToCustomize">发送到自定义</el-button>
             </div>
-            <p style="line-height: 40px;color: #666;">* 将MCP发送到自定义后，您可在工作流或智能体中直接调用。</p>
+            <p style="line-height: 40px;color: #666;">
+              {{isFromSquare ? '* 将MCP发送到自定义后，您可在工作流或智能体中直接调用。' : '* 您已添加到自定义，可直接在工作流或智能体中直接调用。'}}
+            </p>
           </div>
           <div class="tool-item" v-if="detail.tools">
             <p class="title">工具介绍:</p>
@@ -204,8 +206,8 @@ export default {
       this.getDetailData()
 
       //滚动到顶部
-      const timeScroll = document.getElementById("timeScroll")
-      if (timeScroll) timeScroll.scrollTop = 0
+      const main = document.querySelector(".el-main")
+      if (main) main.scrollTop = 0
     },
     getDetailData(){
       if (this.isFromSquare) {
