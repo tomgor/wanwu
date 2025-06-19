@@ -2728,7 +2728,22 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/response.MCPSelectList"
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.MCPSelect"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -2955,22 +2970,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/definitions/response.ListResult"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "list": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "$ref": "#/definitions/response.MCPTool"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            ]
+                                            "$ref": "#/definitions/response.MCPToolList"
                                         }
                                     }
                                 }
@@ -7145,17 +7145,6 @@ const docTemplate = `{
                 }
             }
         },
-        "response.MCPSelectList": {
-            "type": "object",
-            "properties": {
-                "tools": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.MCPSelect"
-                    }
-                }
-            }
-        },
         "response.MCPSquareDetail": {
             "type": "object",
             "properties": {
@@ -7311,6 +7300,17 @@ const docTemplate = `{
                 "type": {
                     "description": "字段类型",
                     "type": "string"
+                }
+            }
+        },
+        "response.MCPToolList": {
+            "type": "object",
+            "properties": {
+                "tools": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MCPTool"
+                    }
                 }
             }
         },

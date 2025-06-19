@@ -2,10 +2,6 @@ package response
 
 import "github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 
-type MCPSelectList struct {
-	Tools []MCPSelect `json:"tools"`
-}
-
 type MCPSelect struct {
 	MCPID       string `json:"mcpId"`       // mcpId
 	MCPSquareID string `json:"mcpSquareId"` // 广场mcpId(非空表示来源于广场)
@@ -13,6 +9,10 @@ type MCPSelect struct {
 	Description string `json:"description"` // 描述
 	ServerFrom  string `json:"serverFrom"`  // 来源
 	ServerURL   string `json:"serverUrl"`   // sseUrl
+}
+
+type MCPToolList struct {
+	Tools []MCPTool `json:"tools"`
 }
 
 // MCPDetail MCP自定义详情
