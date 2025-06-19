@@ -15,13 +15,13 @@
           label-width="130px"
         >
           <el-form-item label="MCP名称">
-            <el-text>{{detail.alias || detail.name}}</el-text>
+            <div>{{detail.name}}</div>
           </el-form-item>
           <el-form-item label="服务来源">
-            <el-text>{{detail.by}}</el-text>
+            <div>{{detail.from}}</div>
           </el-form-item>
           <el-form-item label="功能描述" class="description-text">
-            <el-text >{{detail.description}}</el-text>
+            <div>{{detail.desc}}</div>
           </el-form-item>
           <el-form-item label="MCP ServerURL" prop="serverUrl">
             <el-input v-model="ruleForm.serverUrl"></el-input>
@@ -56,7 +56,7 @@
   </div>
 </template>
 <script>
-import { getTools, setCreate, getList } from "@/api/mcp.js";
+import { getTools, setCreate } from "@/api/mcp.js";
 import { isValidURL } from "@/utils/util";
 
 export default {
@@ -88,60 +88,73 @@ export default {
   },
   methods: {
     handleCancel() {
-        this.clearForm()
-        this.$emit("handleClose", false);
+      this.clearForm()
+      this.$emit("handleClose", false);
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-            let params = {
-                name: this.detail.name,
-                serverFrom: this.detail.by,
-                serverUrl: this.ruleForm.serverUrl,
-                description: this.detail.description,
-                source:2,
-                mcpSquareId:this.detail.mcpSquareId
+          const params = {
+            name: this.detail.name,
+            from: this.detail.from,
+            sseUrl: this.ruleForm.serverUrl,
+            desc: this.detail.desc,
+            mcpSquareId: this.detail.mcpSquareId
+          }
+          setCreate(params).then((res) => {
+            if(res.code === 0){
+              this.$message.success("发布成功")
+              this.clearForm()
+              this.$refs["ruleForm"].clearValidate();
+              this.handleCancel();
+              // 更新发送按钮状态
+              this.$emit("getIsCanSendStatus");
             }
-            setCreate(params)
-                .then((res) => {
-                    if(res.code === 0){
-                        this.$message({
-                            message: "发布成功",
-                            type: "success",
-                        });
-                        this.clearForm()
-                        this.$refs["ruleForm"].clearValidate();
-                        this.handleCancel();
-                        //更新发送按钮状态
-                        this.$emit("getIsCanSendStatus", false);
-                    }
-                })
-                .catch((err) => {});
-        } else {
-          return false;
+          })
         }
-      });
-
+      })
     },
     clearForm(){
-        this.ruleForm.serverUrl = ''
-        this.mcpList = []
+      this.ruleForm.serverUrl = ''
+      this.mcpList = []
     },
     handleTools() {
-        this.$refs['ruleForm'].validate((valid) => {
-            if (valid) {
-                getTools({
-                    serverUrl: this.ruleForm.serverUrl,
-                })
-                    .then((res) => {
-                        this.mcpList = res.data.tools;
-                    })
-                    .catch((err) => {});
-            } else {
-                return false;
-            }
-        });
-
+      this.$refs['ruleForm'].validate((valid) => {
+        if (valid) {
+          getTools({
+            serverUrl: this.ruleForm.serverUrl,
+          }).then((res) => {
+            this.mcpList = res.data.tools || []
+          }).catch(() => {
+            this.mcpList = [
+              {
+                "description": "string",
+                "inputSchema": {
+                  "properties": {
+                    "additionalProp1": {
+                      "description": "string",
+                      "type": "string"
+                    },
+                    "additionalProp2": {
+                      "description": "string",
+                      "type": "string"
+                    },
+                    "additionalProp3": {
+                      "description": "string",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "string"
+                  ],
+                  "type": "string"
+                },
+                "name": "string"
+              }
+            ]
+          })
+        }
+      });
     },
   },
   computed: {

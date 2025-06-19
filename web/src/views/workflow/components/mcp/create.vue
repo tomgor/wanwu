@@ -164,10 +164,7 @@ export default {
     },
     init() {
       this.loading = true;
-      getList({
-        pageNo: 1,
-        pageSize: 9999,
-      })
+      getList()
         .then((res) => {
           this.getToolsList(res.data.list);
         })
@@ -180,10 +177,10 @@ export default {
       for (const item of mcpList) {
         try {
           const res = await getMcpToolList({
-            mcpServerUrl: item.serverUrl,
+            serverUrl: item.serverUrl,
           });
           if (res.code === 0) {
-            item.tools = res.data.tools_list;
+            item.tools = res.data.tools || [];
             await item.tools.forEach((i) => {
               i.checked = false;
               i.disabled = false;

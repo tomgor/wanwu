@@ -18,18 +18,18 @@
           <el-form-item label="服务名称" prop="name">
             <el-input v-model="ruleForm.name"></el-input>
           </el-form-item>
-          <el-form-item label="服务来源" prop="serverFrom">
-            <el-input v-model="ruleForm.serverFrom"></el-input>
+          <el-form-item label="服务来源" prop="from">
+            <el-input v-model="ruleForm.from"></el-input>
           </el-form-item>
-          <el-form-item label="功能描述" prop="description">
+          <el-form-item label="功能描述" prop="desc">
             <el-input
               type="textarea"
               rows="5"
-              v-model="ruleForm.description"
+              v-model="ruleForm.desc"
             ></el-input>
           </el-form-item>
-          <el-form-item label="MCP ServerURL" prop="serverUrl">
-            <el-input v-model="ruleForm.serverUrl"></el-input>
+          <el-form-item label="MCP sseUrl" prop="sseUrl">
+            <el-input v-model="ruleForm.sseUrl"></el-input>
           </el-form-item>
           <el-form-item label=" " style="text-align: right">
             <el-button
@@ -37,8 +37,9 @@
               size="mini"
               @click="handleTools"
               :disabled="isGetMCP"
-              >获取MCP工具</el-button
             >
+              获取MCP工具
+            </el-button>
           </el-form-item>
         </el-form>
         <el-divider v-if="mcpList.length > 0"></el-divider>
@@ -47,23 +48,21 @@
         </ul>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handleCancel" size="mini"
-          >取 消</el-button
-        >
-
+        <el-button @click="handleCancel" size="mini">取 消</el-button>
         <el-button
           type="primary"
           size="mini"
           :disabled="mcpList.length === 0"
           @click="submitForm('ruleForm')"
-          >确定发布</el-button
         >
+          确定发布
+        </el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 <script>
-import { getTools, setCreate, getList } from "@/api/mcp.js";
+import { getTools, setCreate } from "@/api/mcp.js";
 import { isValidURL } from "@/utils/util";
 
 export default {
@@ -80,16 +79,16 @@ export default {
       mcpList: [],
       ruleForm: {
         name: "",
-        serverFrom: "",
-        serverUrl: "", // https://mcp.amap.com/sse?key=77b5f0d102c848d443b791fd469b732d
-        description: "",
+        from: "",
+        sseUrl: "", // https://mcp.amap.com/sse?key=77b5f0d102c848d443b791fd469b732d
+        desc: "",
       },
       rules: {
         name: [{ required: true, message: "请输入服务名称", trigger: "blur" }],
-        serverFrom: [
+        from: [
           { required: true, message: "请输入服务来源", trigger: "blur" },
         ],
-        serverUrl: [
+        sseUrl: [
           {
             required: true,
             message: "请输入服务Server Url",
@@ -97,7 +96,7 @@ export default {
           },
           { validator: validateUrl, trigger: "blur" },
         ],
-        description: [
+        desc: [
           {
             required: true,
             message: "请输入功能描述",
@@ -118,15 +117,11 @@ export default {
         if (valid) {
           setCreate(this.ruleForm)
             .then((res) => {
-                if(res.code === 0){
-                    this.$message({
-                        message: "发布成功",
-                        type: "success",
-                    });
-                    this.handleCancel();
-                }
+              if(res.code === 0){
+                this.$message.success("发布成功")
+                this.handleCancel()
+              }
             })
-            .catch((err) => {});
         } else {
           return false;
         }
@@ -134,17 +129,42 @@ export default {
     },
     handleTools() {
       getTools({
-        serverUrl: this.ruleForm.serverUrl,
+        serverUrl: this.ruleForm.sseUrl,
+      }).then((res) => {
+        this.mcpList = res.data.tools;
+      }).catch(() => {
+        this.mcpList = [
+          {
+            "description": "string",
+            "inputSchema": {
+              "properties": {
+                "additionalProp1": {
+                  "description": "string",
+                  "type": "string"
+                },
+                "additionalProp2": {
+                  "description": "string",
+                  "type": "string"
+                },
+                "additionalProp3": {
+                  "description": "string",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "string"
+              ],
+              "type": "string"
+            },
+            "name": "string"
+          }
+        ]
       })
-        .then((res) => {
-          this.mcpList = res.data.tools;
-        })
-        .catch((err) => {});
     },
   },
   computed: {
     isGetMCP() {
-      if (!isValidURL(this.ruleForm.serverUrl)) {
+      if (!isValidURL(this.ruleForm.sseUrl)) {
         return true;
       } else {
         return false;

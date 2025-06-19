@@ -45,7 +45,7 @@ service.interceptors.response.use(
     if (response.headers["new-token"]) {
         store.commit("user/setToken", response.headers["new-token"]);
     }
-    res.code = res.code * 1
+    if (res.code) res.code = res.code * 1
     if (res.code !== 0) {
       Message.error(res.msg || 'Error', 5 * 1000)
       return Promise.reject(res)

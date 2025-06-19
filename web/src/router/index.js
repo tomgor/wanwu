@@ -47,12 +47,7 @@ const constantRoutes = [
                 meta:{perm: [PERMS.MCP]},
             },
             {
-                path: '/mcp/detail/:mcpId/:source/:mcpSquareId',
-                component:resolve =>require(['@/views/mcpManagement/detail'],resolve),
-                meta:{perm: [PERMS.MCP]},
-            },
-            {
-                path: '/mcp/public/detail/:id/:hosted',  //  host 0：sse 1: 本地
+                path: '/mcp/detail/:type',
                 component:resolve =>require(['@/views/mcpManagementPublic/detail'],resolve),
                 meta:{perm: [PERMS.MCP]},
             },
