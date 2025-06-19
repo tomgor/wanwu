@@ -44,7 +44,7 @@ export default {
         modelAccess: '模型管理',
     },
     header: {
-        title: '大模型MaaS平台',
+        title: '万悟',
         doc: '文档中心',
         logout: '登出',
         login: '登录',

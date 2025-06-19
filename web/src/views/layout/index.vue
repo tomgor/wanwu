@@ -87,7 +87,7 @@
         </div>
       </div>
       <!-- 导航 -->
-      <el-container :class="['inner-container']" :style="`margin-left: ${isShowNav ? 0 : '20px'}`">
+      <el-container :class="['inner-container']">
         <!--取消整体的菜单展示 isShowMenu 一直为 false-->
         <el-aside v-if="isShowMenu && menuList && menuList.length" class="full-menu-aside">
           <el-menu
@@ -302,7 +302,7 @@ export default {
     },
     justifyIsShowNav(path) {
       console.log(path, '-------------------234')
-      const notShowArr = ['/userInfo', '/permission']
+      const notShowArr = ['/userInfo', '/permission', '/workflow']
       let isShowNav = true
       for (let item of notShowArr) {
         if (item === path) {
@@ -419,7 +419,7 @@ export default {
 }
 .full-menu.layout {
   height:100%;
-  background-color: #F7F7FC;
+  background: linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%);
   min-height: 650px;
   .outer-container{
     height: 100%;
@@ -429,6 +429,10 @@ export default {
       padding: 8px 0;
       position: relative;
       min-height: 450px;
+      background: #F7F7FC;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+      margin: 8px 6px;
       .total-create {
         width: 24px;
         cursor: pointer;
@@ -480,12 +484,11 @@ export default {
     /*element ui 样式重写*/
     .inner-container {
       width: calc(100% - 70px);
-      height: calc(100% - 32px);
-      margin: 16px 20px 16px 0;
-      background-color: #fff;
+      height: 100%;
+      margin: 0 6px 0 0;
       border-radius: 10px;
       // border: 1px solid #e6e6e6;
-      box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.15);
+      /*box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.15);*/
       .el-aside.full-menu-aside {
         height: 100%;
         width: 220px !important;
@@ -520,9 +523,9 @@ export default {
         padding: 0!important;
         height: 100%;
         overflow: auto;
-        background: linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%);
+        /*background: linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%);
         border-radius: 8px 8px 8px 8px;
-        border-left: 0.5px solid #e6e6e6;
+        border-left: 0.5px solid #e6e6e6;*/
       }
       /deep/ .el-menu-item {
         color: $color_title;
