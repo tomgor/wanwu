@@ -18,8 +18,11 @@ func InitAssistant(ctx context.Context, cfg Config, initBucketName string) error
 		return err
 	}
 	_minioAssistant = c
-	if err = _minioAssistant.CreateBucketIfNotExist(ctx, initBucketName); err != nil {
+
+	// 创建存储桶并设置存储策略
+	if _, err = _minioAssistant.createBucketIfAbsent(ctx, initBucketName); err != nil {
 		return err
 	}
-	return err
+
+	return nil
 }
