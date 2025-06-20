@@ -147,24 +147,13 @@
         <div class="block prompt-box">
           <p class="block-title">联网检索</p>
           <div class="rl">
-            <el-select
-              v-model="editForm.rerankParams"
-              placeholder="请选择模型"
-              @visible-change="rerankVisible"
-              loading-text="模型加载中..."
-              class="cover-input-icon"
-              style="width:100%;"
-              :disabled="isPublish"
-              :loading="modelLoading"
-            >
-              <el-option
-                v-for="(item,index) in rerankOptions"
-                :key="item.modelId"
-                :label="item.displayName"
-                :value="item.modelId"
-              >
-              </el-option>
-            </el-select>
+            <div class="block-link">
+              <span class="link-text">博查</span>
+              <span>
+                <span class="el-icon-s-operation link-operation" @click="showLinkDiglog"></span>
+                <el-switch v-model="editForm.onlineSearchConfig.enable"></el-switch>
+              </span>
+            </div>
           </div>
         </div>
         <div class="block recommend-box">
@@ -197,10 +186,10 @@
                 class="name"
                 @click="preUpdateAction(n.actionId)"
               >{{n.apiName}}</div>
-              <div
-                class="bt"
-                @click="preDelAction(n.actionId)"
-              >{{$t('common.button.delete')}}</div>
+              <div class="bt">
+                <el-switch v-model="n.enable" class="bt-switch" @change="actionSwitch(n.actionId)"></el-switch>
+                <span @click="preDelAction(n.actionId)">{{$t('common.button.delete')}}</span>
+              </div>
             </div>
             </div>
             </div>
@@ -218,12 +207,13 @@
                     class="name"
                     style="color: #333"
                   >
-                    {{ n.apiName }}
+                    {{ n.configName }}
                   </div>
-                  <div
-                    class="bt"
-                    @click="workflowRemove(n.id)"
-                  >{{$t('common.button.delete')}}</div>
+
+                  <div class="bt">
+                    <el-switch v-model="n.enable" class="bt-switch" @change="workflowSwitch(n.workFlowId)"></el-switch>
+                    <span @click="workflowRemove(n.workFlowId)">{{$t('common.button.delete')}}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -288,6 +278,8 @@
     <ApiKeyDialog ref="apiKeyDialog" :appId="editForm.assistantId" :appType="'agent'" />
     <!-- 选择工作类型 -->
     <ToolDiaglog ref="toolDiaglog" @selectTool="selectTool" />
+    <!-- 联网检索 -->
+    <LinkDialog ref="linkDialog" @setLinkSet="setLinkSet" />
   </div>
 </template>
 
@@ -302,9 +294,10 @@ import ModelSet from "./modelSetDialog";
 import ApiKeyDialog from "./ApiKeyDialog";
 import { deleteAction, getModelList } from "@/api/cubm";
 import { selectModelList,getRerankList} from "@/api/modelAccess";
-import { getAgentInfo,addWorkFlowInfo,delWorkFlowInfo,delActionInfo,putAgentInfo } from "@/api/agent";
+import { getAgentInfo,addWorkFlowInfo,delWorkFlowInfo,delActionInfo,putAgentInfo,enableWorkFlow,enableAction } from "@/api/agent";
 import ActionConfig from "./action";
 import ToolDiaglog from "./toolDialog";
+import LinkDialog from "./linkDialog";
 import {
   getWorkFlowList,
   readWorkFlow,
@@ -320,7 +313,8 @@ export default {
     ModelSet,
     ActionConfig,
     ApiKeyDialog,
-    ToolDiaglog
+    ToolDiaglog,
+    LinkDialog
   },
   watch: {
     basicForm: {
@@ -344,7 +338,7 @@ export default {
             clearTimeout(this.debounceTimer)
           }
         this.debounceTimer = setTimeout(() =>{
-            const props = ['modelParams', 'modelConfig', 'prologue', 'knowledgeBaseIds','instructions','recommendQuestion'];
+            const props = ['modelParams', 'modelConfig', 'prologue', 'knowledgeBaseIds','instructions','recommendQuestion','onlineSearchConfig'];
             const changed = props.some(prop => {
             return JSON.stringify(newVal[prop]) !== JSON.stringify(
                 (this.initialEditForm || {})[prop]
@@ -393,6 +387,11 @@ export default {
           temperatureEnable:true,
           topPEnable:true,
           presencePenaltyEnable:true
+        },
+        onlineSearchConfig:{
+          enable:false,
+          searchKey:'',
+          searchUrl:''
         }
       },
       apiURL:'',
@@ -454,6 +453,23 @@ export default {
     store.dispatch("app/initState");
   },
   methods: {
+    actionSwitch(id){
+      enableAction({actionId:id}).then(res =>{
+        if(res.code === 0){
+          this.getAppDetail();
+        }
+      })
+    },
+    workflowSwitch(id){
+      enableWorkFlow({workFlowId:id}).then(res => {
+        if(res.code === 0){
+          this.getAppDetail();
+        }
+      })
+    },
+    showLinkDiglog(){
+      this.$refs.linkDialog.showDialog()
+    },
     selectTool(val){
       if(val === 'action'){
         this.preCreateAction()
@@ -502,7 +518,11 @@ export default {
       this.$refs.apiKeyDialog.showDialog()
     },
     setModelSet(data){
-      console.log(data)
+      this.editForm.modelConfig = data;
+    },
+    setLinkSet(data){
+      this.editForm.onlineSearchConfig.searchKey = data.searchKey;
+      this.editForm.onlineSearchConfig.searchUrl = data.searchUrl;
     },
     showModelSet(){
       this.$refs.modelSetDialog.showDialog()
@@ -642,6 +662,7 @@ export default {
           modelType: modeInfo.modelType,
           provider: modeInfo.provider,
         },
+        onlineSearchConfig:this.editForm.onlineSearchConfig,
         rerankConfig:rerankInfo?{
           displayName: rerankInfo.displayName,
           model: rerankInfo.model,
@@ -649,6 +670,7 @@ export default {
           modelType: rerankInfo.modelType,
           provider: rerankInfo.provider,
         }:{}
+
       }
       let res = await putAgentInfo(params);
     },
@@ -701,6 +723,7 @@ export default {
               })
             : [],
           actionInfos: data.actionInfos || [],
+          onlineSearchConfig:data.onlineSearchConfig
         };
         
         // this.expandForm = {
@@ -728,8 +751,13 @@ export default {
         workFlowInfos.forEach((n) => {
           this.workflowList.forEach((m, j) => {
             if (n.workFlowId === m.id) {
-              this.$set(this.workflowList, j, { ...n, checked: true });
-              _workFlowInfos.push(n);
+              const updatedItem = {
+                    ...m,         
+                    enable:n.enable,
+                    workFlowId: n.id 
+                  };
+              this.$set(this.workflowList, j, updatedItem);
+              _workFlowInfos.push(updatedItem );
             }
           });
         });
@@ -966,6 +994,23 @@ export default {
         font-weight: normal;
       }
     }
+    .block-link{
+      width:300px;
+      border:1px solid #ddd;
+      padding: 6px 10px;
+      border-radius:6px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      .link-text{
+        color:#384BF7;
+      }
+      .link-operation{
+        cursor: pointer;
+        margin-right:5px;
+        font-size:16px;
+      }
+    }
     .tool-conent{
       display:flex;
       justify-content:space-between;
@@ -1162,20 +1207,24 @@ export default {
   .action-item {
     display: flex;
     justify-content: space-between;
+    align-items:center;
     border: 1px solid #ddd;
     border-radius:6px;
     margin-bottom: 5px;
     .name {
-      flex: 4;
+      // flex: 4;
       padding: 10px 20px;
       cursor: pointer;
       color: #2c7eea;
     }
     .bt {
       text-align: center;
-      flex: 1;
+      // flex: 1;
       cursor: pointer;
       padding: 10px 20px;
+      .bt-switch{
+        margin-right:10px;
+      }
     }
   }
 }
