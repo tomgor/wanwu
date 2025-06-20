@@ -1,7 +1,7 @@
 package model
 
 type MCPModel struct {
-	ID          string `json:"id" gorm:"primarykey;column:id;type:varchar(100);comment:mcpId"`
+	ID          uint32 `gorm:"primary_key;auto_increment;not null;"`
 	SseUrl      string `json:"serverUrl" gorm:"column:sse_url;type:text;comment:服务地址"`
 	McpSquareId string `json:"mcpSquareId" gorm:"column:mcp_square_id;type:varchar(100);comment:广场mcpId"`
 	Name        string `json:"name" gorm:"column:name;type:varchar(255);not null;default:'';comment:服务名称"`

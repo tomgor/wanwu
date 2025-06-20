@@ -70,65 +70,6 @@ func main() {
 	if err := s.Start(ctx); err != nil {
 		log.Fatalf("start grpc server failed, err: %s", err)
 	}
-	//detail, err := s.Mcp.GetSquareMCP(ctx, &mcp_service.GetSquareMCPReq{
-	//	McpSquareId: "converttime",
-	//})
-	//if err != nil {
-	//	return
-	//}
-	//if detail == nil {
-	//	log.Errorf("MCP detail not found")
-	//	return
-	//}
-	//
-	////打印基本信息
-	//printSection := func(title string, items map[string]string) {
-	//	fmt.Printf("\n=== %s ===\n", title)
-	//	for k, v := range items {
-	//		fmt.Printf("%-15s: %s\n", k, v)
-	//	}
-	//}
-	//
-	//// 打印Info部分
-	//info := map[string]string{
-	//	"McpSquareId": detail.Info.McpSquareId,
-	//	"Name":        detail.Info.Name,
-	//	"AvatarPath":  detail.Info.AvatarPath,
-	//	"Desc":        detail.Info.Desc,
-	//	"Category":    detail.Info.Category,
-	//	"From":        detail.Info.From,
-	//}
-	//printSection("基本信息", info)
-	//
-	//// 打印Intro部分
-	//intro := map[string]string{
-	//	"Detail":   detail.Intro.Detail,
-	//	"Summary":  detail.Intro.Summary,
-	//	"Feature":  detail.Intro.Feature,
-	//	"Scenario": detail.Intro.Scenario,
-	//	"Manual":   detail.Intro.Manual,
-	//}
-	//printSection("介绍信息", intro)
-	//
-	//// 打印Tool部分
-	//fmt.Printf("\n=== 工具信息 ===\n")
-	//fmt.Printf("SSE URL: %s\n", detail.Tool.SseUrl)
-	//fmt.Printf("HasCustom: %v\n", detail.Tool.HasCustom)
-	//
-	//// 打印Tools列表
-	//for _, tool := range detail.Tool.Tools {
-	//	fmt.Printf("工具名称: %s\n", tool.Name)
-	//	fmt.Printf("描述: %s\n", tool.Description)
-	//	fmt.Printf("InputSchema: \n")
-	//	fmt.Printf("输入类型: %s\n", tool.InputSchema.Type)
-	//	fmt.Printf("必填字段: %v\n", tool.InputSchema.Required)
-	//
-	//	fmt.Println("properties:")
-	//	for name, field := range tool.InputSchema.Properties {
-	//		fmt.Printf("属性名: %s\n", name)
-	//		fmt.Printf("- %s: %s\n", field.Type, field.Description)
-	//	}
-	//}
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt, syscall.SIGTERM)

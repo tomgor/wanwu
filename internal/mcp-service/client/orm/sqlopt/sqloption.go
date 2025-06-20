@@ -67,6 +67,15 @@ func WithMcpSquareId(mcpSquareId string) SQLOption {
 	})
 }
 
+func WithName(name string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if name != "" {
+			return db.Where("name = ?", name)
+		}
+		return db
+	})
+}
+
 func LikeName(name string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		if name != "" {
