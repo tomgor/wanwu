@@ -301,14 +301,13 @@ export default {
         doSend(params) {
             this.stopBtShow = true
             this.isStoped= false
-            console.log(this.$refs['session-com'])
             let _history = this.$refs['session-com'].getList()
             this.sendEventSource(this.inputVal, '', _history.length)
         },
         sendEventSource(prompt, msgStr, lastIndex) {
             console.log('####  sendEventSource',new Date().getTime())
             if (this.sessionStatus === 0) {
-                this.$message.warning(i18n.t('yuanjing.qaTips'))
+                this.$message.warning('上个问题没有回答完！')
                 return
             }
 
@@ -327,7 +326,6 @@ export default {
                 }
             })
             const trial = this.isTestChat ? true : false
-            console.log(this.sseParams,123)
             let data = {
                 ...this.sseParams,
                 prompt,
@@ -581,7 +579,12 @@ export default {
         refresh() {
             let history_list = this.$refs['session-com'].getList();
             let inputVal = history_list[history_list.length - 1].query;
-            let fileId = history_list[history_list.length - 1].fileId;
+            // let fileId = history_list[history_list.length - 1].fileId;
+            let fileId =  {
+                    fileName:history_list[history_list.length - 1].fileName,
+                    fileSize:history_list[history_list.length - 1].fileSize,
+                    fileUrl:history_list[history_list.length - 1].fileInfo ? history_list[history_list.length - 1].fileInfo['fileUrl'] : history_list[history_list.length - 1].requestFileUrls[0],
+                }
             let fileInfo = [{name:history_list[history_list.length - 1]['fileName'],size:history_list[history_list.length - 1]['fileSize']}] || [];
             this.preSend(inputVal,fileId,fileInfo);
         }

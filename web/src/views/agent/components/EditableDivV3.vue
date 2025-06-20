@@ -97,7 +97,7 @@
                 refreshLoading:false,
                //文件
                 hasFile:false,
-                fileIdList:[],
+                fileIdList:null,
                 fileType:'',
                 fileList:[],
                 fileUrl:'',
@@ -159,7 +159,7 @@
                 console.log(url)
             },
             clearFile(){
-                this.fileIdList = []
+                this.fileIdList = null
                 this.fileList = []
                 this.fileType = ''
                 this.fileUrl = ''
