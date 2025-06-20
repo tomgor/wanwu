@@ -1,15 +1,15 @@
 <template>
   <CommonLayout
-    :aside-title="asideTitle" 
+    :showAside="false"
   >
-    <template #aside-content>
+    <!-- <template #aside-content>
       <div class="explore-aside-app">
         <div v-for="n in historyList " class="appList" @click="historyClick(n)">
            <img :src="'/user/api/'+ n.avatar.path" class="appImg"/>
            <span class="appName">{{n.name}}</span>
         </div>
       </div>
-    </template>
+    </template> -->
     <template #main-content>
       <div class="app-content">
         <div class="app-header">
@@ -76,6 +76,12 @@ export default {
           value:'private',
           activeImg:require('@/assets/imgs/start_active.png'),
           unactiveImg:require('@/assets/imgs/start_unactive.png')
+        },
+        {
+          name:'历史应用',
+          value:'history',
+          activeImg:require('@/assets/imgs/history_active.png'),
+          unactiveImg:require('@/assets/imgs/history_unactive.png')
         }
       ],
       historyList:[],
@@ -92,16 +98,16 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('app', ['historyAppList'])
+    // ...mapGetters('app', ['historyAppList'])
   },
   created(){
-    this.getHistoryList();
+    // this.getHistoryList();
     this.getExplorData(this.activeName,this.active)
   },
   mounted() {
   },
   methods: {
-    ...mapActions('app', ['getHistoryList']),
+    // ...mapActions('app', ['getHistoryList']),
     handleSearch(value){
       this.searchValue = value;
       this.getExplorData(this.activeName,this.active)

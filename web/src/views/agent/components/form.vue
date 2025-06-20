@@ -144,6 +144,29 @@
             </el-select>
           </div>
         </div>
+        <div class="block prompt-box">
+          <p class="block-title">联网检索</p>
+          <div class="rl">
+            <el-select
+              v-model="editForm.rerankParams"
+              placeholder="请选择模型"
+              @visible-change="rerankVisible"
+              loading-text="模型加载中..."
+              class="cover-input-icon"
+              style="width:100%;"
+              :disabled="isPublish"
+              :loading="modelLoading"
+            >
+              <el-option
+                v-for="(item,index) in rerankOptions"
+                :key="item.modelId"
+                :label="item.displayName"
+                :value="item.modelId"
+              >
+              </el-option>
+            </el-select>
+          </div>
+        </div>
         <div class="block recommend-box">
           <p class="block-title">关联知识库</p>
           <div class="rl">
@@ -199,7 +222,7 @@
                   </div>
                   <div
                     class="bt"
-                    @click="workflowRemove(n.workFlowId)"
+                    @click="workflowRemove(n.id)"
                   >{{$t('common.button.delete')}}</div>
                 </div>
               </div>

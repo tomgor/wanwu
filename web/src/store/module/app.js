@@ -94,8 +94,8 @@ export const app = {
         refreshRecentApp({ commit }){
             commit('REFRESH_RECENT_APP')
         },
-        getHistoryList({commit}){
-            getHistoryList().then(res=>{
+        getHistoryList({commit},params=''){
+            getHistoryList({history:params}).then(res=>{
                 if(res.code === 0){
                     if(res.data.list && res.data.list.length >0){
                         const list = res.data.list.map(n =>{
