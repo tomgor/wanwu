@@ -148,7 +148,6 @@
                 if(['txt','csv','xlsx','docx','html','pptx','pdf'].includes(fileType)){
                     this.fileType = 'doc/*'
                 }
-                console.log(this.fileType)
                 this.fileUrl = URL.createObjectURL(file.raw);
                 this.fileList = [];
                 this.fileList.push(file);
@@ -159,7 +158,6 @@
                 }
             },
             uploadFile(fileName,oldFileName,fiePath){
-                // this.chunkFileName = chunkFileName;
                 this.fileInfo = {
                     fileName,
                     fileSize:this.fileList[0]['size'],
@@ -170,45 +168,7 @@
                 this.$emit('setFileId',this.fileInfo)
                 this.$emit('setFile',this.fileList)
                 this.handleClose();
-                // const data = {chunkFileName:this.chunkFileName,fileName:this.fileList[0]['name'],fileSize:this.fileList[0]['size']};
-                // confirmPath(data).then(res =>{
-                //     if(res.code === 0){
-                //         let fileIdList = [];
-                //         fileIdList.push(res.data)
-                //         this.fileIdList = fileIdList || [];
-                //         this.$emit('setFileId',this.fileIdList)
-                //         this.$emit('setFile',this.fileList)
-                //         this.$message.success("文件上传成功");
-                //         this.handleClose();
-                //     }
-                // })
             },
-            // doBatchUpload(){
-            //     var formData = new FormData();
-            //     var config = {headers: {"Content-Type": "multipart/form-data",}};
-            //     // 组装文件
-            //     var files = this.fileList
-            //     if (files.length) {
-            //         files.forEach(element => {
-            //             if (element.status == "ready") {
-            //                 formData.append("files", element.raw, element.name);
-            //             }
-            //         });
-            //     }
-            //     //formData.append("sessionId", this.sessionId);
-            //     this.loading = true
-            //     batchUpload(formData, config).then(response => {
-            //         console.log(response)
-            //         this.loading = false
-            //         this.fileIdList = response.data.list
-            //         this.$emit('setFileId',this.fileIdList)
-            //         this.$message.success("文件上传成功")
-            //         this.handleClose()
-            //     }).catch(error => {
-            //         this.loading = false
-            //         this.clearFile()
-            //     })
-            // },
             getFileIdList(){
                 return this.fileIdList
             },

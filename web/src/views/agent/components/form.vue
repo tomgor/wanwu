@@ -728,8 +728,8 @@ export default {
         workFlowInfos.forEach((n) => {
           this.workflowList.forEach((m, j) => {
             if (n.workFlowId === m.id) {
-              this.$set(this.workflowList, j, { ...m, checked: true });
-              _workFlowInfos.push(m);
+              this.$set(this.workflowList, j, { ...n, checked: true });
+              _workFlowInfos.push(n);
             }
           });
         });
