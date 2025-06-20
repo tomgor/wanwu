@@ -132,3 +132,24 @@ export function isValidURL(string) {
 export function isExternal(path) {
     return /^(https?:|mailto:|tel:)/.test(path);
 }
+
+export const formatTools = (tools) => {
+    if (!(tools && tools.length)) return []
+    const newTools = tools.map((n,i)=>{
+        let params = []
+        let properties = n.inputSchema.properties
+        for(let key in properties){
+            params.push({
+                "name": key,
+                "requiredBadge": n.inputSchema.required.includes(key) ? '必填' : '',
+                "type": properties[key].type,
+                "description": properties[key].description,
+            })
+        }
+        return {
+            ...n,
+            params
+        }
+    })
+    return newTools
+}

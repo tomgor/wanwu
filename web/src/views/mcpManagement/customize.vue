@@ -28,21 +28,21 @@
           @click.stop="handleClick(item)"
         >
           <div class="card-title">
-            <svg-icon icon-class="mcp_server" class="editable--send" />
+            <img class="card-logo" v-if="item.avatar && item.avatar.path" :src="basePath + '/user/api/' + item.avatar.path" />
             <div class="mcp_detailBox">
               <span class="mcp_name">{{ item.name }}</span>
               <span class="mcp_from">
                 <label>
-                  {{ item.serverFrom }}
+                  {{ item.from }}
                 </label>
               </span>
             </div>
             <i
-                class="el-icon-delete-solid"
-                @click.stop="handleDelete(item)"
+              class="el-icon-delete-solid"
+              @click.stop="handleDelete(item)"
             ></i>
           </div>
-          <div class="card-des">{{ item.description }}</div>
+          <div class="card-des">{{ item.desc }}</div>
         </div>
       </div>
 
@@ -52,45 +52,35 @@
           <span>添加你的第一个MCP Server</span>
         </div>
       </div>
-      <!-- </el-tab-pane>
-      </el-tabs> -->
     </div>
     <addDialog :dialogVisible="addOpen" @handleClose="handleClose"></addDialog>
-    <detail
-      v-if="drawer"
-      :drawer="drawer"
-      :id="mcpid"
-      @handleDetailClose="handleDetailClose"
-    ></detail>
   </div>
 </template>
 <script>
 import addDialog from "./addDialog.vue";
-import detail from "./detailDrawer.vue";
-import { getList, setDelete } from "@/api/mcp";
 import SearchInput from "@/components/searchInput.vue"
+import { getList, setDelete } from "@/api/mcp";
 export default {
-  components: { SearchInput, addDialog, detail },
+  components: { SearchInput, addDialog },
   data() {
     return {
+      basePath: this.$basePath,
       is: true, // 是否第一次进来
-      mcpid: "",
-      name: "",
-      activeName: "cust",
       addOpen: false, // 自定义添加mcp开关
-      drawer: false, // 详情开关
       list: [
         {
-          "mcpId": "aa513b0f-b4b5-4db9-8502-8b7689afb6f4",
-          "serverFrom": "测试",
-          "serverUrl": "https://mcp.amap.com/sse?key=6d889bd6aa34bdd63a39c1197a00e377",
-          "description": "测试",
-          "name": "测试",
-          "source": 1,
-          "mcpSquareId": ""
+          "avatar": {
+            key: "showPwd.png",
+            path: "/v1/static/logo/tab_logo.png"
+          },
+          "category": "数据",
+          "desc": "desc",
+          "from": "from",
+          "mcpId": 'mcpId1',
+          "mcpSquareId": "mcpSquareId123",
+          "name": "name"
         }
       ],
-      source:''
     };
   },
   mounted() {
@@ -107,23 +97,18 @@ export default {
     },
     handleSearch() {
       if (this.is !== false) {
-        if (this.list.length > 0) {
-          this.is = false;
+        if (this.list && this.list.length) {
+          this.is = false
         } else {
-          this.is = true;
+          this.is = true
         }
       }
       this.fetchList()
     },
     fetchList(cb) {
       const searchInput = this.$refs.searchInput
-      let params = {
+      const params = {
         name: searchInput.value,
-        pageNo: 1,
-        pageSize: 9999,
-      }
-      if (this.source !== '') {
-        params.source = this.source
       }
       getList(params)
         .then((res) => {
@@ -146,25 +131,16 @@ export default {
       this.addOpen = val;
       this.init();
     },
-    /*handleClick(val) {
-        this.drawer = true;
-        this.mcpid = val.mcpId;
-    },*/
     handleClick(val) {
-      // source 1自定义 2mcp广场
-      this.$router.push({path: `/mcp/detail/${val.mcpId}/${val.source}/${val.mcpSquareId || '0'}`})
+      // smcpSquareId 有值 mcp广场, 否则自定义
+      this.$router.push({path: `/mcp/detail/custom?mcpId=${val.mcpId}&mcpSquareId=${val.mcpSquareId}`})
     },
     handleAddMCP() {
       this.addOpen = true;
     },
-    handleDetailClose(val) {
-      this.drawer = val;
-    },
     handleDelete(item) {
       this.$confirm(
-        "确定要删除 <span style='font-weight: bold;'>" +
-        item.name +
-        "</span> 该服务吗？",
+        "确定要删除 <span style='font-weight: bold;'>" + item.name + "</span> 该服务吗？",
         "提示",
         {
           confirmButtonText: "确定",
@@ -173,28 +149,18 @@ export default {
           type: "warning",
           center: true,
         }
-      )
-        .then(async () => {
-          setDelete({
-            mcpId: item.mcpId,
-          })
-            .then((res) => {
-              if (res.code == 0) {
-                this.$message({
-                  type: "success",
-                  message: "删除成功",
-                });
-                this.init();
-              } else {
-                this.$message({
-                  type: "error",
-                  message: res.msg,
-                });
-              }
-            })
-            .catch((err) => {})
+      ).then(async () => {
+        setDelete({
+          mcpId: item.mcpId,
+        }).then((res) => {
+          if (res.code === 0) {
+            this.$message.success("删除成功")
+            this.init();
+          } else {
+            this.$message.error( res.msg || '删除失败')
+          }
         })
-        .catch(() => {})
+      })
     },
   },
 };
@@ -207,11 +173,9 @@ export default {
     margin: 20px 0 0 0 !important;
   }
 }
-
-.customize {
-  .card-box {
-   /* max-height: calc(100vh - 130px);
-    overflow-y: auto;*/
-  }
+.card-logo{
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
 }
 </style>
