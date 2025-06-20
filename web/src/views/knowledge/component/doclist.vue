@@ -20,7 +20,7 @@
                   v-model="docQuery.status"
                   :placeholder="$t('knowledgeManage.please')"
                   style="width:150px;"
-                  class="marginRight cover-input-icon"
+                  class="marginRight no-border-select cover-input-icon"
                 >
                   <el-option
                     v-for="item in knowLegOptions"
@@ -33,8 +33,9 @@
               </div>
 
               <div class="content_title">
-                <el-button type="primary" icon="el-icon-refresh" @click="reload">{{$t('common.gpuDialog.reload')}}</el-button>
+                <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload">{{$t('common.gpuDialog.reload')}}</el-button>
                 <el-button
+                  size="mini"
                   type="primary"
                   :underline="false"
                   @click="handleUpload"
@@ -421,7 +422,7 @@ export default {
   color: #e60001;
 }
 .marginRight {
-  margin-right: 5px;
+  margin-right: 10px;
 }
 .full-content {
   //padding: 20px 20px 30px 20px;
@@ -481,11 +482,9 @@ export default {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 0 10px;
       h2 {
         font-size: 16px;
-      }
-      .el-button {
-        height: 36px;
       }
       .content_title {
         display: flex;
