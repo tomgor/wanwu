@@ -1,0 +1,405 @@
+server:
+  grpc_endpoint: 0.0.0.0:9898
+  max_recv_msg_size: 4194304 # 1024 * 1024 * 4 = 4M
+
+log:
+  std: true
+  level: debug
+  logs:
+    - enable: true
+      filename: log/mcp-info.log
+      level: info
+      max_size: 10
+      max_backups: 10
+      max_age: 30
+    - enable: true
+      filename: log/mcp-err.log
+      level: error
+      max_size: 10
+      max_backups: 10
+      max_age: 30
+
+db:
+  name: mysql # mysql | postgres | tidb | oceanbase
+  mysql:
+    address: localhost:3306
+    user: root
+    password: Wanwu123456
+    database: mcp_service
+    max_open_conns: 16
+    max_idle_conns: 16
+    log_mode: true
+  postgres:
+    address: localhost:5432
+    user: postgres
+    password: Wanwu123456
+    database: mcp_service
+    max_open_conns: 16
+    max_idle_conns: 16
+    log_mode: true
+  tidb:
+    address: localhost:4000
+    user: root
+    password: Wanwu123456
+    database: mcp_service
+    max_open_conns: 16
+    max_idle_conns: 16
+    log_mode: true
+  oceanbase:
+    address: localhost:2881
+    user: root@wanwu
+    password: Wanwu123456
+    database: mcp_service
+    max_open_conns: 16
+    max_idle_conns: 16
+    log_mode: true
+
+mcp:
+  - mcp_square_id: "gaodemap"
+    name: "Amap 高德地图"
+    category: "search"
+    desc: "高德地图 MCP Server 现已覆盖12大核心服务接口，提供全场景覆盖的地图服务，包括地理编码、逆地理编码、IP 定位、天气查询、骑行路径规划、步行路径规划、驾车路径规划、公交路径规划、距离测量、关键词搜索、周边搜索、详情搜索等。"
+    from: "高德开放平台"
+    avatar: "gaodemap/logo.png"
+    detail: "gaodemap/detail.md"
+    feature: "\t•\t零部署，易使用：无需本地服务器部署，仅通过配置 URL 即可使用。\n\t•\t语义优化结果：对返回 JSON 数据进行语义增强，便于大模型理解。\n\t•\t自动升级：平台持续迭代更新，无需用户手动操作。\n\t•\t全托管云服务：无需用户关注服务器维护或扩容。\n\t•\t协议兼容性强：支持标准 SSE 长连接协议，适配多种场景。"
+    manual: "\t•\t获取开发者 Key：登录高德开放平台并创建应用获取 Key\nhttps://lbs.amap.com/?ref=https://console.amap.com/dev/index\n\t•\t配置 MCP Server：在支持 MCP 的客户端（如 Cursor）中设置 SSE 或 Node.js 接入方式\n\t•\t连接模型：选择大模型（如 Claude），使用 Agent 模式进行交互\n\t•\t直接调用服务：通过快捷键打开交互窗口开始使用，如路线规划、美食推荐等"
+    scenario: "\t•\t在支持 MCP 协议的客户端中使用（如：Cursor、Claude、Cline）\n\t•\t可嵌入到企业应用、AI 助手系统、智能出行方案中\n\t•\t适用于城市交通服务平台、天气播报系统、位置服务 App 等"
+    sse_url: "https://mcpmarket.cn/sse/67ff4974764487b6b9e11c21"
+    summary: "高德地图 MCP Server 是基于 SSE（Server-Sent Events）技术的地理服务接口集合，允许开发者通过 MCP 协议调用地图服务，如路径规划、天气查询、地点搜索等。它支持与如 Cursor、Claude 等大模型工具无缝集成。"
+    tools:
+      - name: maps_regeocode
+        description: "将一个高德经纬度坐标转换为行政区划地址信息"
+        input_schema:
+          type: object
+          properties:
+            - filed: location
+              type: string
+              description: "经纬度"
+          required:
+            - location
+      - name: maps_geo
+        description: "将详细的结构化地址转换为经纬度坐标。支持对地标性名胜景区、建筑物名称解析为经纬度坐标"
+        input_schema:
+          type: object
+          properties:
+            - filed: address
+              type: string
+              description: "待解析的结构化地址信息"
+            - filed: city
+              type: string
+              description: "指定查询的城市"
+          required:
+            - address
+      - name: maps_ip_location
+        description: "IP 定位根据用户输入的 IP 地址，定位 IP 的所在位置"
+        input_schema:
+          type: object
+          properties:
+            - filed: ip
+              type: string
+              description: "IP地址"
+          required:
+            - ip
+      - name: maps_weather
+        description: "根据城市名称或者标准adcode查询指定城市的天气"
+        input_schema:
+          type: object
+          properties:
+            - field: city
+              type: string
+              description: "城市名称或者adcode"
+          required:
+            - city
+      - name: maps_search_detail
+        description: "查询关键词搜或者周边搜获取到的POI ID的详细信息"
+        input_schema:
+          type: object
+          properties:
+            - field: id
+              type: string
+              description: "关键词搜或者周边搜获取到的POI ID"
+          required:
+            - id
+      - name: maps_bicycling
+        description: "骑行路径规划用于规划骑行通勤方案，规划时会考虑天桥、单行线、封路等情况。最大支持500km的骑行路线规划"
+        input_schema:
+          type: object
+          properties:
+            - field: destination
+              type: string
+              description: "目的地经纬度，坐标格式为：经度，纬度"
+            - field: origin
+              type: string
+              description: "出发点经纬度，坐标格式为：经度，纬度"
+          required:
+            - origin
+            - destination
+      - name: maps_direction_walking
+        description: "步行路径规划API可以根据输入起点终点经纬度坐标规划100km以内的步行通勤方案，并且返回通勤方案的数据"
+        input_schema:
+          type: object
+          properties:
+            - field: destination
+              type: string
+              description: "目的地经度，纬度，坐标格式为：经度，纬度"
+            - field: origin
+              type: string
+              description: "出发点经度，纬度，坐标格式为：经度，纬度"
+          required:
+            - origin
+            - destination
+      - name: maps_direction_driving
+        description: "驾车路径规划API可以根据用户起终点经纬度坐标规划以小客车、轿车通勤出行的方案，并且返回通勤方案的数据"
+        input_schema:
+          type: object
+          properties:
+            - field: destination
+              type: string
+              description: "目的地经度，纬度，坐标格式为：经度，纬度"
+            - field: origin
+              type: string
+              description: "出发点经度，纬度，坐标格式为：经度，纬度"
+          required:
+            - origin
+            - destination
+      - name: maps_direction_transit_integrated
+        description: "公交路径规划API可以根据用户起终点经纬度坐标规划综合各类公共（火车、公交、地铁）交通方式的通勤方案，并且返回通勤方案的数据，跨城场景下必须传起点城市与终点城市"
+        input_schema:
+          type: object
+          properties:
+            - field: city
+              type: string
+              description: "公共交通规划起点城市"
+            - field: cityd
+              type: string
+              description: "公共交通规划终点城市"
+            - field: destination
+              type: string
+              description: "目的地经度，纬度，坐标格式为：经度，纬度"
+            - field: origin
+              type: string
+              description: "出发点经度，纬度，坐标格式为：经度，纬度"
+          required:
+            - origin
+            - destination
+            - city
+            - cityd
+      - name: maps_distance
+        description: "距离测量API可以测量两个经纬度坐标之间的距离,支持驾车、步行以及球面距离测量"
+        input_schema:
+          type: object
+          properties:
+            - field: destination
+              type: string
+              description: "终点经度，纬度，坐标格式为：经度，纬度"
+            - field: origins
+              type: string
+              description: "起点经度，纬度，可以传多个坐标，使用竖线隔离，比如120,30|120,31，坐标格式为：经度，纬度"
+            - field: type
+              type: string
+              description: "距离测量类型,1代表驾车距离测量，0代表直线距离测量，3步行距离测量"
+          required:
+            - origins
+            - destination
+      - name: maps_text_search
+        description: "关键词搜，根据用户传入关键词，搜索出相关的POI"
+        input_schema:
+          type: object
+          properties:
+            - field: city
+              type: string
+              description: "查询城市"
+            - field: keywords
+              type: string
+              description: "搜索关键词"
+            - field: types
+              type: string
+              description: "POI类型，比如加油站"
+          required:
+            - keywords
+      - name: maps_around_search
+        description: "周边搜，根据用户传入关键词以及坐标location，搜索出radius半径范围的POI"
+        input_schema:
+          type: object
+          properties:
+            - field: keywords
+              type: string
+              description: "搜索关键词"
+            - field: location
+              type: string
+              description: "中心点经度纬度"
+            - field: radius
+              type: string
+              description: "搜索半径"
+          required:
+            - location
+  - mcp_square_id: "converttime"
+    name: "Time"
+    category: "data"
+    desc: "提供时间和时区转换功能"
+    from: "modelcontextprotocol"
+    avatar: "converttime/logo.png"
+    detail: "converttime/detail.md"
+    feature: "关键特性包括能够获取特定或系统时区的当前时间，以及使用IANA时区名称在不同时区之间转换时间。"
+    manual: "要使用Time MCP Server，可以选择通过``uv``直接运行而无需安装，或通过pip安装，命令为'pip install mcp-server-time'。安装后，可以作为脚本执行。"
+    scenario: "Time可用于需要准确时间信息和时区转换的应用程序，例如调度应用、全球通信工具以及处理时间敏感数据的软件。"
+    sse_url: "https://mcpmarket.cn/sse/67f39bfdb66f446c3d8ef609"
+    summary: "Time是一个模型上下文协议服务器，提供时间和时区转换功能，使LLM能够获取当前时间信息，并使用IANA时区名称进行时区转换。"
+    tools:
+      - name: get_current_time
+        description: "Get current time in a specific timezones"
+        input_schema:
+          type: object
+          properties:
+            - field: timezone
+              type: string
+              description: "IANA timezone name (e.g., 'America/New_York', 'Europe/London'). Use 'Asia/Shanghai' as local timezone if no timezone provided by the user."
+          required:
+            - timezone
+      - name: convert_time
+        description: "Convert time between timezones"
+        input_schema:
+          type: object
+          properties:
+            - field: source_timezone
+              type: string
+              description: "Source IANA timezone name (e.g., 'America/New_York', 'Europe/London'). Use 'Asia/Shanghai' as local timezone if no source timezone provided by the user."
+            - field: target_timezone
+              type: string
+              description: "Target IANA timezone name (e.g., 'Asia/Tokyo', 'America/San_Francisco'). Use 'Asia/Shanghai' as local timezone if no target timezone provided by the user."
+            - field: time
+              type: string
+              description: "Time to convert in 24-hour format (HH:MM)"
+          required:
+            - source_timezone
+            - time
+            - target_timezone
+  - mcp_square_id: "minimax"
+    name: "MiniMax"
+    category: "create"
+    desc: "MiniMax官方MCP Server，支持高质量的视频生成、图像生成、语音生成、和声音克隆等多项能力"
+    from: "MiniMax-AI"
+    avatar: "minimax/logo.png"
+    detail: "minimax/detail.md"
+    feature: "MiniMax-MCP的关键特性包括高质量的文本转语音合成、高效的视频生成能力，以及便于集成的用户友好API。"
+    manual: "使用MiniMax-MCP，开发者可以将提供的API集成到他们的应用程序中，从而实现无缝的文本转语音转换和视频生成功能。"
+    scenario: "MiniMax-MCP可以应用于教育、娱乐、内容创作和为残疾人士提供无障碍解决方案等多个领域。"
+    sse_url: "https://mcpmarket.cn/sse/67f77bf1d6110df54f87a6e6"
+    summary: "MiniMax-MCP是MiniMax模型上下文协议的官方服务器，旨在促进与先进的文本转语音和视频生成API的交互。"
+    tools:
+      - name: text_to_audio
+        description: "Convert text to audio with a given voice and save the output audio file to a given directory.\n    Directory is optional, if not provided, the output file will be saved to $HOME/Desktop.\n    Voice id is optional, if not provided, the default voice will be used.\n\n    COST WARNING: This tool makes an API call to Minimax which may incur costs. Only use when explicitly requested by the user.\n\n    Args:\n        text (str): The text to convert to speech.\n        voice_id (str, optional): The id of the voice to use. For example, \"male-qn-qingse\"/\"audiobook_female_1\"/\"cute_boy\"/\"Charming_Lady\"...\n        model (string, optional): The model to use.\n        speed (float, optional): Speed of the generated audio. Controls the speed of the generated speech. Values range from 0.5 to 2.0, with 1.0 being the default speed. \n        vol (float, optional): Volume of the generated audio. Controls the volume of the generated speech. Values range from 0 to 10, with 1 being the default volume.\n        pitch (int, optional): Pitch of the generated audio. Controls the speed of the generated speech. Values range from -12 to 12, with 0 being the default speed.\n        emotion (str, optional): Emotion of the generated audio. Controls the emotion of the generated speech. Values range [\"happy\", \"sad\", \"angry\", \"fearful\", \"disgusted\", \"surprised\", \"neutral\"], with \"happy\" being the default emotion.\n        sample_rate (int, optional): Sample rate of the generated audio. Controls the sample rate of the generated speech. Values range [8000,16000,22050,24000,32000,44100] with 32000 being the default sample rate.\n        bitrate (int, optional): Bitrate of the generated audio. Controls the bitrate of the generated speech. Values range [32000,64000,128000,256000] with 128000 being the default bitrate.\n        channel (int, optional): Channel of the generated audio. Controls the channel of the generated speech. Values range [1, 2] with 1 being the default channel.\n        format (str, optional): Format of the generated audio. Controls the format of the generated speech. Values range [\"pcm\", \"mp3\",\"flac\"] with \"mp3\" being the default format.\n        language_boost (str, optional): Language boost of the generated audio. Controls the language boost of the generated speech. Values range ['Chinese', 'Chinese,Yue', 'English', 'Arabic', 'Russian', 'Spanish', 'French', 'Portuguese', 'German', 'Turkish', 'Dutch', 'Ukrainian', 'Vietnamese', 'Indonesian', 'Japanese', 'Italian', 'Korean', 'Thai', 'Polish', 'Romanian', 'Greek', 'Czech', 'Finnish', 'Hindi', 'auto'] with \"auto\" being the default language boost.\n        output_directory (str): The directory to save the audio to.\n\n    Returns:\n        Text content with the path to the output file and name of the voice used.\n    "
+        input_schema:
+          type: object
+          properties:
+            - field: bitrate
+              type: integer
+            - field: channel
+              type: integer
+            - field: emotion
+              type: string
+            - field: format
+              type: string
+            - field: language_boost
+              type: string
+            - field: model
+              type: string
+            - field: output_directory
+              type: string
+            - field: pitch
+              type: integer
+            - field: sample_rate
+              type: integer
+            - field: speed
+              type: number
+            - field: text
+              type: string
+            - field: voice_id
+              type: string
+            - field: vol
+              type: number
+          required:
+            - text
+      - name: list_voices
+        description: "List all voices available.\n\n    Args:\n        voice_type (str, optional): The type of voices to list. Values range [\"all\", \"system\", \"voice_cloning\"], with \"all\" being the default.\n    Returns:\n        Text content with the list of voices.\n    "
+        input_schema:
+          type: object
+          properties:
+            - field: voice_type
+              type: string
+      - name: voice_clone
+        description: "Clone a voice using provided audio files. The new voice will be charged upon first use.\n\n    COST WARNING: This tool makes an API call to Minimax which may incur costs. Only use when explicitly requested by the user.\n\n     Args:\n        voice_id (str): The id of the voice to use.\n        file (str): The path to the audio file to clone or a URL to the audio file.\n        text (str, optional): The text to use for the demo audio.\n        is_url (bool, optional): Whether the file is a URL. Defaults to False.\n        output_directory (str): The directory to save the demo audio to.\n    Returns:\n        Text content with the voice id of the cloned voice.\n    "
+        input_schema:
+          type: object
+          properties:
+            - field: file
+              type: string
+            - field: is_url
+              type: boolean
+            - field: output_directory
+              type: string
+            - field: text
+              type: string
+            - field: voice_id
+              type: string
+          required:
+            - voice_id
+            - file
+            - text
+      - name: play_audio
+        description: "Play an audio file. Supports WAV and MP3 formats. Not supports video.\n\n     Args:\n        input_file_path (str): The path to the audio file to play.\n        is_url (bool, optional): Whether the audio file is a URL.\n    Returns:\n        Text content with the path to the audio file.\n    "
+        input_schema:
+          type: object
+          properties:
+            - field: input_file_path
+              type: string
+            - field: is_url
+              type: boolean
+          required:
+            - input_file_path
+      - name: generate_video
+        description: "Generate a video from a prompt.\n\n    COST WARNING: This tool makes an API call to Minimax which may incur costs. Only use when explicitly requested by the user.\n\n     Args:\n        model (str, optional): The model to use. Values range [\"T2V-01\", \"T2V-01-Director\", \"I2V-01\", \"I2V-01-Director\", \"I2V-01-live\"]. \"Director\" supports inserting instructions for camera movement control. \"I2V\" for image to video. \"T2V\" for text to video.\n        prompt (str): The prompt to generate the video from. When use Director model, the prompt supports 15 Camera Movement Instructions (Enumerated Values)\n            -Truck: [Truck left], [Truck right]\n            -Pan: [Pan left], [Pan right]\n            -Push: [Push in], [Pull out]\n            -Pedestal: [Pedestal up], [Pedestal down]\n            -Tilt: [Tilt up], [Tilt down]\n            -Zoom: [Zoom in], [Zoom out]\n            -Shake: [Shake]\n            -Follow: [Tracking shot]\n            -Static: [Static shot]\n        first_frame_image (str): The first frame image. The model must be \"I2V\" Series.\n        output_directory (str): The directory to save the video to.\n        async_mode (bool, optional): Whether to use async mode. Defaults to False. If True, the video generation task will be submitted asynchronously and the response will return a task_id. Should use `query_video_generation` tool to check the status of the task and get the result.\n    Returns:\n        Text content with the path to the output video file.\n    "
+        input_schema:
+          type: object
+          properties:
+            - field: async_mode
+              type: boolean
+            - field: first_frame_image
+              type: string
+            - field: model
+              type: string
+            - field: output_directory
+              type: string
+            - field: prompt
+              type: string
+      - name: query_video_generation
+        description: "Query the status of a video generation task.\n\n    Args:\n        task_id (str): The task ID to query. Should be the task_id returned by `generate_video` tool if `async_mode` is True.\n        output_directory (str): The directory to save the video to.\n    Returns:\n        Text content with the status of the task.\n    "
+        input_schema:
+          type: object
+          properties:
+            - field: output_directory
+              type: string
+            - field: task_id
+              type: string
+          required:
+            - task_id
+      - name: text_to_image
+        description: "Generate a image from a prompt.\n\n    COST WARNING: This tool makes an API call to Minimax which may incur costs. Only use when explicitly requested by the user.\n\n     Args:\n        model (str, optional): The model to use. Values range [\"image-01\"], with \"image-01\" being the default.\n        prompt (str): The prompt to generate the image from.\n        aspect_ratio (str, optional): The aspect ratio of the image. Values range [\"1:1\", \"16:9\",\"4:3\", \"3:2\", \"2:3\", \"3:4\", \"9:16\", \"21:9\"], with \"1:1\" being the default.\n        n (int, optional): The number of images to generate. Values range [1, 9], with 1 being the default.\n        prompt_optimizer (bool, optional): Whether to optimize the prompt. Values range [True, False], with True being the default.\n        output_directory (str): The directory to save the image to.\n    Returns:\n        Text content with the path to the output image file.\n    "
+        input_schema:
+          type: object
+          properties:
+            - field: aspect_ratio
+              type: string
+            - field: model
+              type: string
+            - field: n
+              type: integer
+            - field: output_directory
+              type: string
+            - field: prompt
+              type: string
+            - field: prompt_optimizer
+              type: boolean
+
+
