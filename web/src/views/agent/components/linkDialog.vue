@@ -30,6 +30,12 @@
 </template>
 <script>
 export default {
+    props:{
+        linkform:{
+            type:Object,
+            default:null
+        }
+    },
     data(){
         return{
             dialogVisible:false,
@@ -56,11 +62,11 @@ export default {
             
         },
         showDialog(){
-            this.form = {
-                searchUrl:'',
-                searchKey:''
-            }
             this.dialogVisible = true
+             if(this.linkform !== null){
+                this.form.searchUrl = this.linkform.searchUrl;
+                this.form.searchKey = this.linkform.searchKey;
+            }
         }
     }
 }

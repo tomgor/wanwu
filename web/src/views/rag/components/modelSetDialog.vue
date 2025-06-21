@@ -85,7 +85,7 @@ export default {
         showDialog(){
             this.dialogVisible = true;
             if(this.modelConfig !== null){
-                this.ruleForm =  this.modelConfig
+                this.ruleForm = this.modelConfig
             }
         },
         handleClose(){
@@ -99,6 +99,11 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+/deep/{
+    .el-input-number--small{
+        line-height: 28px!important;
+    }
+}
 .question{
     cursor: pointer;
     color:#ccc;

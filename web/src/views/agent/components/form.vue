@@ -188,7 +188,7 @@
               >{{n.apiName}}</div>
               <div class="bt">
                 <el-switch v-model="n.enable" class="bt-switch" @change="actionSwitch(n.actionId)"></el-switch>
-                <span @click="preDelAction(n.actionId)">{{$t('common.button.delete')}}</span>
+                <span @click="preDelAction(n.actionId)" class="el-icon-delete del"></span>
               </div>
             </div>
             </div>
@@ -212,7 +212,7 @@
 
                   <div class="bt">
                     <el-switch v-model="n.enable" class="bt-switch" @change="workflowSwitch(n.workFlowId)"></el-switch>
-                    <span @click="workflowRemove(n.workFlowId)">{{$t('common.button.delete')}}</span>
+                    <span @click="workflowRemove(n.workFlowId)" class="el-icon-delete del"></span>
                   </div>
                 </div>
               </div>
@@ -273,13 +273,13 @@
     <!-- 编辑智能体 -->
     <CreateIntelligent ref="createIntelligentDialog" :type="'edit'" :editForm="editForm" @updateInfo="getAppDetail" />
     <!-- 模型设置 -->
-    <ModelSet @setModelSet="setModelSet" ref="modelSetDialog" />
+    <ModelSet @setModelSet="setModelSet" ref="modelSetDialog" :modelform="editForm.modelConfig" />
     <!-- apikey -->
     <ApiKeyDialog ref="apiKeyDialog" :appId="editForm.assistantId" :appType="'agent'" />
     <!-- 选择工作类型 -->
     <ToolDiaglog ref="toolDiaglog" @selectTool="selectTool" />
     <!-- 联网检索 -->
-    <LinkDialog ref="linkDialog" @setLinkSet="setLinkSet" />
+    <LinkDialog ref="linkDialog" @setLinkSet="setLinkSet" :linkform="editForm.onlineSearchConfig" />
   </div>
 </template>
 
@@ -287,23 +287,17 @@
 import {getApiKeyRoot,appPublish} from "@/api/appspace";
 import { store } from "@/store/index";
 import { mapGetters } from "vuex";
-import { batchUpload, createApp, getAppDetail, updateApp } from "@/api/chat";
+import { createApp} from "@/api/chat";
 import { getKnowledgeList } from "@/api/knowledge";
 import CreateIntelligent from "@/components/createApp/createIntelligent";
 import ModelSet from "./modelSetDialog";
 import ApiKeyDialog from "./ApiKeyDialog";
-import { deleteAction, getModelList } from "@/api/cubm";
 import { selectModelList,getRerankList} from "@/api/modelAccess";
 import { getAgentInfo,addWorkFlowInfo,delWorkFlowInfo,delActionInfo,putAgentInfo,enableWorkFlow,enableAction } from "@/api/agent";
 import ActionConfig from "./action";
 import ToolDiaglog from "./toolDialog";
 import LinkDialog from "./linkDialog";
-import {
-  getWorkFlowList,
-  readWorkFlow,
-  createWorkFlow,
-  deleteWorkFlow,
-} from "@/api/workflow";
+import { getWorkFlowList,readWorkFlow} from "@/api/workflow";
 import { Base64 } from "js-base64";
 import Chat from "./chat";
 export default {
@@ -317,12 +311,6 @@ export default {
     LinkDialog
   },
   watch: {
-    basicForm: {
-      handler(val) {
-        store.dispatch("app/setBasicForm", val);
-      },
-      deep: true,
-    },
     "editForm.recommendQuestion": {
       handler(val) {
         store.dispatch("app/setStarterPrompts", val);
@@ -383,7 +371,9 @@ export default {
           topP:1,
           frequencyPenalty:0,
           presencePenalty:0,
-          maxTokens:512,
+          maxTokens:512, 
+          maxTokensEnable:true,
+          frequencyPenaltyEnable:true,
           temperatureEnable:true,
           topPEnable:true,
           presencePenaltyEnable:true
@@ -411,13 +401,6 @@ export default {
       saved: false, //按钮
       loading: false, //按钮
       t: null,
-      basicForm: {},
-      expandForm: {
-        fileList: [],
-        starterPrompts: [{ value: "" }],
-        models: [],
-        actionInfos: [],
-      },
       logoFileList: [],
       imageUrl: "",
       defaultLogo: require("@/assets/imgs/bg-logo.png"),
@@ -426,8 +409,6 @@ export default {
   },
   created() {
     this.getKnowledgeList();
-    //如果有缓存数据，先读缓存做预加载再去调接口
-    this.setCacheData();
     this.getModelData();    //获取模型列表
      this.getRerankData(); //获取rerank模型
     if (this.$route.query.id) {
@@ -550,11 +531,6 @@ export default {
         this.getModelData()
       }
     },
-    goModelList() {
-      //跳转到服务管理
-      location.href =
-        window.location.origin + `${this.$basePath}/aibase/portal/training/releaseTable`;
-    },
     async getModelData() {
       this.modelLoading = true;
       const res = await selectModelList();
@@ -571,68 +547,6 @@ export default {
         this.knowledgeData = res.data.knowledgeList || [];
       } else {
         this.$message.error(res.message);
-      }
-    },
-    setCacheData() {
-      if (!this.cacheData.assistantId) {
-        return;
-      }
-      const {
-        avatar,
-        instructions,
-        name,
-        description,
-        fileList,
-        starterPrompts,
-        models,
-      } = this.cacheData;
-      this.basicForm.avatar = avatar || "";
-      this.basicForm.instructions = instructions || "";
-      this.basicForm.name = name || "";
-      this.basicForm.description = description || "";
-
-      this.expandForm.fileList = fileList || [];
-      this.expandForm.starterPrompts = starterPrompts
-        ? starterPrompts.map((n) => {
-            return { value: n };
-          })
-        : [];
-      this.expandForm.models = models || [];
-    },
-    listenerUpdate() {
-      if (this.basicForm.assistantId) {
-        this.doUpdateApp();
-      } else {
-        //一体机验证知识库必填
-        if (this.platform === "YWD_RAG" || this.platform === "HW_RAG") {
-          if (
-            this.basicForm.avatar &&
-            this.basicForm.name &&
-            this.basicForm.instructions &&
-            this.basicForm.knowledgeBaseIds
-          ) {
-            this.doCreateApp();
-          }
-        } else {
-          //正式环境验证模型ID必填
-          // && this.basicForm.modelId
-          if (
-            this.basicForm.avatar &&
-            this.basicForm.name &&
-            this.basicForm.instructions
-          ) {
-            this.doCreateApp();
-          }
-        }
-      }
-    },
-    async doCreateApp() {
-      let params = JSON.parse(JSON.stringify(this.basicForm));
-      delete params.assistantId;
-      let res = await createApp(params);
-      if (res.code === 0) {
-        this.basicForm.assistantId = res.data.assistantId;
-        //this.$refs['knowledge-enhance'].setAssistantId(res.data.assistantId)
       }
     },
     async updateInfo() {
@@ -685,19 +599,6 @@ export default {
         }, 500);
       }
     },
-    get_result(data) {
-      //AI自动生成原生应用基本信息
-      if (JSON.stringify(data) !== "{}") {
-        this.basicForm = {
-          ...this.basicForm,
-          avatar: data.avatar || "",
-          instructions: data.instructions || "",
-          name: data.name || "",
-          description: data.description || "",
-        };
-        this.basicForm.assistantId = data.assistantId;
-      }
-    },
     async getAppDetail() {
       this.startLoading(0);
       let res = await getAgentInfo({ assistantId: this.editForm.assistantId });
@@ -715,7 +616,7 @@ export default {
           name: data.name || "",
           desc: data.desc || "",
           rerankParams:data.rerankConfig.modelId || "",
-          // knowledgeBaseIds: data.knowledgeBaseIds || [],
+          modelConfig:data.modelConfig.config,
           modelParams: data.modelConfig.modelId || "",
           recommendQuestion:data.recommendQuestion && data.recommendQuestion.length >0
             ? data.recommendQuestion.map((n) => {
@@ -725,15 +626,6 @@ export default {
           actionInfos: data.actionInfos || [],
           onlineSearchConfig:data.onlineSearchConfig
         };
-        
-        // this.expandForm = {
-        //   models: data.models || [],
-        //   fileList: data.fileList || [],
-        //   actionInfos: data.actionInfos || [],
-        // };
-
-        store.dispatch("app/setBasicForm", this.editForm);
-        // store.dispatch("app/setExpandForm", this.expandForm);
 
         //回显自定义插件
         this.getWorkflowList(data.workFlowInfos || []);
@@ -1212,16 +1104,23 @@ export default {
     border-radius:6px;
     margin-bottom: 5px;
     .name {
-      // flex: 4;
+      flex: 3;
       padding: 10px 20px;
       cursor: pointer;
       color: #2c7eea;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; 
     }
     .bt {
       text-align: center;
-      // flex: 1;
+      flex: 2;
       cursor: pointer;
-      padding: 10px 20px;
+      //padding: 10px 20px;
+      .del{
+        color:#384BF7;
+        font-size:16px;
+      }
       .bt-switch{
         margin-right:10px;
       }
