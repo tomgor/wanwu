@@ -65,6 +65,11 @@ func AssistantConfigUpdate(ctx *gin.Context, userId, orgId string, req request.A
 			TopKEnable:       req.KnowledgeBaseConfig.Config.TopKEnable,
 		},
 		RerankConfig: rerankConfig,
+		OnlineSearchConfig: &assistant_service.AssistantOnlineSearchConfig{
+			SearchUrl: req.OnlineSearchConfig.SearchUrl,
+			SearchKey: req.OnlineSearchConfig.SearchKey,
+			Enable:    req.OnlineSearchConfig.Enable,
+		},
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
@@ -397,6 +402,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 			actionInfos = append(actionInfos, &response.ActionInfos{
 				ActionId: action.ActionId,
 				ApiName:  action.ApiName,
+				Enable:   action.Enable,
 			})
 			log.Debugf("添加动作信息: ActionId=%s, ApiName=%s", action.ActionId, action.ApiName)
 		}
@@ -412,12 +418,21 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 				Id:         wf.Id,
 				WorkFlowId: wf.WorkFlowId,
 				ApiName:    wf.ApiName,
+				Enable:     wf.Enable,
 			})
 			log.Debugf("添加工作流信息: WorkFlowId=%s, ApiName=%s", wf.WorkFlowId, wf.ApiName)
 		}
 		log.Debugf("总共添加 %d 个工作流信息", len(workFlowInfos))
 	} else {
 		log.Debugf("工作流信息为空")
+	}
+	var onlineSearchConfig request.OnlineSearchConfig
+	if resp.OnlineSearchConfig != nil {
+		onlineSearchConfig = request.OnlineSearchConfig{
+			SearchUrl: resp.OnlineSearchConfig.SearchUrl,
+			SearchKey: resp.OnlineSearchConfig.SearchKey,
+			Enable:    resp.OnlineSearchConfig.Enable,
+		}
 	}
 
 	assistantModel := response.Assistant{
@@ -444,13 +459,14 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 			log.Debugf("知识库配置为空")
 			return request.AppKnowledgebaseConfig{}
 		}(),
-		ModelConfig:   modelConfig,
-		RerankConfig:  rerankConfig,
-		Scope:         resp.Scope,
-		ActionInfos:   actionInfos,
-		WorkFlowInfos: workFlowInfos,
-		CreatedAt:     util.Time2Str(resp.CreatTime),
-		UpdatedAt:     util.Time2Str(resp.UpdateTime),
+		ModelConfig:        modelConfig,
+		RerankConfig:       rerankConfig,
+		OnlineSearchConfig: onlineSearchConfig,
+		Scope:              resp.Scope,
+		ActionInfos:        actionInfos,
+		WorkFlowInfos:      workFlowInfos,
+		CreatedAt:          util.Time2Str(resp.CreatTime),
+		UpdatedAt:          util.Time2Str(resp.UpdateTime),
 	}
 	log.Debugf("Assistant响应到模型转换完成，结果: %+v", assistantModel)
 	return assistantModel, nil

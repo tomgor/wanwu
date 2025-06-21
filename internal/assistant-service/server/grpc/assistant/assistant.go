@@ -165,6 +165,18 @@ func (s *Service) AssistantConfigUpdate(ctx context.Context, req *assistant_serv
 		existingAssistant.KnowledgebaseConfig = string(knowledgeBaseConfigBytes)
 	}
 
+	// 处理onlineSearchConfig，转换成json字符串之后再更新
+	if req.OnlineSearchConfig != nil {
+		onlineSearchConfigBytes, err := json.Marshal(req.OnlineSearchConfig)
+		if err != nil {
+			return nil, errStatus(errs.Code_AssistantErr, &errs.Status{
+				TextKey: "assistant_onlineSearchConfig_marshal",
+				Args:    []string{err.Error()},
+			})
+		}
+		existingAssistant.OnlineSearchConfig = string(onlineSearchConfigBytes)
+	}
+
 	// 调用client方法更新智能体
 	if status := s.cli.UpdateAssistant(ctx, existingAssistant); status != nil {
 		return nil, errStatus(errs.Code_AssistantErr, status)
@@ -226,6 +238,7 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 		actionInfos = append(actionInfos, &assistant_service.ActionInfos{
 			ActionId: strconv.FormatUint(uint64(action.ID), 10),
 			ApiName:  action.ActionName,
+			Enable:   action.Enable,
 		})
 	}
 
@@ -236,6 +249,7 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 			Id:         strconv.FormatUint(uint64(workflow.ID), 10),
 			WorkFlowId: workflow.WorkflowId,
 			ApiName:    workflow.Name,
+			Enable:     workflow.Enable,
 		})
 	}
 
@@ -275,6 +289,18 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 		}
 	}
 
+	// 处理assistant.OnlineSearchConfig，转换成AssistantOnlineSearchConfig
+	var onlineSearchConfig *assistant_service.AssistantOnlineSearchConfig
+	if assistant.OnlineSearchConfig != "" {
+		onlineSearchConfig = &assistant_service.AssistantOnlineSearchConfig{}
+		if err := json.Unmarshal([]byte(assistant.OnlineSearchConfig), onlineSearchConfig); err != nil {
+			return nil, errStatus(errs.Code_AssistantErr, &errs.Status{
+				TextKey: "assistant_onlineSearchConfig_unmarshal",
+				Args:    []string{err.Error()},
+			})
+		}
+	}
+
 	return &assistant_service.AssistantInfo{
 		AssistantId: strconv.FormatUint(uint64(assistant.ID), 10),
 		AssistantBrief: &common.AppBriefConfig{
@@ -288,6 +314,7 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 		ModelConfig:         modelConfig,
 		KnowledgeBaseConfig: knowledgeBaseConfig,
 		RerankConfig:        rerankConfig,
+		OnlineSearchConfig:  onlineSearchConfig,
 		Scope:               int32(assistant.Scope),
 		WorkFlowInfos:       workFlowInfos,
 		ActionInfos:         actionInfos,
