@@ -234,16 +234,6 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	requestBody["plugin_list"] = allPlugin
 	log.Debugf("智能体plugin_list，assistantId: %s, plugin_list: %s", req.AssistantId, allPlugin)
 
-	knowledgebaseConfig := &AppKnowledgebaseConfig{}
-	if assistant.KnowledgebaseConfig != "" {
-		// 将string类型的knowledgebase_config转换为common.AppKnowledgebaseConfig
-		if err := json.Unmarshal([]byte(assistant.KnowledgebaseConfig), knowledgebaseConfig); err != nil {
-			log.Errorf("Assistant服务解析智能体知识库配置失败，assistantId: %s, error: %v, knowledgebaseConfigRaw: %s", req.AssistantId, err, assistant.KnowledgebaseConfig)
-			SSEError(stream, "智能体知识库配置解析失败")
-			return err
-		}
-	}
-
 	// 将string类型的ModelConfig转换为common.AppModelConfig
 	var modelConfig *common.AppModelConfig
 	if assistant.ModelConfig != "" {
@@ -271,6 +261,32 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		log.Warnf("Assistant服务智能体模型配置为空，assistantId: %s", req.AssistantId)
 	}
 
+	onlineSearchConfig := &AppOnlineSearchConfig{}
+	log.Debugf("Assistant服务解析智能体在线搜索配置，assistantId: %s, onlineSearchConfig: %+v", req.AssistantId, assistant.OnlineSearchConfig)
+	if assistant.OnlineSearchConfig != "" {
+		if err := json.Unmarshal([]byte(assistant.OnlineSearchConfig), onlineSearchConfig); err != nil {
+			log.Errorf("Assistant服务解析智能体在线搜索配置失败，assistantId: %s, error: %v, onlineSearchConfigRaw: %s", req.AssistantId, err, assistant.OnlineSearchConfig)
+			SSEError(stream, "智能体在线搜索配置解析失败")
+			return err
+		}
+		log.Debugf("Assistant服务解析智能体在线搜索配置，assistantId: %s, onlineSearchConfig: %+v", req.AssistantId, onlineSearchConfig)
+	}
+	if onlineSearchConfig.Enable && onlineSearchConfig.SearchUrl != "" && onlineSearchConfig.SearchKey != "" {
+		requestBody["search_url"] = onlineSearchConfig.SearchUrl
+		requestBody["search_key"] = onlineSearchConfig.SearchKey
+		requestBody["use_search"] = true
+		log.Debugf("Assistant服务添加在线搜索配置到请求参数，assistantId: %s, search_url: %s, search_key: %s, use_search: %v", req.AssistantId, onlineSearchConfig.SearchUrl, onlineSearchConfig.SearchKey, onlineSearchConfig.Enable)
+	}
+
+	knowledgebaseConfig := &AppKnowledgebaseConfig{}
+	if assistant.KnowledgebaseConfig != "" {
+		// 将string类型的knowledgebase_config转换为common.AppKnowledgebaseConfig
+		if err := json.Unmarshal([]byte(assistant.KnowledgebaseConfig), knowledgebaseConfig); err != nil {
+			log.Errorf("Assistant服务解析智能体知识库配置失败，assistantId: %s, error: %v, knowledgebaseConfigRaw: %s", req.AssistantId, err, assistant.KnowledgebaseConfig)
+			SSEError(stream, "智能体知识库配置解析失败")
+			return err
+		}
+	}
 	if len(knowledgebaseConfig.Knowledgebases) > 0 {
 		rerankConfig := &common.AppModelConfig{}
 		if assistant.RerankConfig != "" {
@@ -483,6 +499,12 @@ type AppKnowledgebaseParams struct {
 	TopKEnable       bool `json:"top_k_enable"`
 }
 
+type AppOnlineSearchConfig struct {
+	SearchUrl string `json:"searchUrl"`
+	SearchKey string `json:"searchKey"`
+	Enable    bool   `json:"enable"`
+}
+
 func mergeMaps(map1, map2 map[string]interface{}) map[string]interface{} {
 	result := make(map[string]interface{})
 	for k, v := range map1 {
@@ -501,9 +523,9 @@ func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantI
 		return pluginList, errStatus(errs.Code_AssistantConversationErr, status)
 	}
 	for _, assistantWorkFlowModel := range resp {
-		// if !assistantWorkFlowModel.Enable {
-		// 	continue
-		// }
+		if !assistantWorkFlowModel.Enable {
+			continue
+		}
 		tmp := PluginListAlgRequest{}
 		schema, err := util.ValidateOpenAPISchema(assistantWorkFlowModel.APISchema)
 		if err != nil {
@@ -540,9 +562,9 @@ func buildActionPluginListAlgParam(ctx context.Context, s *Service, assistantId,
 		return pluginList, errStatus(errs.Code_AssistantConversationErr, status)
 	}
 	for _, assistantActionModel := range resp {
-		// if !assistantActionModel.Enable {
-		// 	continue
-		// }
+		if !assistantActionModel.Enable {
+			continue
+		}
 		tmp := PluginListAlgRequest{}
 		schema, err := util.ValidateOpenAPISchema(assistantActionModel.APISchema)
 		if err != nil {
