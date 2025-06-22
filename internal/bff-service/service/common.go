@@ -28,6 +28,8 @@ const docCenterLocalDir = "static/docs"
 var (
 	avatarCacheMu       sync.Mutex
 	avatarCacheLocalDir = "cache"
+
+	mcpAvatarCacheLocalDir = "cache/mcp"
 )
 
 func GetUserPermission(ctx *gin.Context, userID, orgID string) (*response.UserPermission, error) {

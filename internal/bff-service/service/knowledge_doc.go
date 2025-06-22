@@ -8,6 +8,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
+	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/minio"
 	"github.com/UnicomAI/wanwu/pkg/util"
@@ -48,7 +49,7 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 			docUrl, err = minio.GetUploadFileWithExpire(ctx, info.DocId)
 			if err != nil {
 				log.Errorf("GetUploadFileWithNotExpire error %v", err)
-				return gin_util.I18nCodeError(ctx, errs.Code_KnowledgeDocImportUrlFailed)
+				return grpc_util.ErrorStatus(errs.Code_KnowledgeDocImportUrlFailed)
 			}
 			//特殊处理类型
 			if strings.HasSuffix(docUrl, ".tar.gz") {

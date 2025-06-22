@@ -2,7 +2,6 @@ package gin_util
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -169,10 +168,6 @@ type response struct {
 }
 
 // --- i18n ---
-
-func I18nCodeError(ctx *gin.Context, code err_code.Code, args ...string) error {
-	return errors.New(I18nCodeOrKey(ctx, code, "", args...))
-}
 
 func I18nCode(ctx *gin.Context, code err_code.Code, args ...string) string {
 	return I18nCodeOrKey(ctx, code, "", args...)

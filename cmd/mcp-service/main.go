@@ -17,8 +17,9 @@ import (
 )
 
 var (
-	configFile   = flag.String("config", "configs/microservice/mcp-service/configs/config.yaml", "mcp-service config")
-	isVersion    bool
+	configFile string
+	isVersion  bool
+
 	buildTime    string //编译时间
 	buildVersion string //编译版本
 	gitCommitID  string //git的commit id
@@ -28,14 +29,9 @@ var (
 )
 
 func main() {
-	//打印编译信息
+	flag.StringVar(&configFile, "config", "configs/microservice/mcp-service/configs/config.yaml", "conf yaml file")
 	flag.BoolVar(&isVersion, "v", false, "编译信息")
 	flag.Parse()
-
-	if len(os.Args) > 1 && !isVersion {
-		flag.Usage()
-		return
-	}
 
 	if isVersion {
 		versionPrint()
@@ -45,7 +41,7 @@ func main() {
 	ctx := context.Background()
 
 	flag.Parse()
-	if err := config.LoadConfig(*configFile); err != nil {
+	if err := config.LoadConfig(configFile); err != nil {
 		log.Fatalf("init cfg err: %v", err)
 	}
 

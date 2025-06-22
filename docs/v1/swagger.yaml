@@ -184,6 +184,111 @@ definitions:
         description: 推理url
         type: string
     type: object
+  protocol.DataType:
+    enum:
+    - object
+    - number
+    - integer
+    - string
+    - array
+    - "null"
+    - boolean
+    type: string
+    x-enum-varnames:
+    - ObjectT
+    - Number
+    - Integer
+    - String
+    - Array
+    - "Null"
+    - Boolean
+  protocol.InputSchema:
+    properties:
+      properties:
+        additionalProperties:
+          $ref: '#/definitions/protocol.Property'
+        type: object
+      required:
+        items:
+          type: string
+        type: array
+      type:
+        $ref: '#/definitions/protocol.InputSchemaType'
+    type: object
+  protocol.InputSchemaType:
+    enum:
+    - object
+    type: string
+    x-enum-varnames:
+    - Object
+  protocol.Property:
+    properties:
+      description:
+        description: Description is the description of the schema.
+        type: string
+      enum:
+        items:
+          type: string
+        type: array
+      items:
+        allOf:
+        - $ref: '#/definitions/protocol.Property'
+        description: Items specifies which data type an array contains, if the schema
+          type is Array.
+      properties:
+        additionalProperties:
+          $ref: '#/definitions/protocol.Property'
+        description: Properties describes the properties of an object, if the schema
+          type is Object.
+        type: object
+      required:
+        items:
+          type: string
+        type: array
+      type:
+        $ref: '#/definitions/protocol.DataType'
+    type: object
+  protocol.Tool:
+    properties:
+      annotations:
+        allOf:
+        - $ref: '#/definitions/protocol.ToolAnnotations'
+        description: Annotations provides additional hints about the tool's behavior
+      description:
+        description: Description is a human-readable description of the tool
+        type: string
+      inputSchema:
+        allOf:
+        - $ref: '#/definitions/protocol.InputSchema'
+        description: InputSchema defines the expected parameters for the tool using
+          JSON Schema
+      name:
+        description: Name is the unique identifier of the tool
+        type: string
+    type: object
+  protocol.ToolAnnotations:
+    properties:
+      destructiveHint:
+        description: |-
+          DestructiveHint indicates the tool may perform destructive updates
+          (only meaningful when ReadOnlyHint is false)
+        type: boolean
+      idempotentHint:
+        description: |-
+          IdempotentHint indicates calling the tool repeatedly with the same arguments
+          has no additional effect (only meaningful when ReadOnlyHint is false)
+        type: boolean
+      openWorldHint:
+        description: OpenWorldHint indicates the tool may interact with an "open world"
+          of external entities
+        type: boolean
+      readOnlyHint:
+        description: ReadOnlyHint indicates the tool does not modify its environment
+        type: boolean
+      title:
+        description: Title is a human-readable title for the tool, useful for UI display
+        type: string
+    type: object
   request.ActionAddRequest:
     properties:
       apiAuth:
@@ -760,6 +865,13 @@ definitions:
     - name
     - sseUrl
     type: object
+  request.MCPIDReq:
+    properties:
+      mcpId:
+        type: string
+    required:
+    - mcpId
+    type: object
   request.MergeFileReq:
     properties:
       chunkName:
@@ -1176,6 +1288,8 @@ definitions:
         type: string
       apiName:
         type: string
+      enable:
+        type: boolean
     type: object
   response.AnalysisDocUrlResp:
     properties:
@@ -1817,7 +1931,7 @@ definitions:
     properties:
       tools:
         items:
-          $ref: '#/definitions/response.MCPTool'
+          $ref: '#/definitions/protocol.Tool'
         type: array
     type: object
   response.MergeFileResp:
@@ -2183,6 +2297,8 @@ definitions:
     properties:
       apiName:
         type: string
+      enable:
+        type: boolean
       id:
         type: string
       workFlowId:
@@ -2190,24 +2306,50 @@ definitions:
     type: object
 info:
   contact: {}
-  description: "## HTTP Header\r\n| Header        | 说明      |\r\n| ------------- |
-    --------- |\r\n| Authorization | JWT token |\r\n| X-Language    | 语言Code  |\r\n|
-    X-Org-Id      | 组织ID    |\r\n\r\n## HTTP Status\r\n| HTTP Status             |
-    说明                   |\r\n| ----------------------- | ---------------------- |\r\n|
-    200, StatusOK           | 请求返回成功           |\r\n| 400, StatusBadRequest   | 请求返回失败，用于业务
-    |\r\n| 401, StatusUnauthorized | JWT认证失败            |\r\n| 403, StatusForbidden
-    \   | 没有权限               |\r\n\r\n## 权限-菜单对应表\r\n| 一级权限        | 二级权限  | 三级权限
-    | 一级菜单 | 二级菜单 | 三级菜单 |\r\n|-------------|-------|------|------|------|------|\r\n|
-    guest       |       |      | 【访客】 |      |      |\r\n| common      |       |      |
-    【通用】 |      |      |\r\n| permission  |       |      | 权限管理 |      |      |\r\n|
-    permission  | user  |      | 权限管理 | 用户管理 |      |\r\n| permission  | org   |      |
-    权限管理 | 组织管理 |      |\r\n| permission  | role  |      | 权限管理 | 角色管理 |      |\r\n\r\n##
-    `/v1/user/permission`返回用例\r\n```json\r\n{\r\n  \"code\": 0,\r\n  \"data\": {\r\n
-    \   \"orgPermission\": {\r\n      \"org\": {\"id\": \"test-org-id\", \"name\":
-    \"test-org-name\"},\r\n      \"permissions\": [\r\n        {\"perm\": \"permission\"},\r\n
-    \       {\"perm\": \"permission.user\"},\r\n        {\"perm\": \"permission.org\"},\r\n
-    \       {\"perm\": \"permission.role\"}\r\n      ]\r\n    }\r\n  },\r\n  \"msg\":
-    \"操作成功\"\r\n}\r\n```"
+  description: |-
+    ## HTTP Header
+    | Header        | 说明      |
+    | ------------- | --------- |
+    | Authorization | JWT token |
+    | X-Language    | 语言Code  |
+    | X-Org-Id      | 组织ID    |
+
+    ## HTTP Status
+    | HTTP Status             | 说明                   |
+    | ----------------------- | ---------------------- |
+    | 200, StatusOK           | 请求返回成功           |
+    | 400, StatusBadRequest   | 请求返回失败，用于业务 |
+    | 401, StatusUnauthorized | JWT认证失败            |
+    | 403, StatusForbidden    | 没有权限               |
+
+    ## 权限-菜单对应表
+    | 一级权限        | 二级权限  | 三级权限 | 一级菜单 | 二级菜单 | 三级菜单 |
+    |-------------|-------|------|------|------|------|
+    | guest       |       |      | 【访客】 |      |      |
+    | common      |       |      | 【通用】 |      |      |
+    | permission  |       |      | 权限管理 |      |      |
+    | permission  | user  |      | 权限管理 | 用户管理 |      |
+    | permission  | org   |      | 权限管理 | 组织管理 |      |
+    | permission  | role  |      | 权限管理 | 角色管理 |      |
+
+    ## `/v1/user/permission`返回用例
+    ```json
+    {
+      "code": 0,
+      "data": {
+        "orgPermission": {
+          "org": {"id": "test-org-id", "name": "test-org-name"},
+          "permissions": [
+            {"perm": "permission"},
+            {"perm": "permission.user"},
+            {"perm": "permission.org"},
+            {"perm": "permission.role"}
+          ]
+        }
+      },
+      "msg": "操作成功"
+    }
+    ```
   title: AI Agent Productivity Platform API
   version: v0.0.1
 paths:
@@ -3682,10 +3824,11 @@ paths:
       description: 删除自定义MCP
       parameters:
       - description: mcpId
-        in: query
-        name: mcpId
+        in: body
+        name: data
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/request.MCPIDReq'
       produces:
       - application/json
       responses:

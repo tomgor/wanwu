@@ -82,6 +82,9 @@ app:
 model:
   host: model-service:8989
 
+mcp:
+  host: mcp-service:9898
+
 rag:
   host: rag-service:9640
 

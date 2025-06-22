@@ -331,6 +331,37 @@ services:
       retries: 99
       start_period: 10s
   
+  mcp-service:
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    image: ${WANWU_BACKEND_IMAGE}
+    container_name: mcp-service
+    networks:
+      - ${WANWU_DOCKER_NETWORK}
+    # ports:
+    #   - 9898:9898
+    volumes:
+      - ${WANWU_PROJECT_DIR}/mcp-service/log:/app/log
+    environment:
+      DB_NAME: ${WANWU_DB_NAME}
+      DB_MYSQL_ADDRESS: ${WANWU_MYSQL_ADDRESS}
+      DB_MYSQL_PASSWORD: ${WANWU_MYSQL_PASSWORD}
+      REDIS_HOST: ${WANWU_REDIS_HOST}
+      REDIS_PORT: ${WANWU_REDIS_PORT}
+      REDIS_PASSWORD: ${WANWU_REDIS_PASSWORD}
+    working_dir: /app
+    command: ./bin/mcp-service
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8989"]
+      interval: 15s
+      timeout: 5s
+      retries: 99
+      start_period: 10s
+  
   knowledge-service:
     depends_on:
       mysql:
