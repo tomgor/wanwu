@@ -24,6 +24,7 @@ type Config struct {
 	// microservice
 	Iam       ServiceConfig         `json:"iam" mapstructure:"iam"`
 	Model     ServiceConfig         `json:"model" mapstructure:"model"`
+	MCP       ServiceConfig         `json:"mcp" mapstructure:"mcp"`
 	App       ServiceConfig         `json:"app" mapstructure:"app"`
 	Knowledge ServiceConfig         `json:"knowledge" mapstructure:"knowledge"`
 	Rag       ServiceConfig         `json:"rag" mapstructure:"rag"`

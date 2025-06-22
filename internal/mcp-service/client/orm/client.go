@@ -2,6 +2,8 @@ package orm
 
 import (
 	"context"
+	"errors"
+
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 
 	"github.com/UnicomAI/wanwu/internal/mcp-service/client/model"
@@ -16,13 +18,24 @@ type Client struct {
 func NewClient(ctx context.Context, db *gorm.DB) (*Client, error) {
 	// auto migrate
 	if err := db.AutoMigrate(
-		model.MCPModel{},
+		model.MCPClient{},
 	); err != nil {
 		return nil, err
 	}
 	return &Client{
 		db: db,
 	}, nil
+}
+
+func (c *Client) transaction(ctx context.Context, fc func(tx *gorm.DB) *err_code.Status) *err_code.Status {
+	var status *err_code.Status
+	_ = c.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if status = fc(tx); status != nil {
+			return errors.New(status.String())
+		}
+		return nil
+	})
+	return status
 }
 
 func toErrStatus(key string, args ...string) *err_code.Status {

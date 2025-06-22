@@ -1,6 +1,9 @@
 package response
 
-import "github.com/UnicomAI/wanwu/internal/bff-service/model/request"
+import (
+	"github.com/ThinkInAIXYZ/go-mcp/protocol"
+	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
+)
 
 type MCPSelect struct {
 	MCPID       string `json:"mcpId"`       // mcpId
@@ -12,7 +15,7 @@ type MCPSelect struct {
 }
 
 type MCPToolList struct {
-	Tools []MCPTool `json:"tools"`
+	Tools []*protocol.Tool `json:"tools"`
 }
 
 // MCPDetail MCP自定义详情

@@ -2,13 +2,15 @@ package client
 
 import (
 	"context"
+
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/mcp-service/client/model"
 )
 
 type IClient interface {
-	GetMCP(ctx context.Context, req *model.MCPModel) (*model.MCPModel, *errs.Status)
-	CreateMCP(ctx context.Context, req *model.MCPModel) *errs.Status
-	DeleteMCP(ctx context.Context, req *model.MCPModel) *errs.Status
-	ListMCPs(ctx context.Context, req *model.MCPModel) ([]*model.MCPModel, int64, *errs.Status)
+	CheckMCPExist(ctx context.Context, orgID, userID, mcpSquareID string) (bool, *errs.Status)
+	GetMCP(ctx context.Context, mcpID uint32) (*model.MCPClient, *errs.Status)
+	CreateMCP(ctx context.Context, mcp *model.MCPClient) *errs.Status
+	DeleteMCP(ctx context.Context, mcpID uint32) *errs.Status
+	ListMCPs(ctx context.Context, orgID, userID, name string) ([]*model.MCPClient, *errs.Status)
 }

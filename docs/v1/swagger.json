@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "## HTTP Header\r\n| Header        | 说明      |\r\n| ------------- | --------- |\r\n| Authorization | JWT token |\r\n| X-Language    | 语言Code  |\r\n| X-Org-Id      | 组织ID    |\r\n\r\n## HTTP Status\r\n| HTTP Status             | 说明                   |\r\n| ----------------------- | ---------------------- |\r\n| 200, StatusOK           | 请求返回成功           |\r\n| 400, StatusBadRequest   | 请求返回失败，用于业务 |\r\n| 401, StatusUnauthorized | JWT认证失败            |\r\n| 403, StatusForbidden    | 没有权限               |\r\n\r\n## 权限-菜单对应表\r\n| 一级权限        | 二级权限  | 三级权限 | 一级菜单 | 二级菜单 | 三级菜单 |\r\n|-------------|-------|------|------|------|------|\r\n| guest       |       |      | 【访客】 |      |      |\r\n| common      |       |      | 【通用】 |      |      |\r\n| permission  |       |      | 权限管理 |      |      |\r\n| permission  | user  |      | 权限管理 | 用户管理 |      |\r\n| permission  | org   |      | 权限管理 | 组织管理 |      |\r\n| permission  | role  |      | 权限管理 | 角色管理 |      |\r\n\r\n## `/v1/user/permission`返回用例\r\n```json\r\n{\r\n  \"code\": 0,\r\n  \"data\": {\r\n    \"orgPermission\": {\r\n      \"org\": {\"id\": \"test-org-id\", \"name\": \"test-org-name\"},\r\n      \"permissions\": [\r\n        {\"perm\": \"permission\"},\r\n        {\"perm\": \"permission.user\"},\r\n        {\"perm\": \"permission.org\"},\r\n        {\"perm\": \"permission.role\"}\r\n      ]\r\n    }\r\n  },\r\n  \"msg\": \"操作成功\"\r\n}\r\n```",
+        "description": "## HTTP Header\n| Header        | 说明      |\n| ------------- | --------- |\n| Authorization | JWT token |\n| X-Language    | 语言Code  |\n| X-Org-Id      | 组织ID    |\n\n## HTTP Status\n| HTTP Status             | 说明                   |\n| ----------------------- | ---------------------- |\n| 200, StatusOK           | 请求返回成功           |\n| 400, StatusBadRequest   | 请求返回失败，用于业务 |\n| 401, StatusUnauthorized | JWT认证失败            |\n| 403, StatusForbidden    | 没有权限               |\n\n## 权限-菜单对应表\n| 一级权限        | 二级权限  | 三级权限 | 一级菜单 | 二级菜单 | 三级菜单 |\n|-------------|-------|------|------|------|------|\n| guest       |       |      | 【访客】 |      |      |\n| common      |       |      | 【通用】 |      |      |\n| permission  |       |      | 权限管理 |      |      |\n| permission  | user  |      | 权限管理 | 用户管理 |      |\n| permission  | org   |      | 权限管理 | 组织管理 |      |\n| permission  | role  |      | 权限管理 | 角色管理 |      |\n\n## `/v1/user/permission`返回用例\n```json\n{\n  \"code\": 0,\n  \"data\": {\n    \"orgPermission\": {\n      \"org\": {\"id\": \"test-org-id\", \"name\": \"test-org-name\"},\n      \"permissions\": [\n        {\"perm\": \"permission\"},\n        {\"perm\": \"permission.user\"},\n        {\"perm\": \"permission.org\"},\n        {\"perm\": \"permission.role\"}\n      ]\n    }\n  },\n  \"msg\": \"操作成功\"\n}\n```",
         "title": "AI Agent Productivity Platform API",
         "contact": {},
         "version": "v0.0.1"
@@ -2574,11 +2574,13 @@
                 "summary": "删除自定义MCP",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "mcpId",
-                        "name": "mcpId",
-                        "in": "query",
-                        "required": true
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MCPIDReq"
+                        }
                     }
                 ],
                 "responses": {
@@ -4863,6 +4865,149 @@
                 }
             }
         },
+        "protocol.DataType": {
+            "type": "string",
+            "enum": [
+                "object",
+                "number",
+                "integer",
+                "string",
+                "array",
+                "null",
+                "boolean"
+            ],
+            "x-enum-varnames": [
+                "ObjectT",
+                "Number",
+                "Integer",
+                "String",
+                "Array",
+                "Null",
+                "Boolean"
+            ]
+        },
+        "protocol.InputSchema": {
+            "type": "object",
+            "properties": {
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/protocol.Property"
+                    }
+                },
+                "required": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "type": {
+                    "$ref": "#/definitions/protocol.InputSchemaType"
+                }
+            }
+        },
+        "protocol.InputSchemaType": {
+            "type": "string",
+            "enum": [
+                "object"
+            ],
+            "x-enum-varnames": [
+                "Object"
+            ]
+        },
+        "protocol.Property": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "Description is the description of the schema.",
+                    "type": "string"
+                },
+                "enum": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "items": {
+                    "description": "Items specifies which data type an array contains, if the schema type is Array.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/protocol.Property"
+                        }
+                    ]
+                },
+                "properties": {
+                    "description": "Properties describes the properties of an object, if the schema type is Object.",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/protocol.Property"
+                    }
+                },
+                "required": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "type": {
+                    "$ref": "#/definitions/protocol.DataType"
+                }
+            }
+        },
+        "protocol.Tool": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "description": "Annotations provides additional hints about the tool's behavior",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/protocol.ToolAnnotations"
+                        }
+                    ]
+                },
+                "description": {
+                    "description": "Description is a human-readable description of the tool",
+                    "type": "string"
+                },
+                "inputSchema": {
+                    "description": "InputSchema defines the expected parameters for the tool using JSON Schema",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/protocol.InputSchema"
+                        }
+                    ]
+                },
+                "name": {
+                    "description": "Name is the unique identifier of the tool",
+                    "type": "string"
+                }
+            }
+        },
+        "protocol.ToolAnnotations": {
+            "type": "object",
+            "properties": {
+                "destructiveHint": {
+                    "description": "DestructiveHint indicates the tool may perform destructive updates\n(only meaningful when ReadOnlyHint is false)",
+                    "type": "boolean"
+                },
+                "idempotentHint": {
+                    "description": "IdempotentHint indicates calling the tool repeatedly with the same arguments\nhas no additional effect (only meaningful when ReadOnlyHint is false)",
+                    "type": "boolean"
+                },
+                "openWorldHint": {
+                    "description": "OpenWorldHint indicates the tool may interact with an \"open world\" of external entities",
+                    "type": "boolean"
+                },
+                "readOnlyHint": {
+                    "description": "ReadOnlyHint indicates the tool does not modify its environment",
+                    "type": "boolean"
+                },
+                "title": {
+                    "description": "Title is a human-readable title for the tool, useful for UI display",
+                    "type": "string"
+                }
+            }
+        },
         "request.ActionAddRequest": {
             "type": "object",
             "required": [
@@ -5717,6 +5862,17 @@
                 }
             }
         },
+        "request.MCPIDReq": {
+            "type": "object",
+            "required": [
+                "mcpId"
+            ],
+            "properties": {
+                "mcpId": {
+                    "type": "string"
+                }
+            }
+        },
         "request.MergeFileReq": {
             "type": "object",
             "required": [
@@ -6325,6 +6481,9 @@
                 },
                 "apiName": {
                     "type": "string"
+                },
+                "enable": {
+                    "type": "boolean"
                 }
             }
         },
@@ -7285,7 +7444,7 @@
                 "tools": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/response.MCPTool"
+                        "$ref": "#/definitions/protocol.Tool"
                     }
                 }
             }
@@ -7845,6 +8004,9 @@
             "properties": {
                 "apiName": {
                     "type": "string"
+                },
+                "enable": {
+                    "type": "boolean"
                 },
                 "id": {
                     "type": "string"

@@ -2,85 +2,83 @@ package orm
 
 import (
 	"context"
-	"database/sql"
 	"errors"
+
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
-	mcp_client "github.com/UnicomAI/wanwu/internal/mcp-service/client/model"
+	"github.com/UnicomAI/wanwu/internal/mcp-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/mcp-service/client/orm/sqlopt"
 	"gorm.io/gorm"
 )
 
-func (c *Client) GetMCP(ctx context.Context, tab *mcp_client.MCPModel) (*mcp_client.MCPModel, *errs.Status) {
-	info := &mcp_client.MCPModel{}
-	err := sqlopt.SQLOptions(
-		sqlopt.WithMcpSquareId(tab.McpSquareId),
-		sqlopt.WithID(tab.ID),
-		sqlopt.WithOrgID(tab.OrgID),
-		sqlopt.WithUserID(tab.UserID),
-	).Apply(c.db).WithContext(ctx).First(info).Error
-	if err != nil {
+func (c *Client) CheckMCPExist(ctx context.Context, orgID, userID, mcpSquareID string) (bool, *errs.Status) {
+	if err := sqlopt.SQLOptions(
+		sqlopt.WithOrgID(orgID),
+		sqlopt.WithUserID(userID),
+		sqlopt.WithMcpSquareId(mcpSquareID),
+	).Apply(c.db).WithContext(ctx).First(&model.MCPClient{}).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
+			return false, nil
 		}
+		return false, toErrStatus("mpc_check_exist_err", err.Error())
+	}
+	return true, nil
+}
+
+func (c *Client) GetMCP(ctx context.Context, mcpID uint32) (*model.MCPClient, *errs.Status) {
+	info := &model.MCPClient{}
+	if err := sqlopt.WithID(mcpID).Apply(c.db).WithContext(ctx).First(info).Error; err != nil {
 		return nil, toErrStatus("mcp_get_err", err.Error())
 	}
 	return info, nil
 }
 
-func (c *Client) CreateMCP(ctx context.Context, tab *mcp_client.MCPModel) *errs.Status {
-	var err error
-	db := c.db.Begin(&sql.TxOptions{Isolation: sql.LevelSerializable}).WithContext(ctx)
-	defer func() {
-		if err == nil {
-			db.Commit()
-			return
+func (c *Client) CreateMCP(ctx context.Context, tab *model.MCPClient) *errs.Status {
+	return c.transaction(ctx, func(tx *gorm.DB) *errs.Status {
+		// 检查是否已存在来自广场
+		if tab.McpSquareId != "" {
+			if err := sqlopt.SQLOptions(
+				sqlopt.WithMcpSquareId(tab.McpSquareId),
+				sqlopt.WithOrgID(tab.OrgID),
+				sqlopt.WithUserID(tab.UserID),
+			).Apply(tx).First(&model.MCPClient{}).Error; err == nil {
+				return toErrStatus("mcp_create_duplicate_square")
+			} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+				return toErrStatus("mcp_create_err", err.Error())
+			}
 		}
-		db.Rollback()
-	}()
-	// 先查询是否已存在相同的记录
-	if err = sqlopt.SQLOptions(
-		sqlopt.WithName(tab.Name),
-		sqlopt.WithOrgID(tab.OrgID),
-		sqlopt.WithUserID(tab.UserID),
-	).Apply(db).Select("id").First(&mcp_client.MCPModel{}).Error; err == nil {
-		return toErrStatus("mcp_create_err", "mcp server with same name exist")
-	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return toErrStatus("mcp_create_err", err.Error())
-	}
+		// 检查是否已存在相同的记录
+		if err := sqlopt.SQLOptions(
+			sqlopt.WithName(tab.Name),
+			sqlopt.WithOrgID(tab.OrgID),
+			sqlopt.WithUserID(tab.UserID),
+		).Apply(tx).First(&model.MCPClient{}).Error; err == nil {
+			return toErrStatus("mcp_create_duplicate_name")
+		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return toErrStatus("mcp_create_err", err.Error())
+		}
+		// 创建
+		if err := tx.Create(tab).Error; err != nil {
+			return toErrStatus("mcp_create_err", err.Error())
+		}
+		return nil
+	})
+}
 
-	if err = db.Create(tab).Error; err != nil {
-		return toErrStatus("mcp_create_err", err.Error())
+func (c *Client) DeleteMCP(ctx context.Context, mcpID uint32) *errs.Status {
+	if err := sqlopt.WithID(mcpID).Apply(c.db).WithContext(ctx).Delete(&model.MCPClient{}).Error; err != nil {
+		return toErrStatus("mcp_delete_err", err.Error())
 	}
 	return nil
 }
 
-func (c *Client) DeleteMCP(ctx context.Context, tab *mcp_client.MCPModel) *errs.Status {
-	var existing mcp_client.MCPModel
+func (c *Client) ListMCPs(ctx context.Context, orgID, userID, name string) ([]*model.MCPClient, *errs.Status) {
+	var mcpInfos []*model.MCPClient
 	if err := sqlopt.SQLOptions(
-		sqlopt.WithID(tab.ID),
-	).Apply(c.db).WithContext(ctx).First(&existing).Error; err != nil {
-		return toErrStatus("mcp_delete_err", err.Error())
+		sqlopt.WithOrgID(orgID),
+		sqlopt.WithUserID(userID),
+		sqlopt.LikeName(name),
+	).Apply(c.db).WithContext(ctx).Order("id DESC").Find(&mcpInfos).Error; err != nil {
+		return nil, toErrStatus("mcp_list_mcps_err", err.Error())
 	}
-	if err := c.db.WithContext(ctx).Delete(existing).Error; err != nil {
-		return toErrStatus("mcp_delete_err", err.Error())
-	}
-	return nil
-}
-
-func (c *Client) ListMCPs(ctx context.Context, tab *mcp_client.MCPModel) ([]*mcp_client.MCPModel, int64, *errs.Status) {
-	var count int64
-	var mcpInfos []*mcp_client.MCPModel
-	db := sqlopt.SQLOptions(
-		sqlopt.WithOrgID(tab.OrgID),
-		sqlopt.WithUserID(tab.UserID),
-		sqlopt.LikeName(tab.Name),
-	).Apply(c.db.WithContext(ctx))
-
-	if err := db.Order("created_at DESC").Find(&mcpInfos).Error; err != nil {
-		return nil, 0, toErrStatus("mcp_list_mcps_err", err.Error())
-	}
-	if err := db.Count(&count).Error; err != nil {
-		return nil, 0, toErrStatus("mcp_list_mcps_err", err.Error())
-	}
-	return mcpInfos, count, nil
+	return mcpInfos, nil
 }

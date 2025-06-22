@@ -81,6 +81,19 @@ stop-model:
 		--env-file .env \
 		down model-service
 
+# --- mcp-service ---
+run-mcp:
+	docker-compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		up -d mcp-service
+
+stop-mcp:
+	docker-compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		down mcp-service
+
 # --- app-service ---
 run-app:
 	docker-compose -f docker-compose-develop.yaml \

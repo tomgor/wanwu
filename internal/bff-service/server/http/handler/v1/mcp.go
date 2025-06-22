@@ -1,6 +1,11 @@
 package v1
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
+	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
+	"github.com/UnicomAI/wanwu/internal/bff-service/service"
+	"github.com/gin-gonic/gin"
+)
 
 // GetMCPSquareDetail
 //
@@ -13,7 +18,8 @@ import "github.com/gin-gonic/gin"
 //	@Success		200			{object}	response.Response{data=response.MCPSquareDetail}
 //	@Router			/mcp/square [get]
 func GetMCPSquareDetail(ctx *gin.Context) {
-
+	resp, err := service.GetMCPSquareDetail(ctx, getUserID(ctx), getOrgID(ctx), ctx.Query("mcpSquareId"))
+	gin_util.Response(ctx, resp, err)
 }
 
 // GetMCPSquareList
@@ -28,7 +34,8 @@ func GetMCPSquareDetail(ctx *gin.Context) {
 //	@Success		200			{object}	response.Response{data=response.ListResult{list=[]response.MCPSquareInfo}}
 //	@Router			/mcp/square/list [get]
 func GetMCPSquareList(ctx *gin.Context) {
-
+	resp, err := service.GetMCPSquareList(ctx, getUserID(ctx), getOrgID(ctx), ctx.Query("category"), ctx.Query("name"))
+	gin_util.Response(ctx, resp, err)
 }
 
 // GetMCPSquareRecommends
@@ -43,7 +50,8 @@ func GetMCPSquareList(ctx *gin.Context) {
 //	@Success		200			{object}	response.Response{data=response.ListResult{list=[]response.MCPSquareInfo}}
 //	@Router			/mcp/square/recommend [get]
 func GetMCPSquareRecommends(ctx *gin.Context) {
-
+	resp, err := service.GetMCPSquareList(ctx, getUserID(ctx), getOrgID(ctx), "", "")
+	gin_util.Response(ctx, resp, err)
 }
 
 // CreateMCP
@@ -57,7 +65,11 @@ func GetMCPSquareRecommends(ctx *gin.Context) {
 //	@Success		200		{object}	response.Response{}
 //	@Router			/mcp [post]
 func CreateMCP(ctx *gin.Context) {
-
+	var req request.MCPCreate
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	gin_util.Response(ctx, nil, service.CreateMCP(ctx, getUserID(ctx), getOrgID(ctx), req))
 }
 
 // GetMCP
@@ -71,7 +83,8 @@ func CreateMCP(ctx *gin.Context) {
 //	@Success		200		{object}	response.Response{data=response.MCPDetail}
 //	@Router			/mcp [get]
 func GetMCP(ctx *gin.Context) {
-
+	resp, err := service.GetMCP(ctx, ctx.Query("mcpId"))
+	gin_util.Response(ctx, resp, err)
 }
 
 // DeleteMCP
@@ -81,11 +94,15 @@ func GetMCP(ctx *gin.Context) {
 //	@Description	删除自定义MCP
 //	@Accept			json
 //	@Produce		json
-//	@Param			mcpId	query		string	true	"mcpId"
+//	@Param			data	body		request.MCPIDReq	true	"mcpId"
 //	@Success		200		{object}	response.Response{}
 //	@Router			/mcp [delete]
 func DeleteMCP(ctx *gin.Context) {
-
+	var req request.MCPIDReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	gin_util.Response(ctx, nil, service.DeleteMCP(ctx, req.MCPID))
 }
 
 // GetMCPList
@@ -99,7 +116,8 @@ func DeleteMCP(ctx *gin.Context) {
 //	@Success		200		{object}	response.Response{data=response.ListResult{list=[]response.MCPInfo}}
 //	@Router			/mcp/list [get]
 func GetMCPList(ctx *gin.Context) {
-
+	resp, err := service.GetMCPList(ctx, getUserID(ctx), getOrgID(ctx), ctx.Query("name"))
+	gin_util.Response(ctx, resp, err)
 }
 
 // GetMCPSelect
@@ -112,7 +130,8 @@ func GetMCPList(ctx *gin.Context) {
 //	@Success		200	{object}	response.Response{data=response.ListResult{list=[]response.MCPSelect}}
 //	@Router			/mcp/select [get]
 func GetMCPSelect(ctx *gin.Context) {
-
+	resp, err := service.GetMCPSelect(ctx, getUserID(ctx), getOrgID(ctx))
+	gin_util.Response(ctx, resp, err)
 }
 
 // GetMCPTools
@@ -127,5 +146,6 @@ func GetMCPSelect(ctx *gin.Context) {
 //	@Success		200			{object}	response.Response{data=response.MCPToolList}
 //	@Router			/mcp/tool/list [get]
 func GetMCPTools(ctx *gin.Context) {
-
+	resp, err := service.GetMCPToolList(ctx, ctx.Query("mcpId"), ctx.Query("serverUrl"))
+	gin_util.Response(ctx, resp, err)
 }

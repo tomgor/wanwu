@@ -108,6 +108,29 @@ services:
       REDIS_PASSWORD: ${WANWU_REDIS_PASSWORD}
     working_dir: /app
     command: ./bin/model-service
+  
+  mcp-service:
+    restart: always
+    image: ${WANWU_GO_IMAGE}
+    container_name: mcp-service
+    networks:
+      - ${WANWU_DOCKER_NETWORK}
+    ports:
+      - 9898:9898
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./bin/${WANWU_ARCH}/mcp-service:/app/bin/mcp-service
+      - ./configs/microservice/mcp-service/configs:/app/configs/microservice/mcp-service/configs
+      - ${WANWU_PROJECT_DIR}/mcp-service/log:/app/log
+    environment:
+      DB_NAME: ${WANWU_DB_NAME}
+      DB_MYSQL_ADDRESS: ${WANWU_MYSQL_ADDRESS}
+      DB_MYSQL_PASSWORD: ${WANWU_MYSQL_PASSWORD}
+      REDIS_HOST: ${WANWU_REDIS_HOST}
+      REDIS_PORT: ${WANWU_REDIS_PORT}
+      REDIS_PASSWORD: ${WANWU_REDIS_PASSWORD}
+    working_dir: /app
+    command: ./bin/mcp-service
 
   rag-service:
     restart: always

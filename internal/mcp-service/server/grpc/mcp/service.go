@@ -7,8 +7,6 @@ import (
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 )
 
-const ConfigDir = "configs/microservice/mcp-service/configs/"
-
 type Service struct {
 	mcp_service.UnimplementedMCPServiceServer
 	cli client.IClient
