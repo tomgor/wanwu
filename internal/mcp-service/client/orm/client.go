@@ -2,6 +2,7 @@ package orm
 
 import (
 	"context"
+	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 
 	"github.com/UnicomAI/wanwu/internal/mcp-service/client/model"
 
@@ -22,4 +23,11 @@ func NewClient(ctx context.Context, db *gorm.DB) (*Client, error) {
 	return &Client{
 		db: db,
 	}, nil
+}
+
+func toErrStatus(key string, args ...string) *err_code.Status {
+	return &err_code.Status{
+		TextKey: key,
+		Args:    args,
+	}
 }
