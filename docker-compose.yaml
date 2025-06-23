@@ -459,6 +459,9 @@ services:
       MINIO_ENDPOINT: ${WANWU_MINIO_ENDPOINT}
       MINIO_USER: ${WANWU_MINIO_USER}
       MINIO_PASSWORD: ${WANWU_MINIO_PASSWORD}
+      ES_ADDRESS: ${WANWU_ELASTIC_ADDRESS}
+      ES_USERNAME: ${WANWU_ELASTIC_USER}
+      ES_PASSWORD: ${WANWU_ELASTIC_PASSWORD}
     working_dir: /app
     command: ./bin/assistant-service
     healthcheck:
