@@ -127,14 +127,12 @@ export const getStaticToken = (data) => {
 };
 
 
-export const externalUpload = (data) => {
+export const externalUpload = (data, config) => {
     return request({
-        url: "/proxyupload",
+        url: "/proxyupload/upload",
         method: "post",
         data,
-        headers:{
-            "Content-Type":"multipart/form-data"
-        },
+        config,
         isHandleRes: false
     });
 };

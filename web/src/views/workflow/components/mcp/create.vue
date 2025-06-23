@@ -324,6 +324,9 @@ export default {
       border-bottom-color: $color !important;
     }
   }
+  /deep/ .el-button--primary span {
+    color: $txt_color !important;
+  }
 }
 .mcp-box {
   width: 100%;
