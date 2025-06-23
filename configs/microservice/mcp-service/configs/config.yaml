@@ -73,7 +73,7 @@ mcps:
         input_schema:
           type: object
           properties:
-            - filed: location
+            - field: location
               type: string
               description: "经纬度"
           required:
@@ -83,10 +83,10 @@ mcps:
         input_schema:
           type: object
           properties:
-            - filed: address
+            - field: address
               type: string
               description: "待解析的结构化地址信息"
-            - filed: city
+            - field: city
               type: string
               description: "指定查询的城市"
           required:
@@ -96,7 +96,7 @@ mcps:
         input_schema:
           type: object
           properties:
-            - filed: ip
+            - field: ip
               type: string
               description: "IP地址"
           required:
