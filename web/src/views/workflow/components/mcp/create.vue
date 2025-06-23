@@ -64,10 +64,7 @@
         <div class="no-list" v-if="serverOptions.length === 0">
           <div>
             您还没有可选用的MCP<br />
-            <span
-              >请前往“<strong @click="handleOpenMcp">MCP管理</strong
-              >”进行添加</span
-            >
+            <span>请前往“<strong @click="handleOpenMcp">MCP管理</strong>”进行添加</span>
           </div>
         </div>
       </div>
@@ -122,7 +119,8 @@ export default {
   },
   methods: {
     handleOpenMcp() {
-      window.parent.postMessage({ action: "navigateTo", path: "/mcp" }, "*");
+      /*window.parent.postMessage({ action: "navigateTo", path: "/mcp" }, "*");*/
+      this.$router.push({path: "/mcp"})
     },
     handleTitleClick(name) {
       this.activeCollapseName = this.activeCollapseName === name ? "" : name;
