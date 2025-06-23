@@ -68,7 +68,7 @@ export default {
       is: true, // 是否第一次进来
       addOpen: false, // 自定义添加mcp开关
       list: [
-        {
+        /*{
           "avatar": {
             key: "showPwd.png",
             path: "/v1/static/logo/tab_logo.png"
@@ -79,15 +79,15 @@ export default {
           "mcpId": 'mcpId1',
           "mcpSquareId": "mcpSquareId123",
           "name": "name"
-        }
+        }*/
       ],
     };
   },
   mounted() {
     this.is = true;
     this.fetchList((list) => {
-      if (list.length > 0) {
-        this.is = false;
+      if (list.length) {
+        this.is = false
       }
     })
   },
@@ -112,10 +112,10 @@ export default {
       }
       getList(params)
         .then((res) => {
-          this.list = res.data.list;
+          this.list = res.data.list || []
           cb && cb(this.list)
         })
-        .catch((err) => {});
+        .catch(() => {})
     },
     init() {
       this.fetchList((list) => {

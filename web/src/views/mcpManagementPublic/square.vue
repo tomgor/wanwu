@@ -66,7 +66,7 @@ export default {
       category: '全部',
       menuList: [],
       list: [
-        {
+        /*{
           "avatar": {
             key: "showPwd.png",
             path: "/v1/static/logo/tab_logo.png"
@@ -76,7 +76,7 @@ export default {
           "from": "from",
           "mcpSquareId": "mcpSquareId123",
           "name": "name"
-        }
+        }*/
       ],
       loading:false,
       typeRadio: 'all',
@@ -110,7 +110,7 @@ export default {
 
       getPublicMcpList(params)
         .then((res) => {
-          this.list = res.data.list
+          this.list = res.data.list || []
           this.loading = false
         })
         .catch(() => this.loading = false)

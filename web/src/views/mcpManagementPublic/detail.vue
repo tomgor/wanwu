@@ -86,11 +86,11 @@
               {{isFromSquare ? '* 将MCP发送到自定义后，您可在工作流或智能体中直接调用。' : '* 您已添加到自定义，可直接在工作流或智能体中直接调用。'}}
             </p>
           </div>
-          <div class="tool-item" v-if="detail.tools">
+          <div class="tool-item" v-if="tools && tools.length">
             <p class="title">工具介绍:</p>
             <div class="tool-item-bg tool-intro">
               <el-collapse class="mcp-el-collapse">
-                <el-collapse-item v-for="(n,i) in detail.tools" :title="n.name" :name="i">
+                <el-collapse-item v-for="(n,i) in tools" :key="n.name + i" :title="n.name" :name="i">
                   <div class="desc">描述：{{n.description}}</div>
                   <div class="params">
                     <p>参数说明:</p>
@@ -165,6 +165,7 @@ export default {
       isFromSquare: true,
       mcpSquareId:'',
       detail: {},
+      tools: [],
       foldStatus:false,
       tabActive:0,
       recommendList: [
@@ -201,7 +202,6 @@ export default {
       this.mcpSquareId = this.$route.query.mcpSquareId
       this.mcpId = this.$route.query.mcpId
       this.isFromSquare = this.$route.params.type === 'square'
-      console.log(this.mcpSquareId, this.mcpId, this.isFromSquare, '------------mcpDetail')
       this.tabActive = 0
       this.getDetailData()
 
@@ -212,82 +212,13 @@ export default {
     getDetailData(){
       if (this.isFromSquare) {
         getPublicMcpInfo({mcpSquareId:this.mcpSquareId}).then((res) => {
-          this.detail = res.data
-          this.detail.tools = formatTools(res.data.tools)
-        }).catch(() => {
-          const data = {
-            "avatar": {
-              key: "showPwd.png",
-              path: "/v1/static/logo/tab_logo.png"
-            },
-            "category": "string",
-            "desc": "string",
-            "detail": "string",
-            "feature": "string",
-            "from": "string",
-            "hasCustom": false,
-            "manual": "string",
-            "mcpSquareId": "mcpSquareId123",
-            "name": "string",
-            "scenario": "string",
-            "sseUrl": "https://mcp.amap.com/sse?key=6d889bd6aa34bdd63a39c1197a00e377",
-            "summary": "string",
-            "tools": [
-              {
-                "description": "string",
-                "inputSchema": {
-                  "properties": {
-                    "additionalProp1": {
-                      "description": "string",
-                      "type": "string"
-                    },
-                    "additionalProp2": {
-                      "description": "string",
-                      "type": "string"
-                    },
-                    "additionalProp3": {
-                      "description": "string",
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "string"
-                  ],
-                  "type": "string"
-                },
-                "name": "string"
-              }
-            ]
-          }
-          this.detail = data
-          this.detail.tools = formatTools(data.tools)
-        });
+          this.detail = res.data || {}
+          this.tools = formatTools(res.data.tools)
+        })
       } else {
         if (!this.mcpSquareId) this.tabActive = 1
         getDetail({mcpId:this.mcpId}).then((res) => {
-          this.detail = res.data
-          this.detail.tools = formatTools(res.data.tools)
-        }).catch(() => {
-          const data = {
-            "avatar": {
-              key: "showPwd.png",
-              path: "/v1/static/logo/tab_logo.png"
-            },
-            "category": "string",
-            "desc": "string",
-            "detail": "string",
-            "feature": "string",
-            "from": "string",
-            "manual": "string",
-            "mcpSquareId": "mcpSquareId123",
-            "name": "string",
-            "scenario": "string",
-            "sseUrl": "https://mcp.amap.com/sse?key=6d889bd6aa34bdd63a39c1197a00e377",
-            "summary": "string",
-            "mcpId": "mcpId1",
-          }
-          this.detail = data
-          this.detail.tools = formatTools(data.tools)
+          this.detail = res.data || {}
         })
         this.getToolsList()
       }
@@ -296,36 +227,7 @@ export default {
       getTools({
         mcpId: this.mcpId,
       }).then((res) => {
-        this.detail.tools = formatTools(res.data.tools)
-      })
-      .catch(() => {
-        const data = [
-          {
-            "description": "string",
-            "inputSchema": {
-              "properties": {
-                "additionalProp1": {
-                  "description": "string",
-                  "type": "string"
-                },
-                "additionalProp2": {
-                  "description": "string",
-                  "type": "string"
-                },
-                "additionalProp3": {
-                  "description": "string",
-                  "type": "string"
-                }
-              },
-              "required": [
-                "string"
-              ],
-              "type": "string"
-            },
-            "name": "string"
-          }
-        ]
-        this.detail.tools = formatTools(data)
+        this.tools = formatTools(res.data.tools)
       })
     },
     getIsCanSendStatus(){
