@@ -15,7 +15,7 @@
           </div>-->
         </div>
         <div>
-          <search-input placeholder="请输入内容" ref="searchInput" @handleSearch="handleSearch" />
+          <search-input placeholder="请输入MCP名称进行搜索" ref="searchInput" @handleSearch="handleSearch" />
           <el-button size="mini" type="primary" @click="handleAddMCP">导入</el-button>
         </div>
       </div>
