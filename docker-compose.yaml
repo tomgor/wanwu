@@ -182,9 +182,6 @@ services:
       start_period: 10s
   
   es:
-    depends_on:
-      es-setup:
-        condition: service_healthy
     restart: always
     image: ${WANWU_ELASTIC_IMAGE}
     container_name: ${WANWU_ELASTIC_HOST}
