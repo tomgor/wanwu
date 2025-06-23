@@ -903,6 +903,7 @@ export default {
         height:70px;
         padding:10px;
         img{
+          border:1px solid #eee;
           border-radius:50%;
           width:100%;
           height:100%;

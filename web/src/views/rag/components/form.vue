@@ -42,78 +42,80 @@
             </div>
           </div>
         </div>
-        <div class="block prompt-box">
-          <p class="block-title">
-            <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
-            模型选择
-          </p>
-          <div class="rl">
-            <el-select
-              v-model="editForm.modelParams"
-              placeholder="请选择模型"
-              @visible-change="visibleChange"
-              loading-text="模型加载中..."
-              class="cover-input-icon model-select"
-              :disabled="isPublish"
-              :loading="modelLoading"
-            >
-              <el-option
-                v-for="(item,index) in modleOptions"
-                :key="item.modelId"
-                :label="item.displayName"
-                :value="item.modelId"
+        <div class="model-box">
+          <div class="block prompt-box">
+            <p class="block-title">
+              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+              模型选择
+            </p>
+            <div class="rl">
+              <el-select
+                v-model="editForm.modelParams"
+                placeholder="请选择模型"
+                @visible-change="visibleChange"
+                loading-text="模型加载中..."
+                class="cover-input-icon model-select"
+                :disabled="isPublish"
+                :loading="modelLoading"
               >
-              </el-option>
-            </el-select>
-            <span class="el-icon-s-operation operation" @click="showModelSet"></span>
+                <el-option
+                  v-for="(item,index) in modleOptions"
+                  :key="item.modelId"
+                  :label="item.displayName"
+                  :value="item.modelId"
+                >
+                </el-option>
+              </el-select>
+              <span class="el-icon-s-operation operation" @click="showModelSet"></span>
+            </div>
           </div>
-        </div>
-        <div class="block prompt-box">
-          <p class="block-title">
-            <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
-            Rerank模型
-          </p>
-          <div class="rl">
-            <el-select
-              v-model="editForm.rerankParams"
-              placeholder="请选择模型"
-              @visible-change="rerankVisible"
-              loading-text="模型加载中..."
-              class="cover-input-icon"
-              style="width:100%;"
-              :disabled="isPublish"
-              :loading="modelLoading"
-            >
-              <el-option
-                v-for="(item,index) in rerankOptions"
-                :key="item.modelId"
-                :label="item.displayName"
-                :value="item.modelId"
+          <div class="block prompt-box">
+            <p class="block-title">
+              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+              Rerank模型
+            </p>
+            <div class="rl">
+              <el-select
+                v-model="editForm.rerankParams"
+                placeholder="请选择模型"
+                @visible-change="rerankVisible"
+                loading-text="模型加载中..."
+                class="cover-input-icon"
+                style="width:100%;"
+                :disabled="isPublish"
+                :loading="modelLoading"
               >
-              </el-option>
-            </el-select>
+                <el-option
+                  v-for="(item,index) in rerankOptions"
+                  :key="item.modelId"
+                  :label="item.displayName"
+                  :value="item.modelId"
+                >
+                </el-option>
+              </el-select>
+            </div>
           </div>
-        </div>
-        <div class="block recommend-box">
-          <p class="block-title">
-            <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
-            关联知识库
-          </p>
-          <div class="rl">
-            <el-select 
-            v-model="editForm.knowledgeBaseIds" 
-            placeholder="请选择关联知识库" 
-            class="model-select" 
-            clearable 
-            multiple>
-              <el-option
-                v-for="item in knowledgeData"
-                :key="item.knowledgeId"
-                :label="item.name"
-                :value="item.knowledgeId">
-              </el-option>
-            </el-select>
-            <span class="el-icon-s-operation operation" @click="showKnowledgeSet"></span>
+          <div class="block recommend-box">
+            <p class="block-title">
+              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+              关联知识库
+            </p>
+            <div class="rl">
+              <el-select 
+              v-model="editForm.knowledgeBaseIds" 
+              placeholder="请选择关联知识库" 
+              class="model-select" 
+              clearable 
+              multiple>
+                <el-option
+                  v-for="item in knowledgeData"
+                  :key="item.knowledgeId"
+                  :label="item.name"
+                  :value="item.knowledgeId">
+                </el-option>
+              </el-select>
+              <span class="el-icon-s-operation operation" @click="showKnowledgeSet"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -472,6 +474,8 @@ export default {
     padding:0 40px;
     border-radius: 6px;
     overflow-y: auto;
+    display:flex;
+    flex-direction: column;
     .editIcon{
       font-size: 16px;
       margin-left: 5px;
@@ -489,19 +493,31 @@ export default {
     display: flex;
     justify-content: space-between;
   }
+  .model-box{
+    background:#fff;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+    border-radius:8px;
+    padding:20px 15px;
+    margin-bottom:10px;
+    flex: 1;
+  }
   /*通用*/
   .block {
     margin-bottom: 24px;
     .basicInfo{
       display: flex;
       align-items:center;
-      border-bottom: 1px solid rgb(219, 219, 219);
+      background:#fff;
+      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+      border-radius:8px;
+      padding:10px 0;
       margin-top:10px;
       .img{
         width:70px;
         height:70px;
         padding:10px;
         img{
+          border:1px solid #eee;
           border-radius:50%;
           width:100%;
           height:100%;
@@ -704,6 +720,9 @@ export default {
   width:60%;
   background:#fff;
   border-radius:6px;
+  border-radius:8px;
+  margin:10px 0;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
 }
 }
 
