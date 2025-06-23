@@ -42,113 +42,134 @@
             </div>
           </div>
         </div>
-        <div class="block prompt-box">
-          <p class="block-title">
-            <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
-            模型选择
-          </p>
-          <div class="rl">
-            <el-select
-              v-model="editForm.modelParams"
-              placeholder="请选择模型"
-              @visible-change="visibleChange"
-              loading-text="模型加载中..."
-              class="cover-input-icon model-select"
-              :disabled="isPublish"
-              :loading="modelLoading"
-            >
-              <el-option
-                v-for="(item,index) in modleOptions"
-                :key="item.modelId"
-                :label="item.displayName"
-                :value="item.modelId"
+        <div class="agnetSet">
+          <h3 class="labelTitle">智能体配置</h3>
+          <div class="block prompt-box">
+            <p class="block-title">
+              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+              模型选择
+            </p>
+            <div class="rl">
+              <el-select
+                v-model="editForm.modelParams"
+                placeholder="请选择模型"
+                @visible-change="visibleChange"
+                loading-text="模型加载中..."
+                class="cover-input-icon model-select"
+                :disabled="isPublish"
+                :loading="modelLoading"
               >
-              </el-option>
-            </el-select>
-            <span class="el-icon-s-operation operation" @click="showModelSet"></span>
+                <el-option
+                  v-for="(item,index) in modleOptions"
+                  :key="item.modelId"
+                  :label="item.displayName"
+                  :value="item.modelId"
+                >
+                </el-option>
+              </el-select>
+              <span class="el-icon-s-operation operation" @click="showModelSet"></span>
+            </div>
           </div>
-        </div>
-        <div class="block prompt-box">
-          <p class="block-title">
-            <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
-            开场白
-          </p>
-          <div class="rl">
-            <el-input
-              class="desc-input"
-              v-model="editForm.prologue"
-              maxlength="100"
-              placeholder="请输入开场白"
-              type="textarea"
-            ></el-input>
-            <span class="el-input__count">{{editForm.prologue.length}}/100</span>
+          <div class="block prompt-box">
+            <p class="block-title">
+              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+              开场白
+            </p>
+            <div class="rl">
+              <el-input
+                class="desc-input"
+                v-model="editForm.prologue"
+                maxlength="100"
+                placeholder="请输入开场白"
+                type="textarea"
+              ></el-input>
+              <span class="el-input__count">{{editForm.prologue.length}}/100</span>
+            </div>
           </div>
-        </div>
-        <div class="block prompt-box">
-          <p class="block-title ">系统提示词</p>
-          <div class="rl">
-            <el-input
-              class="desc-input "
-              v-model="editForm.instructions"
-              maxlength="600"
-              placeholder="描述你想创建的应用，详细描述应用的详细功能及作用，以及对该应用生成结果的要求"
-              type="textarea"
-            ></el-input>
-            <span class="el-input__count">{{editForm.instructions.length}}/600</span>
+          <div class="block prompt-box">
+            <p class="block-title ">系统提示词</p>
+            <div class="rl">
+              <el-input
+                class="desc-input "
+                v-model="editForm.instructions"
+                maxlength="600"
+                placeholder="描述你想创建的应用，详细描述应用的详细功能及作用，以及对该应用生成结果的要求"
+                type="textarea"
+              ></el-input>
+              <span class="el-input__count">{{editForm.instructions.length}}/600</span>
+            </div>
           </div>
-        </div>
-        <div class="block recommend-box">
-          <p class="block-title">推荐问题</p>
-          <div
-            class="recommend-item"
-            v-for="(n,i) in editForm.recommendQuestion"
-          >
-            <el-input
-              class="recommend--input"
-              v-model="n.value"
-              maxlength="50"
-              :key="`${i}rml`"
-            ></el-input>
-            <i
-              v-if="i === (editForm.recommendQuestion.length-1)"
-              class="el-icon-plus close--icon"
-              @click="addRecommend(n,i)"
-            ></i>
-            <i
-              v-else
-              class="el-icon-circle-close close--icon"
-              @click="clearRecommend(n,i)"
-            ></i>
-          </div>
-        </div>
-        <div class="block prompt-box">
-          <p class="block-title">Rerank模型</p>
-          <div class="rl">
-            <el-select
-              v-model="editForm.rerankParams"
-              placeholder="请选择模型"
-              @visible-change="rerankVisible"
-              loading-text="模型加载中..."
-              class="cover-input-icon"
-              style="width:100%;"
-              :disabled="isPublish"
-              :loading="modelLoading"
+          <div class="block recommend-box">
+            <p class="block-title">推荐问题</p>
+            <div
+              class="recommend-item"
+              v-for="(n,i) in editForm.recommendQuestion"
             >
-              <el-option
-                v-for="(item,index) in rerankOptions"
-                :key="item.modelId"
-                :label="item.displayName"
-                :value="item.modelId"
-              >
-              </el-option>
-            </el-select>
+              <el-input
+                class="recommend--input"
+                v-model="n.value"
+                maxlength="50"
+                :key="`${i}rml`"
+              ></el-input>
+              <i
+                v-if="i === (editForm.recommendQuestion.length-1)"
+                class="el-icon-plus close--icon"
+                @click="addRecommend(n,i)"
+              ></i>
+              <i
+                v-else
+                class="el-icon-circle-close close--icon"
+                @click="clearRecommend(n,i)"
+              ></i>
+            </div>
           </div>
         </div>
-        <div class="block prompt-box">
+        <div class="common-box">
+          <div class="block prompt-box">
+            <p class="block-title">Rerank模型</p>
+            <div class="rl">
+              <el-select
+                v-model="editForm.rerankParams"
+                placeholder="请选择模型"
+                @visible-change="rerankVisible"
+                loading-text="模型加载中..."
+                class="cover-input-icon"
+                style="width:100%;"
+                :disabled="isPublish"
+                :loading="modelLoading"
+              >
+                <el-option
+                  v-for="(item,index) in rerankOptions"
+                  :key="item.modelId"
+                  :label="item.displayName"
+                  :value="item.modelId"
+                >
+                </el-option>
+              </el-select>
+            </div>
+          </div>
+          <div class="block recommend-box">
+            <p class="block-title">关联知识库</p>
+            <div class="rl">
+              <el-select v-model="editForm.knowledgeBaseIds" placeholder="请选择关联知识库" style="width:100%;" multiple>
+                <el-option
+                  v-for="item in knowledgeData"
+                  :key="item.knowledgeId"
+                  :label="item.name"
+                  :value="item.knowledgeId">
+                </el-option>
+              </el-select>
+            </div>
+          </div>
+        </div>
+        <div class="block prompt-box link-box">
           <p class="block-title">联网检索</p>
           <div class="rl">
             <div class="block-link">
-              <span class="link-text">博查</span>
+              <span class="link-text">
+                <img :src="require('@/assets/imgs/bocha.png')" style="width:20px;margin-right:8px;" />
+                <span>博查</span>
+              </span>
               <span>
                 <span class="el-icon-s-operation link-operation" @click="showLinkDiglog"></span>
                 <el-switch v-model="editForm.onlineSearchConfig.enable"></el-switch>
@@ -156,20 +177,7 @@
             </div>
           </div>
         </div>
-        <div class="block recommend-box">
-          <p class="block-title">关联知识库</p>
-          <div class="rl">
-            <el-select v-model="editForm.knowledgeBaseIds" placeholder="请选择关联知识库" style="width:100%;" multiple>
-              <el-option
-                v-for="item in knowledgeData"
-                :key="item.knowledgeId"
-                :label="item.name"
-                :value="item.knowledgeId">
-              </el-option>
-            </el-select>
-          </div>
-        </div>
-        <div class="block recommend-box">
+        <div class="block recommend-box tool-box">
           <p class="block-title tool-title">
             <span>工具</span>
             <el-button size="small" icon="el-icon-circle-plus-outline" type="primary" plain @click="addTool">添加</el-button>
@@ -646,7 +654,8 @@ export default {
               const updatedItem = {
                     ...m,         
                     enable:n.enable,
-                    workFlowId: n.id 
+                    workFlowId: n.id,
+                    checked: true
                   };
               this.$set(this.workflowList, j, updatedItem);
               _workFlowInfos.push(updatedItem );
@@ -774,7 +783,7 @@ export default {
       padding:10px 0;
     }
   }
-    .header-left{
+  .header-left{
     .btn{
       margin-right:10px;
       font-size:18px;
@@ -845,13 +854,49 @@ export default {
     display: flex;
     justify-content: space-between;
   }
+  .link-box{
+    background: #fff;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+    border-radius:8px;
+    padding:10px 20px;
+  }
+  .common-box{
+    background: #fff;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+    border-radius:8px;
+    padding:10px 20px;
+    margin-bottom: 24px;
+  }
+  .tool-box{
+    background: #fff;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+    border-radius:8px;
+    padding:10px 20px;
+  }
+
+  .agnetSet{
+    background:#fff;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+    border-radius:8px;
+    .block{
+      padding:10px 20px;
+    }
+    .labelTitle{
+      font-size: 18px;
+      font-weight:800;
+      padding:10px 20px;
+    }
+  }
   /*通用*/
   .block {
     margin-bottom: 24px;
     .basicInfo{
       display: flex;
       align-items:center;
-      border-bottom: 1px solid rgb(219, 219, 219);
+      background:#fff;
+      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+      border-radius:8px;
+      padding:10px 0;
       margin-top:10px;
       .img{
         width:70px;
@@ -896,6 +941,8 @@ export default {
       align-items:center;
       .link-text{
         color:#384BF7;
+        display:flex;
+        align-items:center;
       }
       .link-operation{
         cursor: pointer;
@@ -1080,7 +1127,9 @@ export default {
 .drawer-test{
   width:60%;
   background:#fff;
-  border-radius:6px;
+  border-radius:8px;
+  margin:10px 0;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
 }
 }
 

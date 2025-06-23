@@ -559,7 +559,7 @@ export default {
             // })
         },
         setPrompt(data) {
-            // this.$refs['editable'].setPrompt(data)
+            this.$refs['editable'].setPrompt(data)
         },
         clearInput() {
             this.$refs.editable.clearInput()
@@ -578,14 +578,19 @@ export default {
         },
         refresh() {
             let history_list = this.$refs['session-com'].getList();
-            let inputVal = history_list[history_list.length - 1].query;
-            // let fileId = history_list[history_list.length - 1].fileId;
-            let fileId =  {
-                    fileName:history_list[history_list.length - 1].fileName,
-                    fileSize:history_list[history_list.length - 1].fileSize,
-                    fileUrl:history_list[history_list.length - 1].fileInfo ? history_list[history_list.length - 1].fileInfo['fileUrl'] : history_list[history_list.length - 1].requestFileUrls[0],
+            let _history = history_list[history_list.length - 1];
+            let inputVal = _history.query;
+            let fileInfo = null;
+            let fileId = null;
+            if(_history.fileName && _history.fileSize){
+                fileId =  {
+                    fileName:_history.fileName,
+                    fileSize:_history.fileSize,
+                    fileUrl:_history.fileInfo ? _history.fileInfo['fileUrl'] : _history.requestFileUrls[0],
                 }
-            let fileInfo = [{name:history_list[history_list.length - 1]['fileName'],size:history_list[history_list.length - 1]['fileSize']}] || [];
+                fileInfo = [{name:_history['fileName'],size:_history['fileSize']}] || [];
+            }
+
             this.preSend(inputVal,fileId,fileInfo);
         }
     }

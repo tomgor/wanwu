@@ -25,7 +25,7 @@
                           :visible-arrow="false"
                           popper-class="query-copy-popover"
                           content="">
-                    <p class="query-copy" @click="queryCopy(n.query)"><i class="el-icon-s-order"></i>&nbsp;{{$t('agent.copyToInput')}}</p>
+                    <p class="query-copy" @click="queryCopy(n.query)" style="cursor: pointer"><i class="el-icon-s-order"></i>&nbsp;{{$t('agent.copyToInput')}}</p>
                     <span slot="reference" class="answer-text">{{n.query}}</span>
                   </el-popover>
                 </div>
