@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"context"
 	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/minio/minio-go/v7/pkg/lifecycle"
 	"io"
-
-	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 type Config struct {
@@ -89,4 +88,19 @@ func (c *client) SetPathExpireByDay(ctx context.Context, bucketName string, path
 		Rules: rules,
 	})
 	return err
+}
+
+func (c *client) SetBucketPublic(ctx context.Context, bucketName string) error {
+	policy := `{
+		"Version": "2012-10-17",
+		"Statement": [
+			{
+				"Effect": "Allow",
+				"Principal": {"AWS": ["*"]},
+				"Action": ["s3:GetObject"],
+				"Resource": ["arn:aws:s3:::` + bucketName + `/*"]
+			}
+		]
+	}`
+	return c.cli.SetBucketPolicy(ctx, bucketName, policy)
 }
