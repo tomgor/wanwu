@@ -494,7 +494,7 @@ export default {
     justify-content: space-between;
   }
   .model-box{
-    background:#fff;
+    background:#F7F8FA;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
     border-radius:8px;
     padding:20px 15px;
@@ -507,7 +507,7 @@ export default {
     .basicInfo{
       display: flex;
       align-items:center;
-      background:#fff;
+      background:#F7F8FA;
       box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
       border-radius:8px;
       padding:10px 0;
@@ -718,7 +718,7 @@ export default {
 }
 .drawer-test{
   width:60%;
-  background:#fff;
+  background:#F7F8FA;
   border-radius:6px;
   border-radius:8px;
   margin:10px 0;

@@ -165,7 +165,7 @@
         <div class="block prompt-box link-box">
           <p class="block-title">联网检索</p>
           <div class="rl">
-            <div class="block-link">
+            <div class="block-link" style="width:50%;">
               <span class="link-text">
                 <img :src="require('@/assets/imgs/bocha.png')" style="width:20px;margin-right:8px;" />
                 <span>博查</span>
@@ -183,29 +183,26 @@
             <el-button size="small" icon="el-icon-circle-plus-outline" type="primary" plain @click="addTool">添加</el-button>
           </p>
           <div class="rl tool-conent">
-            <div class="tool-left tool">
-            <div class="action-list" v-show="editForm.actionInfos.length">
-            <div
-              class="action-item"
-              v-for="(n,i) in editForm.actionInfos"
-              :key="`${i}ac`"
-            >
+            <div class="tool-left tool" v-show="editForm.actionInfos.length">
+              <div class="action-list">
               <div
-                class="name"
-                @click="preUpdateAction(n.actionId)"
-              >{{n.apiName}}</div>
-              <div class="bt">
-                <el-switch v-model="n.enable" class="bt-switch" @change="actionSwitch(n.actionId)"></el-switch>
-                <span @click="preDelAction(n.actionId)" class="el-icon-delete del"></span>
+                class="action-item"
+                v-for="(n,i) in editForm.actionInfos"
+                :key="`${i}ac`"
+              >
+                <div
+                  class="name"
+                  @click="preUpdateAction(n.actionId)"
+                >{{n.apiName}}</div>
+                <div class="bt">
+                  <el-switch v-model="n.enable" class="bt-switch" @change="actionSwitch(n.actionId)"></el-switch>
+                  <span @click="preDelAction(n.actionId)" class="el-icon-delete del"></span>
+                </div>
+              </div>
               </div>
             </div>
-            </div>
-            </div>
-            <div class="tool-right tool">
-              <div
-                class="action-list"
-                v-show="workFlowInfos.length"
-              >
+            <div class="tool-right tool" v-show="workFlowInfos.length">
+              <div class="action-list">
                 <div
                   class="action-item"
                   v-for="(n, i) in workFlowInfos"
@@ -467,7 +464,8 @@ export default {
       }
     },
     addTool(){
-      this.$refs.toolDiaglog.showDialog();
+      this.wfDialogVisible = true
+      // this.$refs.toolDiaglog.showDialog();
     },
     rerankVisible(val){
       if(val){
@@ -855,27 +853,27 @@ export default {
     justify-content: space-between;
   }
   .link-box{
-    background: #fff;
+    background: #F7F8FA;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
     border-radius:8px;
     padding:10px 20px;
   }
   .common-box{
-    background: #fff;
+    background: #F7F8FA;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
     border-radius:8px;
     padding:10px 20px;
     margin-bottom: 24px;
   }
   .tool-box{
-    background: #fff;
+    background: #F7F8FA;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
     border-radius:8px;
     padding:10px 20px;
   }
 
   .agnetSet{
-    background:#fff;
+    background:#F7F8FA;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
     border-radius:8px;
     .block{
@@ -893,7 +891,7 @@ export default {
     .basicInfo{
       display: flex;
       align-items:center;
-      background:#fff;
+      background:#F7F8FA;
       box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
       border-radius:8px;
       padding:10px 0;
@@ -956,9 +954,16 @@ export default {
       justify-content:space-between;
       gap:10px;
       .tool{
-        width:50%;
-        // height:300px;
+        width:100%;
         max-height:300px;
+        .action-list{
+          width:100%;
+          .action-item{
+            display:flex;
+            flex: 1 0 calc(50% - 10px);
+            box-sizing: border-box;
+          }
+        }
       }
     }
     .model-select{
@@ -1127,7 +1132,7 @@ export default {
 }
 .drawer-test{
   width:60%;
-  background:#fff;
+  background:#F7F8FA;
   border-radius:8px;
   margin:10px 0;
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
