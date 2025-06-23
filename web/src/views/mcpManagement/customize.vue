@@ -67,20 +67,7 @@ export default {
       basePath: this.$basePath,
       is: true, // 是否第一次进来
       addOpen: false, // 自定义添加mcp开关
-      list: [
-        /*{
-          "avatar": {
-            key: "showPwd.png",
-            path: "/v1/static/logo/tab_logo.png"
-          },
-          "category": "数据",
-          "desc": "desc",
-          "from": "from",
-          "mcpId": 'mcpId1',
-          "mcpSquareId": "mcpSquareId123",
-          "name": "name"
-        }*/
-      ],
+      list: [],
     };
   },
   mounted() {

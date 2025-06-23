@@ -168,19 +168,7 @@ export default {
       tools: [],
       foldStatus:false,
       tabActive:0,
-      recommendList: [
-        {
-          "avatar": {
-            key: "showPwd.png",
-            path: "/v1/static/logo/tab_logo.png"
-          },
-          "category": "数据",
-          "desc": "desc",
-          "from": "from",
-          "mcpSquareId": "mcpSquareId12",
-          "name": "name"
-        }
-      ],
+      recommendList: [],
       dialogVisible: false,
     };
   },
@@ -251,7 +239,6 @@ export default {
     parseTxt(txt){
       if (!txt) return ''
       const text = txt.replaceAll('\n\t','<br/>&nbsp;').replaceAll('\n','<br/>').replaceAll('\t', '   &nbsp;')
-      console.log(txt, text, '0000000000000000000000000000234')
       return text
     },
     tabClick(status){
