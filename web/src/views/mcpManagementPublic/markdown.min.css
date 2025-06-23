@@ -946,6 +946,6 @@
 }
 /*mcp样式*/
 .mcp-markdown .code-header{
-    padding: 0;
-    height: 0!important;
+    padding: 0 0 5px 0;
+    /*height: 0!important;*/
 }
