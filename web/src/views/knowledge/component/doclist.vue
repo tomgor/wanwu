@@ -65,10 +65,10 @@
                 >
                   <template slot-scope="scope">
                     <el-popover
-                      placement="bottom"
+                      placement="bottom-start"
                       :content="scope.row.docName"
                       trigger="hover"
-                      width="200"
+                      width="300"
                     >
                       <span slot="reference">{{scope.row.docName.length>20?scope.row.docName.slice(0,20)+'...':scope.row.docName}}</span>
                     </el-popover>
