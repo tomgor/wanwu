@@ -64,6 +64,7 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 		oneMonthAgo := time.Now().AddDate(0, -1, 0).UnixMilli()
 		if err := sqlopt.SQLOptions(
 			sqlopt.WithUserID(userId),
+			sqlopt.WithAppType(appType),
 			sqlopt.StartUpdatedAt(oneMonthAgo),
 		).Apply(c.db.WithContext(ctx)).
 			Order("updated_at DESC").Find(&historyApps).Error; err != nil {
