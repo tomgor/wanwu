@@ -15,7 +15,7 @@
                 multiple
                 :show-file-list="false"
                 :auto-upload="false"
-                :limit="1"
+                :limit="2"
                 accept="image/*"
                 :file-list="logoFileList"
                 :on-change="uploadOnChange"

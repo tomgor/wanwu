@@ -147,24 +147,13 @@
         <div class="block prompt-box">
           <p class="block-title">联网检索</p>
           <div class="rl">
-            <el-select
-              v-model="editForm.rerankParams"
-              placeholder="请选择模型"
-              @visible-change="rerankVisible"
-              loading-text="模型加载中..."
-              class="cover-input-icon"
-              style="width:100%;"
-              :disabled="isPublish"
-              :loading="modelLoading"
-            >
-              <el-option
-                v-for="(item,index) in rerankOptions"
-                :key="item.modelId"
-                :label="item.displayName"
-                :value="item.modelId"
-              >
-              </el-option>
-            </el-select>
+            <div class="block-link">
+              <span class="link-text">博查</span>
+              <span>
+                <span class="el-icon-s-operation link-operation" @click="showLinkDiglog"></span>
+                <el-switch v-model="editForm.onlineSearchConfig.enable"></el-switch>
+              </span>
+            </div>
           </div>
         </div>
         <div class="block recommend-box">
@@ -197,10 +186,10 @@
                 class="name"
                 @click="preUpdateAction(n.actionId)"
               >{{n.apiName}}</div>
-              <div
-                class="bt"
-                @click="preDelAction(n.actionId)"
-              >{{$t('common.button.delete')}}</div>
+              <div class="bt">
+                <el-switch v-model="n.enable" class="bt-switch" @change="actionSwitch(n.actionId)"></el-switch>
+                <span @click="preDelAction(n.actionId)" class="el-icon-delete del"></span>
+              </div>
             </div>
             </div>
             </div>
@@ -218,12 +207,13 @@
                     class="name"
                     style="color: #333"
                   >
-                    {{ n.apiName }}
+                    {{ n.configName }}
                   </div>
-                  <div
-                    class="bt"
-                    @click="workflowRemove(n.id)"
-                  >{{$t('common.button.delete')}}</div>
+
+                  <div class="bt">
+                    <el-switch v-model="n.enable" class="bt-switch" @change="workflowSwitch(n.workFlowId)"></el-switch>
+                    <span @click="workflowRemove(n.workFlowId)" class="el-icon-delete del"></span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -283,11 +273,13 @@
     <!-- 编辑智能体 -->
     <CreateIntelligent ref="createIntelligentDialog" :type="'edit'" :editForm="editForm" @updateInfo="getAppDetail" />
     <!-- 模型设置 -->
-    <ModelSet @setModelSet="setModelSet" ref="modelSetDialog" />
+    <ModelSet @setModelSet="setModelSet" ref="modelSetDialog" :modelform="editForm.modelConfig" />
     <!-- apikey -->
     <ApiKeyDialog ref="apiKeyDialog" :appId="editForm.assistantId" :appType="'agent'" />
     <!-- 选择工作类型 -->
     <ToolDiaglog ref="toolDiaglog" @selectTool="selectTool" />
+    <!-- 联网检索 -->
+    <LinkDialog ref="linkDialog" @setLinkSet="setLinkSet" :linkform="editForm.onlineSearchConfig" />
   </div>
 </template>
 
@@ -295,22 +287,17 @@
 import {getApiKeyRoot,appPublish} from "@/api/appspace";
 import { store } from "@/store/index";
 import { mapGetters } from "vuex";
-import { batchUpload, createApp, getAppDetail, updateApp } from "@/api/chat";
+import { createApp} from "@/api/chat";
 import { getKnowledgeList } from "@/api/knowledge";
 import CreateIntelligent from "@/components/createApp/createIntelligent";
 import ModelSet from "./modelSetDialog";
 import ApiKeyDialog from "./ApiKeyDialog";
-import { deleteAction, getModelList } from "@/api/cubm";
 import { selectModelList,getRerankList} from "@/api/modelAccess";
-import { getAgentInfo,addWorkFlowInfo,delWorkFlowInfo,delActionInfo,putAgentInfo } from "@/api/agent";
+import { getAgentInfo,addWorkFlowInfo,delWorkFlowInfo,delActionInfo,putAgentInfo,enableWorkFlow,enableAction } from "@/api/agent";
 import ActionConfig from "./action";
 import ToolDiaglog from "./toolDialog";
-import {
-  getWorkFlowList,
-  readWorkFlow,
-  createWorkFlow,
-  deleteWorkFlow,
-} from "@/api/workflow";
+import LinkDialog from "./linkDialog";
+import { getWorkFlowList,readWorkFlow} from "@/api/workflow";
 import { Base64 } from "js-base64";
 import Chat from "./chat";
 export default {
@@ -320,15 +307,10 @@ export default {
     ModelSet,
     ActionConfig,
     ApiKeyDialog,
-    ToolDiaglog
+    ToolDiaglog,
+    LinkDialog
   },
   watch: {
-    basicForm: {
-      handler(val) {
-        store.dispatch("app/setBasicForm", val);
-      },
-      deep: true,
-    },
     "editForm.recommendQuestion": {
       handler(val) {
         store.dispatch("app/setStarterPrompts", val);
@@ -344,7 +326,7 @@ export default {
             clearTimeout(this.debounceTimer)
           }
         this.debounceTimer = setTimeout(() =>{
-            const props = ['modelParams', 'modelConfig', 'prologue', 'knowledgeBaseIds','instructions','recommendQuestion'];
+            const props = ['modelParams', 'modelConfig', 'prologue', 'knowledgeBaseIds','instructions','recommendQuestion','onlineSearchConfig'];
             const changed = props.some(prop => {
             return JSON.stringify(newVal[prop]) !== JSON.stringify(
                 (this.initialEditForm || {})[prop]
@@ -389,10 +371,17 @@ export default {
           topP:1,
           frequencyPenalty:0,
           presencePenalty:0,
-          maxTokens:512,
+          maxTokens:512, 
+          maxTokensEnable:true,
+          frequencyPenaltyEnable:true,
           temperatureEnable:true,
           topPEnable:true,
           presencePenaltyEnable:true
+        },
+        onlineSearchConfig:{
+          enable:false,
+          searchKey:'',
+          searchUrl:''
         }
       },
       apiURL:'',
@@ -412,13 +401,6 @@ export default {
       saved: false, //按钮
       loading: false, //按钮
       t: null,
-      basicForm: {},
-      expandForm: {
-        fileList: [],
-        starterPrompts: [{ value: "" }],
-        models: [],
-        actionInfos: [],
-      },
       logoFileList: [],
       imageUrl: "",
       defaultLogo: require("@/assets/imgs/bg-logo.png"),
@@ -427,8 +409,6 @@ export default {
   },
   created() {
     this.getKnowledgeList();
-    //如果有缓存数据，先读缓存做预加载再去调接口
-    this.setCacheData();
     this.getModelData();    //获取模型列表
      this.getRerankData(); //获取rerank模型
     if (this.$route.query.id) {
@@ -454,6 +434,23 @@ export default {
     store.dispatch("app/initState");
   },
   methods: {
+    actionSwitch(id){
+      enableAction({actionId:id}).then(res =>{
+        if(res.code === 0){
+          this.getAppDetail();
+        }
+      })
+    },
+    workflowSwitch(id){
+      enableWorkFlow({workFlowId:id}).then(res => {
+        if(res.code === 0){
+          this.getAppDetail();
+        }
+      })
+    },
+    showLinkDiglog(){
+      this.$refs.linkDialog.showDialog()
+    },
     selectTool(val){
       if(val === 'action'){
         this.preCreateAction()
@@ -502,7 +499,11 @@ export default {
       this.$refs.apiKeyDialog.showDialog()
     },
     setModelSet(data){
-      console.log(data)
+      this.editForm.modelConfig = data;
+    },
+    setLinkSet(data){
+      this.editForm.onlineSearchConfig.searchKey = data.searchKey;
+      this.editForm.onlineSearchConfig.searchUrl = data.searchUrl;
     },
     showModelSet(){
       this.$refs.modelSetDialog.showDialog()
@@ -530,11 +531,6 @@ export default {
         this.getModelData()
       }
     },
-    goModelList() {
-      //跳转到服务管理
-      location.href =
-        window.location.origin + `${this.$basePath}/aibase/portal/training/releaseTable`;
-    },
     async getModelData() {
       this.modelLoading = true;
       const res = await selectModelList();
@@ -551,68 +547,6 @@ export default {
         this.knowledgeData = res.data.knowledgeList || [];
       } else {
         this.$message.error(res.message);
-      }
-    },
-    setCacheData() {
-      if (!this.cacheData.assistantId) {
-        return;
-      }
-      const {
-        avatar,
-        instructions,
-        name,
-        description,
-        fileList,
-        starterPrompts,
-        models,
-      } = this.cacheData;
-      this.basicForm.avatar = avatar || "";
-      this.basicForm.instructions = instructions || "";
-      this.basicForm.name = name || "";
-      this.basicForm.description = description || "";
-
-      this.expandForm.fileList = fileList || [];
-      this.expandForm.starterPrompts = starterPrompts
-        ? starterPrompts.map((n) => {
-            return { value: n };
-          })
-        : [];
-      this.expandForm.models = models || [];
-    },
-    listenerUpdate() {
-      if (this.basicForm.assistantId) {
-        this.doUpdateApp();
-      } else {
-        //一体机验证知识库必填
-        if (this.platform === "YWD_RAG" || this.platform === "HW_RAG") {
-          if (
-            this.basicForm.avatar &&
-            this.basicForm.name &&
-            this.basicForm.instructions &&
-            this.basicForm.knowledgeBaseIds
-          ) {
-            this.doCreateApp();
-          }
-        } else {
-          //正式环境验证模型ID必填
-          // && this.basicForm.modelId
-          if (
-            this.basicForm.avatar &&
-            this.basicForm.name &&
-            this.basicForm.instructions
-          ) {
-            this.doCreateApp();
-          }
-        }
-      }
-    },
-    async doCreateApp() {
-      let params = JSON.parse(JSON.stringify(this.basicForm));
-      delete params.assistantId;
-      let res = await createApp(params);
-      if (res.code === 0) {
-        this.basicForm.assistantId = res.data.assistantId;
-        //this.$refs['knowledge-enhance'].setAssistantId(res.data.assistantId)
       }
     },
     async updateInfo() {
@@ -642,6 +576,7 @@ export default {
           modelType: modeInfo.modelType,
           provider: modeInfo.provider,
         },
+        onlineSearchConfig:this.editForm.onlineSearchConfig,
         rerankConfig:rerankInfo?{
           displayName: rerankInfo.displayName,
           model: rerankInfo.model,
@@ -649,6 +584,7 @@ export default {
           modelType: rerankInfo.modelType,
           provider: rerankInfo.provider,
         }:{}
+
       }
       let res = await putAgentInfo(params);
     },
@@ -661,19 +597,6 @@ export default {
         setTimeout(() => {
           this.loading = false;
         }, 500);
-      }
-    },
-    get_result(data) {
-      //AI自动生成原生应用基本信息
-      if (JSON.stringify(data) !== "{}") {
-        this.basicForm = {
-          ...this.basicForm,
-          avatar: data.avatar || "",
-          instructions: data.instructions || "",
-          name: data.name || "",
-          description: data.description || "",
-        };
-        this.basicForm.assistantId = data.assistantId;
       }
     },
     async getAppDetail() {
@@ -693,7 +616,7 @@ export default {
           name: data.name || "",
           desc: data.desc || "",
           rerankParams:data.rerankConfig.modelId || "",
-          // knowledgeBaseIds: data.knowledgeBaseIds || [],
+          modelConfig:data.modelConfig.config,
           modelParams: data.modelConfig.modelId || "",
           recommendQuestion:data.recommendQuestion && data.recommendQuestion.length >0
             ? data.recommendQuestion.map((n) => {
@@ -701,16 +624,8 @@ export default {
               })
             : [],
           actionInfos: data.actionInfos || [],
+          onlineSearchConfig:data.onlineSearchConfig
         };
-        
-        // this.expandForm = {
-        //   models: data.models || [],
-        //   fileList: data.fileList || [],
-        //   actionInfos: data.actionInfos || [],
-        // };
-
-        store.dispatch("app/setBasicForm", this.editForm);
-        // store.dispatch("app/setExpandForm", this.expandForm);
 
         //回显自定义插件
         this.getWorkflowList(data.workFlowInfos || []);
@@ -728,8 +643,13 @@ export default {
         workFlowInfos.forEach((n) => {
           this.workflowList.forEach((m, j) => {
             if (n.workFlowId === m.id) {
-              this.$set(this.workflowList, j, { ...n, checked: true });
-              _workFlowInfos.push(n);
+              const updatedItem = {
+                    ...m,         
+                    enable:n.enable,
+                    workFlowId: n.id 
+                  };
+              this.$set(this.workflowList, j, updatedItem);
+              _workFlowInfos.push(updatedItem );
             }
           });
         });
@@ -966,6 +886,23 @@ export default {
         font-weight: normal;
       }
     }
+    .block-link{
+      width:300px;
+      border:1px solid #ddd;
+      padding: 6px 10px;
+      border-radius:6px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      .link-text{
+        color:#384BF7;
+      }
+      .link-operation{
+        cursor: pointer;
+        margin-right:5px;
+        font-size:16px;
+      }
+    }
     .tool-conent{
       display:flex;
       justify-content:space-between;
@@ -1162,20 +1099,31 @@ export default {
   .action-item {
     display: flex;
     justify-content: space-between;
+    align-items:center;
     border: 1px solid #ddd;
     border-radius:6px;
     margin-bottom: 5px;
     .name {
-      flex: 4;
+      flex: 3;
       padding: 10px 20px;
       cursor: pointer;
       color: #2c7eea;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; 
     }
     .bt {
       text-align: center;
-      flex: 1;
+      flex: 2;
       cursor: pointer;
-      padding: 10px 20px;
+      //padding: 10px 20px;
+      .del{
+        color:#384BF7;
+        font-size:16px;
+      }
+      .bt-switch{
+        margin-right:10px;
+      }
     }
   }
 }

@@ -33,6 +33,12 @@
 </template>
 <script>
 export default {
+    props:{
+        modelform:{
+            type:Object,
+            default:null
+        }
+    },
     data(){
         return{
             dialogVisible:false,
@@ -44,7 +50,9 @@ export default {
                 maxTokens:512,
                 temperatureEnable:true,
                 topPEnable:true,
-                presencePenaltyEnable:true
+                presencePenaltyEnable:true,
+                maxTokensEnable:true,
+                frequencyPenaltyEnable:true
             },
             modelSet: [
                 {
@@ -98,6 +106,9 @@ export default {
     methods:{
         showDialog(){
             this.dialogVisible = true;
+            if(this.modelform !== null){
+                this.ruleForm = this.modelform
+            }
         },
         handleClose(){
             this.dialogVisible = false;
@@ -110,6 +121,11 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+/deep/{
+    .el-input-number--small{
+        line-height: 28px!important;
+    }
+}
 .question{
     cursor: pointer;
     color:#ccc;
