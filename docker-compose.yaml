@@ -356,7 +356,7 @@ services:
     working_dir: /app
     command: ./bin/mcp-service
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "8989"]
+      test: ["CMD", "nc", "-z", "localhost", "9898"]
       interval: 15s
       timeout: 5s
       retries: 99
