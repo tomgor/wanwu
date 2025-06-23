@@ -532,6 +532,35 @@ services:
       timeout: 5s
       retries: 99
       start_period: 10s
+  
+  rag:
+    depends_on:
+      minio:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      es:
+        condition: service_healthy
+    restart: always
+    image: ${WANWU_RAG_IMAGE}
+    container_name: rag-wanwu
+    networks:
+      - ${WANWU_DOCKER_NETWORK}
+    ports:
+      - 8613:8613
+      - 8681:8681
+      - 10891:10891
+      - 15001:15001
+    environment:
+      MINIO_ADDRESS: ${WANWU_MINIO_ENDPOINT}
+      MINIO_ACCESS_KEY: ${WANWU_MINIO_USER}
+      MINIO_SECRET_KEY: ${WANWU_MINIO_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: ${WANWU_KAFKA_ADDRESS}
+      KAFKA_SASL_PLAIN_USERNAME: ${WANWU_KAFKA_USER}
+      KAFKA_SASL_PLAIN_PASSWORD: ${WANWU_KAFKA_PASSWORD}
+      ES_HOSTS: https://${WANWU_ELASTIC_ADDRESS}
+      ES_USER: ${WANWU_ELASTIC_USER}
+      ES_PASSWORD: ${WANWU_ELASTIC_PASSWORD}
 
   # ------ nginx & frontend ------
   
