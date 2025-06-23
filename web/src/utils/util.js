@@ -141,7 +141,7 @@ export const formatTools = (tools) => {
         for(let key in properties){
             params.push({
                 "name": key,
-                "requiredBadge": n.inputSchema.required.includes(key) ? '必填' : '',
+                "requiredBadge": n.inputSchema.required && n.inputSchema.required.includes(key) ? '必填' : '',
                 "type": properties[key].type,
                 "description": properties[key].description,
             })
