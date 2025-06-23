@@ -91,7 +91,7 @@
             <div class="tool-item-bg tool-intro">
               <el-collapse class="mcp-el-collapse">
                 <el-collapse-item v-for="(n,i) in tools" :key="n.name + i" :title="n.name" :name="i">
-                  <div class="desc">描述：{{n.description}}</div>
+                  <div class="desc">描述：<span v-html="parseTxt(n.description)"></span></div>
                   <div class="params">
                     <p>参数说明:</p>
                     <div class="params-table" v-for="(m, j) in n.params" :key="m.name + j">
@@ -100,7 +100,7 @@
                         <div class="td color">{{m.type}}</div>
                         <div class="td color">{{m.requiredBadge}}</div>
                       </div>
-                      <p class="params-desc">{{m.description}}</p>
+                      <p class="params-desc" v-html="parseTxt(m.description)"></p>
                     </div>
                   </div>
                 </el-collapse-item>
@@ -250,7 +250,9 @@ export default {
     // 解析文本，遇到.换行等
     parseTxt(txt){
       if (!txt) return ''
-      return txt.replaceAll('\n\t','<br/>&nbsp;').replaceAll('\t', '   &nbsp;')
+      const text = txt.replaceAll('\n\t','<br/>&nbsp;').replaceAll('\n','<br/>').replaceAll('\t', '   &nbsp;')
+      console.log(txt, text, '0000000000000000000000000000234')
+      return text
     },
     tabClick(status){
       this.tabActive = status

@@ -133,6 +133,11 @@ module.exports = {
               "^/konwledgeServe": "",
           }*/
         },
+        "/proxyupload": {
+            target: "http://192.168.0.21:8081",
+            changeOrigin: true,
+            secure: false,
+        },
         "/use/model/api": {
           target: "http://192.168.0.21:8081",
           changeOrigin: true,
