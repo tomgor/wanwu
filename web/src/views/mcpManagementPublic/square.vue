@@ -65,19 +65,7 @@ export default {
       mcpSquareId: "",
       category: '全部',
       menuList: [],
-      list: [
-        /*{
-          "avatar": {
-            key: "showPwd.png",
-            path: "/v1/static/logo/tab_logo.png"
-          },
-          "category": "数据",
-          "desc": "desc",
-          "from": "from",
-          "mcpSquareId": "mcpSquareId123",
-          "name": "name"
-        }*/
-      ],
+      list: [],
       loading:false,
       typeRadio: 'all',
       typeList: [

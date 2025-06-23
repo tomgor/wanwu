@@ -80,7 +80,7 @@ export default {
       ruleForm: {
         name: "",
         from: "",
-        sseUrl: "", // https://mcp.amap.com/sse?key=77b5f0d102c848d443b791fd469b732d
+        sseUrl: "",
         desc: "",
       },
       rules: {
@@ -132,33 +132,6 @@ export default {
         serverUrl: this.ruleForm.sseUrl,
       }).then((res) => {
         this.mcpList = res.data.tools;
-      }).catch(() => {
-        this.mcpList = [
-          {
-            "description": "string",
-            "inputSchema": {
-              "properties": {
-                "additionalProp1": {
-                  "description": "string",
-                  "type": "string"
-                },
-                "additionalProp2": {
-                  "description": "string",
-                  "type": "string"
-                },
-                "additionalProp3": {
-                  "description": "string",
-                  "type": "string"
-                }
-              },
-              "required": [
-                "string"
-              ],
-              "type": "string"
-            },
-            "name": "string"
-          }
-        ]
       })
     },
   },
