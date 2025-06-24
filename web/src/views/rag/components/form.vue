@@ -44,9 +44,12 @@
         </div>
         <div class="model-box">
           <div class="block prompt-box">
-            <p class="block-title">
-              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
-              模型选择
+            <p class="block-title common-set">
+              <span class="common-set-label">
+                <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+                模型选择
+              </span>
+              <span class="el-icon-s-operation operation" @click="showModelSet"></span>
             </p>
             <div class="rl">
               <el-select
@@ -66,7 +69,6 @@
                 >
                 </el-option>
               </el-select>
-              <span class="el-icon-s-operation operation" @click="showModelSet"></span>
             </div>
           </div>
           <div class="block prompt-box">
@@ -96,9 +98,12 @@
             </div>
           </div>
           <div class="block recommend-box">
-            <p class="block-title">
-              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
-              关联知识库
+            <p class="block-title common-set">
+              <span class="common-set-label">
+                <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+                关联知识库
+              </span>
+              <span class="el-icon-s-operation operation" @click="showKnowledgeSet"></span>
             </p>
             <div class="rl">
               <el-select 
@@ -114,7 +119,6 @@
                   :value="item.knowledgeId">
                 </el-option>
               </el-select>
-              <span class="el-icon-s-operation operation" @click="showKnowledgeSet"></span>
             </div>
           </div>
         </div>
@@ -501,6 +505,16 @@ export default {
     margin-bottom:10px;
     flex: 1;
   }
+  .common-set{
+    display:flex;
+    justify-content: space-between;
+    .common-set-label{
+      display:flex;
+      align-items:center;
+      font-size: 15px;
+      font-weight:bold;
+    }
+  }
   /*通用*/
   .block {
     margin-bottom: 24px;
@@ -553,10 +567,9 @@ export default {
       }
     }
     .model-select{
-      width:calc(100% - 60px);
+      width:100%;
     }
     .operation{
-      width:60px;
       text-align:center;
       cursor:pointer;
       font-size: 16px;

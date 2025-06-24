@@ -45,9 +45,12 @@
         <div class="agnetSet">
           <h3 class="labelTitle">智能体配置</h3>
           <div class="block prompt-box">
-            <p class="block-title">
-              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
-              模型选择
+            <p class="block-title model-title">
+              <span class="label">
+                <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+                模型选择
+              </span>
+              <span class="el-icon-s-operation operation" @click="showModelSet"></span>
             </p>
             <div class="rl">
               <el-select
@@ -67,7 +70,6 @@
                 >
                 </el-option>
               </el-select>
-              <span class="el-icon-s-operation operation" @click="showModelSet"></span>
             </div>
           </div>
           <div class="block prompt-box">
@@ -100,10 +102,18 @@
             </div>
           </div>
           <div class="block recommend-box">
-            <p class="block-title">推荐问题</p>
+            <p class="block-title recommend-title">
+              <span>推荐问题</span>
+              <span @click="addRecommend" class="common-add">
+                <span class="el-icon-plus"></span>
+                <span class="handleBtn">添加</span>
+              </span>
+            </p>
             <div
               class="recommend-item"
               v-for="(n,i) in editForm.recommendQuestion"
+              @mouseenter="mouseEnter(n)" 
+              @mouseleave="mouseLeave(n)"
             >
               <el-input
                 class="recommend--input"
@@ -111,16 +121,13 @@
                 maxlength="50"
                 :key="`${i}rml`"
               ></el-input>
-              <i
-                v-if="i === (editForm.recommendQuestion.length-1)"
-                class="el-icon-plus close--icon"
-                @click="addRecommend(n,i)"
-              ></i>
-              <i
-                v-else
-                class="el-icon-circle-close close--icon"
+              <span class="el-icon-delete recommend-del" @click="clearRecommend(n,i)" v-if="n.hover && n.hover === true"></span>
+              <!-- <el-button size="small" 
+                icon="el-icon-delete" 
+                type="danger" 
+                plain 
                 @click="clearRecommend(n,i)"
-              ></i>
+              >删除</el-button> -->
             </div>
           </div>
         </div>
@@ -180,7 +187,10 @@
         <div class="block recommend-box tool-box">
           <p class="block-title tool-title">
             <span>工具</span>
-            <el-button size="small" icon="el-icon-circle-plus-outline" type="primary" plain @click="addTool">添加</el-button>
+            <span @click="addTool" class="common-add">
+              <span class="el-icon-plus"></span>
+              <span class="handleBtn">添加</span>
+            </span>
           </p>
           <div class="rl tool-conent">
             <div class="tool-left tool" v-show="editForm.actionInfos.length">
@@ -292,7 +302,6 @@
 import {getApiKeyRoot,appPublish} from "@/api/appspace";
 import { store } from "@/store/index";
 import { mapGetters } from "vuex";
-import { createApp} from "@/api/chat";
 import { getKnowledgeList } from "@/api/knowledge";
 import CreateIntelligent from "@/components/createApp/createIntelligent";
 import ModelSet from "./modelSetDialog";
@@ -316,15 +325,6 @@ export default {
     LinkDialog
   },
   watch: {
-    "editForm.recommendQuestion": {
-      handler(val) {
-        store.dispatch("app/setStarterPrompts", val);
-        if (val[val.length - 1].value) {
-          this.editForm.recommendQuestion.push({ value: "" });
-        }
-      },
-      deep: true,
-    },
     editForm: {
       handler(newVal) {
          if(this.debounceTimer){
@@ -625,8 +625,11 @@ export default {
           modelConfig:data.modelConfig.config,
           modelParams: data.modelConfig.modelId || "",
           recommendQuestion:data.recommendQuestion && data.recommendQuestion.length >0
-            ? data.recommendQuestion.map((n) => {
-                return { value: n };
+            ? data.recommendQuestion.map((n,index) => {
+                return { 
+                  value: n,
+                  ...(index !== 0 && {hover:false})
+                };
               })
             : [],
           actionInfos: data.actionInfos || [],
@@ -692,12 +695,23 @@ export default {
         this.$message.error(this.$t('agent.otherTips'));
       }
     },
+    mouseEnter(n){
+      if(n.hover !== undefined){
+        n.hover = true
+      }
+    },
+    mouseLeave(n){
+      if(n.hover !== undefined){
+        n.hover = false
+      }
+    },
     //推荐问题
     addRecommend() {
       if (this.editForm.recommendQuestion.length > 3) {
         return;
       }
-      this.editForm.recommendQuestion.push({ value: "" });
+      this.editForm.recommendQuestion.push({ value: "",hover:false});
+      console.log(this.editForm.recommendQuestion);
     },
     clearRecommend(n, index) {
       this.editForm.recommendQuestion.splice(index, 1);
@@ -741,6 +755,28 @@ export default {
     img{
       height:14px;
     }
+  }
+}
+//通用添加按钮
+.common-add{
+  color:#595959;
+  cursor: pointer;
+  .handleBtn,.el-icon-plus{
+    font-size: 13px!important;
+    padding:0 2px;
+  }
+  .el-icon-plus{
+    font-weight:bold;
+  }
+}
+.model-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  .label{
+    display: flex;
+    align-items:center;
+    font-size: 15px;
   }
 }
 .question {
@@ -917,6 +953,7 @@ export default {
     .tool-title{
       display:flex;
       justify-content:space-between;
+      span{font-size: 15px;}
     }
     .block-title {
       line-height: 30px;
@@ -958,19 +995,16 @@ export default {
         max-height:300px;
         .action-list{
           width:100%;
-          .action-item{
-            display:flex;
-            flex: 1 0 calc(50% - 10px);
-            box-sizing: border-box;
-          }
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
         }
       }
     }
     .model-select{
-      width:calc(100% - 60px);
+      width:100%;
     }
     .operation{
-      width:60px;
       text-align:center;
       cursor:pointer;
       font-size: 16px;
@@ -1078,10 +1112,27 @@ export default {
   }
   /*推荐问题*/
   .recommend-box {
+    .recommend-title{
+      display:flex;
+      justify-content: space-between;
+      span{
+        font-size:15px;
+      }
+    }
     .recommend-item {
       margin-bottom: 12px;
+      display:flex;
+      justify-content: space-between;
+      position:relative;
       .recommend--input {
-        width: calc(100% - 60px);
+        width:100%;
+      }
+      .recommend-del{
+        position:absolute;
+        right:10px;
+        top:10px;
+        color:#595959;
+        cursor: pointer;
       }
       .close--icon {
         display: inline-block;
@@ -1150,7 +1201,7 @@ export default {
 }
 .action-list {
   margin: 10px 0 15px 0;
-  // border: 1px solid #ddd;
+  width:100%;
   .action-item {
     display: flex;
     justify-content: space-between;
@@ -1158,8 +1209,10 @@ export default {
     border: 1px solid #ddd;
     border-radius:6px;
     margin-bottom: 5px;
+    width:100%;
     .name {
-      flex: 3;
+      width:60%;
+      box-sizing:border-box;
       padding: 10px 20px;
       cursor: pointer;
       color: #2c7eea;
@@ -1169,9 +1222,12 @@ export default {
     }
     .bt {
       text-align: center;
-      flex: 2;
+      width:40%;
+      display:flex;
+      justify-content:flex-end;
+      padding-right:10px;
+      box-sizing:border-box;
       cursor: pointer;
-      //padding: 10px 20px;
       .del{
         color:#384BF7;
         font-size:16px;
