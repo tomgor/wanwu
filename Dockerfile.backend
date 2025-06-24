@@ -9,6 +9,7 @@ COPY . .
 RUN make build-bff-$WANWU_ARCH
 RUN make build-iam-$WANWU_ARCH
 RUN make build-model-$WANWU_ARCH
+RUN make build-mcp-$WANWU_ARCH
 RUN make build-knowledge-$WANWU_ARCH
 RUN make build-rag-$WANWU_ARCH
 RUN make build-assistant-$WANWU_ARCH

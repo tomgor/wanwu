@@ -1726,6 +1726,9 @@ definitions:
         allOf:
         - $ref: '#/definitions/response.CustomTab'
         description: 标签页信息
+      version:
+        description: 版本
+        type: string
     type: object
   response.MCPDetail:
     properties:

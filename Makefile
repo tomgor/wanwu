@@ -1,10 +1,8 @@
 include .env
 include .env.image.${WANWU_ARCH}
 
-version ?= v0.0.1
-
 LDFLAGS := -X main.buildTime=$(shell date +%Y-%m-%d,%H:%M:%S) \
-			-X main.buildVersion=$(version) \
+			-X main.buildVersion=${WANWU_VERSION} \
 			-X main.gitCommitID=$(shell git --git-dir=./.git rev-parse HEAD) \
 			-X main.gitBranch=$(shell git --git-dir=./.git for-each-ref --format='%(refname:short)->%(upstream:short)' $(shell git --git-dir=./.git symbolic-ref -q HEAD)) \
 			-X main.builder=$(shell git config user.name)
@@ -81,10 +79,10 @@ doc-swag:
 	swag init -g callback.go -d internal/bff-service/server/http/handler/callback -o docs/callback --pd
 
 docker-image-backend:
-	docker build -f Dockerfile.backend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/backend:$(version)-${WANWU_ARCH}-$(shell git rev-parse --short HEAD) .
+	docker build -f Dockerfile.backend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/backend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD) .
 
 docker-image-frontend:
-	docker build -f Dockerfile.frontend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/frontend:$(version)-${WANWU_ARCH}-$(shell git rev-parse --short HEAD) .
+	docker build -f Dockerfile.frontend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/frontend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD) .
 
 grpc-protoc:
 	protoc --proto_path=. --go_out=paths=source_relative:api --go-grpc_out=paths=source_relative:api proto/*/*.proto

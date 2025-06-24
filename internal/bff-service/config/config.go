@@ -72,9 +72,10 @@ type DocCenterConfig struct {
 }
 
 type CustomInfoConfig struct {
-	Login CustomLogin `json:"login" mapstructure:"login"`
-	Home  CustomHome  `json:"home" mapstructure:"home"`
-	Tab   CustomTab   `json:"tab" mapstructure:"tab"`
+	Version string      `json:"version" mapstructure:"version"`
+	Login   CustomLogin `json:"login" mapstructure:"login"`
+	Home    CustomHome  `json:"home" mapstructure:"home"`
+	Tab     CustomTab   `json:"tab" mapstructure:"tab"`
 }
 
 type CustomLogin struct {
