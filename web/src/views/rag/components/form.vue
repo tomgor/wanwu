@@ -466,16 +466,16 @@ export default {
   overflow: hidden;
 }
 .agent_form{
-  padding:0 20px;
+  padding:0 10px;
   display: flex;
   justify-content: space-between;
   gap: 20px;
   height:calc(100% - 60px);
   .drawer-form {
-    width:40% ;
+    width:50% ;
     position: relative;
     height:100%;
-    padding:0 40px;
+    padding:0 10px;
     border-radius: 6px;
     overflow-y: auto;
     display:flex;
@@ -503,7 +503,9 @@ export default {
     border-radius:8px;
     padding:20px 15px;
     margin-bottom:10px;
-    flex: 1;
+    .block{
+      margin-bottom:10px;
+    }
   }
   .common-set{
     display:flex;
@@ -730,7 +732,7 @@ export default {
   }
 }
 .drawer-test{
-  width:60%;
+  width:50%;
   background:#F7F8FA;
   border-radius:6px;
   border-radius:8px;

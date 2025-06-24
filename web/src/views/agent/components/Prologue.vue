@@ -6,7 +6,7 @@
                 <img class="logo" :src="`/user/api`+ editForm.avatar.path || (basePath + '/img/a.jpg')" />
                 <div class="answer-content">
                     <p class="name">{{editForm.name || '无信息'}}</p>
-                    <p class="systemPrompt">{{editForm.desc || '无信息'}}</p>
+                    <p class="systemPrompt">{{editForm.prologue || ''}}</p>
                     <div class="recommend">
                         <template v-if="recommendQuestion.length > 0">
                             <p class="recommend-p" 

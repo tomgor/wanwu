@@ -2,14 +2,6 @@
   <CommonLayout
     :showAside="false"
   >
-    <!-- <template #aside-content>
-      <div class="explore-aside-app">
-        <div v-for="n in historyList " class="appList" @click="historyClick(n)">
-           <img :src="'/user/api/'+ n.avatar.path" class="appImg"/>
-           <span class="appName">{{n.name}}</span>
-        </div>
-      </div>
-    </template> -->
     <template #main-content>
       <div class="app-content">
         <div class="app-header">

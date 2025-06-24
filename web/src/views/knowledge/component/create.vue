@@ -89,7 +89,7 @@ export default {
                 { required: true, message: this.$t('knowledgeManage.knowledgeNameRules'), trigger: "blur" },
                 { validator: checkName, trigger: "blur" },
                 ],
-                description:[{ required: true, message: this.$t('createApp.inputDesc'), trigger: "blur" }],
+                description:[{ required: true, message: this.$t('knowledgeManage.inputDesc'), trigger: "blur" }],
                 'embeddingModelInfo.modelId':[{ required: true, message:this.$t('common.select.placeholder'), trigger: "blur" }]
             },
             isEdit: false,
