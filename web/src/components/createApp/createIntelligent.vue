@@ -101,7 +101,7 @@ export default {
                 );
               }
             },
-            trigger: "change",
+            trigger: "blur",
           },
           {
             max:30,message:this.$t('agentDiglog.pluginNameRules'),trigger: "blur"
@@ -120,6 +120,26 @@ export default {
         create:this.$t('agentDiglog.createApp')
       },
     };
+  },
+  watch:{
+    form:{
+       handler(newVal) {
+        Object.keys(newVal).forEach(key => {
+          if (newVal[key] && typeof newVal[key] !== 'object') {
+            this.$refs.form.clearValidate(key);
+          }
+        });
+      },
+      deep: true
+    },
+    'form.avatar': {
+      handler(newVal) {
+        if (newVal && newVal.path) {
+          this.$refs.form.clearValidate('avatar.path');
+        }
+      },
+      deep: true
+    }
   },
   methods: {
     ...mapActions("app", ["setFromList"]),
@@ -149,6 +169,7 @@ export default {
         }
       };
       this.assistantId = ''
+      this.imageUrl = ''
     },
     uploadOnChange(file){
       this.clearFile();

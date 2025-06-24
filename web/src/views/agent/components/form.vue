@@ -122,16 +122,23 @@
                 :key="`${i}rml`"
               ></el-input>
               <span class="el-icon-delete recommend-del" @click="clearRecommend(n,i)" v-if="n.hover && n.hover === true"></span>
-              <!-- <el-button size="small" 
-                icon="el-icon-delete" 
-                type="danger" 
-                plain 
-                @click="clearRecommend(n,i)"
-              >删除</el-button> -->
             </div>
           </div>
         </div>
         <div class="common-box">
+          <div class="block recommend-box">
+            <p class="block-title">关联知识库</p>
+            <div class="rl">
+              <el-select v-model="editForm.knowledgeBaseIds" placeholder="请选择关联知识库" style="width:100%;" multiple>
+                <el-option
+                  v-for="item in knowledgeData"
+                  :key="item.knowledgeId"
+                  :label="item.name"
+                  :value="item.knowledgeId">
+                </el-option>
+              </el-select>
+            </div>
+          </div>
           <div class="block prompt-box">
             <p class="block-title">Rerank模型</p>
             <div class="rl">
@@ -151,19 +158,6 @@
                   :label="item.displayName"
                   :value="item.modelId"
                 >
-                </el-option>
-              </el-select>
-            </div>
-          </div>
-          <div class="block recommend-box">
-            <p class="block-title">关联知识库</p>
-            <div class="rl">
-              <el-select v-model="editForm.knowledgeBaseIds" placeholder="请选择关联知识库" style="width:100%;" multiple>
-                <el-option
-                  v-for="item in knowledgeData"
-                  :key="item.knowledgeId"
-                  :label="item.name"
-                  :value="item.knowledgeId">
                 </el-option>
               </el-select>
             </div>
@@ -369,7 +363,7 @@ export default {
         prologue:'',//开场白
         instructions:'',//系统提示词
         knowledgeBaseIds:[],
-        recommendQuestion:[{ value: "" }],
+        recommendQuestion:[{ value: "", hover:false }],
         actionInfos:[],//action
         modelConfig:{
           temperature:0.7,
@@ -628,7 +622,7 @@ export default {
             ? data.recommendQuestion.map((n,index) => {
                 return { 
                   value: n,
-                  ...(index !== 0 && {hover:false})
+                  hover:false
                 };
               })
             : [],
@@ -711,9 +705,9 @@ export default {
         return;
       }
       this.editForm.recommendQuestion.push({ value: "",hover:false});
-      console.log(this.editForm.recommendQuestion);
     },
     clearRecommend(n, index) {
+      if(this.editForm.recommendQuestion.length === 1) return;
       this.editForm.recommendQuestion.splice(index, 1);
     },
     closeAction(){
@@ -853,7 +847,7 @@ export default {
   overflow: hidden;
 }
 .agent_form{
-  padding:0 20px;
+  padding:0 10px;
   display: flex;
   justify-content: space-between;
   gap: 20px;
@@ -864,11 +858,10 @@ export default {
     padding:0 40px;
   }
   .drawer-form {
-    width:40% ;
+    width:50%;
     position: relative;
     height:100%;
-    padding:0 40px;
-    // border: 1px dashed #d9d9d9;
+    padding:0 10px;
     border-radius: 6px;
     overflow-y: auto;
     .editIcon{
@@ -898,8 +891,11 @@ export default {
     background: #F7F8FA;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
     border-radius:8px;
-    padding:10px 20px;
-    margin-bottom: 24px;
+    padding:5px 20px;
+    margin-bottom: 15px;
+    .block{
+      margin-bottom:10px;
+    }
   }
   .tool-box{
     background: #F7F8FA;
@@ -912,8 +908,10 @@ export default {
     background:#F7F8FA;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
     border-radius:8px;
+    margin-bottom:15px;
     .block{
-      padding:10px 20px;
+      padding:5px 20px;
+      margin-bottom:0px !important;
     }
     .labelTitle{
       font-size: 18px;
@@ -923,7 +921,7 @@ export default {
   }
   /*通用*/
   .block {
-    margin-bottom: 24px;
+    margin-bottom: 15px;
     .basicInfo{
       display: flex;
       align-items:center;
@@ -1182,7 +1180,7 @@ export default {
   }
 }
 .drawer-test{
-  width:60%;
+  width:50%;
   background:#F7F8FA;
   border-radius:8px;
   margin:10px 0;

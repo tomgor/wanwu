@@ -510,36 +510,23 @@ export default {
                 let history_list = []
                 let lastIndex = history_list.length - 1
                 let lastRQ = history_list[lastIndex]
-
                 if(endResponse){
-                    //this._print && this._print.stop()
-                    //this.setStoreSessionStatus(-1)
                     endResponse = convertLatexSyntax(endResponse)
                     // 替换标签
                     endResponse = parseSub(endResponse)
                     this.runResponse = md.render(endResponse)
                     this.runDisabled = false
-                    // this.$refs['session-com'].replaceLastData(lastIndex, {
-                    //     ...lastRQ,
-                    //     finish: 1,
-                    //     pending: false,
-                    //     responseLoading: false,
-                    //     "response":md.render(endResponse) //.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
-                    // })
                     this.$nextTick(()=>{
                         this.addCopyClick()
                     })
 
                 }else{
-                    if(this.sseResponse.code !== 7){
+                    if(Object.keys(this.sseResponse).length !== 0 && this.sseResponse.code !== 7){
                         this.runResponse ="本次回答已被终止"
-                        // this.$refs['session-com'].replaceLastData(lastIndex, {
-                        //     ...lastRQ,
-                        //     finish: 1,
-                        //     pending: false,
-                        //     responseLoading: false,
-                        //     response: '本次回答已被终止'
-                        // })
+                    }else{
+                        this.stopEventSource();
+                        this.setStoreSessionStatus(-1)
+                        this.$refs['session-com'].stopLoading();
                     }
                 }
             },15)

@@ -698,7 +698,8 @@ export default {
         ID:'序号',
         backAnalysis:'返回解析',
         saveIntoData:'保存成功结果入库',
-        fileSizeTips:'上传文件不能超过15MB!'
+        fileSizeTips:'上传文件不能超过15MB!',
+        inputDesc:'请输入描述'
     },
     explore:{
         unFavorite:'是否确定将该应用从常用应用列表中移除?',
@@ -752,6 +753,7 @@ export default {
         descplaceholder:'输入文本描述，将展示给文本问答用户 ',
         pluginNameRules:' 文本问答名称须在30字符以内',
         nameRules:'请填写文本问答名称',
+        logoRules:'请上传文本问答图标'
     },
     fileChunk:{
         fileClear:'文件清除成功',

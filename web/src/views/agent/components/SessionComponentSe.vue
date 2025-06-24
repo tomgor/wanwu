@@ -49,6 +49,13 @@
             <div class="answer-content"><i class="el-icon-loading"></i></div>
           </div>
         </div>
+        <!--pending-->
+        <div v-if="n.isPending"  class="session-answer">
+          <div :class="['session-item','rl']">
+            <img class="logo" :src="'/user/api/'+ defaultUrl" />
+            <div class="answer-content">{{n.response}}</div>
+          </div>
+        </div>
         <!-- 回答故障  code:7-->
         <div class="session-error" v-if="n.error"><i class="el-icon-warning"></i>&nbsp;{{n.response}}</div>
 

@@ -70,6 +70,10 @@
             />
           </div>
         </div>
+        <div v-if="isShowPublished && n.publishType && type !== 'workflow'" class="publishType">
+            <span v-if="n.publishType === 'private'" class="publishType-tag"><span class="el-icon-lock"></span> 私密</span>
+            <span v-else class="publishType-tag"><span class="el-icon-unlock"></span> 公开</span>
+        </div>
         <div
           class="editor"
           v-if="isShowTool"

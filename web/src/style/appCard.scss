@@ -158,6 +158,19 @@
         .date{
             text-align: right;
         }
+        .publishType{
+            position: absolute;
+            right: 30px;
+            bottom: 0;
+            padding: 0 5px 10px 20px;
+            .publishType-tag{
+                color:#666;
+                font-size:12px;
+                background-color: #ECEEFE;
+                padding:2px 5px;
+                border-radius:4px;
+            }
+        }
         .editor{
             position: absolute;
             right: 5px;
