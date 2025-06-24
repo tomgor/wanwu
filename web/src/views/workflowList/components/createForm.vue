@@ -119,7 +119,7 @@ export default {
         ],
         configDesc: [
           { required: true, message: this.$t('list.pluginDescRules'), trigger: "blur" },
-          { max:500, message:this.$t('list.pluginLimitRules'),trigger: "blur"}
+          { max: 600, message:this.$t('list.pluginLimitRules'),trigger: "blur"}
         ],
       },
     };

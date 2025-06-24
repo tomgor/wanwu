@@ -426,7 +426,7 @@
             style="color: cornflowerblue; margin: auto; font-size: 26px"
           ></i>
         </div>
-        <div v-else style="height: 220px; overflow: auto">
+        <div class="node-status-content" v-else style="height: 220px; overflow: auto">
           <!--错误提示-->
           <div
             class="params node-message"
@@ -851,5 +851,9 @@ export default {
 pre {
   width: 100%;
   white-space: pre-wrap;
+}
+.node-status-content::-webkit-scrollbar {
+  display: block;
+  width: 10px;
 }
 </style>

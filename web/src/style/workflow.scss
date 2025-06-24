@@ -99,6 +99,27 @@ $fontSize: 12px;
         }
     }
 }
+.node-content {
+  .name {
+    margin-right: 10px;
+  }
+}
+.item.last-item.popover-select.el-popover__reference {
+  -webkit-appearance: none;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #dcdfe6;
+  box-sizing: border-box;
+  color: #606266;
+  display: inline-block;
+  height: 28px;
+  line-height: 28px;
+  outline: 0;
+  padding: 0 15px;
+  transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+  cursor: pointer;
+  vertical-align: middle;
+}
 .workflow_popover_scale {
     border-radius: 10px !important;
     width: 100px !important;

@@ -43,14 +43,14 @@ body.el-popup-parent--hidden {
   width: 6px;
   height: 6px;
 }
-::-webkit-scrollbar-button {
+/*::-webkit-scrollbar-button {
   display: none;
-}
+}*/
 ::-webkit-scrollbar-corner {
   background-color: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: #ddd;
+  background-color: #bdbebe;
   min-height: 50px;
   min-width: 50px;
   -webkit-border-radius: 10px;
