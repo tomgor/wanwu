@@ -20,7 +20,7 @@
                 {{item.name}}
               </span>
             </div>
-            <search-input placeholder="请输入MCP名称进行搜索" ref="searchInput" @handleSearch="doGetPublicMcpList" />
+            <search-input style="margin-right: 2px" placeholder="请输入MCP名称进行搜索" ref="searchInput" @handleSearch="doGetPublicMcpList" />
           </div>
 
           <div class="card-loading-box" v-if="list.length">

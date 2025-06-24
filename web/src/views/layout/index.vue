@@ -49,16 +49,7 @@
               width="220"
               trigger="click"
             >
-              <div
-                v-if="checkPerm(item.perm)"
-                v-for="item in popoverList"
-                :key="item.name"
-                class="menu--popover-item"
-                @click="menuClick(item)"
-              >
-                {{item.name}}
-              </div>
-              <div class="menu--popover-item" :title="getCurrentOrgName()">
+              <div style="margin-bottom: 6px" class="menu--popover-item" :title="getCurrentOrgName()">
                 <el-select
                   v-model="org.orgId"
                   :placeholder="$t('header.org.placeholder')"
@@ -76,8 +67,25 @@
                   />
                 </el-select>
               </div>
-              <div class="menu--popover-item" @click="logout">
-                {{$t('header.logout')}}
+              <div
+                :class="['menu--popover-wrap', {'wrap-last': popoverList.length === index + 1}]"
+                v-for="(it, index) in popoverList"
+                :key="'popoverList' + index"
+              >
+                <div
+                  v-if="checkPerm(item.perm)"
+                  v-for="item in it"
+                  :key="item.name"
+                  class="menu--popover-item"
+                  @click="menuClick(item)"
+                >
+                  <img class="menu--popover-item-img" :src="item.img" alt="" />
+                  <span class="menu--popover-item-name">{{item.name}}</span>
+                  <img v-if="item.icon" class="menu--popover-item-icon" :src="item.icon" alt="" />
+                  <span v-if="item.version" class="menu--popover-item-version">
+                    {{version || ''}}
+                  </span>
+                </div>
               </div>
               <div slot="reference">
                 <img class="left-menu-width" src="@/assets/imgs/account.png" alt="" />
@@ -216,7 +224,8 @@ export default {
     const accessCert = localStorage.getItem('access_cert')
     return{
       basePath: this.$basePath,
-      homeLogoPath:"",
+      homeLogoPath: '',
+      version: '',
       defaultOpeneds: [],
       orgList: [],
       org: {orgId: ''},
@@ -229,8 +238,21 @@ export default {
       userName: accessCert ? JSON.parse(accessCert).user.userInfo.userName : '',
       isShowNav: true,
       popoverList: [
-        {name: this.$t('menu.account'), path: '/userInfo'},
-        {name: this.$t('menu.setting'), path: '/permission', perm: PERMS.PERMISSION}
+        [
+          {name: this.$t('menu.account'), path: '/userInfo', img: require('@/assets/imgs/user_icon.svg')},
+          {name: this.$t('menu.setting'), path: '/permission', img: require('@/assets/imgs/setting_icon.svg'), perm: PERMS.PERMISSION}
+        ],
+        [
+          {name: 'Github', img: require('@/assets/imgs/github_icon.svg'), icon: require('@/assets/imgs/link_icon.png'), redirect: () => {
+            window.open('https://github.com/UnicomAI/wanwu')
+          }},
+          {name: this.$t('menu.about'), img: require('@/assets/imgs/about_icon.svg'), version: 'version'}
+        ],
+        [
+          {name: this.$t('header.logout'), img: require('@/assets/imgs/logout_icon.svg'), redirect: () => {
+            this.logout()
+          }}
+        ],
       ]
     }
   },
@@ -252,8 +274,9 @@ export default {
     },
     commonInfo:{
       handler(val) {
-        const { home = {}, tab = {},  } = val.data || {}
+        const { home = {}, tab = {}, version } = val.data || {}
         this.homeLogoPath = home.logoPath || ''
+        this.version = version || '1.0'
         replaceIcon(tab.logoPath)
         replaceTitle(tab.title)
       },
@@ -297,11 +320,9 @@ export default {
     },
     getCurrentOrgName() {
       const currentOrg = this.orgList.filter(item => item.id === this.org.orgId)[0] || {}
-      console.log(currentOrg,'--------------------getCurrentOrgName')
       return currentOrg.name
     },
     justifyIsShowNav(path) {
-      console.log(path, '-------------------234')
       const notShowArr = ['/userInfo', '/permission', '/workflow']
       let isShowNav = true
       for (let item of notShowArr) {
@@ -333,7 +354,6 @@ export default {
       this.currentNavMenu = item || {}
       const menus = item.children || []
       this.menuList = menus
-      console.log(item, menus, '-----------------------------123')
 
       if (menus && menus.length) {
         // 切换 nav 菜单跳转有权限的第一个
@@ -353,8 +373,7 @@ export default {
       if (item.redirect) {
         item.redirect()
       } else{
-        // 文档中心返回不带页面 path 前缀，跳转加上 path 前缀，避免点击路径直接拼到当前链接后面等问题
-        this.$router.push({path: item.path})
+        if (item.path) this.$router.push({path: item.path})
       }
     },
     getCurrentMenu() {
@@ -363,12 +382,11 @@ export default {
       this.getMenuList(path)
     },
     getCurrentNav(path) {
-      // 获取一级路由
+      // 获取一级路由, 如果是 appSpace 获取两级
       const pathArray = path.split('/') || []
       const firstLevelPath = pathArray[1] === 'appSpace'
         ? `/${pathArray[1] || ''}/${pathArray[2] || ''}`
         : `/${pathArray[1] || ''}`
-      console.log(firstLevelPath, '--------------------23')
 
       const currentNav = menuList.find(item => JSON.stringify(item).includes(firstLevelPath))
       return currentNav || {}
@@ -631,20 +649,57 @@ export default {
   .el-input__inner {
     background-color: rgba(255, 255, 255, 0);
     border: none !important;
-    color: #606266 !important;
+    color: $color_title !important;
     font-weight: normal;
     padding-left: 0 !important;
     margin-left: 0 !important;
   }
 }
+.menu--popover-wrap {
+  border-top: 1px solid #EBEBEB;
+  padding: 4px 0 6px 0;
+}
+.menu--popover-wrap.wrap-last {
+  padding-bottom: 0;
+}
 .menu--popover-item {
   font-size: 13px;
-  color: #606266;
+  color: $color_title;
   height: 34px;
   line-height: 34px;
   cursor: pointer;
   border-radius: 4px;
   padding: 0 8px;
+  .menu--popover-item-img {
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 5px;
+  }
+  .menu--popover-item-name {
+    font-size: 13px;
+    color: $color_title;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .menu--popover-item-icon {
+    width: 16px;
+    float: right;
+    margin-top: 13px;
+  }
+  .menu--popover-item-version {
+    font-size: 13px;
+    float: right;
+  }
+  .menu--popover-item-version:after {
+    display: inline-block;
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #f59a23;
+    margin-bottom: 2px;
+  }
 }
 .menu--popover-item:hover /deep/ {
   background: #F5F7FA !important;

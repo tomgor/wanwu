@@ -273,7 +273,7 @@
 }
 .card-item {
   display: inline-block;
-  width: calc((100% / 3) - 20px);
+  width: calc((100% / 4) - 20px);
   height: 180px;
   vertical-align: middle;
   margin: 0 10px 20px;
