@@ -33,12 +33,11 @@
             :on-error="handleUploadError"
             accept=".png,.jpg,.jpeg"
           >
-<!--            <el-button type="primary" plain size="mini">{{$t('modelAccess.dialog.select')}}</el-button>-->
             <img
               class="upload-img"
               :src="createForm.avatar && createForm.avatar.path ? basePath + '/user/api/' + createForm.avatar.path : defaultLogo"
             />
-<!--            <span style="margin-left: 12px; color: #606266 !important;" v-if="createForm.avatar && createForm.avatar.path">
+            <!--<span style="margin-left: 12px; color: #606266 !important;" v-if="createForm.avatar && createForm.avatar.path">
               {{createForm.avatar.path}}
             </span>-->
             <span class="upload-hint">
@@ -125,6 +124,10 @@ export default {
           { required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'},
           // { min: 2, max: 50, message: this.$t('common.hint.modelNameLimit'), trigger: 'blur'},
           // { pattern: /^(?!_)[a-zA-Z0-9-_.\u4e00-\u9fa5]+$/, message: this.$t('common.hint.modelName'), trigger: "blur"}
+        ],
+        displayName: [
+          { pattern: /^(?!_)[a-zA-Z0-9-_.\u4e00-\u9fa5]+$/, message: this.$t('common.hint.modelName'), trigger: "blur"},
+          { min: 2, max: 50, message: this.$t('common.hint.modelNameLimit'), trigger: 'blur'},
         ],
         modelType: [{ required: true, message: this.$t('common.select.placeholder'), trigger: "change"}],
         endpointUrl: [

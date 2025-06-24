@@ -32,6 +32,7 @@
               v-if="reqType === 'req'"
               v-model="reqItem"
               @tab-click="reqTabClick"
+              style="margin-top: 40px"
             >
               <el-tab-pane label="Params" name="Params" class="rl">
                 <p class="tab-content-title">Query Params</p>
@@ -700,7 +701,7 @@ export default {
   position: fixed;
   height: calc(100vh - 40px);
   overflow-y: auto;
-  right: 450px;
+  right: 450px !important;
   left: 0;
   top: 20px;
   bottom: 20px;
@@ -841,6 +842,7 @@ export default {
     height: calc(100vh - 536px);
     border-top: 1px solid #eee;
     font-size: 12px;
+    margin: 0 20px;
     .res-header {
       padding: 10px 20px;
       border-bottom: 1px solid #eee;
