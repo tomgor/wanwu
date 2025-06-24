@@ -89,10 +89,10 @@
                 width: 100px;
                 height: 100px;
                 object-fit: cover;
-                border:1px solid #eee;
             }
             .logo{
                 border-radius: 50%;
+                border:1px solid #eee;
             }
             .answer-content{
                 width: calc(100% - 30px);

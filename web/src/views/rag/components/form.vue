@@ -44,9 +44,12 @@
         </div>
         <div class="model-box">
           <div class="block prompt-box">
-            <p class="block-title">
-              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
-              模型选择
+            <p class="block-title common-set">
+              <span class="common-set-label">
+                <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+                模型选择
+              </span>
+              <span class="el-icon-s-operation operation" @click="showModelSet"></span>
             </p>
             <div class="rl">
               <el-select
@@ -66,7 +69,6 @@
                 >
                 </el-option>
               </el-select>
-              <span class="el-icon-s-operation operation" @click="showModelSet"></span>
             </div>
           </div>
           <div class="block prompt-box">
@@ -96,9 +98,12 @@
             </div>
           </div>
           <div class="block recommend-box">
-            <p class="block-title">
-              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
-              关联知识库
+            <p class="block-title common-set">
+              <span class="common-set-label">
+                <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+                关联知识库
+              </span>
+              <span class="el-icon-s-operation operation" @click="showKnowledgeSet"></span>
             </p>
             <div class="rl">
               <el-select 
@@ -114,7 +119,6 @@
                   :value="item.knowledgeId">
                 </el-option>
               </el-select>
-              <span class="el-icon-s-operation operation" @click="showKnowledgeSet"></span>
             </div>
           </div>
         </div>
@@ -494,12 +498,22 @@ export default {
     justify-content: space-between;
   }
   .model-box{
-    background:#fff;
+    background:#F7F8FA;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
     border-radius:8px;
     padding:20px 15px;
     margin-bottom:10px;
     flex: 1;
+  }
+  .common-set{
+    display:flex;
+    justify-content: space-between;
+    .common-set-label{
+      display:flex;
+      align-items:center;
+      font-size: 15px;
+      font-weight:bold;
+    }
   }
   /*通用*/
   .block {
@@ -507,7 +521,7 @@ export default {
     .basicInfo{
       display: flex;
       align-items:center;
-      background:#fff;
+      background:#F7F8FA;
       box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
       border-radius:8px;
       padding:10px 0;
@@ -553,10 +567,9 @@ export default {
       }
     }
     .model-select{
-      width:calc(100% - 60px);
+      width:100%;
     }
     .operation{
-      width:60px;
       text-align:center;
       cursor:pointer;
       font-size: 16px;
@@ -718,7 +731,7 @@ export default {
 }
 .drawer-test{
   width:60%;
-  background:#fff;
+  background:#F7F8FA;
   border-radius:6px;
   border-radius:8px;
   margin:10px 0;
