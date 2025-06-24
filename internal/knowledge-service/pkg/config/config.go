@@ -79,11 +79,12 @@ type LogConfig struct {
 }
 
 type MinioConfig struct {
-	EndPoint     string `json:"endpoint" mapstructure:"endpoint"`
-	KnowledgeDir string `mapstructure:"knowledge-dir" json:"knowledge-dir"`
-	User         string `mapstructure:"user" json:"user"`
-	Password     string `mapstructure:"password" json:"password"`
-	Bucket       string `mapstructure:"bucket" json:"bucket"`
+	EndPoint        string `json:"endpoint" mapstructure:"endpoint"`
+	KnowledgeDir    string `mapstructure:"knowledge-dir" json:"knowledge-dir"`
+	User            string `mapstructure:"user" json:"user"`
+	Password        string `mapstructure:"password" json:"password"`
+	Bucket          string `mapstructure:"bucket" json:"bucket"`
+	PublicRagBucket string `mapstructure:"public-rag-bucket" json:"public-rag-bucket"`
 }
 
 type KafkaConfig struct {
