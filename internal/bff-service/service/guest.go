@@ -28,6 +28,7 @@ func GetLanguageSelect() *response.LanguageSelect {
 
 func GetLogoCustomInfo(ctx *gin.Context) (response.LogoCustomInfo, error) {
 	ret := response.LogoCustomInfo{
+		Version: config.Cfg().CustomInfo.Version,
 		Login: response.CustomLogin{
 			BackgroundPath:   config.Cfg().CustomInfo.Login.BackgroundPath,
 			LoginButtonColor: config.Cfg().CustomInfo.Login.LoginButtonColor,

@@ -7153,6 +7153,10 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.CustomTab"
                         }
                     ]
+                },
+                "version": {
+                    "description": "版本",
+                    "type": "string"
                 }
             }
         },

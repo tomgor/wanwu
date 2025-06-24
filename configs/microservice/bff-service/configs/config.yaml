@@ -50,6 +50,7 @@ i18n:
   defaultLang: zh
 
 custom-info:
+  version: v0.0.1
   login:
     background_path: "/v1/static/logo/login_bg.png"
     login_button_color: "#384BF7"

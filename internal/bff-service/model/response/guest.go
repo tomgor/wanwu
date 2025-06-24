@@ -18,9 +18,10 @@ type Captcha struct {
 }
 
 type LogoCustomInfo struct {
-	Login CustomLogin `json:"login"` // 登录页标题信息
-	Home  CustomHome  `json:"home"`  // 首页标题信息
-	Tab   CustomTab   `json:"tab"`   // 标签页信息
+	Version string      `json:"version"` // 版本
+	Login   CustomLogin `json:"login"`   // 登录页标题信息
+	Home    CustomHome  `json:"home"`    // 首页标题信息
+	Tab     CustomTab   `json:"tab"`     // 标签页信息
 }
 
 type CustomLogin struct {
