@@ -12,11 +12,17 @@ var (
 )
 
 type Config struct {
-	Server    ServerConfig `json:"server" mapstructure:"server"`
-	Log       LogConfig    `json:"log" mapstructure:"log"`
-	DB        db.Config    `json:"db" mapstructure:"db"`
-	Redis     redis.Config `json:"redis" mapstructure:"redis"`
-	Knowledge Knowledge    `mapstructure:"knowledge" json:"knowledge" yaml:"knowledge"`
+	Server    ServerConfig    `json:"server" mapstructure:"server"`
+	Log       LogConfig       `json:"log" mapstructure:"log"`
+	DB        db.Config       `json:"db" mapstructure:"db"`
+	Redis     redis.Config    `json:"redis" mapstructure:"redis"`
+	Knowledge Knowledge       `mapstructure:"knowledge" json:"knowledge" yaml:"knowledge"`
+	RagServer RagServerConfig `mapstructure:"ragServer" json:"ragServer"`
+}
+
+type RagServerConfig struct {
+	ChatEndpoint string `mapstructure:"chatEndpoint" json:"chatEndpoint"`
+	ChatUrl      string `mapstructure:"chatUrl" json:"chatUrl"`
 }
 
 type Knowledge struct {

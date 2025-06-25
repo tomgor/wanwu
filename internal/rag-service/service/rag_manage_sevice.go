@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/UnicomAI/wanwu/internal/rag-service/config"
 	"net/http"
 	"strconv"
 	"time"
@@ -17,12 +18,9 @@ import (
 )
 
 const (
-	SERVICE_PATH_RAG_PORT = "/rag/knowledge/stream/search"
-	HOSTNAME_RAG_PORT     = "172.17.0.1"
-	PORT_RAG_PORT         = 10891
-	DefaultThreshold      = 0.4
-	DefaultTopK           = 5
-	DefaultMaxHistory     = 0
+	DefaultThreshold  = 0.4
+	DefaultTopK       = 5
+	DefaultMaxHistory = 0
 )
 
 type RagChatParams struct {
@@ -103,7 +101,7 @@ func RagStreamChat(ctx context.Context, userId string, req *RagChatParams) (<-ch
 
 func buildHttpParams(userId string, req *RagChatParams) (*http_client.HttpRequestParams, error) {
 	log.Infof("build http param")
-	url := fmt.Sprintf("http://%s:%d%s", HOSTNAME_RAG_PORT, PORT_RAG_PORT, SERVICE_PATH_RAG_PORT)
+	url := fmt.Sprintf("%s%s", config.Cfg().RagServer.ChatEndpoint, config.Cfg().RagServer.ChatUrl)
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
