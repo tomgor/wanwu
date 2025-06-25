@@ -94,6 +94,7 @@ message AssistantOnlineSearchConfig {
   string searchUrl = 1;
   string searchKey = 2;
   bool enable = 3;
+  string searchRerankId = 4;
 }
 
 message GetAssistantListMyAllReq {

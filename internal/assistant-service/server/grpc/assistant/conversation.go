@@ -274,6 +274,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	if onlineSearchConfig.Enable && onlineSearchConfig.SearchUrl != "" && onlineSearchConfig.SearchKey != "" {
 		requestBody["search_url"] = onlineSearchConfig.SearchUrl
 		requestBody["search_key"] = onlineSearchConfig.SearchKey
+		requestBody["search_rerank_id"] = onlineSearchConfig.SearchRerankId
 		requestBody["use_search"] = true
 		log.Debugf("Assistant服务添加在线搜索配置到请求参数，assistantId: %s, search_url: %s, search_key: %s, use_search: %v", req.AssistantId, onlineSearchConfig.SearchUrl, onlineSearchConfig.SearchKey, onlineSearchConfig.Enable)
 	}
@@ -500,9 +501,10 @@ type AppKnowledgebaseParams struct {
 }
 
 type AppOnlineSearchConfig struct {
-	SearchUrl string `json:"searchUrl"`
-	SearchKey string `json:"searchKey"`
-	Enable    bool   `json:"enable"`
+	SearchUrl      string `json:"searchUrl"`
+	SearchKey      string `json:"searchKey"`
+	SearchRerankId string `json:"SearchRerankId"`
+	Enable         bool   `json:"enable"`
 }
 
 func mergeMaps(map1, map2 map[string]interface{}) map[string]interface{} {

@@ -66,9 +66,10 @@ func AssistantConfigUpdate(ctx *gin.Context, userId, orgId string, req request.A
 		},
 		RerankConfig: rerankConfig,
 		OnlineSearchConfig: &assistant_service.AssistantOnlineSearchConfig{
-			SearchUrl: req.OnlineSearchConfig.SearchUrl,
-			SearchKey: req.OnlineSearchConfig.SearchKey,
-			Enable:    req.OnlineSearchConfig.Enable,
+			SearchUrl:      req.OnlineSearchConfig.SearchUrl,
+			SearchKey:      req.OnlineSearchConfig.SearchKey,
+			Enable:         req.OnlineSearchConfig.Enable,
+			SearchRerankId: req.OnlineSearchConfig.SearchRerankId,
 		},
 		Identity: &assistant_service.Identity{
 			UserId: userId,

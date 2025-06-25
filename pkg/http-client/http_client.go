@@ -202,10 +202,15 @@ func SendRequest(ctx context.Context, client *http.Client, httpRequestParams *Ht
 	if httpRequestParams == nil {
 		return nil, errors.New("httpRequestParams is nil")
 	}
+	var hasLog = false
 	defer func() {
 		if r := recover(); r != nil {
 			log.Errorf("SendRequest panic %v", r)
 			err = errors.New("sendHttpRequest panic err")
+		}
+		if !hasLog && err != nil {
+			// 6.打印日志
+			logRequest(ctx, httpRequestParams, requestType, start, -1, nil, err)
 		}
 	}()
 
@@ -256,6 +261,7 @@ func SendRequest(ctx context.Context, client *http.Client, httpRequestParams *Ht
 		body, err = io.ReadAll(resp.Body)
 	}
 
+	hasLog = true
 	// 6.打印日志
 	logRequest(ctx, httpRequestParams, requestType, start, resp.StatusCode, body, err)
 	return body, err
