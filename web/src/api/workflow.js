@@ -129,7 +129,8 @@ export const getStaticToken = (data) => {
 
 export const externalUpload = (data, config) => {
     return request({
-        url: "/proxyupload/upload",
+        // url: "/proxyupload/upload",
+        url:"/service/api/v1/proxy/file/upload",
         method: "post",
         data,
         config,

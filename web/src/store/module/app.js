@@ -28,6 +28,7 @@ export const app = {
             state.fromList = data
         },
         SET_SESSION_STATUS(state,data){
+            console.log(data,'----status')
             state.sessionStatus = data
         },
         SET_BASIC_FORM(state,data){

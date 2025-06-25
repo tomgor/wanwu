@@ -109,7 +109,7 @@ export default {
         ],
         desc: [
           { required: true, message:this.$t('agentDiglog.descplaceholder'), trigger: "blur" },
-          { max:500, message:this.$t('agentDiglog.descRules'),trigger: "blur"}
+          { max:600, message:this.$t('agentDiglog.descRules'),trigger: "blur"}
         ],
         'avatar.path':[
             { required: true, message: this.$t('agentDiglog.uploadImg'), trigger: "blur" },

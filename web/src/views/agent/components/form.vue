@@ -1006,6 +1006,7 @@ export default {
       text-align:center;
       cursor:pointer;
       font-size: 16px;
+      padding-right:10px;
     }
     .operation:hover{
       color:#384BF7;

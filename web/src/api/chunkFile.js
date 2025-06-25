@@ -33,7 +33,7 @@ export const clearChunks = (data) => {//清除切片
 export const delfile = (data) => {//清除切片
     return request({
         url: `${BASE_URL}/v1/file/delete`,
-        method: "post",
+        method: "delete",
         data
     });
 }

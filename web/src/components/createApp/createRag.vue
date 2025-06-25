@@ -109,7 +109,7 @@ export default {
         ],
         desc: [
           { required: true, message: '请输入文本描述', trigger: "blur" },
-          { max:500, message:'文本描述限制600字符以内',trigger: "blur"}
+          { max:600, message:'文本描述限制600字符以内',trigger: "blur"}
         ],
         'avatar.path':[
             { required: true, message: this.$t('ragDiglog.logoRules'), trigger: "blur" },
