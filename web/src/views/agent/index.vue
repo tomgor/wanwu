@@ -55,6 +55,7 @@ export default {
                 avatar:{},
                 name:'',
                 desc:'',
+                prologue:''
             },
         }
     },
@@ -78,7 +79,8 @@ export default {
                 if(res.code === 0){
                     this.editForm.avatar = res.data.avatar;
                     this.editForm.name = res.data.name;
-                    this.editForm.desc = res.data.desc
+                    this.editForm.desc = res.data.desc;
+                    this.editForm.prologue = res.data.prologue;
                 }
             })
         },
@@ -94,6 +96,8 @@ export default {
                         } else {
                             this.historyClick[this.historyList[0]]
                         }
+                    }else{
+                        this.historyList = []
                     }
                 }else{
                     this.historyList = []

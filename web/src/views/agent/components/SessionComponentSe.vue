@@ -449,6 +449,16 @@ export default {
 /deep/{
   pre{
      white-space: pre-wrap !important;
+     min-height: 50px;
+     word-wrap: break-word;
+     resize: vertical;
+     .hljs{
+        max-height:300px!important;
+        white-space: pre-wrap !important;
+        min-height: 50px;
+        word-wrap: break-word;
+        resize: vertical;
+     }
   }
   .el-loading-mask{
     background:none !important;

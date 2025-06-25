@@ -244,7 +244,7 @@ export default {
                             "thinkText":'思考中',
                             "isOpen":true
                         }
-                        if(data.code === 0){
+                        if(data.code === 0 || data.code === 1){
                             //finish 0：进行中  1：关闭   2:敏感词关闭
                             let _sentence = data.data.output;
                                 this._print.print(
@@ -354,6 +354,7 @@ export default {
                 onmessage: (e) => {
                     if (e && e.data) {
                         let data = JSON.parse(e.data)
+                        // console.log('===>',new Date().getTime(), '接收时间',data)
                         this.sseResponse = data
                         //待替换的数据，需要前端组装
                         let commonData = {
@@ -383,10 +384,10 @@ export default {
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
-
+                                        console.log('===>',new Date().getTime(),data)
                                         let fillData = {
                                             ...commonData,
-                                            "response": [0,1,2,3,4,6,20,21,10].includes(commonData.qa_type)?md.render(endStr):endStr.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
+                                            "response": [0,1,2,3,4,6,20,21,10].includes(commonData.qa_type)?md.render(endStr.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>')):endStr.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
                                             oriResponse:endStr,
                                             searchList:(search_list && search_list.length) ? search_list.some(n => n.title.indexOf('yunyingshang') > -1)? []: search_list.map(n => ({
                                                   ...n, // 复制原有的对象属性
@@ -394,8 +395,7 @@ export default {
                                                 }))
                                             : []
                                         }
-
-                                        console.log('===>',new Date().getTime(), data, endStr)
+                                        // console.log('===>',new Date().getTime(), data)
                                         this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                                         if(worldObj.finish !== 0){
                                             if(worldObj.finish === 4){
