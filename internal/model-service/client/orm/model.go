@@ -77,13 +77,12 @@ func (c *Client) UpdateModel(ctx context.Context, tab *model_client.ModelImporte
 	// 查询
 	var existing model_client.ModelImported
 	if err := sqlopt.SQLOptions(
-		sqlopt.WithProvider(tab.Provider),
-		sqlopt.WithModelType(tab.ModelType),
-		sqlopt.WithModel(tab.Model),
-		sqlopt.WithOrgID(tab.OrgID),
-		sqlopt.WithUserID(tab.UserID),
-	).Apply(c.db).WithContext(ctx).Select("id").First(&existing).Error; err != nil {
+		sqlopt.WithID(tab.ID),
+	).Apply(c.db).WithContext(ctx).First(&existing).Error; err != nil {
 		return toErrStatus("model_update_err", err.Error())
+	}
+	if existing.ModelType != tab.ModelType || existing.Model != tab.Model || existing.Provider != tab.Provider {
+		return toErrStatus("model_update_err", "type,model,provider can not update!")
 	}
 	// 更新
 	if err := c.db.WithContext(ctx).Model(existing).Updates(map[string]interface{}{
