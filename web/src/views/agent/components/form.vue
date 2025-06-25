@@ -380,7 +380,8 @@ export default {
         onlineSearchConfig:{
           enable:false,
           searchKey:'',
-          searchUrl:''
+          searchUrl:'',
+          searchRerankId:''
         }
       },
       apiURL:'',
@@ -504,6 +505,7 @@ export default {
     setLinkSet(data){
       this.editForm.onlineSearchConfig.searchKey = data.searchKey;
       this.editForm.onlineSearchConfig.searchUrl = data.searchUrl;
+      this.editForm.onlineSearchConfig.searchRerankId = data.searchRerankId;
     },
     showModelSet(){
       this.$refs.modelSetDialog.showDialog()

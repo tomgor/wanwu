@@ -178,7 +178,6 @@ export default {
             n.hover = false
         },
         setSessionStatus(status) {
-            //this.sessionStatus = status
             this.setStoreSessionStatus(status)
         },
         setSseParams(data) {
@@ -204,7 +203,7 @@ export default {
             let endStr = ''
             this._print = new Print({
                 onPrintEnd: () => {
-                    //this.setStoreSessionStatus(-1)
+                    // this.setStoreSessionStatus(-1)
                 }
             })
             
@@ -267,6 +266,9 @@ export default {
                                             : []
                                         }
                                     this.$refs['session-com'].replaceLastData(lastIndex, fillData)
+                                    if(worldObj.isEnd && worldObj.finish === 1){
+                                        this.setStoreSessionStatus(-1)
+                                    }
                                 })
                             this.$nextTick(()=>{
                                 this.$refs['session-com'].scrollBottom()
@@ -284,7 +286,7 @@ export default {
                 onclose: () => {
                     console.log('===> eventSource onClose')
                     this.setStoreSessionStatus(-1)//关闭后改变状态
-                    // this.sseOnCloseCallBack()
+                    this.sseOnCloseCallBack()
                 },
                 onerror: (e) => {
                     console.log("服务连接异常请重试！");
@@ -372,19 +374,6 @@ export default {
                         if(data.code === 0){
                             //finish 0：进行中  1：关闭   2:敏感词关闭
                             let _sentence = data.response
-                            //图文问答返回是非流式的，直接显示不使用打字机
-                            /*if(data.qa_type === 6){
-                                this.$refs['session-com'].replaceLastData(lastIndex, {...commonData,oriResponse:_sentence,response:_sentence})
-                                if(data.finish !== 0){
-                                    this.setStoreSessionStatus(-1)
-                                }
-                                this.$nextTick(()=>{
-                                    this.$refs['session-com'].scrollBottom()
-                                })
-                                return
-                            }*/
-                            //let _sentence = data.response || '^'
-                            //if (_sentence || (data.search_list && data.search_list.length)) {
                                 this._print.print(
                                     {
                                         response:_sentence,
@@ -393,7 +382,6 @@ export default {
                                     commonData,
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
-                                        //endStr += (worldObj.world==='^')?'':worldObj.world
                                         endStr += worldObj.world
                                         let fillData = {
                                             ...commonData,
@@ -416,21 +404,15 @@ export default {
                                             }
                                             this.setStoreSessionStatus(-1)
                                         }
+                                        if(worldObj.isEnd && worldObj.finish === 1){
+                                          this.setStoreSessionStatus(-1)
+                                       }
                                 })
-                            // } else {
-                            //     //无response 仅图片
-                            //     this.setStoreSessionStatus(-1)
-                            //     this.$refs['session-com'].replaceLastData(lastIndex, commonData)
-                            // }
 
                             this.$nextTick(()=>{
                                 this.$refs['session-com'].scrollBottom()
                             })
 
-                            // if(!this.isPageVisible){
-                            //     this.bufferedMessages.push({ data, commonData });
-                            // }
-                            // this.handleMessageData(data, commonData);
                         }else if(data.code === 7){
                             this.setStoreSessionStatus(-1)
                             let fillData = {

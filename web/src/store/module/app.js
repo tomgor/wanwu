@@ -28,7 +28,6 @@ export const app = {
             state.fromList = data
         },
         SET_SESSION_STATUS(state,data){
-            console.log(data,'----status')
             state.sessionStatus = data
         },
         SET_BASIC_FORM(state,data){
@@ -75,6 +74,7 @@ export const app = {
             commit('SET_FROM_LIST',data)
         },
         setStoreSessionStatus({ commit },data){
+            // console.trace(data,'----status');
             commit('SET_SESSION_STATUS',data)
         },
         setBasicForm({ commit },data) {

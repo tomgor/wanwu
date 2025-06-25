@@ -5,7 +5,7 @@
             :visible.sync="dialogVisible"
             width="50%"
             :before-close="handleClose">
-            <el-form ref="form" :model="form" label-width="80px">
+            <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item 
                 label="Url"
                 prop="searchUrl"
@@ -20,6 +20,28 @@
                 >
                     <el-input v-model="form.searchKey"></el-input>
                 </el-form-item>
+                <el-form-item 
+                label="Rerank模型"
+                prop="searchRerankId"
+                :rules="[{ required: true, message: '请输入Url', trigger: 'blur' }]"
+                >
+                    <el-select
+                        v-model="form.searchRerankId"
+                        placeholder="请选择模型"
+                        @visible-change="rerankVisible"
+                        loading-text="模型加载中..."
+                        class="cover-input-icon"
+                        style="width:100%;"
+                    >
+                        <el-option
+                        v-for="(item,index) in rerankOptions"
+                        :key="item.modelId"
+                        :label="item.displayName"
+                        :value="item.modelId"
+                        >
+                        </el-option>
+                    </el-select>
+                </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取 消</el-button>
@@ -29,6 +51,7 @@
     </div>
 </template>
 <script>
+import { getRerankList} from "@/api/modelAccess";
 export default {
     props:{
         linkform:{
@@ -38,14 +61,28 @@ export default {
     },
     data(){
         return{
+            rerankOptions:[],
             dialogVisible:false,
             form:{
                 searchUrl:'',
-                searchKey:''
+                searchKey:'',
+                searchRerankId:''
             }
         }
     },
     methods:{
+        rerankVisible(val){
+            if(val){
+                this.getRerankData();
+            }
+        },
+         getRerankData(){
+            getRerankList().then(res =>{
+                if(res.code === 0){
+                this.rerankOptions = res.data.list || []
+                }
+            })
+         },
         handleClose(){
             this.dialogVisible = false
         },
@@ -66,6 +103,7 @@ export default {
              if(this.linkform !== null){
                 this.form.searchUrl = this.linkform.searchUrl;
                 this.form.searchKey = this.linkform.searchKey;
+                this.form.searchRerankId = this.linkform.searchRerankId;
             }
         }
     }
