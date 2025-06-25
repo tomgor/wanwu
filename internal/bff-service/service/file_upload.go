@@ -296,7 +296,7 @@ func BuildChunkSequence(storeFile string, fullPath bool) (int, string, error) {
 }
 
 func ProxyUploadFile(ctx *gin.Context, r *request.ProxyUploadFileReq) (*response.ProxyUploadFileResp, error) {
-	file, _, err := ctx.Request.FormFile("file")
+	file, header, err := ctx.Request.FormFile("file")
 	if err != nil {
 		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_file_upload_save", err.Error())
 	}
@@ -305,7 +305,7 @@ func ProxyUploadFile(ctx *gin.Context, r *request.ProxyUploadFileReq) (*response
 	result, err := http_client.ProxyMinio().PostFile(ctx, &http_client.HttpRequestParams{
 		Params: map[string]string{"file_name": r.FileName},
 		FileParams: []*http_client.HttpRequestFileParams{&http_client.HttpRequestFileParams{
-			FileName: r.FileName,
+			FileName: header.Filename,
 			FileData: file,
 		}},
 		Url:        url,
