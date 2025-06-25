@@ -77,6 +77,12 @@ func main() {
 	if err := http_client.InitWorkflow(); err != nil {
 		log.Fatalf("init http client err: %v", err)
 	}
+
+	// init proxy minio http client
+	if err := http_client.InitProxyMinio(); err != nil {
+		log.Fatalf("init http client err: %v", err)
+	}
+
 	// init model provider
 	mp.Init(config.Cfg().Server.CallbackUrl)
 

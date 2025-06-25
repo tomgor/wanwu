@@ -41,11 +41,11 @@ service:
   llm_url: http://bff-service:6668/openapi/v1/chat/completions
   llm_token:
   gui_agent_url: 
-  file_generate_url: http://172.17.0.1:15000/upload
-  file_parse_url: http://172.17.0.1:8681/rag/doc_parser
+  file_generate_url: http://agent-wanwu:15002/upload
+  file_parse_url: http://agent-wanwu:15003/doc_pra
   bff_service_endpoint: http://bff-service:6668
   kong_service: 
-  agentscope_host: 
+  agentscope_host: agentscope-wanwu
 
 server:
   server_port: 6672

@@ -39,7 +39,7 @@ type HttpRequestParams struct {
 	Headers    map[string]string
 	Params     map[string]string
 	Body       []byte
-	fileParams []*HttpRequestFileParams
+	FileParams []*HttpRequestFileParams
 	Url        string
 	Timeout    time.Duration
 	MonitorKey string
@@ -146,23 +146,15 @@ func (c HttpClient) PostForm(ctx context.Context, httpRequestParams *HttpRequest
 	})
 }
 
-// PostFile 如果想传递其他参数，则通过params传递
 func (c HttpClient) PostFile(ctx context.Context, httpRequestParams *HttpRequestParams) (result []byte, err error) {
 	return SendRequest(ctx, c.Client, httpRequestParams, "POST-FILE", func(params *HttpRequestParams, ctx context.Context) (*http.Request, string, error) {
 		payload := &bytes.Buffer{}
 		writer := multipart.NewWriter(payload)
-		if len(httpRequestParams.Params) > 0 {
-			for k, v := range httpRequestParams.Params {
-				err2 := writer.WriteField(k, v)
-				if err2 != nil {
-					return nil, "", err2
-				}
-			}
-		}
-		if len(httpRequestParams.fileParams) == 0 {
+
+		if len(httpRequestParams.FileParams) == 0 {
 			return nil, "", errors.New("no file params")
 		}
-		for _, fileParam := range httpRequestParams.fileParams {
+		for _, fileParam := range httpRequestParams.FileParams {
 			fileWriter, errW := writer.CreateFormFile("file", fileParam.FileName)
 			if errW != nil {
 				return nil, "", errW
@@ -173,13 +165,19 @@ func (c HttpClient) PostFile(ctx context.Context, httpRequestParams *HttpRequest
 			}
 		}
 
-		defer func(writer *multipart.Writer) {
-			err1 := writer.Close()
-			if err1 != nil {
-				err = err1
-				//todo 日志
+		if len(httpRequestParams.Params) > 0 {
+			for k, v := range httpRequestParams.Params {
+				err2 := writer.WriteField(k, v)
+				if err2 != nil {
+					return nil, "", err2
+				}
 			}
-		}(writer)
+		}
+
+		err1 := writer.Close()
+		if err1 != nil {
+			return nil, "", err1
+		}
 
 		request, err2 := http.NewRequest("POST", httpRequestParams.Url, payload)
 		return request, writer.FormDataContentType(), err2
