@@ -318,7 +318,14 @@ export default {
             //发送问题后不允许继续提问
             this.setStoreSessionStatus(0)
             this.clearInput()
-            let params = {query: prompt, pending: true, responseLoading: true, requestFileUrls: this.queryFilePath?[this.queryFilePath]:[]}
+            let params = {
+                query: prompt, 
+                pending: true, 
+                responseLoading: true, 
+                requestFileUrls: this.queryFilePath?[this.queryFilePath]:[],
+                fileName:this.fileList.length > 0 ? this.fileList[0]['name'] : '',
+                fileSize:this.fileList.length > 0 ? this.fileList[0]['size'] : '',
+            }
             //正式环境传模型参数
             this.$refs['session-com'].pushHistory(params)
 

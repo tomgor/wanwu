@@ -66,7 +66,7 @@ export default {
                 },
                 {
                     label:'TopP',
-                    desc: '生成过程中核采样方法概率阈值。取值越大，生成的随机性越高;取值越小，生成的确定性越高',
+                    desc: '生成过程中核采样方法概率阈值。取值越大，生成的随机性越高；取值越小，生成的确定性越高',
                     props: "topP",
                     btnProps:'topPEnable',
                     min: 0,
@@ -84,7 +84,7 @@ export default {
                 },
                 {
                     label:'存在惩罚',
-                    desc: '用于控制模型生成时的重复度,提高此项可以降低模型生成的重复度',
+                    desc: '用于控制模型生成时的重复度，提高此项可以降低模型生成的重复度',
                     props: "presencePenalty",
                     btnProps:'presencePenaltyEnable',
                     min: -2,

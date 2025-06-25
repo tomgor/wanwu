@@ -41,15 +41,7 @@ export default {
         return {
             asideTitle:'新建对话',
             assistantId:'',
-            historyList:[
-                {
-                    appId:'122249e8-c986-4c02-a731-c4c338c0683a',
-                    conversationId: '39ecc738-eb39-4812-93bf-3280746082ca',
-                    createdAt: '2025-06-03 14:57:44',
-                    hover:false,
-                    title: "你是一个问答助手，主要任务是汇总参考信息回答用户问题。请根据参考信息中提供的上下文信息回答用户问题，注意仅用提供的上下文作答不要根据自己已经有的先验知识来回答问题。"
-                }
-            ],
+            historyList:[],
             editForm:{
                 assistantId:'',
                 avatar:{},

@@ -162,7 +162,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions('app', ['getHistoryList']),
+    // ...mapActions('app', ['getHistoryList']),
     isCannotClick(n) {
       return (n.appType === 'workflow' && !n.publishType && n.appId !== 'example') || n.appType !== 'workflow'
     },
@@ -274,7 +274,6 @@ export default {
       this.handleDelete();
     },
     txtQuesOperation(method, row) {
-      console.log(method, row, "--------------txtQuesOperation");
       switch (method) {
         case "edit":
           // 文本问答编辑
@@ -302,7 +301,6 @@ export default {
     },
     commonMethods(method, row) {
       const type = row.appType;
-      console.log(type, "---------------------------commonMethodsType");
       switch (type) {
         case "agent":
           this.intelligentOperation(method, row);
@@ -353,7 +351,7 @@ export default {
               const list = [...this.listData];
               list[i].isFavorite = !n.isFavorite;
               this.listData = [...list];
-              this.getHistoryList();
+              // this.getHistoryList();
             }
           });
         })

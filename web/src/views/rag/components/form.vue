@@ -33,7 +33,7 @@
         <div class="block prompt-box">
           <div class="basicInfo">
             <div class="img">
-              <img :src="`/user/api`+ editForm.avatar.path" loading="lazy" />
+              <img :src="editForm.avatar.path ? `/user/api`+ editForm.avatar.path : '@/assets/imgs/bg-logo.png'"  />
             </div>
             <div>
               <span class="basicInfo-title">{{editForm.name || '无信息'}}</span>

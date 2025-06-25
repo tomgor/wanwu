@@ -3,7 +3,7 @@
     <div class="history-box">
         <div class="session-answer" >
             <div :class="['session-item','rl']" style="width:600px;">
-                <img class="logo" :src="`/user/api`+ editForm.avatar.path || (basePath + '/img/a.jpg')" />
+                <img class="logo" :src="editForm.avatar.path ? `/user/api`+ editForm.avatar.path : '@/assets/imgs/bg-logo.png'" />
                 <div class="answer-content">
                     <p class="name">{{editForm.name || '无信息'}}</p>
                     <p class="systemPrompt">{{editForm.prologue || ''}}</p>
