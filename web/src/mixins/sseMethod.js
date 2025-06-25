@@ -121,8 +121,8 @@ export default {
                 }).catch((err)=>{
                     this.$message.warning("连接失败，请稍后重试")
                     this.isEnd = true
-                            this.setStoreSessionStatus(-1)
-                            this.runDisabled = false
+                    this.setStoreSessionStatus(-1)
+                    this.runDisabled = false
                 });
         },
         ...mapActions("app", ["setStoreSessionStatus"]),
@@ -190,6 +190,7 @@ export default {
             this.sendEventStream(this.inputVal,'', _history.length)
         },
         sendEventStream(prompt, msgStr, lastIndex){
+            console.log("####sendEventStream", '--------------------------')
             if (this.sessionStatus === 0) {
                 this.$message.warning('上个问题没有回答完！')
                 return
@@ -354,7 +355,6 @@ export default {
                     if (e && e.data) {
                         let data = JSON.parse(e.data)
                         this.sseResponse = data
-                        console.log('===>',new Date().getTime(), JSON.parse(e.data))
                         //待替换的数据，需要前端组装
                         let commonData = {
                             ...data,
@@ -383,6 +383,7 @@ export default {
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
+
                                         let fillData = {
                                             ...commonData,
                                             "response": [0,1,2,3,4,6,20,21,10].includes(commonData.qa_type)?md.render(endStr):endStr.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
@@ -393,6 +394,8 @@ export default {
                                                 }))
                                             : []
                                         }
+
+                                        console.log('===>',new Date().getTime(), data, endStr)
                                         this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                                         if(worldObj.finish !== 0){
                                             if(worldObj.finish === 4){
