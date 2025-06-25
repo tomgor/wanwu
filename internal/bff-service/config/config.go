@@ -30,6 +30,7 @@ type Config struct {
 	Rag       ServiceConfig         `json:"rag" mapstructure:"rag"`
 	Assistant ServiceConfig         `json:"assistant" mapstructure:"assistant"`
 	WorkFlow  WorkFlowServiceConfig `json:"workflow" mapstructure:"workflow"`
+	Agent     AgentServiceConfig    `json:"agent" mapstructure:"agent"`
 }
 
 type ServerConfig struct {
@@ -65,6 +66,16 @@ type WorkFlowServiceConfig struct {
 	Endpoint          string `json:"host" mapstructure:"host"`
 	WorkFlowListUri   string `json:"workflow_list_uri" mapstructure:"workflow_list_uri"`
 	DeleteWorkFlowUri string `json:"delete_workflow_uri" mapstructure:"delete_workflow_uri"`
+}
+
+type AgentServiceConfig struct {
+	Endpoint       string    `json:"host" mapstructure:"host"`
+	UploadMinioUri UriConfig `json:"upload_minio" mapstructure:"upload_minio"`
+}
+
+type UriConfig struct {
+	Port string `json:"port" mapstructure:"port"`
+	Uri  string `json:"uri" mapstructure:"uri"`
 }
 
 type DocCenterConfig struct {

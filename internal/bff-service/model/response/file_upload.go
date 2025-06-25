@@ -24,3 +24,7 @@ type DeleteFileResp struct {
 type CheckFileListResp struct {
 	UploadedFileSequences []int `json:"uploadedFileSequences"` //已经上传成功的切片文件序号列表
 }
+
+type ProxyUploadFileResp struct {
+	DownloadLink string `json:"download_link"` //上传文件链接
+}
