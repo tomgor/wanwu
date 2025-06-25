@@ -11,7 +11,7 @@
     >
       <el-form :model="{...createForm}" :rules="rules" ref="createForm" label-width="110px" class="createForm form">
         <el-form-item :label="$t('modelAccess.table.modelType')" prop="modelType">
-          <el-radio-group v-model="createForm.modelType">
+          <el-radio-group :disabled="isEdit" v-model="createForm.modelType">
             <el-radio v-for="item in modelType" :label="item.key" :key="item.key">
               {{item.name}}
             </el-radio>
@@ -198,9 +198,8 @@ export default {
           delete form.endpointUrl
           delete form.functionCalling
 
-          console.log(form, '----------------------123')
           const res = this.isEdit
-            ? await editModel(form)
+            ? await editModel({...form, modelId: this.row.modelId})
             : await addModel(form)
           if (res.code === 0) {
             this.$message.success(this.$t('common.message.success'))
