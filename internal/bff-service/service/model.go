@@ -26,6 +26,9 @@ func ImportModel(ctx *gin.Context, userId, orgId string, req *request.ImportOrUp
 }
 
 func UpdateModel(ctx *gin.Context, userId, orgId string, req *request.ImportOrUpdateModelRequest) error {
+	if req.ModelId == "" {
+		return grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, "modelId cannot be empty")
+	}
 	clientReq, err := parseImportAndUpdateClientReq(userId, orgId, req)
 	if err != nil {
 		return err

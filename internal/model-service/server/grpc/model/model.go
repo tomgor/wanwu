@@ -32,6 +32,7 @@ func (s *Service) ImportModel(ctx context.Context, req *model_service.ModelInfo)
 
 func (s *Service) UpdateModel(ctx context.Context, req *model_service.ModelInfo) (*emptypb.Empty, error) {
 	if err := s.cli.UpdateModel(ctx, &model.ModelImported{
+		ID:             util.MustU32(req.ModelId),
 		Provider:       req.Provider,
 		ModelType:      req.ModelType,
 		Model:          req.Model,
