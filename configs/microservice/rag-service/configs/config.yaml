@@ -75,3 +75,8 @@ redis:
 
 knowledge:
   host: knowledge-service:8889
+
+
+ragServer:
+  chatEndpoint: http://rag-wanwu:10891
+  chatUrl: /rag/knowledge/stream/search

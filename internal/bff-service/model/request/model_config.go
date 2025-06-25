@@ -8,6 +8,7 @@ import (
 )
 
 type ModelConfig struct {
+	ModelId     string      `json:"modelId"`
 	Provider    string      `json:"provider" validate:"required" enums:"OpenAI-API-compatible,YuanJing"` // 模型供应商
 	Model       string      `json:"model" validate:"required"`                                           // 模型名称
 	ModelType   string      `json:"modelType" validate:"required" enums:"llm,embedding,rerank"`          // 模型类型

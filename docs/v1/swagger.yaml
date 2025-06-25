@@ -2092,6 +2092,12 @@ definitions:
         description: 权限
         type: string
     type: object
+  response.ProxyUploadFileResp:
+    properties:
+      download_link:
+        description: 上传文件链接
+        type: string
+    type: object
   response.RagInfo:
     properties:
       avatar:
@@ -4574,6 +4580,39 @@ paths:
       summary: 邀请用户加入组织
       tags:
       - permission.user
+  /proxy/file/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 代理文件上传
+      parameters:
+      - description: 原始文件名
+        in: formData
+        name: fileName
+        required: true
+        type: string
+      - description: 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.ProxyUploadFileResp'
+              type: object
+      security:
+      - JWT: []
+      summary: 代理文件上传
+      tags:
+      - common
   /rag/chat:
     post:
       consumes:

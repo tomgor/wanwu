@@ -1,11 +1,15 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/UnicomAI/wanwu/internal/bff-service/config"
+	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -289,4 +293,32 @@ func BuildChunkSequence(storeFile string, fullPath bool) (int, string, error) {
 		return 0, "", fmt.Errorf("store file (%v) is invalid", storeFile)
 	}
 	return sequence, storeFile[splitIndex+1:], nil
+}
+
+func ProxyUploadFile(ctx *gin.Context, r *request.ProxyUploadFileReq) (*response.ProxyUploadFileResp, error) {
+	file, header, err := ctx.Request.FormFile("file")
+	if err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_file_upload_save", err.Error())
+	}
+	agentConfig := config.Cfg().Agent
+	url := "http://" + agentConfig.Endpoint + ":" + agentConfig.UploadMinioUri.Port + agentConfig.UploadMinioUri.Uri
+	result, err := http_client.ProxyMinio().PostFile(ctx, &http_client.HttpRequestParams{
+		Params: map[string]string{"file_name": r.FileName},
+		FileParams: []*http_client.HttpRequestFileParams{&http_client.HttpRequestFileParams{
+			FileName: header.Filename,
+			FileData: file,
+		}},
+		Url:        url,
+		Timeout:    60 * time.Second,
+		MonitorKey: "proxy_upload_file",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_file_upload_save", err.Error())
+	}
+	var resp = &response.ProxyUploadFileResp{}
+	if err = json.Unmarshal(result, resp); err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_file_upload_save", err.Error())
+	}
+	return resp, nil
 }

@@ -136,9 +136,10 @@ type ConversionStreamFile struct {
 }
 
 type OnlineSearchConfig struct {
-	SearchUrl string `json:"searchUrl" form:"searchUrl"`
-	SearchKey string `json:"searchKey" form:"searchKey"`
-	Enable    bool   `json:"enable" form:"enable"`
+	SearchUrl      string `json:"searchUrl" form:"searchUrl"`
+	SearchKey      string `json:"searchKey" form:"searchKey"`
+	SearchRerankId string `json:"searchRerankId" form:"searchRerankId"`
+	Enable         bool   `json:"enable" form:"enable"`
 }
 
 func (o *OnlineSearchConfig) Check() error {
