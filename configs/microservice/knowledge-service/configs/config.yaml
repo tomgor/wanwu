@@ -90,9 +90,9 @@ kafka:
   default-partition-num: 3
 
 rag-server:
-  endpoint: 'http://172.17.0.1:8681'
-  url-analysis-endpoint: 'http://172.17.0.1:8613'
-  url-import-endpoint: 'http://172.17.0.1:8613'
+  endpoint: 'http://rag-wanwu:8681'
+  url-analysis-endpoint: 'http://rag-wanwu:8613'
+  url-import-endpoint: 'http://rag-wanwu:8613'
   init-knowledge-uri: '/rag/init-knowledge-base'
   update-knowledge-uri: '/rag/update-kb-name'
   delete-knowledge-uri: '/rag/del-knowledge-base'

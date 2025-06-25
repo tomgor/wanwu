@@ -105,6 +105,13 @@ func (s *Service) GetDocCategoryUploadTip(ctx context.Context, req *knowledgebas
 	if err != nil {
 		return nil, err
 	}
+	if len(taskList) == 0 {
+		return &knowledgebase_doc_service.DocImportTipResp{
+			KnowledgeId:   req.KnowledgeId,
+			KnowledgeName: knowledge.Name,
+			UploadStatus:  DocImportFinish,
+		}, nil
+	}
 	if len(taskList) > 0 {
 		task := taskList[0]
 		if task.Status == model.KnowledgeImportError {
@@ -178,31 +185,8 @@ func (s *Service) UpdateDocSegmentStatus(ctx context.Context, req *knowledgebase
 		log.Errorf(fmt.Sprintf("查询知识库详情失败 参数(%v)", req))
 		return nil, err
 	}
-	//前端逻辑，all + status 组合控制一键开启和一键关停，比如：all：true，status：false 则标识一键关停
-	//但是底层 只要all false 就是一键关停
-	var status = req.ContentStatus == "true"
-	var params interface{}
-	//一键开启
-	if req.All {
-		params = &service.DocSegmentStatusUpdateAllParams{
-			DocSegmentStatusUpdateParams: service.DocSegmentStatusUpdateParams{
-				UserId:        req.UserId,
-				KnowledgeName: knowledge.Name,
-				FileName:      service.RebuildFileName(docInfo.DocId, docInfo.FileType, docInfo.Name),
-				ContentId:     req.ContentId,
-			},
-			All: status,
-		}
-	} else {
-		params = &service.DocSegmentStatusUpdateParams{
-			UserId:        req.UserId,
-			KnowledgeName: knowledge.Name,
-			FileName:      service.RebuildFileName(docInfo.DocId, docInfo.FileType, docInfo.Name),
-			ContentId:     req.ContentId,
-			Status:        status,
-		}
-	}
 	//3.更新文档状态
+	var params = buildDocUpdateSegmentStatusParams(req, knowledge, docInfo)
 	err = service.RagDocUpdateDocSegmentStatus(ctx, params)
 	if err != nil {
 		log.Errorf(fmt.Sprintf("UpdateFileStatus 更新知识库文档切片启用状态 失败(%v)  参数(%v)", err, req))
@@ -363,4 +347,29 @@ func buildContentList(contentList []service.FileSplitContent, pageNo int32, page
 		})
 	}
 	return retList
+}
+
+func buildDocUpdateSegmentStatusParams(req *knowledgebase_doc_service.UpdateDocSegmentReq, knowledge *model.KnowledgeBase, docInfo *model.KnowledgeDoc) interface{} {
+	//前端逻辑，all + status 组合控制一键开启和一键关停，比如：all：true，status：false 则标识一键关停
+	//但是底层 只要all false 就是一键关停
+	var status = req.ContentStatus == "true"
+	if req.All {
+		return &service.DocSegmentStatusUpdateAllParams{
+			DocSegmentStatusUpdateParams: service.DocSegmentStatusUpdateParams{
+				UserId:        req.UserId,
+				KnowledgeName: knowledge.Name,
+				FileName:      service.RebuildFileName(docInfo.DocId, docInfo.FileType, docInfo.Name),
+				ContentId:     req.ContentId,
+			},
+			All: status,
+		}
+	} else {
+		return &service.DocSegmentStatusUpdateParams{
+			UserId:        req.UserId,
+			KnowledgeName: knowledge.Name,
+			FileName:      service.RebuildFileName(docInfo.DocId, docInfo.FileType, docInfo.Name),
+			ContentId:     req.ContentId,
+			Status:        status,
+		}
+	}
 }
