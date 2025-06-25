@@ -120,7 +120,7 @@ export default {
   .card-box {
     display: flex;
     flex-wrap: wrap;
-    margin-top: 6px;
+    margin: 6px -10px 0;
     /*overflow: auto;*/
     .card {
       position: relative;
@@ -128,19 +128,13 @@ export default {
       border-radius: 12px;
       height: fit-content;
       background: #fff;
-      // background: rgba(255, 244, 245, 1);
-      //box-shadow: 0 2px 2px #0000000a;
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 23.5%;
-      margin-bottom: 1.5%;
-      margin-right: 1.9%;
+      width: calc((100% / 4) - 20px);
+      margin: 0 10px 20px;
       box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
       border: 1px solid rgba(0, 0, 0, 0);
-      &:nth-child(4n) {
-        margin-right: 0;
-      }
       &:hover {
         cursor: pointer;
         box-shadow: 0 2px 8px #171a220d, 0 4px 16px #0000000f;

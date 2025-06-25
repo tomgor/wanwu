@@ -42,6 +42,7 @@ export default {
         userInfo: '个人信息',
         org: '组织管理',
         modelAccess: '模型管理',
+        about: '关于'
     },
     header: {
         title: '万悟',
