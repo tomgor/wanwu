@@ -32,8 +32,12 @@ func (f FileDocImportService) ImportType() int {
 func (f FileDocImportService) AnalyzeDoc(ctx context.Context, importTask *model.KnowledgeImportTask, importDocInfo *model.DocImportInfo) ([]*model.DocInfo, error) {
 	var docFileList []*model.DocInfo
 	for _, docInfo := range importDocInfo.DocInfoList {
-		isCompressed := checkCompressedFile(docInfo)
-		log.Infof("AnalyzeDoc %v, %v", docInfo, isCompressed)
+		isCompressed, err := checkCompressedFile(docInfo)
+		log.Infof("AnalyzeDoc %v, %v, err %v", docInfo, isCompressed, err)
+		if err != nil {
+			docFileList = append(docFileList, docInfo)
+			continue
+		}
 		docList, err := buildDocList(ctx, isCompressed, docInfo)
 		if err != nil {
 			return nil, err
@@ -123,6 +127,11 @@ func checkSingleFileSize(doc *model.DocInfo) error {
 		fileLimit = limitConfig.PptxSizeLimit
 	case ".html":
 		fileLimit = limitConfig.HtmlSizeLimit
+	case ".tar.gz":
+		fileLimit = limitConfig.CompressedSizeLimit
+	case ".zip":
+		fileLimit = limitConfig.CompressedSizeLimit
+
 	default:
 		fileLimit = limitConfig.MaxFileSize
 	}
@@ -137,17 +146,19 @@ func checkOneTypeFile(fileLimit int64, fileSize int64, fileName string, fileType
 }
 
 // checkCompressedFile 校验是否是压缩文件
-func checkCompressedFile(doc *model.DocInfo) bool {
+func checkCompressedFile(doc *model.DocInfo) (bool, error) {
 	compressedFileTypeList := strings.Split(config.GetConfig().UsageLimit.CompressedFileType, ";")
+	limitSize := config.GetConfig().UsageLimit.CompressedSizeLimit
 	for _, suffix := range compressedFileTypeList {
 		if suffix == "" || strings.TrimSpace(suffix) == "" {
 			continue
 		}
 		if doc.DocType == suffix {
-			return true
+			err := checkOneTypeFile(limitSize, doc.DocSize, doc.DocName, doc.DocType)
+			return true, err
 		}
 	}
-	return false
+	return false, nil
 }
 
 // buildDocList 构造文档列表
@@ -197,6 +208,10 @@ func buildFileTypeMap() map[string]bool {
 	fileTypes := strings.Split(config.GetConfig().UsageLimit.FileTypes, ";")
 	var fileTypeMap = make(map[string]bool)
 	for _, fileType := range fileTypes {
+		fileTypeMap[fileType] = true
+	}
+	compressedFileTypeList := strings.Split(config.GetConfig().UsageLimit.CompressedFileType, ";")
+	for _, fileType := range compressedFileTypeList {
 		fileTypeMap[fileType] = true
 	}
 	return fileTypeMap
