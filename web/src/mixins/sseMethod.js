@@ -284,7 +284,7 @@ export default {
                 onclose: () => {
                     console.log('===> eventSource onClose')
                     this.setStoreSessionStatus(-1)//关闭后改变状态
-                    this.sseOnCloseCallBack()
+                    // this.sseOnCloseCallBack()
                 },
                 onerror: (e) => {
                     console.log("服务连接异常请重试！");
@@ -523,6 +523,7 @@ export default {
                 }else{
                     if(Object.keys(this.sseResponse).length !== 0 && this.sseResponse.code !== 7){
                         this.runResponse ="本次回答已被终止"
+                        this.setStoreSessionStatus(-1)
                     }else{
                         this.stopEventSource();
                         this.setStoreSessionStatus(-1)

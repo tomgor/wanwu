@@ -68,7 +68,6 @@
             ref="ruleForm"
             label-width="140px"
             class="demo-ruleForm"
-            :rules="rules"
             @submit.native.prevent
           >
             <el-form-item :label="$t('knowledgeManage.chunkTypeSet')+'：'">
@@ -81,7 +80,9 @@
               v-if="ruleForm.docSegment.segmentType == '1'"
               :label="$t('knowledgeManage.punctuationMark')+'：'"
               prop="docSegment.splitter"
-              :rules="[{ required: true, message: $t('knowledgeManage.markTips'),trigger:'blur'}]"
+              :rules="ruleForm.docSegment.segmentType === '1' 
+              ? [{ required: true, message: $t('knowledgeManage.markTips'), trigger: 'blur' }] 
+              : []"
             >
               <el-select
                 v-model="ruleForm.docSegment.splitter"
@@ -199,6 +200,8 @@
 import urlAnalysis from './urlAnalysis.vue';
 import uploadChunk from "@/mixins/uploadChunk";
 import {docImport} from '@/api/knowledge'
+import { delfile } from "@/api/chunkFile";
+import { FlagManager } from '@antv/x6/lib/view/flag';
 export default {
   components:{urlAnalysis},
   mixins: [uploadChunk],
@@ -223,9 +226,6 @@ export default {
         docInfoList:[],
         docImportType:0,
         knowledgeId:this.$route.query.id
-      },
-      rules: {
-        'docSegment.splitter':[{ required: true, message: '请选择标点符号', trigger: "blur" },]
       },
       splitOptions: [
         {
@@ -346,6 +346,7 @@ export default {
     },
     // 删除已上传文件
     handleRemove(item,index) {
+      this.delfile({fileList:[this.resList[index]['name']],isExpired:true});
       this.fileList = this.fileList.filter((files) => files.name !== item.name);
       if(this.fileList.length === 0){
         this.file = null
@@ -355,6 +356,13 @@ export default {
       if(this.docInfoList.length > 0){
         this.docInfoList.splice(1,index)
       }
+    },
+    delfile(data){
+      delfile(data).then(res =>{
+        if(res.code === 0){
+          this.$message.success('删除成功')
+        }
+      })
     },
     filterSize(size) {
       if (!size) return "";
@@ -372,6 +380,13 @@ export default {
       this.fileList = []
     },
     submitInfo(){
+      const { segmentType, splitter } = this.ruleForm.docSegment;
+      if (segmentType === '1' && splitter.length === 0) {
+          this.$refs.ruleForm.validate();
+          return false;
+      }
+      this.$refs.ruleForm.clearValidate(['docSegment.splitter']);
+
       if(this.fileType ==='file'){
         this.ruleForm.docImportType  = 0;
       }else if(this.fileType ==='fileUrl'){
@@ -390,10 +405,10 @@ export default {
         data = this.ruleForm
       }
       docImport(data).then(res =>{
-        if(res.code === 0){
-          this.$router.push({path:`/knowledge/doclist/${this.knowledgeId}?name=${this.knowledgeName}`})
-        }
-      })
+          if(res.code === 0){
+            this.$router.push({path:`/knowledge/doclist/${this.knowledgeId}?name=${this.knowledgeName}`})
+          }
+        })
     },
     uploadOnChange(file, fileList){
       if (!fileList.length) return;
@@ -536,9 +551,21 @@ export default {
       }, 50);
     },
     nextStep(){
+      //上传文件类型
       if(this.fileType === 'file' || this.fileType === 'fileUrl'){
         if (this.fileIndex < this.fileList.length){
           this.$message.warning('文件上传中...')
+          return false
+        }
+        if(this.fileList.length === 0){
+          this.$message.warning('请上传文件!')
+          return false
+        }
+      }
+      //url逐条上传
+      if(this.fileType === 'url'){
+        if(this.docInfoList.length === 0){
+          this.$message.warning('请上输入url!')
           return false
         }
       }
