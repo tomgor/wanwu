@@ -33,7 +33,6 @@ func errStatus(code errs.Code, status *errs.Status) error {
 
 func (s *Service) ChatRag(req *rag_service.ChatRagReq, stream grpc.ServerStreamingServer[rag_service.ChatRagResp]) error {
 	ctx := stream.Context()
-
 	// 获取rag详情
 	rag, err := s.cli.FetchRagFirst(ctx, req.RagId)
 	if err != nil {
@@ -66,7 +65,6 @@ func (s *Service) ChatRag(req *rag_service.ChatRagReq, stream grpc.ServerStreami
 		resp := &rag_service.ChatRagResp{
 			Content: text,
 		}
-		//log.Infof("text = %s", text)
 		if err := stream.Send(resp); err != nil {
 			return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", err.Error())
 		}
