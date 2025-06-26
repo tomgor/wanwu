@@ -235,7 +235,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .coder_editor_tip {
   width: 300px;
 }
