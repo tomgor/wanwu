@@ -316,154 +316,153 @@ export default {
       height: auto;
     }
   }
-}
-.main{
-  display: flex;
-  margin: 10px 0 50px 0;
-  .left-info{
-    width: calc(100% - 420px);
-    margin-right: 20px;
-    .mcp-tabs{
-      margin: 20px 0 0 0;
-      .mcp-tab{
-        display: inline-block;
-        vertical-align: middle;
-        width: 160px;
-        height: 40px;
-        border-bottom: 1px solid #333;
-        line-height: 40px;
-        text-align: center;
+  .main{
+    display: flex;
+    margin: 10px 0 50px 0;
+    .left-info{
+      width: calc(100% - 420px);
+      margin-right: 20px;
+      .mcp-tabs{
+        margin: 20px 0 0 0;
+        .mcp-tab{
+          display: inline-block;
+          vertical-align: middle;
+          width: 160px;
+          height: 40px;
+          border-bottom: 1px solid #333;
+          line-height: 40px;
+          text-align: center;
+          cursor: pointer;
+        }
+        .active{
+          background: #333;
+          color: #fff;
+          font-weight: bold;
+        }
+      }
+      .overview{
+        .overview-item{
+          display: flex;
+          padding: 15px 0;
+          border-bottom: 1px solid #eee;
+          line-height: 24px;
+          .item-title{
+            width: 80px;
+            color: $color;
+            font-weight: bold;
+          }
+          .item-desc{
+            width: calc(100% - 100px);
+            margin-left: 10px;
+            flex:1;
+            color: #333;
+          }
+
+        }
+        .overview-item:last-child{
+          border-bottom: none;
+        }
+      }
+      .markdown{
+
+      }
+      .install{
+
+      }
+      .tool{
+        .tool-item{
+          padding: 20px 0;
+          border-bottom: 1px solid #eee;
+          .title{
+            font-weight: bold;
+            line-height: 46px;
+          }
+          .tool-item-bg{
+            background: inherit;
+            background-color: rgba(249, 249, 249, 1);
+            border: none;
+            border-radius: 10px;
+            padding: 20px;
+          }
+        }
+        .tool-item:last-child{
+          border-bottom: none;
+        }
+        .sse-url{
+          .sse-url__input{
+            flex:1;
+            margin-right: 20px;
+            padding: 12px;
+            color: $color;
+          }
+          .sse-url__bt{
+            width: 120px;
+          }
+        }
+        .install-intro-item{
+          p{
+            line-height: 26px;
+            color: #333;
+          }
+          .install-intro-title{
+            color: $color;
+            margin-top: 10px;
+            font-weight: bold;
+          }
+        }
+      }
+    }
+    .right-recommend{
+      width: 400px;
+      overflow-y: auto;
+      border-left:1px solid #eee;
+      padding: 20px;
+      .recommend-item{
+        position: relative;
+        border: 1px solid $border_color; // rgba(208, 167, 167, 1);
+        background: #F4F5FF; // rgba(255, 247, 247, 1);
+        margin-bottom: 15px;
+        border-radius: 10px;
+        padding: 20px 20px 20px 80px;
+        text-align: left;
         cursor: pointer;
-      }
-      .active{
-        background: #333;
-        color: #fff;
-        font-weight: bold;
-      }
-    }
-    .overview{
-      .overview-item{
-        display: flex;
-        padding: 15px 0;
-        border-bottom: 1px solid #eee;
-        line-height: 24px;
-        .item-title{
-          width: 80px;
-          color: $color;
+        .logo{
+          width: 46px;
+          height: 46px;
+          object-fit: cover;
+          position: absolute;
+          left:20px;
+          border: 1px solid #fff;
+          border-radius: 4px;
+        }
+        .name{
+          color: #5D5D5D;
           font-weight: bold;
         }
-        .item-desc{
-          width: calc(100% - 100px);
-          margin-left: 10px;
-          flex:1;
-          color: #333;
-        }
-
-      }
-      .overview-item:last-child{
-        border-bottom: none;
-      }
-    }
-    .markdown{
-
-    }
-    .install{
-
-    }
-    .tool{
-      .tool-item{
-        padding: 20px 0;
-        border-bottom: 1px solid #eee;
-        .title{
-          font-weight: bold;
-          line-height: 46px;
-        }
-        .tool-item-bg{
-          background: inherit;
-          background-color: rgba(249, 249, 249, 1);
-          border: none;
-          border-radius: 10px;
-          padding: 20px;
-        }
-      }
-      .tool-item:last-child{
-        border-bottom: none;
-      }
-      .sse-url{
-        .sse-url__input{
-          flex:1;
-          margin-right: 20px;
-          padding: 12px;
-          color: $color;
-        }
-        .sse-url__bt{
-          width: 120px;
-        }
-      }
-      .install-intro-item{
-        p{
-          line-height: 26px;
-          color: #333;
-        }
-        .install-intro-title{
-          color: $color;
-          margin-top: 10px;
-          font-weight: bold;
+        .intro{
+          height: 34px;
+          color: #5D5D5D;
+          margin-top: 8px;
+          font-size: 13px;
+          overflow: hidden;
         }
       }
     }
   }
-  .right-recommend{
-    width: 400px;
-    overflow-y: auto;
-    border-left:1px solid #eee;
-    padding: 20px;
-    .recommend-item{
-      position: relative;
-      border: 1px solid $border_color; // rgba(208, 167, 167, 1);
-      background: #F4F5FF; // rgba(255, 247, 247, 1);
-      margin-bottom: 15px;
-      border-radius: 10px;
-      padding: 20px 20px 20px 80px;
-      text-align: left;
-      cursor: pointer;
-      .logo{
-        width: 46px;
-        height: 46px;
-        object-fit: cover;
-        position: absolute;
-        left:20px;
-        border: 1px solid #fff;
-        border-radius: 4px;
-      }
-      .name{
-        color: #5D5D5D;
-        font-weight: bold;
-      }
-      .intro{
-        height: 34px;
-        color: #5D5D5D;
-        margin-top: 8px;
-        font-size: 13px;
-        overflow: hidden;
-      }
-    }
+  .bg-border{
+    margin-top: 20px;
+    /*min-height: calc(100vh - 360px);*/
+    background-color: rgba(255, 255, 255, 1);
+    box-sizing: border-box;
+    /*border:1px solid rgba(208, 167, 167, 1);*/
+    border-radius: 10px;
+    padding: 10px 20px;
+    box-shadow: 2px 2px 15px #F4F5FF; // #d0a7a757;
+  }
+  .overview-item .item-desc{
+    line-height: 28px;
   }
 }
-.bg-border{
-  margin-top: 20px;
-  /*min-height: calc(100vh - 360px);*/
-  background-color: rgba(255, 255, 255, 1);
-  box-sizing: border-box;
-  /*border:1px solid rgba(208, 167, 167, 1);*/
-  border-radius: 10px;
-  padding: 10px 20px;
-  box-shadow: 2px 2px 15px #d0a7a757;
-}
-.overview-item .item-desc{
-  line-height: 28px;
-}
-
 
 .mcp-el-collapse.el-collapse {
   border: none;
