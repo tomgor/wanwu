@@ -81,7 +81,12 @@
               <!--<div class="card-type" v-if="item.version">{{item.version}}</div>-->
             </div>
             <div class="card-bottom">
-              <div>{{$t('modelAccess.table.publisher')}}: {{providerObj[item.provider] || '--'}}</div>
+              <div
+                :class="['card-bottom-provider', {'no-publishData': !item.publishDate}]"
+                :title="providerObj[item.provider] || '--'"
+              >
+                {{$t('modelAccess.table.publisher')}}: {{providerObj[item.provider] || '--'}}
+              </div>
               <div style="float: right">{{item.publishDate || '--'}} {{$t('modelAccess.table.publish')}}</div>
             </div>
           </div>
@@ -351,6 +356,15 @@
     right: 12px;
     div {
       display: inline-block;
+    }
+    .card-bottom-provider {
+      width: calc(100% - 100px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .no-publishData.no-publishData {
+      width: calc(100% - 45px);
     }
   }
 }
