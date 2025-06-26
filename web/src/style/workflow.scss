@@ -104,6 +104,10 @@ $fontSize: 12px;
     margin-right: 10px;
   }
 }
+.node-content:hover {
+  background: #eee;
+  border-radius: 6px;
+}
 .item.last-item.popover-select.el-popover__reference {
   -webkit-appearance: none;
   background-color: #fff;
