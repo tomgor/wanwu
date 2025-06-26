@@ -1,6 +1,7 @@
 package service
 
 import (
+	"path"
 	"strconv"
 
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
@@ -44,7 +45,7 @@ func GetDeployInfo(ctx *gin.Context) (interface{}, error) {
 	return map[string]string{
 		"massAccessIp":   cfgServer.ExternalIP,
 		"massAccessPort": strconv.Itoa(cfgServer.ExternalPort),
-		"webBaseUrl":     cfgServer.WebBaseUrl,
+		"webBaseUrl":     path.Join(cfgServer.WebBaseUrl, "/minio/download/api"),
 	}, nil
 }
 
