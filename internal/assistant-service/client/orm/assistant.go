@@ -2,7 +2,6 @@ package orm
 
 import (
 	"context"
-
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/client/orm/sqlopt"
@@ -93,6 +92,28 @@ func (c *Client) GetAssistantList(ctx context.Context, userID, orgID string, nam
 			return toErrStatus("assistants_get_list", err.Error())
 		}
 
+		return nil
+	})
+}
+
+func (c *Client) CheckSameAssistantName(ctx context.Context, userID, orgID, name string) *err_code.Status {
+	// 同一组织下不允许重名
+	return c.transaction(ctx, func(tx *gorm.DB) *err_code.Status {
+		query := sqlopt.SQLOptions(
+			sqlopt.WithOrgID(orgID),
+		).Apply(tx.Model(&model.Assistant{}))
+		if name != "" {
+			query = query.Where("name = ?", name)
+		}
+		var count int64
+		if err := query.Count(&count).Error; err != nil {
+			return toErrStatus("assistant_get_by_name", err.Error())
+		}
+
+		// 存在同名智能体
+		if count > 0 {
+			return toErrStatus("assistant_same_name", name)
+		}
 		return nil
 	})
 }

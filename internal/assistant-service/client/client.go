@@ -15,6 +15,7 @@ type IClient interface {
 	GetAssistant(ctx context.Context, assistantID uint32) (*model.Assistant, *err_code.Status)
 	GetAssistantsByIDs(ctx context.Context, assistantIDs []uint32) ([]*model.Assistant, *err_code.Status)
 	GetAssistantList(ctx context.Context, userID, orgID string, name string) ([]*model.Assistant, int64, *err_code.Status)
+	CheckSameAssistantName(ctx context.Context, userID, orgID, name string) *err_code.Status
 
 	//================AssistantAction================
 	CreateAssistantAction(ctx context.Context, action *model.AssistantAction) *err_code.Status

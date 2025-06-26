@@ -120,48 +120,28 @@
 {"code":150007,"key":"rag_update_err","langs":{"zh":"更新文本问答错误：%v"}}
 {"code":150008,"key":"rag_chat_err","langs":{"zh":"问答错误：%v"}}
 {"code":150009,"key":"rag_list_by_ids_err","langs":{"zh":"id列表为空：%v"}}
-{"code":160001,"key":"assistant_create","langs":{"zh":"创建智能体错误"}}
-{"code":160001,"key":"assistant_update","langs":{"zh":"更新智能体错误"}}
-{"code":160001,"key":"assistant_delete","langs":{"zh":"删除智能体错误"}}
-{"code":160001,"key":"assistant_get","langs":{"zh":"获取智能体错误"}}
-{"code":160001,"key":"assistants_get_by_ids","langs":{"zh":"获取智能体错误"}}
-{"code":160001,"key":"assistants_get_list","langs":{"zh":"获取智能体列表错误"}}
-{"code":160002,"key":"assistant_action_update","langs":{"zh":"更新action错误"}}
-{"code":160002,"key":"assistant_action_get","langs":{"zh":"获取action错误"}}
-{"code":160002,"key":"assistant_actions_get_by_assistant_id","langs":{"zh":"获取action错误"}}
-{"code":160002,"key":"assistant_action_create","langs":{"zh":"创建action错误"}}
-{"code":160002,"key":"assistant_action_delete","langs":{"zh":"删除action错误"}}
-{"code":160002,"key":"assistant_actions_count","langs":{"zh":"获取action错误"}}
-{"code":160003,"key":"assistant_workflow_update","langs":{"zh":"更新工作流错误"}}
-{"code":160003,"key":"assistant_workflow_get","langs":{"zh":"获取工作流错误"}}
-{"code":160003,"key":"assistant_workflows_get_by_assistant_id","langs":{"zh":"获取工作流错误"}}
-{"code":160003,"key":"assistant_workflow_create","langs":{"zh":"创建工作流错误"}}
-{"code":160003,"key":"assistant_workflow_delete","langs":{"zh":"删除工作流错误"}}
-{"code":160003,"key":"assistant_workflows_count","langs":{"zh":"获取工作流错误"}}
+{"code":160001,"key":"assistant_create","langs":{"zh":"创建智能体错误: %v"}}
+{"code":160001,"key":"assistant_update","langs":{"zh":"更新智能体错误: %v"}}
+{"code":160001,"key":"assistant_delete","langs":{"zh":"删除智能体错误: %v"}}
+{"code":160001,"key":"assistant_get","langs":{"zh":"获取智能体错误: %v"}}
+{"code":160001,"key":"assistants_get_by_ids","langs":{"zh":"获取智能体错误: %v"}}
+{"code":160001,"key":"assistants_get_list","langs":{"zh":"获取智能体列表错误: %v"}}
+{"code":160001,"key":"assistant_get_by_name","langs":{"zh":"获取智能体错误: %v"}}
+{"code":160001,"key":"assistant_same_name","langs":{"zh":"智能体名称重复: %v"}}
+{"code":160002,"key":"assistant_action_update","langs":{"zh":"更新action错误: %v"}}
+{"code":160002,"key":"assistant_action_get","langs":{"zh":"获取action错误: %v"}}
+{"code":160002,"key":"assistant_actions_get_by_assistant_id","langs":{"zh":"获取action错误: %v"}}
+{"code":160002,"key":"assistant_action_create","langs":{"zh":"创建action错误: %v"}}
+{"code":160002,"key":"assistant_action_delete","langs":{"zh":"删除action错误: %v"}}
+{"code":160002,"key":"assistant_actions_count","langs":{"zh":"获取action错误: %v"}}
+{"code":160003,"key":"assistant_workflow_update","langs":{"zh":"更新工作流错误: %v"}}
+{"code":160003,"key":"assistant_workflow_get","langs":{"zh":"获取工作流错误: %v"}}
+{"code":160003,"key":"assistant_workflows_get_by_assistant_id","langs":{"zh":"获取工作流错误: %v"}}
+{"code":160003,"key":"assistant_workflow_create","langs":{"zh":"创建工作流错误: %v"}}
+{"code":160003,"key":"assistant_workflow_delete","langs":{"zh":"删除工作流错误: %v"}}
+{"code":160003,"key":"assistant_workflows_count","langs":{"zh":"获取工作流错误: %v"}}
 {"code":160004,"key":"assistant_conversation_create","langs":{"zh":"创建对话错误"}}
 {"code":160004,"key":"assistant_conversation_update","langs":{"zh":"更新对话错误"}}
 {"code":160004,"key":"assistant_conversation_delete","langs":{"zh":"删除对话错误"}}
 {"code":160004,"key":"assistant_conversation_get","langs":{"zh":"获取对话错误"}}
 {"code":160004,"key":"assistant_conversation_get_list","langs":{"zh":"获取对话列表错误"}}
-
-{"code":140000,"key":"","langs":{"zh":"系统异常，请稍后重试"}}
-{"code":140001,"key":"know_doc_unsupported_file_format","langs":{"zh":"文件格式不支持"}}
-{"code":140001,"key":"know_doc_file_size_exceed","langs":{"zh":"文件大小超过限制"}}
-{"code":140001,"key":"know_same_name_validation_fail","langs":{"zh":"已存在同名文件，请更改名字后重试"}}
-{"code":140001,"key":"know_doc_last_failure_info","langs":{"zh":"最近一次失败信息：%v"}}
-{"code":140001,"key":"know_doc_parsing_service_error","langs":{"zh":"文件解析服务异常"}}
-{"code":140001,"key":"know_doc_file_unusable","langs":{"zh":"文件不可用，需确保文件格式正确、无加密情况、文件能正常打开"}}
-{"code":141001,"key":"","langs":{"zh":"新建知识库失败，请稍后重试"}}
-{"code":141002,"key":"","langs":{"zh":"删除知识库失败，请稍后重试"}}
-{"code":141003,"key":"","langs":{"zh":"修改知识库失败，请稍后重试"}}
-{"code":141004,"key":"","langs":{"zh":"获取知识库失败，请稍后重试"}}
-{"code":141005,"key":"","langs":{"zh":"没有操作该知识库的权限"}}
-{"code":141006,"key":"","langs":{"zh":"知识库正在上传文档，不可删除"}}
-{"code":141007,"key":"","langs":{"zh":"知识库正在解析文档，不可删除"}}
-{"code":141008,"key":"","langs":{"zh":"已存在同名知识库"}}
-{"code":141009,"key":"","langs":{"zh":"查询知识库列表失败，请稍后重试"}}
-{"code":142001,"key":"","langs":{"zh":"文档正在解析文档，不可删除"}}
-{"code":142002,"key":"","langs":{"zh":"文档删除失败，请稍后重试"}}
-{"code":142003,"key":"","langs":{"zh":"修改文档分段状态失败，请稍后重试"}}
-{"code":142004,"key":"","langs":{"zh":"文档导入失败，请稍后重试"}}
-{"code":142005,"key":"","langs":{"zh":"文档分片查询失败，请稍后重试"}}

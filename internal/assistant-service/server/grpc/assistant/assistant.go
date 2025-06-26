@@ -61,7 +61,10 @@ func (s *Service) AssistantCreate(ctx context.Context, req *assistant_service.As
 		UserId:     req.Identity.UserId,
 		OrgId:      req.Identity.OrgId,
 	}
-
+	// 查找否存在相同名称智能体
+	if err := s.cli.CheckSameAssistantName(ctx, req.Identity.UserId, req.Identity.OrgId, req.AssistantBrief.Name); err != nil {
+		return nil, errStatus(errs.Code_AssistantErr, err)
+	}
 	// 调用client方法创建智能体
 	if status := s.cli.CreateAssistant(ctx, assistant); status != nil {
 		return nil, errStatus(errs.Code_AssistantErr, status)

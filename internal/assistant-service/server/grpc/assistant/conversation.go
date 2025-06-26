@@ -403,6 +403,8 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 
 	for {
 		if err := ctx.Err(); err != nil {
+			// 退出时保存对话（使用独立上下文）
+			saveConversation(ctx, req, fullResponse.String(), searchList)
 			return err
 		}
 
@@ -410,6 +412,8 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		if err != nil && err != io.ErrUnexpectedEOF && err != io.EOF {
 			log.Errorf("Assistant服务读取流式响应失败，assistantId: %s, error: %v, 已处理行数: %d", req.AssistantId, err, lineCount)
 			SSEError(stream, "智能体响应中断")
+			// 退出时保存对话（使用独立上下文）
+			saveConversation(ctx, req, fullResponse.String(), searchList)
 			return err
 		}
 
@@ -445,6 +449,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 				log.Errorf("Assistant服务发送流式响应失败，assistantId: %s, error: %v", req.AssistantId, err)
 				return err
 			}
+
 		}
 
 		if err != nil && (err == io.ErrUnexpectedEOF || err == io.EOF) {
@@ -455,12 +460,31 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 
 	// 问答调试不保存
 	if !req.Trial {
-		if err := saveConversationDetailToES(ctx, req, fullResponse.String(), searchList); err != nil {
-			log.Errorf("保存聊天记录到ES失败，assistantId: %s, conversationId: %s, error: %v", req.AssistantId, req.ConversationId, err)
-		}
+		saveConversation(ctx, req, fullResponse.String(), searchList)
 	}
 
 	return nil
+}
+
+// 使用独立上下文保存对话的辅助函数
+func saveConversation(originalCtx context.Context, req *assistant_service.AssistantConversionStreamReq, response, searchList string) {
+	// 如果原始上下文已取消，创建一个新的独立上下文
+	if originalCtx.Err() != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		if err := saveConversationDetailToES(ctx, req, response, searchList); err != nil {
+			log.Errorf("保存聊天记录到ES失败，assistantId: %s, conversationId: %s, error: %v",
+				req.AssistantId, req.ConversationId, err)
+		}
+		return
+	}
+
+	// 原始上下文未取消时，继续使用它
+	if err := saveConversationDetailToES(originalCtx, req, response, searchList); err != nil {
+		log.Errorf("保存聊天记录到ES失败，assistantId: %s, conversationId: %s, error: %v",
+			req.AssistantId, req.ConversationId, err)
+	}
 }
 
 type AssistantConversionHistory struct {
