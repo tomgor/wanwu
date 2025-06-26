@@ -3,7 +3,7 @@
     <div class="page-title">
       <i
         class="el-icon-arrow-left"
-        @click="$router.go(-1)"
+        @click="goBack"
         style="margin-right: 10px; font-size: 20px; cursor: pointer"
       >
       </i>
@@ -179,6 +179,9 @@ export default {
     this.getTableData(this.docQuery)
   },
   methods: {
+    goBack(){
+      this.$router.push({path:'/knowledge'})
+    },
     reload(){
       this.getTableData(this.docQuery)
     },
