@@ -75,7 +75,7 @@ type ConversationDetailInfo struct {
 	SysPrompt       string      `json:"sysPrompt"`
 	Response        string      `json:"response"`
 	SearchList      interface{} `json:"searchList"`
-	QaType          int32       `json:"qaType"`
+	QaType          int32       `json:"qa_type"`
 	CreatedBy       string      `json:"createdBy"`
 	CreatedAt       int64       `json:"createdAt"`
 	UpdatedAt       int64       `json:"updatedAt"`

@@ -549,6 +549,8 @@ func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantI
 		return pluginList, errStatus(errs.Code_AssistantConversationErr, status)
 	}
 	for _, assistantWorkFlowModel := range resp {
+		log.Infof("Assistant服务查询到workflow，assistantId: %s, workflowId: %s, enable: %v",
+			assistantId, assistantWorkFlowModel.WorkflowId, assistantWorkFlowModel.Enable)
 		if !assistantWorkFlowModel.Enable {
 			continue
 		}
@@ -578,6 +580,7 @@ func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantI
 		//TODO 适配 assistantActionModel.Type ==None情况
 		pluginList = append(pluginList, tmp)
 	}
+	log.Infof("Assistant服务查询到workflow，assistantId: %s, workflowList: %v", assistantId, pluginList)
 	return pluginList, nil
 }
 

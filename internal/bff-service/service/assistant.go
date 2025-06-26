@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"sort"
 
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
@@ -337,6 +338,12 @@ func GetConversationDetailList(ctx *gin.Context, userId, orgId string, req reque
 		}
 
 		convertedList = append(convertedList, convertedItem)
+
+		// 对切片进行排序
+		sort.Slice(convertedList, func(i, j int) bool {
+			// CreatedAt值小的时间更早，排在前面
+			return convertedList[i].CreatedAt < convertedList[j].CreatedAt
+		})
 	}
 
 	return response.PageResult{Total: resp.Total, List: convertedList, PageNo: req.PageNo, PageSize: req.PageSize}, nil
