@@ -551,7 +551,6 @@ services:
       - 15000:15000
     volumes:
       - ${WANWU_PROJECT_DIR}/rag-wanwu/langchain_rag-master/logs:/model_extend/build/dist/langchain_rag-master/logs
-      - ${WANWU_PROJECT_DIR}/rag-wanwu/minio_project/minio_logs_15000.log:/model_extend/build/dist/minio_project/minio_logs_15000.log
       - ${WANWU_PROJECT_DIR}/rag-wanwu/rag-es-server-unify/logs:/model_extend/build/dist/rag-es-server-unify/logs
     environment:
       MINIO_ADDRESS: ${WANWU_MINIO_ENDPOINT}
