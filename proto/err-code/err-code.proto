@@ -86,7 +86,7 @@ enum Code {
   // [300000, 309999]
   AppGeneral = 300000; // 通用错误
   AppApikey = 300001; // ApiKey相关错误
-  AppExploration = 300002; // APP探索广场相关错误
+  AppExploration = 300002; // APP应用广场相关错误
 
   // --- mcp-service ---
   MCPGeneral = 310000; // 通用错误

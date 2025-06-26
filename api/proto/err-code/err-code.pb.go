@@ -95,7 +95,7 @@ const (
 	// [300000, 309999]
 	Code_AppGeneral     Code = 300000 // 通用错误
 	Code_AppApikey      Code = 300001 // ApiKey相关错误
-	Code_AppExploration Code = 300002 // APP探索广场相关错误
+	Code_AppExploration Code = 300002 // APP应用广场相关错误
 	// --- mcp-service ---
 	Code_MCPGeneral             Code = 310000 // 通用错误
 	Code_MCPGetSquareMCPErr     Code = 310001 // 获取广场MCP详情错误
