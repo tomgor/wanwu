@@ -5,7 +5,7 @@ import {parseSub, isSub} from "@/utils/util.js"
 const Print = function (opt) {
     this.sentenceArr = []
     this.sIndexMap={}
-    this.timer = opt.timer || 30; //打印速度
+    this.timer = opt.timer || 10; //打印速度
     this.t = null;
     this.sIndex = 0
     this.printStatus = 0
@@ -26,6 +26,7 @@ Print.prototype = {
     stop() {
         this.sentenceArr = []
         this.sIndexMap = {}
+        this.sIndex = 0
         this.looper && this.looper.stop()
     },
     loop(printingCB, endCB) {
@@ -37,6 +38,9 @@ Print.prototype = {
 
         let curSentence = this.sentenceArr[this.sIndex]
         this.printStatus = 1
+        if(!curSentence){
+            console.log(this.sIndex, this.sentenceArr)
+        }
         this.looper = new Looper(this.sIndex, curSentence, this.timer, (world) => {
             this.printStatus = 1
             let isEnd = this.sIndex === this.sentenceArr.length -1
@@ -63,8 +67,8 @@ Print.prototype = {
 const Looper = function (sIndex, sentence, timer, printCB, endCB,sIndexMap) {
     this.sIndex = sIndex
     this.sIndexMap=sIndexMap
-    // this.sentence = sentence ? sentence.response : ""
-    this.sentence = sentence.response
+    this.sentence = sentence ? sentence.response : ""
+    // this.sentence = sentence.response
     this.timer = timer
     this.t = null
     this.index = 0
@@ -121,7 +125,7 @@ Looper.prototype = {
             this.sIndexMap[`${this.sIndex}`]=true
             this.endCB({msg: 'end', index: this.sIndex})
         }else{
-            console.log(this.sIndex,12234444,this.t,this.sentence)
+            console.log(this.sIndex, this.t, this.sentence)
         }
         // this.t && workerTimer.clearTimeout(this.t)
         this.t && workerTimer.clearInterval(this.t)
