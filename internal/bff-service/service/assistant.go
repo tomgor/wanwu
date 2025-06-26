@@ -430,9 +430,10 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	var onlineSearchConfig request.OnlineSearchConfig
 	if resp.OnlineSearchConfig != nil {
 		onlineSearchConfig = request.OnlineSearchConfig{
-			SearchUrl: resp.OnlineSearchConfig.SearchUrl,
-			SearchKey: resp.OnlineSearchConfig.SearchKey,
-			Enable:    resp.OnlineSearchConfig.Enable,
+			SearchUrl:      resp.OnlineSearchConfig.SearchUrl,
+			SearchKey:      resp.OnlineSearchConfig.SearchKey,
+			Enable:         resp.OnlineSearchConfig.Enable,
+			SearchRerankId: resp.OnlineSearchConfig.SearchRerankId,
 		}
 	}
 
