@@ -126,7 +126,7 @@
 import {mapActions} from 'vuex'
 import { AppType } from "@/utils/commonSet";
 import { deleteAPP } from "@/api/appspace";
-import { copyWorkFlow, publishWorkFlow } from "@/api/workflow";
+import { copyWorkFlow, publishWorkFlow, copyExample } from "@/api/workflow";
 import { setFavorite } from "@/api/explore";
 export default {
   props:{
@@ -198,12 +198,24 @@ export default {
     async workflowCopy(row) {
       const params = {
         workflowID: row.appId,
-      };
-      const res = await copyWorkFlow(params);
+      }
+
+      const isExample = row.appId === 'example'
+      const exampleParams = {
+        configName: row.name + '_副本',
+        configENName: "",
+        configDesc: row.desc,
+        isStream: false
+      }
+
+      const res = isExample
+        ? await copyExample({...params, ...exampleParams})
+        : await copyWorkFlow(params);
+
       if (res.code === 0) {
         this.$router.push({
           path: "/workflow",
-          query: { id: res.data.workflow_id },
+          query: { id: isExample ? res.data.workflowID : res.data.workflow_id },
         });
       }
     },
