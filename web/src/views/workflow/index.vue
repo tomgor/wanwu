@@ -260,7 +260,7 @@
     <PublishForm ref="publish_ref" @refreshTable="$router.go(-1)" />
     <!--隐藏 token 和 mcp 相关-->
     <!--<AppSelect ref="app-select" @getToken="setToken" />-->
-    <McpCreate ref="mcpcreate" @createMcp="addMcp" />
+    <McpCreate v-if="" ref="mcpcreate" @createMcp="addMcp" />
     <div id="minimap"></div>
   </div>
 </template>

@@ -1,5 +1,10 @@
 <template>
-  <div class="dag-node" :id="node.id">
+  <div
+    class="dag-node"
+    :id="node.id"
+    tabindex="0"
+    @keydown="(e) => handleKeydown(e, nodeData)"
+  >
     <div class="node-header">
       <div>
         <i class="el-icon-caret-bottom"></i>
@@ -7,11 +12,11 @@
         <span class="node-header-name">
           {{ nodeData.name }}
           <!--<span v-if="['StartNode','EndNode'].includes(nodeData.type)">{{nodeData.name}}</span>
-        <el-input v-else size="mini" v-model="nodeData.name"></el-input>-->
+          <el-input v-else size="mini" v-model="nodeData.name"></el-input>-->
         </span>
       </div>
       <el-dropdown
-        v-if="nodeData.type !== 'StartNode' && nodeData.type !== 'EndNode'"
+        v-if="!['StartNode', 'EndNode', 'EndStreamingNode'].includes(nodeData.type)"
         trigger="click"
         class="controls"
         @command="handleDeleteNode"
@@ -196,13 +201,15 @@
       >
         <div class="params-type">
           <i class="el-icon-caret-bottom"></i>
-          <span class="params-type-span">{{
-            i === 0
-              ? "如果"
-              : i === nodeData.data.inputs.length - 1
-              ? "否则"
-              : "否则如果"
-          }}</span>
+          <span class="params-type-span">
+            {{
+              i === 0
+                ? "如果"
+                : i === nodeData.data.inputs.length - 1
+                ? "否则"
+                : "否则如果"
+            }}
+          </span>
         </div>
         <div class="conditions-box">
           <div
@@ -231,9 +238,9 @@
                   }}
                 </span>
               </el-col>
-              <el-col :span="8" class="center">{{
-                switchOperatorConfig[m.operator] || "请选择"
-              }}</el-col>
+              <el-col :span="8" class="center">
+                {{ switchOperatorConfig[m.operator] || "请选择" }}
+              </el-col>
               <el-col
                 :span="8"
                 class="right"
@@ -261,9 +268,9 @@
           </div>
           <!--连接线-->
           <div class="line" v-if="n.conditions && n.conditions.length > 1">
-            <span :class="['line-span', n.logic]">{{
-              switchLogicConfig[n.logic]
-            }}</span>
+            <span :class="['line-span', n.logic]">
+              {{ switchLogicConfig[n.logic] }}
+            </span>
           </div>
         </div>
       </div>
@@ -342,11 +349,11 @@
       </el-collapse>
 
       <!-- <div class="params-content">
-                <div class="params-content-item" v-for="(n,i) in nodeData.data.inputs">
-                    <span>{{n.name}}</span>
-                    <span>{{n.type}}</span>
-                </div>
-            </div>-->
+          <div class="params-content-item" v-for="(n,i) in nodeData.data.inputs">
+              <span>{{n.name}}</span>
+              <span>{{n.type}}</span>
+          </div>
+      </div>-->
     </div>
     <!--其他节点-->
     <div
@@ -412,8 +419,6 @@
           class="el-icon-warning init status-icon"
         ></i>
         {{ statusObj[nodeData.node_status] }}
-
-       
       </div>
 
       <div>
@@ -575,6 +580,13 @@ export default {
     }, 100);
   },
   methods: {
+    handleKeydown(e, nodeData) {
+      if (!['StartNode', 'EndNode', 'EndStreamingNode'].includes(nodeData.type)) {
+        if (e.key === 'Backspace' || e.keyCode === 8 || e.key === 'Delete' || e.keyCode === 46) {
+          this.handleDeleteNode()
+        }
+      }
+    },
     handleDeleteNode() {
       window.graph.removeNode(this.node.id);
     },

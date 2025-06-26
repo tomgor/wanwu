@@ -115,7 +115,8 @@ export default {
     };
   },
   mounted() {
-    this.init();
+    // 打开弹窗时再请求，避免重复请求问题
+    // this.init();
   },
   methods: {
     handleOpenMcp() {
