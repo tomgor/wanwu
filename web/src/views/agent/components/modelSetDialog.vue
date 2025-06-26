@@ -18,7 +18,7 @@
                             <el-switch v-model="ruleForm[item.btnProps]"></el-switch>
                         </el-col>
                         <el-col :span="20">
-                            <el-slider v-model="ruleForm[item.props]" show-input></el-slider>
+                            <el-slider v-model="ruleForm[item.props]" show-input  :min="item.min" :max="item.max" :step="item.step"></el-slider>
                         </el-col>
                     </el-row>
                 </el-form-item>

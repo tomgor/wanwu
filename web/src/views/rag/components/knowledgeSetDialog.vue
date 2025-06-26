@@ -18,7 +18,7 @@
                             <el-switch v-model="ruleForm[item.btnProps]"></el-switch>
                         </el-col>
                         <el-col :span="20">
-                            <el-slider v-model="ruleForm[item.props]" show-input></el-slider>
+                            <el-slider v-model="ruleForm[item.props]" show-input :min="item.min" :max="item.max" :step="item.step"></el-slider>
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -65,9 +65,10 @@ export default {
                     desc: '检索结果匹配度的最小值，小于阈值的结果会被过滤掉',
                     props: "threshold",
                     btnProps:"thresholdEnable",
+                    precision:1,
                     min: 0,
                     max: 1,
-                    step: 0.01,
+                    step: 0.1,
                 },
                 {
                     label:'知识条数',
