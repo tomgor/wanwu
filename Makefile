@@ -79,10 +79,10 @@ doc-swag:
 	swag init -g callback.go -d internal/bff-service/server/http/handler/callback -o docs/callback --pd
 
 docker-image-backend:
-	docker build -f Dockerfile.backend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/backend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD) .
+	docker build -f Dockerfile.backend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/backend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-${WANWU_ARCH} .
 
 docker-image-frontend:
-	docker build -f Dockerfile.frontend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/frontend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD) .
+	docker build -f Dockerfile.frontend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/frontend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-${WANWU_ARCH} .
 
 grpc-protoc:
 	protoc --proto_path=. --go_out=paths=source_relative:api --go-grpc_out=paths=source_relative:api proto/*/*.proto
