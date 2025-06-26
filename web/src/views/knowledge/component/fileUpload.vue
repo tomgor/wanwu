@@ -2,7 +2,7 @@
   <div class="page-wrapper full-content">
     <div class="page-title">
       <span class="el-icon-arrow-left back" @click="goBack"></span>
-      新增知识库
+      新增文件
     </div>
     <div class="table-box">
       <div class="fileUpload">
