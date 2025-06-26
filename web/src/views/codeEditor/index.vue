@@ -181,10 +181,13 @@ export default {
         },
       };
       this.runloading = true;
-      let res = await runPythonNode(params);
-      this.runloading = false;
-      if (res.code === 0) {
-        this.outValue = JSON.stringify(res.data);
+      try {
+        let res = await runPythonNode(params);
+        if (res.code === 0) {
+          this.outValue = JSON.stringify(res.data);
+        }
+      } finally {
+        this.runloading = false;
       }
     },
     //  let res = { "key":"雍和宫"}
