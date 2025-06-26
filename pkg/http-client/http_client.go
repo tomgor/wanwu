@@ -355,7 +355,11 @@ func LogRpcJson(ctx context.Context, business string, method string, params inte
 	}
 	var paramsStr = Convert2LogString(params)
 	var resultStr = Convert2LogString(result)
-	log.Log().Infof("%s|%s|%d|%d|%+v|%+v", business, method, success, time.Now().UnixMilli()-starTimestamp, paramsStr, resultStr)
+	var errMsg = "-"
+	if err != nil {
+		errMsg = err.Error()
+	}
+	log.Log().Infof("%s|%s|%d|%d|%+v|%+v|%s", business, method, success, time.Now().UnixMilli()-starTimestamp, paramsStr, resultStr, errMsg)
 }
 
 func Convert2LogString(object interface{}) string {
