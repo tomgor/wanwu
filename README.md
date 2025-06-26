@@ -14,7 +14,7 @@
 
 ✔ **多租户架构**：提供多租户账号体系，满足用户成本控制、数据安全隔离、业务弹性扩展、行业定制化、快速上线及生态协同等核心需求
 
----
+------
 
 ### 🚩 核心功能模块
 
@@ -64,7 +64,7 @@
 
 ▸ 提供 **细粒度权限控制**，保障生产环境稳定运行
 
----
+------
 
 ### &#x1F4E2; 功能比较
 
@@ -85,36 +85,6 @@
 
 ------
 
-### 🚀 快速开始
-
-&emsp;&emsp;联通元景万悟Lite的工作流模块使用的是[wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git)项目，可到其仓库查看详细。
-
-- **Docker安装（推荐）**
-
-1. 首次运行前
-    ```bash
-    cp .env.bak .env
-    docker network create wanwu-net
-    ```
-
-2. 启动服务
-    ```bash
-    docker-compose --env-file .env --env-file .env.image.amd64 up -d
-    ```
-
-3. 登录系统：http://localhost:8081
-    ```
-    默认用户：admin
-    默认密码：Wanwu123456
-    ```
-
-4. 关闭服务
-    ```bash
-    docker-compose --env-file .env --env-file .env.image.amd64 down
-    ```
-
-------
-
 ### &#x1F3AF; 典型应用场景
 
 - **智能客服**：基于RAG+Agent实现高准确率的业务咨询与工单处理  
@@ -125,7 +95,77 @@
 
 ------
 
+### 🚀 快速开始
 
+&emsp;&emsp;联通元景万悟Lite的工作流模块使用的是[wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git)项目，可到其仓库查看详细。
+
+- **Docker安装（推荐）**
+
+1. 首次运行前
+
+    1.1 拷贝环境变量文件
+    ```bash
+    cp .env.bak .env
+    ```
+
+    1.2 根据系统修改.env文件中的`WANWU_ARCH`变量
+    ```
+    # amd64 / arm64
+    WANWU_ARCH=amd64
+    ```
+
+    1.3 创建docker运行网络
+    ```
+    docker network create wanwu-net
+    ```
+
+2. 启动服务（首次运行会自动从Docker Hub拉取镜像）
+    ```bash
+    # amd64系统执行:
+    docker compose --env-file .env --env-file .env.image.amd64 up -d
+    # arm64系统执行:
+    docker compose --env-file .env --env-file .env.image.arm64 up -d
+    ```
+
+3. 登录系统：http://localhost:8081
+    ```
+    默认用户：admin
+    默认密码：Wanwu123456
+    ```
+
+4. 关闭服务
+    ```bash
+    # amd64系统执行:
+    docker compose --env-file .env --env-file .env.image.amd64 down
+    # arm64系统执行:
+    docker compose --env-file .env --env-file .env.image.arm64 down
+    ```
+
+- **源码启动（开发）**
+
+1. 基于上述Docker安装步骤，将系统服务完整启动
+
+2. 以后端bff-service服务为例
+
+    2.1 停止bff-service
+    ```
+    make -f Makefile.develop stop-bff
+    ```
+
+    2.2 编译bff-service可执行文件
+    ```
+    # amd64系统执行:
+    make build-bff-amd64
+    # arm64系统执行:
+    make build-bff-arm64
+    ```
+
+    2.3 启动bff-service
+    ```
+    make -f Makefile.develop run-bff
+    ```
+
+------
 
 ### ⚖️ 许可证
 联通元景万悟Lite根据Apache License 2.0发布。
