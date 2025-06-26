@@ -39,8 +39,11 @@ i18n:
     - bff-custom
     - iam-service
     - model-service
+    - knowledge-service
+    - mcp-service
     - rag-service
     - assistant-service
+    - app-service
   jsonlPath: configs/microservice/bff-service/configs/wanwu-i18n.jsonl
   langs:
     - code: zh
