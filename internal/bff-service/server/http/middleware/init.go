@@ -43,7 +43,7 @@ func Init() {
 	mid.NewSub("agent", "智能体", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
 
 	// --- exploration ---
-	mid.NewSub("exploration", "探索广场", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
+	mid.NewSub("exploration", "应用广场", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
 
 	// --- permission ---
 	mid.NewSub("permission", "组织管理", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
