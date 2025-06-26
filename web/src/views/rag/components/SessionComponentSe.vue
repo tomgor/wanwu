@@ -101,6 +101,8 @@ export default {
   props: ['sessionStatus','defaultUrl'],
   data(){
       return{
+          autoScroll:true,
+          scrollTimeout:null,
           isDs:['txt2txt-002-001','txt2txt-002-002','txt2txt-002-004','txt2txt-002-005','txt2txt-002-006','txt2txt-002-007','txt2txt-002-008'].indexOf(this.$route.params.id) !=-1,
           loading:false,
           marked:marked,
@@ -138,7 +140,41 @@ export default {
             immediate: true
         }
     },
+    mounted(){
+      this.setupScrollListener();
+    },
+    beforeDestroy(){
+      const container = document.getElementById('timeScroll');
+      if (container) {
+        container.removeEventListener('scroll', this.handleScroll);
+      }
+      clearTimeout(this.scrollTimeout);
+    },
     methods:{
+         setupScrollListener() {
+            const container = document.getElementById('timeScroll');
+            container.addEventListener('scroll', this.handleScroll);
+          },
+         handleScroll(e){
+            const container = document.getElementById('timeScroll');
+            const { scrollTop, clientHeight, scrollHeight } = container;
+            // 检测是否接近底部（5px容差）
+            const nearBottom = scrollHeight - (scrollTop + clientHeight) < 5;
+             // 用户手动滚动时取消自动置底
+            if (!nearBottom) {
+                this.autoScroll = false;
+            }
+            // 清除之前的定时器
+            clearTimeout(this.scrollTimeout);
+            // 设置新的定时器检测滚动停止
+            this.scrollTimeout = setTimeout(() => {
+                // 如果停止时接近底部，恢复自动置底
+                if (nearBottom) {
+                  this.autoScroll = true;
+                  this.scrollBottom();
+                }
+              }, 500); // 500ms内没有新滚动视为停止
+          },
           replaceHTML(data,n){
             let _data = data
             var a = new RegExp('<think>')
@@ -220,6 +256,7 @@ export default {
           this.loading = true
         },
         scrollBottom () {
+          if (!this.autoScroll) return;
             this.$nextTick(() => {
                 this.loading = false
                 document.getElementById('timeScroll').scrollTop = document.getElementById('timeScroll').scrollHeight;

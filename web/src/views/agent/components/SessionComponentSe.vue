@@ -9,7 +9,7 @@
       </el-dropdown>
     </div> -->
 
-    <div class="history-box showScroll" id="timeScroll" v-loading="loading">
+    <div class="history-box showScroll" id="timeScroll" v-loading="loading" ref="timeScroll">
       <div  v-for="(n,i) in session_data.history"  :key="`${i}sdhs`">
         <!--问题-->
         <div v-if="n.query" class="session-question">
@@ -65,7 +65,12 @@
              <img class="logo" :src="'/user/api/'+ defaultUrl" />
             <div class="session-wrap" style="width:calc(100% - 30px);">
               <div v-if="showDSBtn(n.response)" class="deepseek" @click="toggle($event,i)">
-                <img :src="require('@/assets/imgs/think-icon.png')" class="think_icon"/>{{n.thinkText}} 
+                <template v-if="n.qa_type === 20">
+                  <img :src="require('@/assets/imgs/tool-icon.png')" class="think_icon"/>{{n.toolText}}
+                </template>
+                 <template v-else>
+                    <img :src="require('@/assets/imgs/think-icon.png')" class="think_icon"/>{{n.thinkText}}
+                </template>
                 <i v-bind:class="{'el-icon-arrow-down': !n.isOpen,'el-icon-arrow-up': n.isOpen}"></i>
               </div>
               <div class="answer-content" v-bind:class="{'ds-res':showDSBtn(n.response)}" v-html="showDSBtn(n.response)?replaceHTML(n.response,n):n.response"></div>
@@ -155,6 +160,8 @@ export default {
   props: ['sessionStatus','defaultUrl'],
   data(){
       return{
+          autoScroll:true,
+          scrollTimeout:null,
           isDs:['txt2txt-002-001','txt2txt-002-002','txt2txt-002-004','txt2txt-002-005','txt2txt-002-006','txt2txt-002-007','txt2txt-002-008'].indexOf(this.$route.params.id) !=-1,
           loading:false,
           marked:marked,
@@ -192,22 +199,80 @@ export default {
             immediate: true
         }
     },
+    mounted(){
+      this.setupScrollListener();
+    },
+    beforeDestroy(){
+      const container = document.getElementById('timeScroll');
+      if (container) {
+        container.removeEventListener('scroll', this.handleScroll);
+      }
+      clearTimeout(this.scrollTimeout);
+    },
     methods:{
+          setupScrollListener() {
+            const container = document.getElementById('timeScroll');
+            container.addEventListener('scroll', this.handleScroll);
+          },
+          handleScroll(e){
+            const container = document.getElementById('timeScroll');
+            const { scrollTop, clientHeight, scrollHeight } = container;
+            // 检测是否接近底部（5px容差）
+            const nearBottom = scrollHeight - (scrollTop + clientHeight) < 5;
+             // 用户手动滚动时取消自动置底
+            if (!nearBottom) {
+                this.autoScroll = false;
+            }
+            // 清除之前的定时器
+            clearTimeout(this.scrollTimeout);
+            // 设置新的定时器检测滚动停止
+            this.scrollTimeout = setTimeout(() => {
+                // 如果停止时接近底部，恢复自动置底
+                if (nearBottom) {
+                  this.autoScroll = true;
+                  this.scrollBottom();
+                }
+              }, 500); // 500ms内没有新滚动视为停止
+          },
           replaceHTML(data,n){
             let _data = data
-            var a = new RegExp('<think>')
-            var b = new RegExp('</think>')
-            if(b.test(data)){
-              n.thinkText = this.$t('agent.alreadyThink')
+            // var a = new RegExp('<think>')
+            // var b = new RegExp('</think>')
+            // if(b.test(data)){
+            //   n.thinkText = this.$t('agent.alreadyThink')
+            // }
+            // // 如果没有返回前缀，则补上
+            // if(b.test(data) && !a.test(data)){
+            //   _data = '<think>\n'+data
+            // }
+            // return _data.replace(/think>/g,'section>')
+            const thinkStart = /<think>/i;
+            const thinkEnd = /<\/think>/i;
+            const toolStart = /<tool>/i;
+            const toolEnd = /<\/tool>/i;
+
+            // 处理 think 标签
+            if(thinkEnd.test(data)) {
+              n.thinkText = '已深度思考';
+              if(!thinkStart.test(data)) {
+                data = '<think>\n' + data;
+              }
             }
-            // 如果没有返回前缀，则补上
-            if(b.test(data) && !a.test(data)){
-              _data = '<think>\n'+data
+
+            // 新增处理 tool 标签
+            if(toolEnd.test(data)) {
+              n.toolText = '已使用工具'; // 需要添加对应的翻译
+              if(!toolStart.test(data)) {
+                data = '<tool>\n' + data;
+              }
             }
-            return _data.replace(/think>/g,'section>')
+
+            // 统一替换为 section 标签
+            return data.replace(/think>/gi, 'section>').replace(/tool>/gi, 'section>');
           },
           showDSBtn(data){
-            const pattern = /<\/?think>/;
+            // const pattern = /<\/?think>/;
+            const pattern = /<(think|tool)(\s[^>]*)?>|<\/(think|tool)>/;
             const matches = data.match(pattern);
             if(!matches){
               return false
@@ -274,6 +339,7 @@ export default {
           this.loading = true
         },
         scrollBottom () {
+          if (!this.autoScroll) return;
             this.$nextTick(() => {
                 this.loading = false
                 document.getElementById('timeScroll').scrollTop = document.getElementById('timeScroll').scrollHeight;
