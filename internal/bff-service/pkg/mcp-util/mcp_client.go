@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/ThinkInAIXYZ/go-mcp/client"
 	"github.com/ThinkInAIXYZ/go-mcp/protocol"
@@ -15,6 +16,7 @@ import (
 func ListTools(ctx context.Context, sseUrl string) ([]*protocol.Tool, error) {
 	// 创建 SSE 传输客户端
 	transportClient, err := transport.NewSSEClientTransport(sseUrl,
+		transport.WithSSEClientOptionReceiveTimeout(time.Minute*2),
 		transport.WithSSEClientOptionLogger(log.Log()),
 		transport.WithSSEClientOptionHTTPClient(&http.Client{
 			Transport: &http.Transport{
