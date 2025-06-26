@@ -39,6 +39,13 @@
             <div class="answer-content"><i class="el-icon-loading"></i></div>
           </div>
         </div>
+        <!--pending-->
+        <div v-if="n.pendingResponse"  class="session-answer">
+          <div :class="['session-item','rl']">
+            <img class="logo" :src="'/user/api/'+ defaultUrl" />
+            <div class="answer-content" style="padding:0 10px;color:#E6A23C;">{{n.pendingResponse}}</div>
+          </div>
+        </div>
         <!-- 回答故障  code:7-->
         <div class="session-error" v-if="n.error"><i class="el-icon-warning"></i>&nbsp;{{n.response}}</div>
 
@@ -316,13 +323,23 @@ export default {
             this.$emit('clearHistory')
         },
         getList(){
-            return JSON.parse(JSON.stringify(this.session_data.history.filter((item)=>{ delete item.operation ; return !item.pending})))
+          return JSON.parse(JSON.stringify(this.session_data.history.filter((item)=>{ delete item.operation ; return item})))
+            // return JSON.parse(JSON.stringify(this.session_data.history.filter((item)=>{ delete item.operation ; return !item.pending})))
         },
         getAllList(){
             return JSON.parse(JSON.stringify(this.session_data.history))
         },
         stopLoading(){
             this.session_data.history = this.session_data.history.filter((item)=>{ return !item.pending})
+        },
+       stopPending(){
+            this.session_data.history = this.session_data.history.filter(item =>{
+              if(item.pending){
+                item.responseLoading = false
+                item.pendingResponse = '本次回答已被终止'
+              }
+              return item;
+            })
         },
         refresh(){
             if(this.sessionStatus === 0){return}

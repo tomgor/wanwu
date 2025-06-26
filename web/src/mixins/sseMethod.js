@@ -199,7 +199,7 @@ export default {
             this.sseResponse = {}
             this.setStoreSessionStatus(0)
             this.clearInput()
-            let params = {query: prompt, pending: true, responseLoading: true, requestFileUrls:[]}
+            let params = {query: prompt, pending: true, responseLoading: true, requestFileUrls:[],pendingResponse:''}
             this.$refs['session-com'].pushHistory(params)
             let endStr = ''
             this._print = new Print({
@@ -325,6 +325,7 @@ export default {
                 requestFileUrls: this.queryFilePath?[this.queryFilePath]:[],
                 fileName:this.fileList.length > 0 ? this.fileList[0]['name'] : '',
                 fileSize:this.fileList.length > 0 ? this.fileList[0]['size'] : '',
+                pendingResponse:''
             }
             //正式环境传模型参数
             this.$refs['session-com'].pushHistory(params)
@@ -392,7 +393,7 @@ export default {
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
-                                        // console.log('===>',new Date().getTime(),endStr)
+                                        console.log('===>',new Date().getTime(),endStr)
                                         let fillData = {
                                             ...commonData,
                                             "response": [0,1,2,3,4,6,20,21,10].includes(commonData.qa_type)?md.render(endStr):endStr.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
@@ -520,7 +521,7 @@ export default {
                     }else{
                         this.stopEventSource();
                         this.setStoreSessionStatus(-1)
-                        this.$refs['session-com'].stopLoading();
+                        this.$refs['session-com'].stopPending();
                     }
                 }
             },15)

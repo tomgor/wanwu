@@ -50,12 +50,13 @@
           </div>
         </div>
         <!--pending-->
-        <div v-if="n.isPending"  class="session-answer">
+        <div v-if="n.pendingResponse"  class="session-answer">
           <div :class="['session-item','rl']">
             <img class="logo" :src="'/user/api/'+ defaultUrl" />
-            <div class="answer-content">{{n.response}}</div>
+            <div class="answer-content" style="padding:0 10px;color:#E6A23C;">{{n.pendingResponse}}</div>
           </div>
         </div>
+        
         <!-- 回答故障  code:7-->
         <div class="session-error" v-if="n.error"><i class="el-icon-warning"></i>&nbsp;{{n.response}}</div>
 
@@ -399,13 +400,23 @@ export default {
             this.$emit('clearHistory')
         },
         getList(){
-            return JSON.parse(JSON.stringify(this.session_data.history.filter((item)=>{ delete item.operation ; return !item.pending})))
+          return JSON.parse(JSON.stringify(this.session_data.history.filter((item)=>{ delete item.operation ; return item})))
+            // return JSON.parse(JSON.stringify(this.session_data.history.filter((item)=>{ delete item.operation ; return !item.pending})))
         },
         getAllList(){
             return JSON.parse(JSON.stringify(this.session_data.history))
         },
         stopLoading(){
-            this.session_data.history = this.session_data.history.filter((item)=>{ return !item.pending})
+            this.session_data.history = this.session_data.history.filter((item)=>{ return !item.pending});
+        },
+        stopPending(){
+            this.session_data.history = this.session_data.history.filter(item =>{
+              if(item.pending){
+                item.responseLoading = false
+                item.pendingResponse = '本次回答已被终止'
+              }
+              return item;
+            })
         },
         refresh(){
             if(this.sessionStatus === 0){return}
@@ -422,7 +433,6 @@ export default {
         doScore(index,evaluate){
 
         },
-
         //=================标注相关===============
         initCanvasUtil () {
             this.canvasShow = true
@@ -518,12 +528,14 @@ export default {
      min-height: 50px;
      word-wrap: break-word;
      resize: vertical;
+     scroll-snap-type: y mandatory;/* 垂直方向强制吸附 */
      .hljs{
         max-height:300px!important;
         white-space: pre-wrap !important;
         min-height: 50px;
         word-wrap: break-word;
         resize: vertical;
+        scroll-snap-align: end; /* 最后一条消息吸附到底部 */
      }
   }
   .el-loading-mask{
