@@ -519,7 +519,7 @@ export default {
       old: [],
       node: {},
       nodeData: {},
-      modeles: [],
+      models: [],
       statusObj: {
         success: "成功",
         failed: "失败",
@@ -553,11 +553,14 @@ export default {
     },
     modelName() {
       let result = "";
-      this.modeles.forEach((item) => {
-        if (item.modelId == this.nodeData.data.modelForm.model) {
-          result = item.modelName;
-        }
-      });
+
+      if (this.models && this.models.length) {
+        this.models.forEach((item) => {
+          if (item.modelId == this.nodeData.data.modelForm.model) {
+            result = item.modelName;
+          }
+        });
+      }
       return result;
     },
     /*...mapState({
