@@ -280,6 +280,18 @@ export default {
       this.showOperation = !this.showOperation;
     },
     savePublish(){
+      if(this.editForm.modelParams === ''){
+        this.$message.warning('请选择模型！')
+        return false
+      }
+      if(this.editForm.rerankParams === ''){
+        this.$message.warning('请选rerank择模型！')
+        return false
+      }
+      if(this.editForm.knowledgeBaseIds.length === 0){
+        this.$message.warning('请选择关联知识库！')
+        return false
+      }
       const data = {appId:this.editForm.appId,appType:'rag',publishType:this.scope}
       appPublish(data).then(res =>{
         if(res.code === 0){
