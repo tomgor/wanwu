@@ -37,8 +37,8 @@ type KnowledgeBaseConfig struct {
 }
 
 type PublicModel struct {
-	CreatedAt int64  `json:"createdAt" gorm:"autoCreateTime:milli;index:create_at;column:created_at;type:bigint(20);comment:创建时间"`
-	UpdatedAt int64  `json:"updatedAt" gorm:"autoCreateTime:milli;column:updated_at;type:bigint(20);comment:更新时间"`
+	CreatedAt int64  `json:"createdAt" gorm:"autoCreateTime:milli;index:created_at;column:created_at;type:bigint(20);comment:创建时间"`
+	UpdatedAt int64  `json:"updatedAt" gorm:"autoUpdateTime:milli;index:updated_at;column:updated_at;type:bigint(20);comment:更新时间"`
 	OrgID     string `gorm:"index:org_id;column:org_id;type:varchar(255);comment:组织ID" json:"orgId"`
 	UserID    string `gorm:"index:user_id;column:user_id;type:varchar(255);comment:用户ID" json:"userId"`
 }
