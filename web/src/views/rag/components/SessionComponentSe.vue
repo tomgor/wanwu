@@ -474,6 +474,9 @@ export default {
         position: relative;
         margin-left: 14px;
         color: #333;
+        img{
+            width: 400px !important;
+        }
         .answer-content-query{
           display: flex;
           flex-wrap: wrap;
