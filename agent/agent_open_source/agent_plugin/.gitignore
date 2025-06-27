@@ -2,11 +2,9 @@ action_files/
 action_files_backup/
 function_files/
 function_files_backup/
-config.ini
 *.xlsx
 logs/
 __pycache__/
 .ipynb_checkpoints/
-start_action_server.sh
 *.ipynb
 *.pyc
