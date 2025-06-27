@@ -121,8 +121,8 @@ export default {
                 }).catch((err)=>{
                     this.$message.warning("连接失败，请稍后重试")
                     this.isEnd = true
-                            this.setStoreSessionStatus(-1)
-                            this.runDisabled = false
+                    this.setStoreSessionStatus(-1)
+                    this.runDisabled = false
                 });
         },
         ...mapActions("app", ["setStoreSessionStatus"]),
@@ -178,7 +178,6 @@ export default {
             n.hover = false
         },
         setSessionStatus(status) {
-            //this.sessionStatus = status
             this.setStoreSessionStatus(status)
         },
         setSseParams(data) {
@@ -191,6 +190,7 @@ export default {
             this.sendEventStream(this.inputVal,'', _history.length)
         },
         sendEventStream(prompt, msgStr, lastIndex){
+            console.log("####sendEventStream", '--------------------------')
             if (this.sessionStatus === 0) {
                 this.$message.warning('上个问题没有回答完！')
                 return
@@ -199,12 +199,12 @@ export default {
             this.sseResponse = {}
             this.setStoreSessionStatus(0)
             this.clearInput()
-            let params = {query: prompt, pending: true, responseLoading: true, requestFileUrls:[]}
+            let params = {query: prompt, pending: true, responseLoading: true, requestFileUrls:[],pendingResponse:''}
             this.$refs['session-com'].pushHistory(params)
             let endStr = ''
             this._print = new Print({
                 onPrintEnd: () => {
-                    //this.setStoreSessionStatus(-1)
+                    // this.setStoreSessionStatus(-1)
                 }
             })
             
@@ -244,7 +244,7 @@ export default {
                             "thinkText":'思考中',
                             "isOpen":true
                         }
-                        if(data.code === 0){
+                        if(data.code === 0 || data.code === 1){
                             //finish 0：进行中  1：关闭   2:敏感词关闭
                             let _sentence = data.data.output;
                                 this._print.print(
@@ -267,6 +267,9 @@ export default {
                                             : []
                                         }
                                     this.$refs['session-com'].replaceLastData(lastIndex, fillData)
+                                    if(worldObj.isEnd && worldObj.finish === 1){
+                                        this.setStoreSessionStatus(-1)
+                                    }
                                 })
                             this.$nextTick(()=>{
                                 this.$refs['session-com'].scrollBottom()
@@ -301,14 +304,13 @@ export default {
         doSend(params) {
             this.stopBtShow = true
             this.isStoped= false
-            console.log(this.$refs['session-com'])
             let _history = this.$refs['session-com'].getList()
             this.sendEventSource(this.inputVal, '', _history.length)
         },
         sendEventSource(prompt, msgStr, lastIndex) {
             console.log('####  sendEventSource',new Date().getTime())
             if (this.sessionStatus === 0) {
-                this.$message.warning(i18n.t('yuanjing.qaTips'))
+                this.$message.warning('上个问题没有回答完！')
                 return
             }
 
@@ -316,7 +318,15 @@ export default {
             //发送问题后不允许继续提问
             this.setStoreSessionStatus(0)
             this.clearInput()
-            let params = {query: prompt, pending: true, responseLoading: true, requestFileUrls: this.queryFilePath?[this.queryFilePath]:[]}
+            let params = {
+                query: prompt, 
+                pending: true, 
+                responseLoading: true, 
+                requestFileUrls: this.queryFilePath?[this.queryFilePath]:[],
+                fileName:this.fileList.length > 0 ? this.fileList[0]['name'] : '',
+                fileSize:this.fileList.length > 0 ? this.fileList[0]['size'] : '',
+                pendingResponse:''
+            }
             //正式环境传模型参数
             this.$refs['session-com'].pushHistory(params)
 
@@ -327,7 +337,6 @@ export default {
                 }
             })
             const trial = this.isTestChat ? true : false
-            console.log(this.sseParams,123)
             let data = {
                 ...this.sseParams,
                 prompt,
@@ -353,8 +362,8 @@ export default {
                 onmessage: (e) => {
                     if (e && e.data) {
                         let data = JSON.parse(e.data)
+                        console.log('===>',new Date().getTime(),data)
                         this.sseResponse = data
-                        console.log('===>',new Date().getTime(), JSON.parse(e.data))
                         //待替换的数据，需要前端组装
                         let commonData = {
                             ...data,
@@ -368,25 +377,13 @@ export default {
                             "searchList": data.search_list || [],
                             "gen_file_url_list":data.gen_file_url_list || [],
                             "thinkText":i18n.t('agent.thinking'),
+                            'toolText':'使用工具中...',
                             "isOpen":true
                         }
 
                         if(data.code === 0){
                             //finish 0：进行中  1：关闭   2:敏感词关闭
                             let _sentence = data.response
-                            //图文问答返回是非流式的，直接显示不使用打字机
-                            /*if(data.qa_type === 6){
-                                this.$refs['session-com'].replaceLastData(lastIndex, {...commonData,oriResponse:_sentence,response:_sentence})
-                                if(data.finish !== 0){
-                                    this.setStoreSessionStatus(-1)
-                                }
-                                this.$nextTick(()=>{
-                                    this.$refs['session-com'].scrollBottom()
-                                })
-                                return
-                            }*/
-                            //let _sentence = data.response || '^'
-                            //if (_sentence || (data.search_list && data.search_list.length)) {
                                 this._print.print(
                                     {
                                         response:_sentence,
@@ -395,8 +392,8 @@ export default {
                                     commonData,
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
-                                        //endStr += (worldObj.world==='^')?'':worldObj.world
                                         endStr += worldObj.world
+                                        console.log('===>',new Date().getTime(),endStr)
                                         let fillData = {
                                             ...commonData,
                                             "response": [0,1,2,3,4,6,20,21,10].includes(commonData.qa_type)?md.render(endStr):endStr.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
@@ -407,6 +404,7 @@ export default {
                                                 }))
                                             : []
                                         }
+
                                         this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                                         if(worldObj.finish !== 0){
                                             if(worldObj.finish === 4){
@@ -418,21 +416,15 @@ export default {
                                             }
                                             this.setStoreSessionStatus(-1)
                                         }
+                                        if(worldObj.isEnd && worldObj.finish === 1){
+                                          this.setStoreSessionStatus(-1)
+                                       }
                                 })
-                            // } else {
-                            //     //无response 仅图片
-                            //     this.setStoreSessionStatus(-1)
-                            //     this.$refs['session-com'].replaceLastData(lastIndex, commonData)
-                            // }
 
                             this.$nextTick(()=>{
                                 this.$refs['session-com'].scrollBottom()
                             })
 
-                            // if(!this.isPageVisible){
-                            //     this.bufferedMessages.push({ data, commonData });
-                            // }
-                            // this.handleMessageData(data, commonData);
                         }else if(data.code === 7){
                             this.setStoreSessionStatus(-1)
                             let fillData = {
@@ -512,36 +504,24 @@ export default {
                 let history_list = []
                 let lastIndex = history_list.length - 1
                 let lastRQ = history_list[lastIndex]
-
                 if(endResponse){
-                    //this._print && this._print.stop()
-                    //this.setStoreSessionStatus(-1)
                     endResponse = convertLatexSyntax(endResponse)
                     // 替换标签
                     endResponse = parseSub(endResponse)
                     this.runResponse = md.render(endResponse)
                     this.runDisabled = false
-                    // this.$refs['session-com'].replaceLastData(lastIndex, {
-                    //     ...lastRQ,
-                    //     finish: 1,
-                    //     pending: false,
-                    //     responseLoading: false,
-                    //     "response":md.render(endResponse) //.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
-                    // })
                     this.$nextTick(()=>{
                         this.addCopyClick()
                     })
 
                 }else{
-                    if(this.sseResponse.code !== 7){
+                    if(Object.keys(this.sseResponse).length !== 0 && this.sseResponse.code !== 7){
                         this.runResponse ="本次回答已被终止"
-                        // this.$refs['session-com'].replaceLastData(lastIndex, {
-                        //     ...lastRQ,
-                        //     finish: 1,
-                        //     pending: false,
-                        //     responseLoading: false,
-                        //     response: '本次回答已被终止'
-                        // })
+                        this.setStoreSessionStatus(-1)
+                    }else{
+                        this.stopEventSource();
+                        this.setStoreSessionStatus(-1)
+                        this.$refs['session-com'].stopPending();
                     }
                 }
             },15)
@@ -561,7 +541,7 @@ export default {
             // })
         },
         setPrompt(data) {
-            // this.$refs['editable'].setPrompt(data)
+            this.$refs['editable'].setPrompt(data)
         },
         clearInput() {
             this.$refs.editable.clearInput()
@@ -580,9 +560,19 @@ export default {
         },
         refresh() {
             let history_list = this.$refs['session-com'].getList();
-            let inputVal = history_list[history_list.length - 1].query;
-            let fileId = history_list[history_list.length - 1].fileId;
-            let fileInfo = [{name:history_list[history_list.length - 1]['fileName'],size:history_list[history_list.length - 1]['fileSize']}] || [];
+            let _history = history_list[history_list.length - 1];
+            let inputVal = _history.query;
+            let fileInfo = null;
+            let fileId = null;
+            if(_history.fileName && _history.fileSize){
+                fileId =  {
+                    fileName:_history.fileName,
+                    fileSize:_history.fileSize,
+                    fileUrl:_history.fileInfo ? _history.fileInfo['fileUrl'] : _history.requestFileUrls[0],
+                }
+                fileInfo = [{name:_history['fileName'],size:_history['fileSize']}] || [];
+            }
+
             this.preSend(inputVal,fileId,fileInfo);
         }
     }

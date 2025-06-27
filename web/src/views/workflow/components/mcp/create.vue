@@ -28,6 +28,7 @@
           v-if="serverOptions.length > 0"
           class="mcpCollapse"
           v-model="activeCollapseName"
+          @change="changeItem"
         >
           <el-collapse-item
             v-for="(item, index) in serverOptions"
@@ -46,16 +47,17 @@
             </template>
 
             <div>
-              <ul class="detail-mcpList">
+              <ul class="detail-mcpList" v-if="item.tools">
                 <li v-for="(i, n) in item.tools" :key="n">
                   <el-checkbox
                     :disabled="i.disabled"
                     @change="handleRadioClick(index, n, i.name)"
                     :value="i.checked"
-                  ></el-checkbox
-                  ><span class="title-text" style="padding-left: 10px">{{
-                    i.name
-                  }}</span>
+                  >
+                  </el-checkbox>
+                  <span class="title-text" style="padding-left: 10px">
+                    {{i.name }}
+                  </span>
                 </li>
               </ul>
             </div>
@@ -64,10 +66,7 @@
         <div class="no-list" v-if="serverOptions.length === 0">
           <div>
             您还没有可选用的MCP<br />
-            <span
-              >请前往“<strong @click="handleOpenMcp">MCP管理</strong
-              >”进行添加</span
-            >
+            <span>请前往“<strong @click="handleOpenMcp">MCP管理</strong>”进行添加</span>
           </div>
         </div>
       </div>
@@ -79,8 +78,9 @@
           :disabled="!mcp_node"
           type="primary"
           @click="doSubmit"
-          >确定</el-button
         >
+          确定
+        </el-button>
       </span>
     </el-dialog>
   </div>
@@ -118,11 +118,35 @@ export default {
     };
   },
   mounted() {
-    this.init();
+    // 打开弹窗时再请求，避免重复请求问题
+    // this.init();
   },
   methods: {
+    async changeItem(value) {
+      if (!value) return
+
+      const item = this.serverOptions.find(item => item.name === value) || {}
+      const itemIndex = this.serverOptions.findIndex(item => item.name === value)
+      this.serverOptions = this.serverOptions.map((item) => ({...item, tools: []}))
+      console.log(value, item, itemIndex, '-------------------changeItem')
+
+      try {
+        this.loading = true
+        const res = await getMcpToolList({
+          serverUrl: item.serverUrl,
+        });
+        if (res.code === 0) {
+          this.serverOptions[itemIndex].tools = res.data && res.data.tools
+              ? res.data.tools.map(item => ({...item, checked: false, disabled: false}))
+              : []
+        }
+      } finally {
+        this.loading = false
+      }
+    },
     handleOpenMcp() {
-      window.parent.postMessage({ action: "navigateTo", path: "/mcp" }, "*");
+      /*window.parent.postMessage({ action: "navigateTo", path: "/mcp" }, "*");*/
+      this.$router.push({path: "/mcp"})
     },
     handleTitleClick(name) {
       this.activeCollapseName = this.activeCollapseName === name ? "" : name;
@@ -164,10 +188,7 @@ export default {
     },
     init() {
       this.loading = true;
-      getList({
-        pageNo: 1,
-        pageSize: 9999,
-      })
+      getList()
         .then((res) => {
           this.getToolsList(res.data.list);
         })
@@ -177,13 +198,13 @@ export default {
     },
     async getToolsList(list) {
       let mcpList = list;
-      for (const item of mcpList) {
+      /*for (const item of mcpList) {
         try {
           const res = await getMcpToolList({
-            mcpServerUrl: item.serverUrl,
+            serverUrl: item.serverUrl,
           });
           if (res.code === 0) {
-            item.tools = res.data.tools_list;
+            item.tools = res.data.tools || [];
             await item.tools.forEach((i) => {
               i.checked = false;
               i.disabled = false;
@@ -192,9 +213,9 @@ export default {
             item.tools = [];
           }
         } catch (error) {
-          this.loading = false;
+          this.loading = false
         }
-      }
+      }*/
       this.serverOptions = mcpList;
       this.loading = false;
     },
@@ -326,6 +347,9 @@ export default {
     &.active {
       border-bottom-color: $color !important;
     }
+  }
+  /deep/ .el-button--primary span {
+    color: $txt_color !important;
   }
 }
 .mcp-box {

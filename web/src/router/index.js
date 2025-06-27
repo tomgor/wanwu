@@ -28,39 +28,33 @@ const constantRoutes = [
                 name: '404',
             },
             {
-                path: '/explore',
-                component:resolve =>require(['@/views/ExploreSquare'],resolve),
-                meta:{perm: [PERMS.EXPLORE]},
-            },
-            {
                 path: '/userInfo',
                 component:resolve =>require(['@/views/userCenter/components/info'],resolve),
-            },
-            {
-                path: '/modelAccess',
-                component:resolve =>require(['@/views/modelAccess'],resolve),
             },
             {
                 path: '/permission',
                 component:resolve =>require(['@/views/permission'],resolve),
                 meta:{perm: [PERMS.PERMISSION]},
-                /*children: [
-                    {
-                        path: '/permission/user',
-                        component:resolve =>require(['@/views/permission/user'],resolve),
-                        meta:{perm: [PERMS.PERMISSION_USER]}
-                    },
-                    {
-                        path: '/permission/role',
-                        component:resolve =>require(['@/views/permission/role'],resolve),
-                        meta:{perm: [PERMS.PERMISSION_ROLE]}
-                    },
-                    {
-                        path: '/permission/org',
-                        component:resolve =>require(['@/views/permission/org'],resolve),
-                        meta:{perm: [PERMS.PERMISSION_ORG]}
-                    },
-                ]*/
+            },
+            {
+                path: '/modelAccess',
+                component:resolve =>require(['@/views/modelAccess'],resolve),
+                meta:{perm: [PERMS.MODEL]},
+            },
+            {
+                path: '/mcp',
+                component:resolve => require(['@/views/mcpManagement'],resolve),
+                meta:{perm: [PERMS.MCP]},
+            },
+            {
+                path: '/mcp/detail/:type',
+                component:resolve =>require(['@/views/mcpManagementPublic/detail'],resolve),
+                meta:{perm: [PERMS.MCP]},
+            },
+            {
+                path: '/explore',
+                component:resolve =>require(['@/views/ExploreSquare'],resolve),
+                meta:{perm: [PERMS.EXPLORE]},
             },
             {
                 path: '/explore/agent',
@@ -68,49 +62,49 @@ const constantRoutes = [
                 meta:{perm: [PERMS.EXPLORE]},
             },
             {
-                path: '/agent/test',
-                component:resolve =>require(['@/views/agent/components/form'],resolve),
-                meta:{perm: [PERMS.WORKSPACE_APP]},
-            },
-            {
                 path: '/explore/rag',
                 component:resolve =>require(['@/views/rag'],resolve),
                 meta:{perm: [PERMS.EXPLORE]},
             },
             {
+                path: '/agent/test',
+                component:resolve =>require(['@/views/agent/components/form'],resolve),
+                meta:{perm: [PERMS.AGENT]},
+            },
+            {
                 path: '/rag/test',
                 component:resolve =>require(['@/views/rag/components/form'],resolve),
-                meta:{perm: [PERMS.WORKSPACE_APP]},
+                meta:{perm: [PERMS.RAG]},
             },
             {
                 path: '/workflow',
                 component:resolve =>require(['@/views/workflow'],resolve),
-                meta:{perm: [PERMS.WORKSPACE_APP]},
+                meta:{perm: [PERMS.WORKFLOW]},
             },
             {
                 path: '/appSpace/:type',
                 component:resolve =>require(['@/views/appSpace'],resolve),
-                meta:{perm: [PERMS.WORKSPACE_APP]},
+                meta:{perm: [PERMS.RAG, PERMS.AGENT, PERMS.WORKFLOW]},
             },
             {
                 path: '/knowledge',
                 component:resolve =>require(['@/views/knowledge'],resolve),
-                meta:{perm: [PERMS.WORKSPACE_KNOWLEDGE]},
+                meta:{perm: [PERMS.KNOWLEDGE]},
             },
             {
                 path: '/knowledge/doclist/:id',
                 component:resolve =>require(['@/views/knowledge/component/doclist.vue'],resolve),
-                meta:{perm: [PERMS.WORKSPACE_KNOWLEDGE]},
+                meta:{perm: [PERMS.KNOWLEDGE]},
             },
              {
                 path: '/knowledge/fileUpload',
                 component:resolve =>require(['@/views/knowledge/component/fileUpload.vue'],resolve),
-                meta:{perm: [PERMS.WORKSPACE_KNOWLEDGE]},
+                meta:{perm: [PERMS.KNOWLEDGE]},
             },
             {
                 path: '/knowledge/section',
                 component:resolve =>require(['@/views/knowledge/component/section.vue'],resolve),
-                meta:{perm: [PERMS.WORKSPACE_KNOWLEDGE]},
+                meta:{perm: [PERMS.KNOWLEDGE]},
             },
             {
                 path: '/userCenter/*',

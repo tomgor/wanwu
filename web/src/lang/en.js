@@ -26,8 +26,9 @@ export default {
         back: '返回登录'
     },
     menu: {
-        explore: '探索广场',
+        explore: '应用广场',
         workspace: '工作室',
+        mcp: 'MCP广场',
         app: {
             index: '应用空间',
             all: '全部',
@@ -36,13 +37,15 @@ export default {
             workflow: '工作流',
         },
         knowledge: '知识库',
-        account: '设置',
+        account: '账户',
+        setting: '设置',
         userInfo: '个人信息',
         org: '组织管理',
         modelAccess: '模型管理',
+        about: '关于'
     },
     header: {
-        title: '大模型MaaS平台',
+        title: '万悟',
         doc: '文档中心',
         logout: '登出',
         login: '登录',

@@ -68,7 +68,7 @@ module.exports = {
     },
     proxy: {
         "/openAi":{
-            target: "https://192.168.0.21:8081",
+            target: "http://192.168.0.21:8081",
             changeOrigin: true,
             secure: false,
            /* pathRewrite: {
@@ -76,75 +76,75 @@ module.exports = {
             },*/
         },
         "/workflow/api":{
-            target: "https://192.168.0.21:8081",
-            changeOrigin: true,
-            secure: false,
-        },
-        "/service/api":{
-            target: "https://192.168.0.21:8081",
+            target: "http://192.168.0.21:8081",
             changeOrigin: true,
             secure: false,
         },
         "/user/api": {
-            target: "https://192.168.0.21:8081",
+            target: "http://192.168.0.21:8081",
             changeOrigin: true,
             secure: false,
         },
         "/service/api": {
-            target: "https://192.168.0.21:8081",
+            target: "http://192.168.0.21:8081",
             changeOrigin: true,
             secure: false,
         },
         "/training/api": {
-            target: "https://192.168.0.21:8081",
+            target: "http://192.168.0.21:8081",
             changeOrigin: true,
             secure: false,
         },
         "/resource/api": {
-          target: "https://192.168.0.21:8081",
+          target: "http://192.168.0.21:8081",
             changeOrigin: true,
             secure: false,
         },
         "/datacenter/api": {
-            target: "https://192.168.0.21:8081",
+            target: "http://192.168.0.21:8081",
             changeOrigin: true,
             secure: false,
         },
         "/modelprocess/api": {
-            target: "https://192.168.0.21:8081",
+            target: "http://192.168.0.21:8081",
             changeOrigin: true,
             secure: false,
         },
         "/expand/api": {
-            target: "https://192.168.0.21:8081",
+            target: "http://192.168.0.21:8081",
             changeOrigin: true,
             secure: false,
         },
         "/record/api": {
-            target: "https://192.168.0.21:8081",
+            target: "http://192.168.0.21:8081",
             changeOrigin: true,
             secure: false,
         },
         "/img": {
-            target: "https://192.168.0.21:8081",
+            target: "http://192.168.0.21:8081",
             changeOrigin: true,
             secure: false,
         },
         "/konwledgeServe": {
-          target: "https://192.168.0.21:8081",
+          target: "http://192.168.0.21:8081",
           changeOrigin: true,
           secure: false,
           /*pathRewrite: {
               "^/konwledgeServe": "",
           }*/
         },
+        "/proxyupload": {
+            target: "http://192.168.0.21:8081",
+            changeOrigin: true,
+            secure: false,
+        },
         "/use/model/api": {
-          target: "https://192.168.0.21:8081",
+          target: "http://192.168.0.21:8081",
           changeOrigin: true,
           secure: false,
        },
        "/prompt/api": {
-          target: "https://192.168.0.21:8081",
+          target: "http://192.168.0.21:8081",
           changeOrigin: true,
           secure: false,
        }

@@ -80,7 +80,7 @@ export default {
     .el-main{
       padding: 0;
       border-radius:8px 8px 8px 8px;
-      border-left: 0.5px solid #e6e6e6;
+      /*border-left: 0.5px solid #e6e6e6;*/
     }
 }
 </style>

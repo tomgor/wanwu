@@ -2,7 +2,7 @@
   <div class="page-wrapper">
     <div class="table-wrap list-common wrap-fullheight">
       <div class="page-title">
-        <img class="page-title-img" src="@/assets/imgs/modelAccess.png" alt="" />
+        <img class="page-title-img" src="@/assets/imgs/model.png" alt="" />
         <span class="page-title-name">{{$t('modelAccess.title')}}</span>
       </div>
       <div class="table-box">
@@ -81,7 +81,12 @@
               <!--<div class="card-type" v-if="item.version">{{item.version}}</div>-->
             </div>
             <div class="card-bottom">
-              <div>{{$t('modelAccess.table.publisher')}}: {{providerObj[item.provider] || '--'}}</div>
+              <div
+                :class="['card-bottom-provider', {'no-publishData': !item.publishDate}]"
+                :title="providerObj[item.provider] || '--'"
+              >
+                {{$t('modelAccess.table.publisher')}}: {{providerObj[item.provider] || '--'}}
+              </div>
               <div style="float: right">{{item.publishDate || '--'}} {{$t('modelAccess.table.publish')}}</div>
             </div>
           </div>
@@ -273,7 +278,7 @@
 }
 .card-item {
   display: inline-block;
-  width: calc((100% / 3) - 20px);
+  width: calc((100% / 4) - 20px);
   height: 180px;
   vertical-align: middle;
   margin: 0 10px 20px;
@@ -352,11 +357,20 @@
     div {
       display: inline-block;
     }
+    .card-bottom-provider {
+      width: calc(100% - 100px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .no-publishData.no-publishData {
+      width: calc(100% - 45px);
+    }
   }
 }
 .card-item:hover {
-  background-image: url('../../assets/imgs/cardBg.png');
-  background-size: cover;
+  /*background-image: url('../../assets/imgs/cardBg.png');
+  background-size: cover;*/
   border: 1px solid $color;
 }
 /deep/ .el-dropdown-menu__item.card-delete:hover {

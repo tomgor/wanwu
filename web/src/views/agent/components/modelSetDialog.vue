@@ -18,7 +18,7 @@
                             <el-switch v-model="ruleForm[item.btnProps]"></el-switch>
                         </el-col>
                         <el-col :span="20">
-                            <el-slider v-model="ruleForm[item.props]" show-input></el-slider>
+                            <el-slider v-model="ruleForm[item.props]" show-input  :min="item.min" :max="item.max" :step="item.step"></el-slider>
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -33,6 +33,12 @@
 </template>
 <script>
 export default {
+    props:{
+        modelform:{
+            type:Object,
+            default:null
+        }
+    },
     data(){
         return{
             dialogVisible:false,
@@ -44,7 +50,9 @@ export default {
                 maxTokens:512,
                 temperatureEnable:true,
                 topPEnable:true,
-                presencePenaltyEnable:true
+                presencePenaltyEnable:true,
+                maxTokensEnable:true,
+                frequencyPenaltyEnable:true
             },
             modelSet: [
                 {
@@ -58,7 +66,7 @@ export default {
                 },
                 {
                     label:'TopP',
-                    desc: '生成过程中核采样方法概率阈值。取值越大，生成的随机性越高;取值越小，生成的确定性越高',
+                    desc: '生成过程中核采样方法概率阈值。取值越大，生成的随机性越高；取值越小，生成的确定性越高',
                     props: "topP",
                     btnProps:'topPEnable',
                     min: 0,
@@ -76,7 +84,7 @@ export default {
                 },
                 {
                     label:'存在惩罚',
-                    desc: '用于控制模型生成时的重复度,提高此项可以降低模型生成的重复度',
+                    desc: '用于控制模型生成时的重复度，提高此项可以降低模型生成的重复度',
                     props: "presencePenalty",
                     btnProps:'presencePenaltyEnable',
                     min: -2,
@@ -98,6 +106,9 @@ export default {
     methods:{
         showDialog(){
             this.dialogVisible = true;
+            if(this.modelform !== null){
+                this.ruleForm = this.modelform
+            }
         },
         handleClose(){
             this.dialogVisible = false;
@@ -110,6 +121,11 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+/deep/{
+    .el-input-number--small{
+        line-height: 28px!important;
+    }
+}
 .question{
     cursor: pointer;
     color:#ccc;

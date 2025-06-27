@@ -15,7 +15,7 @@
                 multiple
                 :show-file-list="false"
                 :auto-upload="false"
-                :limit="1"
+                :limit="2"
                 accept="image/*"
                 :file-list="logoFileList"
                 :on-change="uploadOnChange"
@@ -101,7 +101,7 @@ export default {
                 );
               }
             },
-            trigger: "change",
+            trigger: "blur",
           },
           {
             max:30,message:this.$t('agentDiglog.pluginNameRules'),trigger: "blur"
@@ -109,7 +109,7 @@ export default {
         ],
         desc: [
           { required: true, message:this.$t('agentDiglog.descplaceholder'), trigger: "blur" },
-          { max:500, message:this.$t('agentDiglog.descRules'),trigger: "blur"}
+          { max:600, message:this.$t('agentDiglog.descRules'),trigger: "blur"}
         ],
         'avatar.path':[
             { required: true, message: this.$t('agentDiglog.uploadImg'), trigger: "blur" },
@@ -120,6 +120,26 @@ export default {
         create:this.$t('agentDiglog.createApp')
       },
     };
+  },
+  watch:{
+    form:{
+       handler(newVal) {
+        Object.keys(newVal).forEach(key => {
+          if (newVal[key] && typeof newVal[key] !== 'object') {
+            this.$refs.form.clearValidate(key);
+          }
+        });
+      },
+      deep: true
+    },
+    'form.avatar': {
+      handler(newVal) {
+        if (newVal && newVal.path) {
+          this.$refs.form.clearValidate('avatar.path');
+        }
+      },
+      deep: true
+    }
   },
   methods: {
     ...mapActions("app", ["setFromList"]),
@@ -149,6 +169,7 @@ export default {
         }
       };
       this.assistantId = ''
+      this.imageUrl = ''
     },
     uploadOnChange(file){
       this.clearFile();

@@ -26,8 +26,9 @@ export default {
         back: '返回登录'
     },
     menu: {
-        explore: '探索广场',
+        explore: '应用广场',
         workspace: '工作室',
+        mcp: 'MCP广场',
         app: {
             index: '应用空间',
             all: '全部',
@@ -36,13 +37,15 @@ export default {
             workflow: '工作流',
         },
         knowledge: '知识库',
-        account: '设置',
+        account: '账户',
+        setting: '设置',
         userInfo: '个人信息',
         org: '组织管理',
         modelAccess: '模型管理',
+        about: '关于'
     },
     header: {
-        title: '大模型MaaS平台',
+        title: '万悟',
         doc: '文档中心',
         logout: '登出',
         login: '登录',
@@ -607,7 +610,7 @@ export default {
         tip:'提示',
         refreshTips:'您导入的文件正在异步处理中，请耐心等待，您可以尝试，刷新列表获取导入结果。',
         editKnowledge:'编辑知识库',
-        delKnowledgeTips:'确定要删除此知识库吗？删除后不可恢复',
+        delKnowledgeTips:'若此知识库已被智能体、文本问答或工作流使用，删除知识库将导致该功能不可用',
         noStatus:'无状态信息',
         categoryNameRules:'命名只能包含小写英文、中文、数字、特殊符号-_',
         chunkTypeConfigTips:'*当前自定义分段对.xlsx文件切分不生效，如您上传.xlsx，将按系统默认形式切分',
@@ -695,7 +698,8 @@ export default {
         ID:'序号',
         backAnalysis:'返回解析',
         saveIntoData:'保存成功结果入库',
-        fileSizeTips:'上传文件不能超过15MB!'
+        fileSizeTips:'上传文件不能超过15MB!',
+        inputDesc:'请输入描述'
     },
     explore:{
         unFavorite:'是否确定将该应用从常用应用列表中移除?',
@@ -749,6 +753,7 @@ export default {
         descplaceholder:'输入文本描述，将展示给文本问答用户 ',
         pluginNameRules:' 文本问答名称须在30字符以内',
         nameRules:'请填写文本问答名称',
+        logoRules:'请上传文本问答图标'
     },
     fileChunk:{
         fileClear:'文件清除成功',

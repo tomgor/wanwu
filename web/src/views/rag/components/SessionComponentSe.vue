@@ -25,7 +25,7 @@
                           :visible-arrow="false"
                           popper-class="query-copy-popover"
                           content="">
-                    <p class="query-copy" @click="queryCopy(n.query)"><i class="el-icon-s-order"></i>&nbsp;{{$t('agent.copyToInput')}}</p>
+                    <p class="query-copy" @click="queryCopy(n.query)" style="cursor: pointer"><i class="el-icon-s-order"></i>&nbsp;{{$t('agent.copyToInput')}}</p>
                     <span slot="reference" class="answer-text">{{n.query}}</span>
                   </el-popover>
                 </div>
@@ -37,6 +37,13 @@
           <div :class="['session-item','rl']">
             <img class="logo" :src="'/user/api/'+defaultUrl"/>
             <div class="answer-content"><i class="el-icon-loading"></i></div>
+          </div>
+        </div>
+        <!--pending-->
+        <div v-if="n.pendingResponse"  class="session-answer">
+          <div :class="['session-item','rl']">
+            <img class="logo" :src="'/user/api/'+ defaultUrl" />
+            <div class="answer-content" style="padding:0 10px;color:#E6A23C;">{{n.pendingResponse}}</div>
           </div>
         </div>
         <!-- 回答故障  code:7-->
@@ -101,6 +108,8 @@ export default {
   props: ['sessionStatus','defaultUrl'],
   data(){
       return{
+          autoScroll:true,
+          scrollTimeout:null,
           isDs:['txt2txt-002-001','txt2txt-002-002','txt2txt-002-004','txt2txt-002-005','txt2txt-002-006','txt2txt-002-007','txt2txt-002-008'].indexOf(this.$route.params.id) !=-1,
           loading:false,
           marked:marked,
@@ -138,7 +147,41 @@ export default {
             immediate: true
         }
     },
+    mounted(){
+      this.setupScrollListener();
+    },
+    beforeDestroy(){
+      const container = document.getElementById('timeScroll');
+      if (container) {
+        container.removeEventListener('scroll', this.handleScroll);
+      }
+      clearTimeout(this.scrollTimeout);
+    },
     methods:{
+         setupScrollListener() {
+            const container = document.getElementById('timeScroll');
+            container.addEventListener('scroll', this.handleScroll);
+          },
+         handleScroll(e){
+            const container = document.getElementById('timeScroll');
+            const { scrollTop, clientHeight, scrollHeight } = container;
+            // 检测是否接近底部（5px容差）
+            const nearBottom = scrollHeight - (scrollTop + clientHeight) < 5;
+             // 用户手动滚动时取消自动置底
+            if (!nearBottom) {
+                this.autoScroll = false;
+            }
+            // 清除之前的定时器
+            clearTimeout(this.scrollTimeout);
+            // 设置新的定时器检测滚动停止
+            this.scrollTimeout = setTimeout(() => {
+                // 如果停止时接近底部，恢复自动置底
+                if (nearBottom) {
+                  this.autoScroll = true;
+                  this.scrollBottom();
+                }
+              }, 500); // 500ms内没有新滚动视为停止
+          },
           replaceHTML(data,n){
             let _data = data
             var a = new RegExp('<think>')
@@ -220,6 +263,7 @@ export default {
           this.loading = true
         },
         scrollBottom () {
+          if (!this.autoScroll) return;
             this.$nextTick(() => {
                 this.loading = false
                 document.getElementById('timeScroll').scrollTop = document.getElementById('timeScroll').scrollHeight;
@@ -279,13 +323,23 @@ export default {
             this.$emit('clearHistory')
         },
         getList(){
-            return JSON.parse(JSON.stringify(this.session_data.history.filter((item)=>{ delete item.operation ; return !item.pending})))
+          return JSON.parse(JSON.stringify(this.session_data.history.filter((item)=>{ delete item.operation ; return item})))
+            // return JSON.parse(JSON.stringify(this.session_data.history.filter((item)=>{ delete item.operation ; return !item.pending})))
         },
         getAllList(){
             return JSON.parse(JSON.stringify(this.session_data.history))
         },
         stopLoading(){
             this.session_data.history = this.session_data.history.filter((item)=>{ return !item.pending})
+        },
+       stopPending(){
+            this.session_data.history = this.session_data.history.filter(item =>{
+              if(item.pending){
+                item.responseLoading = false
+                item.pendingResponse = '本次回答已被终止'
+              }
+              return item;
+            })
         },
         refresh(){
             if(this.sessionStatus === 0){return}
@@ -395,6 +449,11 @@ export default {
 /deep/{
   pre{
      white-space: pre-wrap !important;
+  }
+  .answer-content{
+    img{
+        width: 400px !important;
+      }
   }
    
 }

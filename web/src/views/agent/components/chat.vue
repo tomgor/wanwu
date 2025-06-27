@@ -168,7 +168,7 @@
                 this.inputVal = val || this.$refs['editable'].getPrompt()
                 this.fileId = fileId || null;
                 this.isTestChat = this.chatType === 'test' ? true :false;
-                const file_List = this.$refs['editable'].getFileList()
+                const file_List = this.$refs['editable'].getFileList();
                 this.fileList = file_List.length > 0 ? file_List : fileInfo || []
                 if (!this.inputVal) {
                     this.$message.warning('请输入内容');
@@ -217,7 +217,7 @@
                 if(this.amswerNum > 0){
                     this.isModelDisable = true
                 }
-                let fileId = this.getFileIdList() || this.fileId;
+                let fileId = this.$refs['editable'].getFileIdList() || this.fileId;
                 this.useSearch = this.$refs['editable'].sendUseSearch();
                 this.setSseParams({conversationId: this.conversationId, fileInfo:fileId,assistantId:this.editForm.assistantId})
                 this.doSend()

@@ -15,7 +15,7 @@
                 multiple
                 :show-file-list="false"
                 :auto-upload="false"
-                :limit="1"
+                :limit="2"
                 accept="image/*"
                 :file-list="logoFileList"
                 :on-change="uploadOnChange"
@@ -109,10 +109,10 @@ export default {
         ],
         desc: [
           { required: true, message: '请输入文本描述', trigger: "blur" },
-          { max:500, message:'文本描述限制600字符以内',trigger: "blur"}
+          { max:600, message:'文本描述限制600字符以内',trigger: "blur"}
         ],
         'avatar.path':[
-            { required: true, message: this.$t('list.pluginDescRules'), trigger: "blur" },
+            { required: true, message: this.$t('ragDiglog.logoRules'), trigger: "blur" },
         ]
       },
       titleMap: {
@@ -120,6 +120,26 @@ export default {
         create:this.$t('ragDiglog.createApp')
       },
     };
+  },
+  watch:{
+    form:{
+       handler(newVal) {
+        Object.keys(newVal).forEach(key => {
+          if (newVal[key] && typeof newVal[key] !== 'object') {
+            this.$refs.form.clearValidate(key);
+          }
+        });
+      },
+      deep: true
+    },
+    'form.avatar': {
+      handler(newVal) {
+        if (newVal && newVal.path) {
+          this.$refs.form.clearValidate('avatar.path');
+        }
+      },
+      deep: true
+    }
   },
   methods: {
     ...mapActions("app", ["setFromList"]),
@@ -148,7 +168,8 @@ export default {
           path:''
         }
       };
-      this.ragId = ''
+      this.ragId = '';
+      this.imageUrl = ''
     },
     uploadOnChange(file){
       this.clearFile();

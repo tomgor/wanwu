@@ -127,37 +127,28 @@ export const getStaticToken = (data) => {
 };
 
 
-export const externalUpload = (data) => {
+export const externalUpload = (data, config) => {
     return request({
-        url: "/proxyupload",
+        // url: "/proxyupload/upload",
+        url:"/service/api/v1/proxy/file/upload",
         method: "post",
         data,
-        headers:{
-            "Content-Type":"multipart/form-data"
-        },
+        config,
         isHandleRes: false
     });
 };
 
 export const getMcpToolList = (data) => {
     return request({
-        url: "/workflow/api/workflow/mcp_server_tool_list",
-        method: "post",
-        data:data,
+        url: "/use/model/api/v1/mcp/tool/list",
+        method: "get",
+        params: data,
     });
 };
 
 export const getList = (data)=>{
     return request({
-        url: '/use/model/api/v1/mcp/list',
-        method: 'get',
-        params: data
-    })
-};
-
-export const getTools = (data)=>{
-    return request({
-        url: '/use/model/api/v1/mcp/getTools',
+        url: '/use/model/api/v1/mcp/select',
         method: 'get',
         params: data
     })

@@ -136,33 +136,36 @@ export default {
       return res;
     },
     preUpload() {
-      let file = this.fileList[0];
+      let file = this.fileList[0] || {}
       let filenames = file.name.split(".")
-      if(filenames.length>1){
-        filenames.splice(filenames.length -1,1)
+      if (filenames.length > 1) {
+        filenames.splice(filenames.length - 1, 1)
       }
-      let fname = filenames.join(".")
+      const fname = filenames.join(".")
       this.source = axios.CancelToken.source();
-      externalUpload({
-        file_name: fname,
-        file:file.raw,
-        bucketname: 'upload',
-      }).then((res)=>{
+
+      const config = { headers: { "Content-Type": "multipart/form-data" } }
+      let formData = new FormData()
+      formData.append("file", file.raw)
+      formData.append("file_name", fname)
+
+      externalUpload(formData, config).then((res)=>{
+        console.log(res, '-----------------externalUpload')
+        const { download_link: link } = res.data || {}
         this.loading = false;
-         const params = {
-            index: this.index,
-            url: res.download_link,
-            fileId: res.download_link,
-            file: file,
-          };
-          this.$emit("handleUploadSuccess", params);
-          this.$message.success("文件上传成功");
+        const params = {
+          index: this.index,
+          url: link,
+          fileId: link,
+          file: file,
+        };
+        this.$emit("handleUploadSuccess", params);
+        this.$message.success("文件上传成功");
       }).catch(()=>{
         this.loading = false;
         this.fail = true;
         this.$message.error("文件" + this.fileList[0].name + "上传失败");
       })
-
     },
   },
   computed: {

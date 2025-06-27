@@ -18,7 +18,7 @@
                             <el-switch v-model="ruleForm[item.btnProps]"></el-switch>
                         </el-col>
                         <el-col :span="20">
-                            <el-slider v-model="ruleForm[item.props]" show-input></el-slider>
+                            <el-slider v-model="ruleForm[item.props]" show-input  :min="item.min" :max="item.max" :step="item.step"></el-slider>
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -62,7 +62,7 @@ export default {
                 },
                 {
                     label:'多样性',
-                    desc: '生成过程中核采样方法概率阈值。取值越大，生成的随机性越高;取值越小，生成的确定性越高',
+                    desc: '生成过程中核采样方法概率阈值。取值越大，生成的随机性越高；取值越小，生成的确定性越高',
                     props: "topP",
                     btnProps:"topPEnable",
                     min: 0,
@@ -85,7 +85,7 @@ export default {
         showDialog(){
             this.dialogVisible = true;
             if(this.modelConfig !== null){
-                this.ruleForm =  this.modelConfig
+                this.ruleForm = this.modelConfig
             }
         },
         handleClose(){
@@ -99,6 +99,11 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+/deep/{
+    .el-input-number--small{
+        line-height: 28px!important;
+    }
+}
 .question{
     cursor: pointer;
     color:#ccc;

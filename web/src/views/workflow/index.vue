@@ -35,10 +35,10 @@
         class="addNode_box"
       >
         <div class="node-items">
-          <!--<div @click="createMCP()" class="node-items-box">
+          <div @click="createMCP()" class="node-items-box">
             <span> <img :src="iconObj.MCPClientNode" />&nbsp; MCP </span>
             <div class="nodeSelectDesc">可快捷调用MCP工具</div>
-          </div>-->
+          </div>
           <div @click="preAddNode('IntentionNode')" class="node-items-box">
             <span> <img :src="iconObj.IntentionNode" />&nbsp; 意图识别 </span>
             <div class="nodeSelectDesc">
@@ -92,7 +92,7 @@
             <div class="nodeSelectDesc">
               通过视觉技术解析用户图形界面上的图像信息，并模拟人类操作行为来执行相应任务，与计算机系统进行交互的智能体
             </div>
-          </div>
+          </div>-->
           <div @click="preAddNode('filegenerate')" class="node-items-box">
             <span>
               <img :src="iconObj.FileGenerateNode" />&nbsp; 文档生成
@@ -106,7 +106,7 @@
             <div class="nodeSelectDesc">
               输入txt、pdf、docx、xlsx、csv、pptx等格式文档的URL，可以解析提取出文档的文本内容
             </div>
-          </div>-->
+          </div>
         </div>
         <el-button
           slot="reference"
@@ -260,7 +260,7 @@
     <PublishForm ref="publish_ref" @refreshTable="$router.go(-1)" />
     <!--隐藏 token 和 mcp 相关-->
     <!--<AppSelect ref="app-select" @getToken="setToken" />-->
-    <!--<McpCreate ref="mcpcreate" @createMcp="addMcp" />-->
+    <McpCreate v-if="" ref="mcpcreate" @createMcp="addMcp" />
     <div id="minimap"></div>
   </div>
 </template>
@@ -2039,7 +2039,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../../style/workflow.scss";
+@import "@/style/workflow.scss";
 .workflow-list {
   padding: 0 !important;
 }

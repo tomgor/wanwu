@@ -1,15 +1,22 @@
 <template>
   <div class="page-wrapper">
     <div class="page-title">
-      <img class="page-title-img" src="@/assets/imgs/task.png" alt="" />
-      <span class="page-title-name">{{$t('appSpace.title')}}</span>
+      <img class="page-title-img" :src="typeObj[type] ? typeObj[type].img : require('@/assets/imgs/task.png')" alt="" />
+      <span class="page-title-name">{{typeObj[type] ? typeObj[type].title : $t('appSpace.title')}}</span>
     </div>
     <div class="hide-loading-bg" style="padding: 20px" v-loading="loading">
       <search-input :placeholder="$t('appSpace.search')" ref="searchInput" @handleSearch="getTableData" />
       <el-button class="add-button" size="mini" type="primary" @click="showCreate" icon="el-icon-plus">
         {{$t('common.button.create')}}
       </el-button>
-      <AppList :appData="listData" :isShowPublished="true" :isShowTool="true" @reloadData="getTableData" />
+      <AppList
+        :type="type"
+        :showCreate="showCreate"
+        :appData="listData"
+        :isShowPublished="true"
+        :isShowTool="true"
+        @reloadData="getTableData"
+      />
       <CreateTotalDialog ref="createTotalDialog" />
     </div>
   </div>
@@ -28,13 +35,20 @@ export default {
     return {
       type: '',
       loading: false,
-      listData:[]
+      listData:[],
+      typeObj: {
+        workflow: {title: '工作流', img: require('@/assets/imgs/workflow_icon.png')},
+        rag: {title: '文本问答', img: require('@/assets/imgs/rag.png')},
+        agent: {title: '智能体', img: require('@/assets/imgs/agent.png')}
+      },
+      currentTypeObj: {}
     }
   },
   watch: {
     $route: {
       handler(val) {
         const {type} = val ? val.params || {} : {}
+        this.listData = []
         this.type = type
         this.$refs.searchInput.value = ''
         this.getTableData()

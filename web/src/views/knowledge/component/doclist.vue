@@ -3,7 +3,7 @@
     <div class="page-title">
       <i
         class="el-icon-arrow-left"
-        @click="$router.go(-1)"
+        @click="goBack"
         style="margin-right: 10px; font-size: 20px; cursor: pointer"
       >
       </i>
@@ -20,7 +20,7 @@
                   v-model="docQuery.status"
                   :placeholder="$t('knowledgeManage.please')"
                   style="width:150px;"
-                  class="marginRight cover-input-icon"
+                  class="marginRight no-border-select cover-input-icon"
                 >
                   <el-option
                     v-for="item in knowLegOptions"
@@ -33,8 +33,9 @@
               </div>
 
               <div class="content_title">
-                <el-button type="primary" icon="el-icon-refresh" @click="reload">{{$t('common.gpuDialog.reload')}}</el-button>
+                <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload">{{$t('common.gpuDialog.reload')}}</el-button>
                 <el-button
+                  size="mini"
                   type="primary"
                   :underline="false"
                   @click="handleUpload"
@@ -64,10 +65,10 @@
                 >
                   <template slot-scope="scope">
                     <el-popover
-                      placement="bottom"
+                      placement="bottom-start"
                       :content="scope.row.docName"
                       trigger="hover"
-                      width="200"
+                      width="300"
                     >
                       <span slot="reference">{{scope.row.docName.length>20?scope.row.docName.slice(0,20)+'...':scope.row.docName}}</span>
                     </el-popover>
@@ -178,6 +179,9 @@ export default {
     this.getTableData(this.docQuery)
   },
   methods: {
+    goBack(){
+      this.$router.push({path:'/knowledge'})
+    },
     reload(){
       this.getTableData(this.docQuery)
     },
@@ -421,7 +425,7 @@ export default {
   color: #e60001;
 }
 .marginRight {
-  margin-right: 5px;
+  margin-right: 10px;
 }
 .full-content {
   //padding: 20px 20px 30px 20px;
@@ -481,11 +485,9 @@ export default {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 0 10px;
       h2 {
         font-size: 16px;
-      }
-      .el-button {
-        height: 36px;
       }
       .content_title {
         display: flex;

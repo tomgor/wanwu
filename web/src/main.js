@@ -5,18 +5,20 @@ import router from './router'
 import { store } from './store'
 import { i18n } from './lang'
 import './router/permission'
+import "./assets/icons";
 
 import ElementUi from 'element-ui'
 import moment from 'moment';
 import 'element-ui/lib/theme-chalk/index.css';
+import  '@/style/index.scss'
+import { config, basePath } from './utils/config'
+import {guid} from '@/utils/util'
+require('./utils/rem.js')
+
 Vue.use(ElementUi, {
     i18n: (key, value) => i18n.t(key, value), // 根据选的语言切换 Element-ui 的语言
 })
-import  '@/style/index.scss'
-import { config, basePath } from './utils/config'
 
-require('./utils/rem.js')
-import {guid} from '@/utils/util'
 Vue.prototype.$config = config
 Vue.prototype.$basePath = basePath
 Vue.prototype.$guid = guid

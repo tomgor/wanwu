@@ -3,15 +3,10 @@
     <div class="history-box">
         <div class="session-answer" >
             <div :class="['session-item','rl']">
-                <img class="logo" :src="`/user/api`+ editForm.avatar.path || (basePath + '/img/a.jpg')" />
+                <img class="logo" :src="editForm.avatar.path ? `/user/api`+ editForm.avatar.path : '@/assets/imgs/bg-logo.png'" />
                 <div class="answer-content">
                     <p class="name">{{editForm.name}}</p>
                     <p class="systemPrompt">{{editForm.desc}}</p>
-                    <!-- <div class="recommend">
-                        <template v-if="expandForm.starterPrompts && expandForm.starterPrompts.length > 0">
-                            <p class="recommend-p" v-for="(n,i) in expandForm.starterPrompts" :key="`${i}rml`" @click="setProloguePrompt(n.value)">{{n && n.value }}</p>
-                        </template>
-                    </div> -->
                 </div>
             </div>
         </div>
@@ -57,9 +52,11 @@
                 width: 100px;
                 height: 100px;
                 object-fit: cover;
+                border-radius: 50%;
+                border:1px solid #eee;
             }
             .logo{
-                border-radius: 6px;
+                border-radius: 50%;
             }
             .answer-content{
                 width: calc(100% - 30px);

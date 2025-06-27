@@ -5,7 +5,10 @@ export const PERMS = {
     PERMISSION_ROLE: 'permission.role', // 权限管理-角色管理
 
     EXPLORE: 'exploration', // 探索广场
-    WORKSPACE: 'workspace', // 工作室
-    WORKSPACE_APP: 'workspace.appspace', // 工作室-应用空间
-    WORKSPACE_KNOWLEDGE: 'workspace.knowledgebase', // 工作室-知识库
+    MODEL: 'model', // 模型管理
+    KNOWLEDGE: 'knowledge', // 知识库
+    MCP: 'mcp', // MCP 广场
+    RAG: 'rag', // 文本问答
+    WORKFLOW: 'workflow', // 工作流
+    AGENT: 'agent', // 智能体
 }

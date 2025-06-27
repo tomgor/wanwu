@@ -113,9 +113,9 @@ export const delWorkFlowInfo = (data)=>{
         data
     })
 }
-export const enableWorkFlowInfo = (data)=>{
+export const enableWorkFlow = (data)=>{
     return service({
-        url: `${BASE_URL}/assistant/workflow`,
+        url: `${BASE_URL}/assistant/workflow/enable`,
         method: 'put',
         data
     })

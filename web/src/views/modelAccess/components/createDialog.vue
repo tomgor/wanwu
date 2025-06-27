@@ -11,7 +11,7 @@
     >
       <el-form :model="{...createForm}" :rules="rules" ref="createForm" label-width="110px" class="createForm form">
         <el-form-item :label="$t('modelAccess.table.modelType')" prop="modelType">
-          <el-radio-group v-model="createForm.modelType">
+          <el-radio-group :disabled="isEdit" v-model="createForm.modelType">
             <el-radio v-for="item in modelType" :label="item.key" :key="item.key">
               {{item.name}}
             </el-radio>
@@ -33,12 +33,11 @@
             :on-error="handleUploadError"
             accept=".png,.jpg,.jpeg"
           >
-<!--            <el-button type="primary" plain size="mini">{{$t('modelAccess.dialog.select')}}</el-button>-->
             <img
               class="upload-img"
               :src="createForm.avatar && createForm.avatar.path ? basePath + '/user/api/' + createForm.avatar.path : defaultLogo"
             />
-<!--            <span style="margin-left: 12px; color: #606266 !important;" v-if="createForm.avatar && createForm.avatar.path">
+            <!--<span style="margin-left: 12px; color: #606266 !important;" v-if="createForm.avatar && createForm.avatar.path">
               {{createForm.avatar.path}}
             </span>-->
             <span class="upload-hint">
@@ -126,6 +125,10 @@ export default {
           // { min: 2, max: 50, message: this.$t('common.hint.modelNameLimit'), trigger: 'blur'},
           // { pattern: /^(?!_)[a-zA-Z0-9-_.\u4e00-\u9fa5]+$/, message: this.$t('common.hint.modelName'), trigger: "blur"}
         ],
+        displayName: [
+          { pattern: /^(?!_)[a-zA-Z0-9-_.\u4e00-\u9fa5]+$/, message: this.$t('common.hint.modelName'), trigger: "blur"},
+          { min: 2, max: 50, message: this.$t('common.hint.modelNameLimit'), trigger: 'blur'},
+        ],
         modelType: [{ required: true, message: this.$t('common.select.placeholder'), trigger: "change"}],
         endpointUrl: [
           { required: true, message: this.$t('common.input.placeholder'), trigger: "blur"},
@@ -195,9 +198,8 @@ export default {
           delete form.endpointUrl
           delete form.functionCalling
 
-          console.log(form, '----------------------123')
           const res = this.isEdit
-            ? await editModel(form)
+            ? await editModel({...form, modelId: this.row.modelId})
             : await addModel(form)
           if (res.code === 0) {
             this.$message.success(this.$t('common.message.success'))

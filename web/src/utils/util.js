@@ -20,7 +20,7 @@ export const fetchPermFirPath = (list = menuList) => {
     for (let i in list) {
         const item = list[i]
 
-        if (checkPerm(item.perm)) {
+        if (item.path && checkPerm(item.perm)) {
             if (item.children && item.children.length) {
                 path = fetchPermFirPath(item.children).path
                 break
@@ -121,4 +121,35 @@ export function getQueryString(val, href) {
         return matchArr[0].substring(val.length + 1);
     }
     return null;
+}
+
+// 是否是有效的URL
+export function isValidURL(string) {
+    const res = string.match(/(https?|ftp|file|ssh):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]/i);
+    return res !== null;
+}
+
+export function isExternal(path) {
+    return /^(https?:|mailto:|tel:)/.test(path);
+}
+
+export const formatTools = (tools) => {
+    if (!(tools && tools.length)) return []
+    const newTools = tools.map((n,i)=>{
+        let params = []
+        let properties = n.inputSchema.properties
+        for(let key in properties){
+            params.push({
+                "name": key,
+                "requiredBadge": n.inputSchema.required && n.inputSchema.required.includes(key) ? '必填' : '',
+                "type": properties[key].type,
+                "description": properties[key].description,
+            })
+        }
+        return {
+            ...n,
+            params
+        }
+    })
+    return newTools
 }

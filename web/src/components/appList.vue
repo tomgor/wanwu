@@ -1,7 +1,18 @@
 <template>
   <div class="app-card-container">
-    <div class="app-card" v-if="listData && listData.length">
+    <div class="app-card">
+      <div class="smart rl smart-create" v-if="isShowTool">
+        <div class="app-card-create" @click="showCreate">
+          <div class="create-img-wrap">
+            <img v-if="type" class="create-type" :src="require(`@/assets/imgs/create_${type}.png`)" alt="" />
+            <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
+            <div class="create-filter"></div>
+          </div>
+          <span>{{`创建${apptype[type]}`}}</span>
+        </div>
+      </div>
       <div
+        v-if="listData && listData.length"
         class="smart rl"
         v-for="(n,i) in listData"
         :key="`${i}sm`"
@@ -59,6 +70,10 @@
             />
           </div>
         </div>
+        <div v-if="isShowPublished && n.publishType && type !== 'workflow'" class="publishType">
+            <span v-if="n.publishType === 'private'" class="publishType-tag"><span class="el-icon-lock"></span> 私密</span>
+            <span v-else class="publishType-tag"><span class="el-icon-unlock"></span> 公开</span>
+        </div>
         <div
           class="editor"
           v-if="isShowTool"
@@ -103,7 +118,7 @@
         </div>
       </div>
     </div>
-    <el-empty class="noData" v-else :description="$t('common.noData')"></el-empty>
+    <el-empty class="noData" v-if="!(listData && listData.length)" :description="$t('common.noData')"></el-empty>
   </div>
 </template>
 
@@ -111,10 +126,12 @@
 import {mapActions} from 'vuex'
 import { AppType } from "@/utils/commonSet";
 import { deleteAPP } from "@/api/appspace";
-import { copyWorkFlow, publishWorkFlow } from "@/api/workflow";
+import { copyWorkFlow, publishWorkFlow, copyExample } from "@/api/workflow";
 import { setFavorite } from "@/api/explore";
 export default {
   props:{
+    type: String,
+    showCreate: Function,
     appData:{
       type:Array,
       required:true,
@@ -145,7 +162,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions('app', ['getHistoryList']),
+    // ...mapActions('app', ['getHistoryList']),
     isCannotClick(n) {
       return (n.appType === 'workflow' && !n.publishType && n.appId !== 'example') || n.appType !== 'workflow'
     },
@@ -181,12 +198,24 @@ export default {
     async workflowCopy(row) {
       const params = {
         workflowID: row.appId,
-      };
-      const res = await copyWorkFlow(params);
+      }
+
+      const isExample = row.appId === 'example'
+      const exampleParams = {
+        configName: row.name + '_副本',
+        configENName: "",
+        configDesc: row.desc,
+        isStream: false
+      }
+
+      const res = isExample
+        ? await copyExample({...params, ...exampleParams})
+        : await copyWorkFlow(params);
+
       if (res.code === 0) {
         this.$router.push({
           path: "/workflow",
-          query: { id: res.data.workflow_id },
+          query: { id: isExample ? res.data.workflowID : res.data.workflow_id },
         });
       }
     },
@@ -257,7 +286,6 @@ export default {
       this.handleDelete();
     },
     txtQuesOperation(method, row) {
-      console.log(method, row, "--------------txtQuesOperation");
       switch (method) {
         case "edit":
           // 文本问答编辑
@@ -285,7 +313,6 @@ export default {
     },
     commonMethods(method, row) {
       const type = row.appType;
-      console.log(type, "---------------------------commonMethodsType");
       switch (type) {
         case "agent":
           this.intelligentOperation(method, row);
@@ -336,7 +363,7 @@ export default {
               const list = [...this.listData];
               list[i].isFavorite = !n.isFavorite;
               this.listData = [...list];
-              this.getHistoryList();
+              // this.getHistoryList();
             }
           });
         })
@@ -349,4 +376,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/style/appCard.scss";
+.noData {
+  padding: 30px 0;
+}
 </style>
