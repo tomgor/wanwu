@@ -481,6 +481,14 @@ export default {
       this.showOperation = !this.showOperation;
     },
     savePublish(){
+      if(this.editForm.modelParams === ''){
+        this.$message.warning('请选择模型！')
+        return false
+      }
+      if(this.editForm.prologue === ''){
+        this.$message.warning('请输入开场白！')
+        return false
+      }
       const data = {appId:this.editForm.assistantId,appType:'agent',publishType:this.scope}
       appPublish(data).then(res =>{
         if(res.code === 0){

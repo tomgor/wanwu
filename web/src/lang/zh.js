@@ -610,7 +610,7 @@ export default {
         tip:'提示',
         refreshTips:'您导入的文件正在异步处理中，请耐心等待，您可以尝试，刷新列表获取导入结果。',
         editKnowledge:'编辑知识库',
-        delKnowledgeTips:'确定要删除此知识库吗？删除后不可恢复',
+        delKnowledgeTips:'若此知识库已被智能体、文本问答或工作流使用，删除知识库将导致该功能不可用',
         noStatus:'无状态信息',
         categoryNameRules:'命名只能包含小写英文、中文、数字、特殊符号-_',
         chunkTypeConfigTips:'*当前自定义分段对.xlsx文件切分不生效，如您上传.xlsx，将按系统默认形式切分',
