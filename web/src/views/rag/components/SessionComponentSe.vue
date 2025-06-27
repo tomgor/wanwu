@@ -452,10 +452,15 @@ export default {
   }
   .answer-content{
     img{
-        width: 400px !important;
+        width: 80% !important;
       }
   }
-   
+  .search-list{
+    img{
+      width: 80% !important;
+    }
+  }
+  
 }
 .session{
   word-break: break-all;

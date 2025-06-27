@@ -541,7 +541,16 @@ export default {
   .el-loading-mask{
     background:none !important;
   }
-   
+  .answer-content{
+    img{
+        width: 80% !important;
+      }
+  }
+  .search-list{
+    img{
+      width: 80% !important;
+    }
+  }
 }
 .more{
   color: #384BF7;
