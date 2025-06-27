@@ -28,6 +28,7 @@
           v-if="serverOptions.length > 0"
           class="mcpCollapse"
           v-model="activeCollapseName"
+          @change="changeItem"
         >
           <el-collapse-item
             v-for="(item, index) in serverOptions"
@@ -46,16 +47,17 @@
             </template>
 
             <div>
-              <ul class="detail-mcpList">
+              <ul class="detail-mcpList" v-if="item.tools">
                 <li v-for="(i, n) in item.tools" :key="n">
                   <el-checkbox
                     :disabled="i.disabled"
                     @change="handleRadioClick(index, n, i.name)"
                     :value="i.checked"
-                  ></el-checkbox
-                  ><span class="title-text" style="padding-left: 10px">{{
-                    i.name
-                  }}</span>
+                  >
+                  </el-checkbox>
+                  <span class="title-text" style="padding-left: 10px">
+                    {{i.name }}
+                  </span>
                 </li>
               </ul>
             </div>
@@ -76,8 +78,9 @@
           :disabled="!mcp_node"
           type="primary"
           @click="doSubmit"
-          >确定</el-button
         >
+          确定
+        </el-button>
       </span>
     </el-dialog>
   </div>
@@ -119,6 +122,28 @@ export default {
     // this.init();
   },
   methods: {
+    async changeItem(value) {
+      if (!value) return
+
+      const item = this.serverOptions.find(item => item.name === value) || {}
+      const itemIndex = this.serverOptions.findIndex(item => item.name === value)
+      this.serverOptions = this.serverOptions.map((item) => ({...item, tools: []}))
+      console.log(value, item, itemIndex, '-------------------changeItem')
+
+      try {
+        this.loading = true
+        const res = await getMcpToolList({
+          serverUrl: item.serverUrl,
+        });
+        if (res.code === 0) {
+          this.serverOptions[itemIndex].tools = res.data && res.data.tools
+              ? res.data.tools.map(item => ({...item, checked: false, disabled: false}))
+              : []
+        }
+      } finally {
+        this.loading = false
+      }
+    },
     handleOpenMcp() {
       /*window.parent.postMessage({ action: "navigateTo", path: "/mcp" }, "*");*/
       this.$router.push({path: "/mcp"})
@@ -173,7 +198,7 @@ export default {
     },
     async getToolsList(list) {
       let mcpList = list;
-      for (const item of mcpList) {
+      /*for (const item of mcpList) {
         try {
           const res = await getMcpToolList({
             serverUrl: item.serverUrl,
@@ -188,9 +213,9 @@ export default {
             item.tools = [];
           }
         } catch (error) {
-          this.loading = false;
+          this.loading = false
         }
-      }
+      }*/
       this.serverOptions = mcpList;
       this.loading = false;
     },
