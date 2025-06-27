@@ -115,7 +115,7 @@ func (c *Client) GetRagByIds(ctx context.Context, req *rag_service.GetRagByIdsRe
 	}
 
 	info := make([]*model.RagInfo, 0)
-	err := sqlopt.InRagIds(req.RagIdList).Apply(c.db.WithContext(ctx)).Find(&info).Error
+	err := sqlopt.InRagIds(req.RagIdList).Apply(c.db.WithContext(ctx)).Order("update_at DESC").Find(&info).Error
 	if err != nil {
 		return nil, toErrStatus("rag_list_err", err.Error())
 	}
