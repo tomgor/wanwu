@@ -44,7 +44,7 @@ func GetDeployInfo(ctx *gin.Context) (interface{}, error) {
 	return map[string]string{
 		"massAccessIp":   cfgServer.ExternalIP,
 		"massAccessPort": strconv.Itoa(cfgServer.ExternalPort),
-		"webBaseUrl":     cfgServer.WebBaseUrl + "/minio/download/api",
+		"webBaseUrl":     cfgServer.WebBaseUrl + "/minio/download/api/",
 	}, nil
 }
 
