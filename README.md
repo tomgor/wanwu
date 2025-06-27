@@ -167,6 +167,16 @@
 
 ------
 
+### &#x1F517; 使用的其他开源项目
+
+- https://github.com/modelscope/agentscope  作为联通元景万悟Lite中工作流模块的开发框架；
+- https://github.com/langchain-ai/langchain.git  作为联通元景万悟Lite中智能体的各类基础组件开发；
+- https://github.com/QwenLM/Qwen-Agent.git  作为联通元景万悟Lite中react智能体的构建；
+
+------
+
+
+
 ### ⚖️ 许可证
 联通元景万悟Lite根据Apache License 2.0发布。
 
