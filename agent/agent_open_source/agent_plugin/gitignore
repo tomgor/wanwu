@@ -1,0 +1,8 @@
+*.ipynb
+logs/
+*.xlsx
+.ipynb_checkpoints/
+.git/
+*.pyc*
+**/__pycache__/
+**/.ipynb_checkpoints/
