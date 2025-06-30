@@ -565,7 +565,7 @@ type AssistantConversionHistory struct {
 
 type PluginListAlgRequest struct {
 	APISchema map[string]interface{} `json:"api_schema"`
-	APIAuth   *APIAuth               `json:"api_auth"`
+	APIAuth   *APIAuth               `json:"api_auth,omitempty"`
 }
 
 type APIAuth struct {
