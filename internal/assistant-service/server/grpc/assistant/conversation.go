@@ -390,9 +390,11 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 				historyList = append(historyList, history)
 			}
 
-			// 将history添加到请求参数中
-			requestBody["history"] = historyList
-			log.Debugf("Assistant服务添加历史聊天记录到请求参数，conversationId: %s, 历史记录数: %d", req.ConversationId, len(historyList))
+			if len(historyList) > 0 {
+				// 将history添加到请求参数中
+				requestBody["history"] = historyList
+				log.Debugf("Assistant服务添加历史聊天记录到请求参数，conversationId: %s, 历史记录数: %d", req.ConversationId, len(historyList))
+			}
 		}
 	}
 
