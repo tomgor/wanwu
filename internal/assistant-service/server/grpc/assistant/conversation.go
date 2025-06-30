@@ -638,16 +638,6 @@ func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantI
 		if err != nil {
 			return pluginList, err
 		}
-		if assistantWorkFlowModel.Type == "apiKey" {
-			apiAuth := APIAuth{
-				Type:  "apiKey",
-				In:    "query",
-				Name:  assistantWorkFlowModel.CustomHeaderName,
-				Value: assistantWorkFlowModel.APIKey,
-			}
-			tmp.APIAuth = &apiAuth
-		}
-		//TODO 适配 assistantActionModel.Type ==None情况
 		pluginList = append(pluginList, tmp)
 	}
 	log.Infof("Assistant服务查询到workflow，assistantId: %s, workflowList: %v", assistantId, pluginList)
