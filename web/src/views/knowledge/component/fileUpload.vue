@@ -114,7 +114,7 @@
                 <el-input-number
                     v-model="ruleForm.docSegment.maxSplitter"
                     :min="200"
-                    :max="3000"
+                    :max="500"
                     :placeholder="$t('knowledgeManage.splitMax')"
                 ></el-input-number>
                 <p class="tips">
@@ -220,8 +220,8 @@ export default {
         docSegment:{
           segmentType:'0',
           splitter:["！","。","？","?","!",".","......"],
-          maxSplitter:'',
-          overlap:0
+          maxSplitter:200,
+          overlap:0.2
         },
         docInfoList:[],
         docImportType:0,
