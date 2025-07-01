@@ -5,8 +5,6 @@ import (
 
 	mid "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util/mid-wrap"
 	v1 "github.com/UnicomAI/wanwu/internal/bff-service/server/http/handler/v1"
-	"github.com/UnicomAI/wanwu/internal/bff-service/server/http/middleware"
-	"github.com/UnicomAI/wanwu/pkg/constant"
 	"github.com/gin-gonic/gin"
 )
 
@@ -48,8 +46,4 @@ func registerCommon(apiV1 *gin.RouterGroup) {
 
 	// MCP通用
 	mid.Sub("common").Reg(apiV1, "/mcp/select", http.MethodGet, v1.GetMCPSelect, "获取MCP自定义列表")
-
-	// 流式对话通用
-	mid.Sub("common").Reg(apiV1, "/rag/chat", http.MethodPost, v1.ChatRag, "rag流式接口", middleware.AppHistoryRecord("ragId", constant.AppTypeRag))
-	mid.Sub("common").Reg(apiV1, "/assistant/stream", http.MethodPost, v1.AssistantConversionStream, "智能体流式问答", middleware.AppHistoryRecord("assistantId", constant.AppTypeAgent))
 }

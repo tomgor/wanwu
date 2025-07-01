@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"runtime"
+	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -79,6 +80,13 @@ func LoadOrStore(absPath, method, desc string, authType PermLevel, tag TagName, 
 			var exist bool
 			for _, m := range path.middlewares {
 				if reflect.ValueOf(m).Pointer() == reflect.ValueOf(middleware).Pointer() {
+					exist = true
+					break
+				}
+				parts1 := strings.Split(runtime.FuncForPC(reflect.ValueOf(m).Pointer()).Name(), ".")
+				parts2 := strings.Split(runtime.FuncForPC(reflect.ValueOf(middleware).Pointer()).Name(), ".")
+				if len(parts1) == len(parts2) && len(parts1) >= 2 && parts1[len(parts1)-2] == parts2[len(parts2)-2] {
+					// 中间件有可能是闭包func对象
 					exist = true
 					break
 				}
