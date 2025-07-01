@@ -32,14 +32,18 @@ Print.prototype = {
     loop(printingCB, endCB) {
 
         //如果正在打印或者打印结束
-        if (this.printStatus) {
-            return
+        // if (this.printStatus) {
+        //     return
+        // }
+        if (this.printStatus === 1 || this.sIndex >= this.sentenceArr.length) {
+            return;
         }
 
         let curSentence = this.sentenceArr[this.sIndex]
         this.printStatus = 1
         if(!curSentence){
             console.log(this.sIndex, this.sentenceArr)
+            return;
         }
         this.looper = new Looper(this.sIndex, curSentence, this.timer, (world) => {
             this.printStatus = 1
@@ -68,7 +72,6 @@ const Looper = function (sIndex, sentence, timer, printCB, endCB,sIndexMap) {
     this.sIndex = sIndex
     this.sIndexMap=sIndexMap
     this.sentence = sentence ? sentence.response : ""
-    // this.sentence = sentence.response
     this.timer = timer
     this.t = null
     this.index = 0
@@ -76,6 +79,7 @@ const Looper = function (sIndex, sentence, timer, printCB, endCB,sIndexMap) {
     this.endCB = endCB
     this.start()
 }
+
 Looper.prototype = {
     start() {
         if(this.sentence === ''){
@@ -120,16 +124,25 @@ Looper.prototype = {
         }
     },
     stop() {
-        // console.log('关闭定时器',this.sIndexMap)
-        if(!this.sIndexMap[`${this.sIndex}`]){
-            this.sIndexMap[`${this.sIndex}`]=true
-            this.endCB({msg: 'end', index: this.sIndex})
-        }else{
-            console.log(this.sIndex, this.t, this.sentence)
+        // if(!this.sIndexMap[`${this.sIndex}`]){
+        //     this.sIndexMap[`${this.sIndex}`]=true
+        //     this.endCB({msg: 'end', index: this.sIndex})
+        // }else{
+        //     console.log(this.sIndex, this.t, this.sentence)
+        // }
+        // this.t && workerTimer.clearInterval(this.t)
+        if(this.sIndexMap[`${this.sIndex}`]) {
+            return;
         }
-        // this.t && workerTimer.clearTimeout(this.t)
-        this.t && workerTimer.clearInterval(this.t)
+        this.sIndexMap[`${this.sIndex}`] = true;
+        this.endCB({msg: 'end', index: this.sIndex});
+        this.t && workerTimer.clearInterval(this.t);
+        this.t = null;
     }
 }
 
+
 export default Print
+
+
+;
