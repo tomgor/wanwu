@@ -26,7 +26,7 @@
 import SearchInput from "@/components/searchInput.vue"
 import AppList from "@/components/appList.vue"
 import CreateTotalDialog from "@/components/createTotalDialog.vue"
-import { getAppSpaceList } from "@/api/workspace"
+import { getAppSpaceList } from "@/api/appspace"
 import { mapGetters} from 'vuex'
 
 export default {

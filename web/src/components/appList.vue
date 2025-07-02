@@ -113,6 +113,12 @@
               >
                 {{$t('common.button.publish')}}
               </el-dropdown-item>
+              <el-dropdown-item
+                command="cancelPublish"
+                v-if="n.publishType && n.appId !== 'example'"
+              >
+                {{$t('common.button.cancelPublish')}}
+              </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -123,9 +129,8 @@
 </template>
 
 <script>
-import {mapActions} from 'vuex'
 import { AppType } from "@/utils/commonSet";
-import { deleteAPP } from "@/api/appspace";
+import { deleteApp, appCancelPublish } from "@/api/appspace";
 import { copyWorkFlow, publishWorkFlow, copyExample } from "@/api/workflow";
 import { setFavorite } from "@/api/explore";
 export default {
@@ -162,7 +167,6 @@ export default {
     };
   },
   methods: {
-    // ...mapActions('app', ['getHistoryList']),
     isCannotClick(n) {
       return (n.appType === 'workflow' && !n.publishType && n.appId !== 'example') || n.appType !== 'workflow'
     },
@@ -172,7 +176,7 @@ export default {
         appId: this.row.appId,
         appType:this.row.appType
       };
-      const res = await deleteAPP(params);
+      const res = await deleteApp(params);
       if (res.code === 0) {
         this.$message.success(this.$t("list.delSuccess"));
         this.$emit("reloadData");
@@ -236,8 +240,18 @@ export default {
         },
       });
     },
+    async cancelPublish(row) {
+      const params = {
+        appId: row.appId,
+        appType: row.appType
+      };
+      const res = await appCancelPublish(params)
+      if (res.code === 0) {
+        this.$message.success(this.$t("common.message.success"))
+        this.$emit("reloadData")
+      }
+    },
     workflowOperation(method, row) {
-      console.log(method, row, "-----------------workflowOperation");
       switch (method) {
         case "edit":
           this.workflowEdit(row);
@@ -250,6 +264,9 @@ export default {
           break;
         case "publish":
           this.workflowPublish(row);
+          break;
+        case "cancelPublish":
+          this.cancelPublish(row);
           break;
       }
     },
@@ -273,6 +290,9 @@ export default {
           // 智能体删除
           this.intelligentDelete(row);
           break;
+        case "cancelPublish":
+          this.cancelPublish(row);
+          break;
       }
     },
     txtQuesEdit(row) {
@@ -294,6 +314,9 @@ export default {
         case "delete":
           // 文本问答删除
           this.txtQuesDelete(row);
+          break;
+        case "cancelPublish":
+          this.cancelPublish(row);
           break;
       }
     },
