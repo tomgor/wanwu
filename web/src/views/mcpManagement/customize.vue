@@ -20,8 +20,19 @@
         </div>
       </div>
 
-      <div class="card-box" v-if="list.length > 0">
+      <div class="card-box">
+        <div class="card card-item-create">
+          <div class="app-card-create" @click="handleAddMCP">
+            <div class="create-img-wrap">
+              <img class="create-type" src="@/assets/imgs/modelImport.png" alt="" />
+              <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
+              <div class="create-filter"></div>
+            </div>
+            <span>导入MCP</span>
+          </div>
+        </div>
         <div
+          v-if="list && list.length"
           class="card"
           v-for="(item, index) in list"
           :key="index"
@@ -46,12 +57,13 @@
         </div>
       </div>
 
-      <div class="no-list" v-if="list.length === 0 && is">
+      <!--<div class="no-list" v-if="list.length === 0 && is">
         <div>
           <i class="el-icon-circle-plus-outline" @click="handleAddMCP"></i>
           <span>添加你的第一个MCP Server</span>
         </div>
-      </div>
+      </div>-->
+      <el-empty class="noData" v-if="!(list && list.length)" :description="$t('common.noData')"></el-empty>
     </div>
     <addDialog :dialogVisible="addOpen" @handleClose="handleClose"></addDialog>
   </div>
@@ -164,5 +176,13 @@ export default {
   width: 50px;
   height: 50px;
   object-fit: cover;
+}
+.noData {
+  width: 100%;
+  text-align: center;
+  margin-top: -60px;
+  /deep/ .el-empty__description p {
+    color: #B3B1BC;
+  }
 }
 </style>
