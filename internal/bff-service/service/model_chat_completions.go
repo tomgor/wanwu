@@ -22,6 +22,16 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req map[string]inter
 		gin_util.Response(ctx, nil, err)
 		return
 	}
+	// 校验model字段
+	if req != nil {
+		if _, exists := req["model"]; exists {
+			if req["model"] != modelInfo.Model {
+				gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v chat completions err: model mismatch!", modelInfo.ModelId)))
+				return
+			}
+		}
+	}
+
 	// llm config
 	llm, err := mp.ToModelConfig(modelInfo.Provider, modelInfo.ModelType, modelInfo.ProviderConfig)
 	if err != nil {
