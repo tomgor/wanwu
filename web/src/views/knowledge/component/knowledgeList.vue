@@ -1,40 +1,55 @@
 <template>
-  <div class="block">
-    <div class="app-card" v-if="listData && listData.length">
-      <div class="smart rl" v-for="(n,i) in listData" :key="`${i}sm`" @click.stop="toDocList(n)">
-        <img  class="logo" :src="require('@/assets/imgs/knowledgeIcon.png')" />
-        <div class="info rl">
-          <p class="name" :title="n.name">
-            {{n.name}}
-          </p>
-          <el-tooltip
-            v-if="n.description"
-            popper-class="instr-tooltip tooltip-cover-arrow"
-            effect="dark"
-            :content="n.description"
-            placement="bottom-start"
-          >
-            <p class="desc">{{n.description}}</p>
-          </el-tooltip>
-        </div>
-        <div class="tags">
-          <!-- <span style="margin-left: 5px">{{n.stringNum || 0}}个字符</span> -->
-          <span :class="['smartDate']">{{n.docCount || 0}}个文档 </span>
-        </div>
-        <div class="editor">
-          <el-dropdown @command="handleClick($event, n)" placement="top">
-            <span class="el-dropdown-link">
-              <i class="el-icon-more icon edit-icon" @click.stop></i>
-            </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="edit">{{$t('common.button.edit')}}</el-dropdown-item>
-              <el-dropdown-item command="delete">{{$t('common.button.delete')}}</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
+  <div class="app-card-container">
+    <div class="app-card">
+      <div class="smart rl smart-create">
+        <div class="app-card-create" @click="showCreate">
+          <div class="create-img-wrap">
+            <!-- <img v-if="type" class="create-type" :src="require(`@/assets/imgs/create_${type}.png`)" alt="" /> -->
+            <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
+            <div class="create-filter"></div>
+          </div>
+          <span>创建知识库</span>
         </div>
       </div>
+      <template v-if="listData && listData.length">
+        <div class="smart rl" 
+        v-for="(n,i) in listData" 
+        :key="`${i}sm`" 
+        @click.stop="toDocList(n)">
+          <img  class="logo" :src="require('@/assets/imgs/knowledgeIcon.png')" />
+          <div class="info rl">
+            <p class="name" :title="n.name">
+              {{n.name}}
+            </p>
+            <el-tooltip
+              v-if="n.description"
+              popper-class="instr-tooltip tooltip-cover-arrow"
+              effect="dark"
+              :content="n.description"
+              placement="bottom-start"
+            >
+              <p class="desc">{{n.description}}</p>
+            </el-tooltip>
+          </div>
+          <div class="tags">
+            <!-- <span style="margin-left: 5px">{{n.stringNum || 0}}个字符</span> -->
+            <span :class="['smartDate']">{{n.docCount || 0}}个文档 </span>
+          </div>
+          <div class="editor">
+            <el-dropdown @command="handleClick($event, n)" placement="top">
+              <span class="el-dropdown-link">
+                <i class="el-icon-more icon edit-icon" @click.stop></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="edit">{{$t('common.button.edit')}}</el-dropdown-item>
+                <el-dropdown-item command="delete">{{$t('common.button.delete')}}</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
+        </div>
+      </template>
     </div>
-    <el-empty class="noData" v-else :description="$t('common.noData')"></el-empty>
+    <el-empty class="noData" v-if="!(listData && listData.length)" :description="$t('common.noData')"></el-empty>
   </div>
 </template>
 
@@ -67,6 +82,9 @@ export default {
     }
   },
   methods:{
+  showCreate(){
+    this.$parent.showCreate();
+  },
     handleClick(command,n){
       switch (command){
         case 'edit':
@@ -117,9 +135,6 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/style/appCard.scss";
-// .noData{
-//   opacity:0;
-// }
 .app-card {
   .smart {
     height: 152px;
