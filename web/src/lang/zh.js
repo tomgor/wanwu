@@ -93,6 +93,7 @@ export default {
             import: '导入',
             export: '导出',
             view: '查看',
+            cancelPublish: '取消发布'
         },
         switch: {
             start: '开启',
