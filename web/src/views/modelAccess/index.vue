@@ -37,8 +37,19 @@
             </el-button>
           </div>
         </div>
-        <div v-if="tableData && tableData.length" class="card-wrapper">
+        <div class="card-wrapper">
+          <div class="card-item card-item-create">
+            <div class="app-card-create" @click="preInsert">
+              <div class="create-img-wrap">
+                <img class="create-type" src="@/assets/imgs/modelImport.png" alt="" />
+                <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
+                <div class="create-filter"></div>
+              </div>
+              <span>{{$t('modelAccess.import')}}</span>
+            </div>
+          </div>
           <div
+            v-if="tableData && tableData.length"
             class="card-item"
             v-for="(item, index) in tableData"
             :key="item.model + index"
@@ -91,7 +102,7 @@
             </div>
           </div>
         </div>
-        <el-empty class="noData" v-else :description="$t('common.noData')"></el-empty>
+        <el-empty class="noData" v-if="!(tableData && tableData.length)" :description="$t('common.noData')"></el-empty>
       </div>
       <CreateSelectDialog ref="createSelectDialog" @showCreate="showCreate" />
       <CreateDialog ref="createDialog" @reloadData="reloadData" />
@@ -373,6 +384,57 @@
   background-size: cover;*/
   border: 1px solid $color;
 }
+.card-item-create {
+  background: #F4F5FF;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.15);
+  border: 1px solid rgba(56,75,247,0.47);
+  .app-card-create {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .create-img-wrap {
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 10px;
+      position: relative;
+      .create-img {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: $color;
+        padding: 10px;
+      }
+      .create-filter {
+        width: 40px;
+        height: 8px;
+        background: rgba(2, 81, 252, 0.3);
+        filter: blur(5px);
+        position: absolute;
+        bottom: -6px;
+      }
+      .create-type {
+        width: 30px;
+        position: absolute;
+        background: rgba(171,198,255,0.5);
+        backdrop-filter: blur(6.55px);
+        border-radius: 5px;
+        padding: 6px;
+        top: -10px;
+        left: -12px;
+      }
+    }
+    span {
+      display: inline-block;
+      vertical-align: middle;
+      font-size: 16px;
+      color: #434C6C;
+      font-weight: bold;
+    }
+  }
+}
 /deep/ .el-dropdown-menu__item.card-delete:hover {
   color: #FF4D4F !important;
   background: #FBEAE8 !important;
@@ -383,7 +445,7 @@
 .noData {
   width: 100%;
   text-align: center;
-  padding: 100px 0;
+  margin-top: -60px;
   /deep/ .el-empty__description p {
     color: #B3B1BC;
   }
