@@ -136,7 +136,6 @@ export default {
             temp.innerHTML = shtml
             document.body.appendChild(temp)
             $(temp).find('.line-num').remove()
-            console.log($(temp).html())
             return temp.innerText
         },
         addCopyClick(){
@@ -227,8 +226,8 @@ export default {
                 onmessage: (e) => {
                     if (e && e.data) {
                         let data = JSON.parse(e.data)
+                        console.log('===>',new Date().getTime(),'12345', JSON.parse(e.data))
                         this.sseResponse = data
-                        console.log('===>',new Date().getTime(), JSON.parse(e.data))
                         //待替换的数据，需要前端组装
                         let commonData = {
                             ...data,
@@ -256,6 +255,7 @@ export default {
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
+                                        // console.log('===>',new Date().getTime(), endStr)
                                         let fillData = {
                                             ...commonData,
                                             "response": md.render(endStr),
@@ -265,15 +265,15 @@ export default {
                                                   snippet: md.render(n.snippet) // 对snippet进行Markdown渲染
                                                 }))
                                             : []
-                                        }
+                                    }
                                     this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                                     if(worldObj.isEnd && worldObj.finish === 1){
                                         this.setStoreSessionStatus(-1)
                                     }
                                 })
-                            this.$nextTick(()=>{
-                                this.$refs['session-com'].scrollBottom()
-                            })
+                            // this.$nextTick(()=>{
+                            //     this.$refs['session-com'].scrollBottom()
+                            // })
                         }else if(data.code === 7){
                             this.setStoreSessionStatus(-1)
                             let fillData = {
@@ -393,7 +393,7 @@ export default {
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
-                                        console.log('===>',new Date().getTime(),endStr)
+                                        // console.log('===>',new Date().getTime(),endStr)
                                         let fillData = {
                                             ...commonData,
                                             "response": [0,1,2,3,4,6,20,21,10].includes(commonData.qa_type)?md.render(endStr):endStr.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
