@@ -169,6 +169,13 @@
                     <span class="file-size">
                     {{ filterSize(file.size) }}
                     </span>
+                    <el-progress 
+                      :percentage="file.percentage" 
+                      v-if="file.percentage !== 100"
+                      :status="file.progressStatus"
+                      max="100"
+                      class="progress"
+                    ></el-progress>
                   </span>
                   <span class="handleBtn">
                     <span>
@@ -741,6 +748,12 @@ export default {
       align-items:center;
       justify-content:space-between;
       .size{
+          display:flex;
+          align-items:center;
+          .progress{
+            width:400px;
+            margin-left:30px;
+          }
           img{
             width: 18px;
             height:18px;
