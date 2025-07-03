@@ -114,7 +114,7 @@
                 <el-input-number
                     v-model="ruleForm.docSegment.maxSplitter"
                     :min="200"
-                    :max="3000"
+                    :max="500"
                     :placeholder="$t('knowledgeManage.splitMax')"
                 ></el-input-number>
                 <p class="tips">
@@ -169,6 +169,13 @@
                     <span class="file-size">
                     {{ filterSize(file.size) }}
                     </span>
+                    <el-progress 
+                      :percentage="file.percentage" 
+                      v-if="file.percentage !== 100"
+                      :status="file.progressStatus"
+                      max="100"
+                      class="progress"
+                    ></el-progress>
                   </span>
                   <span class="handleBtn">
                     <span>
@@ -220,8 +227,8 @@ export default {
         docSegment:{
           segmentType:'0',
           splitter:["！","。","？","?","!",".","......"],
-          maxSplitter:'',
-          overlap:0
+          maxSplitter:200,
+          overlap:0.2
         },
         docInfoList:[],
         docImportType:0,
@@ -741,6 +748,12 @@ export default {
       align-items:center;
       justify-content:space-between;
       .size{
+          display:flex;
+          align-items:center;
+          .progress{
+            width:400px;
+            margin-left:30px;
+          }
           img{
             width: 18px;
             height:18px;

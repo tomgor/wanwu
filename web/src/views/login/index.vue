@@ -5,7 +5,7 @@
       <div class="header__left">
         <!--<img
           style="height: 26px; margin: 0 15px 0 22px"
-          :src="home.logoPath ? (basePath + '/user/api' + home.logoPath) : require('@/assets/imgs/wanwu.svg')"
+          :src="home.logoPath ? (basePath + '/user/api' + home.logoPath) : require('@/assets/imgs/title_icon.png')"
         />
          <span style="font-size: 16px;">{{home.title || ''}}</span>-->
         <!--<div style="margin-left: 10px">

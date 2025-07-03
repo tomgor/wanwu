@@ -149,6 +149,7 @@ export default {
     },
     mounted(){
       this.setupScrollListener();
+      this.listenerImg();
     },
     beforeDestroy(){
       const container = document.getElementById('timeScroll');
@@ -158,6 +159,17 @@ export default {
       clearTimeout(this.scrollTimeout);
     },
     methods:{
+        listenerImg(){
+          //捕获图片加载错误
+          document.body.addEventListener('error', e => {
+              if (e.target.tagName === 'IMG') {
+                handleImageError(e.target);
+              }
+          }, true); 
+        },
+        handleImageError(img){
+          img.classList.add('failed')
+        },
          setupScrollListener() {
             const container = document.getElementById('timeScroll');
             container.addEventListener('scroll', this.handleScroll);
@@ -446,6 +458,22 @@ export default {
 </script>
 
 <style scoped lang="scss">
+img.failed {
+  position: relative;
+  border: 2px dashed #ff6b6b;
+  background-color: #fff5f5;
+}
+
+img.failed::after {
+  content: '图片加载失败';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ff6b6b;
+  font-size: 12px;
+}
+
 /deep/{
   pre{
      white-space: pre-wrap !important;

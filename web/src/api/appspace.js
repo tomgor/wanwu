@@ -1,4 +1,5 @@
 import request from "@/utils/request";
+import service from "@/utils/request";
 const BASE_URL = '/user/api/v1'
 
 // 生成apikey
@@ -34,6 +35,15 @@ export const getApiKeyRoot = (params)=>{
     })
 };
 
+// 获取智能体/文本问答/工作流列表
+export const getAppSpaceList = (params)=>{
+    return service({
+        url: '/user/api/v1/appspace/app/list',
+        method: 'get',
+        params
+    })
+}
+
 //发布app
 export const appPublish = (data)=>{
     return request({
@@ -43,8 +53,17 @@ export const appPublish = (data)=>{
     })
 };
 
+// 取消发布app
+export const appCancelPublish = (data)=>{
+    return request({
+        url: `${BASE_URL}/appspace/app/publish`,
+        method: 'delete',
+        data
+    })
+};
+
 //统一删除工作室应用接口
-export const deleteAPP = (data)=>{
+export const deleteApp = (data)=>{
     return request({
         url: `${BASE_URL}/appspace/app`,
         method: 'delete',

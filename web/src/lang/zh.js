@@ -2,7 +2,7 @@
 export default {
     login: {
         title: '登 录',
-        welcomeText: '嗨！欢迎来到万悟Lite',
+        welcomeText: '嗨！欢迎来到元景MaaS智能体平台',
         form: {
             username: '用户名',
             password: '密码',
@@ -45,7 +45,7 @@ export default {
         about: '关于'
     },
     header: {
-        title: '万悟',
+        title: '元景',
         doc: '文档中心',
         logout: '登出',
         login: '登录',
@@ -93,6 +93,7 @@ export default {
             import: '导入',
             export: '导出',
             view: '查看',
+            cancelPublish: '取消发布'
         },
         switch: {
             start: '开启',
@@ -617,7 +618,7 @@ export default {
         markTips:'请输入选择标点符号',
         splitOptionsTips:'按照所选的标识符切分文本。切分后，按设置的切片最大长度对切分后的文本组合成单一切片内容',
         splitMax:'可分割最大值',
-        splitMaxTips:'可填写范围最小为200，最大为3000',
+        splitMaxTips:'可填写范围最小为200，最大为500',
         overLapNum:'可重叠值',
         overLapNumTips:'请输入可重叠值',
         inputErrorTips:'知识库名称格式错误,只能包含小写英文、中文、数字、特殊符号-_',

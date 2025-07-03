@@ -203,6 +203,59 @@ export default {
         word-wrap: break-word;
       }
     }
+
+    .card-item-create {
+      background: #F4F5FF;
+      box-shadow: 0 1px 4px 0 rgba(0,0,0,0.15);
+      border: 1px solid rgba(56,75,247,0.47);
+      .app-card-create {
+        width: 100%;
+        height: 100%;
+        min-height: 125px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .create-img-wrap {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: 10px;
+          position: relative;
+          .create-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: $color;
+            padding: 10px;
+          }
+          .create-filter {
+            width: 40px;
+            height: 8px;
+            background: rgba(2, 81, 252, 0.3);
+            filter: blur(5px);
+            position: absolute;
+            bottom: -6px;
+          }
+          .create-type {
+            width: 30px;
+            position: absolute;
+            background: rgba(171,198,255,0.5);
+            backdrop-filter: blur(6.55px);
+            border-radius: 5px;
+            padding: 6px;
+            top: -10px;
+            left: -12px;
+          }
+        }
+        span {
+          display: inline-block;
+          vertical-align: middle;
+          font-size: 16px;
+          color: #434C6C;
+          font-weight: bold;
+        }
+      }
+    }
   }
   .no-list {
     display: flex;
