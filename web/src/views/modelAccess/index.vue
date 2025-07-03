@@ -421,7 +421,7 @@
         background: rgba(171,198,255,0.5);
         backdrop-filter: blur(6.55px);
         border-radius: 5px;
-        padding: 6px;
+        padding: 5px;
         top: -10px;
         left: -12px;
       }
