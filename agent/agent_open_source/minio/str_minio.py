@@ -20,7 +20,8 @@ app = Flask(__name__)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s', handlers=[logging.StreamHandler()])
 
-pdfmetrics.registerFont(TTFont('SimHei', 'simhei.ttf')) 
+pdfmetrics.registerFont(TTFont('SimHei', 'simhei.ttf'))
+#pdfmetrics.registerFont(TTFont('Noto', '/usr/share/fonts/opentype/noto/NotoSansCJKsc-Regular.otf'))
 
 
 
@@ -31,7 +32,7 @@ def upload_file_to_minio(formatted_markdown,to_format,filename):
         file_path = ''
         if to_format == 'pdf':
             file_path = path+filename+".pdf"
-            filename = filename+'.pdf'            
+            filename = filename            
             c = canvas.Canvas(file_path, pagesize=A4)
             width, height = A4
             margin = 20 * mm
@@ -64,15 +65,16 @@ def upload_file_to_minio(formatted_markdown,to_format,filename):
             doc.add_paragraph(formatted_markdown)
             file_path = path+filename+".docx"
             doc.save(file_path)
-            filename = filename+'.docx'
+            filename = filename
         elif to_format == 'txt':
             file_path = path+filename+".txt"
             with open(file_path, "w", encoding='utf-8') as file:
                 file.write(formatted_markdown)
-            filename = filename+'.txt'
+            filename = filename
         with open(file_path, "rb") as file:
             files = {"file": file}
-            response = requests.post(url, files=files)
+            data = {"bucket_name":'agent-prod',"file_name":filename}
+            response = requests.post(url, files=files,data=data)
             if response.status_code == 200:
                 print("File uploaded successfully")
                 print("Download link:", response.json()["download_link"])

@@ -43,6 +43,7 @@ def parse_doc(file_url, sentence_size, overlap_size):
     url = config["MODELS"]["default_doc_parser_url"]
     payload = json.dumps({
         "url": file_url,
+        "parser_choices":['text'],
         "sentence_size": sentence_size,
         "overlap_size": overlap_size,
         "separators":[

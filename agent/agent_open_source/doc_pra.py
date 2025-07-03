@@ -28,18 +28,18 @@ app = Flask(__name__)
 def parse_doc(file_url, sentence_size, overlap_size):
     """
     解析单个文档
-    
+
     参数:
     file_url (str): 文件URL
     sentence_size (int): 句子大小
     overlap_size (float): 重叠比例
     user_token (str, optional): 用户token
-    
+
     返回:
     list: 解析后的文档片段列表
     """
-    
-    url = config["MODELS"]["default_doc_parser_url "]
+
+    url = config["MODELS"]["default_doc_parser_url"]
     payload = json.dumps({
         "url": file_url,
         "sentence_size": sentence_size,
@@ -76,7 +76,7 @@ def parse_doc(file_url, sentence_size, overlap_size):
 
 
 
-        
+
 @app.route('/doc_pra', methods=['POST'])
 def req_chat_doc():
     data = request.get_json()
@@ -91,26 +91,26 @@ def req_chat_doc():
     all_docs = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         # 创建解析任务
-        print('走到解析任务这里')
+        print('走到解析任务这里',flush=True)
         future_to_url = {
-            executor.submit(parse_doc, url, sentence_size, overlap_size): url 
+            executor.submit(parse_doc, url, sentence_size, overlap_size): url
             for url in file_urls
         }
         # 收集解析结果
         for future in concurrent.futures.as_completed(future_to_url):
-            print('走到这里')
+            print('开始解析',flush=True)
             url = future_to_url[future]
             try:
                 docs = future.result()
                 all_docs.extend(docs)
-                print('all_docs:',all_docs)
+                print('all_docs:',all_docs,flush=True)
             except Exception as e:
                 print("解析文档失败",{str(e)})
-    
+
     if not all_docs:
         return jsonify({"error": "No document content parsed."}), 400
-        
-    
+
+
     # 构建文档列表
     doc_list = [
         {
@@ -118,7 +118,7 @@ def req_chat_doc():
             "file_name": doc.get("metadata", {}).get("file_name"),
         } for doc in all_docs
     ]
-    
+
     # 构建提示词
     prompt = build_docqa_prompt_from_search_list(query, doc_list)
     json_str = json.dumps({"prompt":prompt},ensure_ascii=False)

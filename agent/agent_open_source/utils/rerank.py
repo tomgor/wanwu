@@ -21,37 +21,24 @@ logger = logging.getLogger(__name__)
 
 import configparser
 
-config = configparser.ConfigParser()
-config.read('config.ini',encoding='utf-8')
 
 token_manager = AccessTokenManager()
 
 
-BING_RESULT_LEN =  int(config["BING"]["BING_RESULT_LEN"])
-BING_TOP_K =  int(config["BING"]["BING_TOP_K"])
-BING_THRESHOLD =  float(config["BING"]["BING_THRESHOLD"])
-BING_SENTENCE_SIZE =  int(config["BING"]["BING_SENTENCE_SIZE"])
-BING_TIME_OUT =  float(config["BING"]["BING_TIME_OUT"])
-TARGET_SUCCESS = int(config["BING"]["TARGET_SUCCESS"])
-USE_CHROME = bool(config["BING"]["USE_CHROME"])
-
-BING_WEIGHT =  float(config["BING"]["BING_WEIGHT"])
-BOCHA_WEIGHT = float(config["BING"]["BOCHA_WEIGHT"])
-
-
-
-MAX_INPUT_TOKENS = int(config["AGENTS"]["MAX_INPUT_TOKENS"])
+BING_TOP_K =  5
+BING_THRESHOLD =  0.4
 
 
 
 
 
-    
-    
-    
-    
+
+
+
+
+
 def rerank_by_emb(query,search_rerank_id,raw_search_list, top_k=5, threshold = 0.4,model = "bge"):
-    
+
     if not raw_search_list:
         return {}
     url = f"http://bff-service:6668/callback/v1/model/{search_rerank_id}"
@@ -67,13 +54,15 @@ def rerank_by_emb(query,search_rerank_id,raw_search_list, top_k=5, threshold = 0
     else:
         print("Request failed with status code:", response.status_code)
 
-    url  = 'http://bff-service:8081/user/api/callback/v1/model/12/rerank'
+    url  = f"http://bff-service:6668/callback/v1/model/{search_rerank_id}/rerank"
 
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json"
     }
-    snippets = [item['snippet'] for item in raw_search_list] 
+    logger.info(f"rerank前的list是:{raw_search_list}")
+    sorted_search_list = []
+    snippets = [item['snippet'] for item in raw_search_list]
     data = {
         "model": model_name,
         "query": query,
@@ -90,20 +79,12 @@ def rerank_by_emb(query,search_rerank_id,raw_search_list, top_k=5, threshold = 0
         results = json_data.get("results", [])
 
         # 按得分降序排序
-        sorted_results = sorted(results, key=lambda x: x["relevance_score"], reverse=True)
-
-        # 根据 index 获取对应的文档
-        reranked_documents = [snippets[item["index"]] for item in sorted_results]
-
-        # 输出重排序后的文档列表
-        print("Re-ranked documents:")
-        for doc in reranked_documents:
-            print("-", doc)
+        sorted_search_list = [raw_search_list[r["index"]] for r in sorted(results, key=lambda x: -x["relevance_score"])]
     else:
         print("Request failed:", response.status_code)
-    return reranked_documents
+    return sorted_search_list
 
-    
+
 
 
 
@@ -122,13 +103,13 @@ def execute_rerank(query,search_rerank_id, search_list, top_k=BING_TOP_K, thresh
 def hybrid_rerank_results(query,search_rerank_id, search_list, top_k=BING_TOP_K, threshold=BING_THRESHOLD):
     """
     对搜索结果进行并行重排序并合并结果
-    
+
     参数:
     query (str): 搜索查询
     sub_results (list): 搜索结果列表
     top_k (int): 返回的结果数量
     threshold (float): 相关性阈值
-    
+
     返回:
     list: 重排序后的结果列表
     """
@@ -137,19 +118,19 @@ def hybrid_rerank_results(query,search_rerank_id, search_list, top_k=BING_TOP_K,
         try:
 
             rerank_task_bge = executor.submit(execute_rerank, query,search_rerank_id, search_list, top_k, threshold, rerank_type="bge")
-            result = rerank_task_bge.result()  
+            result = rerank_task_bge.result()
         except Exception as e:
             logger.info(f"An exception occurred during concurrent execution: {e}")
             traceback.print_exc()
             raise
 
-    return result[:top_k] if result else []    
+    return result[:top_k] if result else []
 
 
 
 
 if __name__ == "__main__":
-    
+
 
 
 
@@ -180,7 +161,7 @@ if __name__ == "__main__":
         }
     ]
     query = "巴黎 奥运会 金牌 数量 排名"
-    
+
     # gen_prompt = build_prompt_from_search_list(query,search_list)
     # print(gen_prompt)
 #     top_k = 10
@@ -189,4 +170,3 @@ if __name__ == "__main__":
 
     results = hybrid_rerank_results(query, search_list)
     print(results)
-

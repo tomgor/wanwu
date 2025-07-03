@@ -27,9 +27,9 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 ###配置鉴权信息
-APP_ID = config["ACTION"]['APP_ID']
-API_KEY = config["ACTION"]['API_KEY']
-SECRET_KEY = config["ACTION"]['SECRET_KEY']
+#APP_ID = config["ACTION"]['APP_ID']
+API_KEY = ''
+#SECRET_KEY = config["ACTION"]['SECRET_KEY']
 
 MODEL_NAME_CONFIG = config["MODELS"]["default_llm"]
 MODEL_NAME = os.getenv('CUAI_DEFAULT_LLM_MODEL_ID', MODEL_NAME_CONFIG)
@@ -128,10 +128,10 @@ def plugin_config(API_KEY,query,plugin_list,function_calls_list,action_type,hist
         messages_input = []
         logger.info(f"---history为：{history}---")
         if history:
-            has_rewrite_query = any("rewrite_query" in item.keys() for item in history)
+            has_rewrite_query = any("query" in item.keys() for item in history)
             if has_rewrite_query:
                 for item in history:         
-                    messages_input.append({"role": "user", "content":item["rewrite_query"]})
+                    messages_input.append({"role": "user", "content":item["query"]})
                     messages_input.append({"role": "assistant", "content":item["response"]})    
             else:
                 history = [item for item in history if item['role'] != "system"]

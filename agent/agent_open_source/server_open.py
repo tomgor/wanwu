@@ -3,6 +3,8 @@ import json
 import os
 import anyio
 from openai import OpenAI
+import asyncio
+from bing_plus import *
 
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langgraph.graph import StateGraph,END,START
@@ -22,10 +24,23 @@ import configparser
 from langchain.requests import RequestsWrapper
 
 
-logger_name = 'agent'
-app_name = os.getenv("LOG_FILE")
-logger = setup_logging(app_name, logger_name)
-logger.info(logger_name + '---------LOG_FILE：' + repr(app_name))
+import logging
+
+
+log_dir = "./logs"
+os.makedirs(log_dir, exist_ok=True)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] [%(name)s] %(message)s',
+    handlers=[
+        logging.FileHandler(f"{log_dir}/server.log", encoding='utf-8'),
+        logging.StreamHandler()  # 输出到控制台
+    ]
+)
+
+logger = logging.getLogger(__name__)
+logger.info("主服务启动")
 
 
 app = Flask(__name__)
@@ -33,25 +48,7 @@ CORS(app, supports_credentials=True)
 
 
 
-config = configparser.ConfigParser()
-config.read('config.ini',encoding='utf-8')
-
-BING_DAYS_LIMIT =  float(config["BING"]["BING_DAYS_LIMIT"])
-BING_RESULT_LEN =  int(config["BING"]["BING_RESULT_LEN"])
-BING_TOP_K =  int(config["BING"]["BING_TOP_K"])
-BING_THRESHOLD =  float(config["BING"]["BING_THRESHOLD"])
-BING_SENTENCE_SIZE =  int(config["BING"]["BING_SENTENCE_SIZE"])
-BING_TIME_OUT =  float(config["BING"]["BING_TIME_OUT"])
-TARGET_SUCCESS = int(config["BING"]["TARGET_SUCCESS"])
-LLM_MODEL_NAME = config["MODELS"]["default_llm"]
-
-
-
-
-
-
-
-os.environ["ARK_API_KEY"] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjAwYWM5NjJkLTMxNDItNGYxNy05YjAxLWJkMDQ2MjRhZmI1MCIsInRlbmFudElEcyI6bnVsbCwidXNlclR5cGUiOjAsInVzZXJuYW1lIjoid2FuZ3l5NjAzIiwibmlja25hbWUiOiLnjovoibPpmLMiLCJidWZmZXJUaW1lIjoxNzQ4MzQ5MDE5LCJleHAiOjIzNzkwNjE4MTksImp0aSI6IjMxNjU0ZjdiMmFhZjQ2NDI5Mzc0MzFkN2Q4NThhNWJiIiwiaWF0IjoxNzQ4MzQxNTE5LCJpc3MiOiIwMGFjOTYyZC0zMTQyLTRmMTctOWIwMS1iZDA0NjI0YWZiNTAiLCJuYmYiOjE3NDgzNDE1MTksInN1YiI6ImtvbmcifQ.w1cMbQWTQZIbxrz7DYt14xFSAt8BQCpyjFFhUO6JrwY"
+os.environ["ARK_API_KEY"] = "eyJh"
 
 
 
@@ -72,7 +69,6 @@ def agent_start():
             function_call = data.get("function_call",False)
             logger.info('user_id是:'+userId)
             
-
 
 
             #大模型参数
@@ -114,10 +110,94 @@ def agent_start():
 
             #其他插件参数
             plugin_list = data.get("plugin_list",[])
+            
+            
+            url = f"http://bff-service:6668/callback/v1/model/{model_id}"
+            response = requests.get(url)
+            function_call = False
+            if response.status_code == 200:
+                data = response.json()
+                result = data.get("data", {}).get("config").get("functionCalling")
+                logger.info(f"functioncall result{result}")
+                if result != "noSupport":
+                    function_call = True
+                    logger.info(f"func_is {function_call}")
+
+
+
+            messages = []
+            for item in history:
+                query = item.get("query")
+                response = item.get("response")
+                if query:
+                    messages.append({"role": "user", "content": query})
+                if response:
+                    messages.append({"role": "assistant", "content": response})
+
+            # 限制只保留最近5轮（即10条消息）
+            history = history[-10:]
+            messages = messages[-10:]
+
+            # 追加本轮用户输入
+            
+            
+            
+            
+            chatdoc_schema =         {
+    "api_schema": {
+        "info": {
+            "description": "用于解析并回答用户上传的docx、txt、xlsx各种类型文件内容的问题",
+            "title": "chatdoc",
+            "version": "1.0.0"
+        },
+        "openapi": "3.0.0",
+        "paths": {
+            "/doc_pra": {
+                "post": {
+                    "description": "用于解析并回答用户上传的docx、txt、xlsx各种类型文件内容的问题",
+                    "summary":"chatdoc",
+                    "operationId": "chatdoc",
+                    "requestBody": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "query": {
+                                            "description": "用户提出的问题",
+                                            "type": "string"
+                                        },
+                                        "upload_file_url":{
+                                            "description":"文件下载链接",
+                                            "type":"string"
+                                            }                                               
+                                    },
+                                    "required": [
+                                        "query",
+                                        "upload_file_url"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "servers": [
+            {
+                "url": "http://172.17.0.1:1991"
+            }
+        ]
+    }
+}
+            if upload_file_url:
+                plugin_list.append(chatdoc_schema)
+                
+                
 
             if kn_params:
                 knowledgebase_name = kn_params.get('knowledgeBase')
-                threshold = kn_params.get('threshold',0.4)
+                threshold = kn_params.get('threshold',0.7)
                 topk = kn_params.get('topk',5)
                 rerank_id = kn_params.get('rerank_id')
             
@@ -136,7 +216,7 @@ def agent_start():
                     "topK": topk,
                     "stream": True,
                     "chitchat": False,
-                    "history": [],
+                    "history": history,
                     "auto_citation":auto_citation,
                     "rerank_model_id":rerank_id,
                     "custom_model_info":{"llm_model_id":model_id}
@@ -194,126 +274,131 @@ def agent_start():
                             except Exception as e:
                                 yield f"data: {json.dumps({'error': str(e)}, ensure_ascii=False)}\n\n"
             if not used_rag:
-                print('------------走action')
-                action_url = "http://172.17.0.1:1992/agent/action"
-                headers = {
-                    "Content-Type": "application/json"
-                }
+                print('------------走搜索search')               
+                if use_search == True:
+                    print('------------走搜索search')
+                    #调用网络搜索 透传搜索出来的search_list和回答 结果直接返回                
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
 
-                netsearch_schema =         {
-        "api_schema": {
-            "info": {
-                "description": "用于通过网络查询搜索实时问题的相关信息来回答用户的问题",
-                "title": "网络搜索",
-                "version": "1.0.0"
-            },
-            "openapi": "3.0.0",
-            "paths": {
-                "/net_search": {
-                    "post": {
-                        "description": "用于通过网络查询搜索实时问题的相关信息来回答用户的问题",
-                        "summary":"netsearch",
-                        "operationId": "netsearch",
-                        "requestBody": {
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "properties": {
-                                            "query": {
-                                                "description": "用户提出的问题",
-                                                "type": "string"
-                                            },
-                                            "search_url":{
-                                                "description":"联网搜索使用的浏览器的url",
-                                                "type":"string"
-                                                },
-                                            "search_key":{
-                                                "description": "联网搜索使用的浏览器url对应的key",
-                                                "type":"string"
-                                            },
-                                            "search_rerank_id":{
-                                                "description":"联网搜索内容使用的排序模型id",
-                                                "type":"string"
-                                                }
-                                        },
-                                        "required": [
-                                            "query",
-                                            "search_url",
-                                            "search_key",
-                                            "search_rerank_id"
-                                        ],
-                                        "type": "object"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "servers": [
-                {
-                    "url": "http://172.17.0.1:1990"
-                }
-            ]
-        }
-    }
-                
-                
-                chatdoc_schema =         {
-        "api_schema": {
-            "info": {
-                "description": "用于解析并回答用户上传的docx、txt、xlsx各种类型文件内容的问题",
-                "title": "chatdoc",
-                "version": "1.0.0"
-            },
-            "openapi": "3.0.0",
-            "paths": {
-                "/doc_pra": {
-                    "post": {
-                        "description": "用于解析并回答用户上传的docx、txt、xlsx各种类型文件内容的问题",
-                        "summary":"chatdoc",
-                        "operationId": "chatdoc",
-                        "requestBody": {
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "properties": {
-                                            "query": {
-                                                "description": "用户提出的问题",
-                                                "type": "string"
-                                            },
-                                            "upload_file_url":{
-                                                "description":"文件下载链接",
-                                                "type":"string"
-                                                }                                               
-                                        },
-                                        "required": [
-                                            "query",
-                                            "upload_file_url"
-                                        ],
-                                        "type": "object"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "servers": [
-                {
-                    "url": "http://172.17.0.1:1991"
-                }
-            ]
-        }
-    }
+                    try:
+                        llm = ChatOpenAI(
+                            model_name=model,
+                            base_url=model_url,
+                            openai_api_key=os.environ["ARK_API_KEY"],
+                        )
+                        rewrite_prompt = '请根据历史信息针对本次问题进行改写，如果你认为没必要改写的就直接输出原问题即可'+'\n'+'历史信息是'+str(history)+'\n'+'本次问题是:'+question
+                        logger.info(f"改写模板是:{rewrite_prompt}")
+                        response = llm.invoke(rewrite_prompt)
+                        rewrite_query = response.content
+                        logger.info(f"改写后的问题是:{rewrite_query}")
+                        
+                        bing_top_k = 5
+                        bing_time_out = 3
+                        auto_citation = False
+                        days_limit = -1
+                        bing_result_len = 15
+                        bing_target_success = 10
+                        task = start_async_search(
+                            loop, rewrite_query, bing_top_k, bing_time_out,
+                            bing_target_success, bing_result_len,
+                            model, days_limit, auto_citation,search_url,search_key,search_rerank_id
+                        )
+                        result = loop.run_until_complete(task)        
+                        bing_prompt, bing_search_list = result
 
-                if use_search:
-                    plugin_list.append(netsearch_schema)
-                if upload_file_url:
-                    plugin_list.append(chatdoc_schema)
+                        llm = ChatOpenAI(
+                            model_name=model,
+                            streaming=True,
+                            base_url=model_url,
+                            openai_api_key=os.environ["ARK_API_KEY"],
+                        )
+                        
+                        
+                        
+                        
+                        
+                        first_chunk = True
+                        answer = {
+                "code": 0,
+                "message": "success",
+                "response": "",
+                "gen_file_url_list": [],
+                "history": [],
+                "finish": 0,
+                "usage": {
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "total_tokens": 0
+                },
+                "search_list": [],
+                "qa_type":0
+                }
+                        
+                        
+
+
+
+                        assistant_reply = ""
+                        for chunk in llm.stream(bing_prompt):
+                            if hasattr(chunk, "content"):
+                                print('大模型输出是:',chunk)
+                                answer['response'] = chunk.content
+                                assistant_reply += chunk.content
+                                if first_chunk:
+                                    answer["search_list"] = bing_search_list  # 仅第一条输出
+                                    first_chunk = False
+                                else:
+                                    answer["search_list"] = []  # 后续为空
+
+                                if hasattr(chunk, "response_metadata"):
+                                    if 'finish_reason' in chunk.response_metadata and chunk.response_metadata['finish_reason']=='stop':
+                                        updated_history = history[-4:] if len(history) > 4 else history
+                                        updated_history.append({
+                                            "query": question,
+                                            "response": assistant_reply
+                                        })
+                                        answer['finish']=1
+                                        answer["history"] = updated_history
+                                        
+                                if hasattr(chunk, "usage_metadata") and chunk.usage_metadata is not None:
+                                    answer['usage']['prompt_tokens'] = chunk.usage_metadata['input_tokens'] if 'input_tokens' in chunk.usage_metadata else 0
+                                    answer['usage']['completion_tokens'] = chunk.usage_metadata['output_tokens'] if 'output_tokens' in chunk.usage_metadata else 0
+                                    answer['usage']['total_tokens'] = chunk.usage_metadata['total_tokens'] if 'total_tokens' in chunk.usage_metadata else 0
+                                yield f"data:{json.dumps(answer,ensure_ascii=False)}\n"
+
+
+                    except Exception as e:
+                        print("错误:", str(e), flush=True)
+                        error_response = {
+                            "code": -1,
+                            "message": f"error: {str(e)}",
+                            "response": "",
+                            "gen_file_url_list": [],
+                            "history": [],
+                            "finish": 1,
+                            "usage": {
+                                "prompt_tokens": 0,
+                                "completion_tokens": 0,
+                                "total_tokens": 0
+                            },
+                            "search_list": [],
+                            "qa_type": 0
+                        }
+                        yield f"data:{json.dumps(error_response, ensure_ascii=False)}\n"
+                        
+                    finally:
+                        loop.close()
+                    return
+
+                #如果配置工具则action直接回答
                 if plugin_list:
+                    action_url = "http://172.17.0.1:1992/agent/action"
+                    headers = {
+                        "Content-Type": "application/json"
+                    }
 
-                    question = '问题是:'+question+'\n'+'以下是部分插件可能用到的参数：'+'upload_file_url:'+upload_file_url+'\n'+'search_url:'+search_url+'\n'+'search_key:'+search_key+'\n'+'search_rerank_id:'+search_rerank_id
+                    question = '问题是:'+question+'\n'+'以下是chatdoc工具可能用到的参数：'+'upload_file_url:'+upload_file_url
 
                     print('送入action问题是:',question)
                     print('plugin_list是什么:',plugin_list)
@@ -323,7 +408,8 @@ def agent_start():
                             "plugin_list":plugin_list,
                             "action_type": "function_call",
                             "model_name":model,
-                            "model_url":model_url
+                            "model_url":model_url,
+                            "history":history
                         }
                     else:
                         payload = {
@@ -331,8 +417,10 @@ def agent_start():
                             "plugin_list":plugin_list,
                             "action_type": "action_agent",
                             "model_name":model,
-                            "model_url":model_url
+                            "model_url":model_url,
+                            "history":history
                         }
+                    logger.info(f"is_function_call?{function_call}")
                     response = requests.post(action_url, headers=headers, data=json.dumps(payload),stream=True,verify=False)
                     if response:
                         answer = {
@@ -352,6 +440,9 @@ def agent_start():
     "search_list": [],
     "qa_type":20
 }
+                        
+                        
+                        assistant_reply = ""
 
                         for line in response.iter_lines(decode_unicode=True):
                             print('action输出是什么:',line)
@@ -368,12 +459,27 @@ def agent_start():
                                         answer['gen_file_url_list'] = content_str.get('gen_file_url_list')
 
                                     answer['response'] = content_str.get('response')
+                                    assistant_reply += content_str.get('response')
+                                    
+                                    
                                 else:
                                     answer['response'] = datajson['data']['choices'][0]['message']['content']
+                                    assistant_reply += answer['response']
+                                    
+                                    
+                                    
+                                    
                                 if datajson["data"]["choices"][0]["finish_reason"] == '':
                                     answer['finish']=0
                                 else:
                                     answer['finish']=1
+                                    updated_history = history[-4:] if len(history) > 4 else history
+                                    updated_history.append({
+                                        "query": question,
+                                        "response": assistant_reply
+                                    })
+                                    answer["history"] = updated_history
+                                    
 
 
 
@@ -413,13 +519,22 @@ def agent_start():
     "search_list": [],
     "qa_type":0
 }
-                        for chunk in llm.stream(question):
+                        assistant_reply = ""
+                        messages.append({"role": "user", "content": question})
+                        for chunk in llm.stream(messages):
                             if hasattr(chunk, "content"):
                                 print('大模型输出是:',chunk)
                                 answer['response'] = chunk.content
+                                assistant_reply += chunk.content
                             if hasattr(chunk, "response_metadata"):
                                 if 'finish_reason' in chunk.response_metadata and chunk.response_metadata['finish_reason']=='stop':
+                                    updated_history = history[-4:] if len(history) > 4 else history
+                                    updated_history.append({
+                                        "query": question,
+                                        "response": assistant_reply
+                                    })
                                     answer['finish']=1
+                                    answer["history"] = updated_history
                             if hasattr(chunk, "usage_metadata") and chunk.usage_metadata is not None:
                                 answer['usage']['prompt_tokens'] = chunk.usage_metadata['input_tokens'] if 'input_tokens' in chunk.usage_metadata else 0
                                 answer['usage']['completion_tokens'] = chunk.usage_metadata['output_tokens'] if 'output_tokens' in chunk.usage_metadata else 0
@@ -457,15 +572,25 @@ def agent_start():
 "search_list": [],
 "qa_type":0
 }
-                    for chunk in llm.stream(question):
+                    
+                    
+                    assistant_reply = ""
+                    messages.append({"role": "user", "content": question})
+                    for chunk in llm.stream(messages):
                         if hasattr(chunk, "content"):
                             print('大模型输出是:',chunk)
+                            assistant_reply += chunk.content
                             answer['response'] = chunk.content
-
 
                             if hasattr(chunk, "response_metadata"):
                                 if 'finish_reason' in chunk.response_metadata and chunk.response_metadata['finish_reason']=='stop':
+                                    updated_history = history[-4:] if len(history) > 4 else history
+                                    updated_history.append({
+                                        "query": question,
+                                        "response": assistant_reply
+                                    })
                                     answer['finish']=1
+                                    answer["history"] = updated_history
                             if hasattr(chunk, "usage_metadata") and chunk.usage_metadata is not None:
                                 answer['usage']['prompt_tokens'] = chunk.usage_metadata['input_tokens'] if 'input_tokens' in chunk.usage_metadata else 0
                                 answer['usage']['completion_tokens'] = chunk.usage_metadata['output_tokens'] if 'output_tokens' in chunk.usage_metadata else 0

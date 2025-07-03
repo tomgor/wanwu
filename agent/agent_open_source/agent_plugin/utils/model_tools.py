@@ -41,6 +41,7 @@ token_manager = AccessTokenManager()
 # MODEL_NAME = "unicom-72b-chat-ali"
 # MODEL_NAME = "unicom-34b-chat"
 
+os.environ["ARK_API_KEY"] = "eyJh"
 
 MODEL_NAME_CONFIG = config["MODELS"]["default_llm"]
 env_value_model = os.getenv('CUAI_DEFAULT_LLM_MODEL_ID')
@@ -56,53 +57,6 @@ MODEL_URL = MODEL_URL_CONFIG if env_value_model_url is None or env_value_model_u
 # DEPLOY_MODE = config["DEPLOY"]["DEPLOY_MODE"]
 # MODEL_NAME = "qwen-14b-chat"
 
-'''
-# 元景语言大模型服务封装,支持流式和非流式
-# 可用模型：unicom-7b-chat, unicom-13b-chat, unicom-34b-chat,unicom-13b-special(多轮query改写、系统提示词、会议纪要/摘要、纪委约谈),unicom-16b-math,unicom-70b-chat
-def req_unicom_llm_chat(messages:List, stream=True, model_name=MODEL_NAME, do_sample=False,temperature=0.00001,repetition_penalty=1.1,stop_words =  ['Observation:', 'Observation:\n','Observation: ','Observation: \n']):    
-    # logger.info(f"调用大模型的prompt为：{messages}")
-    # logger.info(f"调用大模型的prompt为：{messages}")
-    # if model_name == "unicom-70b-chat":
-    #     url = config["MODELS"]["unicom_70b_url"]
-    #     access_token = "Mzg5NmZmMWUwNTYyZGVlNjZkNjYwZjdmYTQxM2U0MGM1MzMzMmNkZA=="   
-    # elif model_name == "unicom-16b-math":
-    #     url = "http://1654416620085582.cn-wulanchabu.pai-eas.aliyuncs.com/api/predict/code_v2_16b/v1/coder/generate"               
-    #     access_token = "NjcxZmVhNDYyZjIzMWJhNjZmMDFkOWVmZWZkNjQ5MTI4NmFmYmFiZA=="
-    # elif model_name == "unicom-70b-math":
-    #     url = "http://1654416620085582.cn-wulanchabu.pai-eas.aliyuncs.com/api/predict/llm_math_72b/v1/chat/completions"               
-    #     access_token = "YmU0YWI0OGUzMWY4MjIxNDhkN2U5ODg4YzMzZGY2MzU3MmI5YWZiNA=="
-    # else:
-    base_url = config["MODELS"]["unicom_base_url"]
-    url = base_url + model_name
-    access_token = token_manager.get_access_token()  # 获取 token
-
-    data = {
-    	"stream": stream,
-        # "max_new_tokens": 8192,
-        "temperature":temperature,
-        "do_sample":do_sample,
-        "repetition_penalty": repetition_penalty,
-    	"messages": messages        
-    }
-    
-    # logger.info(f"req_unicom_llm_chat data:{data}")
-
-    
-    headers = {"Content-Type": "application/json","Authorization": f"Bearer {access_token}"}
-    # logger.info(f"req_unicom_llm_chat param:{json.dumps(data,ensure_ascii=False,indent=4)}")
-    # logger.info(f"req_unicom_llm_chat param:{json.dumps(data,ensure_ascii=False,indent=4)}")
-
-    try:
-        response = requests.post(url,json =data, headers = headers, verify=False, stream=stream)
-        # logger.info(f"req_unicom_llm_chat response:{response.text}")
-        # logger.info(f"req_unicom_llm_chat response:{response.text}")
-        # logger.info(f"req_unicom_llm_chat response:{json.dumps(response.json(),ensure_ascii=False,indent=4)}")
-        return response
-
-    except requests.RequestException as e:
-        logger.error("LLM API error: %s", e)  # 记录错误日志
-        return "No answer found due to LLM API error"
-'''
 
 def parse_error_to_dict(error) -> Dict[str, Any]:
     """将错误信息转换为字典类型"""
@@ -158,7 +112,7 @@ def req_unicom_llm_chat(messages: List,
         temperature=0.6,  #deepseek系列模型写死
         base_url=base_url,
 
-        api_key = token_manager.get_access_token()
+        api_key = os.environ["ARK_API_KEY"]
     )
     # logger.info(f"llm:{llm}")
     try:
@@ -202,7 +156,7 @@ def req_unicom_llm_chat_plus(messages:List, stop_words =  ['REASON'], model_name
         model=model_name,
         temperature=0.6,  #deepseek系列模型写死
         base_url=base_url,
-        api_key = token_manager.get_access_token()
+        api_key = os.environ["ARK_API_KEY"]
     )
         
     # logger.info(f"llm:{llm}")

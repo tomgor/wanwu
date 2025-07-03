@@ -8,3 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
+
+.ipynb_checkpoints
+
+*.log
+*.pid
+*.swo
+*.swp
