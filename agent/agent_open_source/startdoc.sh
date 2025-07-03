@@ -3,9 +3,9 @@
 # 端口号（根据你服务运行端口修改）
 PORT=1991
 
-# 设置日志目录
+# 设置日志目录和固定日志文件名
 LOG_DIR="./logs"
-LOG_FILE="$LOG_DIR/doc_pra_$(date +'%Y-%m-%d_%H-%M-%S').log"
+LOG_FILE="$LOG_DIR/doc.log"
 
 # 创建日志目录（如果不存在）
 mkdir -p "$LOG_DIR"
@@ -19,8 +19,12 @@ if [ -n "$PID_ON_PORT" ]; then
   echo "进程 $PID_ON_PORT 已被终止。"
 fi
 
-# 启动服务并将输出写入日志
+# 启动服务并将输出追加写入固定日志文件
 echo "启动 Flask 服务..."
-nohup python doc_pra.py > "$LOG_FILE" 2>&1 &
+nohup python doc_pra.py >> "$LOG_FILE" 2>&1 &
 
-echo "服务已启动，日志保存在：$LOG_FILE"
+# 保存进程 ID 到 pid 文件（可选）
+echo $! > doc.pid
+
+echo "服务已启动，日志写入：$LOG_FILE"
+echo "PID: $(cat doc.pid)"
