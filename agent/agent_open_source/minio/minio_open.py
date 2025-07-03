@@ -79,7 +79,7 @@ def upload_file():
 
         uploaded_file_name = upload_file_to_minio(file_stream, original_filename, bucket_name, overwrite_file_name)
         if uploaded_file_name:
-            download_link = f"{public_minio_download_url}/{bucket_name}/{uploaded_file_name}"
+            download_link = f"{public_minio_download_url}{bucket_name}/{uploaded_file_name}"
             logging.info(f"File uploaded successfully, download link: {download_link}")
             
             return jsonify({"download_link": download_link})

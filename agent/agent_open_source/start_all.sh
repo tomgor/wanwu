@@ -9,10 +9,6 @@ source /root/miniconda3/etc/profile.d/conda.sh
 conda activate agent
 bash start.sh
 
-echo "开始执行网络搜索脚本"
-
-bash startnet.sh
-
 echo "开始执行chatdoc脚本"
 bash startdoc.sh
 

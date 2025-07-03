@@ -642,26 +642,10 @@ def get_bing_multi_search_result(query,bing_top_k,bing_time_out,bing_target_succ
     time_difference2 = finish_time2 - start_time        
     logger.info(f"req_bing_multiquery time: {time_difference2}")
     
-
-   # if auto_citation:        
-    #    combined_list = combine_search_list(aggregated_results)
-     #   logger.info(f"合并对照: {len(aggregated_results)} -->{len(combined_list)}")
-    #else:
-        
-     #   combined_list = combine_search_list(aggregated_results)
-      #  logger.info(f"合并对照: {len(aggregated_results)} -->{len(combined_list)}")
-        # combined_list =  aggregated_results
-    
-    logger.info(f"aggregated_results 什么: {aggregated_results}")
+    logger.info(f"aggregated_results 是什么: {aggregated_results}")
     
     #----准备提示词
-   # prompt = build_bing_prompt_from_search_list(query,aggregated_results,auto_citation,model)    
-    prompt = ''
-
-    #for item in combined_list:
-       # item.pop("datePublished","")
-        #item.pop("dateLastCrawled","")
-        #item.pop("sub_query","")
+    prompt = build_bing_prompt_from_search_list(query,aggregated_results,auto_citation,model)    
 
     return prompt,aggregated_results
 async def async_search(query, bing_top_k,bing_time_out,bing_target_success,bing_result_len,model,search_url,search_key,search_rerank_id,days_limit=-1, auto_citation=False):

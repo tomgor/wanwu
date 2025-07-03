@@ -37,6 +37,7 @@ Begin!
 Question: {query}
 
 Must output strictly in the above format to answer the Question.
+Please answer and analyze in Simplified Chinese during the final output, and prohibit outputting Traditional Chinese
 """
 
 TOOL_DESC_MODELSCOPE = (
