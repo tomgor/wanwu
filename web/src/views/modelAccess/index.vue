@@ -41,7 +41,7 @@
           <div class="card-item card-item-create">
             <div class="app-card-create" @click="preInsert">
               <div class="create-img-wrap">
-                <img class="create-type" src="@/assets/imgs/modelImport.png" alt="" />
+                <img class="create-type" src="@/assets/imgs/create_model.svg" alt="" />
                 <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
                 <div class="create-filter"></div>
               </div>
