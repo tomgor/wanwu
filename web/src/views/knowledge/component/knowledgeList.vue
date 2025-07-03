@@ -4,7 +4,7 @@
       <div class="smart rl smart-create">
         <div class="app-card-create" @click="showCreate">
           <div class="create-img-wrap">
-            <!-- <img v-if="type" class="create-type" :src="require(`@/assets/imgs/create_${type}.png`)" alt="" /> -->
+            <img class="create-type" src="@/assets/imgs/create_knowledge.svg" alt="" />
             <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
             <div class="create-filter"></div>
           </div>
