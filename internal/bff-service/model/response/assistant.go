@@ -87,3 +87,7 @@ type ConversationDetailInfo struct {
 type ConversationCreateResp struct {
 	ConversationId string `json:"conversationId"`
 }
+
+type AssistantCreateResp struct {
+	AssistantId string `json:"assistantId"`
+}

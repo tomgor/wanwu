@@ -47,7 +47,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AssistantServiceClient interface {
 	GetAssistantByIds(ctx context.Context, in *GetAssistantByIdsReq, opts ...grpc.CallOption) (*AppBriefList, error)
-	AssistantCreate(ctx context.Context, in *AssistantCreateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AssistantCreate(ctx context.Context, in *AssistantCreateReq, opts ...grpc.CallOption) (*AssistantCreateResp, error)
 	AssistantUpdate(ctx context.Context, in *AssistantUpdateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AssistantConfigUpdate(ctx context.Context, in *AssistantConfigUpdateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AssistantDelete(ctx context.Context, in *AssistantDeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -86,9 +86,9 @@ func (c *assistantServiceClient) GetAssistantByIds(ctx context.Context, in *GetA
 	return out, nil
 }
 
-func (c *assistantServiceClient) AssistantCreate(ctx context.Context, in *AssistantCreateReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *assistantServiceClient) AssistantCreate(ctx context.Context, in *AssistantCreateReq, opts ...grpc.CallOption) (*AssistantCreateResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
+	out := new(AssistantCreateResp)
 	err := c.cc.Invoke(ctx, AssistantService_AssistantCreate_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -290,7 +290,7 @@ type AssistantService_AssistantConversionStreamClient = grpc.ServerStreamingClie
 // for forward compatibility.
 type AssistantServiceServer interface {
 	GetAssistantByIds(context.Context, *GetAssistantByIdsReq) (*AppBriefList, error)
-	AssistantCreate(context.Context, *AssistantCreateReq) (*emptypb.Empty, error)
+	AssistantCreate(context.Context, *AssistantCreateReq) (*AssistantCreateResp, error)
 	AssistantUpdate(context.Context, *AssistantUpdateReq) (*emptypb.Empty, error)
 	AssistantConfigUpdate(context.Context, *AssistantConfigUpdateReq) (*emptypb.Empty, error)
 	AssistantDelete(context.Context, *AssistantDeleteReq) (*emptypb.Empty, error)
@@ -322,7 +322,7 @@ type UnimplementedAssistantServiceServer struct{}
 func (UnimplementedAssistantServiceServer) GetAssistantByIds(context.Context, *GetAssistantByIdsReq) (*AppBriefList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAssistantByIds not implemented")
 }
-func (UnimplementedAssistantServiceServer) AssistantCreate(context.Context, *AssistantCreateReq) (*emptypb.Empty, error) {
+func (UnimplementedAssistantServiceServer) AssistantCreate(context.Context, *AssistantCreateReq) (*AssistantCreateResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssistantCreate not implemented")
 }
 func (UnimplementedAssistantServiceServer) AssistantUpdate(context.Context, *AssistantUpdateReq) (*emptypb.Empty, error) {

@@ -9,7 +9,7 @@ option go_package = "github.com/UnicomAI/wanwu/api/proto/assistant-service";
 
 service AssistantService {
   rpc GetAssistantByIds(GetAssistantByIdsReq) returns (AppBriefList) {}   // 根据智能体id集合获取智能体列表
-  rpc AssistantCreate(AssistantCreateReq) returns (google.protobuf.Empty) {}
+  rpc AssistantCreate(AssistantCreateReq) returns (AssistantCreateResp) {}
   rpc AssistantUpdate(AssistantUpdateReq) returns (google.protobuf.Empty) {}
   rpc AssistantConfigUpdate(AssistantConfigUpdateReq) returns (google.protobuf.Empty) {}
   rpc AssistantDelete(AssistantDeleteReq) returns (google.protobuf.Empty) {}
@@ -51,6 +51,10 @@ message AppBriefList{
 message AssistantCreateReq {
   common.AppBriefConfig assistantBrief = 1;
   Identity identity = 2;
+}
+
+message AssistantCreateResp {
+  string assistantId = 1;
 }
 
 message AssistantUpdateReq {
