@@ -3,6 +3,7 @@ server:
   port: 6668
   external_ip: localhost
   external_port: 6668
+  web_base_url: http://localhost:8081
   api_base_url: http://localhost:6668
   callback_url: http://172.17.0.1:6668
 
@@ -38,8 +39,11 @@ i18n:
     - bff-custom
     - iam-service
     - model-service
+    - knowledge-service
+    - mcp-service
     - rag-service
     - assistant-service
+    - app-service
   jsonlPath: configs/microservice/bff-service/configs/wanwu-i18n.jsonl
   langs:
     - code: zh
@@ -49,6 +53,7 @@ i18n:
   defaultLang: zh
 
 custom-info:
+  version: v0.0.1
   login:
     background_path: "/v1/static/logo/login_bg.png"
     login_button_color: "#384BF7"
@@ -81,6 +86,9 @@ app:
 model:
   host: model-service:8989
 
+mcp:
+  host: mcp-service:9898
+
 rag:
   host: rag-service:9640
 
@@ -94,3 +102,9 @@ workflow:
   host: http://agentscope-wanwu:6672
   workflow_list_uri: "/workflow/list"
   delete_workflow_uri: "/workflow/delete"
+
+agent:
+  host: agent-wanwu
+  upload_minio:
+      port: 15001
+      uri: /upload

@@ -5,17 +5,16 @@ import (
 
 	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
+	iam_service "github.com/UnicomAI/wanwu/api/proto/iam-service"
 	knowledgebase_doc_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-doc-service"
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
+	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
-	rag_service "github.com/UnicomAI/wanwu/api/proto/rag-service"
-
-	"google.golang.org/grpc"
-
-	iam_service "github.com/UnicomAI/wanwu/api/proto/iam-service"
 	perm_service "github.com/UnicomAI/wanwu/api/proto/perm-service"
+	rag_service "github.com/UnicomAI/wanwu/api/proto/rag-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
@@ -28,6 +27,7 @@ var (
 	iam              iam_service.IAMServiceClient
 	perm             perm_service.PermServiceClient
 	model            model_service.ModelServiceClient
+	mcp              mcp_service.MCPServiceClient
 	knowledgeBase    knowledgebase_service.KnowledgeBaseServiceClient
 	knowledgeBaseDoc knowledgebase_doc_service.KnowledgeBaseDocServiceClient
 	app              app_service.AppServiceClient
@@ -51,6 +51,10 @@ func Init() error {
 	if err != nil {
 		return fmt.Errorf("init model-service connection err: %v", err)
 	}
+	mcpConn, err := newConn(config.Cfg().MCP.Host)
+	if err != nil {
+		return fmt.Errorf("init mcp-service connection err: %v", err)
+	}
 	knowledgeBaseConn, err := newConn(config.Cfg().Knowledge.Host)
 	if err != nil {
 		return fmt.Errorf("init knowledgeBase-service connection err: %v", err)
@@ -67,6 +71,7 @@ func Init() error {
 	iam = iam_service.NewIAMServiceClient(iamConn)
 	perm = perm_service.NewPermServiceClient(iamConn)
 	model = model_service.NewModelServiceClient(modelConn)
+	mcp = mcp_service.NewMCPServiceClient(mcpConn)
 	app = app_service.NewAppServiceClient(appConn)
 	knowledgeBase = knowledgebase_service.NewKnowledgeBaseServiceClient(knowledgeBaseConn)
 	knowledgeBaseDoc = knowledgebase_doc_service.NewKnowledgeBaseDocServiceClient(knowledgeBaseConn)

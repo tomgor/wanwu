@@ -23,11 +23,25 @@ func (c ClientMinio) LoadType() string {
 
 func (c ClientMinio) Load() error {
 	minioConfig := config.GetConfig().Minio
-	return minio.InitKnowledge(context.Background(), minio.Config{
+	//初始化知识库内部使用minio-bucket
+	err := minio.InitKnowledge(context.Background(), minio.Config{
 		Endpoint: minioConfig.EndPoint,
 		User:     minioConfig.User,
 		Password: minioConfig.Password,
-	}, minioConfig.Bucket)
+	}, minioConfig.Bucket, false)
+	if err != nil {
+		return err
+	}
+	//初始化对外公开bucket
+	err = minio.InitKnowledge(context.Background(), minio.Config{
+		Endpoint: minioConfig.EndPoint,
+		User:     minioConfig.User,
+		Password: minioConfig.Password,
+	}, minioConfig.PublicRagBucket, true)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c ClientMinio) StopPriority() int {

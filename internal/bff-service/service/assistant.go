@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"sort"
 
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
@@ -65,6 +66,12 @@ func AssistantConfigUpdate(ctx *gin.Context, userId, orgId string, req request.A
 			TopKEnable:       req.KnowledgeBaseConfig.Config.TopKEnable,
 		},
 		RerankConfig: rerankConfig,
+		OnlineSearchConfig: &assistant_service.AssistantOnlineSearchConfig{
+			SearchUrl:      req.OnlineSearchConfig.SearchUrl,
+			SearchKey:      req.OnlineSearchConfig.SearchKey,
+			Enable:         req.OnlineSearchConfig.Enable,
+			SearchRerankId: req.OnlineSearchConfig.SearchRerankId,
+		},
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
@@ -331,6 +338,12 @@ func GetConversationDetailList(ctx *gin.Context, userId, orgId string, req reque
 		}
 
 		convertedList = append(convertedList, convertedItem)
+
+		// 对切片进行排序
+		sort.Slice(convertedList, func(i, j int) bool {
+			// CreatedAt值小的时间更早，排在前面
+			return convertedList[i].CreatedAt < convertedList[j].CreatedAt
+		})
 	}
 
 	return response.PageResult{Total: resp.Total, List: convertedList, PageNo: req.PageNo, PageSize: req.PageSize}, nil
@@ -397,6 +410,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 			actionInfos = append(actionInfos, &response.ActionInfos{
 				ActionId: action.ActionId,
 				ApiName:  action.ApiName,
+				Enable:   action.Enable,
 			})
 			log.Debugf("添加动作信息: ActionId=%s, ApiName=%s", action.ActionId, action.ApiName)
 		}
@@ -409,14 +423,25 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		workFlowInfos = make([]*response.WorkFlowInfos, 0, len(resp.WorkFlowInfos))
 		for _, wf := range resp.WorkFlowInfos {
 			workFlowInfos = append(workFlowInfos, &response.WorkFlowInfos{
+				Id:         wf.Id,
 				WorkFlowId: wf.WorkFlowId,
 				ApiName:    wf.ApiName,
+				Enable:     wf.Enable,
 			})
 			log.Debugf("添加工作流信息: WorkFlowId=%s, ApiName=%s", wf.WorkFlowId, wf.ApiName)
 		}
 		log.Debugf("总共添加 %d 个工作流信息", len(workFlowInfos))
 	} else {
 		log.Debugf("工作流信息为空")
+	}
+	var onlineSearchConfig request.OnlineSearchConfig
+	if resp.OnlineSearchConfig != nil {
+		onlineSearchConfig = request.OnlineSearchConfig{
+			SearchUrl:      resp.OnlineSearchConfig.SearchUrl,
+			SearchKey:      resp.OnlineSearchConfig.SearchKey,
+			Enable:         resp.OnlineSearchConfig.Enable,
+			SearchRerankId: resp.OnlineSearchConfig.SearchRerankId,
+		}
 	}
 
 	assistantModel := response.Assistant{
@@ -443,13 +468,14 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 			log.Debugf("知识库配置为空")
 			return request.AppKnowledgebaseConfig{}
 		}(),
-		ModelConfig:   modelConfig,
-		RerankConfig:  rerankConfig,
-		Scope:         resp.Scope,
-		ActionInfos:   actionInfos,
-		WorkFlowInfos: workFlowInfos,
-		CreatedAt:     util.Time2Str(resp.CreatTime),
-		UpdatedAt:     util.Time2Str(resp.UpdateTime),
+		ModelConfig:        modelConfig,
+		RerankConfig:       rerankConfig,
+		OnlineSearchConfig: onlineSearchConfig,
+		Scope:              resp.Scope,
+		ActionInfos:        actionInfos,
+		WorkFlowInfos:      workFlowInfos,
+		CreatedAt:          util.Time2Str(resp.CreatTime),
+		UpdatedAt:          util.Time2Str(resp.UpdateTime),
 	}
 	log.Debugf("Assistant响应到模型转换完成，结果: %+v", assistantModel)
 	return assistantModel, nil

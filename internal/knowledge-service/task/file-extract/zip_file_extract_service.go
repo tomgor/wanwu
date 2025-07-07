@@ -48,7 +48,6 @@ func (t ZipFileExtractServiceService) ExtractFile(ctx context.Context, localFile
 		} else {
 			decodeFileName = f.Name
 		}
-
 		// 构建完整的文件路径
 		destFilePath := filepath.Join(destDir, decodeFileName)
 		// 检查是否为目录

@@ -24,11 +24,13 @@ type Config struct {
 	// microservice
 	Iam       ServiceConfig         `json:"iam" mapstructure:"iam"`
 	Model     ServiceConfig         `json:"model" mapstructure:"model"`
+	MCP       ServiceConfig         `json:"mcp" mapstructure:"mcp"`
 	App       ServiceConfig         `json:"app" mapstructure:"app"`
 	Knowledge ServiceConfig         `json:"knowledge" mapstructure:"knowledge"`
 	Rag       ServiceConfig         `json:"rag" mapstructure:"rag"`
 	Assistant ServiceConfig         `json:"assistant" mapstructure:"assistant"`
 	WorkFlow  WorkFlowServiceConfig `json:"workflow" mapstructure:"workflow"`
+	Agent     AgentServiceConfig    `json:"agent" mapstructure:"agent"`
 }
 
 type ServerConfig struct {
@@ -36,6 +38,7 @@ type ServerConfig struct {
 	Port         int    `json:"port" mapstructure:"port"`
 	ExternalIP   string `json:"external_ip" mapstructure:"external_ip"`
 	ExternalPort int    `json:"external_port" mapstructure:"external_port"`
+	WebBaseUrl   string `json:"web_base_url" mapstructure:"web_base_url"`
 	ApiBaseUrl   string `json:"api_base_url" mapstructure:"api_base_url"`
 	CallbackUrl  string `json:"callback_url" mapstructure:"callback_url"`
 }
@@ -65,14 +68,25 @@ type WorkFlowServiceConfig struct {
 	DeleteWorkFlowUri string `json:"delete_workflow_uri" mapstructure:"delete_workflow_uri"`
 }
 
+type AgentServiceConfig struct {
+	Endpoint       string    `json:"host" mapstructure:"host"`
+	UploadMinioUri UriConfig `json:"upload_minio" mapstructure:"upload_minio"`
+}
+
+type UriConfig struct {
+	Port string `json:"port" mapstructure:"port"`
+	Uri  string `json:"uri" mapstructure:"uri"`
+}
+
 type DocCenterConfig struct {
 	DocPath string `json:"doc_path" mapstructure:"doc_path"`
 }
 
 type CustomInfoConfig struct {
-	Login CustomLogin `json:"login" mapstructure:"login"`
-	Home  CustomHome  `json:"home" mapstructure:"home"`
-	Tab   CustomTab   `json:"tab" mapstructure:"tab"`
+	Version string      `json:"version" mapstructure:"version"`
+	Login   CustomLogin `json:"login" mapstructure:"login"`
+	Home    CustomHome  `json:"home" mapstructure:"home"`
+	Tab     CustomTab   `json:"tab" mapstructure:"tab"`
 }
 
 type CustomLogin struct {

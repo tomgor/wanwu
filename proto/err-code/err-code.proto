@@ -86,6 +86,15 @@ enum Code {
   // [300000, 309999]
   AppGeneral = 300000; // 通用错误
   AppApikey = 300001; // ApiKey相关错误
-  AppExploration = 300002; // APP探索广场相关错误
+  AppExploration = 300002; // APP应用广场相关错误
+
+  // --- mcp-service ---
+  MCPGeneral = 310000; // 通用错误
+  MCPGetSquareMCPErr = 310001; // 获取广场MCP详情错误
+  MCPCreateCustomMCPErr = 310002; // 创建自定义MCP错误
+  MCPGetCustomMCPErr = 310003; // 获取自定义MCP详情错误
+  MCPDeleteCustomMCPErr = 310004; // 删除自定义MCP错误
+  MCPGetCustomMCPListErr = 310005; // 获取自定义MCP列表错误
+  MCPGetMCPAvatarErr = 310006; // 获取MCP头像错误
 }
 

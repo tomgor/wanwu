@@ -11,27 +11,27 @@ func Register(apiV1 *gin.RouterGroup) {
 	// common
 	registerCommon(apiV1)
 
-	// permission
-	registerPermission(apiV1)
+	// callback
+	registerV1Callback(apiV1)
 
 	// model
 	registerModel(apiV1)
 
-	// workspace.appspace
-	registerAppSpace(apiV1)
+	// knowledge
+	registerKnowledge(apiV1)
 
-	// exploration
-	registerExploration(apiV1)
+	// mcp
+	registerMCP(apiV1)
 
 	// rag
 	registerRag(apiV1)
 
-	// knowledge
-	registerKnowledge(apiV1)
-
 	// assistant
 	registerAssistant(apiV1)
 
-	//callback
-	registerV1Callback(apiV1)
+	// exploration
+	registerExploration(apiV1)
+
+	// permission
+	registerPermission(apiV1)
 }

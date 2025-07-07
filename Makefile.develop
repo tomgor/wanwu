@@ -19,6 +19,15 @@ stop-all-middleware:
 	make stop-mysql-worker
 	make stop-mysql
 
+unzip-frontend:
+	@find frontend -maxdepth 1 -type f -name "*.tar.gz" | while read gzfile; do \
+		tar -zxvf $$gzfile -C frontend; \
+	done
+
+update-frontend:
+	rm -rf $(WANWU_PROJECT_DIR)/nginx/html/*
+	cp -r frontend/* $(WANWU_PROJECT_DIR)/nginx/html
+
 # --- nginx ---
 run-nginx:
 	docker-compose -f docker-compose-develop.yaml \
@@ -71,6 +80,19 @@ stop-model:
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		down model-service
+
+# --- mcp-service ---
+run-mcp:
+	docker-compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		up -d mcp-service
+
+stop-mcp:
+	docker-compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		down mcp-service
 
 # --- app-service ---
 run-app:

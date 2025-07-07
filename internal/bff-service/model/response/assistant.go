@@ -13,6 +13,7 @@ type Assistant struct {
 	ModelConfig            request.AppModelConfig         `json:"modelConfig"`         // 模型
 	KnowledgeBaseConfig    request.AppKnowledgebaseConfig `json:"knowledgeBaseConfig"` // 知识库
 	RerankConfig           request.AppModelConfig         `json:"rerankConfig"`        // Rerank模型
+	OnlineSearchConfig     request.OnlineSearchConfig     `json:"onlineSearchConfig"`  // 在线搜索配置
 	Scope                  int32                          `json:"scope"`               // 作用域
 	ActionInfos            []*ActionInfos                 `json:"actionInfos"`         // action信息
 	WorkFlowInfos          []*WorkFlowInfos               `json:"workFlowInfos"`       // 工作流信息
@@ -23,11 +24,14 @@ type Assistant struct {
 type ActionInfos struct {
 	ActionId string `json:"actionId"`
 	ApiName  string `json:"apiName"`
+	Enable   bool   `json:"enable"`
 }
 
 type WorkFlowInfos struct {
+	Id         string `json:"id"`
 	WorkFlowId string `json:"workFlowId"`
 	ApiName    string `json:"apiName"`
+	Enable     bool   `json:"enable"`
 }
 
 type Action struct {
@@ -71,7 +75,7 @@ type ConversationDetailInfo struct {
 	SysPrompt       string      `json:"sysPrompt"`
 	Response        string      `json:"response"`
 	SearchList      interface{} `json:"searchList"`
-	QaType          int32       `json:"qaType"`
+	QaType          int32       `json:"qa_type"`
 	CreatedBy       string      `json:"createdBy"`
 	CreatedAt       int64       `json:"createdAt"`
 	UpdatedAt       int64       `json:"updatedAt"`

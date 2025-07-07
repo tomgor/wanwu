@@ -96,12 +96,9 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 		}
 	}
 	if resp.KnowledgeBaseConfig.KnowledgeBaseId != "" {
-		knowledgeInfo, err = knowledgeBase.SelectKnowledgeDetailById(ctx, &knowledgebase_service.KnowledgeDetailSelectReq{
+		knowledgeInfo, _ = knowledgeBase.SelectKnowledgeDetailById(ctx, &knowledgebase_service.KnowledgeDetailSelectReq{
 			KnowledgeId: resp.KnowledgeBaseConfig.KnowledgeBaseId,
 		})
-		if err != nil {
-			return nil, err
-		}
 	}
 	ragInfo = &response.RagInfo{
 		RagID:          resp.RagId,

@@ -67,7 +67,8 @@ message AssistantConfigUpdateReq {
   common.AppModelConfig modelConfig = 5;                  // 模型配置
   AssistantKnowledgeBaseConfig knowledgeBaseConfig = 6;         // 知识库
   common.AppModelConfig rerankConfig = 7;                         // Rerank模型
-  Identity identity = 8;
+  AssistantOnlineSearchConfig onlineSearchConfig = 8;             // 在线搜索配置
+  Identity identity = 9;
 }
 
 message AssistantDeleteReq {
@@ -89,6 +90,13 @@ message AssistantKnowledgeBase {
   string name = 2;
 }
 
+message AssistantOnlineSearchConfig {
+  string searchUrl = 1;
+  string searchKey = 2;
+  bool enable = 3;
+  string searchRerankId = 4;
+}
+
 message GetAssistantListMyAllReq {
   string name = 1;
   Identity identity = 2;
@@ -103,21 +111,25 @@ message AssistantInfo {
   common.AppModelConfig modelConfig = 6;                  // 模型配置
   AssistantKnowledgeBaseConfig knowledgeBaseConfig = 7;  // 知识库
   common.AppModelConfig rerankConfig = 8;                  // Rerank模型  
-  int32 scope = 9;
-  repeated WorkFlowInfos workFlowInfos = 10;
-  repeated ActionInfos actionInfos = 11;
-  int64 creatTime = 12;
-  int64 updateTime = 13;
+  AssistantOnlineSearchConfig onlineSearchConfig = 9;     // 在线搜索配置
+  int32 scope = 10;
+  repeated WorkFlowInfos workFlowInfos = 11;
+  repeated ActionInfos actionInfos = 12;
+  int64 creatTime = 13;
+  int64 updateTime = 14;
 }
 
 message ActionInfos{
   string actionId = 1;
   string apiName = 2;
+  bool enable = 3;
 }
 
 message WorkFlowInfos{
-  string workFlowId = 1;
-  string apiName = 2;
+  string id = 1;
+  string workFlowId = 2;
+  string apiName = 3;
+  bool enable = 4;
 }
 
 message GetAssistantInfoReq {

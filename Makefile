@@ -1,10 +1,8 @@
 include .env
 include .env.image.${WANWU_ARCH}
 
-version ?= v0.0.1
-
 LDFLAGS := -X main.buildTime=$(shell date +%Y-%m-%d,%H:%M:%S) \
-			-X main.buildVersion=$(version) \
+			-X main.buildVersion=${WANWU_VERSION} \
 			-X main.gitCommitID=$(shell git --git-dir=./.git rev-parse HEAD) \
 			-X main.gitBranch=$(shell git --git-dir=./.git for-each-ref --format='%(refname:short)->%(upstream:short)' $(shell git --git-dir=./.git symbolic-ref -q HEAD)) \
 			-X main.builder=$(shell git config user.name)
@@ -26,6 +24,12 @@ build-model-amd64:
 
 build-model-arm64:
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -mod vendor -ldflags "$(LDFLAGS)" -o ./bin/arm64/ ./cmd/model-service
+
+build-mcp-amd64:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod vendor -ldflags "$(LDFLAGS)" -o ./bin/amd64/ ./cmd/mcp-service
+
+build-mcp-arm64:
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -mod vendor -ldflags "$(LDFLAGS)" -o ./bin/arm64/ ./cmd/mcp-service
 
 build-knowledge-amd64:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod vendor -ldflags "$(LDFLAGS)" -o ./bin/amd64/ ./cmd/knowledge-service
@@ -60,7 +64,7 @@ check:
 	docker run --rm -t -v $(PWD):/app -w /app golangci/golangci-lint:v1.64.8 bash -c 'golangci-lint run -v --timeout 3m'
 
 doc:
-	docker run --name golang-swag --privileged=true --rm -v $(PWD):/app -w /app gromitlee/golang:1.22.12-bookworm-swag1.16.4 bash -c 'make doc-swag'
+	docker run --name golang-swag --privileged=true --rm -v $(PWD):/app -w /app crpi-6pj79y7ddzdpexs8.cn-hangzhou.personal.cr.aliyuncs.com/gromitlee/golang:1.22.12-bookworm-swag1.16.4 bash -c 'make doc-swag'
 
 doc-swag:
 	# swag version v1.16.4
@@ -75,10 +79,10 @@ doc-swag:
 	swag init -g callback.go -d internal/bff-service/server/http/handler/callback -o docs/callback --pd
 
 docker-image-backend:
-	docker build -f Dockerfile.backend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/backend:$(version)-${WANWU_ARCH}-$(shell git rev-parse --short HEAD) .
+	docker build -f Dockerfile.backend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/backend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-${WANWU_ARCH} .
 
 docker-image-frontend:
-	docker build -f Dockerfile.frontend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/frontend:$(version)-${WANWU_ARCH}-$(shell git rev-parse --short HEAD) .
+	docker build -f Dockerfile.frontend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/frontend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-${WANWU_ARCH} .
 
 grpc-protoc:
 	protoc --proto_path=. --go_out=paths=source_relative:api --go-grpc_out=paths=source_relative:api proto/*/*.proto
@@ -91,7 +95,7 @@ init:
 	go mod vendor
 
 pb:
-	docker run --name golang-grpc --privileged=true --rm -v $(PWD):/app -w /app gromitlee/golang:1.22.12-bookworm-protoc29.4-gengo1.34.1-gengrpc1.5.1-gengw2.20.0-genapi2.20.0 bash -c 'make grpc-protoc'
+	docker run --name golang-grpc --privileged=true --rm -v $(PWD):/app -w /app crpi-6pj79y7ddzdpexs8.cn-hangzhou.personal.cr.aliyuncs.com/gromitlee/golang:1.22.12-bookworm-protoc29.4-gengo1.34.1-gengrpc1.5.1-gengw2.20.0-genapi2.20.0 bash -c 'make grpc-protoc'
 
 # --- mysql ---
 run-mysql:

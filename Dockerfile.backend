@@ -9,6 +9,7 @@ COPY . .
 RUN make build-bff-$WANWU_ARCH
 RUN make build-iam-$WANWU_ARCH
 RUN make build-model-$WANWU_ARCH
+RUN make build-mcp-$WANWU_ARCH
 RUN make build-knowledge-$WANWU_ARCH
 RUN make build-rag-$WANWU_ARCH
 RUN make build-assistant-$WANWU_ARCH
@@ -32,6 +33,10 @@ EXPOSE 8888
 # model-servie
 COPY --from=builder /app/bin/$WANWU_ARCH/model-service ./bin/model-service
 EXPOSE 8989
+
+# mcp-servie
+COPY --from=builder /app/bin/$WANWU_ARCH/mcp-service ./bin/mcp-service
+EXPOSE 9898
 
 # knowledge-servie
 COPY --from=builder /app/bin/$WANWU_ARCH/knowledge-service ./bin/knowledge-service

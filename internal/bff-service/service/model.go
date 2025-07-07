@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -26,6 +25,9 @@ func ImportModel(ctx *gin.Context, userId, orgId string, req *request.ImportOrUp
 }
 
 func UpdateModel(ctx *gin.Context, userId, orgId string, req *request.ImportOrUpdateModelRequest) error {
+	if req.ModelId == "" {
+		return grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, "modelId cannot be empty")
+	}
 	clientReq, err := parseImportAndUpdateClientReq(userId, orgId, req)
 	if err != nil {
 		return err
@@ -126,6 +128,7 @@ func ListTypeModels(ctx *gin.Context, userId, orgId string, req *request.ListTyp
 func parseImportAndUpdateClientReq(userId, orgId string, req *request.ImportOrUpdateModelRequest) (*model_service.ModelInfo, error) {
 	clientReq := &model_service.ModelInfo{
 		Provider:      req.Provider,
+		ModelId:       req.ModelId,
 		ModelType:     req.ModelType,
 		Model:         req.Model,
 		DisplayName:   req.DisplayName,
