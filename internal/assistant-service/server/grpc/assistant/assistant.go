@@ -51,7 +51,7 @@ func (s *Service) GetAssistantByIds(ctx context.Context, req *assistant_service.
 }
 
 // AssistantCreate 创建智能体
-func (s *Service) AssistantCreate(ctx context.Context, req *assistant_service.AssistantCreateReq) (*emptypb.Empty, error) {
+func (s *Service) AssistantCreate(ctx context.Context, req *assistant_service.AssistantCreateReq) (*assistant_service.AssistantCreateResp, error) {
 	// 组装model参数
 	assistant := &model.Assistant{
 		AvatarPath: req.AssistantBrief.AvatarPath,
@@ -70,7 +70,9 @@ func (s *Service) AssistantCreate(ctx context.Context, req *assistant_service.As
 		return nil, errStatus(errs.Code_AssistantErr, status)
 	}
 
-	return &emptypb.Empty{}, nil
+	return &assistant_service.AssistantCreateResp{
+		AssistantId: strconv.FormatUint(uint64(assistant.ID), 10),
+	}, nil
 }
 
 // AssistantUpdate 修改智能体

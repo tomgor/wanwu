@@ -13,8 +13,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AssistantCreate(ctx *gin.Context, userId, orgId string, req request.AppBriefConfig) (interface{}, error) {
-	_, err := assistant.AssistantCreate(ctx, &assistant_service.AssistantCreateReq{
+func AssistantCreate(ctx *gin.Context, userId, orgId string, req request.AppBriefConfig) (response.AssistantCreateResp, error) {
+	resp, err := assistant.AssistantCreate(ctx, &assistant_service.AssistantCreateReq{
 		AssistantBrief: appBriefConfigModel2Proto(req),
 		Identity: &assistant_service.Identity{
 			UserId: userId,
@@ -22,9 +22,11 @@ func AssistantCreate(ctx *gin.Context, userId, orgId string, req request.AppBrie
 		},
 	})
 	if err != nil {
-		return nil, err
+		return response.AssistantCreateResp{}, err
 	}
-	return nil, nil
+	return response.AssistantCreateResp{
+		AssistantId: resp.AssistantId,
+	}, nil
 }
 
 func AssistantUpdate(ctx *gin.Context, userId, orgId string, req request.AssistantBrief) (interface{}, error) {
