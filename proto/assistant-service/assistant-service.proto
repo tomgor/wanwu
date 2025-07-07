@@ -8,6 +8,7 @@ import "proto/common/common.proto";
 option go_package = "github.com/UnicomAI/wanwu/api/proto/assistant-service";
 
 service AssistantService {
+  // --- assistant ---
   rpc GetAssistantByIds(GetAssistantByIdsReq) returns (AppBriefList) {}   // 根据智能体id集合获取智能体列表
   rpc AssistantCreate(AssistantCreateReq) returns (AssistantCreateResp) {}
   rpc AssistantUpdate(AssistantUpdateReq) returns (google.protobuf.Empty) {}
@@ -15,19 +16,26 @@ service AssistantService {
   rpc AssistantDelete(AssistantDeleteReq) returns (google.protobuf.Empty) {}
   rpc GetAssistantListMyAll(GetAssistantListMyAllReq) returns (AppBriefList) {}
   rpc GetAssistantInfo(GetAssistantInfoReq) returns (AssistantInfo) {}
+
+  // --- workFlow ---
   rpc AssistantWorkFlowCreate(AssistantWorkFlowCreateReq) returns (google.protobuf.Empty) {}
   rpc AssistantWorkFlowDelete(AssistantWorkFlowDeleteReq) returns (google.protobuf.Empty) {}
   rpc AssistantWorkFlowEnableSwitch(AssistantWorkFlowEnableSwitchReq) returns (google.protobuf.Empty) {}
+
+  // --- action ---
   rpc AssistantActionCreate(AssistantActionCreateReq) returns (AssistantActionCreateResp) {}
   rpc AssistantActionDelete(AssistantActionDeleteReq) returns (google.protobuf.Empty) {}
   rpc AssistantActionUpdate(AssistantActionUpdateReq) returns (google.protobuf.Empty) {}
   rpc GetAssistantActionInfo(GetAssistantActionInfoReq) returns (GetAssistantActionInfoResp) {}
   rpc AssistantActionEnableSwitch(AssistantActionEnableSwitchReq) returns (google.protobuf.Empty) {}
+
+  // --- conversation ---
   rpc ConversationCreate(ConversationCreateReq) returns (ConversationCreateResp) {}
   rpc ConversationDelete(ConversationDeleteReq) returns (google.protobuf.Empty) {}
   rpc GetConversationList(GetConversationListReq) returns (GetConversationListResp) {}
   rpc GetConversationDetailList(GetConversationDetailListReq) returns (GetConversationDetailListResp) {}
   rpc AssistantConversionStream(AssistantConversionStreamReq) returns (stream AssistantConversionStreamResp) {}
+  rpc ConversationDeleteByAssistantId(ConversationDeleteByAssistantIdReq) returns (google.protobuf.Empty) {}
 }
   
 message AssistantConversionStreamResp {
@@ -294,4 +302,9 @@ message ConversionStreamFile{
   string fileName = 1;
   int64 fileSize = 2;
   string fileUrl = 3;
+}
+
+message ConversationDeleteByAssistantIdReq {
+  string assistantId = 1;
+  Identity identity = 2;
 }

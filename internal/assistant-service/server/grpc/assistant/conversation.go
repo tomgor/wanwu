@@ -767,3 +767,11 @@ func saveConversationDetailToES(ctx context.Context, req *assistant_service.Assi
 		indexName, req.AssistantId, req.ConversationId)
 	return nil
 }
+
+// ConversationDeleteByAssistantId 根据智能体ID删除对话
+func (s *Service) ConversationDeleteByAssistantId(ctx context.Context, req *assistant_service.ConversationDeleteByAssistantIdReq) (*emptypb.Empty, error) {
+	if status := s.cli.DeleteConversationByAssistantID(ctx, req.AssistantId, req.Identity.UserId, req.Identity.OrgId); status != nil {
+		return nil, errStatus(errs.Code_AssistantConversationErr, status)
+	}
+	return &emptypb.Empty{}, nil
+}
