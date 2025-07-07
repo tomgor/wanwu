@@ -20,32 +20,34 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AssistantService_GetAssistantByIds_FullMethodName             = "/assistant_service.AssistantService/GetAssistantByIds"
-	AssistantService_AssistantCreate_FullMethodName               = "/assistant_service.AssistantService/AssistantCreate"
-	AssistantService_AssistantUpdate_FullMethodName               = "/assistant_service.AssistantService/AssistantUpdate"
-	AssistantService_AssistantConfigUpdate_FullMethodName         = "/assistant_service.AssistantService/AssistantConfigUpdate"
-	AssistantService_AssistantDelete_FullMethodName               = "/assistant_service.AssistantService/AssistantDelete"
-	AssistantService_GetAssistantListMyAll_FullMethodName         = "/assistant_service.AssistantService/GetAssistantListMyAll"
-	AssistantService_GetAssistantInfo_FullMethodName              = "/assistant_service.AssistantService/GetAssistantInfo"
-	AssistantService_AssistantWorkFlowCreate_FullMethodName       = "/assistant_service.AssistantService/AssistantWorkFlowCreate"
-	AssistantService_AssistantWorkFlowDelete_FullMethodName       = "/assistant_service.AssistantService/AssistantWorkFlowDelete"
-	AssistantService_AssistantWorkFlowEnableSwitch_FullMethodName = "/assistant_service.AssistantService/AssistantWorkFlowEnableSwitch"
-	AssistantService_AssistantActionCreate_FullMethodName         = "/assistant_service.AssistantService/AssistantActionCreate"
-	AssistantService_AssistantActionDelete_FullMethodName         = "/assistant_service.AssistantService/AssistantActionDelete"
-	AssistantService_AssistantActionUpdate_FullMethodName         = "/assistant_service.AssistantService/AssistantActionUpdate"
-	AssistantService_GetAssistantActionInfo_FullMethodName        = "/assistant_service.AssistantService/GetAssistantActionInfo"
-	AssistantService_AssistantActionEnableSwitch_FullMethodName   = "/assistant_service.AssistantService/AssistantActionEnableSwitch"
-	AssistantService_ConversationCreate_FullMethodName            = "/assistant_service.AssistantService/ConversationCreate"
-	AssistantService_ConversationDelete_FullMethodName            = "/assistant_service.AssistantService/ConversationDelete"
-	AssistantService_GetConversationList_FullMethodName           = "/assistant_service.AssistantService/GetConversationList"
-	AssistantService_GetConversationDetailList_FullMethodName     = "/assistant_service.AssistantService/GetConversationDetailList"
-	AssistantService_AssistantConversionStream_FullMethodName     = "/assistant_service.AssistantService/AssistantConversionStream"
+	AssistantService_GetAssistantByIds_FullMethodName               = "/assistant_service.AssistantService/GetAssistantByIds"
+	AssistantService_AssistantCreate_FullMethodName                 = "/assistant_service.AssistantService/AssistantCreate"
+	AssistantService_AssistantUpdate_FullMethodName                 = "/assistant_service.AssistantService/AssistantUpdate"
+	AssistantService_AssistantConfigUpdate_FullMethodName           = "/assistant_service.AssistantService/AssistantConfigUpdate"
+	AssistantService_AssistantDelete_FullMethodName                 = "/assistant_service.AssistantService/AssistantDelete"
+	AssistantService_GetAssistantListMyAll_FullMethodName           = "/assistant_service.AssistantService/GetAssistantListMyAll"
+	AssistantService_GetAssistantInfo_FullMethodName                = "/assistant_service.AssistantService/GetAssistantInfo"
+	AssistantService_AssistantWorkFlowCreate_FullMethodName         = "/assistant_service.AssistantService/AssistantWorkFlowCreate"
+	AssistantService_AssistantWorkFlowDelete_FullMethodName         = "/assistant_service.AssistantService/AssistantWorkFlowDelete"
+	AssistantService_AssistantWorkFlowEnableSwitch_FullMethodName   = "/assistant_service.AssistantService/AssistantWorkFlowEnableSwitch"
+	AssistantService_AssistantActionCreate_FullMethodName           = "/assistant_service.AssistantService/AssistantActionCreate"
+	AssistantService_AssistantActionDelete_FullMethodName           = "/assistant_service.AssistantService/AssistantActionDelete"
+	AssistantService_AssistantActionUpdate_FullMethodName           = "/assistant_service.AssistantService/AssistantActionUpdate"
+	AssistantService_GetAssistantActionInfo_FullMethodName          = "/assistant_service.AssistantService/GetAssistantActionInfo"
+	AssistantService_AssistantActionEnableSwitch_FullMethodName     = "/assistant_service.AssistantService/AssistantActionEnableSwitch"
+	AssistantService_ConversationCreate_FullMethodName              = "/assistant_service.AssistantService/ConversationCreate"
+	AssistantService_ConversationDelete_FullMethodName              = "/assistant_service.AssistantService/ConversationDelete"
+	AssistantService_GetConversationList_FullMethodName             = "/assistant_service.AssistantService/GetConversationList"
+	AssistantService_GetConversationDetailList_FullMethodName       = "/assistant_service.AssistantService/GetConversationDetailList"
+	AssistantService_AssistantConversionStream_FullMethodName       = "/assistant_service.AssistantService/AssistantConversionStream"
+	AssistantService_ConversationDeleteByAssistantId_FullMethodName = "/assistant_service.AssistantService/ConversationDeleteByAssistantId"
 )
 
 // AssistantServiceClient is the client API for AssistantService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AssistantServiceClient interface {
+	// --- assistant ---
 	GetAssistantByIds(ctx context.Context, in *GetAssistantByIdsReq, opts ...grpc.CallOption) (*AppBriefList, error)
 	AssistantCreate(ctx context.Context, in *AssistantCreateReq, opts ...grpc.CallOption) (*AssistantCreateResp, error)
 	AssistantUpdate(ctx context.Context, in *AssistantUpdateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -53,19 +55,23 @@ type AssistantServiceClient interface {
 	AssistantDelete(ctx context.Context, in *AssistantDeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetAssistantListMyAll(ctx context.Context, in *GetAssistantListMyAllReq, opts ...grpc.CallOption) (*AppBriefList, error)
 	GetAssistantInfo(ctx context.Context, in *GetAssistantInfoReq, opts ...grpc.CallOption) (*AssistantInfo, error)
+	// --- workFlow ---
 	AssistantWorkFlowCreate(ctx context.Context, in *AssistantWorkFlowCreateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AssistantWorkFlowDelete(ctx context.Context, in *AssistantWorkFlowDeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AssistantWorkFlowEnableSwitch(ctx context.Context, in *AssistantWorkFlowEnableSwitchReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// --- action ---
 	AssistantActionCreate(ctx context.Context, in *AssistantActionCreateReq, opts ...grpc.CallOption) (*AssistantActionCreateResp, error)
 	AssistantActionDelete(ctx context.Context, in *AssistantActionDeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AssistantActionUpdate(ctx context.Context, in *AssistantActionUpdateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetAssistantActionInfo(ctx context.Context, in *GetAssistantActionInfoReq, opts ...grpc.CallOption) (*GetAssistantActionInfoResp, error)
 	AssistantActionEnableSwitch(ctx context.Context, in *AssistantActionEnableSwitchReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// --- conversation ---
 	ConversationCreate(ctx context.Context, in *ConversationCreateReq, opts ...grpc.CallOption) (*ConversationCreateResp, error)
 	ConversationDelete(ctx context.Context, in *ConversationDeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetConversationList(ctx context.Context, in *GetConversationListReq, opts ...grpc.CallOption) (*GetConversationListResp, error)
 	GetConversationDetailList(ctx context.Context, in *GetConversationDetailListReq, opts ...grpc.CallOption) (*GetConversationDetailListResp, error)
 	AssistantConversionStream(ctx context.Context, in *AssistantConversionStreamReq, opts ...grpc.CallOption) (grpc.ServerStreamingClient[AssistantConversionStreamResp], error)
+	ConversationDeleteByAssistantId(ctx context.Context, in *ConversationDeleteByAssistantIdReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type assistantServiceClient struct {
@@ -285,10 +291,21 @@ func (c *assistantServiceClient) AssistantConversionStream(ctx context.Context, 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type AssistantService_AssistantConversionStreamClient = grpc.ServerStreamingClient[AssistantConversionStreamResp]
 
+func (c *assistantServiceClient) ConversationDeleteByAssistantId(ctx context.Context, in *ConversationDeleteByAssistantIdReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AssistantService_ConversationDeleteByAssistantId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AssistantServiceServer is the server API for AssistantService service.
 // All implementations must embed UnimplementedAssistantServiceServer
 // for forward compatibility.
 type AssistantServiceServer interface {
+	// --- assistant ---
 	GetAssistantByIds(context.Context, *GetAssistantByIdsReq) (*AppBriefList, error)
 	AssistantCreate(context.Context, *AssistantCreateReq) (*AssistantCreateResp, error)
 	AssistantUpdate(context.Context, *AssistantUpdateReq) (*emptypb.Empty, error)
@@ -296,19 +313,23 @@ type AssistantServiceServer interface {
 	AssistantDelete(context.Context, *AssistantDeleteReq) (*emptypb.Empty, error)
 	GetAssistantListMyAll(context.Context, *GetAssistantListMyAllReq) (*AppBriefList, error)
 	GetAssistantInfo(context.Context, *GetAssistantInfoReq) (*AssistantInfo, error)
+	// --- workFlow ---
 	AssistantWorkFlowCreate(context.Context, *AssistantWorkFlowCreateReq) (*emptypb.Empty, error)
 	AssistantWorkFlowDelete(context.Context, *AssistantWorkFlowDeleteReq) (*emptypb.Empty, error)
 	AssistantWorkFlowEnableSwitch(context.Context, *AssistantWorkFlowEnableSwitchReq) (*emptypb.Empty, error)
+	// --- action ---
 	AssistantActionCreate(context.Context, *AssistantActionCreateReq) (*AssistantActionCreateResp, error)
 	AssistantActionDelete(context.Context, *AssistantActionDeleteReq) (*emptypb.Empty, error)
 	AssistantActionUpdate(context.Context, *AssistantActionUpdateReq) (*emptypb.Empty, error)
 	GetAssistantActionInfo(context.Context, *GetAssistantActionInfoReq) (*GetAssistantActionInfoResp, error)
 	AssistantActionEnableSwitch(context.Context, *AssistantActionEnableSwitchReq) (*emptypb.Empty, error)
+	// --- conversation ---
 	ConversationCreate(context.Context, *ConversationCreateReq) (*ConversationCreateResp, error)
 	ConversationDelete(context.Context, *ConversationDeleteReq) (*emptypb.Empty, error)
 	GetConversationList(context.Context, *GetConversationListReq) (*GetConversationListResp, error)
 	GetConversationDetailList(context.Context, *GetConversationDetailListReq) (*GetConversationDetailListResp, error)
 	AssistantConversionStream(*AssistantConversionStreamReq, grpc.ServerStreamingServer[AssistantConversionStreamResp]) error
+	ConversationDeleteByAssistantId(context.Context, *ConversationDeleteByAssistantIdReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAssistantServiceServer()
 }
 
@@ -378,6 +399,9 @@ func (UnimplementedAssistantServiceServer) GetConversationDetailList(context.Con
 }
 func (UnimplementedAssistantServiceServer) AssistantConversionStream(*AssistantConversionStreamReq, grpc.ServerStreamingServer[AssistantConversionStreamResp]) error {
 	return status.Errorf(codes.Unimplemented, "method AssistantConversionStream not implemented")
+}
+func (UnimplementedAssistantServiceServer) ConversationDeleteByAssistantId(context.Context, *ConversationDeleteByAssistantIdReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConversationDeleteByAssistantId not implemented")
 }
 func (UnimplementedAssistantServiceServer) mustEmbedUnimplementedAssistantServiceServer() {}
 func (UnimplementedAssistantServiceServer) testEmbeddedByValue()                          {}
@@ -753,6 +777,24 @@ func _AssistantService_AssistantConversionStream_Handler(srv interface{}, stream
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type AssistantService_AssistantConversionStreamServer = grpc.ServerStreamingServer[AssistantConversionStreamResp]
 
+func _AssistantService_ConversationDeleteByAssistantId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConversationDeleteByAssistantIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssistantServiceServer).ConversationDeleteByAssistantId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssistantService_ConversationDeleteByAssistantId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssistantServiceServer).ConversationDeleteByAssistantId(ctx, req.(*ConversationDeleteByAssistantIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AssistantService_ServiceDesc is the grpc.ServiceDesc for AssistantService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -835,6 +877,10 @@ var AssistantService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetConversationDetailList",
 			Handler:    _AssistantService_GetConversationDetailList_Handler,
+		},
+		{
+			MethodName: "ConversationDeleteByAssistantId",
+			Handler:    _AssistantService_ConversationDeleteByAssistantId_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
