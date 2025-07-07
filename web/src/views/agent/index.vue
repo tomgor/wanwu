@@ -150,7 +150,7 @@ export default {
         },
         openApiDialog(){
             this.$refs.apiKeyDialog.showDialog();
-        }
+        },
     }
 }
 </script>
