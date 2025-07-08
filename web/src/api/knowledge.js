@@ -260,3 +260,44 @@ export const docImport = (data)=>{
         data
     })
 };
+
+//删除知识库标签
+export const delTag = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/tag`,
+        method: 'delete',
+        data
+    })
+};
+//查询知识库标签列表
+export const tagList = (params)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/tag`,
+        method: 'get',
+        params
+    })
+};
+//创建知识库标签
+export const createTag = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/tag`,
+        method: 'post',
+        data
+    })
+};
+//修改知识库标签
+export const editTag = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/tag`,
+        method: 'put',
+        data
+    })
+};
+//绑定修改知识库标签
+export const bindTag = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/tag/bind`,
+        method: 'post',
+        data
+    })
+};

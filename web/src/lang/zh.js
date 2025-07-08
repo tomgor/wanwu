@@ -154,6 +154,10 @@ export default {
             noSource: '若没有可选资源，请先释放卡资源',
             hint: '一次启动一个实例(一个实例可以占多张卡)',
             reload: '刷新数据'
+        },
+        info:{
+            delInfo:'删除成功',
+            create:'创建成功'
         }
     },
     docDownload: {
@@ -700,7 +704,11 @@ export default {
         backAnalysis:'返回解析',
         saveIntoData:'保存成功结果入库',
         fileSizeTips:'上传文件不能超过15MB!',
-        inputDesc:'请输入描述'
+        inputDesc:'请输入描述',
+        keyWordManage:'关键词管理',
+        keyWordTip:'知识库问答场景，可配置问题中使用的口语化关键词与知识库文档中词语的映射规则，便于提升知识库内容的召回效果及回答准确率 。',
+        keyWordPlaceholder:'输入问题中的关键词或文档中的词语搜索',
+        newKeyWord:'新建关键词'
     },
     explore:{
         unFavorite:'是否确定将该应用从常用应用列表中移除?',
@@ -760,5 +768,11 @@ export default {
         fileClear:'文件清除成功',
         uploadFinish:'上传完成',
         uploadFail:'上传失败，请点击续传继续上传...'
+    },
+    keyword:{
+        quesKeyword:'问题中的关键词',
+        docWord:'文档中的词语',
+        linkKnowledge:'关联知识库',
+        undateTime:'更新时间'
     }
 }

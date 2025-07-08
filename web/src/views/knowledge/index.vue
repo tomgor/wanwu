@@ -5,10 +5,15 @@
       <span class="page-title-name">{{$t('knowledgeManage.knowledge')}}</span>
     </div>
     <div style="padding: 20px">
-      <search-input class="cover-input-icon" :placeholder="$t('knowledgeManage.searchPlaceholder')" ref="searchInput" @handleSearch="getTableData" />
-      <el-button class="add-button" size="mini" type="primary" @click="showCreate()" icon="el-icon-plus">
-        {{$t('common.button.create')}}
-      </el-button>
+      <div class="search-box">
+        <search-input class="cover-input-icon" :placeholder="$t('knowledgeManage.searchPlaceholder')" ref="searchInput" @handleSearch="getTableData" />
+        <div>
+          <el-button size="mini" type="primary" @click="$router.push('/knowledge/keyword')">{{$t('knowledgeManage.keyWordManage')}}</el-button>
+          <el-button size="mini" type="primary" @click="showCreate()" icon="el-icon-plus">
+            {{$t('common.button.create')}}
+          </el-button>
+        </div>
+      </div>
       <knowledgeList :appData="knowledgeData" @editItem="showCreate" @reloadData="getTableData" ref="knowledgeList" v-loading="tableLoading" />
       <createKnowledge ref="createKnowledge" @reloadData="getTableData" />
     </div>
@@ -52,8 +57,9 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.add-button {
- float: right;
+.search-box {
+ display:flex;
+ justify-content:space-between;
 }
 
 /deep/{
