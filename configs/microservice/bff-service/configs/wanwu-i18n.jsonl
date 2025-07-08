@@ -41,9 +41,9 @@
 {"code":110000,"key":"bff_workflow_apps_list","langs":{"en":"get workflow app list err: %v","zh":"获取工作流应用列表错误：%v"}}
 {"code":110000,"key":"bff_workflow_app_delete","langs":{"en":"delete workflow app err: %v","zh":"删除工作流应用错误：%v"}}
 {"code":0,"key":"------ custom ------","langs":{}}
-{"code":0,"key":"bff_custom_home_title","langs":{"en":"Yuanjing","zh":"元景"}}
-{"code":0,"key":"bff_custom_tab_title","langs":{"en":"Yuanjing","zh":"元景"}}
-{"code":0,"key":"bff_custom_login_welcome_text","langs":{"en":"Hi! Welcome to the Yuanjing MaaS intelligent agent platform","zh":"嗨！欢迎来到元景MaaS智能体平台"}}
+{"code":0,"key":"bff_custom_home_title","langs":{"en":"Yuanjing WanWu","zh":"元景万悟"}}
+{"code":0,"key":"bff_custom_tab_title","langs":{"en":"Yuanjing WanWu","zh":"元景万悟"}}
+{"code":0,"key":"bff_custom_login_welcome_text","langs":{"en":"Hi! Welcome to the Yuanjing WanWu intelligent agent platform","zh":"嗨！欢迎来到元景万悟智能体平台"}}
 {"code":120002,"key":"iam_captcha_refresh","langs":{"en":"refresh but key or code empty","zh":"刷新验证码时 key 或 code 为空"}}
 {"code":120002,"key":"iam_captcha_create","langs":{"en":"code not created,  please refresh: %v","zh":"验证码未生成，请刷新: %v"}}
 {"code":120002,"key":"iam_captcha_check","langs":{"en":"check captcha but key or code empty","zh":"检查验证码时 key 或 code 为空"}}
