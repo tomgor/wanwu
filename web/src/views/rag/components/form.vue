@@ -73,7 +73,7 @@
           </div>
           <div class="block prompt-box">
             <p class="block-title">
-              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+              <!-- <img :src="require('@/assets/imgs/require.png')" class="required-label"/> -->
               Rerank模型
             </p>
             <div class="rl">
@@ -222,7 +222,7 @@ export default {
             );
           });
           if (changed) {
-            if(newVal['modelParams']!== '' && newVal['rerankParams']!== '' && newVal['knowledgeBaseIds'].length > 0){
+            if(newVal['modelParams']!== '' && newVal['knowledgeBaseIds'].length > 0){
               this.updateInfo();
             }
           }
@@ -284,10 +284,10 @@ export default {
         this.$message.warning('请选择模型！')
         return false
       }
-      if(this.editForm.rerankParams === ''){
-        this.$message.warning('请选rerank择模型！')
-        return false
-      }
+      // if(this.editForm.rerankParams === ''){
+      //   this.$message.warning('请选rerank择模型！')
+      //   return false
+      // }
       if(this.editForm.knowledgeBaseIds.length === 0){
         this.$message.warning('请选择关联知识库！')
         return false
@@ -378,11 +378,11 @@ export default {
           provider: modeInfo.provider,
         },
         rerankConfig:{
-          displayName: rerankInfo.displayName,
-          model: rerankInfo.model,
-          modelId: rerankInfo.modelId,
-          modelType: rerankInfo.modelType,
-          provider: rerankInfo.provider,
+          displayName: rerankInfo ? rerankInfo.displayName : '',
+          model: rerankInfo ? rerankInfo.model : '',
+          modelId: rerankInfo ? rerankInfo.modelId : '',
+          modelType: rerankInfo ? rerankInfo.modelType : '',
+          provider: rerankInfo ? rerankInfo.provider : '',
         }
       }
       const res = await updateRagConfig(fromParams)

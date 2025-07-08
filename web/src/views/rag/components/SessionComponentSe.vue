@@ -163,7 +163,7 @@ export default {
           //捕获图片加载错误
           document.body.addEventListener('error', e => {
               if (e.target.tagName === 'IMG') {
-                handleImageError(e.target);
+                this.handleImageError(e.target);
               }
           }, true); 
         },
