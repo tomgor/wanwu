@@ -5,7 +5,7 @@
         width="20%"
         :before-close="handleClose">
         <div>
-            <el-input placeholder="搜索标签" suffix-icon="el-icon-search" @keyup.enter.native="addByEnterKey"></el-input>
+            <el-input placeholder="搜索标签" suffix-icon="el-icon-search" @keyup.enter.native="addByEnterKey" v-model="tagName"></el-input>
             <div class="add"  @click="addTag"><span class="el-icon-plus add-icon"></span>创建标签</div>
             <div class="tag-box">
                 <div 
@@ -15,9 +15,9 @@
                 @mouseleave="mouseLeave(item)"
                 @dblclick="handleDoubleClick(item)"
                 >
-                    <el-checkbox v-model="item.checked" v-if="!item.showIpt">{{item.tagName}}</el-checkbox>
+                    <el-checkbox v-model="item.checked" v-if="!item.showIpt" @change="checkboxChange(item)">{{item.tagName}}</el-checkbox>
                     <el-input v-model="item.tagName" v-if="item.showIpt" @blur="inputBlur(item)" ></el-input>
-                    <span class="el-icon-close del-icon" v-if="item.showDel && !item.showIpt"></span>
+                    <span class="el-icon-close del-icon" v-if="item.showDel && !item.showIpt" @click="delTag(item.tagId)"></span>
                 </div>
             </div>
         </div>
@@ -28,34 +28,49 @@
     </el-dialog>
 </template>
 <script>
+import { delTag,tagList,createTag,editTag,bindTag } from "@/api/knowledge";
 export default {
     data(){
         return{
             dialogVisible:false,
-            tagList:[
-                {
-                    tagName:'标签1',
-                    checked:false,
-                    showDel:false,
-                    showIpt:false
-                },
-                {
-                    tagName:'标签2',
-                    checked:false,
-                    showDel:false,
-                    showIpt:false
-                },
-                {
-                    tagName:'标签3',
-                    checked:false,
-                    showDel:false,
-                    showIpt:false
-                }
-            ]
+            tagList:[],
+            tagName:'',
+            knowledgeId:''
         }
     },
+    created(){
+       this.getList();
+    },
     methods:{
-        showDiaglog(){
+        checkboxChange(item){
+           const option = item.checked ? 0 : 1
+           bindTag({knowledgeId:this.knowledgeId,tagIdList:[item.tagId],option}).then(res =>{
+                if(res.code === 0){
+                    this.$emit('relodaData')
+                }
+            })
+        },
+        getList(){
+            tagList({tagName:this.tagName}).then(res => {
+                if(res.code === 0){
+                    this.tagList = res.data.knowledgeTagList.map(item =>({
+                        ...item,
+                        checked:false,
+                        showDel:false,
+                        showIpt:false
+                    }))
+                }
+            })
+        },
+        delTag(tagId){
+            delTag({tagId}).then(res =>{
+                if(res.code === 0){
+                    this.getList()
+                }
+            })
+        },
+        showDiaglog(id){
+            this.knowledgeId = id
             this.dialogVisible = true;
         },
         handleClose(){
@@ -71,7 +86,27 @@ export default {
             n.showIpt = true
         },
         inputBlur(n){
-            n.showIpt = false
+            if(n.tagId){
+                this.edit_tag(n);
+            }else{
+                this.add_Tag(n);
+            }
+        },
+        add_Tag(n){
+            createTag({tagName:n.tagName}).then(res =>{
+                if(res.code === 0){
+                    n.showIpt = false;
+                    this.getList();
+                }
+            })
+        },
+        edit_tag(n){
+            editTag({tagId:n.tagId,tagName:n.tagName}).then(res =>{
+                if(res.code === 0){
+                    n.showIpt = false;
+                    this.getList();
+                }
+            })
         },
         addTag(){
             this.tagList.unshift(
@@ -85,7 +120,7 @@ export default {
         },
         addByEnterKey(e){
             if (e.keyCode === 13){
-                console.log('搜索标签')
+                 this.getList();
             }
         }
     }

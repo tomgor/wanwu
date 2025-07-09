@@ -209,7 +209,6 @@ export default {
         z-index:999;
         top:0;
         left:0;
-        // border-bottom:1px solid #eaeaea;
         display:flex;
         justify-content:flex-end;
         align-content:center;

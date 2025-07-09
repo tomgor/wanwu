@@ -35,11 +35,11 @@
             </el-tooltip>
           </div>
           <div class="tags">
-            <span :class="['smartDate','tagList']" v-if="tagList.length === 0" @click.stop="addTag">
+            <span :class="['smartDate','tagList']" v-if="n.knowledgeTagList.length === 0" @click.stop="addTag(n.knowledgeId)">
               <span class="el-icon-price-tag icon-tag"></span>
               添加标签
             </span>
-            <span v-else>tag1,tag2,tag3</span>
+            <span v-else>{{formattedTagNames(n.knowledgeTagList) }}</span>
           </div>
           <div class="editor">
             <el-dropdown @command="handleClick($event, n)" placement="top">
@@ -56,7 +56,7 @@
       </template>
     </div>
     <el-empty class="noData" v-if="!(listData && listData.length)" :description="$t('common.noData')"></el-empty>
-    <tagDialog ref="tagDialog" />
+    <tagDialog ref="tagDialog" @relodaData="relodaData"/>
   </div>
 </template>
 
@@ -84,15 +84,21 @@ export default {
   },
   data(){
     return{
-      tagList:[],
       apptype:AppType,
       basePath: this.$basePath,
       listData:[]
     }
   },
   methods:{
+  formattedTagNames(data){
+    const tags = data.map(item => item.tagName).join(', ');
+    if (tags.length > 30) {
+        return tags.slice(0, 30) + '...';
+    }
+    return tags;
+  },
   addTag(){
-    this.$refs.tagDialog.showDiaglog();
+    this.$refs.tagDialog.showDiaglog(id);
   },
   showCreate(){
     this.$parent.showCreate();
@@ -109,6 +115,9 @@ export default {
     },
     editItem(row) {
       this.$emit('editItem', row)
+    },
+    relodaData(){
+      this.$emit('reloadData');
     },
     deleteItem(knowledgeId){
       this.$confirm(this.$t('knowledgeManage.delKnowledgeTips'), this.$t('knowledgeManage.tip'), {
