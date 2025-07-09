@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
+	assistant_template "github.com/UnicomAI/wanwu/internal/bff-service/pkg/assistant-template"
 	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/i18n"
 	"github.com/UnicomAI/wanwu/internal/bff-service/server/http/handler"
 	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
@@ -85,6 +86,11 @@ func main() {
 
 	// init model provider
 	mp.Init(config.Cfg().Server.CallbackUrl)
+
+	// init assistant template
+	if err := assistant_template.Init(ctx); err != nil {
+		log.Fatalf("init assistant template err: %v", err)
+	}
 
 	// start http handler
 	handler.Start(ctx)

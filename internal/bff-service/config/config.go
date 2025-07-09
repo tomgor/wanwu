@@ -12,13 +12,14 @@ var (
 )
 
 type Config struct {
-	Server     ServerConfig     `json:"server" mapstructure:"server"`
-	Log        LogConfig        `json:"log" mapstructure:"log"`
-	JWT        JWTConfig        `json:"jwt" mapstructure:"jwt"`
-	Decrypt    DecryptPasswd    `json:"decrypt-passwd" mapstructure:"decrypt-passwd"`
-	I18n       i18n.Config      `json:"i18n" mapstructure:"i18n"`
-	CustomInfo CustomInfoConfig `json:"custom-info" mapstructure:"custom-info"`
-	DocCenter  DocCenterConfig  `json:"doc-center" mapstructure:"doc-center"`
+	Server            ServerConfig            `json:"server" mapstructure:"server"`
+	Log               LogConfig               `json:"log" mapstructure:"log"`
+	JWT               JWTConfig               `json:"jwt" mapstructure:"jwt"`
+	Decrypt           DecryptPasswd           `json:"decrypt-passwd" mapstructure:"decrypt-passwd"`
+	I18n              i18n.Config             `json:"i18n" mapstructure:"i18n"`
+	AssistantTemplate AssistantTemplateConfig `json:"assistant-template" mapstructure:"assistant-template"`
+	CustomInfo        CustomInfoConfig        `json:"custom-info" mapstructure:"custom-info"`
+	DocCenter         DocCenterConfig         `json:"doc-center" mapstructure:"doc-center"`
 	// middleware
 	Minio minio.Config `json:"minio" mapstructure:"minio"`
 	// microservice
@@ -76,6 +77,10 @@ type AgentServiceConfig struct {
 type UriConfig struct {
 	Port string `json:"port" mapstructure:"port"`
 	Uri  string `json:"uri" mapstructure:"uri"`
+}
+
+type AssistantTemplateConfig struct {
+	ConfigPath string `json:"configPath" mapstructure:"configPath"`
 }
 
 type DocCenterConfig struct {

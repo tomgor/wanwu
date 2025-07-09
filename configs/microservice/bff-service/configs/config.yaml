@@ -52,6 +52,9 @@ i18n:
       name: English
   defaultLang: zh
 
+assistant-template:
+  configPath: configs/microservice/bff-service/configs/assistant_template_config.yaml
+
 custom-info:
   version: v0.0.1
   login:
