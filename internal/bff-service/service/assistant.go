@@ -13,6 +13,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetAssistantTemplateList() (response.ListResult, error) {
+	return response.ListResult{}, nil
+}
+
 func AssistantCreate(ctx *gin.Context, userId, orgId string, req request.AppBriefConfig) (response.AssistantCreateResp, error) {
 	resp, err := assistant.AssistantCreate(ctx, &assistant_service.AssistantCreateReq{
 		AssistantBrief: appBriefConfigModel2Proto(req),
