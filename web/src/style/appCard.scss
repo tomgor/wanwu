@@ -189,6 +189,23 @@
                 }
             }
         }
+        .copy-editor{
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            padding: 10px 10px 10px 20px;
+            background: #384BF7;
+            color:#fff;
+            width:100%;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            .add{
+                margin-right:5px;
+            }
+        }
     }
     .smart-create {
         background: #F4F5FF;

@@ -72,6 +72,11 @@ const constantRoutes = [
                 meta:{perm: [PERMS.AGENT]},
             },
             {
+                path: '/agent/templateDetail',
+                component:resolve =>require(['@/components/agentDetail'],resolve),
+                meta:{perm: [PERMS.AGENT]},
+            },
+            {
                 path: '/rag/test',
                 component:resolve =>require(['@/views/rag/components/form'],resolve),
                 meta:{perm: [PERMS.RAG]},

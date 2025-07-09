@@ -71,3 +71,20 @@ export const deleteApp = (data)=>{
     })
 };
 
+//智能体模版
+export const agnetTemplateList = (params)=>{
+    return request({
+        url: `${BASE_URL}/assistant/template/list`,
+        method: 'get',
+        params
+    })
+};
+//复制智能体
+export const copyAgnetTemplate = (data)=>{
+    return request({
+        url: `${BASE_URL}/assistant/template`,
+        method: 'post',
+        data
+    })
+};
+

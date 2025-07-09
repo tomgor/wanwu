@@ -625,6 +625,7 @@ export default {
           prologue: data.prologue || "",//开场白
           name: data.name || "",
           desc: data.desc || "",
+          instructions:data.instructions || "",//系统提示词
           rerankParams:data.rerankConfig.modelId || "",
           modelConfig:data.modelConfig.config,
           modelParams: data.modelConfig.modelId || "",

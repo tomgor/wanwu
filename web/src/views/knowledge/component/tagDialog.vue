@@ -15,14 +15,14 @@
                 @mouseleave="mouseLeave(item)"
                 @dblclick="handleDoubleClick(item)"
                 >
-                    <el-checkbox v-model="item.selected" v-if="!item.showIpt" @change="checkboxChange(item)">{{item.tagName}}</el-checkbox>
+                    <el-checkbox v-model="item.selected" v-if="!item.showIpt">{{item.tagName}}</el-checkbox>
                     <el-input v-model="item.tagName" v-if="item.showIpt" @blur="inputBlur(item)" ></el-input>
                     <span class="el-icon-close del-icon" v-if="item.showDel && !item.showIpt" @click="delTag(item.tagId)"></span>
                 </div>
             </div>
         </div>
         <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+            <el-button type="primary" @click="submitDialog">确 定</el-button>
         </span>
     </el-dialog>
 </template>
@@ -38,16 +38,17 @@ export default {
         }
     },
     created(){
-       this.getList();
+    //    this.getList();
     },
     methods:{
-        checkboxChange(item){
-           const option = item.selected ? 0 : 1
-           bindTag({knowledgeId:this.knowledgeId,tagIdList:[item.tagId],option}).then(res =>{
+        submitDialog(){
+            const ids = this.tagList.filter(item => item.selected).map(item => item.tagId)
+            bindTag({knowledgeId:this.knowledgeId,tagIdList:ids}).then(res =>{
                 if(res.code === 0){
                     this.$emit('relodaData')
                 }
             })
+            this.dialogVisible = false
         },
         getList(){
             tagList({knowledgeId:this.knowledgeId,tagName:this.tagName}).then(res => {

@@ -1,7 +1,7 @@
 <template>
   <div class="app-card-container">
     <div class="app-card">
-      <div class="smart rl smart-create" v-if="isShowTool">
+      <div class="smart rl smart-create" v-if="isShowTool && validateAgnet()">
         <div class="app-card-create" @click="showCreate">
           <div class="create-img-wrap">
             <img v-if="type" class="create-type" :src="require(`@/assets/imgs/create_${type}.png`)" alt="" />
@@ -10,7 +10,6 @@
           </div>
           <span>{{`创建${apptype[type]}`}}</span>
         </div>
-        <!-- <div></div> -->
       </div>
       <div
         v-if="listData && listData.length"
@@ -19,6 +18,8 @@
         :key="`${i}sm`"
         :style="`cursor: ${isCannotClick(n) ? 'pointer' : 'default'} !important;`"
         @click.stop="isCannotClick(n) && toEdit(n)"
+        @mouseenter="mouseEnter(n)"
+        @mouseleave="mouseLeave(n)"
       >
         <img v-if="n.avatar && n.avatar.path" class="logo" :src="basePath + '/user/api/' + n.avatar.path" />
         <span :class="['tag-app', `${n.appType}-tag`]">{{apptype[n.appType] || ''}}</span>
@@ -115,14 +116,18 @@
                 {{$t('common.button.publish')}}
               </el-dropdown-item>
               <!--暂时隐藏-->
-              <el-dropdown-item
+              <!-- <el-dropdown-item
                 command="cancelPublish"
                 v-if="n.publishType && n.appId !== 'example'"
               >
                 {{$t('common.button.cancelPublish')}}
-              </el-dropdown-item>
+              </el-dropdown-item> -->
             </el-dropdown-menu>
           </el-dropdown>
+        </div>
+        <div class="copy-editor" v-if="type==='agent'&& agnetType === 'template' && n.isShowCopy" @click="copyTemplate(n)">
+          <span class="el-icon-plus add"></span>
+          <span>复制</span>
         </div>
       </div>
     </div>
@@ -132,18 +137,20 @@
 
 <script>
 import { AppType } from "@/utils/commonSet";
-import { deleteApp, appCancelPublish } from "@/api/appspace";
+import { deleteApp, appCancelPublish,copyAgnetTemplate } from "@/api/appspace";
 import { copyWorkFlow, publishWorkFlow, copyExample } from "@/api/workflow";
 import { setFavorite } from "@/api/explore";
 export default {
   props:{
     type: String,
     showCreate: Function,
+    agnetType:String,
     appData:{
       type:Array,
       required:true,
       default:[]
     },
+    agent_type:'agent_template',
     isShowTool: false,
     isShowPublished: false,
     appFrom:{
@@ -169,6 +176,32 @@ export default {
     };
   },
   methods: {
+    copyTemplate(n){
+      copyAgnetTemplate({assistantTemplateId:n.assistantTemplateId}).then(res =>{
+        if(res.code === 0){
+          this.$message.success('复制成功')
+          const id = res.data.assistantId
+          this.$router.push({path:`/agent/test?id=${id}`})
+        }
+      })
+    },
+    mouseEnter(n){
+      if(this.type === 'agent' && this.agnetType === 'template'){
+        n.isShowCopy = true;
+      }
+    },
+    mouseLeave(n){
+      if(this.type === 'agent' && this.agnetType === 'template'){
+        n.isShowCopy = false;
+      }
+    },
+    validateAgnet(){
+      if(this.type === 'agent' && this.agnetType === 'template'){
+        return false
+      }else{
+        return true
+      }
+    },
     isCannotClick(n) {
       return (n.appType === 'workflow' && !n.publishType && n.appId !== 'example') || n.appType !== 'workflow'
     },
@@ -356,7 +389,10 @@ export default {
     toEdit(row) {
       if(this.appFrom === 'explore'){
         this.commonToChat(row)
-      }else{
+      }else if(this.type === 'agent' && this.agnetType === 'template'){
+        this.$router.push({path:`/agent/templateDetail?id=${row.assistantTemplateId}`})
+      }
+      else{
         this.commonMethods("edit", row);
       }
     },
