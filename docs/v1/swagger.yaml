@@ -480,6 +480,32 @@ definitions:
     required:
     - assistantId
     type: object
+  request.AssistantTemplateRequest:
+    properties:
+      avatar:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 图标
+      desc:
+        description: 描述
+        type: string
+      instructions:
+        description: 系统提示词
+        type: string
+      name:
+        description: 名称
+        type: string
+      prologue:
+        description: 开场白
+        type: string
+      recommendQuestion:
+        description: 推荐问题
+        items:
+          type: string
+        type: array
+    required:
+    - name
+    type: object
   request.Avatar:
     properties:
       key:
@@ -1421,6 +1447,47 @@ definitions:
     properties:
       assistantId:
         type: string
+    type: object
+  response.AssistantTemplateInfo:
+    properties:
+      avatar:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 图标
+      category:
+        description: 种类(gov:政务,industry:工业,edu:文教,medical:医疗)
+        type: string
+      desc:
+        description: 描述
+        type: string
+      feature:
+        description: 特性说明
+        type: string
+      instructions:
+        description: 系统提示词
+        type: string
+      name:
+        description: 名称
+        type: string
+      prologue:
+        description: 开场白
+        type: string
+      recommendQuestion:
+        description: 推荐问题
+        items:
+          type: string
+        type: array
+      scenario:
+        description: 应用场景
+        type: string
+      summary:
+        description: 使用概述
+        type: string
+      workFlowInstruction:
+        description: 工作流配置说明
+        type: string
+    required:
+    - name
     type: object
   response.Captcha:
     properties:
@@ -3057,6 +3124,73 @@ paths:
       security:
       - JWT: []
       summary: 智能体流式问答
+      tags:
+      - agent
+  /assistant/template:
+    post:
+      consumes:
+      - application/json
+      description: 通过复制创建智能体
+      parameters:
+      - description: 复制创建智能体所需信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.AssistantTemplateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 复制创建智能体
+      tags:
+      - agent
+  /assistant/template/list:
+    get:
+      consumes:
+      - application/json
+      description: 智能体模板列表
+      parameters:
+      - description: 智能体类型
+        enum:
+        - gov
+        - industry
+        - edu
+        - medical
+        in: query
+        name: category
+        type: string
+      - description: 智能体名称
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.AssistantTemplateInfo'
+                        type: array
+                    type: object
+              type: object
+      security:
+      - JWT: []
+      summary: 智能体模板列表
       tags:
       - agent
   /assistant/workflow:

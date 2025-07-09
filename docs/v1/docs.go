@@ -1216,6 +1216,120 @@ const docTemplate = `{
                 }
             }
         },
+        "/assistant/template": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "通过复制创建智能体",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "复制创建智能体",
+                "parameters": [
+                    {
+                        "description": "复制创建智能体所需信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AssistantTemplateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assistant/template/list": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "智能体模板列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "智能体模板列表",
+                "parameters": [
+                    {
+                        "enum": [
+                            "gov",
+                            "industry",
+                            "edu",
+                            "medical"
+                        ],
+                        "type": "string",
+                        "description": "智能体类型",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "智能体名称",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.AssistantTemplateInfo"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/assistant/workflow": {
             "post": {
                 "security": [
@@ -5378,6 +5492,45 @@ const docTemplate = `{
                 }
             }
         },
+        "request.AssistantTemplateRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "avatar": {
+                    "description": "图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "desc": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "instructions": {
+                    "description": "系统提示词",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "prologue": {
+                    "description": "开场白",
+                    "type": "string"
+                },
+                "recommendQuestion": {
+                    "description": "推荐问题",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "request.Avatar": {
             "type": "object",
             "properties": {
@@ -6759,6 +6912,65 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "assistantId": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.AssistantTemplateInfo": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "avatar": {
+                    "description": "图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "category": {
+                    "description": "种类(gov:政务,industry:工业,edu:文教,medical:医疗)",
+                    "type": "string"
+                },
+                "desc": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "feature": {
+                    "description": "特性说明",
+                    "type": "string"
+                },
+                "instructions": {
+                    "description": "系统提示词",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "prologue": {
+                    "description": "开场白",
+                    "type": "string"
+                },
+                "recommendQuestion": {
+                    "description": "推荐问题",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "scenario": {
+                    "description": "应用场景",
+                    "type": "string"
+                },
+                "summary": {
+                    "description": "使用概述",
+                    "type": "string"
+                },
+                "workFlowInstruction": {
+                    "description": "工作流配置说明",
                     "type": "string"
                 }
             }
