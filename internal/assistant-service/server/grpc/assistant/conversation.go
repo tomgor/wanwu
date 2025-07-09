@@ -418,10 +418,10 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	id := uuid.New().String()
 	log.Infof("Assistant服务开始调用HttpRequestLlmStream，uuid: %s, assistantId: %s, url: %s, userId: %s, timeout: %v, body: %s",
 		id, req.AssistantId, assistantConfig.SseUrl, reqUserId, timeout, string(requestBodyBytes))
-	sseResp, err := HttpRequestLlmStream(requestCtx, assistantConfig.SseUrl, reqUserId, xuid, bytes.NewReader(requestBodyBytes))
+	sseResp, err := HttpRequestLlmStream(requestCtx, assistantConfig.SseUrl, reqUserId, xuid, bytes.NewReader(requestBodyBytes), timeout)
 	if err != nil {
 		log.Errorf("Assistant服务调用智能体能力接口失败，assistantId: %s, uuid: %s, error: %v", req.AssistantId, id, err)
-		if ctx.Err() != nil {
+		if ctx.Err() != nil && !req.Trial {
 			saveConversation(ctx, req, "本次回答已被终止", "")
 			return ctx.Err()
 		}
@@ -434,7 +434,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	// SSE 请求返回Code大于400
 	if sseResp.StatusCode > http.StatusBadRequest {
 		log.Errorf("Assistant服务智能体能力接口返回错误状态码，assistantId: %s, statusCode: %d", req.AssistantId, sseResp.StatusCode)
-		if ctx.Err() != nil {
+		if ctx.Err() != nil && !req.Trial {
 			saveConversation(ctx, req, "本次回答已被终止", "")
 			return ctx.Err()
 		}
@@ -704,7 +704,7 @@ func SSEError(stream assistant_service.AssistantService_AssistantConversionStrea
 	}
 }
 
-func HttpRequestLlmStream(ctx context.Context, url, userId, xuid string, body io.Reader) (*http.Response, error) {
+func HttpRequestLlmStream(ctx context.Context, url, userId, xuid string, body io.Reader, timeout time.Duration) (*http.Response, error) {
 	requestCtx, err := http.NewRequestWithContext(ctx, http.MethodPost, url, body)
 	if err != nil {
 		log.Errorf("HttpRequestLlmStream创建HTTP请求失败，url: %s, userId: %s, error: %v", url, userId, err)
@@ -719,9 +719,12 @@ func HttpRequestLlmStream(ctx context.Context, url, userId, xuid string, body io
 		url, userId, requestCtx.Method, requestCtx.Header)
 
 	// 创建客户端并发送请求
-	client := &http.Client{Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}}
+	client := &http.Client{
+		Timeout: timeout,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
 
 	response, err := client.Do(requestCtx)
 	if err != nil {
