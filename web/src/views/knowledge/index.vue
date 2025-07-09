@@ -6,7 +6,17 @@
     </div>
     <div style="padding: 20px">
       <div class="search-box">
-        <search-input class="cover-input-icon" :placeholder="$t('knowledgeManage.searchPlaceholder')" ref="searchInput" @handleSearch="getTableData" />
+        <div>
+          <search-input class="cover-input-icon" :placeholder="$t('knowledgeManage.searchPlaceholder')" ref="searchInput" @handleSearch="getTableData" />
+          <el-select v-model="tagIds" placeholder="请选择标签" multiple @visible-change="tagChange">
+          <el-option
+              v-for="item in tagOptions"
+              :key="item.tagId"
+              :label="item.tagName"
+              :value="item.tagId">
+            </el-option>
+          </el-select>
+        </div>
         <div>
           <el-button size="mini" type="primary" @click="$router.push('/knowledge/keyword')">{{$t('knowledgeManage.keyWordManage')}}</el-button>
           <el-button size="mini" type="primary" @click="showCreate()" icon="el-icon-plus">
@@ -20,7 +30,7 @@
   </div>
 </template>
 <script>
-import { getKnowledgeList } from "@/api/knowledge";
+import { getKnowledgeList,tagList } from "@/api/knowledge";
 import SearchInput from "@/components/searchInput.vue"
 import knowledgeList from './component/knowledgeList.vue';
 import createKnowledge from './component/create.vue';
@@ -29,17 +39,32 @@ export default {
     data(){
        return{
         knowledgeData:[],
-        tableLoading:false
+        tableLoading:false,
+        tagOptions:[],
+        tagIds:[]
        } 
     },
     mounted(){
       this.getTableData();
+      this.getList();
     },
     methods:{
+      getList(){
+        tagList({knowledgeId:'',tagName:''}).then(res => {
+            if(res.code === 0){
+                this.tagOptions = res.data.knowledgeTagList || []
+            }
+          })
+        },
+        tagChange(val){
+          if(!val && this.tagIds.length > 0){
+              this.getTableData()
+          }
+        },
         getTableData(){
             const searchInput = this.$refs.searchInput.value
             this.tableLoading = true
-            getKnowledgeList({name:searchInput}).then(res => {
+            getKnowledgeList({name:searchInput,tagId:this.tagIds}).then(res => {
                 this.knowledgeData = res.data.knowledgeList || [];
                 this.tableLoading = false
             }).catch((error) =>{

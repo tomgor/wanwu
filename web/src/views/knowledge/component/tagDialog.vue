@@ -50,7 +50,7 @@ export default {
             })
         },
         getList(){
-            tagList({tagName:this.tagName}).then(res => {
+            tagList({knowledgeId:this.knowledgeId,tagName:this.tagName}).then(res => {
                 if(res.code === 0){
                     this.tagList = res.data.knowledgeTagList.map(item =>({
                         ...item,

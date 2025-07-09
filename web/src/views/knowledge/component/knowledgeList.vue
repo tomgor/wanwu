@@ -35,11 +35,11 @@
             </el-tooltip>
           </div>
           <div class="tags">
-            <span :class="['smartDate','tagList']" v-if="n.knowledgeTagList.length === 0" @click.stop="addTag(n.knowledgeId)">
+            <span :class="['smartDate','tagList']" v-if="formattedTagNames(n.knowledgeTagList).length === 0" @click.stop="addTag(n.knowledgeId)">
               <span class="el-icon-price-tag icon-tag"></span>
               添加标签
             </span>
-            <span v-else>{{formattedTagNames(n.knowledgeTagList) }}</span>
+            <span v-else @click.stop="addTag(n.knowledgeId)">{{formattedTagNames(n.knowledgeTagList) }}</span>
           </div>
           <div class="editor">
             <el-dropdown @command="handleClick($event, n)" placement="top">
@@ -91,7 +91,10 @@ export default {
   },
   methods:{
   formattedTagNames(data){
-    const tags = data.map(item => item.tagName).join(', ');
+    if(data.length === 0){
+      return [];
+    }
+    const tags = data.filter(item => item.selected).map(item =>  item.tagName ).join(', ');
     if (tags.length > 30) {
         return tags.slice(0, 30) + '...';
     }
