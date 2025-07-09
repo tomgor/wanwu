@@ -15,14 +15,13 @@
                 @mouseleave="mouseLeave(item)"
                 @dblclick="handleDoubleClick(item)"
                 >
-                    <el-checkbox v-model="item.checked" v-if="!item.showIpt" @change="checkboxChange(item)">{{item.tagName}}</el-checkbox>
+                    <el-checkbox v-model="item.selected" v-if="!item.showIpt" @change="checkboxChange(item)">{{item.tagName}}</el-checkbox>
                     <el-input v-model="item.tagName" v-if="item.showIpt" @blur="inputBlur(item)" ></el-input>
                     <span class="el-icon-close del-icon" v-if="item.showDel && !item.showIpt" @click="delTag(item.tagId)"></span>
                 </div>
             </div>
         </div>
         <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
             <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
         </span>
     </el-dialog>
@@ -43,7 +42,7 @@ export default {
     },
     methods:{
         checkboxChange(item){
-           const option = item.checked ? 0 : 1
+           const option = item.selected ? 0 : 1
            bindTag({knowledgeId:this.knowledgeId,tagIdList:[item.tagId],option}).then(res =>{
                 if(res.code === 0){
                     this.$emit('relodaData')
@@ -55,7 +54,6 @@ export default {
                 if(res.code === 0){
                     this.tagList = res.data.knowledgeTagList.map(item =>({
                         ...item,
-                        checked:false,
                         showDel:false,
                         showIpt:false
                     }))

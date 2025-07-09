@@ -97,7 +97,7 @@ export default {
     }
     return tags;
   },
-  addTag(){
+  addTag(id){
     this.$refs.tagDialog.showDiaglog(id);
   },
   showCreate(){

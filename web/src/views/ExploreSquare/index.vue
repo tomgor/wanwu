@@ -1,48 +1,40 @@
 <template>
-  <CommonLayout
-    :showAside="false"
-  >
-    <template #main-content>
-      <div class="app-content">
-        <div class="app-header">
-           <div class="header-top">
-              <div class="taglist_warp">
-                <div v-for="item in tagList" class="tagList" @click="handleTagClick(item)" :class="{'white':item.value === active}">
-                  <img :src="item.value === active ? item.activeImg : item.unactiveImg" class="h-icon" />
-                  <span>{{item.name}}</span>
-                </div>
-              </div>
-                <!-- <SearchInput :placeholder="placeholder" style="width:200px;" @handleSearch="handleSearch"/> -->
-           </div>
-           <div>
-            <el-tabs v-model="activeName" @tab-click="handleClick">
-              <el-tab-pane label="智能体" name="agent">
-                <AppList :appData="listData" :isShowTool="false" :appFrom="'explore'" />
-              </el-tab-pane>
-              <el-tab-pane label="文本问答" name="rag">
-                <AppList :appData="listData" :isShowTool="false" :appFrom="'explore'" />
-              </el-tab-pane>
-              <!-- <el-tab-pane label="工作流" name="workflow">
-                 <AppList :appData="listData" :isShowTool="false" :appFrom="'explore'" />
-              </el-tab-pane> -->
-            </el-tabs>
-           </div>
+  <div class="page-wrapper">
+    <div class="app-header">
+        <div class="header-top">
+          <div class="taglist_warp">
+            <div v-for="item in tagList" class="tagList" @click="handleTagClick(item)" :class="{'white':item.value === active}">
+              <img :src="item.value === active ? item.activeImg : item.unactiveImg" class="h-icon" />
+              <span>{{item.name}}</span>
+            </div>
+          </div>
+            <!-- <SearchInput :placeholder="placeholder" style="width:200px;" @handleSearch="handleSearch"/> -->
         </div>
-      </div>
-    </template>
-  </CommonLayout>
+        <div>
+        <el-tabs v-model="activeName" @tab-click="handleClick">
+          <el-tab-pane label="智能体" name="agent">
+            <AppList :appData="listData" :isShowTool="false" :appFrom="'explore'" />
+          </el-tab-pane>
+          <el-tab-pane label="文本问答" name="rag">
+            <AppList :appData="listData" :isShowTool="false" :appFrom="'explore'" />
+          </el-tab-pane>
+          <!-- <el-tab-pane label="工作流" name="workflow">
+              <AppList :appData="listData" :isShowTool="false" :appFrom="'explore'" />
+          </el-tab-pane> -->
+        </el-tabs>
+        </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import {mapActions, mapGetters} from 'vuex'
-import CommonLayout from '@/components/exploreContainer.vue'
 import SearchInput from "@/components/searchInput.vue"
 import AppList from "@/components/appList.vue"
 import CreateTotalDialog from "@/components/createTotalDialog.vue"
 import { getExplorList } from "@/api/explore"
 
 export default {
-  components: { SearchInput, CreateTotalDialog, AppList,CommonLayout },
+  components: { SearchInput, CreateTotalDialog, AppList },
   data() {
     return {
       placeholder:'输入应用名称搜索',
@@ -141,7 +133,7 @@ export default {
   background: #fff;
   color: #384BF7;
 }
-.explore-aside-app{
+// .explore-aside-app{
   .appList:hover{
     background-color: $color_opacity !important;
   }
@@ -170,14 +162,16 @@ export default {
     }
   }
   
-}
-.app-content{
-  padding: 20px;
+// }
+.page-wrapper{
+  // padding: 20px;
   margin:20px;
+  box-sizing:border-box;
   .header-top{
     display: flex;
     justify-content: space-between;
     padding:15px 0;
+    box-sizing:border-box;
     border-bottom: 1px solid #eaeaea;
     .tagList:nth-child(1){
       margin-left: 0 !important;
