@@ -1071,6 +1071,7 @@ export default {
         }
 
         if (
+          edge.store.data.source_node_id &&
           edge.store.data.source_node_id
             .toLowerCase()
             .indexOf("intentionnode") > -1
@@ -1214,6 +1215,7 @@ export default {
         //如果是分支器节点，保存一下目标节点
 
         if (
+          edge.store.data.source_node_id &&
           edge.store.data.source_node_id
             .toLowerCase()
             .indexOf("intentionnode") > -1
