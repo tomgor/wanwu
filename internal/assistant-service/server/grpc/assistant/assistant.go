@@ -82,17 +82,23 @@ func (s *Service) AssistantUpdate(ctx context.Context, req *assistant_service.As
 	if err != nil {
 		return nil, err
 	}
-
-	// 组装model参数
-	assistant := &model.Assistant{
-		ID:         uint32(assistantID),
-		AvatarPath: req.AssistantBrief.AvatarPath,
-		Name:       req.AssistantBrief.Name,
-		Desc:       req.AssistantBrief.Desc,
+	// 查找否存在相同名称智能体
+	if err := s.cli.CheckSameAssistantName(ctx, req.Identity.UserId, req.Identity.OrgId, req.AssistantBrief.Name); err != nil {
+		return nil, errStatus(errs.Code_AssistantErr, err)
 	}
 
+	// 获取现有智能体信息
+	existingAssistant, status := s.cli.GetAssistant(ctx, uint32(assistantID))
+	if status != nil {
+		return nil, errStatus(errs.Code_AssistantErr, status)
+	}
+
+	existingAssistant.AvatarPath = req.AssistantBrief.AvatarPath
+	existingAssistant.Name = req.AssistantBrief.Name
+	existingAssistant.Desc = req.AssistantBrief.Desc
+
 	// 调用client方法更新智能体
-	if status := s.cli.UpdateAssistant(ctx, assistant); status != nil {
+	if status := s.cli.UpdateAssistant(ctx, existingAssistant); status != nil {
 		return nil, errStatus(errs.Code_AssistantErr, status)
 	}
 
