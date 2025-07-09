@@ -1249,7 +1249,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.AssistantCreateResp"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -5495,39 +5507,11 @@ const docTemplate = `{
         "request.AssistantTemplateRequest": {
             "type": "object",
             "required": [
-                "name"
+                "assistantTemplateId"
             ],
             "properties": {
-                "avatar": {
-                    "description": "图标",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/request.Avatar"
-                        }
-                    ]
-                },
-                "desc": {
-                    "description": "描述",
+                "assistantTemplateId": {
                     "type": "string"
-                },
-                "instructions": {
-                    "description": "系统提示词",
-                    "type": "string"
-                },
-                "name": {
-                    "description": "名称",
-                    "type": "string"
-                },
-                "prologue": {
-                    "description": "开场白",
-                    "type": "string"
-                },
-                "recommendQuestion": {
-                    "description": "推荐问题",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         },
@@ -6922,6 +6906,10 @@ const docTemplate = `{
                 "name"
             ],
             "properties": {
+                "assistantTemplateId": {
+                    "description": "智能体模板Id",
+                    "type": "string"
+                },
                 "avatar": {
                     "description": "图标",
                     "allOf": [

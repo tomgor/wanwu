@@ -150,10 +150,7 @@ func (o *OnlineSearchConfig) Check() error {
 }
 
 type AssistantTemplateRequest struct {
-	AppBriefConfig
-	Prologue          string   `json:"prologue"`          // 开场白
-	Instructions      string   `json:"instructions"`      // 系统提示词
-	RecommendQuestion []string `json:"recommendQuestion"` // 推荐问题
+	AssistantTemplateId string `json:"assistantTemplateId" form:"assistantTemplateId"  validate:"required"`
 }
 
 func (a *AssistantTemplateRequest) Check() error { return nil }

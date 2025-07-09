@@ -32,7 +32,7 @@ func GetAssistantTemplateList(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			data	body		request.AssistantTemplateRequest	true	"复制创建智能体所需信息"
-//	@Success		200		{object}	response.Response
+//	@Success		200		{object}	response.Response{data=response.AssistantCreateResp}
 //	@Router			/assistant/template [post]
 func AssistantTemplateCreate(ctx *gin.Context) {
 
