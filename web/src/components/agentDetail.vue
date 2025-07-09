@@ -1,50 +1,74 @@
 <template>
-  <div class="mcp-detail" id="timeScroll">
-    <span class="back" @click="back">返回</span>
+  <div
+    class="mcp-detail"
+    id="timeScroll"
+  >
+    <span
+      class="back"
+      @click="back"
+    >
+    <span class="el-icon-arrow-left"></span>
+    返回
+    </span>
     <div class="mcp-title">
-      <img class="logo" v-if="detail.avatar && detail.avatar.path" :src="basePath + '/user/api/' + detail.avatar.path" />
+      <img
+        class="logo"
+        v-if="detail.avatar && detail.avatar.path"
+        :src="basePath + '/user/api/' + detail.avatar.path"
+      />
       <div :class="['info',{fold:foldStatus}]">
         <p class="name">{{detail.name}}</p>
-        <p v-if="detail.desc && detail.desc.length > 260" class="desc">
+        <p
+          v-if="detail.desc && detail.desc.length > 260"
+          class="desc"
+        >
           {{foldStatus ? detail.desc : detail.desc.slice(0,268) + '...'}}
-          <span class="arrow" v-show="detail.desc.length > 260" @click="fold">
+          <span
+            class="arrow"
+            v-show="detail.desc.length > 260"
+            @click="fold"
+          >
             {{foldStatus ? '收起' : '详情 >>'}}
           </span>
         </p>
-        <p v-else class="desc">{{detail.desc}}</p>
+        <p
+          v-else
+          class="desc"
+        >{{detail.desc}}</p>
       </div>
     </div>
     <div class="main">
       <div class="left-info">
-        <!-- tabs -->
-        <div class="mcp-tabs">
-          <div v-if="mcpSquareId" :class="['mcp-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">介绍概览</div>
-          <div style="display: inline-block">
-            <div :class="['mcp-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">SSE URL及工具</div>
-          </div>
-        </div>
-
-        <div v-if="tabActive === 0">
-          <div class="overview bg-border" >
+        <div>
+          <div class="overview bg-border">
             <div class="overview-item">
               <div class="item-title">• &nbsp;使用概述</div>
-              <div class="item-desc" v-html="parseTxt(detail.summary)"></div>
+              <div
+                class="item-desc"
+                v-html="parseTxt(detail.summary)"
+              ></div>
             </div>
             <div class="overview-item">
               <div class="item-title">• &nbsp;特性说明</div>
-              <div class="item-desc" v-html="parseTxt(detail.feature)"></div>
+              <div
+                class="item-desc"
+                v-html="parseTxt(detail.feature)"
+              ></div>
             </div>
             <div class="overview-item">
               <div class="item-title">• &nbsp;应用场景</div>
-              <div class="item-desc" >
+              <div class="item-desc">
                 <div v-html="parseTxt(detail.scenario)"></div>
               </div>
             </div>
           </div>
-          <div class="overview bg-border" >
+          <div class="overview bg-border">
             <div class="overview-item">
-              <div class="item-title">• &nbsp;工作流配置说明</div>
-              <div class="item-desc" v-html="parseTxt(detail.manual)"></div>
+              <div class="item-title" style="width:110px;">• &nbsp;工作流配置说明</div>
+              <div
+                class="item-desc"
+                v-html="parseTxt(detail.workFlowInstruction)"
+              ></div>
             </div>
           </div>
         </div>
@@ -52,8 +76,17 @@
 
       <div class="right-recommend">
         <p style="margin: 20px 0;color: #333;">更多推荐</p>
-        <div class="recommend-item" v-for="(item ,i) in recommendList" :key="`${i}rc`" @click="handleClick(item)">
-          <img class="logo" v-if="item.avatar && item.avatar.path" :src="basePath + '/user/api/' + item.avatar.path" />
+        <!-- @click="handleClick(item)" -->
+        <div
+          class="recommend-item"
+          v-for="(item ,i) in recommendList"
+          :key="`${i}rc`"
+        >
+          <img
+            class="logo"
+            v-if="item.avatar && item.avatar.path"
+            :src="basePath + '/user/api/' + item.avatar.path"
+          />
           <p class="name">{{item.name}}</p>
           <p class="intro">{{item.desc}}</p>
         </div>
@@ -63,23 +96,51 @@
 </template>
 <script>
 import { md } from '@/mixins/marksown-it'
-import { getRecommendsList, getPublicMcpInfo, getDetail, getTools } from "@/api/mcp"
-import { agnetTemplateList } from "@/api/appspace"
-import { formatTools } from "@/utils/util"
+import { agnetTemplateList,agnetTemplateDetail } from "@/api/appspace"
 
 export default {
   data() {
     return {
       basePath: this.$basePath,
       md:md,
-      isFromSquare: true,
-      mcpSquareId:'',
-      detail: {},
-      tools: [],
+      detail: {
+        assistantTemplateId:  "1",
+        avatar: 
+              {key: "custom-upload/avatar/agent/gov.png", path: "v1/cache/avatar/agent/gov.png"},
+              category
+              : 
+              "agent_gov",
+              desc
+              : 
+              "用于解答市民政务问题。",
+              feature
+              : 
+              "特性说明",
+              instructions
+              : 
+              "xxx（目前只能填写文字，不支持关联变量）",
+              name
+              : 
+              "政务小助手",
+              prologue
+              : 
+              "你哈，我是政务小助手，可以解答您关于各种政策的问题",
+              recommendQuestion
+              : 
+              ["1、公积金提取", "2、养老保险"],
+              scenario
+              : 
+              "应用场景",
+              summary
+              : 
+              "使用概述",
+              workFlowInstruction
+              : 
+              "工作流配置说明"
+      },
       foldStatus:false,
-      tabActive:0,
       recommendList: [],
-      dialogVisible: false,
+      assistantId:''
     };
   },
   watch: {
@@ -96,47 +157,25 @@ export default {
     this.getRecommendList()
   },
   methods: {
+    fold(){
+      this.foldStatus = !this.foldStatus
+    },
     initData(){
-      this.mcpSquareId = this.$route.query.mcpSquareId
-      this.mcpId = this.$route.query.mcpId
-      this.isFromSquare = this.$route.params.type === 'square'
-      this.tabActive = 0
-      this.getDetailData()
+      this.assistantId = this.$route.query.id
+      // this.getDetailData()
 
       //滚动到顶部
       const main = document.querySelector(".el-main")
       if (main) main.scrollTop = 0
     },
     getDetailData(){
-      if (this.isFromSquare) {
-        getPublicMcpInfo({mcpSquareId:this.mcpSquareId}).then((res) => {
+      agnetTemplateDetail({assistantTemplateId:this.assistantId}).then((res) => {
           this.detail = res.data || {}
-          this.tools = formatTools(res.data.tools)
-        })
-      } else {
-        if (!this.mcpSquareId) this.tabActive = 1
-        getDetail({mcpId:this.mcpId}).then((res) => {
-          this.detail = res.data || {}
-        })
-        this.getToolsList()
-      }
-    },
-    getToolsList(){
-      getTools({
-        mcpId: this.mcpId,
-      }).then((res) => {
-        this.tools = formatTools(res.data.tools)
       })
-    },
-    getIsCanSendStatus(){
-      getPublicMcpInfo({mcpSquareId:this.mcpSquareId})
-        .then((res) => {
-          this.detail.hasCustom = res.data.hasCustom
-        })
     },
     getRecommendList() {
       agnetTemplateList({category:'',name:''}).then((res) => {
-        this.recommendList = res.data.list || []
+        this.recommendList = [...(res.data.list || [])].splice(0, 5)
       })
     },
     handleClick(val){
@@ -148,32 +187,19 @@ export default {
       const text = txt.replaceAll('\n\t','<br/>&nbsp;').replaceAll('\n','<br/>').replaceAll('\t', '   &nbsp;')
       return text
     },
-    tabClick(status){
-      this.tabActive = status
-    },
-    fold(){
-      this.foldStatus = !this.foldStatus
-    },
-    preSendToCustomize(){
-      this.dialogVisible = true
-      this.$refs.dialog.ruleForm.serverUrl = this.detail.sseUrl
-    },
-    handleClose(){
-      this.dialogVisible = false
-    },
     back() {
-      this.$router.push({path: '/mcp'})
+      this.$router.push({path: '/appSpace/agent'})
     },
   }
 };
 </script>
 <style lang="scss">
 @import "../views/mcpManagementPublic/markdown.min.css";
-.markdown-body{
-  font-family: 'Microsoft YaHei', Arial, sans-serif;
+.markdown-body {
+  font-family: "Microsoft YaHei", Arial, sans-serif;
   color: #333;
 }
-.mcp-detail{
+.mcp-detail {
   padding: 20px;
   overflow: auto;
   margin: 20px;
@@ -181,31 +207,31 @@ export default {
     color: $color;
     cursor: pointer;
   }
-  .mcp-title{
+  .mcp-title {
     padding: 20px 0;
     display: flex;
     border-bottom: 1px solid #bfbfbf;
-    .logo{
+    .logo {
       width: 54px;
       height: 54px;
       object-fit: cover;
     }
-    .info{
+    .info {
       position: relative;
       width: 1240px;
       margin-left: 15px;
-      .name{
+      .name {
         font-size: 16px;
-        color: #5D5D5D;
+        color: #5d5d5d;
         font-weight: bold;
       }
-      .desc{
+      .desc {
         margin-top: 10px;
         line-height: 22px;
-        color: #9F9F9F;
+        color: #9f9f9f;
         word-break: break-all;
       }
-      .arrow{
+      .arrow {
         position: absolute;
         display: block;
         right: 0;
@@ -216,19 +242,19 @@ export default {
         font-size: 13px;
       }
     }
-    .fold{
+    .fold {
       height: auto;
     }
   }
-  .main{
+  .main {
     display: flex;
     margin: 10px 0 50px 0;
-    .left-info{
+    .left-info {
       width: calc(100% - 420px);
       margin-right: 20px;
-      .mcp-tabs{
+      .mcp-tabs {
         margin: 20px 0 0 0;
-        .mcp-tab{
+        .mcp-tab {
           display: inline-block;
           vertical-align: middle;
           width: 160px;
@@ -238,50 +264,47 @@ export default {
           text-align: center;
           cursor: pointer;
         }
-        .active{
+        .active {
           background: #333;
           color: #fff;
           font-weight: bold;
         }
       }
-      .overview{
-        .overview-item{
+      .overview {
+        .overview-item {
           display: flex;
           padding: 15px 0;
           border-bottom: 1px solid #eee;
           line-height: 24px;
-          .item-title{
+          .item-title {
             width: 80px;
             color: $color;
             font-weight: bold;
           }
-          .item-desc{
+          .item-desc {
             width: calc(100% - 100px);
             margin-left: 10px;
-            flex:1;
+            flex: 1;
             color: #333;
           }
-
         }
-        .overview-item:last-child{
+        .overview-item:last-child {
           border-bottom: none;
         }
       }
-      .markdown{
-
+      .markdown {
       }
-      .install{
-
+      .install {
       }
-      .tool{
-        .tool-item{
+      .tool {
+        .tool-item {
           padding: 20px 0;
           border-bottom: 1px solid #eee;
-          .title{
+          .title {
             font-weight: bold;
             line-height: 46px;
           }
-          .tool-item-bg{
+          .tool-item-bg {
             background: inherit;
             background-color: rgba(249, 249, 249, 1);
             border: none;
@@ -289,26 +312,26 @@ export default {
             padding: 20px;
           }
         }
-        .tool-item:last-child{
+        .tool-item:last-child {
           border-bottom: none;
         }
-        .sse-url{
-          .sse-url__input{
-            flex:1;
+        .sse-url {
+          .sse-url__input {
+            flex: 1;
             margin-right: 20px;
             padding: 12px;
             color: $color;
           }
-          .sse-url__bt{
+          .sse-url__bt {
             width: 120px;
           }
         }
-        .install-intro-item{
-          p{
+        .install-intro-item {
+          p {
             line-height: 26px;
             color: #333;
           }
-          .install-intro-title{
+          .install-intro-title {
             color: $color;
             margin-top: 10px;
             font-weight: bold;
@@ -316,36 +339,36 @@ export default {
         }
       }
     }
-    .right-recommend{
+    .right-recommend {
       width: 400px;
       overflow-y: auto;
-      border-left:1px solid #eee;
+      border-left: 1px solid #eee;
       padding: 20px;
-      .recommend-item{
+      .recommend-item {
         position: relative;
         border: 1px solid $border_color; // rgba(208, 167, 167, 1);
-        background: #F4F5FF; // rgba(255, 247, 247, 1);
+        background: #f4f5ff; // rgba(255, 247, 247, 1);
         margin-bottom: 15px;
         border-radius: 10px;
         padding: 20px 20px 20px 80px;
         text-align: left;
         cursor: pointer;
-        .logo{
+        .logo {
           width: 46px;
           height: 46px;
           object-fit: cover;
           position: absolute;
-          left:20px;
+          left: 20px;
           border: 1px solid #fff;
           border-radius: 4px;
         }
-        .name{
-          color: #5D5D5D;
+        .name {
+          color: #5d5d5d;
           font-weight: bold;
         }
-        .intro{
+        .intro {
           height: 34px;
-          color: #5D5D5D;
+          color: #5d5d5d;
           margin-top: 8px;
           font-size: 13px;
           overflow: hidden;
@@ -353,7 +376,7 @@ export default {
       }
     }
   }
-  .bg-border{
+  .bg-border {
     margin-top: 20px;
     /*min-height: calc(100vh - 360px);*/
     background-color: rgba(255, 255, 255, 1);
@@ -361,9 +384,9 @@ export default {
     /*border:1px solid rgba(208, 167, 167, 1);*/
     border-radius: 10px;
     padding: 10px 20px;
-    box-shadow: 2px 2px 15px #F4F5FF; // #d0a7a757;
+    box-shadow: 2px 2px 15px #f4f5ff; // #d0a7a757;
   }
-  .overview-item .item-desc{
+  .overview-item .item-desc {
     line-height: 28px;
   }
 }
@@ -388,10 +411,10 @@ export default {
   }
 
   .desc {
-    background: #F4F5FF; // rgba(255, 246, 246, 1);
+    background: #f4f5ff; // rgba(255, 246, 246, 1);
     padding: 10px 15px;
     border-radius: 6px;
-    border: 1px solid #98A6E9; // #f5cbcb;
+    border: 1px solid #98a6e9; // #f5cbcb;
   }
 
   .params {
@@ -424,7 +447,7 @@ export default {
   }
 }
 .mcp-markdown {
-  /deep/.code-header{
+  /deep/.code-header {
     /*height: 0!important;*/
     padding: 0 0 5px 0;
   }

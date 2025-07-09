@@ -87,4 +87,12 @@ export const copyAgnetTemplate = (data)=>{
         data
     })
 };
+//智能体模版详情
+export const agnetTemplateDetail = (params)=>{
+    return request({
+        url: `${BASE_URL}/assistant/template`,
+        method: 'get',
+        params
+    })
+};
 

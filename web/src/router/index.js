@@ -73,6 +73,7 @@ const constantRoutes = [
             },
             {
                 path: '/agent/templateDetail',
+                name:'templateDetail',
                 component:resolve =>require(['@/components/agentDetail'],resolve),
                 meta:{perm: [PERMS.AGENT]},
             },

@@ -125,7 +125,7 @@
             </el-dropdown-menu>
           </el-dropdown>
         </div>
-        <div class="copy-editor" v-if="type==='agent'&& agnetType === 'template' && n.isShowCopy" @click="copyTemplate(n)">
+        <div class="copy-editor" v-if="type==='agent'&& agnetType === 'template' && n.isShowCopy" @click.stop="copyTemplate(n)">
           <span class="el-icon-plus add"></span>
           <span>复制</span>
         </div>
