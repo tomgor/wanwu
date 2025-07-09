@@ -70,6 +70,10 @@ export default {
       typeRadio: 'all',
       typeList: [
         {name: '全部', key: 'all'},
+        {name: '政务', key: 'gov'},
+        {name: '工业', key: 'industry'},
+        {name: '文教', key: 'edu'},
+        {name: '医疗', key: 'medical'},
         {name: '数据', key: 'data'},
         {name: '创作', key: 'create'},
         {name: '搜索', key: 'search'},
