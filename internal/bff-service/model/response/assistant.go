@@ -93,7 +93,8 @@ type AssistantCreateResp struct {
 }
 
 type AssistantTemplateInfo struct {
-	Category string `json:"category"` // 种类(gov:政务,industry:工业,edu:文教,medical:医疗)
+	AssistantTemplateId string `json:"assistantTemplateId"` // 智能体模板Id
+	Category            string `json:"category"`            // 种类(gov:政务,industry:工业,edu:文教,medical:医疗)
 	request.AppBriefConfig
 	Prologue                  string   `json:"prologue"`            // 开场白
 	Instructions              string   `json:"instructions"`        // 系统提示词

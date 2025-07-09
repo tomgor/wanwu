@@ -482,29 +482,10 @@ definitions:
     type: object
   request.AssistantTemplateRequest:
     properties:
-      avatar:
-        allOf:
-        - $ref: '#/definitions/request.Avatar'
-        description: 图标
-      desc:
-        description: 描述
+      assistantTemplateId:
         type: string
-      instructions:
-        description: 系统提示词
-        type: string
-      name:
-        description: 名称
-        type: string
-      prologue:
-        description: 开场白
-        type: string
-      recommendQuestion:
-        description: 推荐问题
-        items:
-          type: string
-        type: array
     required:
-    - name
+    - assistantTemplateId
     type: object
   request.Avatar:
     properties:
@@ -1450,6 +1431,9 @@ definitions:
     type: object
   response.AssistantTemplateInfo:
     properties:
+      assistantTemplateId:
+        description: 智能体模板Id
+        type: string
       avatar:
         allOf:
         - $ref: '#/definitions/request.Avatar'
@@ -3144,7 +3128,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.AssistantCreateResp'
+              type: object
       security:
       - JWT: []
       summary: 复制创建智能体
