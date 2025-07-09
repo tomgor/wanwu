@@ -454,20 +454,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 
 	for {
 		if err := ctx.Err(); err != nil {
-			if !hasReadFirstMessage {
-				// 如果还没有读取到第一条消息，保存终止消息
-				saveConversation(ctx, req, "本次回答已被终止", searchList)
-			} else {
-				// 如果已经读取到消息，保存已经收到的消息
-				saveConversation(ctx, req, fullResponse.String(), searchList)
-			}
-			return err
-		}
-
-		line, err := reader.ReadBytes('\n')
-		if err != nil && err != io.ErrUnexpectedEOF && err != io.EOF {
-			log.Errorf("Assistant服务读取流式响应失败，assistantId: %s, error: %v, 已处理行数: %d", req.AssistantId, err, lineCount)
-			if ctx.Err() != nil {
+			if !req.Trial {
 				if !hasReadFirstMessage {
 					// 如果还没有读取到第一条消息，保存终止消息
 					saveConversation(ctx, req, "本次回答已被终止", searchList)
@@ -475,9 +462,23 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 					// 如果已经读取到消息，保存已经收到的消息
 					saveConversation(ctx, req, fullResponse.String(), searchList)
 				}
-				return ctx.Err()
 			}
-			SSEError(stream, "智能体响应中断")
+			return err
+		}
+
+		line, err := reader.ReadBytes('\n')
+		if err != nil && err != io.ErrUnexpectedEOF && err != io.EOF {
+			log.Errorf("Assistant服务读取流式响应失败，assistantId: %s, error: %v, 已处理行数: %d", req.AssistantId, err, lineCount)
+			if !req.Trial {
+				if !hasReadFirstMessage {
+					// 如果还没有读取到第一条消息，保存中断消息
+					saveConversation(ctx, req, "本次回答已中断", searchList)
+				} else {
+					// 如果已经读取到消息，保存已经收到的消息
+					saveConversation(ctx, req, fullResponse.String(), searchList)
+				}
+			}
+			SSEError(stream, "本次回答已中断")
 			return err
 		}
 
