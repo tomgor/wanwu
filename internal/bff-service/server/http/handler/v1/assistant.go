@@ -7,37 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetAssistantTemplateList
-//
-//	@Tags			agent
-//	@Summary		智能体模板列表
-//	@Description	智能体模板列表
-//	@Security		JWT
-//	@Accept			json
-//	@Produce		json
-//	@Param			category	query		string	false	"智能体类型"	Enums(gov,industry,edu,medical)
-//	@Param			name		query		string	false	"智能体名称"
-//	@Success		200			{object}	response.Response{data=response.ListResult{list=[]response.AssistantTemplateInfo}}
-//	@Router			/assistant/template/list [get]
-func GetAssistantTemplateList(ctx *gin.Context) {
-
-}
-
-// AssistantTemplateCreate
-//
-//	@Tags			agent
-//	@Summary		复制创建智能体
-//	@Description	通过复制创建智能体
-//	@Security		JWT
-//	@Accept			json
-//	@Produce		json
-//	@Param			data	body		request.AssistantTemplateRequest	true	"复制创建智能体所需信息"
-//	@Success		200		{object}	response.Response{data=response.AssistantCreateResp}
-//	@Router			/assistant/template [post]
-func AssistantTemplateCreate(ctx *gin.Context) {
-
-}
-
 // AssistantCreate
 //
 //	@Tags			agent

@@ -12,6 +12,7 @@ import (
 
 func registerAssistant(apiV1 *gin.RouterGroup) {
 	mid.Sub("agent").Reg(apiV1, "/assistant/template/list", http.MethodGet, v1.GetAssistantTemplateList, "智能体模板列表")
+	mid.Sub("agent").Reg(apiV1, "/assistant/template", http.MethodGet, v1.GetAssistantTemplate, "获取智能体模板")
 	mid.Sub("agent").Reg(apiV1, "/assistant/template", http.MethodPost, v1.AssistantTemplateCreate, "复制智能体模板")
 
 	mid.Sub("agent").Reg(apiV1, "/assistant", http.MethodPost, v1.AssistantCreate, "创建智能体")
