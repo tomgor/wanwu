@@ -125,7 +125,7 @@
             </el-dropdown-menu>
           </el-dropdown>
         </div>
-        <div class="copy-editor" v-if="type==='agent'&& agnetType === 'template' && n.isShowCopy" @click.stop="copyTemplate(n)">
+        <div class="copy-editor" v-if="n.appType === 'agentTemplate' && n.isShowCopy" @click.stop="copyTemplate(n)">
           <span class="el-icon-plus add"></span>
           <span>复制</span>
         </div>
@@ -186,12 +186,12 @@ export default {
       })
     },
     mouseEnter(n){
-      if(this.type === 'agent' && this.agnetType === 'template'){
+      if(n.appType === 'agentTemplate'){
         n.isShowCopy = true;
       }
     },
     mouseLeave(n){
-      if(this.type === 'agent' && this.agnetType === 'template'){
+      if(n.appType === 'agentTemplate'){
         n.isShowCopy = false;
       }
     },
@@ -389,7 +389,7 @@ export default {
     toEdit(row) {
       if(this.appFrom === 'explore'){
         this.commonToChat(row)
-      }else if(this.type === 'agent' && this.agnetType === 'template'){
+      }else if(row.appType === 'agentTemplate'){
         this.$router.push({path:`/agent/templateDetail?id=${row.assistantTemplateId}`})
       }
       else{

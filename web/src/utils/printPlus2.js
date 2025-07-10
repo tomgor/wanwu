@@ -98,18 +98,32 @@ Looper.prototype = {
 
         // this.printFn();
 
-        let sentenceArr = this.sentence.split('')
-        if(sentenceArr.length>100){
-            sentenceArr = this.sentence.split(',')
-        }
+        
+        const batchSize = 10; // 推荐每次输出10个字符
+        const interval = 10; // 减少输出间隔时间
         this.t = workerTimer.setInterval(() => {
-            if (this.index === sentenceArr.length) {
+            if (this.index === this.sentence.length) {
                 this.stop()
                 return
             }
-            this.printCB(sentenceArr[this.index])
-            this.index++;
-        }, this.timer,this)
+            const endIdx = Math.min(this.index + batchSize, this.sentence.length);
+            const chunk = this.sentence.slice(this.index, endIdx);
+            this.printCB(chunk);
+            this.index = endIdx;
+        }, interval,this)
+
+        // let sentenceArr = this.sentence.split('')
+        // if(sentenceArr.length>100){
+        //     sentenceArr = this.sentence.split(',')
+        // }
+        // this.t = workerTimer.setInterval(() => {
+        //     if (this.index === sentenceArr.length) {
+        //         this.stop()
+        //         return
+        //     }
+        //     this.printCB(sentenceArr[this.index])
+        //     this.index++;
+        // }, this.timer,this)
     },
     printFn(){
         let sentenceArr = this.sentence.split('')
