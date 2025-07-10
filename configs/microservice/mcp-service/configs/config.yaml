@@ -905,5 +905,915 @@ mcps:
               description: "The URL to generate LLMs.txt from"
           required:
             - url
-
-
+  - mcp_square_id: "mcpserverchart"
+    name: "McpChart"
+    category: "industry"
+    desc: "可视化图标"
+    from: "AntV"
+    avatar_path: "mcpserverchart/logo.png"
+    detail_path: "mcpserverchart/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "丰富的图表类型，支持超过25种可视化图表，涵盖常见的统计图表（折线图、柱状图、饼图等）、关系类图表（组织架构图、思维导图、网络图等）及标注地图和路径地图。"
+    manual: "推荐使用docker安装dbhub，连接方式使用sse，镜像名称为bytebase/dbhub，也支持使用npm安装"
+    scenario: "数据分析与报告\n教育与培训\n项目管理\n地理信息系统"
+    summary: "MCP Server Chart 是蚂蚁AntV团队推出的可视化图表生成工具。工具基于Model Context Protocol（MCP）协议，支持超过25种可视化图表，包括常见的统计图表（如折线图、柱状图、饼图）和关系类图表（如组织架构图、思维导图、网络图等），支持标注地图和路径地图。用户只需简单文本输入，能快速生成图表，无需复杂操作。工具支持多种客户端接入，如Cherry Studio、Claude Desktop等，提供SSE和Streamable传输协议，方便集成到不同平台。"
+    tools:
+      - name: generate_area_chart
+        description: "Generate a area chart to show data trends under continuous independent variables and observe the overall data trend"
+        input_schema:
+          type: object
+          properties:
+            - field: data
+              type: array
+              description: "Data for area chart, such as, [{ time: '2018', value: 99.9 }]."
+            - field: theme
+              type: string
+              description: "Set the theme for the chart"
+            - field: width
+              type: number
+              description: "Set the width of chart, default is 600."
+            - field: height
+              type: number
+              description: "Set the height of chart, default is 400."
+            - field: title
+              type: string
+              description: "Set the title of chart."
+            - field: axisXTitle
+              type: string
+              description: "Set the x-axis title of chart."
+            - field: axisYTitle
+              type: string
+              description: "Set the y-axis title of chart."
+          required:
+            - data
+  - mcp_square_id: "dbhub"
+    name: "DBHub"
+    category: "industry"
+    desc: "一站式数据管理"
+    from: "bytedase"
+    avatar_path: "dbhub/logo.png"
+    detail_path: "dbhub/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "关键特性包括支持多种数据库，包括 PostgreSQL、MySQL、MariaDB、SQL Server、SQLite 和 Oracle。"
+    manual: "推荐使用docker安装dbhub，连接方式使用sse，镜像名称为bytebase/dbhub，也支持使用npm安装"
+    scenario: "DBHub 是一个通用的数据库网关，支持多种数据库，包括 PostgreSQL、MySQL、MariaDB、SQL Server、SQLite 和 Oracle。"
+    summary: "DBHub 是一个通用的数据库网关，实现了模型上下文协议（MCP）服务器接口。 它允许与 MCP 兼容的客户端连接并探索不同的数据库。 支持多种数据库，包括 PostgreSQL、MySQL、MariaDB、SQL Server、SQLite 和 Oracle。"
+    tools:
+      - name: run_query
+        description: "Execute a SQL query"
+        input_schema:
+          type: object
+          properties:
+            - field: query
+              type: string
+              description: "sql cmd"
+          required:
+            - query
+  - mcp_square_id: "mcphub"
+    name: "MCPHub"
+    category: "industry"
+    desc: "一站式管理mcp服务器聚合平台"
+    from: "other"
+    avatar_path: "mcphub/logo.png"
+    detail_path: "mcphub/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "广泛的 MCP 服务器支持：无缝集成任何 MCP 服务器，配置简单。集中式管理控制台：在一个简洁的 Web UI 中实时监控所有服务器的状态和性能指标。灵活的协议兼容：完全支持 stdio 和 SSE 两种 MCP 协议。"
+    manual: "推荐使用docker安装mcphub，连接方式使用sse，镜像名称为samanhappy/mcphub，也支持使用npm安装"
+    scenario: "适用于MCP服务管理。"
+    summary: "MCPHub 通过将多个 MCP（Model Context Protocol）服务器组织为灵活的流式 HTTP（SSE）端点，简化了管理与扩展工作。系统支持按需访问全部服务器、单个服务器或按场景分组的服务器集合。"
+    tools:
+      - name: list_tools
+        description: "list all tools"
+  - mcp_square_id: "climcpserver"
+    name: "run_command"
+    category: "industry"
+    desc: "命令行执行"
+    from: "other"
+    avatar_path: "climcpserver/logo.png"
+    detail_path: "climcpserver/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "在受限制的目录中执行命令，支持配置shell运算符。"
+    manual: "安装cli-mcp-server可以使用npx安装"
+    scenario: "适用于在受控环境中执行shell命令，例如列出文件、查看文件内容等。"
+    summary: "一种用于在指定目录中执行shell命令的工具，支持配置shell运算符，确保命令在安全环境中执行。"
+    tools:
+      - name: run_command
+        description: "Allows command (CLI) execution in the directory: /allowed/dir\n\nAvailable commands: ls, cat, pwd\nAvailable flags: -l, -a, -h\n\nShell operators (&&, ||, |, >, >>, <, <<, ;) are not supported. Set ALLOW_SHELL_OPERATORS=true to enable."
+        input_schema:
+          type: object
+          properties:
+            - field: command
+              type: string
+              description: "Single command to execute (example: 'ls -l' or 'cat file.txt')"
+          required:
+            - command
+  - mcp_square_id: "mcpshellserver"
+    name: "ShellServer"
+    category: "industry"
+    desc: "在指定目录执行命令行工具"
+    from: "other"
+    avatar_path: "mcpshellserver/logo.png"
+    detail_path: "mcpshellserver/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持多参数命令执行、标准输入传递、工作目录指定和超时控制"
+    manual: "安装cli-mcp-server可以使用uv或者npx安装"
+    scenario: "适用于需要在特定目录执行命令行工具的场景，如文件操作、编译命令等"
+    summary: "一个命令行工具执行器，允许在指定目录执行命令，并可配置标准输入内容和超时限制。确保命令在安全环境中执行，避免 shell 注入风险"
+    tools:
+      - name: shell_execute
+        description: "在指定目录执行命令行工具\n允许的命令: ls, cat, pwd, echo"
+        input_schema:
+          type: object
+          properties:
+            - field: command
+              type: array
+              items:
+                type: string
+              description: "命令及其参数数组"
+            - field: stdin
+              type: string
+              description: "通过标准输入传递给命令的内容"
+            - field: directory
+              type: string
+              description: "命令执行的工作目录"
+            - field: timeout
+              type: integer
+              description: "最大执行时间（秒）"
+              minimum: 0
+          required:
+            - command
+            - directory
+  - mcp_square_id: "mcpmermaid"
+    name: "Mermaid"
+    category: "industry"
+    desc: "将 Mermaid markdown 语法描述的图表转换为 PNG 图像，允许 AI 助手和其他应用程序实现图表可视化。"
+    from: "other"
+    avatar_path: "mcpmermaid/logo.png"
+    detail_path: "mcpmermaid/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持多种图表主题，高质量渲染，输出选项灵活"
+    manual: "安装cli-mcp-server可以使用uv或者npx安装"
+    scenario: "智能文档生成；实验平台架构展示"
+    summary: "为 AI 应用和其他程序提供了将 Mermaid 图表转换为 PNG 图像的能力。通过标准化的协议接口，实现了与 AI 助手的无缝集成，具有主题多样、渲染质量高、输出灵活等特点。其使用方式多样，适用于多种需要图表可视化的 AI 相关场景，有助于提升 AI 应用在图表生成与展示方面的效率和效果"
+    tools:
+      - name: generate_mermaid_diagram
+        description: "Generate mermaid diagram and chart with mermaid syntax dynamically. Mermaid is a JavaScript based diagramming and charting tool that uses Markdown-inspired text definitions and a renderer to create and modify complex diagrams. The main purpose of Mermaid is to help documentation catch up with development."
+        input_schema:
+          type: object
+          properties:
+            - field: mermaid
+              type: string
+              description: "用于生成图表的Mermaid语法，例如：graph TD; A-->B; A-->C; B-->D; C-->D;"
+            - field: theme
+              type: string
+              enum: [ "default", "base", "forest", "dark", "neutral" ]
+              description: "图表主题（可选），默认值为'default'"
+            - field: backgroundColor
+              type: string
+              description: "图表背景色（可选），默认值为'white'"
+            - field: outputType
+              type: string
+              description: "图表输出类型，可选'png'、'svg'或'mermaid'，默认值为'png'"
+          required:
+            - mermaid
+  - mcp_square_id: "mongomcp"
+    name: "MongoMcp"
+    category: "industry"
+    desc: "MongoDB 比较与同步工具"
+    from: "第三方 MongoDB 工具生态"
+    avatar_path: "mongomcp/logo.png"
+    detail_path: "mongomcp/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持 MongoDB 数据结构与内容的精准比对，包括集合结构、文档字段、索引配置等；提供数据同步功能，可实现不同 MongoDB 实例间的增量或全量数据同步；支持跨版本 MongoDB 环境的比对与同步，兼容主流版本；具备可视化比对结果展示，清晰呈现差异点。"
+    manual: "推荐通过官方 GitHub 仓库下载安装包，支持 Windows、Linux、MacOS 系统；安装后配置 MongoDB 连接信息（主机、端口、用户名、密码、数据库名）；选择比对模式（结构比对 / 数据比对）或同步模式，执行操作后查看结果报告。"
+    scenario: "数据库迁移与升级 \n 多环境数据一致性校验 \n 主从库数据同步监控 \n 开发与生产环境数据差异排查"
+    summary: "Mongo-Cmp 的 MCP 工具是一款基于 Model Context Protocol（MCP）协议的 MongoDB 专用比对与同步工具。它聚焦于 MongoDB 数据库的结构与数据一致性管理，支持跨版本环境，提供可视化结果展示，操作便捷。适用于数据库迁移、多环境校验等场景，帮助用户高效维护 MongoDB 数据的准确性与一致性，是 MongoDB 生态中数据管理的实用工具。"
+    tools:
+      - name: find
+        description: "Query documents in a collection using MongoDB query syntax"
+        input_schema:
+          type: object
+          properties:
+            - field: collection
+              type: string
+              description: "Name of the collection to query"
+            - field: filter
+              type: object
+              description: "MongoDB query filter"
+            - field: limit
+              type: number
+              description: "Maximum documents to return"
+            - field: projection
+              type: object
+              description: "Fields to include/exclude"
+          required:
+            - collection
+  - mcp_square_id: "websitedownloader"
+    name: "WebsiteDownloaderMcp"
+    category: "industry"
+    desc: "网站内容下载与本地化工具"
+    from: "开源社区 / MCP 生态贡献者"
+    avatar_path: "websitedownloader/logo.png"
+    detail_path: "websitedownloader/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持整站递归下载，包括 HTML、CSS、JS、图片等资源；自动修正资源路径，确保本地离线可访问；可配置下载深度与并发数，平衡效率与服务器负载；支持断点续传，应对网络中断场景；保留原始网站目录结构，便于内容管理。"
+    manual: " 通过 pip 安装工具包（pip install mcp-website-downloader）；使用命令行指定目标 URL（mcp-download --url https://example.com）；可选参数配置：--depth（下载深度，默认 5）、--concurrency（并发数，默认 3）、--output（保存路径，默认./website-offline）；执行后自动开始下载，进度实时显示。"
+    scenario: "网站离线备份与归档 \n 学术资料离线查阅 \n 网络环境受限下的内容访问 \n 网站迁移前的内容完整性校验"
+    summary: "Website-Downloader 的 MCP 工具是一款基于 Model Context Protocol（MCP）协议的网站本地化工具，专注于将在线网站内容完整下载并转换为可离线访问的本地资源。其支持整站递归下载、路径自动修正与断点续传，通过灵活的参数配置适配不同场景需求。适用于网站备份、离线查阅等场景，为用户提供便捷的网站内容本地化解决方案。"
+    tools:
+      - name: download_website
+        description: "Download an entire website using wget"
+        input_schema:
+          type: object
+          properties:
+            - field: url
+              type: string
+              description: "URL of the website to download"
+            - field: outputPath
+              type: string
+              description: "Path where the website should be downloaded (optional, defaults to current directory)"
+            - field: depth
+              type: number
+              description: "Maximum depth level for recursive downloading (optional, defaults to infinite)"
+          required:
+            - url
+  - mcp_square_id: "markdownifymcp"
+    name: "MarkdownifyMcp"
+    category: "industry"
+    desc: "文本格式转换工具"
+    from: "other"
+    avatar_path: "markdownifymcp/logo.png"
+    detail_path: "markdownifymcp/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持多种格式转换为 Markdown，包括 HTML、Word 文档、纯文本等；保留原始内容的排版结构，如标题层级、列表、表格、链接等；可自定义转换规则，调整格式处理细节；转换速度快，处理大文件效率高；支持批量转换多个文件。"
+    manual: "可通过 npm 安装（npm install markdownify-mcp），也可下载桌面客户端；打开工具后，选择输入格式和源文件；设置输出路径和转换选项（如是否保留图片链接）；点击转换按钮，完成后查看生成的 Markdown 文件。"
+    scenario: "文档格式统一处理 \n 网络文章备份为 Markdown\n 学术论文格式转换 \n 多文件批量格式转换处理"
+    summary: "markdownify-mcp 的 MCP 工具是一款基于 Model Context Protocol（MCP）协议的格式转换工具。它能将多种格式的文本高效转换为 Markdown 格式，且能较好保留原始排版结构，还支持自定义规则和批量转换。适用于多种需要处理文本格式的场景，为用户提供了便捷的格式转换解决方案。"
+    tools:
+      - name: "pdf-to-markdown"
+        description: "Convert a PDF file to markdown"
+        input_schema:
+          type: "object"
+          properties:
+            - field: filepath
+              type: "string"
+              description: "Absolute path of the PDF file to convert"
+          required:
+            - filepath
+  - mcp_square_id: "elasticsearchmcpserver"
+    name: "ElasticsearchMcpServer"
+    category: "industry"
+    desc: "Elasticsearch 搜索引擎的 MCP 协议适配服务"
+    from: "Elasticsearch 社区 / MCP 协议适配团队"
+    avatar_path: "elasticsearchmcpserver/logo.png"
+    detail_path: "elasticsearchmcpserver/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "实现 MCP 协议与 Elasticsearch 的无缝对接，支持通过 MCP 协议接口操作 Elasticsearch；支持索引管理、文档 CRUD、复杂查询等核心功能的 MCP 标准化调用；提供实时查询结果反馈，支持流式响应（SSE）；可配置访问权限与请求限流，保障服务稳定性；兼容多个 Elasticsearch 版本（7.x+）。"
+    manual: "推荐使用 docker 部署（docker pull elasticsearch-mcp-server:latest），配置文件指定 Elasticsearch 连接地址与 MCP 端口；启动容器后，通过 MCP 客户端（如 mcp-cli）连接，使用标准 MCP 指令交互；示例：查询索引（mcp request --action search --index myindex --query '{\"match\": { \"title\": \"test\" } }'）。"
+    scenario: "多系统 Elasticsearch 统一访问层 \nAI 助手集成全文检索能力 \n 跨平台搜索服务标准化对接 \n 分布式日志检索的 MCP 协议适配"
+    summary: "elasticsearch-mcp-server 的 MCP 工具是基于 Model Context Protocol（MCP）协议的 Elasticsearch 适配服务。它为 Elasticsearch 提供了标准化的 MCP 协议接口，支持核心搜索与管理功能，兼容多版本且部署灵活。适用于需要统一访问 Elasticsearch 或集成搜索能力到 MCP 生态的场景，简化了跨平台搜索服务的对接流程。"
+    tools:
+      - name: "get_document"
+        description: "Get a document by ID"
+        input_schema:
+          type: "object"
+          properties:
+            - field: index
+              type: "string"
+              description: "Name of the index"
+            - field: id
+              type: "string"
+              description: "Document ID"
+          required:
+            - index
+            - id
+  - mcp_square_id: "qrcodemcp"
+    name: "QrcodeMcp"
+    category: "industry"
+    desc: "二维码生成与解析工具"
+    from: "other"
+    avatar_path: "qrcodemcp/logo.png"
+    detail_path: "qrcodemcp/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持文本、网址、联系人等多种信息生成二维码；可自定义二维码尺寸、颜色（前景色、背景色）、容错级别；提供二维码解析功能，能识别图像中的二维码并提取信息；支持批量生成多个二维码，输出格式包括 PNG、JPEG、SVG 等；兼容不同版本二维码标准（QR Code 2.0）。"
+    manual: " 通过 npm 安装（npm install qrcode-mcp），或使用 docker 镜像（docker pull qrcode-mcp:latest）；生成二维码：调用 API 传入内容及参数，如 qrcode-mcp generate --content 'https://example.com' --size 200 --color '#000000' --output ./qrcode.png；解析二维码：qrcode-mcp decode --input ./qrcode.png。"
+    scenario: "营销活动中的信息快速传播（如网址、优惠码）\n 会议签到时的身份信息二维码生成 \n 物资管理中的标签二维码制作 \n 移动端与 PC 端的信息快速交互"
+    summary: "qrcode_mcp 的 MCP 工具是一款基于 Model Context Protocol（MCP）协议的二维码处理工具，集生成与解析功能于一体。它支持多种信息类型和自定义参数，能批量处理且输出格式多样，兼容主流二维码标准。适用于营销、会议、物资管理等场景，为信息的快速传递与识别提供了便捷的解决方案。"
+    tools:
+      - name: "generate_qr_code"
+        description: "Generate QR code(生成二维码图片) from text and return as image with description"
+        input_schema:
+          type: "object"
+          properties:
+            - field: text
+              type: "string"
+              description: "Text content to convert to QR code"
+            - field: box_size
+              type: "int"
+              description: "Size of each box in pixels (1-50)"
+            - field: border
+              type: "int"
+              description: "Number of boxes for border (0-20)"
+            - field: fill_color
+              type: "str"
+              description: "Foreground color,default is black"
+            - field: back_color
+              type: "str"
+              description: "Background color,default is  white"
+          required:
+            - urls
+  - mcp_square_id: "mcpimagecompression"
+    name: "McpImageCompression"
+    category: "industry"
+    desc: "图像压缩与优化工具"
+    from: "other"
+    avatar_path: "mcpimagecompression/logo.png"
+    detail_path: "mcpimagecompression/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持多种图像格式压缩，包括 JPEG、PNG、WebP、GIF 等；提供不同压缩级别可选，平衡图像质量与文件大小；采用智能压缩算法，在减少文件体积的同时最大程度保留图像细节；支持批量压缩多个图像文件，提升处理效率；可设置压缩后的图像尺寸、格式转换等参数。"
+    manual: "可通过 npm 安装（npm install mcp-image-compression），或使用 docker 镜像（docker pull mcp-image-compression:latest）；调用工具时，传入源图像路径、输出路径及压缩参数（如 --quality 80 表示质量保留 80%）；示例命令：mcp-compress --input ./images --output ./compressed --format webp --quality 75。"
+    scenario: "网站图像优化以提升加载速度 \n 移动应用资源压缩减少存储空间占用 \n 社交媒体内容上传前的体积优化 \n 图像批量处理与格式转换"
+    summary: "mcp-image-compression 的 MCP 工具是一款基于 Model Context Protocol（MCP）协议的图像处理工具，专注于图像的压缩与优化。它支持多种图像格式，提供灵活的压缩参数设置，采用智能算法保障压缩效果，且支持批量处理。适用于网站、移动应用等场景的图像优化，能有效减少图像文件体积，提升传输和加载效率。"
+    tools:
+      - name: "image_compression"
+        description: "Compress an image"
+        input_schema:
+          type: "object"
+          properties:
+            - field: urls
+              type: "string"
+              description: "URL of the image to compress,If it's a local file, do not add any prefix. array join by ','"
+            - field: quantity
+              type: "number"
+              description: "Number of transcripts to return"
+            - field: format
+              type: "string"
+              description: "Image format"
+          required:
+            - urls
+  - mcp_square_id: "mcpinternetspeedtest"
+    name: "McpInternetSpeedTest"
+    category: "network"
+    desc: "网络速度测试与分析工具"
+    from: "网络工具开发团队 / MCP 生态贡献者"
+    avatar_path: "mcpinternetspeedtest/logo.png"
+    detail_path: "mcpinternetspeedtest/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持下载速度、上传速度、延迟（Ping）和抖动（Jitter）的全方位测试；提供多节点测试选择，可指定测试服务器位置；测试结果以直观数据和图表形式展示，包含详细参数；支持定时自动测试，记录网络性能变化趋势；兼容多种网络类型（有线、无线、移动数据）。"
+    manual: "通过 pip 安装（pip install mcp-internet-speed-test），或使用 docker 部署（docker run -it mcp-internet-speed-test）；命令行执行基础测试：mcp-speed-test；可选参数：--server（指定服务器 ID）、--interval（定时测试间隔，单位分钟）、--output（结果保存路径）；测试完成后查看实时生成的结果报告。"
+    scenario: "家庭网络性能评估与问题排查 \n 企业网络带宽监控与优化 \n 远程办公网络环境检测 \n 网络服务质量（QoS）验证"
+    summary: "mcp-internet-speed-test 的 MCP 工具是一款基于 Model Context Protocol（MCP）协议的网络速度测试工具。它能全面测试网络的下载、上传速度及延迟等指标，支持多节点选择和定时测试，结果展示直观。适用于家庭、企业等多种场景的网络性能评估与监控，为网络优化和问题排查提供可靠数据支持。"
+    tools:
+      - name: "measure_download_speed"
+        description: "Measure download speed using incremental file sizes."
+        input_schema:
+          type: "object"
+          properties:
+            - field: size_limit
+              type: "string"
+              description: "Maximum file size to test (default: 100MB)"
+          required:
+            - size_limit
+  - mcp_square_id: "ifcmcp"
+    name: "ifcMCP"
+    category: "industry"
+    desc: "使LLM代理能够与IFC（Industry Foundation Classes）文件进行交互的MCP服务器"
+    from: "smartaec"
+    avatar_path: "ifcmcp/logo.png"
+    detail_path: "ifcmcp/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "关键特性包括能够解析和查询建筑信息模型（BIM）数据，提供实体属性查询、空间关系分析、建筑构件定位等功能，支持建筑工程领域的AI辅助设计和数据分析。"
+    manual: "要使用ifcMCP服务器，首先克隆仓库，安装所需的包（ifcopenshell、FastMCP），然后在ifcMCP文件夹中运行命令'python server.py'启动服务器。配置MCP服务器时使用HTTP接口'http://127.0.0.1:8000/mcp'。"
+    scenario: "ifcMCP可用于建筑、工程和施工行业的BIM数据处理和分析，例如建筑设计软件、工程管理系统、施工规划工具等。\n 使用场景包括查询建筑构件属性、分析空间关系、获取墙体开口信息、计算空间边界，以及将建筑信息模型集成到AI辅助设计流程中。"
+    summary: "ifcMCP是一个专门处理IFC文件的模型上下文协议服务器，使LLM能够理解和操作建筑信息模型数据，为建筑工程领域提供智能化的数据查询和分析能力。"
+    tools:
+      - name: "get_entities"
+        description: "获取IFC文件中的实体信息"
+        input_schema:
+          type: object
+          properties:
+            - field: "entity_type"
+              type: "string"
+              description: "要查询的实体类型（如IfcWall、IfcSpace等）"
+            - field: "filter_conditions"
+              type: "object"
+              description: "过滤条件，可选参数"
+          required:
+            - "entity_type"
+      - name: "get_named_property_of_entities"
+        description: "获取实体的命名属性"
+        input_schema:
+          type: object
+          properties:
+            - field: "entity_id"
+              type: "string"
+              description: "实体的唯一标识符"
+            - field: "property_name"
+              type: "string"
+              description: "要查询的属性名称"
+          required:
+            - "entity_id"
+            - "property_name"
+      - name: "get_entity_properties"
+        description: "获取实体的所有属性信息"
+        input_schema:
+          type: object
+          properties:
+            - field: "entity_id"
+              type: "string"
+              description: "实体的唯一标识符"
+          required:
+            - "entity_id"
+      - name: "get_entity_location"
+        description: "获取实体的位置信息"
+        input_schema:
+          type: object
+          properties:
+            - field: "entity_id"
+              type: "string"
+              description: "实体的唯一标识符"
+          required:
+            - "entity_id"
+      - name: "get_entities_in_spatial"
+        description: "获取特定空间内的实体"
+        input_schema:
+          type: object
+          properties:
+            - field: "spatial_id"
+              type: "string"
+              description: "空间的唯一标识符"
+            - field: "entity_type"
+              type: "string"
+              description: "要查询的实体类型，可选参数"
+          required:
+            - "spatial_id"
+      - name: "get_openings_on_wall"
+        description: "获取墙体上的开口信息"
+        input_schema:
+          type: object
+          properties:
+            - field: "wall_id"
+              type: "string"
+              description: "墙体的唯一标识符"
+          required:
+            - "wall_id"
+      - name: "get_space_boundaries"
+        description: "获取空间的边界信息"
+        input_schema:
+          type: object
+          properties:
+            - field: "space_id"
+              type: "string"
+              description: "空间的唯一标识符"
+          required:
+            - "space_id"
+  - mcp_square_id: "sshmcp"
+    name: "SSH MCP Server"
+    category: "industry"
+    desc: "专为工业设备远程管理设计的SSH连接MCP服务器"
+    from: "modelcontextprotocol"
+    avatar_path: "sshmcp/logo.png"
+    detail_path: "sshmcp/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "提供安全的SSH远程连接能力，支持工业设备的远程监控、配置管理、故障诊断和维护操作，确保工业系统的安全可靠运行。"
+    manual: "通过npm安装：npm install @modelcontextprotocol/server-ssh，配置SSH连接参数和密钥认证后启动服务"
+    scenario: "适用于工业设备远程维护、生产线监控、PLC程序上传下载、HMI系统管理等场景。\n 使用场景包括远程设备诊断、工业网络设备配置、服务器运维管理、自动化系统维护、安全监控等工业远程管理应用。"
+    summary: "SSH MCP Server为工业设备提供安全可靠的远程访问能力，支持各种工业设备的远程管理和维护操作。"
+    tools:
+      - name: "connect"
+        description: "建立SSH连接"
+        input_schema:
+          type: object
+          properties:
+            - field: "host"
+              type: "string"
+              description: "目标主机地址"
+            - field: "username"
+              type: "string"
+              description: "用户名"
+            - field: "port"
+              type: "integer"
+              description: "SSH端口，默认22"
+          required:
+            - "host"
+            - "username"
+      - name: "execute_command"
+        description: "执行远程命令"
+        input_schema:
+          type: object
+          properties:
+            - field: "command"
+              type: "string"
+              description: "要执行的命令"
+            - field: "timeout"
+              type: "integer"
+              description: "命令超时时间（秒）"
+          required:
+            - "command"
+      - name: "upload_file"
+        description: "上传文件到远程主机"
+        input_schema:
+          type: object
+          properties:
+            - field: "local_path"
+              type: "string"
+              description: "本地文件路径"
+            - field: "remote_path"
+              type: "string"
+              description: "远程文件路径"
+          required:
+            - "local_path"
+            - "remote_path"
+      - name: "download_file"
+        description: "从远程主机下载文件"
+        input_schema:
+          type: object
+          properties:
+            - field: "remote_path"
+              type: "string"
+              description: "远程文件路径"
+            - field: "local_path"
+              type: "string"
+              description: "本地文件路径"
+          required:
+            - "remote_path"
+            - "local_path"
+      - name: "list_directory"
+        description: "列出远程目录内容"
+        input_schema:
+          type: object
+          properties:
+            - field: "path"
+              type: "string"
+              description: "目录路径"
+          required:
+            - "path"
+      - name: "disconnect"
+        description: "断开SSH连接"
+        input_schema:
+          type: object
+          properties: [ ]
+          required: [ ]
+  - mcp_square_id: "sqlitemcp"
+    name: "SQLite MCP Server"
+    category: "industry"
+    desc: "专为工业数据管理设计的SQLite数据库集成MCP服务器"
+    from: "modelcontextprotocol"
+    avatar_path: "sqlitemcp/logo.png"
+    detail_path: "sqlitemcp/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "提供完整的SQLite数据库操作能力，包括数据查询、插入、更新、删除，支持复杂的SQL查询和事务处理，适用于工业数据存储和分析。"
+    manual: "通过npm安装：npm install @modelcontextprotocol/server-sqlite，配置数据库路径后可通过stdio模式运行"
+    scenario: "适用于工业生产数据记录、设备状态监控、质量控制数据管理等场景。\n 使用场景包括生产线数据采集、设备维护记录管理、质量检测数据分析、工艺参数存储等工业数据库应用。"
+    summary: "SQLite MCP Server为工业应用提供轻量级但功能强大的数据库解决方案，支持结构化数据的存储、查询和分析。"
+    tools:
+      - name: "query"
+        description: "执行SQL查询语句"
+        input_schema:
+          type: object
+          properties:
+            - field: "sql"
+              type: "string"
+              description: "要执行的SQL查询语句"
+          required:
+            - "sql"
+      - name: "execute"
+        description: "执行SQL命令（INSERT、UPDATE、DELETE等）"
+        input_schema:
+          type: object
+          properties:
+            - field: "sql"
+              type: "string"
+              description: "要执行的SQL命令"
+          required:
+            - "sql"
+      - name: "list_tables"
+        description: "列出数据库中的所有表"
+        input_schema:
+          type: object
+          properties: [ ]
+          required: [ ]
+      - name: "describe_table"
+        description: "获取表的结构信息"
+        input_schema:
+          type: object
+          properties:
+            - field: "table_name"
+              type: "string"
+              description: "表名"
+          required:
+            - "table_name"
+      - name: "create_table"
+        description: "创建新的数据表"
+        input_schema:
+          type: object
+          properties:
+            - field: "table_name"
+              type: "string"
+              description: "表名"
+            - field: "schema"
+              type: "string"
+              description: "表结构定义"
+          required:
+            - "table_name"
+            - "schema"
+  - mcp_square_id: "sequelizemcp"
+    name: "Sequelize MCP Server"
+    category: "industry"
+    desc: "基于Sequelize ORM的工业数据库管理MCP服务器"
+    from: "modelcontextprotocol"
+    avatar_path: "sequelizemcp/logo.png"
+    detail_path: "sequelizemcp/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "提供现代化的ORM数据库操作能力，支持多种数据库引擎，为工业应用提供高效的数据模型管理、关系映射、事务处理和数据验证功能。"
+    manual: "通过npm安装：npm install @modelcontextprotocol/server-sequelize，配置数据库连接和模型后启动服务"
+    scenario: "适用于工业数据建模、企业资源管理、生产计划系统、质量管理系统等场景。\n 使用场景包括工业数据模型设计、生产订单管理、库存追踪系统、设备资产管理、质量检测记录等工业数据库应用。"
+    summary: "Sequelize MCP Server为工业应用提供强大的ORM数据库解决方案，简化复杂数据操作并提高开发效率。"
+    tools:
+      - name: "create_model"
+        description: "创建数据模型"
+        input_schema:
+          type: object
+          properties:
+            - field: "model_name"
+              type: "string"
+              description: "模型名称"
+            - field: "attributes"
+              type: "object"
+              description: "模型属性定义"
+            - field: "options"
+              type: "object"
+              description: "模型选项"
+          required:
+            - "model_name"
+            - "attributes"
+      - name: "find_records"
+        description: "查询记录"
+        input_schema:
+          type: object
+          properties:
+            - field: "model_name"
+              type: "string"
+              description: "模型名称"
+            - field: "where"
+              type: "object"
+              description: "查询条件"
+            - field: "include"
+              type: "array"
+              description: "关联查询"
+            - field: "limit"
+              type: "integer"
+              description: "查询限制"
+          required:
+            - "model_name"
+      - name: "create_record"
+        description: "创建记录"
+        input_schema:
+          type: object
+          properties:
+            - field: "model_name"
+              type: "string"
+              description: "模型名称"
+            - field: "data"
+              type: "object"
+              description: "记录数据"
+          required:
+            - "model_name"
+            - "data"
+      - name: "update_record"
+        description: "更新记录"
+        input_schema:
+          type: object
+          properties:
+            - field: "model_name"
+              type: "string"
+              description: "模型名称"
+            - field: "data"
+              type: "object"
+              description: "更新数据"
+            - field: "where"
+              type: "object"
+              description: "更新条件"
+          required:
+            - "model_name"
+            - "data"
+            - "where"
+      - name: "delete_record"
+        description: "删除记录"
+        input_schema:
+          type: object
+          properties:
+            - field: "model_name"
+              type: "string"
+              description: "模型名称"
+            - field: "where"
+              type: "object"
+              description: "删除条件"
+          required:
+            - "model_name"
+            - "where"
+      - name: "create_association"
+        description: "创建模型关联"
+        input_schema:
+          type: object
+          properties:
+            - field: "source_model"
+              type: "string"
+              description: "源模型"
+            - field: "target_model"
+              type: "string"
+              description: "目标模型"
+            - field: "association_type"
+              type: "string"
+              description: "关联类型"
+            - field: "options"
+              type: "object"
+              description: "关联选项"
+          required:
+            - "source_model"
+            - "target_model"
+            - "association_type"
+      - name: "sync_database"
+        description: "同步数据库结构"
+        input_schema:
+          type: object
+          properties:
+            - field: "force"
+              type: "boolean"
+              description: "是否强制同步"
+            - field: "alter"
+              type: "boolean"
+              description: "是否修改表结构"
+          required: [ ]
+  - mcp_square_id: "postgresmcp"
+    name: "PostgreSQL MCP Server"
+    category: "industry"
+    desc: "面向工业级应用的PostgreSQL数据库集成MCP服务器"
+    from: "modelcontextprotocol"
+    avatar_path: "postgresmcp/logo.png"
+    detail_path: "postgresmcp/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "提供企业级PostgreSQL数据库的完整操作能力，支持复杂查询、事务处理、数据分析、备份恢复等功能，适用于大规模工业数据管理。"
+    manual: "通过npm安装：npm install @modelcontextprotocol/server-postgres，配置数据库连接参数后启动服务"
+    scenario: "适用于大型工业企业的数据仓库、生产管理系统、供应链管理、设备监控等场景。\n 使用场景包括企业资源规划(ERP)系统、制造执行系统(MES)、质量管理系统(QMS)、设备资产管理等大规模工业数据应用。"
+    summary: "PostgreSQL MCP Server为工业企业提供强大的关系型数据库解决方案，支持高并发、大数据量的工业应用场景。"
+    tools:
+      - name: "query"
+        description: "执行PostgreSQL查询语句"
+        input_schema:
+          type: object
+          properties:
+            - field: "sql"
+              type: "string"
+              description: "要执行的SQL查询语句"
+          required:
+            - "sql"
+      - name: "execute"
+        description: "执行PostgreSQL命令"
+        input_schema:
+          type: object
+          properties:
+            - field: "sql"
+              type: "string"
+              description: "要执行的SQL命令"
+          required:
+            - "sql"
+      - name: "list_schemas"
+        description: "列出数据库中的所有模式"
+        input_schema:
+          type: object
+          properties: [ ]
+          required: [ ]
+      - name: "list_tables"
+        description: "列出指定模式中的所有表"
+        input_schema:
+          type: object
+          properties:
+            - field: "schema"
+              type: "string"
+              description: "模式名称"
+          required:
+            - "schema"
+      - name: "describe_table"
+        description: "获取表的详细结构信息"
+        input_schema:
+          type: object
+          properties:
+            - field: "table_name"
+              type: "string"
+              description: "表名"
+            - field: "schema"
+              type: "string"
+              description: "模式名称"
+          required:
+            - "table_name"
+      - name: "create_index"
+        description: "创建数据库索引"
+        input_schema:
+          type: object
+          properties:
+            - field: "index_name"
+              type: "string"
+              description: "索引名称"
+            - field: "table_name"
+              type: "string"
+              description: "表名"
+            - field: "columns"
+              type: "array"
+              description: "索引列"
+          required:
+            - "index_name"
+            - "table_name"
+            - "columns"
+  - mcp_square_id: "memorymcp"
+    name: "Memory MCP Server"
+    category: "industry"
+    desc: "专为工业知识管理设计的持久化记忆MCP服务器"
+    from: "modelcontextprotocol"
+    avatar_path: "memorymcp/logo.png"
+    detail_path: "memorymcp/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "提供工业知识的长期存储和检索能力，支持设备手册、操作规程、故障案例、经验总结等工业知识的智能管理和快速查找。"
+    manual: "通过npm安装：npm install @modelcontextprotocol/server-memory，配置存储路径后启动服务"
+    scenario: "适用于工业知识库管理、设备维护经验存储、故障诊断案例库、操作培训等场景。\n 使用场景包括设备操作手册智能查询、故障解决方案库、维护保养记录管理、工艺参数优化经验、安全操作规程等工业知识管理应用。"
+    summary: "Memory MCP Server为工业企业提供智能化的知识管理解决方案，帮助积累和传承宝贵的工业经验和知识。"
+    tools:
+      - name: "store_memory"
+        description: "存储工业知识或经验"
+        input_schema:
+          type: object
+          properties:
+            - field: "key"
+              type: "string"
+              description: "知识标识符"
+            - field: "content"
+              type: "string"
+              description: "知识内容"
+            - field: "category"
+              type: "string"
+              description: "知识分类"
+            - field: "tags"
+              type: "array"
+              description: "知识标签"
+          required:
+            - "key"
+            - "content"
+      - name: "retrieve_memory"
+        description: "检索存储的知识"
+        input_schema:
+          type: object
+          properties:
+            - field: "key"
+              type: "string"
+              description: "知识标识符"
+          required:
+            - "key"
+      - name: "search_memory"
+        description: "搜索相关知识"
+        input_schema:
+          type: object
+          properties:
+            - field: "query"
+              type: "string"
+              description: "搜索查询"
+            - field: "category"
+              type: "string"
+              description: "搜索分类"
+            - field: "limit"
+              type: "integer"
+              description: "结果数量限制"
+          required:
+            - "query"
+      - name: "update_memory"
+        description: "更新已存储的知识"
+        input_schema:
+          type: object
+          properties:
+            - field: "key"
+              type: "string"
+              description: "知识标识符"
+            - field: "content"
+              type: "string"
+              description: "更新后的内容"
+            - field: "tags"
+              type: "array"
+              description: "更新后的标签"
+          required:
+            - "key"
+            - "content"
+      - name: "delete_memory"
+        description: "删除存储的知识"
+        input_schema:
+          type: object
+          properties:
+            - field: "key"
+              type: "string"
+              description: "知识标识符"
+          required:
+            - "key"
+      - name: "list_categories"
+        description: "列出所有知识分类"
+        input_schema:
+          type: object
+          properties: [ ]
+          required: [ ]
