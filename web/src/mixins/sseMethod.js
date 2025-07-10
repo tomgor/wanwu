@@ -363,6 +363,7 @@ export default {
                     if (e && e.data) {
                         let data = JSON.parse(e.data)
                         console.log('===>',new Date().getTime(),data)
+                        console.log(data.code)
                         this.sseResponse = data
                         //待替换的数据，需要前端组装
                         let commonData = {
@@ -425,7 +426,7 @@ export default {
                                 this.$refs['session-com'].scrollBottom()
                             })
 
-                        }else if(data.code === 7 || data.code === -1){
+                        }else if(data.code === 7){
                             this.setStoreSessionStatus(-1)
                             let fillData = {
                                 ...commonData,

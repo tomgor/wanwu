@@ -482,6 +482,9 @@ img.failed::after {
     img{
         width: 80% !important;
       }
+    section li{
+      list-style-position: inside; /* 将标记符号放在内容框内 */
+    }
   }
   .search-list{
     img{
