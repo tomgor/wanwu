@@ -94,6 +94,7 @@ type AssistantCreateResp struct {
 
 type AssistantTemplateInfo struct {
 	AssistantTemplateId string `json:"assistantTemplateId"` // 智能体模板Id
+	AppType             string `json:"appType"`             // 应用类型(固定值: agentTemplate)
 	Category            string `json:"category"`            // 种类(gov:政务,industry:工业,edu:文教,medical:医疗)
 	request.AppBriefConfig
 	Prologue                  string   `json:"prologue"`            // 开场白

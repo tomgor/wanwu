@@ -107,6 +107,7 @@ func AssistantTemplateCreate(ctx *gin.Context, userId, orgId string, req request
 func toAssistantTemplate(ctx *gin.Context, cfg *template.Assistant) *response.AssistantTemplateInfo {
 	return &response.AssistantTemplateInfo{
 		AssistantTemplateId: cfg.TemplateId,
+		AppType:             "agentTemplate",
 		Category:            cfg.Category,
 		AppBriefConfig: request.AppBriefConfig{
 			Avatar: CacheAvatar(ctx, cfg.AvatarKey),
