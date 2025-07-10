@@ -35,7 +35,7 @@
             <div class="img">
               <img :src="editForm.avatar.path ? `/user/api`+ editForm.avatar.path : '@/assets/imgs/bg-logo.png'"  />
             </div>
-            <div>
+            <div class="basicInfo-desc">
               <span class="basicInfo-title">{{editForm.name || '无信息'}}</span>
               <span class="el-icon-edit-outline editIcon" @click="editAgent"></span>
               <p>{{editForm.desc || '无信息'}}</p>
@@ -541,16 +541,17 @@ export default {
       padding:10px 0;
       margin-top:10px;
       .img{
-        width:70px;
-        height:70px;
         padding:10px;
         img{
           border:1px solid #eee;
           border-radius:50%;
-          width:100%;
-          height:100%;
+          width:60px;
+          height:60px;
           object-fit: cover;
         }
+      }
+      .basicInfo-desc{
+        flex:1;
       }
       .basicInfo-title{
         display:inline-block;
