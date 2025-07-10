@@ -363,7 +363,6 @@ export default {
                     if (e && e.data) {
                         let data = JSON.parse(e.data)
                         console.log('===>',new Date().getTime(),data)
-                        console.log(data.code)
                         this.sseResponse = data
                         //待替换的数据，需要前端组装
                         let commonData = {
