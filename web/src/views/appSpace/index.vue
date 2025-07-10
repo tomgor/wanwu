@@ -116,7 +116,7 @@ export default {
     },
     getAgentTemplate(){
       this.loading = true
-      const searchInput = this.$refs.searchInput
+      const searchInput = this.$refs.searchInput.value
       agnetTemplateList({category:'',name:searchInput}).then(res =>{
         if(res.code === 0){
           this.loading = false
