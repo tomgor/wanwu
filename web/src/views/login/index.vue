@@ -57,6 +57,7 @@
               {{$t('login.button')}}
             </p>
           </div>
+          <div class="bottom-text">{{login.platformDesc}}</div>
         </div>
       </div>
     </div>
@@ -308,6 +309,13 @@ export default {
             cursor: pointer;
           }
         }
+      }
+      .bottom-text {
+        text-align: center;
+        font-weight: normal;
+        color: #888;
+        margin-top: 6px;
+        font-size: 12px;
       }
     }
     .login-pwd-input /deep/ {
