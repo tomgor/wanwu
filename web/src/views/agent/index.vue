@@ -63,7 +63,8 @@ export default {
                 avatar:{},
                 name:'',
                 desc:'',
-                prologue:''
+                prologue:'',          
+                recommendQuestion:[]
             },
         }
     },
@@ -90,6 +91,7 @@ export default {
                     this.editForm.name = res.data.name;
                     this.editForm.desc = res.data.desc;
                     this.editForm.prologue = res.data.prologue;
+                    this.editForm.recommendQuestion = res.data.recommendQuestion.map(item =>({value:item}));
                 }
             })
         },
@@ -203,12 +205,12 @@ export default {
     width:100%;
     height:100%;
     .app-header-api{
-        width:100%;
+        width:50%;
         padding:10px;
         position:absolute;
         z-index:999;
         top:0;
-        left:0;
+        right:0;
         display:flex;
         justify-content:flex-end;
         align-content:center;
