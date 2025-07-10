@@ -76,11 +76,11 @@
 
       <div class="right-recommend">
         <p style="margin: 20px 0;color: #333;">更多推荐</p>
-        <!-- @click="handleClick(item)" -->
         <div
           class="recommend-item"
           v-for="(item ,i) in recommendList"
           :key="`${i}rc`"
+          @click="handleClick(item)"
         >
           <img
             class="logo"
@@ -140,7 +140,7 @@ export default {
       },
       foldStatus:false,
       recommendList: [],
-      assistantId:''
+      assistantTemplateId:''
     };
   },
   watch: {
@@ -161,7 +161,7 @@ export default {
       this.foldStatus = !this.foldStatus
     },
     initData(){
-      this.assistantId = this.$route.query.id
+      this.assistantTemplateId = this.$route.query.id
       this.getDetailData()
 
       //滚动到顶部
@@ -169,7 +169,7 @@ export default {
       if (main) main.scrollTop = 0
     },
     getDetailData(){
-      agnetTemplateDetail({assistantTemplateId:this.assistantId}).then((res) => {
+      agnetTemplateDetail({assistantTemplateId:this.assistantTemplateId}).then((res) => {
           this.detail = res.data || {}
       })
     },
@@ -178,8 +178,9 @@ export default {
         this.recommendList = [...(res.data.list || [])].splice(0, 5)
       })
     },
-    handleClick(val){
-      this.$router.push(`/mcp/detail/square?mcpSquareId=${val.mcpSquareId}`)
+    handleClick(item){
+      this.assistantTemplateId = item.assistantTemplateId;
+      this.getDetailData();
     },
     // 解析文本，遇到.换行等
     parseTxt(txt){
