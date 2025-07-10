@@ -411,14 +411,12 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	}
 
 	timeout := 300 * time.Second
-	requestCtx, cancelFunc := context.WithTimeout(ctx, timeout)
-	defer cancelFunc()
 
 	startTime := time.Now()
 	id := uuid.New().String()
 	log.Infof("Assistant服务开始调用HttpRequestLlmStream，uuid: %s, assistantId: %s, url: %s, userId: %s, timeout: %v, body: %s",
 		id, req.AssistantId, assistantConfig.SseUrl, reqUserId, timeout, string(requestBodyBytes))
-	sseResp, err := HttpRequestLlmStream(requestCtx, assistantConfig.SseUrl, reqUserId, xuid, bytes.NewReader(requestBodyBytes), timeout)
+	sseResp, err := HttpRequestLlmStream(ctx, assistantConfig.SseUrl, reqUserId, xuid, bytes.NewReader(requestBodyBytes), timeout)
 	if err != nil {
 		log.Errorf("Assistant服务调用智能体能力接口失败，assistantId: %s, uuid: %s, error: %v", req.AssistantId, id, err)
 		if ctx.Err() != nil && !req.Trial {
@@ -460,7 +458,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 					saveConversation(ctx, req, "本次回答已被终止", searchList)
 				} else {
 					// 如果已经读取到消息，保存已经收到的消息
-					saveConversation(ctx, req, fullResponse.String(), searchList)
+					saveConversation(ctx, req, fullResponse.String()+"\n本次回答已被终止", searchList)
 				}
 			}
 			return err
@@ -475,7 +473,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 					saveConversation(ctx, req, "本次回答已中断", searchList)
 				} else {
 					// 如果已经读取到消息，保存已经收到的消息
-					saveConversation(ctx, req, fullResponse.String(), searchList)
+					saveConversation(ctx, req, fullResponse.String()+"\n本次回答已中断", searchList)
 				}
 			}
 			SSEError(stream, "本次回答已中断")
