@@ -5,7 +5,7 @@
       <span class="page-title-name">{{typeObj[type] ? typeObj[type].title : $t('appSpace.title')}}</span>
     </div>
     <div class="hide-loading-bg" style="padding: 20px" v-loading="loading">
-      <search-input :placeholder="$t('appSpace.search')" ref="searchInput" @handleSearch="getTableData" />
+      <search-input :placeholder="$t('appSpace.search')" ref="searchInput" @handleSearch="handleSearch" />
       <el-button class="add-button" size="mini" type="primary" @click="showCreate" icon="el-icon-plus" v-if="validateAgent()">
         {{$t('common.button.create')}}
       </el-button>
@@ -94,7 +94,6 @@ export default {
   mounted() {
     const {type} = this.$route.params || {}
     this.type = type
-    console.log(this.type)
     if(this.type === 'agent'){
       this.getAgentTemplate();
     }else{
@@ -102,6 +101,13 @@ export default {
     }
   },
   methods: {
+    handleSearch(){
+      if(this.type === 'agent' && this.agnet_type === 'template'){
+        this.getAgentTemplate();
+      }else{
+        this.getTableData();
+      }
+    },
     validateAgent(){
       if(this.type === 'agent' && this.agnet_type === 'template'){
         return false
@@ -110,7 +116,8 @@ export default {
     },
     getAgentTemplate(){
       this.loading = true
-      agnetTemplateList({category:'',name:''}).then(res =>{
+      const searchInput = this.$refs.searchInput
+      agnetTemplateList({category:'',name:searchInput}).then(res =>{
         if(res.code === 0){
           this.loading = false
           this.listData = res.data 
