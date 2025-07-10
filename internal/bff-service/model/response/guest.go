@@ -28,6 +28,7 @@ type CustomLogin struct {
 	BackgroundPath   string `json:"backgroundPath"`   // 登录页背景图路径
 	LoginButtonColor string `json:"loginButtonColor"` // 登录按钮颜色
 	WelcomeText      string `json:"welcomeText"`      // 登录页欢迎标词
+	PlatformDesc     string `json:"platformDesc"`     // 平台描述词
 }
 
 type CustomHome struct {

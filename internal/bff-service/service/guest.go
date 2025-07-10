@@ -33,6 +33,7 @@ func GetLogoCustomInfo(ctx *gin.Context) (response.LogoCustomInfo, error) {
 			BackgroundPath:   config.Cfg().CustomInfo.Login.BackgroundPath,
 			LoginButtonColor: config.Cfg().CustomInfo.Login.LoginButtonColor,
 			WelcomeText:      gin_util.I18nKey(ctx, config.Cfg().CustomInfo.Login.WelcomeText),
+			PlatformDesc:     gin_util.I18nKey(ctx, config.Cfg().CustomInfo.Login.PlatformDesc),
 		},
 		Home: response.CustomHome{
 			LogoPath: config.Cfg().CustomInfo.Home.LogoPath,

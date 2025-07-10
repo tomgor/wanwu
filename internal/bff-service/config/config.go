@@ -98,6 +98,7 @@ type CustomLogin struct {
 	BackgroundPath   string `json:"background_path" mapstructure:"background_path"`
 	LoginButtonColor string `json:"login_button_color" mapstructure:"login_button_color"`
 	WelcomeText      string `json:"welcome_text" mapstructure:"welcome_text"`
+	PlatformDesc     string `json:"platform_desc" mapstructure:"platform_desc"`
 }
 
 type CustomHome struct {

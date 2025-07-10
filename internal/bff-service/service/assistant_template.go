@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
@@ -9,6 +10,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	template "github.com/UnicomAI/wanwu/internal/bff-service/pkg/assistant-template"
+	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/gin-gonic/gin"
 )
@@ -72,7 +74,7 @@ func AssistantTemplateCreate(ctx *gin.Context, userId, orgId string, req request
 	for {
 		i++
 		exist = false
-		name = fmt.Sprintf("%v_副本%v", assistantTemplate.Name, i)
+		name = gin_util.I18nKey(ctx, "bff_assistant_template_name", assistantTemplate.Name, strconv.Itoa(i))
 		for _, assistantInfo := range listResp.AssistantInfos {
 			if assistantInfo.Name == name {
 				exist = true
