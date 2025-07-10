@@ -60,6 +60,7 @@
                 class="cover-input-icon model-select"
                 :disabled="isPublish"
                 :loading="modelLoading"
+                clearable
               >
                 <el-option
                   v-for="(item,index) in modleOptions"
@@ -86,6 +87,7 @@
                 style="width:100%;"
                 :disabled="isPublish"
                 :loading="modelLoading"
+                clearable
               >
                 <el-option
                   v-for="(item,index) in rerankOptions"

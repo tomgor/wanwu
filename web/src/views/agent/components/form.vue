@@ -61,6 +61,7 @@
                 class="cover-input-icon model-select"
                 :disabled="isPublish"
                 :loading="modelLoading"
+                clearable
               >
                 <el-option
                   v-for="(item,index) in modleOptions"
@@ -151,6 +152,7 @@
                 style="width:100%;"
                 :disabled="isPublish"
                 :loading="modelLoading"
+                clearable
               >
                 <el-option
                   v-for="(item,index) in rerankOptions"
@@ -627,7 +629,7 @@ export default {
           desc: data.desc || "",
           instructions:data.instructions || "",//系统提示词
           rerankParams:data.rerankConfig.modelId || "",
-          modelConfig:data.modelConfig.config,
+          modelConfig:data.modelConfig.config !== null ?data.modelConfig.config : this.editForm.modelConfig,
           modelParams: data.modelConfig.modelId || "",
           recommendQuestion:data.recommendQuestion && data.recommendQuestion.length >0
             ? data.recommendQuestion.map((n,index) => {
