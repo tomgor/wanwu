@@ -182,7 +182,7 @@ export default {
   margin-top:20px;
   width:300px;
   height:40px;
-  border-bottom: 1px solid #384BF7;
+  border-bottom: 1px solid #333;
   display:flex;
   justify-content:space-between;
   .agent_type_item{
@@ -198,7 +198,8 @@ export default {
   }
   .agentActive{
     color: #fff;
-    background:#384BF7;
+    background: #333;
+    border-radius: 0;
   }
 }
 </style>
