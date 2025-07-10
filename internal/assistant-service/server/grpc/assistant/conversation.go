@@ -171,10 +171,12 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	var searchList string
 	var hasReadFirstMessage bool
 	var streamStarted bool
+	var conversationSaved bool // 标记是否已经保存过对话
 
 	// 使用defer统一处理上下文取消的情况
 	defer func() {
-		if ctx.Err() != nil && !req.Trial {
+		// 只有在上下文被手动取消且还未保存过对话时，才保存"已被终止"消息
+		if ctx.Err() != nil && !req.Trial && !conversationSaved {
 			if !streamStarted {
 				// 流式响应还未开始，保存基本终止消息
 				saveConversation(ctx, req, "本次回答已被终止", "")
@@ -438,6 +440,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 					// 如果已经读取到消息，保存已经收到的消息
 					saveConversation(ctx, req, fullResponse.String()+"\n本次回答已中断", searchList)
 				}
+				conversationSaved = true // 标记已保存，避免defer中重复保存
 			}
 			SSEError(stream, "本次回答已中断")
 			return err
@@ -493,6 +496,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	// 问答调试不保存
 	if !req.Trial {
 		saveConversation(ctx, req, fullResponse.String(), searchList)
+		conversationSaved = true // 标记已保存
 	}
 
 	return nil
