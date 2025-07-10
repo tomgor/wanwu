@@ -432,17 +432,25 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		line, err := reader.ReadBytes('\n')
 		if err != nil && err != io.ErrUnexpectedEOF && err != io.EOF {
 			log.Errorf("Assistant服务读取流式响应失败，assistantId: %s, error: %v, 已处理行数: %d", req.AssistantId, err, lineCount)
-			if !req.Trial {
-				if !hasReadFirstMessage {
-					// 如果还没有读取到第一条消息，保存中断消息
-					saveConversation(ctx, req, "本次回答已中断", searchList)
-				} else {
-					// 如果已经读取到消息，保存已经收到的消息
-					saveConversation(ctx, req, fullResponse.String()+"\n本次回答已中断", searchList)
+
+			// 检查是否是上下文取消导致的错误
+			if ctx.Err() != nil {
+				// 用户手动取消请求，让defer函数处理"已被终止"消息，这里不保存
+				log.Debugf("Assistant服务检测到上下文取消，assistantId: %s", req.AssistantId)
+			} else {
+				// 真正的SSE读取错误，保存"已中断"消息
+				if !req.Trial {
+					if !hasReadFirstMessage {
+						// 如果还没有读取到第一条消息，保存中断消息
+						saveConversation(ctx, req, "本次回答已中断", searchList)
+					} else {
+						// 如果已经读取到消息，保存已经收到的消息
+						saveConversation(ctx, req, fullResponse.String()+"\n本次回答已中断", searchList)
+					}
+					conversationSaved = true // 标记已保存，避免defer中重复保存
 				}
-				conversationSaved = true // 标记已保存，避免defer中重复保存
+				SSEError(stream, "本次回答已中断")
 			}
-			SSEError(stream, "本次回答已中断")
 			return err
 		}
 
