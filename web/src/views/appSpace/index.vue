@@ -194,13 +194,13 @@ export default {
     border-radius:4px;
     text-align:center;
     line-height:40px;
-    font-weight:bold;
-    font-size: 16px;
+    font-size: 14px;
   }
   .agentActive{
     color: #fff;
     background: #333;
     border-radius: 0;
+    font-weight: bold;
   }
 }
 </style>
