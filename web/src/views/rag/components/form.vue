@@ -35,7 +35,7 @@
             <div class="img">
               <img :src="editForm.avatar.path ? `/user/api`+ editForm.avatar.path : '@/assets/imgs/bg-logo.png'"  />
             </div>
-            <div>
+            <div class="basicInfo-desc">
               <span class="basicInfo-title">{{editForm.name || '无信息'}}</span>
               <span class="el-icon-edit-outline editIcon" @click="editAgent"></span>
               <p>{{editForm.desc || '无信息'}}</p>
@@ -60,6 +60,7 @@
                 class="cover-input-icon model-select"
                 :disabled="isPublish"
                 :loading="modelLoading"
+                clearable
               >
                 <el-option
                   v-for="(item,index) in modleOptions"
@@ -73,7 +74,7 @@
           </div>
           <div class="block prompt-box">
             <p class="block-title">
-              <!-- <img :src="require('@/assets/imgs/require.png')" class="required-label"/> -->
+              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
               Rerank模型
             </p>
             <div class="rl">
@@ -86,6 +87,7 @@
                 style="width:100%;"
                 :disabled="isPublish"
                 :loading="modelLoading"
+                clearable
               >
                 <el-option
                   v-for="(item,index) in rerankOptions"
@@ -222,7 +224,7 @@ export default {
             );
           });
           if (changed) {
-            if(newVal['modelParams']!== '' && newVal['knowledgeBaseIds'].length > 0){
+            if(newVal['modelParams']!== '' && newVal['knowledgeBaseIds'].length > 0 && newVal['rerankParams'] !==''){
               this.updateInfo();
             }
           }
@@ -284,10 +286,10 @@ export default {
         this.$message.warning('请选择模型！')
         return false
       }
-      // if(this.editForm.rerankParams === ''){
-      //   this.$message.warning('请选rerank择模型！')
-      //   return false
-      // }
+      if(this.editForm.rerankParams === ''){
+        this.$message.warning('请选rerank择模型！')
+        return false
+      }
       if(this.editForm.knowledgeBaseIds.length === 0){
         this.$message.warning('请选择关联知识库！')
         return false
@@ -541,16 +543,17 @@ export default {
       padding:10px 0;
       margin-top:10px;
       .img{
-        width:70px;
-        height:70px;
         padding:10px;
         img{
           border:1px solid #eee;
           border-radius:50%;
-          width:100%;
-          height:100%;
+          width:60px;
+          height:60px;
           object-fit: cover;
         }
+      }
+      .basicInfo-desc{
+        flex:1;
       }
       .basicInfo-title{
         display:inline-block;

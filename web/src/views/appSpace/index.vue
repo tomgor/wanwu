@@ -134,6 +134,7 @@ export default {
     },
     agentType_change(item){
       this.agnet_type = item.type;
+      this.$refs.searchInput.value = '';
       if(this.agnet_type === 'auto'){
         this.getTableData();
       }else{
