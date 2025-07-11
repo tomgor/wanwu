@@ -37,6 +37,7 @@
               size="mini"
               @click="handleTools"
               :disabled="isGetMCP"
+              :loading="toolsLoading"
             >
               获取MCP工具
             </el-button>
@@ -54,6 +55,7 @@
           size="mini"
           :disabled="mcpList.length === 0"
           @click="submitForm('ruleForm')"
+          :loading="publishLoading"
         >
           确定发布
         </el-button>
@@ -104,6 +106,8 @@ export default {
           },
         ],
       },
+      toolsLoading: false,
+      publishLoading: false
     };
   },
   methods: {
@@ -115,24 +119,26 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          this.publishLoading = true
           setCreate(this.ruleForm)
             .then((res) => {
               if(res.code === 0){
                 this.$message.success("发布成功")
+                this.publishLoading = false
                 this.handleCancel()
               }
-            })
-        } else {
-          return false;
+            }).catch(() => this.publishLoading = false)
         }
       });
     },
     handleTools() {
+      this.toolsLoading = true
       getTools({
         serverUrl: this.ruleForm.sseUrl,
       }).then((res) => {
         this.mcpList = res.data.tools;
-      })
+        this.toolsLoading = false
+      }).catch(() => this.toolsLoading = false)
     },
   },
   computed: {
