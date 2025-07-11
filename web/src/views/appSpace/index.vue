@@ -9,9 +9,9 @@
       <el-button class="add-button" size="mini" type="primary" @click="showCreate" icon="el-icon-plus" v-if="validateAgent()">
         {{$t('common.button.create')}}
       </el-button>
-      <div v-if="type === 'agent'" class="agent_type_switch">
+      <!-- <div v-if="type === 'agent'" class="agent_type_switch">
           <div v-for="item in agentSwitch" :class="{'agentActive':item.type === agnet_type }" class="agent_type_item" @click="agentType_change(item)" :key="item.type">{{item.name}}</div>
-      </div>
+      </div> -->
       <AppList
         :agnetType="agnet_type"
         :type="type"
@@ -46,7 +46,7 @@ export default {
         agent: {title: '智能体', img: require('@/assets/imgs/agent.png')}
       },
       currentTypeObj: {},
-      agnet_type:'template',
+      agnet_type:'auto',
       agentSwitch:[
         {
           type:'template',
@@ -66,13 +66,13 @@ export default {
         this.listData = []
         this.type = type
         this.$refs.searchInput.value = ''
-        console.log(this.type)
-        if(this.type === 'agent'){
-          this.agnet_type = 'template'
-          this.getAgentTemplate()
-        }else{
-          this.getTableData()
-        }
+        // if(this.type === 'agent'){
+        //   this.agnet_type = 'template'
+        //   this.getAgentTemplate()
+        // }else{
+        //   this.getTableData()
+        // }
+        this.getTableData()
       },
       // 深度观察监听
       deep: true
@@ -81,12 +81,13 @@ export default {
       handler(val){
         if(val !== ''){
           this.type = val;
-          if(this.type === 'agent'){
-            this.agnet_type = 'template'
-            this.getAgentTemplate()
-          }else{
-              this.getTableData()
-          }
+          // if(this.type === 'agent'){
+          //   this.agnet_type = 'template'
+          //   this.getAgentTemplate()
+          // }else{
+          //     this.getTableData()
+          // }
+          this.getTableData()
         }
       }
     }
@@ -97,12 +98,13 @@ export default {
   mounted() {
     const {type} = this.$route.params || {}
     this.type = type
-    if(this.type === 'agent'){
-      this.agnet_type = 'template'
-      this.getAgentTemplate();
-    }else{
-      this.getTableData();
-    }
+    // if(this.type === 'agent'){
+    //   this.agnet_type = 'template'
+    //   this.getAgentTemplate();
+    // }else{
+    //   this.getTableData();
+    // }
+    this.getTableData();
   },
   methods: {
     handleSearch(){
