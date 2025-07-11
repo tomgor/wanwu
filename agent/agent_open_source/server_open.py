@@ -88,7 +88,7 @@ def agent_start():
             enable_thinking = data.get("enable_thinking",False)
 
             #搜索参数
-            auto_citation = data.get("auto_citation",True)
+            auto_citation = data.get("auto_citation",False)
             use_search = data.get("use_search",False)
             need_search_list = data.get("need_search_list",True)
             search_url = data.get("search_url",'')
@@ -197,7 +197,7 @@ def agent_start():
 
             if kn_params:
                 knowledgebase_name = kn_params.get('knowledgeBase')
-                threshold = kn_params.get('threshold',0.7)
+                threshold = kn_params.get('threshold',0.4)
                 topk = kn_params.get('topk',5)
                 rerank_id = kn_params.get('rerank_id')
             
