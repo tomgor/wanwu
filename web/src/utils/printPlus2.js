@@ -99,7 +99,7 @@ Looper.prototype = {
         // this.printFn();
 
         
-        const batchSize = 10; // 推荐每次输出10个字符
+        const batchSize = 30; // 推荐每次输出30个字符
         const interval = 10; // 减少输出间隔时间
         this.t = workerTimer.setInterval(() => {
             if (this.index === this.sentence.length) {
