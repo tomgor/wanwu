@@ -66,7 +66,9 @@ export default {
         this.listData = []
         this.type = type
         this.$refs.searchInput.value = ''
+        console.log(this.type)
         if(this.type === 'agent'){
+          this.agnet_type = 'template'
           this.getAgentTemplate()
         }else{
           this.getTableData()
@@ -80,6 +82,7 @@ export default {
         if(val !== ''){
           this.type = val;
           if(this.type === 'agent'){
+            this.agnet_type = 'template'
             this.getAgentTemplate()
           }else{
               this.getTableData()
@@ -95,6 +98,7 @@ export default {
     const {type} = this.$route.params || {}
     this.type = type
     if(this.type === 'agent'){
+      this.agnet_type = 'template'
       this.getAgentTemplate();
     }else{
       this.getTableData();

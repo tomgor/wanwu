@@ -3,11 +3,11 @@ import workerTimer from './worker'
 import {parseSub, isSub} from "@/utils/util.js"
 
 const Print = function (opt) {
-    this.sentenceArr = []
-    this.sIndexMap={}
+    this.sentenceArr = []//存储待打印的句子的数组
+    this.sIndexMap={} 
     this.timer = opt.timer || 10; //打印速度
     this.t = null;
-    this.sIndex = 0
+    this.sIndex = 0 //记录已打印句子的索引（避免重复打印）
     this.printStatus = 0
     this.fullWord = ''
     this.searchList = []
@@ -101,6 +101,8 @@ Looper.prototype = {
         
         const batchSize = 30; // 推荐每次输出30个字符
         const interval = 10; // 减少输出间隔时间
+        // console.log(this.sentence,'sentence')
+        // console.log(this.index)
         this.t = workerTimer.setInterval(() => {
             if (this.index === this.sentence.length) {
                 this.stop()
@@ -138,13 +140,6 @@ Looper.prototype = {
         }
     },
     stop() {
-        // if(!this.sIndexMap[`${this.sIndex}`]){
-        //     this.sIndexMap[`${this.sIndex}`]=true
-        //     this.endCB({msg: 'end', index: this.sIndex})
-        // }else{
-        //     console.log(this.sIndex, this.t, this.sentence)
-        // }
-        // this.t && workerTimer.clearInterval(this.t)
         if(this.sIndexMap[`${this.sIndex}`]) {
             return;
         }
@@ -155,8 +150,4 @@ Looper.prototype = {
     }
 }
 
-
-export default Print
-
-
-;
+export default Print;
