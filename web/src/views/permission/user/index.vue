@@ -2,8 +2,13 @@
   <div>
     <div class="table-wrap list-common wrap-fullheight">
       <div class="table-box">
-        <search-input :placeholder="$t('user.form.user')" ref="searchInput" @handleSearch="getTableData" />
-        <el-button class="add-bt" size="mini" type="primary" @click="preInsert">
+        <search-input
+          style="margin-right: 2px; margin-bottom: 20px"
+          :placeholder="$t('user.form.user')"
+          ref="searchInput"
+          @handleSearch="getTableData"
+        />
+        <el-button v-if="!isSystem" style="margin-left: 13px" class="add-bt" size="mini" type="primary" @click="preInsert">
           <img src="@/assets/imgs/addUser.png" alt="" />
           <span>{{$t('user.button.create')}}</span>
         </el-button>
@@ -401,7 +406,7 @@
       color: #555;
     }
     .add-bt {
-      margin: 20px 0;
+      margin: 0 0 20px;
       img {
         width: 16px;
         margin-right: 5px;

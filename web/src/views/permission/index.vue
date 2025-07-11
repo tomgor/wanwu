@@ -6,7 +6,7 @@
       <span class="page-title-name">{{$t('menu.setting')}}</span>
     </div>
     <div style="margin: 10px 20px 0 20px;">
-      <div style="margin-bottom: -50px">
+      <div style="margin-bottom: -30px">
         <span
           v-for="item in list"
           :key="item.key"
