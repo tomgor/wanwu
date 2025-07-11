@@ -21,7 +21,6 @@ Print.prototype = {
             this.searchList = privateData.searchList
         }
         this.sentenceArr.push(sentence)
-        console.log(this.sentenceArr,'插入句子的索引')
         this.loop(printingCB, endCB, "truely")
     },
     stop() {
@@ -40,7 +39,6 @@ Print.prototype = {
             return;
         }
 
-        console.log(this.sentenceArr,this.sIndex)
         let curSentence = this.sentenceArr[this.sIndex]
         this.printStatus = 1
         if(!curSentence){
@@ -99,34 +97,68 @@ Looper.prototype = {
         }
 
         // this.printFn();
-
-        
-        const batchSize = 30; // 推荐每次输出30个字符
-        const interval = 10; // 减少输出间隔时间
-        console.log(this.sentence,'sentence',this.index)
-        this.t = workerTimer.setInterval(() => {
-            if (this.index === this.sentence.length) {
-                this.stop()
-                return
-            }
-            const endIdx = Math.min(this.index + batchSize, this.sentence.length);
-            const chunk = this.sentence.slice(this.index, endIdx);
-            this.printCB(chunk);
-            this.index = endIdx;
-        }, interval,this)
-
-        // let sentenceArr = this.sentence.split('')
-        // if(sentenceArr.length>100){
-        //     sentenceArr = this.sentence.split(',')
-        // }
+       
+        // const batchSize = 30; // 推荐每次输出30个字符
+        // const interval = 10; // 减少输出间隔时间
+        // console.log(this.sentence,'sentence',this.index)
         // this.t = workerTimer.setInterval(() => {
-        //     if (this.index === sentenceArr.length) {
+        //     if (this.index === this.sentence.length) {
         //         this.stop()
         //         return
         //     }
-        //     this.printCB(sentenceArr[this.index])
-        //     this.index++;
-        // }, this.timer,this)
+        //     const endIdx = Math.min(this.index + batchSize, this.sentence.length);
+        //     const chunk = this.sentence.slice(this.index, endIdx);
+        //     this.printCB(chunk);
+        //     this.index = endIdx;
+        // }, interval,this)
+
+
+
+        let sentenceArr = this.sentence.split('')
+        console.log(this.sentence)
+        console.log(sentenceArr)
+        if(sentenceArr.length>100){
+            sentenceArr = this.sentence.split(',')
+        }
+        this.t = workerTimer.setInterval(() => {
+            console.log(this.index)
+            console.log(this.timer)
+            if (this.index === sentenceArr.length) {
+                this.stop()
+                return
+            }
+            this.printCB(sentenceArr[this.index])
+            this.index++;
+        }, this.timer,this)
+    },
+    printContentWithTypewriter(content, onComplete) {
+        let index = 0;
+        const batchSize = 30;
+        const interval = this.timer;
+
+        const timer = workerTimer.setInterval(() => {
+            if (index >= content.length) {
+                workerTimer.clearInterval(timer);
+                onComplete();
+                return;
+            }
+            const chunk = content.slice(index, index + batchSize);
+            this.printCB(chunk);
+            index += batchSize;
+        }, interval);
+    },
+    startBatchPrint() {
+        const batchSize = 30;
+        const interval = this.timer;
+        this.t = workerTimer.setInterval(() => {
+            if (this.index >= this.sentence.length) {
+                this.stop();
+                return;
+            }
+            const chunk = this.sentence.slice(this.index, this.index + batchSize);
+            this.printCB(chunk);
+            this.index += batchSize;
+        }, interval, this);
     },
     printFn(){
         let sentenceArr = this.sentence.split('')
@@ -141,14 +173,13 @@ Looper.prototype = {
         }
     },
     stop() {
-        if(this.sIndexMap[`${this.sIndex}`]) {
-            return;
-        }
+        if(this.sIndexMap[`${this.sIndex}`])return;
         this.sIndexMap[`${this.sIndex}`] = true;
         this.endCB({msg: 'end', index: this.sIndex});
         this.t && workerTimer.clearInterval(this.t);
         this.t = null;
     }
 }
+
 
 export default Print;

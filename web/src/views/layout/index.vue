@@ -7,7 +7,7 @@
           <div style="padding: 10px 0 14px; border-bottom: 1px solid #D9D9D9">
             <img
               style="width: 36px; margin: 0 auto"
-              :src="homeLogoPath ? (basePath + '/user/api' + homeLogoPath) : require('@/assets/imgs/title_icon.png')"
+              :src="homeLogoPath ? (basePath + '/user/api' + homeLogoPath) : require('@/assets/imgs/wanwu.svg')"
             />
           </div>
         </div>

@@ -5,11 +5,15 @@
       <span class="page-title-name">{{typeObj[type] ? typeObj[type].title : $t('appSpace.title')}}</span>
     </div>
     <div class="hide-loading-bg" style="padding: 20px" v-loading="loading">
-      <search-input :placeholder="$t('appSpace.search')" ref="searchInput" @handleSearch="getTableData" />
-      <el-button class="add-button" size="mini" type="primary" @click="showCreate" icon="el-icon-plus">
+      <search-input :placeholder="$t('appSpace.search')" ref="searchInput" @handleSearch="handleSearch" />
+      <el-button class="add-button" size="mini" type="primary" @click="showCreate" icon="el-icon-plus" v-if="validateAgent()">
         {{$t('common.button.create')}}
       </el-button>
+      <!-- <div v-if="type === 'agent'" class="agent_type_switch">
+          <div v-for="item in agentSwitch" :class="{'agentActive':item.type === agnet_type }" class="agent_type_item" @click="agentType_change(item)" :key="item.type">{{item.name}}</div>
+      </div> -->
       <AppList
+        :agnetType="agnet_type"
         :type="type"
         :showCreate="showCreate"
         :appData="listData"
@@ -26,7 +30,7 @@
 import SearchInput from "@/components/searchInput.vue"
 import AppList from "@/components/appList.vue"
 import CreateTotalDialog from "@/components/createTotalDialog.vue"
-import { getAppSpaceList } from "@/api/appspace"
+import { getAppSpaceList,agnetTemplateList } from "@/api/appspace"
 import { mapGetters} from 'vuex'
 
 export default {
@@ -41,7 +45,18 @@ export default {
         rag: {title: '文本问答', img: require('@/assets/imgs/rag.png')},
         agent: {title: '智能体', img: require('@/assets/imgs/agent.png')}
       },
-      currentTypeObj: {}
+      currentTypeObj: {},
+      agnet_type:'auto',
+      agentSwitch:[
+        {
+          type:'template',
+          name:'智能体模版'
+        },
+        {
+          type:'auto',
+          name:'自定义智能体'
+        }
+      ]
     }
   },
   watch: {
@@ -51,8 +66,13 @@ export default {
         this.listData = []
         this.type = type
         this.$refs.searchInput.value = ''
+        // if(this.type === 'agent'){
+        //   this.agnet_type = 'template'
+        //   this.getAgentTemplate()
+        // }else{
+        //   this.getTableData()
+        // }
         this.getTableData()
-        console.log(type, '----------------appSpace')
       },
       // 深度观察监听
       deep: true
@@ -61,7 +81,13 @@ export default {
       handler(val){
         if(val !== ''){
           this.type = val;
-          this.getTableData();
+          // if(this.type === 'agent'){
+          //   this.agnet_type = 'template'
+          //   this.getAgentTemplate()
+          // }else{
+          //     this.getTableData()
+          // }
+          this.getTableData()
         }
       }
     }
@@ -72,9 +98,55 @@ export default {
   mounted() {
     const {type} = this.$route.params || {}
     this.type = type
-    this.getTableData()
+    // if(this.type === 'agent'){
+    //   this.agnet_type = 'template'
+    //   this.getAgentTemplate();
+    // }else{
+    //   this.getTableData();
+    // }
+    this.getTableData();
   },
   methods: {
+    handleSearch(){
+      if(this.type === 'agent' && this.agnet_type === 'template'){
+        this.getAgentTemplate();
+      }else{
+        this.getTableData();
+      }
+    },
+    validateAgent(){
+      if(this.type === 'agent' && this.agnet_type === 'template'){
+        return false
+      }
+      return true
+    },
+    getAgentTemplate(){
+      this.loading = true
+      const searchInput = this.$refs.searchInput.value
+      agnetTemplateList({category:'',name:searchInput}).then(res =>{
+        if(res.code === 0){
+          this.loading = false
+          this.listData = res.data 
+            ? res.data.list.map(item => ({
+                ...item,
+                isShowCopy: false
+              })) 
+            : [];
+          }
+      }).catch(() => {
+        this.loading = false
+        this.listData = []
+      })
+    },
+    agentType_change(item){
+      this.agnet_type = item.type;
+      this.$refs.searchInput.value = '';
+      if(this.agnet_type === 'auto'){
+        this.getTableData();
+      }else{
+        this.getAgentTemplate();
+      }
+    },
     getTableData() {
       this.loading = true
       const searchInput = this.$refs.searchInput
@@ -112,5 +184,29 @@ export default {
 <style lang="scss" scoped>
 .add-button {
  float: right;
+}
+.agent_type_switch{
+  margin-top:20px;
+  width:300px;
+  height:40px;
+  border-bottom: 1px solid #333;
+  display:flex;
+  justify-content:space-between;
+  .agent_type_item{
+    cursor: pointer;
+    height:100%;
+    width:50%;
+    color:#333;
+    border-radius:4px;
+    text-align:center;
+    line-height:40px;
+    font-size: 14px;
+  }
+  .agentActive{
+    color: #fff;
+    background: #333;
+    border-radius: 0;
+    font-weight: bold;
+  }
 }
 </style>

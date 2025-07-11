@@ -201,7 +201,7 @@
                     return false;
                     }
                 }
-                if(this.editForm.knowledgeBaseIds.length > 0){
+                if(this.editForm.knowledgeBaseIds.length > 0){ //知识库与rerank解绑
                     if(!this.editForm.rerankParams){
                         this.$message.warning('请选择rerank模型');
                         return false;

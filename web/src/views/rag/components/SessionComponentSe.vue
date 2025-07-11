@@ -163,7 +163,7 @@ export default {
           //捕获图片加载错误
           document.body.addEventListener('error', e => {
               if (e.target.tagName === 'IMG') {
-                handleImageError(e.target);
+                this.handleImageError(e.target);
               }
           }, true); 
         },
@@ -482,6 +482,9 @@ img.failed::after {
     img{
         width: 80% !important;
       }
+    section li{
+      list-style-position: inside; /* 将标记符号放在内容框内 */
+    }
   }
   .search-list{
     img{

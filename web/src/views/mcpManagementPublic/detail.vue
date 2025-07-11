@@ -14,7 +14,7 @@
         <p v-else class="desc">{{detail.desc}}</p>
       </div>
     </div>
-    <div class="main">
+    <div class="mcp-main">
       <div class="left-info">
         <!-- tabs -->
         <div class="mcp-tabs">
@@ -316,9 +316,9 @@ export default {
       height: auto;
     }
   }
-  .main{
+  .mcp-main{
     display: flex;
-    margin: 10px 0 50px 0;
+    margin: 10px 0 0 0;
     .left-info{
       width: calc(100% - 420px);
       margin-right: 20px;
@@ -362,12 +362,6 @@ export default {
         .overview-item:last-child{
           border-bottom: none;
         }
-      }
-      .markdown{
-
-      }
-      .install{
-
       }
       .tool{
         .tool-item{
@@ -417,6 +411,7 @@ export default {
       overflow-y: auto;
       border-left:1px solid #eee;
       padding: 20px;
+      max-height: 900px;
       .recommend-item{
         position: relative;
         border: 1px solid $border_color; // rgba(208, 167, 167, 1);
@@ -440,7 +435,7 @@ export default {
           font-weight: bold;
         }
         .intro{
-          height: 34px;
+          height: 36px;
           color: #5D5D5D;
           margin-top: 8px;
           font-size: 13px;

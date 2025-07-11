@@ -216,7 +216,8 @@ export default {
         if(res.code === 0){
           this.dialogVisible = false;
           const type = 'agent';
-          this.$router.push({path:`/appSpace/${type}`})
+          const id = res.data.assistantId
+          this.$router.push({path:`/agent/test?id=${id}`})
           this.setFromList(type)
         }
       })

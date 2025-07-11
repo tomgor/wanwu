@@ -393,7 +393,6 @@ export default {
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
-                                        // console.log('===>',new Date().getTime(),endStr)
                                         let fillData = {
                                             ...commonData,
                                             "response": [0,1,2,3,4,6,20,21,10].includes(commonData.qa_type)?md.render(endStr):endStr.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
@@ -429,7 +428,7 @@ export default {
                             this.setStoreSessionStatus(-1)
                             let fillData = {
                                 ...commonData,
-                                "response": data.message                                
+                                "response": data.message                               
                             }
                             this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                         }
