@@ -32,8 +32,10 @@
               size="mini"
               @click="handleTools"
               :disabled="isGetMCP"
-              >获取MCP工具</el-button
+              :loading="toolsLoading"
             >
+              获取MCP工具
+            </el-button>
           </el-form-item>
         </el-form>
         <el-divider v-if="mcpList.length > 0"></el-divider>
@@ -47,6 +49,7 @@
           size="mini"
           :disabled="mcpList.length === 0"
           @click="submitForm('ruleForm')"
+          :loading="publishLoading"
         >
           确定发送
         </el-button>
@@ -60,7 +63,7 @@ import { getTools, setCreate } from "@/api/mcp.js";
 import { isValidURL } from "@/utils/util";
 
 export default {
-  props: ["dialogVisible","detail"],
+  props: ["dialogVisible", "detail"],
   data() {
     const validateUrl = (rule, value, callback) => {
       if (!isValidURL(value)) {
@@ -84,11 +87,14 @@ export default {
           { validator: validateUrl, trigger: "blur" },
         ],
       },
+      toolsLoading: false,
+      publishLoading: false
     };
   },
   methods: {
     handleCancel() {
-      this.clearForm()
+      this.clearForm();
+      this.$refs["ruleForm"].clearValidate();
       this.$emit("handleClose", false);
     },
     submitForm(formName) {
@@ -101,12 +107,12 @@ export default {
             desc: this.detail.desc,
             mcpSquareId: this.detail.mcpSquareId
           }
+          this.publishLoading = true
           setCreate(params).then((res) => {
             if(res.code === 0){
               this.$message.success("发布成功")
-              this.clearForm()
-              this.$refs["ruleForm"].clearValidate();
-              this.handleCancel();
+              this.publishLoading = false
+              this.handleCancel()
               // 更新发送按钮状态
               this.$emit("getIsCanSendStatus");
             }
@@ -119,13 +125,15 @@ export default {
       this.mcpList = []
     },
     handleTools() {
+      this.toolsLoading = true
       this.$refs['ruleForm'].validate((valid) => {
         if (valid) {
           getTools({
             serverUrl: this.ruleForm.serverUrl,
           }).then((res) => {
             this.mcpList = res.data.tools || []
-          })
+            this.toolsLoading = false
+          }).catch(() => this.toolsLoading = false)
         }
       });
     },
