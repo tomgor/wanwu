@@ -7,7 +7,6 @@
 ### 📢 新闻
 
 - **[2025-07-10]** 
-  - 支持智能体模板
   - MCP广场新增行业MCP server
 
 ------
@@ -117,10 +116,13 @@
     cp .env.bak .env
     ```
 
-    1.2 根据系统修改.env文件中的`WANWU_ARCH`变量
+    1.2 根据系统修改.env文件中的`WANWU_ARCH`、`WANWU_EXTERNAL_IP`变量
     ```
     # amd64 / arm64
     WANWU_ARCH=amd64
+
+    # external ip port（注意localhost要换成本机局域网或对外IP，例如192.168.0.xx，不能是localhost或127.0.0.1）
+    WANWU_EXTERNAL_IP=localhost
     ```
 
     1.3 创建docker运行网络
