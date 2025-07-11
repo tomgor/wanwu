@@ -21,7 +21,6 @@ Print.prototype = {
             this.searchList = privateData.searchList
         }
         this.sentenceArr.push(sentence)
-        console.log(this.sentenceArr,'插入句子的索引')
         this.loop(printingCB, endCB, "truely")
     },
     stop() {
@@ -33,14 +32,10 @@ Print.prototype = {
     loop(printingCB, endCB) {
 
         //如果正在打印或者打印结束
-        // if (this.printStatus) {
-        //     return
-        // }
         if (this.printStatus === 1 || this.sIndex >= this.sentenceArr.length) {
             return;
         }
 
-        console.log(this.sentenceArr,this.sIndex)
         let curSentence = this.sentenceArr[this.sIndex]
         this.printStatus = 1
         if(!curSentence){
@@ -103,7 +98,6 @@ Looper.prototype = {
         
         const batchSize = 30; // 推荐每次输出30个字符
         const interval = 10; // 减少输出间隔时间
-        console.log(this.sentence,'sentence',this.index)
         this.t = workerTimer.setInterval(() => {
             if (this.index === this.sentence.length) {
                 this.stop()
