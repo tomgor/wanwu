@@ -647,6 +647,7 @@ def get_bing_multi_search_result(query,bing_top_k,bing_time_out,bing_target_succ
     #----准备提示词
     prompt = build_bing_prompt_from_search_list(query,aggregated_results,auto_citation,model)    
 
+    logger.info(f"prompt是:{prompt}")
     return prompt,aggregated_results
 async def async_search(query, bing_top_k,bing_time_out,bing_target_success,bing_result_len,model,search_url,search_key,search_rerank_id,days_limit=-1, auto_citation=False):
     # 假设 get_bing_multi_search_result 是同步的，需要运行在线程池中
