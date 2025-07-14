@@ -83,7 +83,8 @@ export default {
             import: '导入',
             export: '导出',
             view: '查看',
-            cancelPublish: '取消发布'
+            cancelPublish: '取消发布',
+            add: '创建'
         },
         switch: {
             start: '开启',
@@ -133,7 +134,8 @@ export default {
             uploadError: '上传失败，请重新上传'
         },
         copy: {
-            success: '内容已复制到粘贴板'
+            success: '内容已复制到粘贴板',
+            copyText: '副本'
         },
         noData: '暂无数据',
         loading: '正在加载数据...',
@@ -411,7 +413,9 @@ export default {
         knowLedge:'知识库',
         addNode:'添加节点',
         publishButton: '发布',
-        publishText: '发布为工具：仅自己可见',
+        publishText: '私密发布为工具：仅自己可见',
+        publicPublishText: '公开发布为工具：组织内可见',
+        saveButton: '保 存',
         collapseNode:'折叠节点',
         expandNode:'展开节点',
         mapCenter:'居中视图',
