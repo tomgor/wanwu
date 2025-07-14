@@ -115,13 +115,12 @@
               >
                 {{$t('common.button.publish')}}
               </el-dropdown-item>
-              <!--暂时隐藏-->
-              <!-- <el-dropdown-item
+               <el-dropdown-item
                 command="cancelPublish"
                 v-if="n.publishType && n.appId !== 'example'"
               >
                 {{$t('common.button.cancelPublish')}}
-              </el-dropdown-item> -->
+              </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
