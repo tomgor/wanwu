@@ -2664,7 +2664,7 @@ const docTemplate = `{
             }
         },
         "/knowledge/select": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "JWT": []
@@ -7484,6 +7484,22 @@ const docTemplate = `{
                 }
             }
         },
+        "response.CustomAbout": {
+            "type": "object",
+            "properties": {
+                "copyright": {
+                    "description": "版权",
+                    "type": "string"
+                },
+                "logoPath": {
+                    "description": "关于图标路径",
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "response.CustomHome": {
             "type": "object",
             "properties": {
@@ -7848,6 +7864,14 @@ const docTemplate = `{
         "response.LogoCustomInfo": {
             "type": "object",
             "properties": {
+                "about": {
+                    "description": "关于信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.CustomAbout"
+                        }
+                    ]
+                },
                 "home": {
                     "description": "首页标题信息",
                     "allOf": [
@@ -7871,10 +7895,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.CustomTab"
                         }
                     ]
-                },
-                "version": {
-                    "description": "版本",
-                    "type": "string"
                 }
             }
         },

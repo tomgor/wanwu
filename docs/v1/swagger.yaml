@@ -1621,6 +1621,17 @@ definitions:
       knowledgeId:
         type: string
     type: object
+  response.CustomAbout:
+    properties:
+      copyright:
+        description: 版权
+        type: string
+      logoPath:
+        description: 关于图标路径
+        type: string
+      version:
+        type: string
+    type: object
   response.CustomHome:
     properties:
       logoPath:
@@ -1867,6 +1878,10 @@ definitions:
     type: object
   response.LogoCustomInfo:
     properties:
+      about:
+        allOf:
+        - $ref: '#/definitions/response.CustomAbout'
+        description: 关于信息
       home:
         allOf:
         - $ref: '#/definitions/response.CustomHome'
@@ -1879,9 +1894,6 @@ definitions:
         allOf:
         - $ref: '#/definitions/response.CustomTab'
         description: 标签页信息
-      version:
-        description: 版本
-        type: string
     type: object
   response.MCPDetail:
     properties:
@@ -4078,7 +4090,7 @@ paths:
       tags:
       - knowledge
   /knowledge/select:
-    get:
+    post:
       consumes:
       - application/json
       description: 查询知识库列表

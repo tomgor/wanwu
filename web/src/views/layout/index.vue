@@ -11,22 +11,24 @@
             />
           </div>
         </div>
-        <div style="padding: 6px 5px 10px">
-          <div
-            :class="['nav-item', {'is-active': currentNavMenu.key === item.key}]"
-            v-for="(item, index) in navList"
-            :key="item.key + index"
-            @click="clickNavMenu(item)"
-            v-if="checkPerm(item.perm)"
-          >
-            <div v-if="item.key !== 'line'">
-              <div class="left-nav-img-wrap">
-                <img class="left-menu-width left-nav-img" :src="currentNavMenu.key === item.key ? item.imgActive : item.img" alt="" />
+        <div class="left-nav-content-wrap">
+          <div class="left-nav-content">
+            <div
+              :class="['nav-item', {'is-active': currentNavMenu.key === item.key}]"
+              v-for="(item, index) in navList"
+              :key="item.key + index"
+              @click="clickNavMenu(item)"
+              v-if="checkPerm(item.perm)"
+            >
+              <div v-if="item.key !== 'line'">
+                <div class="left-nav-img-wrap">
+                  <img class="left-menu-width left-nav-img" :src="currentNavMenu.key === item.key ? item.imgActive : item.img" alt="" />
+                </div>
+                <div class="nav-menu-name">{{item.name}}</div>
               </div>
-              <div class="nav-menu-name">{{item.name}}</div>
-            </div>
-            <div v-if="item.key === 'line'" style="padding: 0 10px">
-              <div style="border-bottom: 1px solid #D9D9D9"></div>
+              <div v-if="item.key === 'line'">
+                <div style="padding: 0 18px; height: 0.5px; background: #D9D9D9;"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -42,7 +44,7 @@
             <img class="left-menu-width" src="@/assets/imgs/doc.png" alt="" @click="showDocDownloadDialog" />
             <DocDownloadDialog ref="docDownloadDialog" />
           </div>
-
+          <AboutDialog ref="aboutDialog" />
           <div style="margin-top: 15px;">
             <el-popover
               placement="right"
@@ -217,9 +219,10 @@ import { fetchPermFirPath, fetchCurrentPathIndex, replaceIcon, replaceTitle } fr
 import ChangeLang from "@/components/changeLang.vue"
 import DocDownloadDialog from "@/components/docDownloadDialog.vue"
 import CreateTotalDialog from "@/components/createTotalDialog.vue"
+import AboutDialog from "@/components/aboutDialog.vue";
 export default {
   name: 'Layout',
-  components: { ChangeLang, DocDownloadDialog, CreateTotalDialog },
+  components: { ChangeLang, DocDownloadDialog, CreateTotalDialog, AboutDialog },
   data() {
     const accessCert = localStorage.getItem('access_cert')
     return{
@@ -246,7 +249,9 @@ export default {
           {name: 'Github', img: require('@/assets/imgs/github_icon.svg'), icon: require('@/assets/imgs/link_icon.png'), redirect: () => {
             window.open('https://github.com/UnicomAI/wanwu')
           }},
-          {name: this.$t('menu.about'), img: require('@/assets/imgs/about_icon.svg'), version: 'version'}
+          {name: this.$t('menu.about'), img: require('@/assets/imgs/about_icon.svg'), version: 'version', redirect: () => {
+            this.showAboutDialog()
+          }}
         ],
         [
           {name: this.$t('header.logout'), img: require('@/assets/imgs/logout_icon.svg'), redirect: () => {
@@ -274,9 +279,9 @@ export default {
     },
     commonInfo:{
       handler(val) {
-        const { home = {}, tab = {}, version } = val.data || {}
+        const { home = {}, tab = {}, about = {} } = val.data || {}
         this.homeLogoPath = home.logoPath || ''
-        this.version = version || '1.0'
+        this.version = about.version || '1.0'
         replaceIcon(tab.logoPath)
         replaceTitle(tab.title)
       },
@@ -349,6 +354,9 @@ export default {
     },*/
     showDocDownloadDialog() {
       this.$refs.docDownloadDialog.openDialog()
+    },
+    showAboutDialog() {
+      this.$refs.aboutDialog.openDialog()
     },
     clickNavMenu(item) {
       this.currentNavMenu = item || {}
@@ -444,13 +452,30 @@ export default {
     .left-nav {
       width: 70px;
       text-align: center;
-      padding: 8px 0;
+      padding: 1% 0 8px 0;
       position: relative;
-      min-height: 450px;
+      min-height: 650px;
       background: #F7F7FC;
       border-radius: 8px;
       box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
       margin: 8px 6px;
+      .left-nav-content-wrap {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 260px);
+        min-height: 500px;
+        justify-content: space-around;
+      }
+      .left-nav-content {
+        padding: 6px 5px;
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 180px);
+        min-height: 500px;
+        align-items: center;
+        justify-content: space-around;
+        max-height: 600px;
+      }
       .total-create {
         width: 24px;
         cursor: pointer;
@@ -461,7 +486,7 @@ export default {
         object-fit: contain;
       }
       .nav-item {
-        margin: 14px 0;
+        // margin: calc((100vh - 400px) / 16) 0;
         color: #77869E;
         font-weight: bold;
         cursor: pointer;
