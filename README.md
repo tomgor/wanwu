@@ -176,27 +176,28 @@
 
 ------
 
-### &#x1F517; 使用的其他开源项目
+### &#x1F517; 致谢
 
-- https://github.com/modelscope/agentscope  作为元景万悟智能体平台中工作流模块的开发框架；
-- https://github.com/langchain-ai/langchain.git  作为元景万悟智能体平台中智能体的各类基础组件开发；
-- https://github.com/QwenLM/Qwen-Agent.git  作为元景万悟智能体平台中react智能体的构建；
+- [AgentScope](https://github.com/modelscope/agentscope)
+- [LangChain](https://github.com/langchain-ai/langchain.git)
+- [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent.git)
 
 ------
 
-### &#x1F4F0; TODO LIST
+### &#x1F4DD; TODO
 
-- 支持智能体、文本问答、工作流取消发布
-- 支持知识库命中测试、关键词管理
-- 工作流支持公开发布
-- 应用广场支持按照应用名称进行搜索
-- 支持设定敏感词安全护栏
-- 支持工作流的导入导出
-- 支持自定义MCP Server，即可以把工作流、智能体、或者符合OpenAPI规范的API作为tools添加到MCP Server里进行发布
-- 增加模型供应商
-- 增加工作流节点类型
-- 支持知识库打标签
-- 支持自定义工具
+* [ ] 支持智能体、文本问答、工作流取消发布
+* [ ] 支持知识库命中测试、关键词管理
+* [ ] 工作流支持公开发布
+* [ ] 应用广场支持按照应用名称进行搜索
+* [ ] 支持设定敏感词安全护栏
+* [ ] 支持工作流的导入导出
+* [ ] 支持自定义MCP Server，即可以把工作流、智能体、或者符合OpenAPI规范的API作为tools添加到MCP Server里进行发布
+* [ ] 增加模型供应商
+* [ ] 增加工作流节点类型
+* [ ] 支持知识库打标签
+* [ ] 支持自定义工具
+* [ ] 知识库RAG支持OCR
 
 ------
 
