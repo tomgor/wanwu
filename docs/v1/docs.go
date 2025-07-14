@@ -2714,6 +2714,219 @@ const docTemplate = `{
                 }
             }
         },
+        "/knowledge/tag": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "查询知识库标签列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.tag"
+                ],
+                "summary": "查询知识库标签列表",
+                "parameters": [
+                    {
+                        "description": "查询知识库请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.KnowledgeTagSelectReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.KnowledgeTagListResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "修改知识库标签",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.tag"
+                ],
+                "summary": "修改知识库标签",
+                "parameters": [
+                    {
+                        "description": "修改知识库标签请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateKnowledgeTagReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "创建知识库标签",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.tag"
+                ],
+                "summary": "创建知识库标签",
+                "parameters": [
+                    {
+                        "description": "创建知识库标签请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateKnowledgeTagReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CreateKnowledgeTagResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "删除知识库标签",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.tag"
+                ],
+                "summary": "删除知识库标签",
+                "parameters": [
+                    {
+                        "description": "删除知识库标签请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DeleteKnowledgeTagReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/knowledge/tag/bind": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "绑定知识库标签",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.tag"
+                ],
+                "summary": "绑定知识库标签",
+                "parameters": [
+                    {
+                        "description": "绑定知识库标签请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.BindKnowledgeTagReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/mcp": {
             "get": {
                 "description": "获取自定义MCP详情",
@@ -5612,6 +5825,27 @@ const docTemplate = `{
                 }
             }
         },
+        "request.BindKnowledgeTagReq": {
+            "type": "object",
+            "required": [
+                "knowledgeId",
+                "tagIdList"
+            ],
+            "properties": {
+                "knowledgeId": {
+                    "type": "string"
+                },
+                "option": {
+                    "type": "integer"
+                },
+                "tagIdList": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "request.ChangeExplorationAppFavoriteRequest": {
             "type": "object",
             "required": [
@@ -5775,6 +6009,17 @@ const docTemplate = `{
                 }
             }
         },
+        "request.CreateKnowledgeTagReq": {
+            "type": "object",
+            "required": [
+                "tagName"
+            ],
+            "properties": {
+                "tagName": {
+                    "type": "string"
+                }
+            }
+        },
         "request.DelApiKeyRequest": {
             "type": "object",
             "required": [
@@ -5841,6 +6086,17 @@ const docTemplate = `{
             ],
             "properties": {
                 "knowledgeId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.DeleteKnowledgeTagReq": {
+            "type": "object",
+            "required": [
+                "tagId"
+            ],
+            "properties": {
+                "tagId": {
                     "type": "string"
                 }
             }
@@ -6099,6 +6355,23 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "name": {
+                    "type": "string"
+                },
+                "tagId": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "request.KnowledgeTagSelectReq": {
+            "type": "object",
+            "properties": {
+                "knowledgeId": {
+                    "type": "string"
+                },
+                "tagName": {
                     "type": "string"
                 }
             }
@@ -6559,6 +6832,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.UpdateKnowledgeTagReq": {
+            "type": "object",
+            "required": [
+                "tagId",
+                "tagName"
+            ],
+            "properties": {
+                "tagId": {
+                    "type": "string"
+                },
+                "tagName": {
                     "type": "string"
                 }
             }
@@ -7188,6 +7476,14 @@ const docTemplate = `{
                 }
             }
         },
+        "response.CreateKnowledgeTagResp": {
+            "type": "object",
+            "properties": {
+                "knowledgeId": {
+                    "type": "string"
+                }
+            }
+        },
         "response.CustomHome": {
             "type": "object",
             "properties": {
@@ -7379,6 +7675,13 @@ const docTemplate = `{
                     "description": "知识库id",
                     "type": "string"
                 },
+                "knowledgeTagList": {
+                    "description": "知识库标签列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.KnowledgeTag"
+                    }
+                },
                 "name": {
                     "description": "知识库名称",
                     "type": "string"
@@ -7392,6 +7695,34 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.KnowledgeInfo"
+                    }
+                }
+            }
+        },
+        "response.KnowledgeTag": {
+            "type": "object",
+            "properties": {
+                "selected": {
+                    "description": "此表标签是否选中",
+                    "type": "boolean"
+                },
+                "tagId": {
+                    "description": "知识库标签id",
+                    "type": "string"
+                },
+                "tagName": {
+                    "description": "知识库标签名称",
+                    "type": "string"
+                }
+            }
+        },
+        "response.KnowledgeTagListResp": {
+            "type": "object",
+            "properties": {
+                "knowledgeTagList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.KnowledgeTag"
                     }
                 }
             }

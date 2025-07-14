@@ -42,6 +42,21 @@ func WithKnowledgeID(id string) SQLOption {
 	})
 }
 
+func WithKnowledgeIDList(idList []string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if len(idList) > 0 {
+			return db.Where("knowledge_id IN (?)", idList)
+		}
+		return db
+	})
+}
+
+func WithTagID(id string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("tag_id = ?", id)
+	})
+}
+
 func WithImportID(id string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		return db.Where("import_id = ?", id)

@@ -80,6 +80,14 @@ enum Code {
   KnowledgeDocSplitFailed = 142005; // 文档分片查询失败，请稍后重试
   KnowledgeDocUpdateStatusFailed = 142006; // 更新文档状态失败，请稍后重试
   KnowledgeDocImportUrlFailed = 142007; // 获取上传文档失败，请稍后重试
+  KnowledgeTagCreateFailed = 143001; // 新建知识库标签失败，请稍后重试
+  KnowledgeTagDeleteFailed = 143002; // 删除知识库标签失败，请稍后重试
+  KnowledgeTagUpdateFailed = 143003; // 修改知识库标签失败，请稍后重试
+  KnowledgeTagDuplicateName = 143004; // 已存在同名知识库标签
+  KnowledgeTagSelectFailed = 143005; // 查询知识库标签列表失败，请稍后重试
+  KnowledgeTagBindFailed = 143006; // 知识库标签设置失败，请稍后重试
+  KnowledgeTagUnbindFailed = 143007; // 知识库标签取消失败，请稍后重试
+  KnowledgeTagAccessDenied = 143008; // 没有操作该知识库标签的权限
 
 
   // --- app-service ---
