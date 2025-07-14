@@ -139,6 +139,7 @@
 </template>
 
 <script>
+import { md } from '@/mixins/marksown-it'
 import {marked} from 'marked'
 var highlight = require('highlight.js');
 import 'highlight.js/styles/atom-one-dark.css';
@@ -161,6 +162,7 @@ export default {
   props: ['sessionStatus','defaultUrl'],
   data(){
       return{
+          md:md,
           autoScroll:true,
           scrollTimeout:null,
           isDs:['txt2txt-002-001','txt2txt-002-002','txt2txt-002-004','txt2txt-002-005','txt2txt-002-006','txt2txt-002-007','txt2txt-002-008'].indexOf(this.$route.params.id) !=-1,

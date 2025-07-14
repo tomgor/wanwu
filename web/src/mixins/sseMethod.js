@@ -391,14 +391,13 @@ export default {
                                     },
                                     commonData,
                                     (worldObj,search_list) => {
-                                        // let codeBuffer = ''; // 缓存代码块内容
-                                        // let isInCodeBlock = false; // 标记是否在代码块中
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
                                         const finalResponse = String(endStr)
                                         let fillData = {
                                             ...commonData,
                                             response: [0,1,2,3,4,6,20,21,10].includes(commonData.qa_type)?md.render(finalResponse):finalResponse.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
+                                            // response:finalResponse,
                                             oriResponse:endStr,
                                             searchList:(search_list && search_list.length) ? search_list.some(n => n.title.indexOf('yunyingshang') > -1)? []: search_list.map(n => ({
                                                   ...n, // 复制原有的对象属性
@@ -406,21 +405,6 @@ export default {
                                                 }))
                                             : []
                                         }
-                                        // 检测代码块开始/结束
-                                        // if(worldObj.world.includes('```')){
-                                        //     isInCodeBlock = !isInCodeBlock;
-                                        //     codeBuffer += worldObj.world;
-                                        //     if (!isInCodeBlock) {
-                                        //         // 代码块结束，整体渲染
-                                        //         fillData.response = md.render(codeBuffer);
-                                        //         codeBuffer = '';
-                                        //     }
-                                        // }else if(isInCodeBlock){
-                                        //     // 代码块内容累积
-                                        //     codeBuffer += worldObj.world;
-                                        // }else{
-                                        //     fillData.response = endStr.replaceAll('\n', '<br/>');
-                                        // }
 
                                         this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                                         if(worldObj.finish !== 0){

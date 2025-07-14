@@ -103,41 +103,7 @@ export default {
     return {
       basePath: this.$basePath,
       md:md,
-      detail: {
-        // assistantTemplateId:  "1",
-        // avatar: 
-        //       {key: "custom-upload/avatar/agent/gov.png", path: "v1/cache/avatar/agent/gov.png"},
-        //       category
-        //       : 
-        //       "agent_gov",
-        //       desc
-        //       : 
-        //       "用于解答市民政务问题。",
-        //       feature
-        //       : 
-        //       "特性说明",
-        //       instructions
-        //       : 
-        //       "xxx（目前只能填写文字，不支持关联变量）",
-        //       name
-        //       : 
-        //       "政务小助手",
-        //       prologue
-        //       : 
-        //       "你哈，我是政务小助手，可以解答您关于各种政策的问题",
-        //       recommendQuestion
-        //       : 
-        //       ["1、公积金提取", "2、养老保险"],
-        //       scenario
-        //       : 
-        //       "应用场景",
-        //       summary
-        //       : 
-        //       "使用概述",
-        //       workFlowInstruction
-        //       : 
-        //       "工作流配置说明"
-      },
+      detail: {},
       foldStatus:false,
       recommendList: [],
       assistantTemplateId:''

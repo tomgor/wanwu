@@ -18,7 +18,7 @@
         @click.stop="toDocList(n)">
           <div>
               <img  class="logo" :src="require('@/assets/imgs/knowledgeIcon.png')" />
-              <p :class="['smartDate']">{{n.docCount || 0}}个文档</p>
+              <!-- <p :class="['smartDate']">{{n.docCount || 0}}个文档</p> -->
           </div>
           <div class="info rl">
             <p class="name" :title="n.name">
@@ -35,12 +35,12 @@
             </el-tooltip>
           </div>
           <div class="tags">
-            <!-- <span :class="['smartDate','tagList']">{{n.docCount || 0}}个文档</span> -->
-            <span :class="['smartDate','tagList']" v-if="formattedTagNames(n.knowledgeTagList).length === 0" @click.stop="addTag(n.knowledgeId)">
+            <span :class="['smartDate','tagList']">{{n.docCount || 0}}个文档</span>
+            <!-- <span :class="['smartDate','tagList']" v-if="formattedTagNames(n.knowledgeTagList).length === 0" @click.stop="addTag(n.knowledgeId)">
               <span class="el-icon-price-tag icon-tag"></span>
               添加标签
             </span>
-            <span v-else @click.stop="addTag(n.knowledgeId)">{{formattedTagNames(n.knowledgeTagList) }}</span>
+            <span v-else @click.stop="addTag(n.knowledgeId)">{{formattedTagNames(n.knowledgeTagList) }}</span> -->
           </div>
           <div class="editor">
             <el-dropdown @command="handleClick($event, n)" placement="top">
