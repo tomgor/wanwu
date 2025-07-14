@@ -63,7 +63,9 @@
 </template>
 
 <script>
+import { getuploadFile, newUploadFile, setConfirmPath } from "@/api/cubm";
 import {externalUpload} from "@/api/workflow";
+import UPDATEFILe from "./updatefile.js";
 import axios from "axios";
 export default {
   props: ["index"],

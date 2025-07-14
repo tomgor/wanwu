@@ -8,7 +8,7 @@
             <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
             <div class="create-filter"></div>
           </div>
-          <span>{{`${$t('common.button.add')}${apptype[type]}`}}</span>
+          <span>{{`创建${apptype[type]}`}}</span>
         </div>
       </div>
       <div
@@ -115,7 +115,7 @@
               >
                 {{$t('common.button.publish')}}
               </el-dropdown-item>
-              <el-dropdown-item
+               <el-dropdown-item
                 command="cancelPublish"
                 v-if="n.publishType && n.appId !== 'example'"
               >
@@ -131,33 +131,12 @@
       </div>
     </div>
     <el-empty class="noData" v-if="!(listData && listData.length)" :description="$t('common.noData')"></el-empty>
-    <el-dialog
-      :title="$t('list.tips')"
-      :visible.sync="dialogVisible"
-      width="400px"
-      append-to-body
-      :close-on-click-modal="false"
-      :before-close="handleClose"
-      class="createTotalDialog"
-    >
-      <div style="margin-top: -20px">
-        <div>
-          <el-radio :label="'private'" v-model="publishType">{{$t('workFlow.publishText')}}</el-radio>
-        </div>
-        <div style="margin-top: 5px">
-          <el-radio :label="'public'" v-model="publishType">{{$t('workFlow.publicPublishText')}}</el-radio>
-        </div>
-        <div style="text-align: right; margin-top: 20px; margin-bottom: -10px">
-          <el-button size="mini" type="primary" @click="doPublish">{{$t('common.button.confirm')}}</el-button>
-        </div>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import { AppType } from "@/utils/commonSet";
-import { deleteApp, appCancelPublish,copyAgnetTemplate, appPublish } from "@/api/appspace";
+import { deleteApp, appCancelPublish,copyAgnetTemplate } from "@/api/appspace";
 import { copyWorkFlow, publishWorkFlow, copyExample } from "@/api/workflow";
 import { setFavorite } from "@/api/explore";
 export default {
@@ -193,8 +172,6 @@ export default {
       basePath: this.$basePath,
       listData: [],
       row: {},
-      publishType: 'private',
-      dialogVisible: false
     };
   },
   methods: {
@@ -223,9 +200,6 @@ export default {
       }else{
         return true
       }
-    },
-    handleClose() {
-      this.dialogVisible = false
     },
     isCannotClick(n) {
       return (n.appType === 'workflow' && !n.publishType && n.appId !== 'example') || n.appType !== 'workflow'
@@ -266,7 +240,7 @@ export default {
 
       const isExample = row.appId === 'example'
       const exampleParams = {
-        configName: row.name + '_' + this.$t('common.copy.copyText'),
+        configName: row.name + '_副本',
         configENName: "",
         configDesc: row.desc,
         isStream: false
@@ -284,22 +258,21 @@ export default {
       }
     },
     workflowPublish(row) {
-      this.row = row
-      this.dialogVisible = true
-      this.publishType = 'private'
-    },
-    async doPublish() {
-      const params = {
-        appId: this.row.appId,
-        appType: this.row.appType,
-        publishType: this.publishType
-      }
-      const res = await appPublish(params)
-      if (res.code === 0) {
-        this.$message.success(this.$t("list.publicSuccess"))
-        this.handleClose()
-        this.$emit('reloadData')
-      }
+      this.$alert(this.$t("workFlow.publishText"), this.$t("list.tips"), {
+        confirmButtonText: this.$t("list.confirm"),
+        callback: async (action) => {
+          if (action === "confirm") {
+            const params = {
+              workflowID: row.appId,
+            };
+            const res = await publishWorkFlow(params);
+            if (res.code === 0) {
+              this.$message.success(this.$t("list.publicSuccess"))
+              this.$emit('reloadData')
+            }
+          }
+        },
+      });
     },
     async cancelPublish(row) {
       const params = {
@@ -391,7 +364,7 @@ export default {
           this.$router.push({path:'/explore/rag', query:{id:row.appId}});
           break;
         case "workflow":
-          this.$router.push({path:'/explore/workflow', query:{id:row.appId}});
+          console.log('workflow')
           break;
       }
     },
@@ -455,6 +428,7 @@ export default {
           });
         })
         .catch(() => {});
+      
     },
   },
 };
