@@ -33,7 +33,7 @@ func registerCommon(apiV1 *gin.RouterGroup) {
 	mid.Sub("common").Reg(apiV1, "/model/select/embedding", http.MethodGet, v1.ListEmbeddingModels, "embedding模型列表展示")
 
 	// 知识库通用
-	mid.Sub("common").Reg(apiV1, "/knowledge/select", http.MethodGet, v1.GetKnowledgeSelect, "查询用户知识库列表")
+	mid.Sub("common").Reg(apiV1, "/knowledge/select", http.MethodPost, v1.GetKnowledgeSelect, "查询用户知识库列表")
 
 	// rag/agent/workflow通用
 	mid.Sub("common").Reg(apiV1, "/appspace/app", http.MethodDelete, v1.DeleteAppSapceApp, "刪除应用")
