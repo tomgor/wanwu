@@ -28,7 +28,6 @@ func GetLanguageSelect() *response.LanguageSelect {
 
 func GetLogoCustomInfo(ctx *gin.Context) (response.LogoCustomInfo, error) {
 	ret := response.LogoCustomInfo{
-		Version: config.Cfg().CustomInfo.Version,
 		Login: response.CustomLogin{
 			BackgroundPath:   config.Cfg().CustomInfo.Login.BackgroundPath,
 			LoginButtonColor: config.Cfg().CustomInfo.Login.LoginButtonColor,
@@ -42,6 +41,11 @@ func GetLogoCustomInfo(ctx *gin.Context) (response.LogoCustomInfo, error) {
 		Tab: response.CustomTab{
 			LogoPath: config.Cfg().CustomInfo.Tab.TabLogoPath,
 			Title:    gin_util.I18nKey(ctx, config.Cfg().CustomInfo.Tab.TabTitle),
+		},
+		About: response.CustomAbout{
+			LogoPath:  config.Cfg().CustomInfo.About.LogoPath,
+			Version:   config.Cfg().CustomInfo.About.Version,
+			Copyright: gin_util.I18nKey(ctx, config.Cfg().CustomInfo.About.Copyright),
 		},
 	}
 	return ret, nil
