@@ -67,3 +67,23 @@ func PublishApp(ctx *gin.Context) {
 	err := service.PublishApp(ctx, getUserID(ctx), getOrgID(ctx), req)
 	gin_util.Response(ctx, nil, err)
 }
+
+// UnPublishApp
+//
+//	@Tags			app
+//	@Summary		取消发布应用
+//	@Description	取消发布应用
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.UnPublishAppRequest	true	"取消发布应用参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/appspace/app/publish [delete]
+func UnPublishApp(ctx *gin.Context) {
+	var req request.UnPublishAppRequest
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.UnPublishApp(ctx, getUserID(ctx), getOrgID(ctx), req)
+	gin_util.Response(ctx, nil, err)
+}

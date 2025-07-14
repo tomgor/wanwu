@@ -1109,6 +1109,15 @@ definitions:
     - name
     - roleId
     type: object
+  request.UnPublishAppRequest:
+    properties:
+      appId:
+        description: 应用ID
+        type: string
+      appType:
+        description: 应用类型
+        type: string
+    type: object
   request.UpdateDocSegmentStatusReq:
     properties:
       all:
@@ -2576,6 +2585,29 @@ paths:
       tags:
       - app
   /appspace/app/publish:
+    delete:
+      consumes:
+      - application/json
+      description: 取消发布应用
+      parameters:
+      - description: 取消发布应用参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UnPublishAppRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 取消发布应用
+      tags:
+      - app
     post:
       consumes:
       - application/json
