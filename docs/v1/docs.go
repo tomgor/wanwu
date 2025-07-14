@@ -297,6 +297,43 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "取消发布应用",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "取消发布应用",
+                "parameters": [
+                    {
+                        "description": "取消发布应用参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UnPublishAppRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
             }
         },
         "/appspace/app/url": {
@@ -6469,6 +6506,19 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "roleId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.UnPublishAppRequest": {
+            "type": "object",
+            "properties": {
+                "appId": {
+                    "description": "应用ID",
+                    "type": "string"
+                },
+                "appType": {
+                    "description": "应用类型",
                     "type": "string"
                 }
             }
