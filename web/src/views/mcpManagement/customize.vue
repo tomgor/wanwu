@@ -177,7 +177,7 @@ export default {
   height: 50px;
   object-fit: cover;
 }
-.noData {
+.mcp-content-box .noData {
   width: 100%;
   text-align: center;
   margin-top: -60px;
