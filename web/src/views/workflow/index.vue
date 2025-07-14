@@ -223,21 +223,28 @@
       </el-tooltip>
       <el-popover
         placement="top"
-        width="180"
-        trigger="hover"
+        width="246"
+        trigger="click"
         :visible-arrow="false"
         popper-class="workflow_popover_publish"
         class="publish_box"
       >
         <div>
-          {{$t('workFlow.publishText')}}
+          <div>
+            <el-radio :label="'private'" v-model="publishType">{{$t('workFlow.publishText')}}</el-radio>
+          </div>
+          <div>
+            <el-radio :label="'public'" v-model="publishType">{{$t('workFlow.publicPublishText')}}</el-radio>
+          </div>
+          <div style="text-align: center; margin-top: 10px">
+            <el-button size="mini" type="primary" @click="doPublish">{{$t('workFlow.saveButton')}}</el-button>
+          </div>
         </div>
         <el-button
           slot="reference"
           class="add-bt"
           type="primary"
           size="mini"
-          @click="doPublish"
         >
           {{$t('workFlow.publishButton')}}
         </el-button>
@@ -260,7 +267,7 @@
     <PublishForm ref="publish_ref" @refreshTable="$router.go(-1)" />
     <!--隐藏 token 和 mcp 相关-->
     <!--<AppSelect ref="app-select" @getToken="setToken" />-->
-    <McpCreate v-if="" ref="mcpcreate" @createMcp="addMcp" />
+    <McpCreate ref="mcpcreate" @createMcp="addMcp" />
     <div id="minimap"></div>
   </div>
 </template>
@@ -308,6 +315,7 @@ import {
   getWorkFlowStatus,
   publishWorkFlow,
 } from "@/api/workflow";
+import { appPublish } from "@/api/appspace"
 import {i18n} from "@/lang"
 export default {
   components: {
@@ -333,6 +341,7 @@ export default {
       cells: [],
       graph: null,
       timer: null,
+      publishType: 'private',
       iconObj: {
         ApiNode: require("./components/img/api.png"),
         PythonNode: require("./components/img/code.png"),
@@ -387,9 +396,11 @@ export default {
     ]),
     async doPublish() {
       const params = {
-        workflowID: this.workflowId,
+        appId: this.workflowId,
+        appType: 'workflow',
+        publishType: this.publishType
       }
-      const res = await publishWorkFlow(params);
+      const res = await appPublish(params);
       if (res.code === 0) {
         this.$message.success(this.$t('list.publicSuccess'))
         this.$router.push({path: '/appSpace/workflow'})
