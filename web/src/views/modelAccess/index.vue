@@ -1,5 +1,5 @@
 <template>
-  <div class="page-wrapper modelAccess">
+  <div class="page-wrapper">
     <div class="table-wrap list-common wrap-fullheight">
       <div class="page-title">
         <img class="page-title-img" src="@/assets/imgs/model.png" alt="" />
@@ -126,7 +126,25 @@
         basePath: this.$basePath,
         modelTypeObj: MODEL_TYPE_OBJ,
         providerObj: PROVIDER_OBJ,
-        tableData: [],
+        tableData: [
+         /* {
+            "createdAt": "string",
+            "displayName": "string",
+            "isActive": true,
+            "model": "string",
+            "avatar": {
+              key: "showPwd.png",
+              path: "/v1/static/logo/tab_logo.png"
+            },
+            "modelId": "string",
+            "modelType": "llm",
+            "orgId": "string",
+            "provider": "OpenAI-API-compatible",
+            "publishDate": "2025-05-20",
+            "updatedAt": "string",
+            "userId": "string"
+          },*/
+        ],
         params: {
           provider: '',
           displayName: ''
@@ -160,6 +178,7 @@
         }
       },
       handleCommand(value) {
+        console.log(value, '--------------------handleCommand')
         const {type, item} = value || {}
         switch (type) {
           case 'edit':
@@ -178,6 +197,23 @@
       },
       preUpdate(row) {
         const {model, modelType, provider} = row || {}
+
+        /*const rowObj = {
+          config: {apiKey: 'apiKey', endpointUrl: 'https://www.zhihu.com', functionCalling: 'noSupport'},
+          avatar: {
+            key: '',
+            path: '/v1/static/logo/tab_logo.png'
+          },
+          displayName: "测试",
+          model: "test",
+          modelType: "llm",
+          provider: "OpenAI-API-compatible",
+          publishDate: "2025-05-28",
+          updatedAt: "string",
+          userId: "string"
+        }
+        const newRow = {...rowObj, ...rowObj.config}
+        this.$refs.createDialog.openDialog(provider, newRow)*/
 
         getModelDetail({model, modelType, provider}).then(res => {
           const rowObj = res.data || {}
@@ -406,7 +442,7 @@
 .card-opera-icon {
   font-size: 15px;
 }
-.modelAccess .noData {
+.noData {
   width: 100%;
   text-align: center;
   margin-top: -60px;
