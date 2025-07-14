@@ -358,7 +358,6 @@ export default {
         },
         replaceLastData(index,data){
           this.$set(this.session_data.history,index,data)
-          console.log(this.session_data.history,'更新的数据')
           this.scrollBottom()
           this.codeScrollBottom();//code内容置底
         },
