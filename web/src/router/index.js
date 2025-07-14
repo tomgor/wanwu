@@ -62,6 +62,11 @@ const constantRoutes = [
                 meta:{perm: [PERMS.EXPLORE]},
             },
             {
+                path: '/explore/workflow',
+                component:resolve =>require(['@/views/workflowRun'],resolve),
+                meta:{perm: [PERMS.EXPLORE]},
+            },
+            {
                 path: '/explore/rag',
                 component:resolve =>require(['@/views/rag'],resolve),
                 meta:{perm: [PERMS.EXPLORE]},
