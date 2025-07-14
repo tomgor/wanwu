@@ -46,7 +46,7 @@ export default {
     },
     mounted(){
       this.getTableData();
-      // this.getList();
+      this.getList();
     },
     methods:{
       getList(){
