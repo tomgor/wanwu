@@ -1,8 +1,9 @@
 <template>
-  <div class="debug" v-if="visable">
+  <div class="debug">
     <div class="config-header">
-      <i class="el-icon-close close-icon" @click="preClose"></i>
-      <span class="header-name">工作流调试</span>
+      <!--<i class="el-icon-close close-icon" @click="preClose"></i>-->
+      <div style="color: #888" @click="$router.go(-1)">返回</div>
+      <div class="header-name">{{startNode.workflowName || '--'}}</div>
     </div>
     <div class="form">
       <div class="form-item" v-for="(n, i) in startNode.data.outputs" :key="i">
@@ -73,9 +74,7 @@
       >
         <div class="params-content-item">
           <span>token：</span>
-          <span>
-            {{startNode.data.settings.staticAuthToken.slice(0, 6) + "******" }}
-          </span>
+          <span>{{ startNode.data.settings.staticAuthToken.slice(0, 6) + "******" }}</span>
         </div>
       </div>
     </div>
@@ -86,13 +85,8 @@
         @click="preRun"
         :disabled="runDisabled"
       >
-        <i class="el-icon-caret-right"></i>&nbsp;&nbsp;开始运行
+        <i class="el-icon-caret-right"></i>&nbsp;&nbsp;运行
       </el-button>
-      <br />
-      <el-button size="mini" @click="preCancelRun">
-        <i class="el-icon-video-pause"></i>&nbsp;&nbsp;取消调试
-      </el-button>
-      <br />
       <el-button
         v-if="isStream && sessionStatus !== -1"
         size="mini"
@@ -131,7 +125,8 @@ import sseMethod from "@/mixins/sseMethod.js";
 import codeEditor from "@/views/ArrayEditor/index.vue";
 import Upload from "./upload.vue";
 import { getQueryString } from "@/utils/util.js";
-import { mapGetters } from "vuex";
+import { getWorkFlowParams } from "@/api/workflow";
+import { mapGetters } from "vuex"
 
 export default {
   components: { codeEditor, Upload },
@@ -140,46 +135,41 @@ export default {
     return {
       source: [], // 储存目前上传的接口
       isStream: getQueryString("isStream"),
-      visable: false,
-      startNode: {},
-      nodeStatusObj: {
-        success: {
-          style: "green",
-          label: "成功",
+      startNode: {
+        data: {
+          outputs: [],
+          settings: {}
         },
-        failed: {
-          style: "red",
-          label: "失败",
-        },
-        init: {
-          style: "blue",
-          label: "等待",
-        },
+        workflowName: ''
       },
-      nodeTypeObj: {
-        StartNode: "开始节点",
-        ApiNode: "API节点",
-        PythonNode: "代码节点",
-        EndNode: "结束节点",
-      },
-      nodeResult: {},
       runDisabled: false,
       thinkText: "",
       isOpen: true,
+      workflowId: ''
     };
   },
   computed: {
     ...mapGetters('app', ['sessionStatus'])
   },
-  created() {},
+  created() {
+    this.workflowId = this.$route.query.id
+    this.getWorkFlowParams()
+  },
   methods: {
-    // 上传功能新增代码 ************* start  **********************
+    getWorkFlowParams() {
+      getWorkFlowParams({
+        workflowID: this.workflowId
+      }).then((res) => {
+        this.startNode = res.data || {}
+      })
+    },
+    // 上传功能新增代码
     handleUploadSuccess(obj) {
-      // ** obj
-      // ** obj.index 下标 第几个参数
-      // ** obj.url 返回的 downloadUrl
-      // ** obj.fileId 返回的 fileId
-      // ** obj.file 选中的文件信息
+      /** obj
+       * obj.index 下标 第几个参数
+       * obj.url 返回的 downloadUrl
+       * obj.fileId 返回的 fileId
+       * obj.file 选中的文件信息 */
       this.startNode.data.outputs[obj.index].value.content = obj.fileId;
     },
     // 上传中触发事件,返回目前是否在上传文件
@@ -195,49 +185,9 @@ export default {
       this.startNode.data.outputs[i].value.content = "";
     },
     // ******************* end  **********************
-    preClose() {
-      this.visable = false;
-    },
-    openDialog(workflowSchema) {
-      this.runResponse = "";
-      if (workflowSchema.nodes) {
-        let validate = true;
-        let message = "";
-        workflowSchema.nodes.forEach((item) => {
-          if (
-            item.validate &&
-            (JSON.parse(item.validate).inputValidate === false ||
-              JSON.parse(item.validate).outputValidate === false)
-          ) {
-            validate = false;
-            message = `${item.name}:  ${JSON.parse(item.validate).message}`;
-          }
-        });
-        if (!validate) {
-          this.$message.error(message);
-          return;
-        }
-      }
-      let startNode = workflowSchema.nodes.filter((n) => {
-        /*n.data.outputs.forEach(m=>{
-                        m.value.content = '11'
-                    })*/
-        return n.type === "StartNode";
-      })[0];
-      startNode.data.outputs.forEach((n) => {
-        if (n.type === "fileUrl") {
-          n.upLoadType = "0";
-        }
-      });
-      this.startNode = startNode;
-      this.visable = true;
-    },
     setArray(data) {
       try {
         let arr = JSON.parse(data);
-        // arr = arr.map((item)=>{
-        //   return String(item)
-        // })
         return arr;
       } catch (error) {
         return [data];
@@ -247,30 +197,16 @@ export default {
       this.startNode.data.outputs[i].value.content = value;
     },
     preRun() {
+      this.runDisabled = true;
+
       let params = {};
       this.startNode.data.outputs.forEach((n) => {
         params[n.name] =
-          n.type == "array" && n.value.content
+          n.type === "array" && n.value.content
             ? this.setArray(n.value.content)
             : n.value.content;
       });
-
-      this.runDisabled = true;
       this.$emit("doDebug", params);
-    },
-    setDebugResult(data) {
-      this.nodeResult = data;
-      this.runDisabled = false;
-    },
-    preCancelRun() {
-      this.stopSse();
-      if (this.source.length > 0) {
-        this.source.forEach((item) => {
-          item.cancel();
-        });
-        this.source = [];
-      }
-      this.$emit("cancelRun");
     },
     stopSse() {
       if (this.sessionStatus !== -1) {
@@ -317,12 +253,12 @@ export default {
     },
     replaceHTML(data) {
       let _data = data;
-      var a = new RegExp("<think>");
-      var b = new RegExp("</think>");
+      let a = new RegExp("<think>");
+      let b = new RegExp("</think>");
       if (b.test(data)) {
         this.thinkText = "已深度思考";
       } else {
-        if (this.sessionStatus == -1) {
+        if (this.sessionStatus === -1) {
           if (a.test(data) && !b.test(data)) {
             this.thinkText = "思考已停止";
           }
@@ -339,12 +275,6 @@ export default {
 
       return _data.replace(/think>/g, "section>");
     },
-    scrollBottom() {
-      var a = document.getElementsByClassName("answer-content")[0];
-      if (a) {
-        a.scrollTop = a.scrollHeight;
-      }
-    },
   },
 };
 </script>
@@ -354,18 +284,19 @@ export default {
   position: absolute;
   display: flex;
   flex-direction: column;
-  width: 450px;
-  height: 100%;
-  top: 0;
-  bottom: 0;
-  right: 0;
+  width: 420px;
+  height: calc(100% - 20px);
+  top: 10px;
+  bottom: 10px;
+  left: 10px;
   padding: 20px;
   border-left: 1px solid #ddd;
   background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.15);
 }
 .config-header {
   position: relative;
-  margin-top: 40px;
   .close-icon {
     position: absolute;
     right: 0;
@@ -381,6 +312,9 @@ export default {
     object-fit: contain;
   }
   .header-name {
+    font-size: 15px;
+    border-bottom: 1px solid #dedede;
+    padding:  20px 0 8px;
   }
   .desc {
     padding: 10px 0;
@@ -388,7 +322,7 @@ export default {
   }
 }
 .form {
-  margin-top: 20px;
+  margin-top: 10px;
   .form-item {
     margin: 20px 0;
     .form-item--label {
@@ -436,11 +370,12 @@ export default {
   }
 }
 .btns {
-  display: flex;
-  flex-direction: column;
+  /*display: flex;
+  flex-direction: column;*/
+  text-align: right;
   margin-top: 20px;
   .el-button {
-    margin-left: 0;
+    margin-left: 10px;
   }
 }
 .cancel-bt {

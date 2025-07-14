@@ -69,7 +69,8 @@ export default {
             import: '导入',
             export: '导出',
             view: '查看',
-            cancelPublish: '取消发布'
+            cancelPublish: '取消发布',
+            add: '创建'
         },
         switch: {
             start: '开启',
@@ -119,7 +120,8 @@ export default {
             uploadError: '上传失败，请重新上传'
         },
         copy: {
-            success: '内容已复制到粘贴板'
+            success: '内容已复制到粘贴板',
+            coryText: '副本'
         },
         noData: '暂无数据',
         loading: '正在加载数据...',

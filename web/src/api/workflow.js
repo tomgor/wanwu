@@ -14,6 +14,20 @@ export const saveWorkFlow = (data)=>{
         data
     })
 };
+export const getWorkFlowParams = (params) => {
+    return request({
+        url: "/workflow/api/workflow/parameter",
+        method: "get",
+        params,
+    });
+};
+export const useWorkFlow = (data)=>{
+    return request({
+        url: '/workflow/api/workflow/use',
+        method: 'post',
+        data
+    })
+};
 export const runWorkFlow = (data)=>{
     return request({
         url: '/workflow/api/workflow/run',
