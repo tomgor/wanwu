@@ -43,8 +43,8 @@ type CustomTab struct {
 
 type CustomAbout struct {
 	LogoPath  string `json:"logoPath"` // 关于图标路径
-	Version   string `json:"version" mapstructure:"version"`
-	Copyright string `json:"copyright" mapstructure:"copyright"` // 版权
+	Version   string `json:"version"`
+	Copyright string `json:"copyright"` // 版权
 }
 
 type LanguageSelect struct {
