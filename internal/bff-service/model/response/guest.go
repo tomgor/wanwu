@@ -18,10 +18,10 @@ type Captcha struct {
 }
 
 type LogoCustomInfo struct {
-	Version string      `json:"version"` // 版本
-	Login   CustomLogin `json:"login"`   // 登录页标题信息
-	Home    CustomHome  `json:"home"`    // 首页标题信息
-	Tab     CustomTab   `json:"tab"`     // 标签页信息
+	Login CustomLogin `json:"login"` // 登录页标题信息
+	Home  CustomHome  `json:"home"`  // 首页标题信息
+	Tab   CustomTab   `json:"tab"`   // 标签页信息
+	About CustomAbout `json:"about"` // 关于信息
 }
 
 type CustomLogin struct {
@@ -37,8 +37,14 @@ type CustomHome struct {
 }
 
 type CustomTab struct {
-	LogoPath string `json:"logoPath"` //标签页图标路径
-	Title    string `json:"title"`    //标签页标题
+	LogoPath string `json:"logoPath"` // 标签页图标路径
+	Title    string `json:"title"`    // 标签页标题
+}
+
+type CustomAbout struct {
+	LogoPath  string `json:"logoPath"` // 关于图标路径
+	Version   string `json:"version" mapstructure:"version"`
+	Copyright string `json:"copyright" mapstructure:"copyright"` // 版权
 }
 
 type LanguageSelect struct {
