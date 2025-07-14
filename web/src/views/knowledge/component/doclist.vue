@@ -172,13 +172,31 @@ export default {
       tableData: [],
       knowLegOptions:this.getKnowOptions(),
       knowledgeData: [],
-      currentKnowValue:null
+      currentKnowValue:null,
+      timer:null
     };
   },
   mounted(){
     this.getTableData(this.docQuery)
   },
+  beforeDestroy(){
+    this.clearTimer()
+  },
   methods: {
+    startTimer(){
+      this.timer = setInterval(() =>{
+        this.getTableData(this.docQuery)
+      },30000)
+      setTimeout(() => {
+          this.clearTimer();
+      },60000);
+    },
+    clearTimer() {
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+      }
+    },
     goBack(){
       this.$router.push({path:'/knowledge'})
     },

@@ -17,7 +17,7 @@
                 >
                     <el-checkbox v-model="item.selected" v-if="!item.showIpt">{{item.tagName}}</el-checkbox>
                     <el-input v-model="item.tagName" v-if="item.showIpt" @blur="inputBlur(item)" ></el-input>
-                    <span class="el-icon-close del-icon" v-if="item.showDel && !item.showIpt" @click="delTag(item.tagId)"></span>
+                    <span class="el-icon-close del-icon" v-if="item.showDel && !item.showIpt" @click="delTag(item)"></span>
                 </div>
             </div>
         </div>
@@ -38,7 +38,7 @@ export default {
         }
     },
     created(){
-       this.getList();
+    //    this.getList();
     },
     methods:{
         submitDialog(){
@@ -61,8 +61,9 @@ export default {
                 }
             })
         },
-        delTag(tagId){
-            delTag({tagId}).then(res =>{
+        delTag(item){
+            if(item.selected) return
+            delTag({tagId:item.tagId}).then(res =>{
                 if(res.code === 0){
                     this.getList()
                 }
@@ -71,6 +72,7 @@ export default {
         showDiaglog(id){
             this.knowledgeId = id
             this.dialogVisible = true;
+            this.getList();
         },
         handleClose(){
             this.dialogVisible = false;
