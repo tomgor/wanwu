@@ -180,11 +180,11 @@ export const BatchUrlDemo = ()=>{
 
 //new 获取知识库列表
 const BASE_URL = '/user/api/v1'
-export const getKnowledgeList = (params)=>{
+export const getKnowledgeList = (data)=>{
     return service({
         url: `${BASE_URL}/knowledge/select`,
-        method: 'get',
-        params
+        method: 'post',
+        data
     })
 };
 export const delKnowledgeItem = (data)=>{
