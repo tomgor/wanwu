@@ -18,4 +18,5 @@ type KnowledgeInfo struct {
 	Description        string              `json:"description"`        //知识库描述
 	DocCount           int                 `json:"docCount"`           //文档数量
 	EmbeddingModelInfo *EmbeddingModelInfo `json:"embeddingModelInfo"` //embedding模型信息
+	KnowledgeTagList   []*KnowledgeTag     `json:"knowledgeTagList"`   //知识库标签列表
 }

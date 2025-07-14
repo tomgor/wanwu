@@ -56,6 +56,7 @@ message KnowledgeSelectReq {
   string userId = 1;
   string orgId = 2;
   string name = 3; //知识库名称，支持模糊搜索
+  repeated string tagIdList = 4; //知识库id 列表
 }
 
 message KnowledgeSelectListResp {
@@ -76,4 +77,10 @@ message KnowledgeInfo {
   int32 docCount = 3;
   string description = 4;
   EmbeddingModelInfo embeddingModelInfo = 5;
+  repeated KnowledgeTagInfo knowledgeTagInfoList = 6;
+}
+
+message KnowledgeTagInfo {
+  string tagId = 1;//知识库标签id
+  string tagName = 2; //知识库标签名称
 }

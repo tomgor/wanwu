@@ -57,6 +57,10 @@ func LogAccessPB(ctx context.Context, business string, method string, params int
 	if err != nil {
 		success = 0
 	}
+	var errMsg = ""
+	if err != nil {
+		errMsg = err.Error()
+	}
 
-	accessSLog.Infof("%s|%s|%d|%d|%+v|%+v", business, method, success, time.Now().UnixMilli()-starTimestamp, params, result)
+	accessSLog.Infof("%s|%s|%d|%d|%+v|%+v|%s", business, method, success, time.Now().UnixMilli()-starTimestamp, params, result, errMsg)
 }
