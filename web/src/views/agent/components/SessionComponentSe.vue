@@ -346,6 +346,12 @@ export default {
                 document.getElementById('timeScroll').scrollTop = document.getElementById('timeScroll').scrollHeight;
             });
         },
+        codeScrollBottom(){
+          this.$nextTick(() => {
+                this.loading = false
+                document.getElementsByTagName('code').scrollTop = document.getElementsByTagName('code').scrollHeight;
+            });
+        },
         pushHistory(data){
             this.session_data.history.push(data)
             this.scrollBottom()
@@ -353,6 +359,7 @@ export default {
         replaceLastData(index,data){
           this.$set(this.session_data.history,index,data)
           this.scrollBottom()
+          this.codeScrollBottom();//code内容置底
         },
         getFileSizeDisplay(fileSize){
             if (!fileSize || typeof fileSize !== 'number' || isNaN(fileSize)) {
@@ -429,9 +436,6 @@ export default {
         preCai(index,item){
             if(this.sessionStatus === 0){return}
             this.$set(this.session_data.history,index,{...item,evaluate:2})
-        },
-        doScore(index,evaluate){
-
         },
         //=================标注相关===============
         initCanvasUtil () {
@@ -528,14 +532,18 @@ export default {
      min-height: 50px;
      word-wrap: break-word;
      resize: vertical;
-     scroll-snap-type: y mandatory;/* 垂直方向强制吸附 */
      .hljs{
         max-height:300px!important;
         white-space: pre-wrap !important;
         min-height: 50px;
         word-wrap: break-word;
         resize: vertical;
-        scroll-snap-align: end; /* 最后一条消息吸附到底部 */
+     }
+     code{
+      display: block;
+      white-space: pre-wrap;
+      word-break:break-all;
+      scroll-behavior:smooth;
      }
   }
   .el-loading-mask{
