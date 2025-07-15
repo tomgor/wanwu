@@ -301,3 +301,21 @@ export const bindTag = (data)=>{
         data
     })
 };
+
+//查询标签绑定知识库数量
+export const bindTagCount = (params)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/tag/bind/count`,
+        method: 'get',
+        params
+    })
+};
+
+//命中测试接口
+export const hitTest = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/hit`,
+        method: 'post',
+        data
+    })
+};

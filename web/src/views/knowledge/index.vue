@@ -8,17 +8,18 @@
       <div class="search-box">
         <div>
           <search-input class="cover-input-icon" :placeholder="$t('knowledgeManage.searchPlaceholder')" ref="searchInput" @handleSearch="getTableData" />
-          <!-- <el-select v-model="tagIds" placeholder="请选择标签" multiple @visible-change="tagChange" @remove-tag="removeTag">
+          <el-select v-model="tagIds" placeholder="请选择标签" multiple @visible-change="tagChange" @remove-tag="removeTag">
             <el-option
               v-for="item in tagOptions"
               :key="item.tagId"
               :label="item.tagName"
               :value="item.tagId">
             </el-option>
-          </el-select> -->
+          </el-select>
         </div>
         <div>
           <!-- <el-button size="mini" type="primary" @click="$router.push('/knowledge/keyword')">{{$t('knowledgeManage.keyWordManage')}}</el-button> -->
+          <el-button size="mini" type="primary" @click="$router.push('/knowledge/hitTest')">命中测试</el-button>
           <el-button size="mini" type="primary" @click="showCreate()" icon="el-icon-plus">
             {{$t('common.button.create')}}
           </el-button>
@@ -46,7 +47,7 @@ export default {
     },
     mounted(){
       this.getTableData();
-      // this.getList();
+      this.getList();
     },
     methods:{
       getList(){
@@ -59,6 +60,8 @@ export default {
         tagChange(val){
           if(!val && this.tagIds.length > 0){
               this.getTableData()
+          }else{
+            this.getList()
           }
         },
         removeTag(){

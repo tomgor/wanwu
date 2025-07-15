@@ -123,6 +123,11 @@ const constantRoutes = [
                 meta:{perm: [PERMS.KNOWLEDGE]},
             },
             {
+                path: '/knowledge/hitTest',
+                component:resolve =>require(['@/views/knowledge/component/hitTest'],resolve),
+                meta:{perm: [PERMS.KNOWLEDGE]},
+            },
+            {
                 path: '/userCenter/*',
                 name:'userCenter',
                 component:resolve =>require(['@/views/userCenter'],resolve),
