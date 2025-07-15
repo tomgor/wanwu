@@ -7,7 +7,6 @@
 ### 📢 新闻
 
 - **[2025-07-10]** 
-  - 支持智能体模板
   - MCP广场新增行业MCP server
 
 ------
@@ -117,10 +116,13 @@
     cp .env.bak .env
     ```
 
-    1.2 根据系统修改.env文件中的`WANWU_ARCH`变量
+    1.2 根据系统修改.env文件中的`WANWU_ARCH`、`WANWU_EXTERNAL_IP`变量
     ```
     # amd64 / arm64
     WANWU_ARCH=amd64
+
+    # external ip port（注意localhost要换成本机局域网或对外IP，例如192.168.0.xx，不能是localhost或127.0.0.1）
+    WANWU_EXTERNAL_IP=localhost
     ```
 
     1.3 创建docker运行网络
@@ -190,6 +192,14 @@
 - 支持知识库命中测试、关键词管理
 - 工作流支持公开发布
 - 应用广场支持按照应用名称进行搜索
+- 支持设定敏感词安全护栏
+- 支持知识库OCR解析
+- 支持工作流的导入导出
+- 支持自定义MCP Server，即可以把工作流、智能体、或者符合OpenAPI规范的API作为tools添加到MCP Server里进行发布
+- 增加模型供应商
+- 增加工作流节点类型
+- 支持知识库打标签
+- 支持自定义工具
 
 ------
 

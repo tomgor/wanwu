@@ -86,7 +86,8 @@ export default {
         showDialog(){
             this.dialogVisible = true;
             if(this.knowledgeConfig !== null){
-                this.ruleForm = this.knowledgeConfig;
+                const data = JSON.parse(JSON.stringify(this.knowledgeConfig));
+                this.ruleForm = data;
             }
         },
         handleClose(){

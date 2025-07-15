@@ -166,6 +166,33 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	log.Debugf("Assistant服务开始智能体流式对话，assistantId: %s, userId: %s, orgId: %s, conversationId: %s, fileInfo: %+v, trial: %v, prompt: %s",
 		req.AssistantId, reqUserId, req.Identity.OrgId, req.ConversationId, req.FileInfo, req.Trial, req.Prompt)
 
+	// 用于跟踪流式响应状态的变量
+	var fullResponse strings.Builder
+	var searchList string
+	var hasReadFirstMessage bool
+	var streamStarted bool
+	var conversationSaved bool // 标记是否已经保存过对话
+
+	// 使用defer统一处理上下文取消的情况
+	defer func() {
+		// 只有在上下文被手动取消且还未保存过对话时，才保存"已被终止"消息
+		if ctx.Err() != nil && !req.Trial && !conversationSaved {
+			if !streamStarted {
+				// 流式响应还未开始，保存基本终止消息
+				saveConversation(ctx, req, "本次回答已被终止", "")
+			} else {
+				// 流式响应已开始
+				if !hasReadFirstMessage {
+					// 如果还没有读取到第一条消息，保存终止消息
+					saveConversation(ctx, req, "本次回答已被终止", searchList)
+				} else {
+					// 如果已经读取到消息，保存已经收到的消息
+					saveConversation(ctx, req, fullResponse.String()+"\n本次回答已被终止", searchList)
+				}
+			}
+		}
+	}()
+
 	// 根据智能体id查询智能体信息
 	assistantID, err := strconv.ParseUint(req.AssistantId, 10, 32)
 	if err != nil {
@@ -176,10 +203,6 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	assistant, status := s.cli.GetAssistant(ctx, uint32(assistantID))
 	if status != nil {
 		log.Errorf("Assistant服务获取智能体信息失败，assistantId: %s, error: %v", req.AssistantId, status)
-		if ctx.Err() != nil {
-			saveConversation(ctx, req, "本次回答已被终止", "")
-			return ctx.Err()
-		}
 		SSEError(stream, "智能体信息获取失败")
 		return errStatus(errs.Code_AssistantConversationErr, status)
 	}
@@ -198,10 +221,6 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	assistantConfig := config.Cfg().Assistant
 	if assistantConfig.SseUrl == "" {
 		log.Errorf("Assistant服务SSE URL配置为空，assistantId: %s", req.AssistantId)
-		if ctx.Err() != nil {
-			saveConversation(ctx, req, "本次回答已被终止", "")
-			return ctx.Err()
-		}
 		SSEError(stream, "智能体配置错误")
 		return fmt.Errorf("智能体配置错误")
 	}
@@ -224,10 +243,6 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		actionPluginList, err = buildActionPluginListAlgParam(ctx, s, req.AssistantId, reqUserId, req.Identity.OrgId)
 		if err != nil {
 			log.Errorf(err.Error())
-			if ctx.Err() != nil {
-				saveConversation(ctx, req, "本次回答已被终止", "")
-				return ctx.Err()
-			}
 			SSEError(stream, "智能体action配置错误")
 			return err
 		}
@@ -237,10 +252,6 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		workflowPluginList, err = buildWorkflowPluginListAlgParam(ctx, s, req.AssistantId, reqUserId, req.Identity.OrgId)
 		if err != nil {
 			log.Errorf(err.Error())
-			if ctx.Err() != nil {
-				saveConversation(ctx, req, "本次回答已被终止", "")
-				return ctx.Err()
-			}
 			SSEError(stream, "智能体workflow配置错误")
 			return err
 		}
@@ -257,10 +268,6 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		modelConfig = &common.AppModelConfig{}
 		if err := json.Unmarshal([]byte(assistant.ModelConfig), modelConfig); err != nil {
 			log.Errorf("Assistant服务解析智能体模型配置失败，assistantId: %s, error: %v, modelConfigRaw: %s", req.AssistantId, err, assistant.ModelConfig)
-			if ctx.Err() != nil {
-				saveConversation(ctx, req, "本次回答已被终止", "")
-				return ctx.Err()
-			}
 			SSEError(stream, "智能体模型配置解析失败")
 			return err
 		}
@@ -286,10 +293,6 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	if assistant.OnlineSearchConfig != "" {
 		if err := json.Unmarshal([]byte(assistant.OnlineSearchConfig), onlineSearchConfig); err != nil {
 			log.Errorf("Assistant服务解析智能体在线搜索配置失败，assistantId: %s, error: %v, onlineSearchConfigRaw: %s", req.AssistantId, err, assistant.OnlineSearchConfig)
-			if ctx.Err() != nil {
-				saveConversation(ctx, req, "本次回答已被终止", "")
-				return ctx.Err()
-			}
 			SSEError(stream, "智能体在线搜索配置解析失败")
 			return err
 		}
@@ -308,10 +311,6 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		// 将string类型的knowledgebase_config转换为common.AppKnowledgebaseConfig
 		if err := json.Unmarshal([]byte(assistant.KnowledgebaseConfig), knowledgebaseConfig); err != nil {
 			log.Errorf("Assistant服务解析智能体知识库配置失败，assistantId: %s, error: %v, knowledgebaseConfigRaw: %s", req.AssistantId, err, assistant.KnowledgebaseConfig)
-			if ctx.Err() != nil {
-				saveConversation(ctx, req, "本次回答已被终止", "")
-				return ctx.Err()
-			}
 			SSEError(stream, "智能体知识库配置解析失败")
 			return err
 		}
@@ -322,22 +321,14 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 			// 将string类型的assistant.RerankConfig转换为common.AppModelConfig
 			if err := json.Unmarshal([]byte(assistant.RerankConfig), rerankConfig); err != nil {
 				log.Errorf("Assistant服务解析智能体rerank配置失败，assistantId: %s, error: %v, rerankConfigRaw: %s", req.AssistantId, err, assistant.RerankConfig)
-				if ctx.Err() != nil {
-					saveConversation(ctx, req, "本次回答已被终止", "")
-					return ctx.Err()
-				}
 				SSEError(stream, "智能体rerank配置解析失败")
 				return err
 			}
 		}
 		if rerankConfig.Model == "" || rerankConfig.ModelId == "" {
 			log.Errorf("Assistant服务缺少rerank配置，assistantId: %s", req.AssistantId)
-			if ctx.Err() != nil {
-				saveConversation(ctx, req, "本次回答已被终止", "")
-				return ctx.Err()
-			}
 			SSEError(stream, "智能体缺少rerank配置")
-			return err
+			return fmt.Errorf("智能体缺少rerank配置")
 		}
 
 		rerankEndpoint := mp.ToModelEndpoint(rerankConfig.ModelId, rerankConfig.Model)
@@ -402,29 +393,19 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	requestBodyBytes, err := json.Marshal(requestBody)
 	if err != nil {
 		log.Errorf("Assistant服务序列化请求体失败，assistantId: %s, error: %v", req.AssistantId, err)
-		if ctx.Err() != nil {
-			saveConversation(ctx, req, "本次回答已被终止", "")
-			return ctx.Err()
-		}
 		SSEError(stream, "请求参数错误")
 		return err
 	}
 
 	timeout := 300 * time.Second
-	requestCtx, cancelFunc := context.WithTimeout(ctx, timeout)
-	defer cancelFunc()
 
 	startTime := time.Now()
 	id := uuid.New().String()
 	log.Infof("Assistant服务开始调用HttpRequestLlmStream，uuid: %s, assistantId: %s, url: %s, userId: %s, timeout: %v, body: %s",
 		id, req.AssistantId, assistantConfig.SseUrl, reqUserId, timeout, string(requestBodyBytes))
-	sseResp, err := HttpRequestLlmStream(requestCtx, assistantConfig.SseUrl, reqUserId, xuid, bytes.NewReader(requestBodyBytes), timeout)
+	sseResp, err := HttpRequestLlmStream(ctx, assistantConfig.SseUrl, reqUserId, xuid, bytes.NewReader(requestBodyBytes), timeout)
 	if err != nil {
 		log.Errorf("Assistant服务调用智能体能力接口失败，assistantId: %s, uuid: %s, error: %v", req.AssistantId, id, err)
-		if ctx.Err() != nil && !req.Trial {
-			saveConversation(ctx, req, "本次回答已被终止", "")
-			return ctx.Err()
-		}
 		SSEError(stream, "智能体服务异常")
 		return err
 	}
@@ -434,10 +415,6 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	// SSE 请求返回Code大于400
 	if sseResp.StatusCode > http.StatusBadRequest {
 		log.Errorf("Assistant服务智能体能力接口返回错误状态码，assistantId: %s, statusCode: %d", req.AssistantId, sseResp.StatusCode)
-		if ctx.Err() != nil && !req.Trial {
-			saveConversation(ctx, req, "本次回答已被终止", "")
-			return ctx.Err()
-		}
 		SSEError(stream, "智能体服务异常")
 		return fmt.Errorf("智能体服务返回错误状态码: %d", sseResp.StatusCode)
 	}
@@ -446,39 +423,34 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	reader := bufio.NewReader(sseResp.Body)
 	lineCount := 0
 
-	// 初始化聊天记录数据
-	var fullResponse strings.Builder
-	var searchList string
+	// 标记流式响应已开始
+	streamStarted = true
 	searchListExtracted := false
-	hasReadFirstMessage := false
 
 	for {
-		if err := ctx.Err(); err != nil {
-			if !req.Trial {
-				if !hasReadFirstMessage {
-					// 如果还没有读取到第一条消息，保存终止消息
-					saveConversation(ctx, req, "本次回答已被终止", searchList)
-				} else {
-					// 如果已经读取到消息，保存已经收到的消息
-					saveConversation(ctx, req, fullResponse.String(), searchList)
-				}
-			}
-			return err
-		}
 
 		line, err := reader.ReadBytes('\n')
 		if err != nil && err != io.ErrUnexpectedEOF && err != io.EOF {
 			log.Errorf("Assistant服务读取流式响应失败，assistantId: %s, error: %v, 已处理行数: %d", req.AssistantId, err, lineCount)
-			if !req.Trial {
-				if !hasReadFirstMessage {
-					// 如果还没有读取到第一条消息，保存中断消息
-					saveConversation(ctx, req, "本次回答已中断", searchList)
-				} else {
-					// 如果已经读取到消息，保存已经收到的消息
-					saveConversation(ctx, req, fullResponse.String(), searchList)
+
+			// 检查是否是上下文取消导致的错误
+			if ctx.Err() != nil {
+				// 用户手动取消请求，让defer函数处理"已被终止"消息，这里不保存
+				log.Debugf("Assistant服务检测到上下文取消，assistantId: %s", req.AssistantId)
+			} else {
+				// 真正的SSE读取错误，保存"已中断"消息
+				if !req.Trial {
+					if !hasReadFirstMessage {
+						// 如果还没有读取到第一条消息，保存中断消息
+						saveConversation(ctx, req, "本次回答已中断", searchList)
+					} else {
+						// 如果已经读取到消息，保存已经收到的消息
+						saveConversation(ctx, req, fullResponse.String()+"\n本次回答已中断", searchList)
+					}
+					conversationSaved = true // 标记已保存，避免defer中重复保存
 				}
+				SSEError(stream, "本次回答已中断")
 			}
-			SSEError(stream, "本次回答已中断")
 			return err
 		}
 
@@ -532,6 +504,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	// 问答调试不保存
 	if !req.Trial {
 		saveConversation(ctx, req, fullResponse.String(), searchList)
+		conversationSaved = true // 标记已保存
 	}
 
 	return nil

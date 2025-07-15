@@ -197,7 +197,7 @@ export default {
         });
     },
     async getToolsList(list) {
-      let mcpList = list;
+      let mcpList = list || [];
       /*for (const item of mcpList) {
         try {
           const res = await getMcpToolList({

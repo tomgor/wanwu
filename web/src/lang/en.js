@@ -2,28 +2,22 @@
 export default {
     login: {
         title: '登 录',
-        welcomeText: '嗨！欢迎来到元景MaaS智能体平台',
+        welcomeText: '嗨！欢迎来到元景万悟智能体平台',
         form: {
             username: '用户名',
             password: '密码',
             code: '验证码'
         },
         button: '登 录',
-        desc: {
-            title: 'MaaS开发平台：',
-            desc: '多模融合、按需定制、生态共创、普惠便民',
-            subDesc: '打造大模型开发应用范式，成为大模型技术规模化落地应用的引领者',
-            tabs:  [
-                {name: '选模型', desc: '模型即服务MaaS'},
-                {name: '改模型', desc: '微调训练即服务FaaS'},
-                {name: '用模型', desc: '扩展工具即服务TaaS'}
-            ]
-        }
     },
     register: {
         title: '欢迎注册',
         button: '注 册',
         back: '返回登录'
+    },
+    about: {
+        version: '版本',
+        company: '◎ 联通数据智能有限公司'
     },
     menu: {
         explore: '应用广场',
@@ -45,7 +39,7 @@ export default {
         about: '关于'
     },
     header: {
-        title: '元景',
+        title: '元景万悟',
         doc: '文档中心',
         logout: '登出',
         login: '登录',

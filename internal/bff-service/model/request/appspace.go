@@ -24,6 +24,15 @@ func (req PublishAppRequest) Check() error {
 	return nil
 }
 
+type UnPublishAppRequest struct {
+	AppId   string `json:"appId"`   // 应用ID
+	AppType string `json:"appType"` // 应用类型
+}
+
+func (req UnPublishAppRequest) Check() error {
+	return nil
+}
+
 type GetApiBaseUrlRequest struct {
 	AppId   string `form:"appId" json:"appId" validate:"required"`     // 应用ID
 	AppType string `form:"appType" json:"appType" validate:"required"` // 应用类型

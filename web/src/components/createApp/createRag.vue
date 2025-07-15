@@ -215,7 +215,8 @@ export default {
           if(res.code === 0){
             this.dialogVisible = false;
             const type = 'rag';
-            this.$router.push({path:`/appSpace/${type}`})
+            const id = res.data.ragId;
+            this.$router.push({path:`/rag/test?id=${id}`})
             this.setFromList(type)
           }
         })

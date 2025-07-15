@@ -72,6 +72,12 @@ const constantRoutes = [
                 meta:{perm: [PERMS.AGENT]},
             },
             {
+                path: '/agent/templateDetail',
+                name:'templateDetail',
+                component:resolve =>require(['@/components/agentDetail'],resolve),
+                meta:{perm: [PERMS.AGENT]},
+            },
+            {
                 path: '/rag/test',
                 component:resolve =>require(['@/views/rag/components/form'],resolve),
                 meta:{perm: [PERMS.RAG]},
@@ -104,6 +110,11 @@ const constantRoutes = [
             {
                 path: '/knowledge/section',
                 component:resolve =>require(['@/views/knowledge/component/section.vue'],resolve),
+                meta:{perm: [PERMS.KNOWLEDGE]},
+            },
+            {
+                path: '/knowledge/keyword',
+                component:resolve =>require(['@/views/knowledge/keyword'],resolve),
                 meta:{perm: [PERMS.KNOWLEDGE]},
             },
             {

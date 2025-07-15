@@ -22,7 +22,20 @@
     </template>
     <template #main-content>
       <div class="app-content">
+        <div class="app-header-api">
+            <div class="header-api-box">
+                <div class="header-api-url">
+                    <el-tag  effect="plain" class="root-url">API根地址</el-tag>
+                    {{apiURL}}
+                </div>
+                <el-button size="small" @click="openApiDialog" plain class="apikeyBtn" >
+                    <img :src="require('@/assets/imgs/apikey.png')" />
+                    API秘钥
+                </el-button>
+            </div>
+        </div>
         <Chat :chatType="'chat'" :editForm="editForm"  ref="agentChat" @reloadList="reloadList" @setHistoryStatus="setHistoryStatus"/>
+        <ApiKeyDialog ref="apiKeyDialog" :appId="editForm.assistantId" :appType="'agent'" />
       </div>
     </template>
   </CommonLayout>
@@ -31,14 +44,17 @@
 import CommonLayout from '@/components/exploreContainer.vue'
 import Chat from './components/chat.vue'
  import {mapGetters} from 'vuex'
+ import ApiKeyDialog from './components/ApiKeyDialog.vue'
  import { getAgentInfo } from "@/api/agent";
+ import {getApiKeyRoot} from "@/api/appspace";
 import sseMethod from '@/mixins/sseMethod'
 import { getConversationlist} from "@/api/agent";
 export default {
-    components: {CommonLayout,Chat },
+    components: {CommonLayout,Chat,ApiKeyDialog },
     mixins: [sseMethod],
     data(){
         return {
+            apiURL:'',
             asideTitle:'新建对话',
             assistantId:'',
             historyList:[],
@@ -47,7 +63,8 @@ export default {
                 avatar:{},
                 name:'',
                 desc:'',
-                prologue:''
+                prologue:'',          
+                recommendQuestion:[]
             },
         }
     },
@@ -60,6 +77,7 @@ export default {
             this.editForm.assistantId = this.$route.query.id;
             this.getDetail()
             this.getList()
+            this.apiKeyRootUrl()
         }
     },
     methods:{
@@ -73,6 +91,7 @@ export default {
                     this.editForm.name = res.data.name;
                     this.editForm.desc = res.data.desc;
                     this.editForm.prologue = res.data.prologue;
+                    this.editForm.recommendQuestion = res.data.recommendQuestion.map(item =>({value:item}));
                 }
             })
         },
@@ -122,7 +141,18 @@ export default {
         },
         mouseLeave(n){
             n.hover = false;
-        }
+        },
+        apiKeyRootUrl(){
+            const data = {appId:this.editForm.assistantId,appType:'agent'}
+            getApiKeyRoot(data).then(res =>{
+                if(res.code === 0){
+                    this.apiURL = res.data || ''
+                }
+            })
+        },
+        openApiDialog(){
+            this.$refs.apiKeyDialog.showDialog();
+        },
     }
 }
 </script>
@@ -174,5 +204,30 @@ export default {
  .app-content{
     width:100%;
     height:100%;
+    .app-header-api{
+        width:50%;
+        padding:10px;
+        position:absolute;
+        z-index:999;
+        top:0;
+        right:0;
+        display:flex;
+        justify-content:flex-end;
+        align-content:center;
+        .header-api-box{
+            display:flex;
+            .header-api-url{
+                padding: 6px 10px;
+                background:#fff;
+                margin:0 10px;
+                border-radius:6px;
+                .root-url{
+                    background-color:#ECEEFE;
+                    color:#384BF7;
+                    border:none;
+                }
+            }
+        }
+    }
  }
 </style>

@@ -88,16 +88,17 @@ type DocCenterConfig struct {
 }
 
 type CustomInfoConfig struct {
-	Version string      `json:"version" mapstructure:"version"`
-	Login   CustomLogin `json:"login" mapstructure:"login"`
-	Home    CustomHome  `json:"home" mapstructure:"home"`
-	Tab     CustomTab   `json:"tab" mapstructure:"tab"`
+	Login CustomLogin `json:"login" mapstructure:"login"`
+	Home  CustomHome  `json:"home" mapstructure:"home"`
+	Tab   CustomTab   `json:"tab" mapstructure:"tab"`
+	About CustomAbout `json:"about" mapstructure:"about"`
 }
 
 type CustomLogin struct {
 	BackgroundPath   string `json:"background_path" mapstructure:"background_path"`
 	LoginButtonColor string `json:"login_button_color" mapstructure:"login_button_color"`
 	WelcomeText      string `json:"welcome_text" mapstructure:"welcome_text"`
+	PlatformDesc     string `json:"platform_desc" mapstructure:"platform_desc"`
 }
 
 type CustomHome struct {
@@ -108,6 +109,12 @@ type CustomHome struct {
 type CustomTab struct {
 	TabTitle    string `json:"tab_title" mapstructure:"tab_title"`
 	TabLogoPath string `json:"tab_logo_path" mapstructure:"tab_logo_path"`
+}
+
+type CustomAbout struct {
+	LogoPath  string `json:"logo_path" mapstructure:"logo_path"`
+	Version   string `json:"version" mapstructure:"version"`
+	Copyright string `json:"copyright" mapstructure:"copyright"`
 }
 
 func LoadConfig(in string) error {
