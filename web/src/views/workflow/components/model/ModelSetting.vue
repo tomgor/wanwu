@@ -180,11 +180,20 @@
     <!--提示词-->
     <div class="model-box">
       <p class="params-type-span">提示词<span class="required"> *</span></p>
-      <el-input
+      <!--<el-input
         type="textarea"
         v-model="modelForm.input"
         :placeholder="placeholder"
-      ></el-input>
+      >
+      </el-input>-->
+      <AutoComplete
+        :suggestions="nodeData.data.inputs.map(item => item.name)"
+        trigger="{{"
+        v-model="modelForm.input"
+        :placeholder="placeholder"
+        ref="autoComplete"
+        @changeValue="handleSelect"
+      />
     </div>
 
     <!--输出-->
@@ -231,13 +240,15 @@
 <script>
 import { mapState } from "vuex";
 import nodeMethod from "@/views/workflow/mixins/nodeMethod";
+import AutoComplete from "./autoComplete.vue";
 import {getModels} from "@/api/workflow";
 
 export default {
-  components: {},
+  components: {AutoComplete},
   props: ["graph", "node"],
   data() {
     return {
+      variables: ['firstName', 'lastName', 'email', 'phone'],
       placeholder:"编写大模型的提示词，使大模型实现对应功能。通过插入{{参数值}}引用输入参数中的变量",
       editVisible: false,
       settings: {},
@@ -264,14 +275,24 @@ export default {
   mixins: [nodeMethod],
   created() {
     //this.nodeData = this.node.data;
-    this.modelForm = this.node.data.data.modelForm ||{};
+    this.modelForm = this.node.data.data.modelForm || {};
     this.getModels();
     //this.parseNodeData(this.nodeData);
 
     // this.settings = this.node.data.data.settings;
     //this.getPreNode(this.nodeData.id);
   },
+  mounted() {
+    this.setAutoCompleteValue(this.modelForm.input)
+  },
   methods: {
+    setAutoCompleteValue(value) {
+      if (this.$refs.autoComplete) this.$refs.autoComplete.inputValue = value || ''
+    },
+    handleSelect(value) {
+      console.log('Selected:', value)
+      this.modelForm.input = value
+    },
     getModels() {
       getModels().then((res) => {
         const {list} = res.data || {}

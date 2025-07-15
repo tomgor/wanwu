@@ -28,14 +28,14 @@
 
       <!--api-->
       <ApiSetting
-        v-show="nodeData.type === 'ApiNode'"
+        v-if="nodeData.type === 'ApiNode'"
         ref="api"
         :graph="graph"
         :node="node"
         :key="datekey"
       />
       <!--<GuiSetting
-        v-show="nodeData.type === 'GUIAgentNode'"
+        v-if="nodeData.type === 'GUIAgentNode'"
         ref="api"
         :graph="graph"
         :node="node"
@@ -43,7 +43,7 @@
       />-->
       <!--代码-->
       <CodeSetting
-        v-show="nodeData.type === 'PythonNode'"
+        v-if="nodeData.type === 'PythonNode'"
         ref="code"
         :graph="graph"
         :node="node"
@@ -52,7 +52,7 @@
 
       <!--大模型-->
       <ModelSetting
-        v-show="nodeData.type === 'LLMNode'"
+        v-if="nodeData.type === 'LLMNode'"
         ref="code"
         :graph="graph"
         :node="node"
@@ -61,7 +61,7 @@
 
       <!--大模型-->
       <ModelStreamSetting
-        v-show="nodeData.type === 'LLMStreamingNode'"
+        v-if="nodeData.type === 'LLMStreamingNode'"
         ref="model"
         :graph="graph"
         :node="node"
@@ -70,7 +70,7 @@
 
       <!--分支器-->
       <SwitchSetting
-        v-show="nodeData.type === 'SwitchNode'"
+        v-if="nodeData.type === 'SwitchNode'"
         ref="code"
         :graph="graph"
         :node="node"
@@ -80,7 +80,7 @@
 
       <!--知识库-->
       <RagSetting
-        v-show="nodeData.type === 'RAGNode'"
+        v-if="nodeData.type === 'RAGNode'"
         ref="rag"
         :graph="graph"
         :node="node"
@@ -89,7 +89,7 @@
 
       <!--文件生成-->
       <FilegenerateSetting
-        v-show="nodeData.type === 'FileGenerateNode'"
+        v-if="nodeData.type === 'FileGenerateNode'"
         ref="filegenerate"
         :graph="graph"
         :node="node"
@@ -98,7 +98,7 @@
 
       <!--文件解析-->
       <FileparseSetting
-        v-show="nodeData.type === 'FileParseNode'"
+        v-if="nodeData.type === 'FileParseNode'"
         ref="fileparse"
         :graph="graph"
         :node="node"
@@ -107,7 +107,7 @@
 
       <!--mcp-->
       <McpSetting
-        v-show="nodeData.type === 'MCPClientNode'"
+        v-if="nodeData.type === 'MCPClientNode'"
         ref="mcp"
         :graph="graph"
         :node="node"
@@ -116,7 +116,7 @@
 
       <!--意图识别-->
       <IntentionSetting
-        v-show="nodeData.type === 'IntentionNode'"
+        v-if="nodeData.type === 'IntentionNode'"
         ref="intention"
         :graph="graph"
         :node="node"
