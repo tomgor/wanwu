@@ -9,7 +9,7 @@
       @input="handleInput"
       @keydown.down="moveDown"
       @keydown.up="moveUp"
-      @keydown.enter="selectItem"
+      @keydown.enter="e => selectItem(e)"
       @keydown.esc="closeList"
       @blur="handleBlur"
     />
@@ -31,7 +31,7 @@ export default {
   props: {
     suggestions: {
       type: Array,
-      default: () => ['name', 'email', 'phone', 'address']
+      default: () => []
     },
     trigger: {
       type: String,
@@ -91,6 +91,9 @@ export default {
       this.activeIndex = Math.max(this.activeIndex - 1, 0);
     },
     selectItem(e, item) {
+      e.stopPropagation()
+      e.preventDefault()
+
       if (!item && this.activeIndex >= 0) {
         item = this.filteredSuggestions[this.activeIndex];
       }
@@ -100,7 +103,7 @@ export default {
         const newValue =
           this.inputValue.slice(0, this.lastTriggerPosition) +
           this.trigger + item + '}}' +
-          this.inputValue.slice(this.$refs.input.selectionStart);
+          this.inputValue.slice(this.$refs.input.selectionStart) + ' ';
 
         this.inputValue = newValue;
         this.$emit('select', item);
