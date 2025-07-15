@@ -3597,581 +3597,6 @@ mcps:
           required:
             - "site_name"
             - "action"
-  - mcp_square_id: "githubmcp"
-    name: "GitHub MCP Server"
-    category: "industry"
-    desc: "与GitHub API无缝集成的MCP服务器，用于工业软件开发和版本控制"
-    from: "github"
-    avatar_path: "githubmcp/logo.png"
-    detail_path: "githubmcp/detail.md"
-    feature: "提供完整的GitHub工作流自动化、代码仓库管理、问题跟踪、拉取请求处理等功能，支持工业级软件开发的协作和版本控制需求。"
-    manual: "支持通过VS Code集成或本地安装使用。需要配置GITHUB_PERSONAL_ACCESS_TOKEN环境变量，可以通过stdio模式运行：./github-mcp-server stdio"
-    scenario: "适用于工业软件开发团队的代码管理、自动化部署、质量控制等场景。\n 使用场景包括自动化代码审查、项目管理、缺陷跟踪、发布管理，以及工业软件的持续集成和持续部署流程。"
-    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
-    summary: "GitHub MCP Server为工业软件开发提供完整的GitHub集成能力，支持代码协作、项目管理和自动化工作流。"
-    tools:
-      - name: "create_repository"
-        description: "创建新的代码仓库"
-        input_schema:
-          type: object
-          properties:
-            - field: "name"
-              type: "string"
-              description: "仓库名称"
-            - field: "description"
-              type: "string"
-              description: "仓库描述"
-            - field: "private"
-              type: "boolean"
-              description: "是否为私有仓库"
-          required:
-            - "name"
-      - name: "create_issue"
-        description: "创建新的问题或缺陷报告"
-        input_schema:
-          type: object
-          properties:
-            - field: "title"
-              type: "string"
-              description: "问题标题"
-            - field: "body"
-              type: "string"
-              description: "问题详细描述"
-            - field: "labels"
-              type: "array"
-              description: "问题标签"
-          required:
-            - "title"
-      - name: "create_pull_request"
-        description: "创建拉取请求"
-        input_schema:
-          type: object
-          properties:
-            - field: "title"
-              type: "string"
-              description: "拉取请求标题"
-            - field: "body"
-              type: "string"
-              description: "拉取请求描述"
-            - field: "head"
-              type: "string"
-              description: "源分支"
-            - field: "base"
-              type: "string"
-              description: "目标分支"
-          required:
-            - "title"
-            - "head"
-            - "base"
-      - name: "list_repositories"
-        description: "列出用户或组织的仓库"
-        input_schema:
-          type: object
-          properties:
-            - field: "type"
-              type: "string"
-              description: "仓库类型（all, owner, member）"
-          required: [ ]
-      - name: "get_repository_info"
-        description: "获取仓库详细信息"
-        input_schema:
-          type: object
-          properties:
-            - field: "owner"
-              type: "string"
-              description: "仓库所有者"
-            - field: "repo"
-              type: "string"
-              description: "仓库名称"
-          required:
-            - "owner"
-            - "repo"
-  - mcp_square_id: "filesystemmcp"
-    name: "Filesystem MCP Server"
-    category: "industry"
-    desc: "专为工业文档管理设计的文件系统操作MCP服务器"
-    from: "modelcontextprotocol"
-    avatar_path: "filesystemmcp/logo.png"
-    detail_path: "filesystemmcp/detail.md"
-    feature: "提供全面的文件系统管理能力，支持工业文档、图纸、数据文件的组织、搜索、备份和版本控制，确保工业资料的安全和高效管理。"
-    manual: "通过npm安装：npm install @modelcontextprotocol/server-filesystem，配置访问权限和路径后启动服务"
-    scenario: "适用于工业图纸管理、技术文档归档、数据文件整理、版本控制、备份恢复等场景。\n 使用场景包括 CAD 图纸文件管理、技术规范文档归档、生产数据文件整理、项目资料备份、文档版本追踪等工业文件管理应用。"
-    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
-    summary: "Filesystem MCP Server为工业企业提供专业的文件管理解决方案，支持各类工业文档和数据的有序管理。"
-    tools:
-      - name: "read_file"
-        description: "读取文件内容"
-        input_schema:
-          type: object
-          properties:
-            - field: "path"
-              type: "string"
-              description: "文件路径"
-          required:
-            - "path"
-      - name: "write_file"
-        description: "写入文件内容"
-        input_schema:
-          type: object
-          properties:
-            - field: "path"
-              type: "string"
-              description: "文件路径"
-            - field: "content"
-              type: "string"
-              description: "文件内容"
-          required:
-            - "path"
-            - "content"
-      - name: "list_directory"
-        description: "列出目录内容"
-        input_schema:
-          type: object
-          properties:
-            - field: "path"
-              type: "string"
-              description: "目录路径"
-          required:
-            - "path"
-      - name: "create_directory"
-        description: "创建目录"
-        input_schema:
-          type: object
-          properties:
-            - field: "path"
-              type: "string"
-              description: "目录路径"
-          required:
-            - "path"
-      - name: "delete_file"
-        description: "删除文件"
-        input_schema:
-          type: object
-          properties:
-            - field: "path"
-              type: "string"
-              description: "文件路径"
-          required:
-            - "path"
-      - name: "copy_file"
-        description: "复制文件"
-        input_schema:
-          type: object
-          properties:
-            - field: "source"
-              type: "string"
-              description: "源文件路径"
-            - field: "destination"
-              type: "string"
-              description: "目标文件路径"
-          required:
-            - "source"
-            - "destination"
-      - name: "move_file"
-        description: "移动文件"
-        input_schema:
-          type: object
-          properties:
-            - field: "source"
-              type: "string"
-              description: "源文件路径"
-            - field: "destination"
-              type: "string"
-              description: "目标文件路径"
-          required:
-            - "source"
-            - "destination"
-      - name: "get_file_info"
-        description: "获取文件信息"
-        input_schema:
-          type: object
-          properties:
-            - field: "path"
-              type: "string"
-              description: "文件路径"
-          required:
-            - "path"
-  - mcp_square_id: "everartmcp"
-    name: "EverArt MCP Server"
-    category: "industry"
-    desc: "专为工业设计和可视化的AI艺术生成MCP服务器"
-    from: "everart"
-    avatar_path: "everartmcp/logo.png"
-    detail_path: "everartmcp/detail.md"
-    feature: "提供专业的AI图像生成能力，支持工业产品设计草图、技术示意图、培训材料图表、安全标识设计等工业可视化内容的智能生成。"
-    manual: "通过npm安装：npm install @everart/mcp-server，配置EVERART_API_KEY环境变量后启动服务"
-    scenario: "适用于工业产品概念设计、技术文档插图、培训材料制作、安全标识设计、工艺流程图等场景。\n 使用场景包括产品原型可视化、操作说明图制作、安全警示图标设计、工艺流程图表、设备示意图生成等工业设计可视化应用。"
-    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
-    summary: "EverArt MCP Server为工业设计提供AI驱动的图像生成能力，帮助快速创建专业的工业可视化内容。"
-    tools:
-      - name: "generate_image"
-        description: "生成AI图像"
-        input_schema:
-          type: object
-          properties:
-            - field: "prompt"
-              type: "string"
-              description: "图像生成提示词"
-            - field: "style"
-              type: "string"
-              description: "图像风格"
-            - field: "size"
-              type: "string"
-              description: "图像尺寸"
-            - field: "quality"
-              type: "string"
-              description: "图像质量"
-          required:
-            - "prompt"
-      - name: "edit_image"
-        description: "编辑现有图像"
-        input_schema:
-          type: object
-          properties:
-            - field: "image_url"
-              type: "string"
-              description: "原始图像URL"
-            - field: "prompt"
-              type: "string"
-              description: "编辑指令"
-            - field: "mask"
-              type: "string"
-              description: "编辑区域遮罩"
-          required:
-            - "image_url"
-            - "prompt"
-      - name: "upscale_image"
-        description: "图像放大增强"
-        input_schema:
-          type: object
-          properties:
-            - field: "image_url"
-              type: "string"
-              description: "原始图像URL"
-            - field: "scale_factor"
-              type: "integer"
-              description: "放大倍数"
-          required:
-            - "image_url"
-      - name: "generate_variations"
-        description: "生成图像变体"
-        input_schema:
-          type: object
-          properties:
-            - field: "image_url"
-              type: "string"
-              description: "原始图像URL"
-            - field: "count"
-              type: "integer"
-              description: "变体数量"
-          required:
-            - "image_url"
-      - name: "create_collage"
-        description: "创建图像拼贴"
-        input_schema:
-          type: object
-          properties:
-            - field: "images"
-              type: "array"
-              description: "图像URL列表"
-            - field: "layout"
-              type: "string"
-              description: "布局样式"
-          required:
-            - "images"
-  - mcp_square_id: "dockermcp"
-    name: "Docker MCP Server"
-    category: "industry"
-    desc: "面向工业应用容器化部署的Docker管理MCP服务器"
-    from: "modelcontextprotocol"
-    avatar_path: "dockermcp/logo.png"
-    detail_path: "dockermcp/detail.md"
-    feature: "提供完整的Docker容器管理能力，支持工业应用的容器化部署、微服务架构、集群管理和自动化运维，适用于现代化工业软件部署。"
-    manual: "通过npm安装：npm install @modelcontextprotocol/server-docker，确保Docker守护进程运行后启动服务"
-    scenario: "适用于工业软件的容器化部署、微服务架构、边缘计算、云原生应用等场景。\n 使用场景包括工业 IoT 应用部署、数据处理服务容器化、监控系统部署、API 服务管理、开发测试环境搭建等工业容器化应用。"
-    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
-    summary: "Docker MCP Server为工业应用提供现代化的容器管理解决方案，支持高效的应用部署、扩展和运维管理。"
-    tools:
-      - name: "list_containers"
-        description: "列出所有容器"
-        input_schema:
-          type: object
-          properties:
-            - field: "all"
-              type: "boolean"
-              description: "是否包含停止的容器"
-          required: [ ]
-      - name: "create_container"
-        description: "创建新容器"
-        input_schema:
-          type: object
-          properties:
-            - field: "image"
-              type: "string"
-              description: "容器镜像名称"
-            - field: "name"
-              type: "string"
-              description: "容器名称"
-            - field: "ports"
-              type: "object"
-              description: "端口映射配置"
-            - field: "volumes"
-              type: "array"
-              description: "卷挂载配置"
-          required:
-            - "image"
-      - name: "start_container"
-        description: "启动容器"
-        input_schema:
-          type: object
-          properties:
-            - field: "container_id"
-              type: "string"
-              description: "容器ID或名称"
-          required:
-            - "container_id"
-      - name: "stop_container"
-        description: "停止容器"
-        input_schema:
-          type: object
-          properties:
-            - field: "container_id"
-              type: "string"
-              description: "容器ID或名称"
-          required:
-            - "container_id"
-      - name: "remove_container"
-        description: "删除容器"
-        input_schema:
-          type: object
-          properties:
-            - field: "container_id"
-              type: "string"
-              description: "容器ID或名称"
-            - field: "force"
-              type: "boolean"
-              description: "是否强制删除"
-          required:
-            - "container_id"
-      - name: "get_container_logs"
-        description: "获取容器日志"
-        input_schema:
-          type: object
-          properties:
-            - field: "container_id"
-              type: "string"
-              description: "容器ID或名称"
-            - field: "tail"
-              type: "integer"
-              description: "显示最后N行"
-          required:
-            - "container_id"
-      - name: "list_images"
-        description: "列出所有镜像"
-        input_schema:
-          type: object
-          properties: [ ]
-          required: [ ]
-  - mcp_square_id: "bravesearchmcp"
-    name: "Brave Search MCP Server"
-    category: "industry"
-    desc: "面向工业技术资料搜索的Brave搜索引擎MCP服务器"
-    from: "modelcontextprotocol"
-    avatar_path: "bravesearchmcp/logo.png"
-    detail_path: "bravesearchmcp/detail.md"
-    feature: "提供专业的技术文献搜索能力，支持工业标准、设备手册、技术规范、学术论文等工业技术资料的快速检索和获取。"
-    manual: "通过npm安装：npm install @modelcontextprotocol/server-brave-search，配置BRAVE_API_KEY环境变量后启动服务"
-    scenario: "适用于工业技术研发、设备选型、标准查询、故障排查、技术文档检索等场景。\n 使用场景包括工业标准规范查询、设备技术资料搜索、新技术调研、竞品分析、专利检索、行业动态跟踪等工业信息获取应用。"
-    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
-    summary: "Brave Search MCP Server为工业用户提供专业的技术信息搜索服务，帮助快速获取准确的工业技术资料和信息。"
-    tools:
-      - name: "web_search"
-        description: "执行网络搜索"
-        input_schema:
-          type: object
-          properties:
-            - field: "query"
-              type: "string"
-              description: "搜索查询关键词"
-            - field: "count"
-              type: "integer"
-              description: "返回结果数量"
-            - field: "offset"
-              type: "integer"
-              description: "结果偏移量"
-          required:
-            - "query"
-      - name: "news_search"
-        description: "搜索新闻资讯"
-        input_schema:
-          type: object
-          properties:
-            - field: "query"
-              type: "string"
-              description: "搜索查询关键词"
-            - field: "count"
-              type: "integer"
-              description: "返回结果数量"
-          required:
-            - "query"
-      - name: "image_search"
-        description: "搜索图片资源"
-        input_schema:
-          type: object
-          properties:
-            - field: "query"
-              type: "string"
-              description: "搜索查询关键词"
-            - field: "count"
-              type: "integer"
-              description: "返回结果数量"
-          required:
-            - "query"
-      - name: "video_search"
-        description: "搜索视频资源"
-        input_schema:
-          type: object
-          properties:
-            - field: "query"
-              type: "string"
-              description: "搜索查询关键词"
-            - field: "count"
-              type: "integer"
-              description: "返回结果数量"
-          required:
-            - "query"
-      - name: "summarize_results"
-        description: "总结搜索结果"
-        input_schema:
-          type: object
-          properties:
-            - field: "results"
-              type: "array"
-              description: "要总结的搜索结果"
-            - field: "focus"
-              type: "string"
-              description: "总结重点"
-          required:
-            - "results"
-  - mcp_square_id: "awsmcp"
-    name: "AWS MCP Server"
-    category: "industry"
-    desc: "面向工业云计算的AWS服务集成MCP服务器"
-    from: "aws"
-    avatar_path: "awsmcp/logo.png"
-    detail_path: "awsmcp/detail.md"
-    feature: "提供完整的AWS云服务管理能力，支持工业IoT设备管理、数据湖构建、机器学习部署、云端监控等工业云计算应用的全生命周期管理。"
-    manual: "通过npm安装：npm install @aws/mcp-server，配置AWS凭证和区域后启动服务"
-    scenario: "适用于工业 IoT 平台、云端数据分析、边缘计算部署、AI 模型服务、监控告警等场景。\n 使用场景包括工业设备数据上云、智能制造平台构建、预测性维护模型部署、实时监控系统、数据备份与恢复等工业云计算应用。"
-    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
-    summary: "AWS MCP Server为工业企业提供强大的云计算服务支持，助力数字化转型和智能化升级。"
-    tools:
-      - name: "list_ec2_instances"
-        description: "列出EC2实例"
-        input_schema:
-          type: object
-          properties:
-            - field: "region"
-              type: "string"
-              description: "AWS区域"
-            - field: "state"
-              type: "string"
-              description: "实例状态过滤"
-          required: [ ]
-      - name: "create_s3_bucket"
-        description: "创建S3存储桶"
-        input_schema:
-          type: object
-          properties:
-            - field: "bucket_name"
-              type: "string"
-              description: "存储桶名称"
-            - field: "region"
-              type: "string"
-              description: "AWS区域"
-          required:
-            - "bucket_name"
-      - name: "upload_to_s3"
-        description: "上传文件到S3"
-        input_schema:
-          type: object
-          properties:
-            - field: "bucket_name"
-              type: "string"
-              description: "存储桶名称"
-            - field: "key"
-              type: "string"
-              description: "对象键"
-            - field: "file_path"
-              type: "string"
-              description: "本地文件路径"
-          required:
-            - "bucket_name"
-            - "key"
-            - "file_path"
-      - name: "invoke_lambda"
-        description: "调用Lambda函数"
-        input_schema:
-          type: object
-          properties:
-            - field: "function_name"
-              type: "string"
-              description: "Lambda函数名称"
-            - field: "payload"
-              type: "object"
-              description: "调用参数"
-          required:
-            - "function_name"
-      - name: "create_iot_thing"
-        description: "创建IoT设备"
-        input_schema:
-          type: object
-          properties:
-            - field: "thing_name"
-              type: "string"
-              description: "设备名称"
-            - field: "thing_type"
-              type: "string"
-              description: "设备类型"
-            - field: "attributes"
-              type: "object"
-              description: "设备属性"
-          required:
-            - "thing_name"
-      - name: "publish_iot_message"
-        description: "发布IoT消息"
-        input_schema:
-          type: object
-          properties:
-            - field: "topic"
-              type: "string"
-              description: "MQTT主题"
-            - field: "message"
-              type: "object"
-              description: "消息内容"
-          required:
-            - "topic"
-            - "message"
-      - name: "query_cloudwatch_metrics"
-        description: "查询CloudWatch指标"
-        input_schema:
-          type: object
-          properties:
-            - field: "namespace"
-              type: "string"
-              description: "指标命名空间"
-            - field: "metric_name"
-              type: "string"
-              description: "指标名称"
-            - field: "start_time"
-              type: "string"
-              description: "开始时间"
-            - field: "end_time"
-              type: "string"
-              description: "结束时间"
-          required:
-            - "namespace"
-            - "metric_name"
   - mcp_square_id: "mcpserverchart"
     name: "McpChart"
     category: "industry"
@@ -4520,7 +3945,7 @@ mcps:
             - urls
   - mcp_square_id: "mcpinternetspeedtest"
     name: "McpInternetSpeedTest"
-    category: "network"
+    category: "industry"
     desc: "网络速度测试与分析工具"
     from: "网络工具开发团队 / MCP 生态贡献者"
     avatar_path: "mcpinternetspeedtest/logo.png"
@@ -4541,549 +3966,6 @@ mcps:
               description: "Maximum file size to test (default: 100MB)"
           required:
             - size_limit
-  - mcp_square_id: "ifcmcp"
-    name: "ifcMCP"
-    category: "industry"
-    desc: "使LLM代理能够与IFC（Industry Foundation Classes）文件进行交互的MCP服务器"
-    from: "smartaec"
-    avatar_path: "ifcmcp/logo.png"
-    detail_path: "ifcmcp/detail.md"
-    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
-    feature: "关键特性包括能够解析和查询建筑信息模型（BIM）数据，提供实体属性查询、空间关系分析、建筑构件定位等功能，支持建筑工程领域的AI辅助设计和数据分析。"
-    manual: "要使用ifcMCP服务器，首先克隆仓库，安装所需的包（ifcopenshell、FastMCP），然后在ifcMCP文件夹中运行命令'python server.py'启动服务器。配置MCP服务器时使用HTTP接口'http://127.0.0.1:8000/mcp'。"
-    scenario: "ifcMCP可用于建筑、工程和施工行业的BIM数据处理和分析，例如建筑设计软件、工程管理系统、施工规划工具等。\n 使用场景包括查询建筑构件属性、分析空间关系、获取墙体开口信息、计算空间边界，以及将建筑信息模型集成到AI辅助设计流程中。"
-    summary: "ifcMCP是一个专门处理IFC文件的模型上下文协议服务器，使LLM能够理解和操作建筑信息模型数据，为建筑工程领域提供智能化的数据查询和分析能力。"
-    tools:
-      - name: "get_entities"
-        description: "获取IFC文件中的实体信息"
-        input_schema:
-          type: object
-          properties:
-            - field: "entity_type"
-              type: "string"
-              description: "要查询的实体类型（如IfcWall、IfcSpace等）"
-            - field: "filter_conditions"
-              type: "object"
-              description: "过滤条件，可选参数"
-          required:
-            - "entity_type"
-      - name: "get_named_property_of_entities"
-        description: "获取实体的命名属性"
-        input_schema:
-          type: object
-          properties:
-            - field: "entity_id"
-              type: "string"
-              description: "实体的唯一标识符"
-            - field: "property_name"
-              type: "string"
-              description: "要查询的属性名称"
-          required:
-            - "entity_id"
-            - "property_name"
-      - name: "get_entity_properties"
-        description: "获取实体的所有属性信息"
-        input_schema:
-          type: object
-          properties:
-            - field: "entity_id"
-              type: "string"
-              description: "实体的唯一标识符"
-          required:
-            - "entity_id"
-      - name: "get_entity_location"
-        description: "获取实体的位置信息"
-        input_schema:
-          type: object
-          properties:
-            - field: "entity_id"
-              type: "string"
-              description: "实体的唯一标识符"
-          required:
-            - "entity_id"
-      - name: "get_entities_in_spatial"
-        description: "获取特定空间内的实体"
-        input_schema:
-          type: object
-          properties:
-            - field: "spatial_id"
-              type: "string"
-              description: "空间的唯一标识符"
-            - field: "entity_type"
-              type: "string"
-              description: "要查询的实体类型，可选参数"
-          required:
-            - "spatial_id"
-      - name: "get_openings_on_wall"
-        description: "获取墙体上的开口信息"
-        input_schema:
-          type: object
-          properties:
-            - field: "wall_id"
-              type: "string"
-              description: "墙体的唯一标识符"
-          required:
-            - "wall_id"
-      - name: "get_space_boundaries"
-        description: "获取空间的边界信息"
-        input_schema:
-          type: object
-          properties:
-            - field: "space_id"
-              type: "string"
-              description: "空间的唯一标识符"
-          required:
-            - "space_id"
-  - mcp_square_id: "sshmcp"
-    name: "SSH MCP Server"
-    category: "industry"
-    desc: "专为工业设备远程管理设计的SSH连接MCP服务器"
-    from: "modelcontextprotocol"
-    avatar_path: "sshmcp/logo.png"
-    detail_path: "sshmcp/detail.md"
-    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
-    feature: "提供安全的SSH远程连接能力，支持工业设备的远程监控、配置管理、故障诊断和维护操作，确保工业系统的安全可靠运行。"
-    manual: "通过npm安装：npm install @modelcontextprotocol/server-ssh，配置SSH连接参数和密钥认证后启动服务"
-    scenario: "适用于工业设备远程维护、生产线监控、PLC程序上传下载、HMI系统管理等场景。\n 使用场景包括远程设备诊断、工业网络设备配置、服务器运维管理、自动化系统维护、安全监控等工业远程管理应用。"
-    summary: "SSH MCP Server为工业设备提供安全可靠的远程访问能力，支持各种工业设备的远程管理和维护操作。"
-    tools:
-      - name: "connect"
-        description: "建立SSH连接"
-        input_schema:
-          type: object
-          properties:
-            - field: "host"
-              type: "string"
-              description: "目标主机地址"
-            - field: "username"
-              type: "string"
-              description: "用户名"
-            - field: "port"
-              type: "integer"
-              description: "SSH端口，默认22"
-          required:
-            - "host"
-            - "username"
-      - name: "execute_command"
-        description: "执行远程命令"
-        input_schema:
-          type: object
-          properties:
-            - field: "command"
-              type: "string"
-              description: "要执行的命令"
-            - field: "timeout"
-              type: "integer"
-              description: "命令超时时间（秒）"
-          required:
-            - "command"
-      - name: "upload_file"
-        description: "上传文件到远程主机"
-        input_schema:
-          type: object
-          properties:
-            - field: "local_path"
-              type: "string"
-              description: "本地文件路径"
-            - field: "remote_path"
-              type: "string"
-              description: "远程文件路径"
-          required:
-            - "local_path"
-            - "remote_path"
-      - name: "download_file"
-        description: "从远程主机下载文件"
-        input_schema:
-          type: object
-          properties:
-            - field: "remote_path"
-              type: "string"
-              description: "远程文件路径"
-            - field: "local_path"
-              type: "string"
-              description: "本地文件路径"
-          required:
-            - "remote_path"
-            - "local_path"
-      - name: "list_directory"
-        description: "列出远程目录内容"
-        input_schema:
-          type: object
-          properties:
-            - field: "path"
-              type: "string"
-              description: "目录路径"
-          required:
-            - "path"
-      - name: "disconnect"
-        description: "断开SSH连接"
-        input_schema:
-          type: object
-          properties: [ ]
-          required: [ ]
-  - mcp_square_id: "sqlitemcp"
-    name: "SQLite MCP Server"
-    category: "industry"
-    desc: "专为工业数据管理设计的SQLite数据库集成MCP服务器"
-    from: "modelcontextprotocol"
-    avatar_path: "sqlitemcp/logo.png"
-    detail_path: "sqlitemcp/detail.md"
-    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
-    feature: "提供完整的SQLite数据库操作能力，包括数据查询、插入、更新、删除，支持复杂的SQL查询和事务处理，适用于工业数据存储和分析。"
-    manual: "通过npm安装：npm install @modelcontextprotocol/server-sqlite，配置数据库路径后可通过stdio模式运行"
-    scenario: "适用于工业生产数据记录、设备状态监控、质量控制数据管理等场景。\n 使用场景包括生产线数据采集、设备维护记录管理、质量检测数据分析、工艺参数存储等工业数据库应用。"
-    summary: "SQLite MCP Server为工业应用提供轻量级但功能强大的数据库解决方案，支持结构化数据的存储、查询和分析。"
-    tools:
-      - name: "query"
-        description: "执行SQL查询语句"
-        input_schema:
-          type: object
-          properties:
-            - field: "sql"
-              type: "string"
-              description: "要执行的SQL查询语句"
-          required:
-            - "sql"
-      - name: "execute"
-        description: "执行SQL命令（INSERT、UPDATE、DELETE等）"
-        input_schema:
-          type: object
-          properties:
-            - field: "sql"
-              type: "string"
-              description: "要执行的SQL命令"
-          required:
-            - "sql"
-      - name: "list_tables"
-        description: "列出数据库中的所有表"
-        input_schema:
-          type: object
-          properties: [ ]
-          required: [ ]
-      - name: "describe_table"
-        description: "获取表的结构信息"
-        input_schema:
-          type: object
-          properties:
-            - field: "table_name"
-              type: "string"
-              description: "表名"
-          required:
-            - "table_name"
-      - name: "create_table"
-        description: "创建新的数据表"
-        input_schema:
-          type: object
-          properties:
-            - field: "table_name"
-              type: "string"
-              description: "表名"
-            - field: "schema"
-              type: "string"
-              description: "表结构定义"
-          required:
-            - "table_name"
-            - "schema"
-  - mcp_square_id: "sequelizemcp"
-    name: "Sequelize MCP Server"
-    category: "industry"
-    desc: "基于Sequelize ORM的工业数据库管理MCP服务器"
-    from: "modelcontextprotocol"
-    avatar_path: "sequelizemcp/logo.png"
-    detail_path: "sequelizemcp/detail.md"
-    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
-    feature: "提供现代化的ORM数据库操作能力，支持多种数据库引擎，为工业应用提供高效的数据模型管理、关系映射、事务处理和数据验证功能。"
-    manual: "通过npm安装：npm install @modelcontextprotocol/server-sequelize，配置数据库连接和模型后启动服务"
-    scenario: "适用于工业数据建模、企业资源管理、生产计划系统、质量管理系统等场景。\n 使用场景包括工业数据模型设计、生产订单管理、库存追踪系统、设备资产管理、质量检测记录等工业数据库应用。"
-    summary: "Sequelize MCP Server为工业应用提供强大的ORM数据库解决方案，简化复杂数据操作并提高开发效率。"
-    tools:
-      - name: "create_model"
-        description: "创建数据模型"
-        input_schema:
-          type: object
-          properties:
-            - field: "model_name"
-              type: "string"
-              description: "模型名称"
-            - field: "attributes"
-              type: "object"
-              description: "模型属性定义"
-            - field: "options"
-              type: "object"
-              description: "模型选项"
-          required:
-            - "model_name"
-            - "attributes"
-      - name: "find_records"
-        description: "查询记录"
-        input_schema:
-          type: object
-          properties:
-            - field: "model_name"
-              type: "string"
-              description: "模型名称"
-            - field: "where"
-              type: "object"
-              description: "查询条件"
-            - field: "include"
-              type: "array"
-              description: "关联查询"
-            - field: "limit"
-              type: "integer"
-              description: "查询限制"
-          required:
-            - "model_name"
-      - name: "create_record"
-        description: "创建记录"
-        input_schema:
-          type: object
-          properties:
-            - field: "model_name"
-              type: "string"
-              description: "模型名称"
-            - field: "data"
-              type: "object"
-              description: "记录数据"
-          required:
-            - "model_name"
-            - "data"
-      - name: "update_record"
-        description: "更新记录"
-        input_schema:
-          type: object
-          properties:
-            - field: "model_name"
-              type: "string"
-              description: "模型名称"
-            - field: "data"
-              type: "object"
-              description: "更新数据"
-            - field: "where"
-              type: "object"
-              description: "更新条件"
-          required:
-            - "model_name"
-            - "data"
-            - "where"
-      - name: "delete_record"
-        description: "删除记录"
-        input_schema:
-          type: object
-          properties:
-            - field: "model_name"
-              type: "string"
-              description: "模型名称"
-            - field: "where"
-              type: "object"
-              description: "删除条件"
-          required:
-            - "model_name"
-            - "where"
-      - name: "create_association"
-        description: "创建模型关联"
-        input_schema:
-          type: object
-          properties:
-            - field: "source_model"
-              type: "string"
-              description: "源模型"
-            - field: "target_model"
-              type: "string"
-              description: "目标模型"
-            - field: "association_type"
-              type: "string"
-              description: "关联类型"
-            - field: "options"
-              type: "object"
-              description: "关联选项"
-          required:
-            - "source_model"
-            - "target_model"
-            - "association_type"
-      - name: "sync_database"
-        description: "同步数据库结构"
-        input_schema:
-          type: object
-          properties:
-            - field: "force"
-              type: "boolean"
-              description: "是否强制同步"
-            - field: "alter"
-              type: "boolean"
-              description: "是否修改表结构"
-          required: [ ]
-  - mcp_square_id: "postgresmcp"
-    name: "PostgreSQL MCP Server"
-    category: "industry"
-    desc: "面向工业级应用的PostgreSQL数据库集成MCP服务器"
-    from: "modelcontextprotocol"
-    avatar_path: "postgresmcp/logo.png"
-    detail_path: "postgresmcp/detail.md"
-    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
-    feature: "提供企业级PostgreSQL数据库的完整操作能力，支持复杂查询、事务处理、数据分析、备份恢复等功能，适用于大规模工业数据管理。"
-    manual: "通过npm安装：npm install @modelcontextprotocol/server-postgres，配置数据库连接参数后启动服务"
-    scenario: "适用于大型工业企业的数据仓库、生产管理系统、供应链管理、设备监控等场景。\n 使用场景包括企业资源规划(ERP)系统、制造执行系统(MES)、质量管理系统(QMS)、设备资产管理等大规模工业数据应用。"
-    summary: "PostgreSQL MCP Server为工业企业提供强大的关系型数据库解决方案，支持高并发、大数据量的工业应用场景。"
-    tools:
-      - name: "query"
-        description: "执行PostgreSQL查询语句"
-        input_schema:
-          type: object
-          properties:
-            - field: "sql"
-              type: "string"
-              description: "要执行的SQL查询语句"
-          required:
-            - "sql"
-      - name: "execute"
-        description: "执行PostgreSQL命令"
-        input_schema:
-          type: object
-          properties:
-            - field: "sql"
-              type: "string"
-              description: "要执行的SQL命令"
-          required:
-            - "sql"
-      - name: "list_schemas"
-        description: "列出数据库中的所有模式"
-        input_schema:
-          type: object
-          properties: [ ]
-          required: [ ]
-      - name: "list_tables"
-        description: "列出指定模式中的所有表"
-        input_schema:
-          type: object
-          properties:
-            - field: "schema"
-              type: "string"
-              description: "模式名称"
-          required:
-            - "schema"
-      - name: "describe_table"
-        description: "获取表的详细结构信息"
-        input_schema:
-          type: object
-          properties:
-            - field: "table_name"
-              type: "string"
-              description: "表名"
-            - field: "schema"
-              type: "string"
-              description: "模式名称"
-          required:
-            - "table_name"
-      - name: "create_index"
-        description: "创建数据库索引"
-        input_schema:
-          type: object
-          properties:
-            - field: "index_name"
-              type: "string"
-              description: "索引名称"
-            - field: "table_name"
-              type: "string"
-              description: "表名"
-            - field: "columns"
-              type: "array"
-              description: "索引列"
-          required:
-            - "index_name"
-            - "table_name"
-            - "columns"
-  - mcp_square_id: "memorymcp"
-    name: "Memory MCP Server"
-    category: "industry"
-    desc: "专为工业知识管理设计的持久化记忆MCP服务器"
-    from: "modelcontextprotocol"
-    avatar_path: "memorymcp/logo.png"
-    detail_path: "memorymcp/detail.md"
-    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
-    feature: "提供工业知识的长期存储和检索能力，支持设备手册、操作规程、故障案例、经验总结等工业知识的智能管理和快速查找。"
-    manual: "通过npm安装：npm install @modelcontextprotocol/server-memory，配置存储路径后启动服务"
-    scenario: "适用于工业知识库管理、设备维护经验存储、故障诊断案例库、操作培训等场景。\n 使用场景包括设备操作手册智能查询、故障解决方案库、维护保养记录管理、工艺参数优化经验、安全操作规程等工业知识管理应用。"
-    summary: "Memory MCP Server为工业企业提供智能化的知识管理解决方案，帮助积累和传承宝贵的工业经验和知识。"
-    tools:
-      - name: "store_memory"
-        description: "存储工业知识或经验"
-        input_schema:
-          type: object
-          properties:
-            - field: "key"
-              type: "string"
-              description: "知识标识符"
-            - field: "content"
-              type: "string"
-              description: "知识内容"
-            - field: "category"
-              type: "string"
-              description: "知识分类"
-            - field: "tags"
-              type: "array"
-              description: "知识标签"
-          required:
-            - "key"
-            - "content"
-      - name: "retrieve_memory"
-        description: "检索存储的知识"
-        input_schema:
-          type: object
-          properties:
-            - field: "key"
-              type: "string"
-              description: "知识标识符"
-          required:
-            - "key"
-      - name: "search_memory"
-        description: "搜索相关知识"
-        input_schema:
-          type: object
-          properties:
-            - field: "query"
-              type: "string"
-              description: "搜索查询"
-            - field: "category"
-              type: "string"
-              description: "搜索分类"
-            - field: "limit"
-              type: "integer"
-              description: "结果数量限制"
-          required:
-            - "query"
-      - name: "update_memory"
-        description: "更新已存储的知识"
-        input_schema:
-          type: object
-          properties:
-            - field: "key"
-              type: "string"
-              description: "知识标识符"
-            - field: "content"
-              type: "string"
-              description: "更新后的内容"
-            - field: "tags"
-              type: "array"
-              description: "更新后的标签"
-          required:
-            - "key"
-            - "content"
-      - name: "delete_memory"
-        description: "删除存储的知识"
-        input_schema:
-          type: object
-          properties:
-            - field: "key"
-              type: "string"
-              description: "知识标识符"
-          required:
-            - "key"
-      - name: "list_categories"
-        description: "列出所有知识分类"
-        input_schema:
-          type: object
-          properties: [ ]
-          required: [ ]
   - mcp_square_id: "biosppy"
     name: "BioSPPy 生物信号处理"
     category: "medical"
@@ -6446,6 +5328,59 @@ mcps:
             - dicom_series_id
             - export_format
             - output_path
+  - mcp_square_id: "openmrsmcp"
+    name: "OpenMRS电子病历接口"
+    category: "medical"
+    desc: "通过MCP协议访问OpenMRS系统中的结构化患者信息、诊断与医嘱数据"
+    from: "modelcontextprotocol"
+    avatar_path: "openmrsmcp/logo.png"
+    detail_path: "openmrsmcp/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持基于OpenMRS REST API访问患者基本信息、就诊记录、诊断编码、用药记录与观察项数据，可用于医学问答、病历质控、临床研究数据提取等应用。"
+    manual: "部署OpenMRS服务器并启用REST API模块，通过配置MCP连接参数（URL、认证信息）完成对接。适配多种HIS/EMR场景。"
+    scenario: "适用于智慧医院数据接口、医疗LLM临床数据接入、辅助诊断系统、结构化病历研究平台等场景。"
+    summary: "Openmrs-mcp 是连接开源OpenMRS电子病历系统的数据访问模块，封装REST API，提供标准化患者信息查询、诊断检索与医嘱数据获取功能，助力医疗AI系统与医院系统集成。"
+    tools:
+      - name: get_patient_by_identifier
+        description: "根据患者标识符查询基本信息与就诊ID"
+        input_schema:
+          type: object
+          properties:
+            - field: identifier
+              type: string
+              description: "患者ID或注册编号"
+          required:
+            - identifier
+      - name: get_patient_diagnoses
+        description: "获取指定患者的诊断列表（ICD编码+诊断名称）"
+        input_schema:
+          type: object
+          properties:
+            - field: patient_uuid
+              type: string
+              description: "患者UUID（OpenMRS中的唯一标识）"
+          required:
+            - patient_uuid
+      - name: get_patient_visits
+        description: "查询患者的就诊记录（挂号时间、科室、医生等）"
+        input_schema:
+          type: object
+          properties:
+            - field: patient_uuid
+              type: string
+              description: "患者UUID"
+          required:
+            - patient_uuid
+      - name: get_patient_observations
+        description: "获取患者的检查/观察项（如体温、血压、化验结果）"
+        input_schema:
+          type: object
+          properties:
+            - field: patient_uuid
+              type: string
+              description: "患者UUID"
+          required:
+            - patient_uuid
   - mcp_square_id: "orthancdb"
     name: "OrthancDB MCP"
     category: "medical"
@@ -6773,6 +5708,329 @@ mcps:
           type: object
           properties: [ ]
           required: [ ]
+  - mcp_square_id: "congenitalheartdiseasepaperresource"
+    name: "先天性心脏病文献资源库"
+    category: "medical"
+    desc: "提供先天性心脏病相关研究论文的结构化数据查询与使用接口"
+    from: "modelcontextprotocol"
+    avatar_path: "congenitalheartdiseasepaperresource/logo.png"
+    detail_path: "congenitalheartdiseasepaperresource/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "该资源聚合了大量先天性心脏病的研究文献，涵盖病理机制、临床诊断、影像表现、治疗手段等，支持按关键词、作者、年份、期刊等维度筛选，并可进行结构化摘要提取。"
+    manual: "安装 mcp-server-chd-paper 后运行服务器，或通过 FastMCP 直接部署服务。用户可调用接口进行文献检索、摘要获取与下载。"
+    scenario: "适用于医学研究人员、医生、学生进行先天性心脏病相关文献查询、知识抽取与临床科研支持。尤其适合科研选题前的资料梳理或AI模型训练的参考数据准备。"
+    summary: "该MCP资源库聚焦先天性心脏病领域的科研文献，结合文献解析与结构化处理能力，为医学人工智能建模、临床科研和教育提供关键支撑。"
+    tools:
+      - name: query_chd_papers
+        description: "按条件查询先天性心脏病相关的研究文献"
+        input_schema:
+          type: object
+          properties:
+            - field: keyword
+              type: string
+              description: "查询关键词，可为疾病亚型、治疗方式、病理机制等"
+            - field: year_range
+              type: string
+              description: "检索的时间范围，如 '2010-2023'"
+            - field: author
+              type: string
+              description: "第一作者或通讯作者姓名"
+            - field: journal
+              type: string
+              description: "期刊名称，如 'Circulation'"
+          required:
+            - keyword
+      - name: get_paper_summary
+        description: "获取指定文献的结构化摘要信息"
+        input_schema:
+          type: object
+          properties:
+            - field: paper_id
+              type: string
+              description: "文献唯一ID，由系统自动生成"
+          required:
+            - paper_id
+      - name: download_paper
+        description: "下载指定文献的原始PDF文件（如有权限）"
+        input_schema:
+          type: object
+          properties:
+            - field: paper_id
+              type: string
+              description: "文献唯一ID"
+            - field: format
+              type: string
+              description: "下载格式，可选 'pdf', 'bibtex'"
+          required:
+            - paper_id
+  - mcp_square_id: "druginstructionresource"
+    name: "合理用药智能指令资源"
+    category: "medical"
+    desc: "面向临床用药场景的智能指令生成与用药合理性校验服务"
+    from: "modelcontextprotocol"
+    avatar_path: "druginstructionresource/logo.png"
+    detail_path: "druginstructionresource/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持自然语言解析、患者特征建模、药物相互作用检查、适应症匹配与个体化用药推荐。具备对不合理用药行为的结构化反馈能力。"
+    manual: "安装 mcp-server-drug-instruction 后运行服务，可通过 RESTful API 或 FastMCP 接入智能体。输入患者信息、药品、疾病指令后，可获取结构化合理用药建议。"
+    scenario: "适用于电子病历系统（EMR）、智能问诊助手、药事服务平台、医学生教学等场景。支持人机混合决策与标准化数据接口。"
+    summary: "DrugInstruction-resource 提供基于规则库与知识图谱的智能用药建议服务，结合患者特征与药品数据库，生成个体化、合理的用药指令或反馈建议。"
+    tools:
+      - name: parse_drug_instruction
+        description: "解析自然语言用药请求，提取核心结构信息（疾病、药物、患者特征）"
+        input_schema:
+          type: object
+          properties:
+            - field: instruction
+              type: string
+              description: "自然语言形式的用药请求（如：'老年糖尿病患者能吃二甲双胍吗？'）"
+          required:
+            - instruction
+      - name: check_drug_reasonability
+        description: "评估当前用药方案是否合理，返回交互式建议"
+        input_schema:
+          type: object
+          properties:
+            - field: patient_profile
+              type: object
+              description: "患者信息，如年龄、性别、肝肾功能、妊娠状态等"
+            - field: drug_list
+              type: array
+              description: "药品列表，每个元素为药品通用名"
+            - field: diagnosis
+              type: string
+              description: "主要诊断或适应症"
+          required:
+            - patient_profile
+            - drug_list
+      - name: recommend_safe_drugs
+        description: "基于患者特征与疾病自动推荐安全合理的药物列表"
+        input_schema:
+          type: object
+          properties:
+            - field: patient_profile
+              type: object
+              description: "患者信息，如年龄、性别、基础疾病等"
+            - field: diagnosis
+              type: string
+              description: "诊断名称或疾病分类"
+          required:
+            - patient_profile
+            - diagnosis
+  - mcp_square_id: "herbstandardresource"
+    name: "中药标准资源库"
+    category: "medical"
+    desc: "提供中药材、中成药、配伍禁忌、成分功效等标准化知识查询能力"
+    from: "modelcontextprotocol"
+    avatar_path: "herbstandardresource/logo.png"
+    detail_path: "herbstandardresource/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持中药名称别名解析、成分与功效查询、药对搭配规范、配伍禁忌检测、药食同源条目检索等，适配临床问答与中医药智能体调用。"
+    manual: "安装 mcp-server-herb-standard 后运行服务，支持自然语言或结构化调用，适配中药领域知识问答、用药分析或组方验证等任务。"
+    scenario: "广泛应用于中医药问答助手、中药组方系统、合理用药平台、中药教育工具等场景。"
+    summary: "HerbStandard-resource 是一个中药领域标准知识服务接口，涵盖药材、成分、功效、禁忌等结构化数据，支持智能问答、搭配校验和药对推荐。"
+    tools:
+      - name: query_herb_info
+        description: "查询中药材的基本信息，包括性味归经、功效主治、来源等"
+        input_schema:
+          type: object
+          properties:
+            - field: herb_name
+              type: string
+              description: "中药名称或别名（如：黄芪、当归、党参）"
+          required:
+            - herb_name
+      - name: check_herb_combination
+        description: "检测两味或多味中药材的配伍是否合理，是否存在配伍禁忌"
+        input_schema:
+          type: object
+          properties:
+            - field: herb_list
+              type: array
+              description: "中药材名称数组，如 ['甘草', '干姜', '芒硝']"
+          required:
+            - herb_list
+      - name: get_herb_pair_usage
+        description: "查询常用药对的临床搭配、用途及现代研究支持"
+        input_schema:
+          type: object
+          properties:
+            - field: herb1
+              type: string
+              description: "第一味中药名称"
+            - field: herb2
+              type: string
+              description: "第二味中药名称"
+          required:
+            - herb1
+            - herb2
+      - name: get_herb_by_effect
+        description: "根据功效需求推荐中药材列表"
+        input_schema:
+          type: object
+          properties:
+            - field: effect
+              type: string
+              description: "功效名称（如：益气补血、清热解毒、祛风湿）"
+          required:
+            - effect
+  - mcp_square_id: "medimageresource"
+    name: "医学影像资源库"
+    category: "medical"
+    desc: "提供医学影像的读取、格式转换、关键参数提取与预处理能力"
+    from: "modelcontextprotocol"
+    avatar_path: "medimageresource/logo.png"
+    detail_path: "medimageresource/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持DICOM文件读取、像素数组提取、影像元数据结构化、体素信息标准化、影像与报告关联管理等多项功能。"
+    manual: "安装 mcp-server-medimage 后运行服务，适配影像AI开发、质控分析、数据管理等使用场景，可通过REST或FastMCP调用。"
+    scenario: "适用于AI训练数据准备、DICOM服务器自动处理、医学图像预处理管线构建、医学报告与影像数据管理等场景。"
+    summary: "MedImage-resource 提供对医学影像文件（尤其是 DICOM）的读取、结构化解析和基础处理能力，是医学影像AI系统构建的重要组件模块。"
+    tools:
+      - name: load_dicom
+        description: "加载 DICOM 文件并解析基本信息与像素数据"
+        input_schema:
+          type: object
+          properties:
+            - field: file_path
+              type: string
+              description: "DICOM 文件路径"
+          required:
+            - file_path
+      - name: extract_dicom_metadata
+        description: "提取 DICOM 文件中的关键信息（患者、设备、序列参数等）"
+        input_schema:
+          type: object
+          properties:
+            - field: file_path
+              type: string
+              description: "DICOM 文件路径"
+          required:
+            - file_path
+      - name: convert_to_nifti
+        description: "将 DICOM 序列转换为 NIfTI 格式（.nii）"
+        input_schema:
+          type: object
+          properties:
+            - field: dicom_folder
+              type: string
+              description: "DICOM 文件夹路径（包含序列）"
+          required:
+            - dicom_folder
+      - name: get_image_shape_spacing
+        description: "获取影像的体素尺寸、空间分辨率等结构信息"
+        input_schema:
+          type: object
+          properties:
+            - field: file_path
+              type: string
+              description: "DICOM 或 NIfTI 文件路径"
+          required:
+            - file_path
+  - mcp_square_id: "medterminologycodingresource"
+    name: "医学术语编码资源库"
+    category: "medical"
+    desc: "提供ICD、SNOMED、LOINC等医学术语标准编码的查询与结构化对接能力"
+    from: "modelcontextprotocol"
+    avatar_path: "medterminologycodingresource/logo.png"
+    detail_path: "medterminologycodingresource/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持自然语言到编码的映射、编码反查、模糊匹配、诊断/检验项目标准化等，适配中英文多语言处理，支持ICD-10、ICD-11、SNOMED CT、LOINC等标准。"
+    manual: "安装 mcp-server-medcoding 后运行服务，可通过 REST 或 FastMCP 接入。适用于电子病历、智能问诊、辅助编码等任务。"
+    scenario: "适用于医院信息系统（HIS）、电子病历（EMR）、质控平台、医学LLM中结构化诊断或检验项目标准对接场景。"
+    summary: "MedTerminologyCoding-resource 是医学术语标准编码资源服务，支持主流医学编码体系的映射与查询，是临床结构化文书、智能问诊与知识图谱的重要接口模块。"
+    tools:
+      - name: map_term_to_code
+        description: "将自然语言术语映射为标准编码（ICD、SNOMED、LOINC）"
+        input_schema:
+          type: object
+          properties:
+            - field: term
+              type: string
+              description: "临床术语（如 '糖尿病性视网膜病变'）"
+            - field: coding_system
+              type: string
+              description: "编码体系（如 'ICD-10', 'ICD-11', 'SNOMED', 'LOINC'）"
+          required:
+            - term
+            - coding_system
+      - name: lookup_code_description
+        description: "根据编码返回对应术语解释与分类结构"
+        input_schema:
+          type: object
+          properties:
+            - field: code
+              type: string
+              description: "标准编码（如 'E11.3'）"
+            - field: coding_system
+              type: string
+              description: "编码体系（如 'ICD-10'）"
+          required:
+            - code
+            - coding_system
+      - name: fuzzy_match_terms
+        description: "模糊匹配输入术语，返回最相关的标准术语及编码建议"
+        input_schema:
+          type: object
+          properties:
+            - field: input_text
+              type: string
+              description: "自由文本或症状描述（如 '高血压伴肾功能不全'）"
+            - field: coding_system
+              type: string
+              description: "目标编码体系（如 'ICD-11'）"
+          required:
+            - input_text
+            - coding_system
+  - mcp_square_id: "oncologyexpertconsensusresource"
+    name: "肿瘤专家共识资源库"
+    category: "medical"
+    desc: "提供结构化肿瘤相关专家共识文献查询、筛选与摘要提取能力"
+    from: "modelcontextprotocol"
+    avatar_path: "oncologyexpertconsensusresource/logo.png"
+    detail_path: "oncologyexpertconsensusresource/detail.md"
+    sse_url: "http://<your.mcp-server.com>/sse?<api_key=your_key>"
+    feature: "支持按癌种、年份、发布机构筛选共识文献，提取核心推荐意见、证据等级与摘要内容，适配智能问答系统与临床决策支持模块。"
+    manual: "安装 mcp-server-oncology-consensus 后运行服务，支持通过 REST 或 FastMCP 接口查询与调用专家共识文献内容。"
+    scenario: "适用于智能问诊系统、肿瘤知识图谱构建、辅助决策系统、科研查新服务等医疗信息场景。"
+    summary: "OncologyExpertConsensus-resource 是一个专注于肿瘤疾病领域专家共识的结构化知识服务模块，支持精准推荐与共识摘要获取。"
+    tools:
+      - name: query_consensus_by_filter
+        description: "按癌种、年份、机构等条件检索专家共识文献"
+        input_schema:
+          type: object
+          properties:
+            - field: cancer_type
+              type: string
+              description: "癌种名称，如 '肺癌'、'肝癌'"
+            - field: year_range
+              type: string
+              description: "时间范围，如 '2018-2024'"
+            - field: organization
+              type: string
+              description: "发布机构，如 'CSCO'、'NCCN'"
+          required:
+            - cancer_type
+      - name: get_consensus_summary
+        description: "获取某份专家共识的结构化摘要内容"
+        input_schema:
+          type: object
+          properties:
+            - field: consensus_id
+              type: string
+              description: "共识文献唯一ID"
+          required:
+            - consensus_id
+      - name: extract_recommendation_points
+        description: "提取专家共识中各章节的推荐要点与证据等级"
+        input_schema:
+          type: object
+          properties:
+            - field: consensus_id
+              type: string
+              description: "共识文献唯一ID"
+          required:
+            - consensus_id
   - mcp_square_id: "kuaizi"
     name: "Kuaizi-视频创作"
     category: "edu"
