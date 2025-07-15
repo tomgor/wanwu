@@ -130,12 +130,6 @@ func PublishApp(ctx *gin.Context, userId, orgId string, req request.PublishAppRe
 }
 
 func UnPublishApp(ctx *gin.Context, userId, orgId string, req request.UnPublishAppRequest) error {
-	if req.AppType == constant.AppTypeWorkflow {
-		err := UnPublishWorkFlow(ctx, userId, orgId, req.AppId)
-		if err != nil {
-			return err
-		}
-	}
 	// 删除智能体对话聊天记录
 	if req.AppType == constant.AppTypeAgent {
 		_, err := assistant.ConversationDeleteByAssistantId(ctx, &assistant_service.ConversationDeleteByAssistantIdReq{
@@ -154,5 +148,14 @@ func UnPublishApp(ctx *gin.Context, userId, orgId string, req request.UnPublishA
 		AppType: req.AppType,
 		UserId:  userId,
 	})
-	return err
+	if err != nil {
+		return err
+	}
+	if req.AppType == constant.AppTypeWorkflow {
+		err = UnPublishWorkFlow(ctx, userId, orgId, req.AppId)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
