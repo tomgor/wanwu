@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	knowledgebase_tag_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-tag-service"
 
 	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
@@ -30,6 +31,7 @@ var (
 	mcp              mcp_service.MCPServiceClient
 	knowledgeBase    knowledgebase_service.KnowledgeBaseServiceClient
 	knowledgeBaseDoc knowledgebase_doc_service.KnowledgeBaseDocServiceClient
+	knowledgeBaseTag knowledgebase_tag_service.KnowledgeBaseTagServiceClient
 	app              app_service.AppServiceClient
 	rag              rag_service.RagServiceClient
 	assistant        assistant_service.AssistantServiceClient
@@ -75,6 +77,7 @@ func Init() error {
 	app = app_service.NewAppServiceClient(appConn)
 	knowledgeBase = knowledgebase_service.NewKnowledgeBaseServiceClient(knowledgeBaseConn)
 	knowledgeBaseDoc = knowledgebase_doc_service.NewKnowledgeBaseDocServiceClient(knowledgeBaseConn)
+	knowledgeBaseTag = knowledgebase_tag_service.NewKnowledgeBaseTagServiceClient(knowledgeBaseConn)
 	rag = rag_service.NewRagServiceClient(ragConn)
 	assistant = assistant_service.NewAssistantServiceClient(assistantConn)
 	return nil

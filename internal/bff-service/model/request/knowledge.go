@@ -8,7 +8,8 @@ import (
 )
 
 type KnowledgeSelectReq struct {
-	Name string `json:"name" form:"name" `
+	Name      string   `json:"name" form:"name" `
+	TagIdList []string `json:"tagId" form:"tagId" `
 	CommonCheck
 }
 

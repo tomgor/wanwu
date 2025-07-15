@@ -87,3 +87,21 @@ type ConversationDetailInfo struct {
 type ConversationCreateResp struct {
 	ConversationId string `json:"conversationId"`
 }
+
+type AssistantCreateResp struct {
+	AssistantId string `json:"assistantId"`
+}
+
+type AssistantTemplateInfo struct {
+	AssistantTemplateId string `json:"assistantTemplateId"` // 智能体模板Id
+	AppType             string `json:"appType"`             // 应用类型(固定值: agentTemplate)
+	Category            string `json:"category"`            // 种类(gov:政务,industry:工业,edu:文教,medical:医疗)
+	request.AppBriefConfig
+	Prologue                  string   `json:"prologue"`            // 开场白
+	Instructions              string   `json:"instructions"`        // 系统提示词
+	RecommendQuestion         []string `json:"recommendQuestion"`   // 推荐问题
+	Summary                   string   `json:"summary"`             // 使用概述
+	Feature                   string   `json:"feature"`             // 特性说明
+	Scenario                  string   `json:"scenario"`            // 应用场景
+	WorkFlowConfigInstruction string   `json:"workFlowInstruction"` // 工作流配置说明
+}

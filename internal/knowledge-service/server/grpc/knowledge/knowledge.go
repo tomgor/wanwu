@@ -18,12 +18,23 @@ import (
 )
 
 func (s *Service) SelectKnowledgeList(ctx context.Context, req *knowledgebase_service.KnowledgeSelectReq) (*knowledgebase_service.KnowledgeSelectListResp, error) {
-	list, err := orm.SelectKnowledgeList(ctx, req.UserId, req.OrgId, req.Name)
+	list, err := orm.SelectKnowledgeList(ctx, req.UserId, req.OrgId, req.Name, req.TagIdList)
 	if err != nil {
 		log.Errorf(fmt.Sprintf("获取知识库列表失败(%v)  参数(%v)", err, req))
 		return nil, util.ErrCode(errs.Code_KnowledgeBaseSelectFailed)
 	}
-	return buildKnowledgeListResp(list), nil
+
+	var tagMap = make(map[string][]*orm.TagRelationDetail)
+	if len(list) > 0 {
+		var knowledgeList []string
+		for _, k := range list {
+			knowledgeList = append(knowledgeList, k.KnowledgeId)
+		}
+		relation := orm.SelectKnowledgeTagListWithRelation(ctx, req.UserId, req.OrgId, "", knowledgeList)
+		tagMap = buildKnowledgeTagMap(relation)
+	}
+
+	return buildKnowledgeListResp(list, tagMap), nil
 }
 
 func (s *Service) SelectKnowledgeDetailById(ctx context.Context, req *knowledgebase_service.KnowledgeDetailSelectReq) (*knowledgebase_service.KnowledgeInfo, error) {
@@ -111,17 +122,60 @@ func (s *Service) DeleteKnowledge(ctx context.Context, req *knowledgebase_servic
 }
 
 // buildKnowledgeListResp 构造知识库列表返回结果
-func buildKnowledgeListResp(knowledgeList []*model.KnowledgeBase) *knowledgebase_service.KnowledgeSelectListResp {
+func buildKnowledgeListResp(knowledgeList []*model.KnowledgeBase, knowledgeTagMap map[string][]*orm.TagRelationDetail) *knowledgebase_service.KnowledgeSelectListResp {
 	if len(knowledgeList) == 0 {
 		return &knowledgebase_service.KnowledgeSelectListResp{}
 	}
 	var retList []*knowledgebase_service.KnowledgeInfo
 	for _, knowledge := range knowledgeList {
-		retList = append(retList, buildKnowledgeInfo(knowledge))
+		knowledgeInfo := buildKnowledgeInfo(knowledge)
+		knowledgeInfo.KnowledgeTagInfoList = buildKnowledgeTagList(knowledge.KnowledgeId, knowledgeTagMap)
+		retList = append(retList, knowledgeInfo)
 	}
 	return &knowledgebase_service.KnowledgeSelectListResp{
 		KnowledgeList: retList,
 	}
+}
+
+func buildKnowledgeTagMap(tagRelation *orm.TagRelation) map[string][]*orm.TagRelationDetail {
+	if tagRelation.RelationErr != nil || tagRelation.TagErr != nil {
+		return make(map[string][]*orm.TagRelationDetail)
+	}
+	var knowledgeTagMap = make(map[string][]*orm.TagRelationDetail)
+	for _, relation := range tagRelation.RelationList {
+		details := knowledgeTagMap[relation.KnowledgeId]
+		if details == nil {
+			details = make([]*orm.TagRelationDetail, 0)
+		}
+		for _, tag := range tagRelation.TagList {
+			if tag.TagId == relation.TagId {
+				details = append(details, &orm.TagRelationDetail{
+					TagId:   tag.TagId,
+					TagName: tag.Name,
+				})
+			}
+		}
+		knowledgeTagMap[relation.KnowledgeId] = details
+	}
+	return knowledgeTagMap
+}
+
+func buildKnowledgeTagList(knowledgeId string, knowledgeTagMap map[string][]*orm.TagRelationDetail) []*knowledgebase_service.KnowledgeTagInfo {
+	if len(knowledgeTagMap) == 0 {
+		return []*knowledgebase_service.KnowledgeTagInfo{}
+	}
+	tagList := knowledgeTagMap[knowledgeId]
+	if len(tagList) == 0 {
+		return []*knowledgebase_service.KnowledgeTagInfo{}
+	}
+	var retList []*knowledgebase_service.KnowledgeTagInfo
+	for _, tag := range tagList {
+		retList = append(retList, &knowledgebase_service.KnowledgeTagInfo{
+			TagId:   tag.TagId,
+			TagName: tag.TagName,
+		})
+	}
+	return retList
 }
 
 // buildKnowledgeInfo 构造知识库信息

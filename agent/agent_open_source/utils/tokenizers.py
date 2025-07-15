@@ -36,6 +36,7 @@ class CustomTokenizer:
 
     def __init__(self, tokenizer_dir: str = "/agent/agent_open_source/utils/tokenizers", model_name: str = "deepseek-v3", device: str = None):
         """初始化tokenizer"""
+        model_name = "deepseek-v3"
         if not hasattr(self, 'tokenizer'):  # 确保只初始化一次
             self.tokenizer = None
             self.device = None

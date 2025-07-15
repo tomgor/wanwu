@@ -13,9 +13,10 @@ import (
 // SelectKnowledgeList 查询知识库列表，主要根据userId 查询用户所有知识库
 func SelectKnowledgeList(ctx *gin.Context, userId, orgId string, req *request.KnowledgeSelectReq) (*response.KnowledgeListResp, error) {
 	resp, err := knowledgeBase.SelectKnowledgeList(ctx.Request.Context(), &knowledgebase_service.KnowledgeSelectReq{
-		UserId: userId,
-		OrgId:  orgId,
-		Name:   req.Name,
+		UserId:    userId,
+		OrgId:     orgId,
+		Name:      req.Name,
+		TagIdList: req.TagIdList,
 	})
 	if err != nil {
 		return nil, err
@@ -95,6 +96,7 @@ func buildKnowledgeInfoList(knowledgeListResp *knowledgebase_service.KnowledgeSe
 	if knowledgeListResp == nil || len(knowledgeListResp.KnowledgeList) == 0 {
 		return &response.KnowledgeListResp{}
 	}
+
 	var list []*response.KnowledgeInfo
 	for _, knowledge := range knowledgeListResp.KnowledgeList {
 		list = append(list, &response.KnowledgeInfo{
@@ -105,9 +107,23 @@ func buildKnowledgeInfoList(knowledgeListResp *knowledgebase_service.KnowledgeSe
 			EmbeddingModelInfo: &response.EmbeddingModelInfo{
 				ModelId: knowledge.EmbeddingModelInfo.ModelId,
 			},
+			KnowledgeTagList: buildTagList(knowledge.KnowledgeTagInfoList),
 		})
 	}
-	return &response.KnowledgeListResp{
-		KnowledgeList: list,
+	return &response.KnowledgeListResp{KnowledgeList: list}
+}
+
+// buildTagList 构造知识库标签列表
+func buildTagList(tagList []*knowledgebase_service.KnowledgeTagInfo) []*response.KnowledgeTag {
+	var retTagList = make([]*response.KnowledgeTag, 0)
+	if len(tagList) > 0 {
+		for _, tag := range tagList {
+			retTagList = append(retTagList, &response.KnowledgeTag{
+				TagId:    tag.TagId,
+				TagName:  tag.TagName,
+				Selected: true,
+			})
+		}
 	}
+	return retTagList
 }

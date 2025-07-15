@@ -15,6 +15,10 @@ export default {
         button: '注 册',
         back: '返回登录'
     },
+    about: {
+        version: '版本',
+        company: '◎ 联通数据智能有限公司'
+    },
     menu: {
         explore: '应用广场',
         workspace: '工作室',

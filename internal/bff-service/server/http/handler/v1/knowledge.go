@@ -17,11 +17,11 @@ import (
 //	@Param			data	body	request.KnowledgeSelectReq	true	"查询知识库列表"
 //	@Produce		json
 //	@Success		200	{object}	response.Response{data=response.KnowledgeListResp}
-//	@Router			/knowledge/select [get]
+//	@Router			/knowledge/select [post]
 func GetKnowledgeSelect(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)
 	var req request.KnowledgeSelectReq
-	if !gin_util.BindQuery(ctx, &req) {
+	if !gin_util.Bind(ctx, &req) {
 		return
 	}
 	resp, err := service.SelectKnowledgeList(ctx, userId, orgId, &req)

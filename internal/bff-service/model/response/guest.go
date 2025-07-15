@@ -18,16 +18,17 @@ type Captcha struct {
 }
 
 type LogoCustomInfo struct {
-	Version string      `json:"version"` // 版本
-	Login   CustomLogin `json:"login"`   // 登录页标题信息
-	Home    CustomHome  `json:"home"`    // 首页标题信息
-	Tab     CustomTab   `json:"tab"`     // 标签页信息
+	Login CustomLogin `json:"login"` // 登录页标题信息
+	Home  CustomHome  `json:"home"`  // 首页标题信息
+	Tab   CustomTab   `json:"tab"`   // 标签页信息
+	About CustomAbout `json:"about"` // 关于信息
 }
 
 type CustomLogin struct {
 	BackgroundPath   string `json:"backgroundPath"`   // 登录页背景图路径
 	LoginButtonColor string `json:"loginButtonColor"` // 登录按钮颜色
 	WelcomeText      string `json:"welcomeText"`      // 登录页欢迎标词
+	PlatformDesc     string `json:"platformDesc"`     // 平台描述词
 }
 
 type CustomHome struct {
@@ -36,8 +37,14 @@ type CustomHome struct {
 }
 
 type CustomTab struct {
-	LogoPath string `json:"logoPath"` //标签页图标路径
-	Title    string `json:"title"`    //标签页标题
+	LogoPath string `json:"logoPath"` // 标签页图标路径
+	Title    string `json:"title"`    // 标签页标题
+}
+
+type CustomAbout struct {
+	LogoPath  string `json:"logoPath"` // 关于图标路径
+	Version   string `json:"version"`
+	Copyright string `json:"copyright"` // 版权
 }
 
 type LanguageSelect struct {
