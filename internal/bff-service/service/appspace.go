@@ -113,6 +113,12 @@ func GetAppSpaceAppList(ctx *gin.Context, userId, orgId, name, appType string) (
 }
 
 func PublishApp(ctx *gin.Context, userId, orgId string, req request.PublishAppRequest) error {
+	// 特殊处理工作流的发布
+	if req.AppType == constant.AppTypeWorkflow {
+		if err := PublishWorkFlow(ctx, userId, orgId, req.AppId); err != nil {
+			return err
+		}
+	}
 	_, err := app.PublishApp(ctx.Request.Context(), &app_service.PublishAppReq{
 		AppId:       req.AppId,
 		AppType:     req.AppType,
@@ -124,6 +130,12 @@ func PublishApp(ctx *gin.Context, userId, orgId string, req request.PublishAppRe
 }
 
 func UnPublishApp(ctx *gin.Context, userId, orgId string, req request.UnPublishAppRequest) error {
+	if req.AppType == constant.AppTypeWorkflow {
+		err := UnPublishWorkFlow(ctx, userId, orgId, req.AppId)
+		if err != nil {
+			return err
+		}
+	}
 	// 删除智能体对话聊天记录
 	if req.AppType == constant.AppTypeAgent {
 		_, err := assistant.ConversationDeleteByAssistantId(ctx, &assistant_service.ConversationDeleteByAssistantIdReq{
@@ -140,6 +152,7 @@ func UnPublishApp(ctx *gin.Context, userId, orgId string, req request.UnPublishA
 	_, err := app.UnPublishApp(ctx.Request.Context(), &app_service.UnPublishAppReq{
 		AppId:   req.AppId,
 		AppType: req.AppType,
+		UserId:  userId,
 	})
 	return err
 }

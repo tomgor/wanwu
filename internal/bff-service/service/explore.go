@@ -33,7 +33,11 @@ func GetExplorationAppList(ctx *gin.Context, userId string, req request.GetExplo
 	if err != nil {
 		return nil, err
 	}
-	apps := append(rags, agents...)
+	workFlows, err := explorerationFilterWorkFlow(ctx, explorationApp.Infos, req.Name)
+	if err != nil {
+		return nil, err
+	}
+	apps := append(rags, append(agents, workFlows...)...)
 	sort.SliceStable(apps, func(i, j int) bool {
 		return apps[i].CreatedAt > apps[j].CreatedAt
 	})
@@ -164,6 +168,48 @@ func explorerationFilterAgent(ctx *gin.Context, apps []*app_service.ExplorationA
 				break
 			}
 		}
+	}
+	// 如果name不为空，过滤结果
+	if name != "" {
+		var filteredList []*response.ExplorationAppInfo
+		for _, ret := range retAppList {
+			if strings.Contains(strings.ToLower(ret.AppBriefInfo.Name), strings.ToLower(name)) {
+				filteredList = append(filteredList, ret)
+			}
+		}
+		return filteredList, nil
+	}
+	return retAppList, nil
+}
+
+func explorerationFilterWorkFlow(ctx *gin.Context, apps []*app_service.ExplorationAppInfo, name string) ([]*response.ExplorationAppInfo, error) {
+	// 获取工作流详情
+	workFlowList, err := ListWorkFlowInternal(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var retAppList []*response.ExplorationAppInfo
+	for _, expApp := range apps {
+		for _, workFlow := range workFlowList.List {
+			if expApp.AppId == workFlow.Id {
+				appInfo := &response.ExplorationAppInfo{
+					AppBriefInfo: response.AppBriefInfo{
+						AppId:   workFlow.Id,
+						AppType: constant.AppTypeWorkflow,
+						Avatar:  request.Avatar{},
+						Name:    workFlow.ConfigName,
+						Desc:    workFlow.ConfigDesc,
+					},
+				}
+				appInfo.CreatedAt = util.Time2Str(expApp.CreatedAt)
+				appInfo.UpdatedAt = util.Time2Str(expApp.UpdatedAt)
+				appInfo.PublishType = expApp.PublishType
+				appInfo.IsFavorite = expApp.IsFavorite
+				retAppList = append(retAppList, appInfo)
+				break
+			}
+		}
+
 	}
 	// 如果name不为空，过滤结果
 	if name != "" {

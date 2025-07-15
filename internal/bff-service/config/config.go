@@ -64,9 +64,12 @@ type ServiceConfig struct {
 }
 
 type WorkFlowServiceConfig struct {
-	Endpoint          string `json:"host" mapstructure:"host"`
-	WorkFlowListUri   string `json:"workflow_list_uri" mapstructure:"workflow_list_uri"`
-	DeleteWorkFlowUri string `json:"delete_workflow_uri" mapstructure:"delete_workflow_uri"`
+	Endpoint                string `json:"host" mapstructure:"host"`
+	WorkFlowListUri         string `json:"workflow_list_uri" mapstructure:"workflow_list_uri"`
+	WorkFlowListUriInternal string `json:"workflow_list_uri_internal" mapstructure:"workflow_list_uri_internal"`
+	DeleteWorkFlowUri       string `json:"delete_workflow_uri" mapstructure:"delete_workflow_uri"`
+	PublishWorkFlowUri      string `json:"publish_workflow_uri" mapstructure:"publish_workflow_uri"`
+	UnPublishWorkFlowUri    string `json:"unpublish_workflow_uri" mapstructure:"unpublish_workflow_uri"`
 }
 
 type AgentServiceConfig struct {
