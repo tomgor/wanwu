@@ -87,6 +87,7 @@ Looper.prototype = {
         }
 
         // 检查是否是代码块内容（假设代码块以 ```开头）
+        // console.log(this.sentence,'打印sentence')
         if (this.sentence.startsWith('```')) {
             // 直接渲染整个代码块
             console.log(this.sentence)

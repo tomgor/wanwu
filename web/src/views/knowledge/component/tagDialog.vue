@@ -32,6 +32,7 @@
             v-model="item.tagName"
             v-if="item.showIpt"
             @blur="inputBlur(item)"
+            @keyup.enter.native="inputBlur(item)"
           ></el-input>
           <span
             class="el-icon-close del-icon"
