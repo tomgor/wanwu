@@ -16,7 +16,7 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Param			data	body		request.AppBriefConfig	true	"智能体基本信息"
-//	@Success		200		{object}	response.Response
+//	@Success		200		{object}	response.Response{data=response.AssistantCreateResp}
 //	@Router			/assistant [post]
 func AssistantCreate(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)

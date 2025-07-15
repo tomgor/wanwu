@@ -122,3 +122,24 @@ func PublishApp(ctx *gin.Context, userId, orgId string, req request.PublishAppRe
 	})
 	return err
 }
+
+func UnPublishApp(ctx *gin.Context, userId, orgId string, req request.UnPublishAppRequest) error {
+	// 删除智能体对话聊天记录
+	if req.AppType == constant.AppTypeAgent {
+		_, err := assistant.ConversationDeleteByAssistantId(ctx, &assistant_service.ConversationDeleteByAssistantIdReq{
+			AssistantId: req.AppId,
+			Identity: &assistant_service.Identity{
+				UserId: "",
+				OrgId:  "",
+			},
+		})
+		if err != nil {
+			return err
+		}
+	}
+	_, err := app.UnPublishApp(ctx.Request.Context(), &app_service.UnPublishAppReq{
+		AppId:   req.AppId,
+		AppType: req.AppType,
+	})
+	return err
+}

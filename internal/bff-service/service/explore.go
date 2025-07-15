@@ -2,6 +2,7 @@ package service
 
 import (
 	"sort"
+	"strings"
 
 	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
@@ -24,11 +25,11 @@ func GetExplorationAppList(ctx *gin.Context, userId string, req request.GetExplo
 	if err != nil {
 		return nil, err
 	}
-	rags, err := explorerationFilterRag(ctx, explorationApp.Infos)
+	rags, err := explorerationFilterRag(ctx, explorationApp.Infos, req.Name)
 	if err != nil {
 		return nil, err
 	}
-	agents, err := explorerationFilterAgent(ctx, explorationApp.Infos)
+	agents, err := explorerationFilterAgent(ctx, explorationApp.Infos, req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +68,7 @@ func AddAppHistoryRecord(ctx *gin.Context, userId, appId, appType string) error 
 
 // --- internal ---
 
-func explorerationFilterRag(ctx *gin.Context, explorationApp []*app_service.ExplorationAppInfo) ([]*response.ExplorationAppInfo, error) {
+func explorerationFilterRag(ctx *gin.Context, explorationApp []*app_service.ExplorationAppInfo, name string) ([]*response.ExplorationAppInfo, error) {
 	// 首先收集所有rag类型的appId
 	var ids []string
 	for _, info := range explorationApp {
@@ -109,10 +110,20 @@ func explorerationFilterRag(ctx *gin.Context, explorationApp []*app_service.Expl
 			}
 		}
 	}
+	// 如果name不为空，过滤结果
+	if name != "" {
+		var filteredList []*response.ExplorationAppInfo
+		for _, ret := range retAppList {
+			if strings.Contains(strings.ToLower(ret.AppBriefInfo.Name), strings.ToLower(name)) {
+				filteredList = append(filteredList, ret)
+			}
+		}
+		return filteredList, nil
+	}
 	return retAppList, nil
 }
 
-func explorerationFilterAgent(ctx *gin.Context, apps []*app_service.ExplorationAppInfo) ([]*response.ExplorationAppInfo, error) {
+func explorerationFilterAgent(ctx *gin.Context, apps []*app_service.ExplorationAppInfo, name string) ([]*response.ExplorationAppInfo, error) {
 	// 首先收集所有agent类型的appId
 	var ids []string
 	for _, info := range apps {
@@ -153,6 +164,16 @@ func explorerationFilterAgent(ctx *gin.Context, apps []*app_service.ExplorationA
 				break
 			}
 		}
+	}
+	// 如果name不为空，过滤结果
+	if name != "" {
+		var filteredList []*response.ExplorationAppInfo
+		for _, ret := range retAppList {
+			if strings.Contains(strings.ToLower(ret.AppBriefInfo.Name), strings.ToLower(name)) {
+				filteredList = append(filteredList, ret)
+			}
+		}
+		return filteredList, nil
 	}
 	return retAppList, nil
 }

@@ -2,9 +2,16 @@
   <img src="https://github.com/user-attachments/assets/8b5f10d8-293c-44a5-941f-7c7b7e32b4fd" style="width:45%; height:auto;" />
 </div><br>
 
-&emsp;&emsp;**元景MaaS智能体平台**是一款面向**企业级**场景的**一站式**、**商用license友好**的**智能体开发平台**，致力于为企业提供安全、高效、合规的一站式AI解决方案。我们以"技术开放、生态共建"为核心理念，通过整合大语言模型、业务流程自动化等前沿技术，构建了覆盖模型全生命周期管理、MCP、联网检索、智能体快速开发、企业知识库建设、复杂工作流编排等完整功能体系的AI工程化平台。平台采用模块化架构设计，支持灵活的功能扩展和二次开发，在确保企业数据安全和隐私保护的同时，大幅降低了AI技术的应用门槛。无论是中小型企业快速构建智能化应用，还是大型企业实现复杂业务场景的智能化改造，元景MaaS智能体平台都能提供强有力的技术支撑，助力企业加速数字化转型进程，实现降本增效和业务创新。
+&emsp;&emsp;**元景万悟智能体平台**是一款面向**企业级**场景的**一站式**、**商用license友好**的**智能体开发平台**，致力于为企业提供安全、高效、合规的一站式AI解决方案。我们以"技术开放、生态共建"为核心理念，通过整合大语言模型、业务流程自动化等前沿技术，构建了覆盖模型全生命周期管理、MCP、联网检索、智能体快速开发、企业知识库建设、复杂工作流编排等完整功能体系的AI工程化平台。平台采用模块化架构设计，支持灵活的功能扩展和二次开发，在确保企业数据安全和隐私保护的同时，大幅降低了AI技术的应用门槛。无论是中小型企业快速构建智能化应用，还是大型企业实现复杂业务场景的智能化改造，元景万悟智能体平台都能提供强有力的技术支撑，助力企业加速数字化转型进程，实现降本增效和业务创新。
 
-### &#x1F525; 平台核心优势
+### 📢 新闻
+
+- **[2025-07-10]** 
+  - MCP广场新增行业MCP server
+
+------
+
+### &#x1F525; 采用宽松友好的 Apache 2.0 License，支持开发者自由扩展与二次开发
 
 ✔ **企业级工程化**：提供从模型纳管到应用落地的完整工具链，解决LLM技术落地"最后一公里"问题  
 
@@ -68,15 +75,15 @@
 
 ### &#x1F4E2; 功能比较
 
-|    功能     |  元景MaaS智能体平台  |       Dify.AI        |       Fastgpt        |      Ragflow       |
+|    功能     |  元景万悟智能体平台  |       Dify.AI        |       Fastgpt        |      Ragflow       |
 | :---------: | :----------------: | :------------------: | :------------------: | :----------------: |
 |  编程方法   | API + 应用程序导向 |  API + 应用程序导向  |  API + 应用程序导向  | API + 应用程序导向 |
 |   易用性    |  高（学习成本低）  | 中高（需一定学习量） | 中高（需一定学习量） |    中（偏技术）    |
 |  资源消耗   |         低         |          低          |          低          |         高         |
 | 支持的LLMs  |         ✅          |          ✅           |          ✅           |         ✅          |
 |   RAG引擎   |         ✅          |          ✅           |          ✅           |         ✅          |
-|    MCP     |         ✅          |  ✅（需安装工具使用）   |  ✅（需安装工具使用）   |         ✅          |
-|  搜索增强   |         ✅          |  ✅（需安装工具使用）   |  ✅✅（需安装工具使用） |         ✅          |
+|    MCP     |         ✅          |  ✅（需安装工具使用）   |          ✅           |  ✅（需安装工具使用） |
+|  搜索增强   |         ✅          |  ✅（需安装工具使用）   |          ✅           |  ✅（需安装工具使用） |
 |    Agent    |         ✅          |          ✅           |          ✅           |         ✅          |
 |   工作流    |         ✅          |          ✅           |          ✅           |         ✅          |
 |  可观测性   |         ✅          |          ✅           |          ✅           |         ✅          |
@@ -98,7 +105,7 @@
 
 ### 🚀 快速开始
 
-&emsp;&emsp;元景MaaS智能体平台的工作流模块使用的是[wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git)项目，可到其仓库查看详细。
+&emsp;&emsp;元景万悟智能体平台的工作流模块使用的是[wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git)项目，可到其仓库查看详细。
 
 - **Docker安装（推荐）**
 
@@ -109,10 +116,13 @@
     cp .env.bak .env
     ```
 
-    1.2 根据系统修改.env文件中的`WANWU_ARCH`变量
+    1.2 根据系统修改.env文件中的`WANWU_ARCH`、`WANWU_EXTERNAL_IP`变量
     ```
     # amd64 / arm64
     WANWU_ARCH=amd64
+
+    # external ip port（注意localhost要换成本机局域网或对外IP，例如192.168.0.xx，不能是localhost或127.0.0.1）
+    WANWU_EXTERNAL_IP=localhost
     ```
 
     1.3 创建docker运行网络
@@ -170,16 +180,72 @@
 
 ### &#x1F517; 使用的其他开源项目
 
-- https://github.com/modelscope/agentscope  作为元景MaaS智能体平台中工作流模块的开发框架；
-- https://github.com/langchain-ai/langchain.git  作为元景MaaS智能体平台中智能体的各类基础组件开发；
-- https://github.com/QwenLM/Qwen-Agent.git  作为元景MaaS智能体平台中react智能体的构建；
+- https://github.com/modelscope/agentscope  作为元景万悟智能体平台中工作流模块的开发框架；
+- https://github.com/langchain-ai/langchain.git  作为元景万悟智能体平台中智能体的各类基础组件开发；
+- https://github.com/QwenLM/Qwen-Agent.git  作为元景万悟智能体平台中react智能体的构建；
 
 ------
 
+### &#x1F4F0; TODO LIST
 
+- 支持智能体、文本问答、工作流取消发布
+- 支持知识库命中测试、关键词管理
+- 工作流支持公开发布
+- 应用广场支持按照应用名称进行搜索
+- 支持设定敏感词安全护栏
+- 支持知识库OCR解析
+- 支持工作流的导入导出
+- 支持自定义MCP Server，即可以把工作流、智能体、或者符合OpenAPI规范的API作为tools添加到MCP Server里进行发布
+- 增加模型供应商
+- 增加工作流节点类型
+- 支持知识库打标签
+- 支持自定义工具
+
+------
+
+### &#128172; Q & A
+
+- **【Q】Linux系统Elastic(elastic-wanwu)启动报错：Memory limited without swap.**
+
+    【A】关闭服务，执行 `sudo sysctl -w vm.max_map_count=262144` 后，重启服务
+
+- **【Q】Windows系统Agent(agent-wanwu)启动报错：bash: ./start_all.sh: /bin/bash^M: bad interpreter**
+
+    【A】git配置关闭自动回车换行(CRLF)，执行 `git config --global core.autocrlf false` 后，关闭服务，重新clone wanwu仓库，重启服务**
+
+- **【Q】模型导入相关**
+
+    【A】以导入联通元景LLM为例（导入OpenAI-API-compatible或导入Embedding、Rerank类型类似）：
+    ```
+    1. 联通元景MaaS云LLM的Open API接口例如：https://maas.ai-yuanjing.com/openapi/compatible-mode/v1/chat/completions
+    
+    2. 用户在联通元景MaaS云上申请到的API Key形如：sk-abc********************xyz
+    
+    3. 确认API与Key可正确请求LLM，以请求yuanjing-70b-chat为例：
+        curl --location 'https://maas.ai-yuanjing.com/openapi/compatible-mode/v1/chat/completions' \
+        --header 'Content-Type: application/json' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: Bearer sk-abc********************xyz' \
+        --data '{
+                "model": "yuanjing-70b-chat",
+                "messages": [{
+                        "role": "user",
+                        "content": "你好"
+                }]
+        }'
+    
+    4. 导入模型：
+    4.1【模型名称】必须为上述curl中可以正确请求的model；例如 yuanjing-70b-chat
+    4.2【API Key】必须为上述curl中可以正确请求的key；例如 sk-abc********************xyz（注意不填Bearer前缀）
+    4.3【推理URL】必须为上述curl中可以正确请求的url；例如 https://maas.ai-yuanjing.com/openapi/compatible-mode/v1（注意不带 /chat/completions 后缀）
+    
+    5. 导入Embedding模型同上述导入LLM，注意推理URL不带 /embeddings 后缀
+
+    6. 导入Rerank模型同上述导入LLM，注意推理URL不带 /rerank 后缀
+    ```
 
 ### ⚖️ 许可证
-元景MaaS智能体平台根据Apache License 2.0发布。
+元景万悟智能体平台根据Apache License 2.0发布。
 
 ------
 

@@ -148,3 +148,9 @@ func (o *OnlineSearchConfig) Check() error {
 	}
 	return nil
 }
+
+type AssistantTemplateRequest struct {
+	AssistantTemplateId string `json:"assistantTemplateId" form:"assistantTemplateId"  validate:"required"`
+}
+
+func (a *AssistantTemplateRequest) Check() error { return nil }
