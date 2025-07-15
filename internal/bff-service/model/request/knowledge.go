@@ -26,6 +26,13 @@ type UpdateKnowledgeReq struct {
 	CommonCheck
 }
 
+type KnowledgeHitReq struct {
+	KnowledgeIdList []string `json:"knowledgeIdList"   validate:"required"`
+	Question        string   `json:"question"   validate:"required"`
+	RerankModelId   string   `json:"rerankModelId"   validate:"required"`
+	CommonCheck
+}
+
 type EmbeddingModel struct {
 	ModelId string `json:"modelId"  validate:"required"`
 }

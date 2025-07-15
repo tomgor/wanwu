@@ -25,6 +25,7 @@ const (
 	KnowledgeBaseTagService_UpdateKnowledgeTag_FullMethodName     = "/knowledgebase_tag_service.KnowledgeBaseTagService/UpdateKnowledgeTag"
 	KnowledgeBaseTagService_DeleteKnowledgeTag_FullMethodName     = "/knowledgebase_tag_service.KnowledgeBaseTagService/DeleteKnowledgeTag"
 	KnowledgeBaseTagService_BindKnowledgeTag_FullMethodName       = "/knowledgebase_tag_service.KnowledgeBaseTagService/BindKnowledgeTag"
+	KnowledgeBaseTagService_TagBindCount_FullMethodName           = "/knowledgebase_tag_service.KnowledgeBaseTagService/TagBindCount"
 )
 
 // KnowledgeBaseTagServiceClient is the client API for KnowledgeBaseTagService service.
@@ -41,6 +42,8 @@ type KnowledgeBaseTagServiceClient interface {
 	DeleteKnowledgeTag(ctx context.Context, in *DeleteKnowledgeTagReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 修改知识库标签
 	BindKnowledgeTag(ctx context.Context, in *BindKnowledgeTagReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 修改知识库标签
+	TagBindCount(ctx context.Context, in *TagBindCountReq, opts ...grpc.CallOption) (*TagBindCountResp, error)
 }
 
 type knowledgeBaseTagServiceClient struct {
@@ -101,6 +104,16 @@ func (c *knowledgeBaseTagServiceClient) BindKnowledgeTag(ctx context.Context, in
 	return out, nil
 }
 
+func (c *knowledgeBaseTagServiceClient) TagBindCount(ctx context.Context, in *TagBindCountReq, opts ...grpc.CallOption) (*TagBindCountResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TagBindCountResp)
+	err := c.cc.Invoke(ctx, KnowledgeBaseTagService_TagBindCount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KnowledgeBaseTagServiceServer is the server API for KnowledgeBaseTagService service.
 // All implementations must embed UnimplementedKnowledgeBaseTagServiceServer
 // for forward compatibility.
@@ -115,6 +128,8 @@ type KnowledgeBaseTagServiceServer interface {
 	DeleteKnowledgeTag(context.Context, *DeleteKnowledgeTagReq) (*emptypb.Empty, error)
 	// 修改知识库标签
 	BindKnowledgeTag(context.Context, *BindKnowledgeTagReq) (*emptypb.Empty, error)
+	// 修改知识库标签
+	TagBindCount(context.Context, *TagBindCountReq) (*TagBindCountResp, error)
 	mustEmbedUnimplementedKnowledgeBaseTagServiceServer()
 }
 
@@ -139,6 +154,9 @@ func (UnimplementedKnowledgeBaseTagServiceServer) DeleteKnowledgeTag(context.Con
 }
 func (UnimplementedKnowledgeBaseTagServiceServer) BindKnowledgeTag(context.Context, *BindKnowledgeTagReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BindKnowledgeTag not implemented")
+}
+func (UnimplementedKnowledgeBaseTagServiceServer) TagBindCount(context.Context, *TagBindCountReq) (*TagBindCountResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TagBindCount not implemented")
 }
 func (UnimplementedKnowledgeBaseTagServiceServer) mustEmbedUnimplementedKnowledgeBaseTagServiceServer() {
 }
@@ -252,6 +270,24 @@ func _KnowledgeBaseTagService_BindKnowledgeTag_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _KnowledgeBaseTagService_TagBindCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TagBindCountReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KnowledgeBaseTagServiceServer).TagBindCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KnowledgeBaseTagService_TagBindCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KnowledgeBaseTagServiceServer).TagBindCount(ctx, req.(*TagBindCountReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // KnowledgeBaseTagService_ServiceDesc is the grpc.ServiceDesc for KnowledgeBaseTagService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -278,6 +314,10 @@ var KnowledgeBaseTagService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "BindKnowledgeTag",
 			Handler:    _KnowledgeBaseTagService_BindKnowledgeTag_Handler,
+		},
+		{
+			MethodName: "TagBindCount",
+			Handler:    _KnowledgeBaseTagService_TagBindCount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

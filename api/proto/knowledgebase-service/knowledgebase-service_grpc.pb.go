@@ -26,6 +26,7 @@ const (
 	KnowledgeBaseService_CreateKnowledge_FullMethodName             = "/knowledgebase_service.KnowledgeBaseService/CreateKnowledge"
 	KnowledgeBaseService_UpdateKnowledge_FullMethodName             = "/knowledgebase_service.KnowledgeBaseService/UpdateKnowledge"
 	KnowledgeBaseService_DeleteKnowledge_FullMethodName             = "/knowledgebase_service.KnowledgeBaseService/DeleteKnowledge"
+	KnowledgeBaseService_KnowledgeHit_FullMethodName                = "/knowledgebase_service.KnowledgeBaseService/KnowledgeHit"
 )
 
 // KnowledgeBaseServiceClient is the client API for KnowledgeBaseService service.
@@ -44,6 +45,8 @@ type KnowledgeBaseServiceClient interface {
 	UpdateKnowledge(ctx context.Context, in *UpdateKnowledgeReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 删除文档知识分类
 	DeleteKnowledge(ctx context.Context, in *DeleteKnowledgeReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 知识库命中测试
+	KnowledgeHit(ctx context.Context, in *KnowledgeHitReq, opts ...grpc.CallOption) (*KnowledgeHitResp, error)
 }
 
 type knowledgeBaseServiceClient struct {
@@ -114,6 +117,16 @@ func (c *knowledgeBaseServiceClient) DeleteKnowledge(ctx context.Context, in *De
 	return out, nil
 }
 
+func (c *knowledgeBaseServiceClient) KnowledgeHit(ctx context.Context, in *KnowledgeHitReq, opts ...grpc.CallOption) (*KnowledgeHitResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(KnowledgeHitResp)
+	err := c.cc.Invoke(ctx, KnowledgeBaseService_KnowledgeHit_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KnowledgeBaseServiceServer is the server API for KnowledgeBaseService service.
 // All implementations must embed UnimplementedKnowledgeBaseServiceServer
 // for forward compatibility.
@@ -130,6 +143,8 @@ type KnowledgeBaseServiceServer interface {
 	UpdateKnowledge(context.Context, *UpdateKnowledgeReq) (*emptypb.Empty, error)
 	// 删除文档知识分类
 	DeleteKnowledge(context.Context, *DeleteKnowledgeReq) (*emptypb.Empty, error)
+	// 知识库命中测试
+	KnowledgeHit(context.Context, *KnowledgeHitReq) (*KnowledgeHitResp, error)
 	mustEmbedUnimplementedKnowledgeBaseServiceServer()
 }
 
@@ -157,6 +172,9 @@ func (UnimplementedKnowledgeBaseServiceServer) UpdateKnowledge(context.Context, 
 }
 func (UnimplementedKnowledgeBaseServiceServer) DeleteKnowledge(context.Context, *DeleteKnowledgeReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteKnowledge not implemented")
+}
+func (UnimplementedKnowledgeBaseServiceServer) KnowledgeHit(context.Context, *KnowledgeHitReq) (*KnowledgeHitResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method KnowledgeHit not implemented")
 }
 func (UnimplementedKnowledgeBaseServiceServer) mustEmbedUnimplementedKnowledgeBaseServiceServer() {}
 func (UnimplementedKnowledgeBaseServiceServer) testEmbeddedByValue()                              {}
@@ -287,6 +305,24 @@ func _KnowledgeBaseService_DeleteKnowledge_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _KnowledgeBaseService_KnowledgeHit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(KnowledgeHitReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KnowledgeBaseServiceServer).KnowledgeHit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KnowledgeBaseService_KnowledgeHit_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KnowledgeBaseServiceServer).KnowledgeHit(ctx, req.(*KnowledgeHitReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // KnowledgeBaseService_ServiceDesc is the grpc.ServiceDesc for KnowledgeBaseService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -317,6 +353,10 @@ var KnowledgeBaseService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteKnowledge",
 			Handler:    _KnowledgeBaseService_DeleteKnowledge_Handler,
+		},
+		{
+			MethodName: "KnowledgeHit",
+			Handler:    _KnowledgeBaseService_KnowledgeHit_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

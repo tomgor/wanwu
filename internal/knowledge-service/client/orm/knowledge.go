@@ -49,6 +49,19 @@ func SelectKnowledgeById(ctx context.Context, knowledgeId, userId, orgId string)
 	return &knowledge, nil
 }
 
+// SelectKnowledgeByIdList 查询知识库信息
+func SelectKnowledgeByIdList(ctx context.Context, knowledgeIdList []string, userId, orgId string) ([]*model.KnowledgeBase, error) {
+	var knowledgeList []*model.KnowledgeBase
+	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.WithKnowledgeIDList(knowledgeIdList), sqlopt.WithDelete(0)).
+		Apply(db.GetHandle(ctx), &model.KnowledgeBase{}).
+		Find(&knowledgeList).Error
+	if err != nil {
+		log.Errorf("SelectKnowledgeByIdList userId %s err: %v", userId, err)
+		return nil, util.ErrCode(errs.Code_KnowledgeBaseAccessDenied)
+	}
+	return knowledgeList, nil
+}
+
 // SelectKnowledgeByName 查询知识库信息
 func SelectKnowledgeByName(ctx context.Context, knowledgeName, userId, orgId string) (*model.KnowledgeBase, error) {
 	var knowledge model.KnowledgeBase
