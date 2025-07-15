@@ -4,10 +4,10 @@
       <div class="left-nav" v-if="isShowNav">
         <!--不展示平台的图标-->
         <div style="padding: 0 15px">
-          <div style="padding: 10px 0 14px; border-bottom: 1px solid #D9D9D9">
+          <div style="padding: 10px 0 14px; border-bottom: 1px solid #D9D9D9;">
             <img
-              style="width: 36px; margin: 0 auto"
-              :src="homeLogoPath ? (basePath + '/user/api' + homeLogoPath) : require('@/assets/imgs/wanwu.svg')"
+              style="width: 50px; margin-left: -5px"
+              :src="homeLogoPath ? (basePath + '/user/api' + homeLogoPath) : require('@/assets/imgs/wanwu_logo.png')"
             />
           </div>
         </div>
@@ -446,7 +446,7 @@ export default {
 .full-menu.layout {
   height:100%;
   background: linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%);
-  min-height: 650px;
+  min-height: 660px;
   .outer-container{
     height: 100%;
     .left-nav {
@@ -463,7 +463,7 @@ export default {
         display: flex;
         flex-direction: column;
         height: calc(100vh - 260px);
-        min-height: 500px;
+        min-height: 480px;
         justify-content: space-around;
       }
       .left-nav-content {
@@ -471,7 +471,7 @@ export default {
         display: flex;
         flex-direction: column;
         height: calc(100vh - 180px);
-        min-height: 500px;
+        min-height: 480px;
         align-items: center;
         justify-content: space-around;
         max-height: 600px;
