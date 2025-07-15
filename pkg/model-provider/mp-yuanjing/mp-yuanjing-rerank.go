@@ -18,6 +18,13 @@ type Rerank struct {
 	EndpointUrl string `json:"endpointUrl"` // 推理url
 }
 
+func (cfg *Rerank) NewReq(req *mp_common.RerankReq) (mp_common.IRerankReq, error) {
+	m := map[string]interface{}{
+		"texts": req.Documents,
+		"query": req.Query,
+	}
+	return mp_common.NewRerankReq(m), nil
+}
 func (cfg *Rerank) Rerank(ctx context.Context, req mp_common.IRerankReq, headers ...mp_common.Header) (mp_common.IRerankResp, error) {
 	if cfg.ApiKey != "" {
 		headers = append(headers, mp_common.Header{
@@ -75,4 +82,27 @@ func (resp *rerankResp) Data() (interface{}, bool) {
 		return nil, false
 	}
 	return ret, true
+}
+func (resp *rerankResp) ConvertResp() (*mp_common.RerankResp, bool) {
+	var data []map[string]interface{}
+	if err := json.Unmarshal([]byte(resp.raw), &data); err != nil {
+		log.Errorf("rerank resp (%v) convert to data err: %v", resp.raw, err)
+		return nil, false
+	}
+
+	var results []mp_common.Result
+	for _, item := range data {
+		result := mp_common.Result{
+			Index:          int(item["index"].(float64)),
+			RelevanceScore: item["score"].(float64),
+			Document: &mp_common.Document{
+				Text: item["document"].(string),
+			},
+		}
+		results = append(results, result)
+	}
+
+	return &mp_common.RerankResp{
+		Results: results,
+	}, true
 }

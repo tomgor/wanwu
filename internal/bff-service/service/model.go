@@ -17,6 +17,9 @@ func ImportModel(ctx *gin.Context, userId, orgId string, req *request.ImportOrUp
 	if err != nil {
 		return err
 	}
+	if err = ValidateModel(ctx, clientReq); err != nil {
+		return grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("An error occurred during model import validation: Invalid model: %v, err : %v", clientReq.Model, err))
+	}
 	_, err = model.ImportModel(ctx, clientReq)
 	if err != nil {
 		return err
@@ -31,6 +34,9 @@ func UpdateModel(ctx *gin.Context, userId, orgId string, req *request.ImportOrUp
 	clientReq, err := parseImportAndUpdateClientReq(userId, orgId, req)
 	if err != nil {
 		return err
+	}
+	if err = ValidateModel(ctx, clientReq); err != nil {
+		return grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("An error occurred during model import validation: Invalid model: %v, err : %v", clientReq.Model, err))
 	}
 	_, err = model.UpdateModel(ctx, clientReq)
 	if err != nil {

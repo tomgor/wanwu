@@ -3,6 +3,7 @@ package callback
 import (
 	"encoding/json"
 	"fmt"
+	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -87,9 +88,9 @@ func ModelChatCompletions(ctx *gin.Context) {
 //	@Summary	Model Embeddings
 //	@Accept		json
 //	@Produce	json
-//	@Param		modelId	path		string					true	"模型ID"
-//	@Param		data	body		map[string]interface{}	true	"请求参数"
-//	@Success	200		{object}	response.Response{}
+//	@Param		modelId	path		string						true	"模型ID"
+//	@Param		data	body		mp_common.EmbeddingReq{}	true	"请求参数"
+//	@Success	200		{object}	mp_common.EmbeddingResp{}
 //	@Router		/model/{modelId}/embeddings [post]
 func ModelEmbeddings(ctx *gin.Context) {
 	body, ok := ctx.Get(gin.BodyBytesKey)
@@ -97,7 +98,7 @@ func ModelEmbeddings(ctx *gin.Context) {
 		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, "invalid body"))
 		return
 	}
-	data := make(map[string]interface{})
+	data := &mp_common.EmbeddingReq{}
 	if err := json.Unmarshal(body.([]byte), &data); err != nil {
 		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, err.Error()))
 		return
@@ -112,8 +113,8 @@ func ModelEmbeddings(ctx *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Param		modelId	path		string					true	"模型ID"
-//	@Param		data	body		map[string]interface{}	true	"请求参数"
-//	@Success	200		{object}	response.Response{}
+//	@Param		data	body		mp_common.RerankReq{}	true	"请求参数"
+//	@Success	200		{object}	mp_common.RerankResp{}
 //	@Router		/model/{modelId}/rerank [post]
 func ModelRerank(ctx *gin.Context) {
 	body, ok := ctx.Get(gin.BodyBytesKey)
@@ -121,7 +122,7 @@ func ModelRerank(ctx *gin.Context) {
 		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, "invalid body"))
 		return
 	}
-	data := make(map[string]interface{})
+	data := &mp_common.RerankReq{}
 	if err := json.Unmarshal(body.([]byte), &data); err != nil {
 		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, err.Error()))
 		return
