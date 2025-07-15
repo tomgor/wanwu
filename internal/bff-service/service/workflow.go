@@ -91,12 +91,13 @@ func PublishWorkFlow(ctx *gin.Context, userId, orgId, workflowID string) error {
 	if err != nil {
 		return grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_apps_publish", err.Error())
 	}
-	result, err := http_client.Workflow().Get(ctx.Request.Context(), &http_client.HttpRequestParams{
+	result, err := http_client.Workflow().PostJson(ctx.Request.Context(), &http_client.HttpRequestParams{
 		Url: url,
 		Headers: map[string]string{
 			"x-org-id":      orgId,
 			"x-user-id":     userId,
 			"Authorization": ctx.GetHeader("Authorization"),
+			"Content-Type":  "application/json",
 		},
 		Body:       body,
 		Timeout:    60 * time.Second,
@@ -155,12 +156,13 @@ func UnPublishWorkFlow(ctx *gin.Context, userId, orgId, workflowID string) error
 	if err != nil {
 		return grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_apps_unpublish", err.Error())
 	}
-	result, err := http_client.Workflow().Get(ctx.Request.Context(), &http_client.HttpRequestParams{
+	result, err := http_client.Workflow().PostJson(ctx.Request.Context(), &http_client.HttpRequestParams{
 		Url: url,
 		Headers: map[string]string{
 			"x-org-id":      orgId,
 			"x-user-id":     userId,
 			"Authorization": ctx.GetHeader("Authorization"),
+			"Content-Type":  "application/json",
 		},
 		Body:       body,
 		Timeout:    60 * time.Second,
