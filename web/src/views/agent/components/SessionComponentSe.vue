@@ -239,16 +239,7 @@ export default {
           },
           replaceHTML(data,n){
             let _data = data
-            // var a = new RegExp('<think>')
-            // var b = new RegExp('</think>')
-            // if(b.test(data)){
-            //   n.thinkText = this.$t('agent.alreadyThink')
-            // }
-            // // 如果没有返回前缀，则补上
-            // if(b.test(data) && !a.test(data)){
-            //   _data = '<think>\n'+data
-            // }
-            // return _data.replace(/think>/g,'section>')
+            console.log(data,'渲染完成')
             const thinkStart = /<think>/i;
             const thinkEnd = /<\/think>/i;
             const toolStart = /<tool>/i;
@@ -564,6 +555,7 @@ export default {
       width: 80% !important;
     }
   }
+
 }
 .more{
   color: #384BF7;

@@ -85,6 +85,17 @@ Looper.prototype = {
             this.index++;
             return
         }
+
+        // 检查是否是代码块内容（假设代码块以 ```开头）
+        if (this.sentence.startsWith('```')) {
+            // 直接渲染整个代码块
+            console.log(this.sentence)
+            this.printCB(this.sentence);
+            this.stop();
+            this.index = this.sentence.length;
+            return;
+        }
+
         // 处理索引引文标签
         if(isSub(this.sentence)){
             this.printCB(parseSub(this.sentence))

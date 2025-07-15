@@ -53,7 +53,7 @@
   </el-dialog>
 </template>
 <script>
-import { delTag, tagList, createTag, editTag, bindTag } from "@/api/knowledge";
+import { delTag, tagList, createTag, editTag, bindTag,bindTagCount} from "@/api/knowledge";
 export default {
   data() {
     return {
@@ -62,9 +62,6 @@ export default {
       tagName: "",
       knowledgeId: "",
     };
-  },
-  created() {
-    //    this.getList();
   },
   methods: {
     submitDialog() {
@@ -91,22 +88,34 @@ export default {
         }
       );
     },
-    delTag(item) {
-      this.$confirm(
+    bindTagCount(tagId){
+      return bindTagCount({tagId}).then(res =>{
+        if(res.code === 0){
+          const tagBindCount = res.data.tagBindCount;
+          return tagBindCount > 0;
+        }
+        return 'unknow'
+      }).catch(() =>{
+        return 'unknow'
+      })
+    },
+    async delTag(item) {
+      const isBind = await this.bindTagCount(item.tagId);
+      if(isBind == 'unknow') return
+      await this.$confirm(
         `删除标签${item.tagName}`,
-        item.selected ? "标签正在使用中，是否删除？" : "确认要删除当前标签？",
+        item.selected && isBind ? "标签正在使用中，是否删除？" : "确认要删除当前标签？",
         {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning",
         }
       )
-        .then(() => {
-          delTag({ tagId: item.tagId }).then((res) => {
+        .then(async() => {
+          const res = await delTag({ tagId: item.tagId })
             if (res.code === 0) {
               this.getList();
             }
-          });
         })
         .catch((error) => {
           this.getList();
