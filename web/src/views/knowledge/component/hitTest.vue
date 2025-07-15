@@ -16,7 +16,7 @@
                 </div>
                 <el-form :model="formInline" ref="formInline" :inline="false" class="test_form">
                     <el-form-item label="选择知识库" class="vertical-form-item">
-                        <el-select v-model="formInline.knowledgeIdList" placeholder="请选择" multiple clearable style="width:100%;">
+                        <el-select v-model="formInline.knowledgeIdList" placeholder="请选择" multiple clearable style="width:100%;" @visible-change="visibleChange($event,'knowledge')">
                             <el-option
                                 v-for="item in knowledgeOptions"
                                 :key="item.knowledgeId"
@@ -31,6 +31,7 @@
                         style="width:100%;"
                         loading-text="模型加载中..."
                         v-model="formInline.rerankModelId" 
+                        @visible-change="visibleChange($event,'rerank')"
                         placeholder="请选择">
                             <el-option
                                 v-for="item in rerankOptions"
@@ -55,7 +56,7 @@
                                     <span class="score">{{$t('knowledgeManage.hitScore')}}: {{score[index]}}</span>
                                 </div>
                                 <div>
-                                    <div>{{item.title + ', ' + item.snippet}}</div>
+                                    <div v-html="md.render(item.snippet)"></div>
                                     <div class="file_name">文件名称：{{item.title}}</div>
                                 </div>
                         </div>
@@ -66,46 +67,17 @@
                     </div>
                 </div>
             </div>
-        </div>
-            <el-main class="padding border" style="margin-left:10px;">
-                <el-container style="width:100%;height:100%">
-                    <el-header>{{$t('knowledgeManage.hitPrediction')}}</el-header>
-                    <el-main class="padding">
-                       <div style="height:30%;width:100%;">
-                            <el-input  type="textarea" :rows="4" :placeholder="$t('knowledgeManage.inputTestContent')" v-model="testInput"></el-input>
-                            <div class="btn">
-                                <el-button type="primary" @click="startTest">{{$t('knowledgeManage.startTest')}}</el-button>
-                            </div>
-                       </div>
-                       <div style="height:70%;width:100%;">
-                        <el-header>{{$t('knowledgeManage.hitResult')}}</el-header>
-                        <div class="result" v-loading="resultLoading">
-                            <template v-if="searchList.length >0">
-                            <div v-for="(item,index) in searchList" :key="'result'+index" class="resultItem">
-                                <div class="resultTitle">
-                                    <span class="tag">{{$t('knowledgeManage.section')}}{{index+1}}</span>
-                                    <span class="score">{{$t('knowledgeManage.hitScore')}}: {{score[index]}}</span>
-                                </div>
-                                <div>{{item}}</div>
-                            </div>
-                            </template>
-                            <div v-else class="noResult">
-                               {{ noResult }}
-                            </div>
-                        </div>
-                       </div>
-                    </el-main>
-                </el-container>
-            </el-main>
-        </el-container> -->
+        </div> 
     </div>
 </template>
 <script>
 import { getKnowledgeList,hitTest } from "@/api/knowledge";
 import { getRerankList} from "@/api/modelAccess";
+import { md } from '@/mixins/marksown-it'
 export default{
     data(){
         return{
+            md:md,
             knowledgeOptions:[],
             rerankOptions:[],
             formInline:{
@@ -114,12 +86,8 @@ export default{
             },
             question:'',
             resultLoading:false,
-            searchList:[
-                { "title": "名胜古迹简介.docx", "snippet": "故宫简介： \n北京故宫（The Imperial Palace ），位于中国北京市，是明清两代的皇家宫殿，旧称紫禁城，位于北京中轴线的中心。以三大殿为中心，占地面积约72万平方米，建筑面积约15万平方米，有大小宫殿七十多座，相传故宫一共有9999.5间房屋，实际据1973年专家现场测量故宫有房间8707间 。 \n故宫于明永乐四年（1406年）开始建设，以南京故宫为蓝本营建，到永乐十八年（1420年）建成，成为明清两朝二十四位皇帝的皇宫。民国十四年（1925年）10月10日，故宫博物院正式成立开幕。北京故宫南北长961米，东西宽753米，四面围有高10米的城墙，城外有宽52米的护城河。故宫有四座城门，南面为午门，北面为神武门，东面为东华门，西面为西华门。城墙的四角各有一座风姿绰约的角楼，民间有九梁十八柱七十二条脊之说，形容其结构的复杂。 \n故宫内的建筑分为外朝和内廷两部分。外朝的中心为太和殿、中和殿、保和殿，统称三大殿，是国家举行大典礼的地方。三大殿左右两翼辅以文华殿、武英殿两组建筑。内廷的中心是乾清宫、交泰殿、坤宁宫，统称后三宫，是皇帝和皇后居住的正宫。其后为御花园。后三宫两侧排列着东、西六宫，是后妃们居住休息的地方。东六宫东侧是天穹宝殿等佛堂建筑，西六宫西侧是中正殿等佛堂建筑。外朝、内廷之外还有外东路、外西路两部分建筑。 \n故宫是世界上现存规模最大、保存最为完整的木质结构古建筑群之一。1961年3月4日，北京故宫被公布为第一批全国重点文物保护单位。1987年被列为世界文化遗产。 \n中国国家博物馆简介：", "knowledgeName": "名胜古迹介绍", "meta_data": {} },
-                { "title": "名胜古迹简介123.docx", "snippet": "故宫简介： \n北京故宫（The Imperial Palace ），位于中国北京市，是明清两代的皇家宫殿，旧称紫禁城，位于北京中轴线的中心。以三大殿为中心，占地面积约72万平方米，建筑面积约15万平方米，有大小宫殿七十多座，相传故宫一共有9999.5间房屋，实际据1973年专家现场测量故宫有房间8707间 。 \n故宫于明永乐四年（1406年）开始建设，以南京故宫为蓝本营建，到永乐十八年（1420年）建成，成为明清两朝二十四位皇帝的皇宫。民国十四年（1925年）10月10日，故宫博物院正式成立开幕。北京故宫南北长961米，东西宽753米，四面围有高10米的城墙，城外有宽52米的护城河。故宫有四座城门，南面为午门，北面为神武门，东面为东华门，西面为西华门。城墙的四角各有一座风姿绰约的角楼，民间有九梁十八柱七十二条脊之说，形容其结构的复杂。 \n故宫内的建筑分为外朝和内廷两部分。外朝的中心为太和殿、中和殿、保和殿，统称三大殿，是国家举行大典礼的地方。三大殿左右两翼辅以文华殿、武英殿两组建筑。内廷的中心是乾清宫、交泰殿、坤宁宫，统称后三宫，是皇帝和皇后居住的正宫。其后为御花园。后三宫两侧排列着东、西六宫，是后妃们居住休息的地方。东六宫东侧是天穹宝殿等佛堂建筑，西六宫西侧是中正殿等佛堂建筑。外朝、内廷之外还有外东路、外西路两部分建筑。 \n故宫是世界上现存规模最大、保存最为完整的木质结构古建筑群之一。1961年3月4日，北京故宫被公布为第一批全国重点文物保护单位。1987年被列为世界文化遗产。 \n中国国家博物馆简介：", "knowledgeName": "名胜古迹介绍", "meta_data": {} }
-            ],
-            score:[0.5,0.6],
-            noResult: "",
+            searchList:[],
+            score:[],
         }
     },
     created(){
@@ -142,6 +110,15 @@ export default{
                     this.rerankOptions = res.data.list || []
                 }
             })
+        },
+        visibleChange(val,type){
+            if(val){
+                if(type === 'knowledge'){
+                    this.getKnowledgeList()
+                }else{
+                    this.getRerankData()
+                }
+            }
         },
         goBack(){
           this.$router.go(-1);
@@ -167,14 +144,14 @@ export default{
         },
         async test(data){
             this.resultLoading = true
+            this.searchList = [];
+            this.score = [];
             const res = await hitTest(data);
             if(res.code === 0){
-                this.$message.success(this.$t('knowledgeManage.operateSuccess'))
                 this.searchList = res.data !== null ? res.data.searchList : [];
                 if(res.data){
                     this.score = res.data.score.map(item =>item.toFixed(5))
                 }else{
-                    this.noResult = this.$t('knowledgeManage.testResultTips')+`“${data.question}”`+this.$t('knowledgeManage.testResultTips1');
                     this.score = []
                 }
                 this.resultLoading = false
