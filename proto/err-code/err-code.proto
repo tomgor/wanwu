@@ -73,6 +73,7 @@ enum Code {
   KnowledgeBaseDeleteDuringParse = 141007; // 知识库正在解析文档，不可删除
   KnowledgeBaseDuplicateName = 141008; // 已存在同名知识库
   KnowledgeBaseSelectFailed = 141009; // 查询知识库列表失败，请稍后重试
+  KnowledgeBaseHitFailed = 141010; // 命中测试失败，请稍后重试
   KnowledgeDocDeleteDuringParse = 142001; // 文档正在解析文档，不可删除
   KnowledgeDocDeleteFailed = 142002; // 文档删除失败，请稍后重试
   KnowledgeDocSegmentStatusUpdateFail = 142003; // 修改文档分段状态失败，请稍后重试
