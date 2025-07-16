@@ -21,7 +21,7 @@ export const md = MarkdownIt({
                 preCode = hljs.highlightAuto(str).value;
             }
         } catch (err) {
-            preCode = markdownIt.utils.escapeHtml(str);
+            preCode = md.utils.escapeHtml(str);
         }
 
         // 以换行进行分割
