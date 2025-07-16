@@ -63,6 +63,14 @@ export const getWorkFlowList = (data)=>{
         params:data
     })
 };
+//应用广场工作流列表
+export const getExplorationFlowList = (params)=>{
+    return request({
+        url: '/user/api/v1/exploration/app/list',
+        method: 'get',
+        params
+    })
+};
 export const createWorkFlow = (data)=>{
     return request({
         url: '/workflow/api/workflow/create',
