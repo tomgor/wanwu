@@ -3,7 +3,6 @@ package callback
 import (
 	"encoding/json"
 	"fmt"
-	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -11,6 +10,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
+	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -93,17 +93,11 @@ func ModelChatCompletions(ctx *gin.Context) {
 //	@Success	200		{object}	mp_common.EmbeddingResp{}
 //	@Router		/model/{modelId}/embeddings [post]
 func ModelEmbeddings(ctx *gin.Context) {
-	body, ok := ctx.Get(gin.BodyBytesKey)
-	if !ok {
-		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, "invalid body"))
+	var data mp_common.EmbeddingReq
+	if !gin_util.Bind(ctx, &data) {
 		return
 	}
-	data := &mp_common.EmbeddingReq{}
-	if err := json.Unmarshal(body.([]byte), &data); err != nil {
-		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, err.Error()))
-		return
-	}
-	service.ModelEmbeddings(ctx, ctx.Param("modelId"), data)
+	service.ModelEmbeddings(ctx, ctx.Param("modelId"), &data)
 }
 
 // ModelRerank
@@ -117,17 +111,11 @@ func ModelEmbeddings(ctx *gin.Context) {
 //	@Success	200		{object}	mp_common.RerankResp{}
 //	@Router		/model/{modelId}/rerank [post]
 func ModelRerank(ctx *gin.Context) {
-	body, ok := ctx.Get(gin.BodyBytesKey)
-	if !ok {
-		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, "invalid body"))
+	var data mp_common.RerankReq
+	if !gin_util.Bind(ctx, &data) {
 		return
 	}
-	data := &mp_common.RerankReq{}
-	if err := json.Unmarshal(body.([]byte), &data); err != nil {
-		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, err.Error()))
-		return
-	}
-	service.ModelRerank(ctx, ctx.Param("modelId"), data)
+	service.ModelRerank(ctx, ctx.Param("modelId"), &data)
 }
 
 // UpdateDocStatus

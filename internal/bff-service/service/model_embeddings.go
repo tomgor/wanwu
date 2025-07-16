@@ -24,7 +24,7 @@ func ModelEmbeddings(ctx *gin.Context, modelID string, req *mp_common.EmbeddingR
 
 	// 校验model字段
 	if req != nil {
-		if req.Model != modelInfo.Model {
+		if req.Model != "" && req.Model != modelInfo.Model {
 			gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v embeddings err: model mismatch!", modelInfo.ModelId)))
 			return
 		}

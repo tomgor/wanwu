@@ -22,10 +22,13 @@ func (cfg *Rerank) NewReq(req *mp_common.RerankReq) (mp_common.IRerankReq, error
 		"model":            req.Model,
 		"query":            req.Query,
 		"return_documents": req.ReturnDocuments,
-		"top_n":            req.TopN,
+	}
+	if req.TopN > 0 {
+		m["top_n"] = req.TopN
 	}
 	return mp_common.NewRerankReq(m), nil
 }
+
 func (cfg *Rerank) Rerank(ctx context.Context, req mp_common.IRerankReq, headers ...mp_common.Header) (mp_common.IRerankResp, error) {
 	if cfg.ApiKey != "" {
 		headers = append(headers, mp_common.Header{

@@ -2,12 +2,13 @@ package service
 
 import (
 	"fmt"
+	"strings"
+	"sync"
+
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	"github.com/gin-gonic/gin"
-	"strings"
-	"sync"
 )
 
 // 定义校验函数类型
@@ -16,9 +17,9 @@ type ModelValidator func(ctx *gin.Context, modelInfo *model_service.ModelInfo) e
 // 校验器注册表
 var validators = sync.OnceValue(func() map[string]ModelValidator {
 	return map[string]ModelValidator{
-		"llm":       ValidateLLMModel,
-		"rerank":    ValidateRerankModel,
-		"embedding": ValidateEmbeddingModel,
+		mp.ModelTypeLLM:       ValidateLLMModel,
+		mp.ModelTypeRerank:    ValidateRerankModel,
+		mp.ModelTypeEmbedding: ValidateEmbeddingModel,
 	}
 })
 

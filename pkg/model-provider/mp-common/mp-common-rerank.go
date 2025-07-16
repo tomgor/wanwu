@@ -6,11 +6,8 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/log"
 )
 
-// --- request ---
+// --- openapi request ---
 
-type IRerankReq interface {
-	Data() map[string]interface{}
-}
 type RerankReq struct {
 	Documents       []string `json:"documents" validate:"required"`
 	Model           string   `json:"model" validate:"required"`
@@ -18,6 +15,10 @@ type RerankReq struct {
 	ReturnDocuments bool     `json:"return_documents"`
 	TopN            int      `json:"top_n" validate:"gte=0"`
 }
+
+func (req *RerankReq) Check() error { return nil }
+
+// --- openapi response ---
 
 type RerankResp struct {
 	Results []Result `json:"results"`
@@ -27,7 +28,7 @@ type RerankResp struct {
 }
 type Result struct {
 	Index          int       `json:"index"`
-	Document       *Document `json:"document"`
+	Document       *Document `json:"document,omitempty"`
 	RelevanceScore float64   `json:"relevance_score"`
 }
 
@@ -41,17 +42,18 @@ type Usage struct {
 	CompletionTokens int `json:"completion_tokens"`
 }
 
+// --- request ---
+
+type IRerankReq interface {
+	Data() map[string]interface{}
+}
+
 // rerankReq implementation of IRerankReq
 type rerankReq struct {
 	data map[string]interface{}
 }
 
 func NewRerankReq(data map[string]interface{}) IRerankReq {
-	if val, exists := data["top_n"]; exists {
-		if num, ok := val.(int); ok && num <= 0 {
-			delete(data, "top_n")
-		}
-	}
 	return &rerankReq{data: data}
 }
 

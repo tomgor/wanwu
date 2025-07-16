@@ -6,16 +6,17 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/log"
 )
 
-// --- request ---
+// --- openapi request ---
 
-type IEmbeddingReq interface {
-	Data() map[string]interface{}
-}
 type EmbeddingReq struct {
 	Model          string   `json:"model" validate:"required"`
 	Input          []string `json:"input" validate:"required"`
 	EncodingFormat string   `json:"encoding_format"`
 }
+
+func (req *EmbeddingReq) Check() error { return nil }
+
+// --- openapi response ---
 
 type EmbeddingResp struct {
 	Model  string          `json:"model"`
@@ -28,6 +29,12 @@ type EmbeddingData struct {
 	Object    string    `json:"object"`
 	Embedding []float64 `json:"embedding"`
 	Index     int       `json:"index"`
+}
+
+// --- request ---
+
+type IEmbeddingReq interface {
+	Data() map[string]interface{}
 }
 
 // embeddingReq implementation of IEmbeddingReq

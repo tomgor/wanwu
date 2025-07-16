@@ -19,13 +19,14 @@ type Embedding struct {
 func (cfg *Embedding) NewReq(req *mp_common.EmbeddingReq) (mp_common.IEmbeddingReq, error) {
 	m := map[string]interface{}{
 		"model": req.Model,
-		"input": req.Model,
+		"input": req.Input,
 	}
 	if req.EncodingFormat != "" {
 		m["encoding_format"] = req.EncodingFormat
 	}
 	return mp_common.NewRerankReq(m), nil
 }
+
 func (cfg *Embedding) Embeddings(ctx context.Context, req mp_common.IEmbeddingReq, headers ...mp_common.Header) (mp_common.IEmbeddingResp, error) {
 	if cfg.ApiKey != "" {
 		headers = append(headers, mp_common.Header{
