@@ -18,7 +18,7 @@
       ><span class="el-icon-plus add-icon"></span>创建标签</div>
       <div class="tag-box">
         <div
-          v-for="item in tagList"
+          v-for="(item,index) in tagList"
           class="tag_item"
           @mouseenter="mouseEnter(item)"
           @mouseleave="mouseLeave(item)"
@@ -31,6 +31,7 @@
           <el-input
             v-model="item.tagName"
             v-if="item.showIpt"
+            @keydown.backspace.native="handleDelete(item,index)" 
             @blur="inputBlur(item)"
             @keyup.enter.native="inputBlur(item)"
           ></el-input>
@@ -140,10 +141,18 @@ export default {
       n.showIpt = true;
     },
     inputBlur(n) {
+      if(!n.tagName){
+        return
+      }
       if (n.tagId) {
         this.edit_tag(n);
       } else {
         this.add_Tag(n);
+      }
+    },
+    handleDelete(n,i){
+      if(n.tagName === '' && !n.tagId){
+          this.tagList.splice(i,1)
       }
     },
     add_Tag(n) {
