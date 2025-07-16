@@ -16,8 +16,8 @@
         class="smart rl"
         v-for="(n,i) in listData"
         :key="`${i}sm`"
-        :style="`cursor: ${isCannotClick(n) ? 'pointer' : 'default'} !important;`"
-        @click.stop="isCannotClick(n) && toEdit(n)"
+        :style="`cursor: ${isCanClick(n) ? 'pointer' : 'default'} !important;`"
+        @click.stop="isCanClick(n) && toEdit(n)"
         @mouseenter="mouseEnter(n)"
         @mouseleave="mouseLeave(n)"
       >
@@ -93,7 +93,7 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item
                 command="edit"
-                v-if="isCannotClick(n)"
+                v-if="isCanClick(n)"
               >
                 {{$t('common.button.edit')}}
               </el-dropdown-item>
@@ -227,8 +227,8 @@ export default {
     handleClose() {
       this.dialogVisible = false
     },
-    isCannotClick(n) {
-      return (n.appType === 'workflow' && !n.publishType && n.appId !== 'example') || n.appType !== 'workflow'
+    isCanClick(n) {
+      return this.isShowTool ? ((n.appType === 'workflow' && !n.publishType && n.appId !== 'example') || n.appType !== 'workflow') : true
     },
     // 公用删除方法
     async handleDelete() {
