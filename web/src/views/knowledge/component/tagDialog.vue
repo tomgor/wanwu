@@ -28,11 +28,11 @@
             v-model="item.selected"
             v-if="!item.showIpt"
           >{{item.tagName}}</el-checkbox>
+          <!-- @blur="inputBlur(item)" -->
           <el-input
             v-model="item.tagName"
             v-if="item.showIpt"
             @keydown.backspace.native="handleDelete(item,index)" 
-            @blur="inputBlur(item)"
             @keyup.enter.native="inputBlur(item)"
           ></el-input>
           <span
