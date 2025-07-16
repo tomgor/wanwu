@@ -172,6 +172,8 @@ export default {
       });
     },
     addTag() {
+      const emptyTag = this.tagList.find(tag => !tag.tagId && tag.tagName === "");
+      if(emptyTag) return;
       this.tagList.unshift({
         tagName: "",
         checked: false,
