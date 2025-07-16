@@ -529,7 +529,7 @@ export default {
       };
       let res = await readWorkFlow(params);
       if (res.code === 0) {
-        this.doCreateWorkFlow(n.id, res.data.base64OpenAPISchema, index);
+        this.doCreateWorkFlow(n.appId, res.data.base64OpenAPISchema, index);
       }
     },
     preAddWorkflow() {
@@ -651,9 +651,10 @@ export default {
       let res = await getExplorationFlowList({name:'',appType:'workflow',searchType:'all'});
       if (res.code === 0) {
         //获取已发布插件
-        this.workflowList = res.data.list.filter((n) => {
-          return n.publishType === "public";
-        });
+        // this.workflowList = res.data.list.filter((n) => {
+        //   return n.publishType === "public";
+        // });
+         this.workflowList = res.data.list || []
         //回显已选插件
         let _workFlowInfos = [];
         workFlowInfos.forEach((n) => {
