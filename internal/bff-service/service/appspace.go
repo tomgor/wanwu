@@ -73,6 +73,15 @@ func GetAppSpaceAppList(ctx *gin.Context, userId, orgId, name, appType string) (
 			ret = append(ret, appBriefProto2Model(ctx, assistantInfo))
 		}
 	}
+	if appType == "" || appType == constant.AppTypeWorkflow {
+		resp, err := ListWorkFlow(ctx, userId, orgId, name)
+		if err != nil {
+			return nil, err
+		}
+		for _, workflowInfo := range resp.List {
+			ret = append(ret, workflowInfo2Model(workflowInfo))
+		}
+	}
 	var appIds []string
 	for _, appInfo := range ret {
 		appIds = append(appIds, appInfo.AppId)
@@ -92,20 +101,9 @@ func GetAppSpaceAppList(ctx *gin.Context, userId, orgId, name, appType string) (
 			ret[idx].PublishType = publishType
 		}
 	}
-
-	if appType == "" || appType == constant.AppTypeWorkflow {
-		resp, err := ListWorkFlow(ctx, userId, orgId, name)
-		if err != nil {
-			return nil, err
-		}
-		for _, workflowInfo := range resp.List {
-			ret = append(ret, workflowInfo2Model(workflowInfo))
-		}
-	}
 	sort.SliceStable(ret, func(i, j int) bool {
 		return ret[i].UpdatedAt > ret[j].UpdatedAt
 	})
-
 	return &response.ListResult{
 		List:  ret,
 		Total: int64(len(ret)),
