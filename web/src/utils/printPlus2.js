@@ -74,10 +74,26 @@ const Looper = function (sIndex, sentence, timer, printCB, endCB,sIndexMap) {
     this.index = 0 //当前打印到的字符位置
     this.printCB = printCB //每打印一个字符的回调
     this.endCB = endCB //句子打印结束的回调
+    this.isCodeBlock = false // 新增：标记是否为代码块
+    this.codeBlockContent = '' // 新增：存储代码块内容
+
+    // 在初始化时检测是否为代码块
+    this.detectCodeBlock()
     this.start()
 }
 
 Looper.prototype = {
+    detectCodeBlock() {
+        // 更宽松的代码块匹配正则
+        const codeBlockRegex = /^```([\s\S]*?)```$/s;
+        const match = this.sentence.match(codeBlockRegex);
+        
+        if (match) {
+            this.isCodeBlock = true;
+            this.codeBlockContent = match[0]; // 整个代码块内容
+            this.sentence = match[1]; // 代码块内部内容（去掉```）
+        }
+    },
     start() {
         if(this.sentence === ''){
             this.printCB('')
@@ -86,17 +102,9 @@ Looper.prototype = {
             return
         }
 
-        // 检查是否是代码块内容（假设代码块以 ```开头）
-        console.log(this.sentence,'打印sentence')
-        const regex = /```(\w+)?\r?\n([\s\S]*?)\r?\n?```/g;
-        let match = regex.exec(this.sentence)
-        console.log(match)
-        if (this.sentence.startsWith('```')) {
-            // 直接渲染整个代码块
-            console.log(this.sentence)
-            this.printCB(this.sentence);
+        if (this.isCodeBlock) {
+            this.printCB('```' + this.sentence + '```');
             this.stop();
-            this.index = this.sentence.length;
             return;
         }
 
