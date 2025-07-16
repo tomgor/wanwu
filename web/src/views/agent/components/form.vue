@@ -659,7 +659,7 @@ export default {
         let _workFlowInfos = [];
         workFlowInfos.forEach((n) => {
           this.workflowList.forEach((m, j) => {
-            if (n.appId === m.id) {
+            if (n.workFlowId === m.appId) {
               const updatedItem = {
                     ...m,         
                     enable:n.enable,
