@@ -239,8 +239,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/mp_common.EmbeddingReq"
                         }
                     }
                 ],
@@ -248,7 +247,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/mp_common.EmbeddingResp"
                         }
                     }
                 }
@@ -280,8 +279,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/mp_common.RerankReq"
                         }
                     }
                 ],
@@ -289,7 +287,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/mp_common.RerankResp"
                         }
                     }
                 }
@@ -333,6 +331,149 @@ const docTemplate = `{
                 },
                 "providerYuanJing": {
                     "$ref": "#/definitions/mp.ProviderModelByYuanjing"
+                }
+            }
+        },
+        "mp_common.Document": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "mp_common.EmbeddingData": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "index": {
+                    "type": "integer"
+                },
+                "object": {
+                    "type": "string"
+                }
+            }
+        },
+        "mp_common.EmbeddingReq": {
+            "type": "object",
+            "required": [
+                "input",
+                "model"
+            ],
+            "properties": {
+                "encoding_format": {
+                    "type": "string"
+                },
+                "input": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "model": {
+                    "type": "string"
+                }
+            }
+        },
+        "mp_common.EmbeddingResp": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mp_common.EmbeddingData"
+                    }
+                },
+                "model": {
+                    "type": "string"
+                },
+                "object": {
+                    "type": "string"
+                },
+                "usage": {
+                    "$ref": "#/definitions/mp_common.Usage"
+                }
+            }
+        },
+        "mp_common.RerankReq": {
+            "type": "object",
+            "required": [
+                "documents",
+                "model",
+                "query"
+            ],
+            "properties": {
+                "documents": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "model": {
+                    "type": "string"
+                },
+                "query": {
+                    "type": "string"
+                },
+                "return_documents": {
+                    "type": "boolean"
+                },
+                "top_n": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        },
+        "mp_common.RerankResp": {
+            "type": "object",
+            "properties": {
+                "model": {
+                    "type": "string"
+                },
+                "object": {
+                    "type": "string"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mp_common.Result"
+                    }
+                },
+                "usage": {
+                    "$ref": "#/definitions/mp_common.Usage"
+                }
+            }
+        },
+        "mp_common.Result": {
+            "type": "object",
+            "properties": {
+                "document": {
+                    "$ref": "#/definitions/mp_common.Document"
+                },
+                "index": {
+                    "type": "integer"
+                },
+                "relevance_score": {
+                    "type": "number"
+                }
+            }
+        },
+        "mp_common.Usage": {
+            "type": "object",
+            "properties": {
+                "completion_tokens": {
+                    "type": "integer"
+                },
+                "prompt_tokens": {
+                    "type": "integer"
+                },
+                "total_tokens": {
+                    "type": "integer"
                 }
             }
         },

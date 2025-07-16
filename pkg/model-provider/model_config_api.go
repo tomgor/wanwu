@@ -15,10 +15,12 @@ type ILLM interface {
 }
 
 type IEmbedding interface {
+	NewReq(req *mp_common.EmbeddingReq) (mp_common.IEmbeddingReq, error)
 	Embeddings(ctx context.Context, req mp_common.IEmbeddingReq, headers ...mp_common.Header) (mp_common.IEmbeddingResp, error)
 }
 
 type IRerank interface {
+	NewReq(req *mp_common.RerankReq) (mp_common.IRerankReq, error)
 	Rerank(ctx context.Context, req mp_common.IRerankReq, headers ...mp_common.Header) (mp_common.IRerankResp, error)
 }
 
