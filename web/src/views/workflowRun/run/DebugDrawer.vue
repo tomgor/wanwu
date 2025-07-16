@@ -2,7 +2,7 @@
   <div class="debug">
     <div class="config-header">
       <!--<i class="el-icon-close close-icon" @click="preClose"></i>-->
-      <div style="color: #888" @click="$router.go(-1)">返回</div>
+      <div style="color: #888; cursor: pointer" @click="$router.go(-1)">返回</div>
       <div class="header-name">{{startNode.workflowName || '--'}}</div>
     </div>
     <div class="form">
