@@ -42,6 +42,7 @@
               placeholder="请选择"
               multiple
               clearable
+              filterable 
               style="width:100%;"
               @visible-change="visibleChange($event,'knowledge')"
             >
@@ -60,6 +61,7 @@
           >
             <el-select
               clearable
+              filterable 
               style="width:100%;"
               loading-text="模型加载中..."
               v-model="formInline.rerankModelId"
@@ -174,15 +176,15 @@ export default {
       this.$router.go(-1);
     },
     startTest() {
+      if (this.question === "") {
+        this.$message.warning("请输入问题");
+        return;
+      }
       if (this.formInline.knowledgeIdList.length === 0) {
         this.$message.warning(this.$t("knowledgeManage.pselectKnowledgeTips"));
         return;
       }
       if (this.formInline.rerankModelId.length === 0) {
-        this.$message.warning(this.$t("knowledgeManage.pselectKnowledgeTips"));
-        return;
-      }
-      if (this.question === "") {
         this.$message.warning("请选择Rerank模型");
         return;
       }
