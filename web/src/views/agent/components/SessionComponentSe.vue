@@ -239,7 +239,6 @@ export default {
           },
           replaceHTML(data,n){
             let _data = data
-            console.log(data,'渲染完成')
             const thinkStart = /<think>/i;
             const thinkEnd = /<\/think>/i;
             const toolStart = /<tool>/i;
@@ -333,9 +332,9 @@ export default {
           this.loading = true
         },
         scrollBottom () {
+          this.loading = false
           if (!this.autoScroll) return;
             this.$nextTick(() => {
-                this.loading = false
                 document.getElementById('timeScroll').scrollTop = document.getElementById('timeScroll').scrollHeight;
             });
         },

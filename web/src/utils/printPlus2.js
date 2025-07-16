@@ -87,7 +87,10 @@ Looper.prototype = {
         }
 
         // 检查是否是代码块内容（假设代码块以 ```开头）
-        // console.log(this.sentence,'打印sentence')
+        console.log(this.sentence,'打印sentence')
+        const regex = /```(\w+)?\r?\n([\s\S]*?)\r?\n?```/g;
+        let match = regex.exec(this.sentence)
+        console.log(match)
         if (this.sentence.startsWith('```')) {
             // 直接渲染整个代码块
             console.log(this.sentence)
