@@ -20,7 +20,7 @@ import (
 
 const (
 	HitTopK              = 3
-	HitThreshold float64 = 0.0
+	HitThreshold float64 = 0.4
 )
 
 func (s *Service) SelectKnowledgeList(ctx context.Context, req *knowledgebase_service.KnowledgeSelectReq) (*knowledgebase_service.KnowledgeSelectListResp, error) {
