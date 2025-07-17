@@ -173,8 +173,19 @@ export default {
       knowLegOptions:this.getKnowOptions(),
       knowledgeData: [],
       currentKnowValue:null,
-      timer:null
+      timer:null,
+      refreshCount:0
     };
+  },
+  watch:{
+    '$route':{
+      handler(val){
+        if(val.query.done){
+          this.startTimer()
+        }
+      },
+      immediate:true
+    }
   },
   mounted(){
     this.getTableData(this.docQuery)
@@ -184,12 +195,16 @@ export default {
   },
   methods: {
     startTimer(){
-      this.timer = setInterval(() =>{
+      this.clearTimer();
+      if (this.refreshCount >= 2) {
+        return;
+      }
+      const delay = this.refreshCount === 0 ? 3000 : 5000;
+      this.timer = setTimeout(() =>{
         this.getTableData(this.docQuery)
-      },30000)
-      setTimeout(() => {
-          this.clearTimer();
-      },60000);
+        this.refreshCount++;
+        this.startTimer()
+      },delay)
     },
     clearTimer() {
       if (this.timer) {

@@ -413,7 +413,7 @@ export default {
       }
       docImport(data).then(res =>{
           if(res.code === 0){
-            this.$router.push({path:`/knowledge/doclist/${this.knowledgeId}?name=${this.knowledgeName}`})
+            this.$router.push({path:`/knowledge/doclist/${this.knowledgeId}`,query:{name:this.knowledgeName,done:'fileUpload'}})
           }
         })
     },

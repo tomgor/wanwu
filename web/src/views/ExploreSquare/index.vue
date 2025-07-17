@@ -37,7 +37,6 @@ export default {
   components: { SearchInput, CreateTotalDialog, AppList },
   data() {
     return {
-      appName:'',
       placeholder:'输入应用名称搜索',
       asideTitle:'历史应用',
       activeName:'agent',
