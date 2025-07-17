@@ -199,7 +199,7 @@ export default {
       if (this.refreshCount >= 2) {
         return;
       }
-      const delay = this.refreshCount === 0 ? 3000 : 5000;
+      const delay = this.refreshCount === 0 ? 1000 : 3000;
       this.timer = setTimeout(() =>{
         this.getTableData(this.docQuery)
         this.refreshCount++;
