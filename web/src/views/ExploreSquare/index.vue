@@ -8,7 +8,7 @@
               <span>{{item.name}}</span>
             </div>
           </div>
-            <!-- <SearchInput :placeholder="placeholder" style="width:200px;" @handleSearch="handleSearch"/> -->
+            <SearchInput :placeholder="placeholder" style="width:200px;" @handleSearch="handleSearch"/>
         </div>
         <div>
         <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -37,6 +37,7 @@ export default {
   components: { SearchInput, CreateTotalDialog, AppList },
   data() {
     return {
+      appName:'',
       placeholder:'输入应用名称搜索',
       asideTitle:'历史应用',
       activeName:'agent',
@@ -81,17 +82,12 @@ export default {
       }
     }
   },
-  computed: {
-    // ...mapGetters('app', ['historyAppList'])
-  },
   created(){
-    // this.getHistoryList();
     this.getExplorData(this.activeName,this.active)
   },
   mounted() {
   },
   methods: {
-    // ...mapActions('app', ['getHistoryList']),
     handleSearch(value){
       this.searchValue = value;
       this.getExplorData(this.activeName,this.active)
@@ -164,7 +160,6 @@ export default {
   
 // }
 .page-wrapper{
-  // padding: 20px;
   margin:20px;
   box-sizing:border-box;
   .header-top{
