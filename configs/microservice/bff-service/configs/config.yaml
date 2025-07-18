@@ -108,7 +108,10 @@ knowledge:
 workflow:
   host: http://agentscope-wanwu:6672
   workflow_list_uri: "/workflow/list"
+  workflow_list_uri_internal: "/workflow/list_internal"
   delete_workflow_uri: "/workflow/delete"
+  publish_workflow_uri: "/plugin/api/publish"
+  unpublish_workflow_uri: "/plugin/api/unpublish"
 
 agent:
   host: agent-wanwu

@@ -96,6 +96,7 @@ rag-server:
   init-knowledge-uri: '/rag/init-knowledge-base'
   update-knowledge-uri: '/rag/update-kb-name'
   delete-knowledge-uri: '/rag/del-knowledge-base'
+  knowledge-hit-uri: '/rag/search-knowledge-base'
   get-doc-segment-uri: '/rag/get-content-list'
   doc-segment-update-status-uri: '/rag/update-content-status'
   doc-delete-uri: '/rag/del-knowledge-file'

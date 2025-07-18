@@ -25,6 +25,100 @@ definitions:
       providerYuanJing:
         $ref: '#/definitions/mp.ProviderModelByYuanjing'
     type: object
+  mp_common.Document:
+    properties:
+      text:
+        type: string
+    type: object
+  mp_common.EmbeddingData:
+    properties:
+      embedding:
+        items:
+          type: number
+        type: array
+      index:
+        type: integer
+      object:
+        type: string
+    type: object
+  mp_common.EmbeddingReq:
+    properties:
+      encoding_format:
+        type: string
+      input:
+        items:
+          type: string
+        type: array
+      model:
+        type: string
+    required:
+    - input
+    - model
+    type: object
+  mp_common.EmbeddingResp:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/mp_common.EmbeddingData'
+        type: array
+      model:
+        type: string
+      object:
+        type: string
+      usage:
+        $ref: '#/definitions/mp_common.Usage'
+    type: object
+  mp_common.RerankReq:
+    properties:
+      documents:
+        items:
+          type: string
+        type: array
+      model:
+        type: string
+      query:
+        type: string
+      return_documents:
+        type: boolean
+      top_n:
+        minimum: 0
+        type: integer
+    required:
+    - documents
+    - model
+    - query
+    type: object
+  mp_common.RerankResp:
+    properties:
+      model:
+        type: string
+      object:
+        type: string
+      results:
+        items:
+          $ref: '#/definitions/mp_common.Result'
+        type: array
+      usage:
+        $ref: '#/definitions/mp_common.Usage'
+    type: object
+  mp_common.Result:
+    properties:
+      document:
+        $ref: '#/definitions/mp_common.Document'
+      index:
+        type: integer
+      relevance_score:
+        type: number
+    type: object
+  mp_common.Usage:
+    properties:
+      completion_tokens:
+        type: integer
+      prompt_tokens:
+        type: integer
+      total_tokens:
+        type: integer
+    type: object
   mp_openai_compatible.Embedding:
     properties:
       apiKey:
@@ -328,15 +422,14 @@ paths:
         name: data
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/mp_common.EmbeddingReq'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/mp_common.EmbeddingResp'
       summary: Model Embeddings
       tags:
       - callback
@@ -355,15 +448,14 @@ paths:
         name: data
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/mp_common.RerankReq'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/mp_common.RerankResp'
       summary: Model Rerank
       tags:
       - callback

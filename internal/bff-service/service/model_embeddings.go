@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ModelEmbeddings(ctx *gin.Context, modelID string, req map[string]interface{}) {
+func ModelEmbeddings(ctx *gin.Context, modelID string, req *mp_common.EmbeddingReq) {
 	// modelInfo by modelID
 	modelInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: modelID})
 	if err != nil {
@@ -24,11 +24,9 @@ func ModelEmbeddings(ctx *gin.Context, modelID string, req map[string]interface{
 
 	// 校验model字段
 	if req != nil {
-		if _, exists := req["model"]; exists {
-			if req["model"] != modelInfo.Model {
-				gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v embeddings err: model mismatch!", modelInfo.ModelId)))
-				return
-			}
+		if req.Model != "" && req.Model != modelInfo.Model {
+			gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v embeddings err: model mismatch!", modelInfo.ModelId)))
+			return
 		}
 	}
 
@@ -44,13 +42,17 @@ func ModelEmbeddings(ctx *gin.Context, modelID string, req map[string]interface{
 		return
 	}
 	// embeddings
-	embeddingReq := mp_common.NewEmbeddingReq(req)
+	embeddingReq, err := iEmbedding.NewReq(req)
+	if err != nil {
+		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v embeddings NewReq err: %v", modelInfo.ModelId, err)))
+		return
+	}
 	resp, err := iEmbedding.Embeddings(ctx.Request.Context(), embeddingReq)
 	if err != nil {
 		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v embeddings err: %v", modelInfo.ModelId, err)))
 		return
 	}
-	if data, ok := resp.Data(); ok {
+	if data, ok := resp.ConvertResp(); ok {
 		status := http.StatusOK
 		ctx.Set(config.STATUS, status)
 		//ctx.Set(config.RESULT, resp.String())

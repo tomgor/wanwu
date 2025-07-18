@@ -82,18 +82,13 @@ func appModelConfigModel2Proto(appModel request.AppModelConfig) (*common.AppMode
 }
 
 func workflowInfo2Model(workflowInfo response.WorkFlowInfo) response.AppBriefInfo {
-	publishType := ""
-	if workflowInfo.Status == PublishedStatus {
-		publishType = constant.AppPublishPrivate
-	}
 	return response.AppBriefInfo{
 		AppId:   workflowInfo.Id,
 		AppType: constant.AppTypeWorkflow,
 		//Avatar:    CacheAvatar(ctx, workflowInfo.AvatarPath),
-		PublishType: publishType,
-		Name:        workflowInfo.ConfigName,
-		Desc:        workflowInfo.ConfigDesc,
-		CreatedAt:   workflowInfo.UpdatedTime,
-		UpdatedAt:   workflowInfo.UpdatedTime,
+		Name:      workflowInfo.ConfigName,
+		Desc:      workflowInfo.ConfigDesc,
+		CreatedAt: workflowInfo.UpdatedTime,
+		UpdatedAt: workflowInfo.UpdatedTime,
 	}
 }

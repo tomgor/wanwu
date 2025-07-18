@@ -10,11 +10,17 @@ import (
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/generator"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/util"
+	rag_service "github.com/UnicomAI/wanwu/internal/knowledge-service/service"
 	"github.com/UnicomAI/wanwu/pkg/log"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	"google.golang.org/protobuf/types/known/emptypb"
+)
+
+const (
+	HitTopK              = 3
+	HitThreshold float64 = 0.4
 )
 
 func (s *Service) SelectKnowledgeList(ctx context.Context, req *knowledgebase_service.KnowledgeSelectReq) (*knowledgebase_service.KnowledgeSelectListResp, error) {
@@ -121,6 +127,27 @@ func (s *Service) DeleteKnowledge(ctx context.Context, req *knowledgebase_servic
 	return &emptypb.Empty{}, nil
 }
 
+// KnowledgeHit 知识库命中测试
+func (s *Service) KnowledgeHit(ctx context.Context, req *knowledgebase_service.KnowledgeHitReq) (*knowledgebase_service.KnowledgeHitResp, error) {
+	list, err := orm.SelectKnowledgeByIdList(ctx, req.KnowledgeIdList, req.UserId, req.OrgId)
+	if err != nil {
+		return nil, err
+	}
+	hitResp, err := rag_service.RagKnowledgeHit(ctx, &rag_service.KnowledgeHitParams{
+		UserId:        req.UserId,
+		Question:      req.Question,
+		KnowledgeBase: buildKnowledgeNameList(list),
+		TopK:          HitTopK,
+		Threshold:     HitThreshold,
+		RerankModelId: req.RerankModelId,
+	})
+	if err != nil {
+		log.Errorf("RagKnowledgeHit error %s", err)
+		return nil, util.ErrCode(errs.Code_KnowledgeBaseHitFailed)
+	}
+	return buildKnowledgeBaseHitResp(hitResp), nil
+}
+
 // buildKnowledgeListResp 构造知识库列表返回结果
 func buildKnowledgeListResp(knowledgeList []*model.KnowledgeBase, knowledgeTagMap map[string][]*orm.TagRelationDetail) *knowledgebase_service.KnowledgeSelectListResp {
 	if len(knowledgeList) == 0 {
@@ -207,4 +234,37 @@ func buildKnowledgeBaseModel(req *knowledgebase_service.CreateKnowledgeReq) (*mo
 		CreatedAt:      time.Now().UnixMilli(),
 		UpdatedAt:      time.Now().UnixMilli(),
 	}, nil
+}
+
+// buildKnowledgeNameList 构造知识库名称
+func buildKnowledgeNameList(knowledgeList []*model.KnowledgeBase) []string {
+	if len(knowledgeList) == 0 {
+		return make([]string, 0)
+	}
+	var knowledgeNameList []string
+	for _, knowledge := range knowledgeList {
+		knowledgeNameList = append(knowledgeNameList, knowledge.Name)
+	}
+	return knowledgeNameList
+}
+
+// buildKnowledgeBaseHitResp 构造知识库命中返回
+func buildKnowledgeBaseHitResp(ragKnowledgeHitResp *rag_service.RagKnowledgeHitResp) *knowledgebase_service.KnowledgeHitResp {
+	knowledgeHitData := ragKnowledgeHitResp.Data
+	var searchList = make([]*knowledgebase_service.KnowledgeSearchInfo, 0)
+	list := knowledgeHitData.SearchList
+	if len(list) > 0 {
+		for _, search := range list {
+			searchList = append(searchList, &knowledgebase_service.KnowledgeSearchInfo{
+				Title:         search.Title,
+				Snippet:       search.Snippet,
+				KnowledgeName: search.KbName,
+			})
+		}
+	}
+	return &knowledgebase_service.KnowledgeHitResp{
+		Prompt:     knowledgeHitData.Prompt,
+		Score:      knowledgeHitData.Score,
+		SearchList: searchList,
+	}
 }

@@ -90,10 +90,10 @@ func CheckSameKnowledgeTagName(ctx context.Context, userId, orgId, name string) 
 		Count(&count).Error
 	if err != nil {
 		log.Errorf("KnowledgeTagNameExist userId %s name %s err: %v", userId, name, err)
-		return util.ErrCode(errs.Code_KnowledgeBaseDuplicateName)
+		return util.ErrCode(errs.Code_KnowledgeTagDuplicateName)
 	}
 	if count > 0 {
-		return util.ErrCode(errs.Code_KnowledgeBaseDuplicateName)
+		return util.ErrCode(errs.Code_KnowledgeTagDuplicateName)
 	}
 	return nil
 }

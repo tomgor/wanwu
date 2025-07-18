@@ -6,6 +6,11 @@ type KnowledgeTagSelectReq struct {
 	CommonCheck
 }
 
+type TagBindCountReq struct {
+	TagId string `json:"tagId" form:"tagId" validate:"required"`
+	CommonCheck
+}
+
 type CreateKnowledgeTagReq struct {
 	TagName string `json:"tagName" form:"tagName" validate:"required"`
 	CommonCheck

@@ -5,6 +5,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm/sqlopt"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/db"
+	"github.com/UnicomAI/wanwu/pkg/log"
 	"gorm.io/gorm"
 )
 
@@ -37,6 +38,19 @@ func SelectKnowledgeIdByTagId(ctx context.Context, tagIdList []string) ([]string
 		return nil, err
 	}
 	return knowledgeIdList, nil
+}
+
+// SelectKnowledgeCountByTagId 根据tagId 查询知识库id数量
+func SelectKnowledgeCountByTagId(ctx context.Context, tagId string) (int64, error) {
+	var count int64
+	err := db.GetHandle(ctx).Model(&model.KnowledgeTagRelation{}).
+		Where("tag_id = ?", tagId).
+		Count(&count).Error
+	if err != nil {
+		log.Errorf("SelectKnowledgeCountByTagId error %v", err)
+		return 0, err
+	}
+	return count, nil
 }
 
 // BindKnowledgeTag 绑定知识库标签
