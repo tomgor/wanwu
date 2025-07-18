@@ -443,25 +443,23 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 			// 在accessedWorkFlowList中查找匹配的工作流
 			found := false
 			if accessedWorkFlowList != nil && accessedWorkFlowList.List != nil {
-				// 类型断言：将interface{}转换为[]interface{}
-				if listSlice, ok := accessedWorkFlowList.List.([]interface{}); ok {
-					for _, item := range listSlice {
-						if workflowItem, ok := item.(map[string]interface{}); ok {
-							if appId, exists := workflowItem["appId"]; exists && appId == wf.WorkFlowId {
-								// 找到匹配的工作流，设置名称和描述
-								if name, ok := workflowItem["name"].(string); ok {
-									workFlowInfo.WorkFlowName = name
-								}
-								if desc, ok := workflowItem["desc"].(string); ok {
-									workFlowInfo.WorkFlowDesc = desc
-								}
-								found = true
-								log.Debugf("找到工作流信息: WorkFlowId=%s, Name=%s, Desc=%s", wf.WorkFlowId, workFlowInfo.WorkFlowName, workFlowInfo.WorkFlowDesc)
-								break
-							}
+				log.Debugf("accessedWorkFlowList.List的实际类型: %T", accessedWorkFlowList.List)
+				// 类型断言：将[]interface{}转换为[]*response.ExplorationAppInfo
+				if appInfoList, ok := accessedWorkFlowList.List.([]*response.ExplorationAppInfo); ok {
+					for _, appInfo := range appInfoList {
+						if appInfo.AppId == wf.WorkFlowId {
+							// 找到匹配的工作流，设置名称和描述
+							workFlowInfo.WorkFlowName = appInfo.Name
+							workFlowInfo.WorkFlowDesc = appInfo.Desc
+							found = true
+							break
 						}
 					}
+				} else {
+					log.Debugf("类型断言失败，无法转换为[]response.ExplorationAppInfo，实际类型: %T", accessedWorkFlowList.List)
 				}
+			} else {
+				log.Debugf("accessedWorkFlowList为空或List为空")
 			}
 
 			// 如果没有找到匹配的工作流，设置为无效
