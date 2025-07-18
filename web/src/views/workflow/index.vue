@@ -99,7 +99,7 @@
               输入txt、pdf、docx、xlsx、csv、pptx等格式文档的URL，可以解析提取出文档的文本内容
             </div>
           </div>
-          <div class="node-items-box"> <!--@click="preAddNode('gui')"-->
+          <!--<div class="node-items-box"> &lt;!&ndash;@click="preAddNode('gui')"&ndash;&gt;
             <span>
               <img :src="iconObj.GUIAgentNode" />&nbsp; GUI 智能体节点
             </span>
@@ -146,7 +146,7 @@
             <div class="nodeSelectDesc">
               变量赋值节点用于向可写入变量（例如对会话变量）进行变量赋值
             </div>
-          </div>
+          </div>-->
         </div>
         <el-button
           slot="reference"
