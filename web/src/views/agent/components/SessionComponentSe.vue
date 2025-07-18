@@ -139,6 +139,7 @@
 </template>
 
 <script>
+import { md } from '@/mixins/marksown-it'
 import {marked} from 'marked'
 var highlight = require('highlight.js');
 import 'highlight.js/styles/atom-one-dark.css';
@@ -161,6 +162,7 @@ export default {
   props: ['sessionStatus','defaultUrl'],
   data(){
       return{
+          md:md,
           autoScroll:true,
           scrollTimeout:null,
           isDs:['txt2txt-002-001','txt2txt-002-002','txt2txt-002-004','txt2txt-002-005','txt2txt-002-006','txt2txt-002-007','txt2txt-002-008'].indexOf(this.$route.params.id) !=-1,
@@ -237,16 +239,6 @@ export default {
           },
           replaceHTML(data,n){
             let _data = data
-            // var a = new RegExp('<think>')
-            // var b = new RegExp('</think>')
-            // if(b.test(data)){
-            //   n.thinkText = this.$t('agent.alreadyThink')
-            // }
-            // // 如果没有返回前缀，则补上
-            // if(b.test(data) && !a.test(data)){
-            //   _data = '<think>\n'+data
-            // }
-            // return _data.replace(/think>/g,'section>')
             const thinkStart = /<think>/i;
             const thinkEnd = /<\/think>/i;
             const toolStart = /<tool>/i;
@@ -267,7 +259,6 @@ export default {
                 data = '<tool>\n' + data;
               }
             }
-
             // 统一替换为 section 标签
             return data.replace(/think>/gi, 'section>').replace(/tool>/gi, 'section>');
           },
@@ -340,10 +331,16 @@ export default {
           this.loading = true
         },
         scrollBottom () {
+          this.loading = false
           if (!this.autoScroll) return;
             this.$nextTick(() => {
-                this.loading = false
                 document.getElementById('timeScroll').scrollTop = document.getElementById('timeScroll').scrollHeight;
+            });
+        },
+        codeScrollBottom(){
+          this.$nextTick(() => {
+                this.loading = false
+                document.getElementsByTagName('code').scrollTop = document.getElementsByTagName('code').scrollHeight;
             });
         },
         pushHistory(data){
@@ -353,6 +350,7 @@ export default {
         replaceLastData(index,data){
           this.$set(this.session_data.history,index,data)
           this.scrollBottom()
+          this.codeScrollBottom();//code内容置底
         },
         getFileSizeDisplay(fileSize){
             if (!fileSize || typeof fileSize !== 'number' || isNaN(fileSize)) {
@@ -429,9 +427,6 @@ export default {
         preCai(index,item){
             if(this.sessionStatus === 0){return}
             this.$set(this.session_data.history,index,{...item,evaluate:2})
-        },
-        doScore(index,evaluate){
-
         },
         //=================标注相关===============
         initCanvasUtil () {
@@ -528,14 +523,18 @@ export default {
      min-height: 50px;
      word-wrap: break-word;
      resize: vertical;
-     scroll-snap-type: y mandatory;/* 垂直方向强制吸附 */
      .hljs{
         max-height:300px!important;
         white-space: pre-wrap !important;
         min-height: 50px;
         word-wrap: break-word;
         resize: vertical;
-        scroll-snap-align: end; /* 最后一条消息吸附到底部 */
+     }
+     code{
+      display: block;
+      white-space: pre-wrap;
+      word-break:break-all;
+      scroll-behavior:smooth;
      }
   }
   .el-loading-mask{
@@ -545,12 +544,16 @@ export default {
     img{
         width: 80% !important;
       }
+    section li{
+      list-style-position: inside; /* 将标记符号放在内容框内 */
+    }
   }
   .search-list{
     img{
       width: 80% !important;
     }
   }
+
 }
 .more{
   color: #384BF7;

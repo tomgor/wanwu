@@ -40,6 +40,14 @@ func (s *Service) PublishApp(ctx context.Context, req *app_service.PublishAppReq
 	return &emptypb.Empty{}, nil
 }
 
+func (s *Service) UnPublishApp(ctx context.Context, req *app_service.UnPublishAppReq) (*emptypb.Empty, error) {
+	err := s.cli.UnPublishApp(ctx, req.AppId, req.AppType, req.UserId)
+	if err != nil {
+		return nil, errStatus(errs.Code_AppExploration, err)
+	}
+	return &emptypb.Empty{}, nil
+}
+
 func (s *Service) GetAppList(ctx context.Context, req *app_service.GetAppListReq) (*app_service.AppList, error) {
 	publishAppList, err := s.cli.GetAppList(ctx, req.UserId, req.OrgId, req.AppType)
 	if err != nil {

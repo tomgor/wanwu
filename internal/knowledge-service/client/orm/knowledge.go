@@ -15,9 +15,17 @@ import (
 )
 
 // SelectKnowledgeList 查询知识库列表
-func SelectKnowledgeList(ctx context.Context, userId, orgId, name string) ([]*model.KnowledgeBase, error) {
+func SelectKnowledgeList(ctx context.Context, userId, orgId, name string, tagIdList []string) ([]*model.KnowledgeBase, error) {
+	var knowledgeIdList []string
+	var err error
+	if len(tagIdList) > 0 {
+		knowledgeIdList, err = SelectKnowledgeIdByTagId(ctx, tagIdList)
+		if err != nil {
+			return nil, err
+		}
+	}
 	var knowledgeList []*model.KnowledgeBase
-	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.LikeName(name), sqlopt.WithDelete(0)).
+	err = sqlopt.SQLOptions(sqlopt.WithKnowledgeIDList(knowledgeIdList), sqlopt.WithPermit(orgId, userId), sqlopt.LikeName(name), sqlopt.WithDelete(0)).
 		Apply(db.GetHandle(ctx), &model.KnowledgeBase{}).
 		Order("create_at desc").
 		Find(&knowledgeList).
@@ -39,6 +47,19 @@ func SelectKnowledgeById(ctx context.Context, knowledgeId, userId, orgId string)
 		return nil, util.ErrCode(errs.Code_KnowledgeBaseAccessDenied)
 	}
 	return &knowledge, nil
+}
+
+// SelectKnowledgeByIdList 查询知识库信息
+func SelectKnowledgeByIdList(ctx context.Context, knowledgeIdList []string, userId, orgId string) ([]*model.KnowledgeBase, error) {
+	var knowledgeList []*model.KnowledgeBase
+	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.WithKnowledgeIDList(knowledgeIdList), sqlopt.WithDelete(0)).
+		Apply(db.GetHandle(ctx), &model.KnowledgeBase{}).
+		Find(&knowledgeList).Error
+	if err != nil {
+		log.Errorf("SelectKnowledgeByIdList userId %s err: %v", userId, err)
+		return nil, util.ErrCode(errs.Code_KnowledgeBaseAccessDenied)
+	}
+	return knowledgeList, nil
 }
 
 // SelectKnowledgeByName 查询知识库信息

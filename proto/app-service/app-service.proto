@@ -18,6 +18,7 @@ service AppService {
   rpc RecordAppHistory(RecordAppHistoryReq) returns (google.protobuf.Empty) {}
   // --- app ---
   rpc PublishApp(PublishAppReq) returns (google.protobuf.Empty){}
+  rpc UnPublishApp(UnPublishAppReq) returns (google.protobuf.Empty){}
   rpc GetAppList(GetAppListReq) returns (AppList){}
   rpc GetAppListByIds(GetAppListByIdsReq) returns (AppList){}
   rpc DeleteApp(DeleteAppReq) returns (google.protobuf.Empty) {}
@@ -102,12 +103,18 @@ message RecordAppHistoryReq {
   string appType = 3;
 }
 
-message PublishAppReq{
+message PublishAppReq {
   string appId = 1;
   string appType = 2;
   string publishType = 3;
   string userId = 4;
   string orgId = 5;
+}
+
+message UnPublishAppReq {
+  string appId = 1;
+  string appType = 2;
+  string userId = 3;
 }
 
 message GetAppListReq {

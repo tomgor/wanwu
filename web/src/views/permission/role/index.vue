@@ -253,7 +253,7 @@ export default {
     color: #555;
   }
   .add-bt {
-    margin: 20px 0;
+    margin: 0 0 20px;
     img {
       width: 16px;
       margin-right: 5px;

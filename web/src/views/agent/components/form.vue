@@ -35,7 +35,7 @@
             <div class="img">
               <img :src="editForm.avatar.path ? `/user/api`+ editForm.avatar.path : '@/assets/imgs/bg-logo.png'" />
             </div>
-            <div>
+            <div class="basicInfo-desc">
               <span class="basicInfo-title">{{editForm.name || '无信息'}}</span>
               <span class="el-icon-edit-outline editIcon" @click="editAgent"></span>
               <p>{{editForm.desc || '无信息'}}</p>
@@ -61,6 +61,7 @@
                 class="cover-input-icon model-select"
                 :disabled="isPublish"
                 :loading="modelLoading"
+                clearable
               >
                 <el-option
                   v-for="(item,index) in modleOptions"
@@ -151,6 +152,7 @@
                 style="width:100%;"
                 :disabled="isPublish"
                 :loading="modelLoading"
+                clearable
               >
                 <el-option
                   v-for="(item,index) in rerankOptions"
@@ -216,12 +218,13 @@
                     class="name"
                     style="color: #333"
                   >
-                    {{ n.configName }}
+                    <span v-if="n.valid">{{ n.workFlowName }}</span>
+                    <span v-else>工具已失效</span>
                   </div>
 
                   <div class="bt">
-                    <el-switch v-model="n.enable" class="bt-switch" @change="workflowSwitch(n.workFlowId)"></el-switch>
-                    <span @click="workflowRemove(n.workFlowId)" class="el-icon-delete del"></span>
+                    <el-switch v-model="n.enable" class="bt-switch" @change="workflowSwitch(n.id)" v-if="n.valid"></el-switch>
+                    <span @click="workflowRemove(n.id)" class="el-icon-delete del"></span>
                   </div>
                 </div>
               </div>
@@ -260,8 +263,8 @@
           >
             <img class="workflow-item-icon" :src="require('@/assets/imgs/workflowIcon.png')" />
             <div class="workflow-item-info">
-              <p class="info-name">{{ n.configName }}</p>
-              <p class="info-desc">{{ n.configDesc }}</p>
+              <p class="info-name">{{ n.name }}</p>
+              <p class="info-desc">{{ n.desc }}</p>
             </div>
             <div class="workflow-item-bt">
               <el-button v-if="n.checked" disabled size="mini"
@@ -305,7 +308,7 @@ import { getAgentInfo,addWorkFlowInfo,delWorkFlowInfo,delActionInfo,putAgentInfo
 import ActionConfig from "./action";
 import ToolDiaglog from "./toolDialog";
 import LinkDialog from "./linkDialog";
-import { getWorkFlowList,readWorkFlow} from "@/api/workflow";
+import { getWorkFlowList,readWorkFlow,getExplorationFlowList} from "@/api/workflow";
 import { Base64 } from "js-base64";
 import Chat from "./chat";
 export default {
@@ -523,11 +526,11 @@ export default {
     },
     async getWorkFlowDetail(n, index) {
       let params = {
-        workflowID: n.id,
+        workflowID: n.appId,
       };
       let res = await readWorkFlow(params);
       if (res.code === 0) {
-        this.doCreateWorkFlow(n.id, res.data.base64OpenAPISchema, index);
+        this.doCreateWorkFlow(n.appId, res.data.base64OpenAPISchema, index);
       }
     },
     preAddWorkflow() {
@@ -552,7 +555,7 @@ export default {
     },
     async getKnowledgeList() {
       //获取文档知识分类
-      const res = await getKnowledgeList();
+      const res = await getKnowledgeList({});
       if (res.code === 0) {
         this.knowledgeData = res.data.knowledgeList || [];
       } else {
@@ -625,8 +628,9 @@ export default {
           prologue: data.prologue || "",//开场白
           name: data.name || "",
           desc: data.desc || "",
+          instructions:data.instructions || "",//系统提示词
           rerankParams:data.rerankConfig.modelId || "",
-          modelConfig:data.modelConfig.config,
+          modelConfig:data.modelConfig.config !== null ?data.modelConfig.config : this.editForm.modelConfig,
           modelParams: data.modelConfig.modelId || "",
           recommendQuestion:data.recommendQuestion && data.recommendQuestion.length >0
             ? data.recommendQuestion.map((n,index) => {
@@ -641,21 +645,18 @@ export default {
         };
 
         //回显自定义插件
+        this.workFlowInfos = data.workFlowInfos || []
         this.getWorkflowList(data.workFlowInfos || []);
       }
     },
     async getWorkflowList(workFlowInfos) {
-      let res = await getWorkFlowList();
+      let res = await getExplorationFlowList({name:'',appType:'workflow',searchType:'all'});
       if (res.code === 0) {
-        //获取已发布插件
-        this.workflowList = res.data.list.filter((n) => {
-          return n.status === "published";
-        });
-        //回显已选插件
-        let _workFlowInfos = [];
+         this.workflowList = res.data.list || []
+        //对比数据回显已选插件
         workFlowInfos.forEach((n) => {
           this.workflowList.forEach((m, j) => {
-            if (n.workFlowId === m.id) {
+            if (n.workFlowId === m.appId) {
               const updatedItem = {
                     ...m,         
                     enable:n.enable,
@@ -663,11 +664,9 @@ export default {
                     checked: true
                   };
               this.$set(this.workflowList, j, updatedItem);
-              _workFlowInfos.push(updatedItem );
             }
           });
         });
-        this.workFlowInfos = _workFlowInfos;
       }
     },
     async doCreateWorkFlow(workFlowId, schema, index) {
@@ -941,15 +940,16 @@ export default {
       padding:10px 0;
       margin-top:10px;
       .img{
-        width:70px;
-        height:70px;
         padding:10px;
         img{
-          border:1px solid #eee;
           border-radius:50%;
-          width:100%;
-          height:100%;
+          border:1px solid #eee;
+          width:60px;
+          height:60px;
           object-fit: cover;
+        }
+        .basicInfo-desc{
+          flex:1;
         }
       }
       .basicInfo-title{

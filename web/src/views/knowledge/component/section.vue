@@ -73,7 +73,7 @@
                 <el-switch
                   style="float: right; padding: 3px 0"
                   v-model="item.available"
-                  active-color="#E60001"
+                  active-color="#384bf7"
                   @change="handleStatusChange(item, index)"
                 >
                 </el-switch>
@@ -117,7 +117,7 @@
           @change="handleDetailStatusChange"
           style="float: right; padding: 3px 0"
           v-model="cardObj[0].available"
-          active-color="#E60001"
+          active-color="#384bf7"
         >
         </el-switch>
       </div>

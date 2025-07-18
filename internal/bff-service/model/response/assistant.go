@@ -28,10 +28,13 @@ type ActionInfos struct {
 }
 
 type WorkFlowInfos struct {
-	Id         string `json:"id"`
-	WorkFlowId string `json:"workFlowId"`
-	ApiName    string `json:"apiName"`
-	Enable     bool   `json:"enable"`
+	Id           string `json:"id"`
+	WorkFlowId   string `json:"workFlowId"`
+	ApiName      string `json:"apiName"`
+	Enable       bool   `json:"enable"`
+	WorkFlowName string `json:"workFlowName"`
+	WorkFlowDesc string `json:"workFlowDesc"`
+	Valid        bool   `json:"valid"`
 }
 
 type Action struct {
@@ -94,6 +97,7 @@ type AssistantCreateResp struct {
 
 type AssistantTemplateInfo struct {
 	AssistantTemplateId string `json:"assistantTemplateId"` // 智能体模板Id
+	AppType             string `json:"appType"`             // 应用类型(固定值: agentTemplate)
 	Category            string `json:"category"`            // 种类(gov:政务,industry:工业,edu:文教,medical:医疗)
 	request.AppBriefConfig
 	Prologue                  string   `json:"prologue"`            // 开场白

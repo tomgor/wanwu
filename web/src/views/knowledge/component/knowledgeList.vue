@@ -16,7 +16,10 @@
         v-for="(n,i) in listData" 
         :key="`${i}sm`" 
         @click.stop="toDocList(n)">
-          <img  class="logo" :src="require('@/assets/imgs/knowledgeIcon.png')" />
+          <div>
+              <img  class="logo" :src="require('@/assets/imgs/knowledgeIcon.png')" />
+              <p :class="['smartDate']">{{n.docCount || 0}}个文档</p>
+          </div>
           <div class="info rl">
             <p class="name" :title="n.name">
               {{n.name}}
@@ -32,8 +35,12 @@
             </el-tooltip>
           </div>
           <div class="tags">
-            <!-- <span style="margin-left: 5px">{{n.stringNum || 0}}个字符</span> -->
-            <span :class="['smartDate']">{{n.docCount || 0}}个文档 </span>
+            <!-- <span :class="['smartDate','tagList']">{{n.docCount || 0}}个文档</span> -->
+            <span :class="['smartDate','tagList']" v-if="formattedTagNames(n.knowledgeTagList).length === 0" @click.stop="addTag(n.knowledgeId)">
+              <span class="el-icon-price-tag icon-tag"></span>
+              添加标签
+            </span>
+            <span v-else @click.stop="addTag(n.knowledgeId)">{{formattedTagNames(n.knowledgeTagList) }}</span>
           </div>
           <div class="editor">
             <el-dropdown @command="handleClick($event, n)" placement="top">
@@ -50,14 +57,16 @@
       </template>
     </div>
     <el-empty class="noData" v-if="!(listData && listData.length)" :description="$t('common.noData')"></el-empty>
+    <tagDialog ref="tagDialog" @relodaData="relodaData"/>
   </div>
 </template>
 
 <script>
 import { delKnowledgeItem } from "@/api/knowledge";
-import { removeDoc } from "@/api/knowledge";
 import { AppType } from "@/utils/commonSet"
+import tagDialog from './tagDialog.vue';
 export default {
+  components:{tagDialog},
   props:{
     appData:{
       type:Array,
@@ -82,6 +91,19 @@ export default {
     }
   },
   methods:{
+  formattedTagNames(data){
+    if(data.length === 0){
+      return [];
+    }
+    const tags = data.filter(item => item.selected).map(item =>  item.tagName ).join(', ');
+    if (tags.length > 30) {
+        return tags.slice(0, 30) + '...';
+    }
+    return tags;
+  },
+  addTag(id){
+    this.$refs.tagDialog.showDiaglog(id);
+  },
   showCreate(){
     this.$parent.showCreate();
   },
@@ -97,6 +119,9 @@ export default {
     },
     editItem(row) {
       this.$emit('editItem', row)
+    },
+    relodaData(){
+      this.$emit('reloadData');
     },
     deleteItem(knowledgeId){
       this.$confirm(this.$t('knowledgeManage.delKnowledgeTips'), this.$t('knowledgeManage.tip'), {
@@ -138,6 +163,11 @@ export default {
 .app-card {
   .smart {
     height: 152px;
+    .smartDate{
+      // text-align:center;
+      padding-top:3px;
+      color:#888888;
+    }
     .info {
       padding-right: 0;
     }
@@ -148,9 +178,20 @@ export default {
       border-radius:50%;
       background: #F1F4FF;
       box-shadow: none;
-      width:70px;
-      height:70px;
+      padding:0 5px!important;
+      width: 65px !important;
+      height:65px !important;
     }
+    .tagList{
+      cursor: pointer;
+      .icon-tag{
+        transform: rotate(-40deg);
+        margin-right:3px;
+      }
+    }
+    .tagList:hover{
+        color:#384BF7;
+      }
   }
 }
 </style>

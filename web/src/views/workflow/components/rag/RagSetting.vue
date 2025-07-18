@@ -297,7 +297,7 @@ export default {
       async getClassfyDoc() {
           //获取文档知识分类
           this.knowledgeLoading = true
-          const res = await getKnowledgeList();
+          const res = await getKnowledgeList({});
           if (res.code === 0) {
               this.knowledgeLoading = false
               //this.knowledgeData = res.data;

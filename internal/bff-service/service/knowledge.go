@@ -13,9 +13,10 @@ import (
 // SelectKnowledgeList 查询知识库列表，主要根据userId 查询用户所有知识库
 func SelectKnowledgeList(ctx *gin.Context, userId, orgId string, req *request.KnowledgeSelectReq) (*response.KnowledgeListResp, error) {
 	resp, err := knowledgeBase.SelectKnowledgeList(ctx.Request.Context(), &knowledgebase_service.KnowledgeSelectReq{
-		UserId: userId,
-		OrgId:  orgId,
-		Name:   req.Name,
+		UserId:    userId,
+		OrgId:     orgId,
+		Name:      req.Name,
+		TagIdList: req.TagIdList,
 	})
 	if err != nil {
 		return nil, err
@@ -90,11 +91,27 @@ func DeleteKnowledge(ctx *gin.Context, userId, orgId string, r *request.DeleteKn
 	return resp, nil
 }
 
+// KnowledgeHit 知识库命中
+func KnowledgeHit(ctx *gin.Context, userId, orgId string, r *request.KnowledgeHitReq) (*response.KnowledgeHitResp, error) {
+	resp, err := knowledgeBase.KnowledgeHit(ctx.Request.Context(), &knowledgebase_service.KnowledgeHitReq{
+		Question:        r.Question,
+		UserId:          userId,
+		OrgId:           orgId,
+		KnowledgeIdList: r.KnowledgeIdList,
+		RerankModelId:   r.RerankModelId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return buildKnowledgeHitResp(resp), nil
+}
+
 // buildKnowledgeInfoList 构造知识库列表结果
 func buildKnowledgeInfoList(knowledgeListResp *knowledgebase_service.KnowledgeSelectListResp) *response.KnowledgeListResp {
 	if knowledgeListResp == nil || len(knowledgeListResp.KnowledgeList) == 0 {
 		return &response.KnowledgeListResp{}
 	}
+
 	var list []*response.KnowledgeInfo
 	for _, knowledge := range knowledgeListResp.KnowledgeList {
 		list = append(list, &response.KnowledgeInfo{
@@ -105,9 +122,42 @@ func buildKnowledgeInfoList(knowledgeListResp *knowledgebase_service.KnowledgeSe
 			EmbeddingModelInfo: &response.EmbeddingModelInfo{
 				ModelId: knowledge.EmbeddingModelInfo.ModelId,
 			},
+			KnowledgeTagList: buildTagList(knowledge.KnowledgeTagInfoList),
 		})
 	}
-	return &response.KnowledgeListResp{
-		KnowledgeList: list,
+	return &response.KnowledgeListResp{KnowledgeList: list}
+}
+
+// buildTagList 构造知识库标签列表
+func buildTagList(tagList []*knowledgebase_service.KnowledgeTagInfo) []*response.KnowledgeTag {
+	var retTagList = make([]*response.KnowledgeTag, 0)
+	if len(tagList) > 0 {
+		for _, tag := range tagList {
+			retTagList = append(retTagList, &response.KnowledgeTag{
+				TagId:    tag.TagId,
+				TagName:  tag.TagName,
+				Selected: true,
+			})
+		}
+	}
+	return retTagList
+}
+
+// buildKnowledgeHitResp 构造知识库命中返回
+func buildKnowledgeHitResp(resp *knowledgebase_service.KnowledgeHitResp) *response.KnowledgeHitResp {
+	var searchList = make([]*response.ChunkSearchList, 0)
+	if len(resp.SearchList) > 0 {
+		for _, search := range resp.SearchList {
+			searchList = append(searchList, &response.ChunkSearchList{
+				Title:         search.Title,
+				Snippet:       search.Snippet,
+				KnowledgeName: search.KnowledgeName,
+			})
+		}
+	}
+	return &response.KnowledgeHitResp{
+		Prompt:     resp.Prompt,
+		Score:      resp.Score,
+		SearchList: searchList,
 	}
 }

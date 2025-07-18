@@ -8,7 +8,8 @@ import (
 )
 
 type KnowledgeSelectReq struct {
-	Name string `json:"name" form:"name" `
+	Name      string   `json:"name" form:"name" `
+	TagIdList []string `json:"tagId" form:"tagId" `
 	CommonCheck
 }
 
@@ -22,6 +23,13 @@ type UpdateKnowledgeReq struct {
 	KnowledgeId string `json:"knowledgeId"   validate:"required"`
 	Name        string `json:"name"   validate:"required"`
 	Description string `json:"description"`
+	CommonCheck
+}
+
+type KnowledgeHitReq struct {
+	KnowledgeIdList []string `json:"knowledgeIdList"   validate:"required"`
+	Question        string   `json:"question"   validate:"required"`
+	RerankModelId   string   `json:"rerankModelId"   validate:"required"`
 	CommonCheck
 }
 

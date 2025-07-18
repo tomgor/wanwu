@@ -73,9 +73,9 @@
       >
         <div class="params-content-item">
           <span>token：</span>
-          <span>{{
-            startNode.data.settings.staticAuthToken.slice(0, 6) + "******"
-          }}</span>
+          <span>
+            {{startNode.data.settings.staticAuthToken.slice(0, 6) + "******" }}
+          </span>
         </div>
       </div>
     </div>
@@ -131,6 +131,7 @@ import sseMethod from "@/mixins/sseMethod.js";
 import codeEditor from "@/views/ArrayEditor/index.vue";
 import Upload from "./upload.vue";
 import { getQueryString } from "@/utils/util.js";
+import { mapGetters } from "vuex";
 
 export default {
   components: { codeEditor, Upload },
@@ -166,6 +167,9 @@ export default {
       thinkText: "",
       isOpen: true,
     };
+  },
+  computed: {
+    ...mapGetters('app', ['sessionStatus'])
   },
   created() {},
   methods: {

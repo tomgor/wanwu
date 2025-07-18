@@ -3,11 +3,11 @@ import workerTimer from './worker'
 import {parseSub, isSub} from "@/utils/util.js"
 
 const Print = function (opt) {
-    this.sentenceArr = []
-    this.sIndexMap={}
+    this.sentenceArr = []//存储待打印的句子的数组
+    this.sIndexMap={} 
     this.timer = opt.timer || 10; //打印速度
     this.t = null;
-    this.sIndex = 0
+    this.sIndex = 0 //记录已打印句子的索引（避免重复打印）
     this.printStatus = 0
     this.fullWord = ''
     this.searchList = []
@@ -32,9 +32,6 @@ Print.prototype = {
     loop(printingCB, endCB) {
 
         //如果正在打印或者打印结束
-        // if (this.printStatus) {
-        //     return
-        // }
         if (this.printStatus === 1 || this.sIndex >= this.sentenceArr.length) {
             return;
         }
@@ -71,16 +68,32 @@ Print.prototype = {
 const Looper = function (sIndex, sentence, timer, printCB, endCB,sIndexMap) {
     this.sIndex = sIndex
     this.sIndexMap=sIndexMap
-    this.sentence = sentence ? sentence.response : ""
+    this.sentence = sentence ? sentence.response : "" //当前要打印的句子
     this.timer = timer
     this.t = null
-    this.index = 0
-    this.printCB = printCB
-    this.endCB = endCB
+    this.index = 0 //当前打印到的字符位置
+    this.printCB = printCB //每打印一个字符的回调
+    this.endCB = endCB //句子打印结束的回调
+    this.isCodeBlock = false // 新增：标记是否为代码块
+    this.codeBlockContent = '' // 新增：存储代码块内容
+
+    // 在初始化时检测是否为代码块
+    this.detectCodeBlock()
     this.start()
 }
 
 Looper.prototype = {
+    detectCodeBlock() {
+        // 更宽松的代码块匹配正则
+        const codeBlockRegex = /^```([\s\S]*?)```$/s;
+        const match = this.sentence.match(codeBlockRegex);
+        
+        if (match) {
+            this.isCodeBlock = true;
+            this.codeBlockContent = match[0]; // 整个代码块内容
+            this.sentence = match[1]; // 代码块内部内容（去掉```）
+        }
+    },
     start() {
         if(this.sentence === ''){
             this.printCB('')
@@ -88,6 +101,13 @@ Looper.prototype = {
             this.index++;
             return
         }
+
+        if (this.isCodeBlock) {
+            this.printCB('```' + this.sentence + '```');
+            this.stop();
+            return;
+        }
+
         // 处理索引引文标签
         if(isSub(this.sentence)){
             this.printCB(parseSub(this.sentence))
@@ -98,18 +118,32 @@ Looper.prototype = {
 
         // this.printFn();
 
-        let sentenceArr = this.sentence.split('')
-        if(sentenceArr.length>100){
-            sentenceArr = this.sentence.split(',')
-        }
+        
+        const batchSize = 30; // 推荐每次输出30个字符
+        const interval = 10; // 减少输出间隔时间
         this.t = workerTimer.setInterval(() => {
-            if (this.index === sentenceArr.length) {
+            if (this.index === this.sentence.length) {
                 this.stop()
                 return
             }
-            this.printCB(sentenceArr[this.index])
-            this.index++;
-        }, this.timer,this)
+            const endIdx = Math.min(this.index + batchSize, this.sentence.length);
+            const chunk = this.sentence.slice(this.index, endIdx);
+            this.printCB(chunk);
+            this.index = endIdx;
+        }, interval,this)
+
+        // let sentenceArr = this.sentence.split('')
+        // if(sentenceArr.length>100){
+        //     sentenceArr = this.sentence.split(',')
+        // }
+        // this.t = workerTimer.setInterval(() => {
+        //     if (this.index === sentenceArr.length) {
+        //         this.stop()
+        //         return
+        //     }
+        //     this.printCB(sentenceArr[this.index])
+        //     this.index++;
+        // }, this.timer,this)
     },
     printFn(){
         let sentenceArr = this.sentence.split('')
@@ -124,13 +158,6 @@ Looper.prototype = {
         }
     },
     stop() {
-        // if(!this.sIndexMap[`${this.sIndex}`]){
-        //     this.sIndexMap[`${this.sIndex}`]=true
-        //     this.endCB({msg: 'end', index: this.sIndex})
-        // }else{
-        //     console.log(this.sIndex, this.t, this.sentence)
-        // }
-        // this.t && workerTimer.clearInterval(this.t)
         if(this.sIndexMap[`${this.sIndex}`]) {
             return;
         }
@@ -141,8 +168,4 @@ Looper.prototype = {
     }
 }
 
-
-export default Print
-
-
-;
+export default Print;

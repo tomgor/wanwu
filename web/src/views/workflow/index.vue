@@ -85,14 +85,6 @@
               {{$t('workFlow.nodeSelectDesc5')}}
             </div>
           </div>
-          <!--<div @click="preAddNode('gui')" class="node-items-box">
-            <span>
-              <img :src="iconObj.GUIAgentNode" />&nbsp; GUI 智能体节点
-            </span>
-            <div class="nodeSelectDesc">
-              通过视觉技术解析用户图形界面上的图像信息，并模拟人类操作行为来执行相应任务，与计算机系统进行交互的智能体
-            </div>
-          </div>-->
           <div @click="preAddNode('filegenerate')" class="node-items-box">
             <span>
               <img :src="iconObj.FileGenerateNode" />&nbsp; 文档生成
@@ -107,6 +99,54 @@
               输入txt、pdf、docx、xlsx、csv、pptx等格式文档的URL，可以解析提取出文档的文本内容
             </div>
           </div>
+          <!--<div class="node-items-box"> &lt;!&ndash;@click="preAddNode('gui')"&ndash;&gt;
+            <span>
+              <img :src="iconObj.GUIAgentNode" />&nbsp; GUI 智能体节点
+            </span>
+            <div class="nodeSelectDesc">
+              通过视觉技术解析用户图形界面上的图像信息，并模拟人类操作行为来执行相应任务，与计算机系统进行交互的智能体
+            </div>
+          </div>
+          <div class="node-items-box">
+            <span>
+              <img :src="iconObj.LoopNode" />&nbsp; 循环
+            </span>
+            <div class="nodeSelectDesc">
+              循环执行一段逻辑直到满足结束条件或者到达循环次数上限
+            </div>
+          </div>
+          <div class="node-items-box">
+            <span>
+              <img :src="iconObj.VariableNode" />&nbsp; 变量聚合
+            </span>
+            <div class="nodeSelectDesc">
+              将多路分支的变量聚合为一个变量，以实现下游节点统一配置
+            </div>
+          </div>
+          <div class="node-items-box">
+            <span>
+              <img :src="iconObj.ParameterParserNode" />&nbsp; 参数解析
+            </span>
+            <div class="nodeSelectDesc">
+              利用LLM从自然语言内推理解析出结构化参数，用于后置的工具调用或HTTP请求
+            </div>
+          </div>
+          <div class="node-items-box">
+            <span>
+              <img :src="iconObj.TransformNode" />&nbsp; 模版转换
+            </span>
+            <div class="nodeSelectDesc">
+              使用 Jinja 模版语法将数据转换为字符串
+            </div>
+          </div>
+          <div class="node-items-box">
+            <span>
+              <img :src="iconObj.AssignerNode" />&nbsp; 变量赋值
+            </span>
+            <div class="nodeSelectDesc">
+              变量赋值节点用于向可写入变量（例如对会话变量）进行变量赋值
+            </div>
+          </div>-->
         </div>
         <el-button
           slot="reference"
@@ -223,21 +263,28 @@
       </el-tooltip>
       <el-popover
         placement="top"
-        width="180"
-        trigger="hover"
+        width="246"
+        trigger="click"
         :visible-arrow="false"
         popper-class="workflow_popover_publish"
         class="publish_box"
       >
         <div>
-          {{$t('workFlow.publishText')}}
+          <div>
+            <el-radio :label="'private'" v-model="publishType">{{$t('workFlow.publishText')}}</el-radio>
+          </div>
+          <div>
+            <el-radio :label="'public'" v-model="publishType">{{$t('workFlow.publicPublishText')}}</el-radio>
+          </div>
+          <div style="text-align: center; margin-top: 10px">
+            <el-button size="mini" type="primary" @click="doPublish">{{$t('workFlow.saveButton')}}</el-button>
+          </div>
         </div>
         <el-button
           slot="reference"
           class="add-bt"
           type="primary"
           size="mini"
-          @click="doPublish"
         >
           {{$t('workFlow.publishButton')}}
         </el-button>
@@ -260,7 +307,7 @@
     <PublishForm ref="publish_ref" @refreshTable="$router.go(-1)" />
     <!--隐藏 token 和 mcp 相关-->
     <!--<AppSelect ref="app-select" @getToken="setToken" />-->
-    <McpCreate v-if="" ref="mcpcreate" @createMcp="addMcp" />
+    <McpCreate ref="mcpcreate" @createMcp="addMcp" />
     <div id="minimap"></div>
   </div>
 </template>
@@ -308,6 +355,7 @@ import {
   getWorkFlowStatus,
   publishWorkFlow,
 } from "@/api/workflow";
+import { appPublish } from "@/api/appspace"
 import {i18n} from "@/lang"
 export default {
   components: {
@@ -333,6 +381,7 @@ export default {
       cells: [],
       graph: null,
       timer: null,
+      publishType: 'private',
       iconObj: {
         ApiNode: require("./components/img/api.png"),
         PythonNode: require("./components/img/code.png"),
@@ -344,6 +393,11 @@ export default {
         SwitchNode: require("./components/img/switch.png"),
         RAGNode: require("./components/img/rag.png"),
         GUIAgentNode: require("./components/img/gui.png"),
+        LoopNode: require("./components/img/loop.png"),
+        ParameterParserNode: require("./components/img/parameter-parser.png"),
+        TransformNode: require("./components/img/transform.png"),
+        VariableNode: require("./components/img/variable-aggregator.png"),
+        AssignerNode: require("./components/img/assigner.png"),
         FileGenerateNode: require("./components/img/filegenerate.png"),
         FileParseNode: require("./components/img/fileparse.png"),
         MCPClientNode: require("./components/img/MCP.png"),
@@ -387,9 +441,11 @@ export default {
     ]),
     async doPublish() {
       const params = {
-        workflowID: this.workflowId,
+        appId: this.workflowId,
+        appType: 'workflow',
+        publishType: this.publishType
       }
-      const res = await publishWorkFlow(params);
+      const res = await appPublish(params);
       if (res.code === 0) {
         this.$message.success(this.$t('list.publicSuccess'))
         this.$router.push({path: '/appSpace/workflow'})
@@ -1071,6 +1127,7 @@ export default {
         }
 
         if (
+          edge.store.data.source_node_id &&
           edge.store.data.source_node_id
             .toLowerCase()
             .indexOf("intentionnode") > -1
@@ -1214,6 +1271,7 @@ export default {
         //如果是分支器节点，保存一下目标节点
 
         if (
+          edge.store.data.source_node_id &&
           edge.store.data.source_node_id
             .toLowerCase()
             .indexOf("intentionnode") > -1

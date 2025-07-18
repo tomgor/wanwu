@@ -19,7 +19,8 @@ service KnowledgeBaseService {
   rpc UpdateKnowledge(UpdateKnowledgeReq) returns (google.protobuf.Empty) {}
   // 删除文档知识分类
   rpc DeleteKnowledge(DeleteKnowledgeReq) returns (google.protobuf.Empty) {}
-
+  // 知识库命中测试
+  rpc KnowledgeHit(KnowledgeHitReq) returns (KnowledgeHitResp) {}
 }
 
 message DeleteKnowledgeReq{
@@ -34,6 +35,14 @@ message UpdateKnowledgeReq{
   string description = 3;
   string userId = 4;
   string orgId = 5;
+}
+
+message KnowledgeHitReq{
+  string orgId = 1;
+  string userId = 2;
+  string question = 3; //问题
+  repeated string knowledgeIdList = 4;//知识库id 列表
+  string rerankModelId = 5; //重排序模型id
 }
 
 message CreateKnowledgeReq{
@@ -56,6 +65,7 @@ message KnowledgeSelectReq {
   string userId = 1;
   string orgId = 2;
   string name = 3; //知识库名称，支持模糊搜索
+  repeated string tagIdList = 4; //知识库id 列表
 }
 
 message KnowledgeSelectListResp {
@@ -76,4 +86,22 @@ message KnowledgeInfo {
   int32 docCount = 3;
   string description = 4;
   EmbeddingModelInfo embeddingModelInfo = 5;
+  repeated KnowledgeTagInfo knowledgeTagInfoList = 6;
+}
+
+message KnowledgeTagInfo {
+  string tagId = 1;//知识库标签id
+  string tagName = 2; //知识库标签名称
+}
+
+message KnowledgeHitResp{
+  string prompt = 1;
+  repeated double score = 2;
+  repeated KnowledgeSearchInfo searchList = 3;
+}
+
+message KnowledgeSearchInfo{
+  string title = 1;
+  string snippet = 2;
+  string knowledgeName = 3;
 }

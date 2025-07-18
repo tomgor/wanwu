@@ -28,6 +28,7 @@ const (
 	AppService_ChangeExplorationAppFavorite_FullMethodName = "/app_service.AppService/ChangeExplorationAppFavorite"
 	AppService_RecordAppHistory_FullMethodName             = "/app_service.AppService/RecordAppHistory"
 	AppService_PublishApp_FullMethodName                   = "/app_service.AppService/PublishApp"
+	AppService_UnPublishApp_FullMethodName                 = "/app_service.AppService/UnPublishApp"
 	AppService_GetAppList_FullMethodName                   = "/app_service.AppService/GetAppList"
 	AppService_GetAppListByIds_FullMethodName              = "/app_service.AppService/GetAppListByIds"
 	AppService_DeleteApp_FullMethodName                    = "/app_service.AppService/DeleteApp"
@@ -48,6 +49,7 @@ type AppServiceClient interface {
 	RecordAppHistory(ctx context.Context, in *RecordAppHistoryReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// --- app ---
 	PublishApp(ctx context.Context, in *PublishAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UnPublishApp(ctx context.Context, in *UnPublishAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetAppList(ctx context.Context, in *GetAppListReq, opts ...grpc.CallOption) (*AppList, error)
 	GetAppListByIds(ctx context.Context, in *GetAppListByIdsReq, opts ...grpc.CallOption) (*AppList, error)
 	DeleteApp(ctx context.Context, in *DeleteAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -141,6 +143,16 @@ func (c *appServiceClient) PublishApp(ctx context.Context, in *PublishAppReq, op
 	return out, nil
 }
 
+func (c *appServiceClient) UnPublishApp(ctx context.Context, in *UnPublishAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AppService_UnPublishApp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *appServiceClient) GetAppList(ctx context.Context, in *GetAppListReq, opts ...grpc.CallOption) (*AppList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AppList)
@@ -186,6 +198,7 @@ type AppServiceServer interface {
 	RecordAppHistory(context.Context, *RecordAppHistoryReq) (*emptypb.Empty, error)
 	// --- app ---
 	PublishApp(context.Context, *PublishAppReq) (*emptypb.Empty, error)
+	UnPublishApp(context.Context, *UnPublishAppReq) (*emptypb.Empty, error)
 	GetAppList(context.Context, *GetAppListReq) (*AppList, error)
 	GetAppListByIds(context.Context, *GetAppListByIdsReq) (*AppList, error)
 	DeleteApp(context.Context, *DeleteAppReq) (*emptypb.Empty, error)
@@ -222,6 +235,9 @@ func (UnimplementedAppServiceServer) RecordAppHistory(context.Context, *RecordAp
 }
 func (UnimplementedAppServiceServer) PublishApp(context.Context, *PublishAppReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PublishApp not implemented")
+}
+func (UnimplementedAppServiceServer) UnPublishApp(context.Context, *UnPublishAppReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnPublishApp not implemented")
 }
 func (UnimplementedAppServiceServer) GetAppList(context.Context, *GetAppListReq) (*AppList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAppList not implemented")
@@ -397,6 +413,24 @@ func _AppService_PublishApp_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AppService_UnPublishApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnPublishAppReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServiceServer).UnPublishApp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AppService_UnPublishApp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServiceServer).UnPublishApp(ctx, req.(*UnPublishAppReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AppService_GetAppList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAppListReq)
 	if err := dec(in); err != nil {
@@ -489,6 +523,10 @@ var AppService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PublishApp",
 			Handler:    _AppService_PublishApp_Handler,
+		},
+		{
+			MethodName: "UnPublishApp",
+			Handler:    _AppService_UnPublishApp_Handler,
 		},
 		{
 			MethodName: "GetAppList",

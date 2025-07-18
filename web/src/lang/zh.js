@@ -2,28 +2,22 @@
 export default {
     login: {
         title: '登 录',
-        welcomeText: '嗨！欢迎来到元景MaaS智能体平台',
+        welcomeText: '嗨！欢迎来到元景万悟智能体平台',
         form: {
             username: '用户名',
             password: '密码',
             code: '验证码'
         },
         button: '登 录',
-        desc: {
-            title: 'MaaS开发平台：',
-            desc: '多模融合、按需定制、生态共创、普惠便民',
-            subDesc: '打造大模型开发应用范式，成为大模型技术规模化落地应用的引领者',
-            tabs:  [
-                {name: '选模型', desc: '模型即服务MaaS'},
-                {name: '改模型', desc: '微调训练即服务FaaS'},
-                {name: '用模型', desc: '扩展工具即服务TaaS'}
-            ]
-        }
     },
     register: {
         title: '欢迎注册',
         button: '注 册',
         back: '返回登录'
+    },
+    about: {
+        version: '版本',
+        company: '◎ 联通数据智能有限公司'
     },
     menu: {
         explore: '应用广场',
@@ -45,7 +39,7 @@ export default {
         about: '关于'
     },
     header: {
-        title: '元景',
+        title: '元景万悟',
         doc: '文档中心',
         logout: '登出',
         login: '登录',
@@ -93,7 +87,8 @@ export default {
             import: '导入',
             export: '导出',
             view: '查看',
-            cancelPublish: '取消发布'
+            cancelPublish: '取消发布',
+            add: '创建'
         },
         switch: {
             start: '开启',
@@ -143,7 +138,8 @@ export default {
             uploadError: '上传失败，请重新上传'
         },
         copy: {
-            success: '内容已复制到粘贴板'
+            success: '内容已复制到粘贴板',
+            copyText: '副本'
         },
         noData: '暂无数据',
         loading: '正在加载数据...',
@@ -154,6 +150,10 @@ export default {
             noSource: '若没有可选资源，请先释放卡资源',
             hint: '一次启动一个实例(一个实例可以占多张卡)',
             reload: '刷新数据'
+        },
+        info:{
+            delInfo:'删除成功',
+            create:'创建成功'
         }
     },
     docDownload: {
@@ -417,7 +417,9 @@ export default {
         knowLedge:'知识库',
         addNode:'添加节点',
         publishButton: '发布',
-        publishText: '发布为工具：仅自己可见',
+        publishText: '私密发布为工具：仅自己可见',
+        publicPublishText: '公开发布为工具：组织内可见',
+        saveButton: '保 存',
         collapseNode:'折叠节点',
         expandNode:'展开节点',
         mapCenter:'居中视图',
@@ -700,7 +702,11 @@ export default {
         backAnalysis:'返回解析',
         saveIntoData:'保存成功结果入库',
         fileSizeTips:'上传文件不能超过15MB!',
-        inputDesc:'请输入描述'
+        inputDesc:'请输入描述',
+        keyWordManage:'关键词管理',
+        keyWordTip:'知识库问答场景，可配置问题中使用的口语化关键词与知识库文档中词语的映射规则，便于提升知识库内容的召回效果及回答准确率 。',
+        keyWordPlaceholder:'输入问题中的关键词或文档中的词语搜索',
+        newKeyWord:'新建关键词'
     },
     explore:{
         unFavorite:'是否确定将该应用从常用应用列表中移除?',
@@ -760,5 +766,11 @@ export default {
         fileClear:'文件清除成功',
         uploadFinish:'上传完成',
         uploadFail:'上传失败，请点击续传继续上传...'
+    },
+    keyword:{
+        quesKeyword:'问题中的关键词',
+        docWord:'文档中的词语',
+        linkKnowledge:'关联知识库',
+        undateTime:'更新时间'
     }
 }

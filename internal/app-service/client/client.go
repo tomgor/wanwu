@@ -21,6 +21,7 @@ type IClient interface {
 
 	// --- app ---
 	PublishApp(ctx context.Context, userId, orgId, appId, appType, publishType string) *err_code.Status
+	UnPublishApp(ctx context.Context, appId, appType, userId string) *err_code.Status
 	GetAppList(ctx context.Context, userId, orgId, appType string) ([]*model.App, *err_code.Status)
 	DeleteApp(ctx context.Context, appId, appType string) *err_code.Status
 	RecordAppHistory(ctx context.Context, userId, appId, appType string) *err_code.Status

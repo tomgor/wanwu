@@ -34,6 +34,7 @@
 
               <div class="content_title">
                 <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload">{{$t('common.gpuDialog.reload')}}</el-button>
+                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/hitTest?knowledgeId=${docQuery.knowledgeId}`)">命中测试</el-button>
                 <el-button
                   size="mini"
                   type="primary"
@@ -172,13 +173,46 @@ export default {
       tableData: [],
       knowLegOptions:this.getKnowOptions(),
       knowledgeData: [],
-      currentKnowValue:null
+      currentKnowValue:null,
+      timer:null,
+      refreshCount:0
     };
+  },
+  watch:{
+    '$route':{
+      handler(val){
+        if(val.query.done){
+          this.startTimer()
+        }
+      },
+      immediate:true
+    }
   },
   mounted(){
     this.getTableData(this.docQuery)
   },
+  beforeDestroy(){
+    this.clearTimer()
+  },
   methods: {
+    startTimer(){
+      this.clearTimer();
+      if (this.refreshCount >= 2) {
+        return;
+      }
+      const delay = this.refreshCount === 0 ? 1000 : 3000;
+      this.timer = setTimeout(() =>{
+        this.getTableData(this.docQuery)
+        this.refreshCount++;
+        this.startTimer()
+      },delay)
+    },
+    clearTimer() {
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+      }
+    },
     goBack(){
       this.$router.push({path:'/knowledge'})
     },

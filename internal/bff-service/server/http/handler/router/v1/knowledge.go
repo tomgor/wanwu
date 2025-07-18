@@ -13,6 +13,8 @@ func registerKnowledge(apiV1 *gin.RouterGroup) {
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge", http.MethodPost, v1.CreateKnowledge, "创建知识库（文档分类）")
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge", http.MethodPut, v1.UpdateKnowledge, "修改知识库（文档分类）")
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge", http.MethodDelete, v1.DeleteKnowledge, "删除知识库（文档分类）")
+	// 知识库命中测试
+	mid.Sub("knowledge").Reg(apiV1, "/knowledge/hit", http.MethodPost, v1.KnowledgeHit, "知识库命中测试")
 	// 知识库文档
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/list", http.MethodGet, v1.GetDocList, "获取文档列表")
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/import", http.MethodPost, v1.ImportDoc, "上传文档")
@@ -23,4 +25,13 @@ func registerKnowledge(apiV1 *gin.RouterGroup) {
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/segment/status/update", http.MethodPost, v1.UpdateDocSegmentStatus, "更新文档切片启用状态")
 	// 知识库url文档导入
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/url/analysis", http.MethodPost, v1.AnalysisDocUrl, "解析url")
+
+	// 知识库标签增删改查
+	mid.Sub("knowledge.tag").Reg(apiV1, "/knowledge/tag", http.MethodGet, v1.GetKnowledgeTagSelect, "查询知识库标签列表")
+	mid.Sub("knowledge.tag").Reg(apiV1, "/knowledge/tag", http.MethodPost, v1.CreateKnowledgeTag, "创建知识库标签")
+	mid.Sub("knowledge.tag").Reg(apiV1, "/knowledge/tag", http.MethodPut, v1.UpdateKnowledgeTag, "修改知识库标签")
+	mid.Sub("knowledge.tag").Reg(apiV1, "/knowledge/tag", http.MethodDelete, v1.DeleteKnowledgeTag, "删除知识库标签")
+	// 绑定知识库标签
+	mid.Sub("knowledge.tag").Reg(apiV1, "/knowledge/tag/bind/count", http.MethodGet, v1.SelectTagBindCount, "查询标签绑定的知识库数量")
+	mid.Sub("knowledge.tag").Reg(apiV1, "/knowledge/tag/bind", http.MethodPost, v1.BindKnowledgeTag, "绑定知识库标签")
 }

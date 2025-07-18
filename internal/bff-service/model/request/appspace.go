@@ -24,6 +24,15 @@ func (req PublishAppRequest) Check() error {
 	return nil
 }
 
+type UnPublishAppRequest struct {
+	AppId   string `json:"appId"`   // 应用ID
+	AppType string `json:"appType"` // 应用类型
+}
+
+func (req UnPublishAppRequest) Check() error {
+	return nil
+}
+
 type GetApiBaseUrlRequest struct {
 	AppId   string `form:"appId" json:"appId" validate:"required"`     // 应用ID
 	AppType string `form:"appType" json:"appType" validate:"required"` // 应用类型
@@ -42,5 +51,21 @@ type DeleteWorkFlowRequest struct {
 }
 
 func (o *DeleteWorkFlowRequest) Check() error {
+	return nil
+}
+
+type PublishWorkFlowRequest struct {
+	AppId string `form:"workflowID" json:"workflowID" validate:"required"` // 应用ID
+}
+
+func (p *PublishWorkFlowRequest) Check() error {
+	return nil
+}
+
+type UnPublishWorkFlowRequest struct {
+	AppId string `form:"workflowID" json:"workflowID" validate:"required"` // 应用ID
+}
+
+func (p *UnPublishWorkFlowRequest) Check() error {
 	return nil
 }
