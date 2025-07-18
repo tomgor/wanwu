@@ -239,7 +239,6 @@ export default {
           },
           replaceHTML(data,n){
             let _data = data
-            console.log(data,'渲染完成')
             const thinkStart = /<think>/i;
             const thinkEnd = /<\/think>/i;
             const toolStart = /<tool>/i;
@@ -260,7 +259,6 @@ export default {
                 data = '<tool>\n' + data;
               }
             }
-
             // 统一替换为 section 标签
             return data.replace(/think>/gi, 'section>').replace(/tool>/gi, 'section>');
           },
@@ -333,9 +331,9 @@ export default {
           this.loading = true
         },
         scrollBottom () {
+          this.loading = false
           if (!this.autoScroll) return;
             this.$nextTick(() => {
-                this.loading = false
                 document.getElementById('timeScroll').scrollTop = document.getElementById('timeScroll').scrollHeight;
             });
         },

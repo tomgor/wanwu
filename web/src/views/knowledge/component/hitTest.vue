@@ -33,7 +33,7 @@
           :inline="false"
           class="test_form"
         >
-          <el-form-item
+          <!-- <el-form-item
             label="选择知识库"
             class="vertical-form-item"
           >
@@ -54,7 +54,7 @@
               >
               </el-option>
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item
             label="Rerank模型"
             class="vertical-form-item"
@@ -105,7 +105,7 @@
                 <span class="score">{{$t('knowledgeManage.hitScore')}}: {{score[index]}}</span>
               </div>
               <div>
-                <div v-html="md.render(item.snippet)"></div>
+                <div v-html="md.render(item.snippet)" class="resultContent"></div>
                 <div class="file_name">文件名称：{{item.title}}</div>
               </div>
             </div>
@@ -133,7 +133,7 @@ export default {
       knowledgeOptions: [],
       rerankOptions: [],
       formInline: {
-        knowledgeIdList: [],
+        knowledgeIdList: [this.$route.query.knowledgeId],
         rerankModelId: "",
       },
       question: "",
@@ -143,7 +143,7 @@ export default {
     };
   },
   created() {
-    this.getKnowledgeList();
+    // this.getKnowledgeList();
     this.getRerankData();
   },
   methods: {
@@ -180,10 +180,10 @@ export default {
         this.$message.warning("请输入问题");
         return;
       }
-      if (this.formInline.knowledgeIdList.length === 0) {
-        this.$message.warning(this.$t("knowledgeManage.pselectKnowledgeTips"));
-        return;
-      }
+      // if (this.formInline.knowledgeIdList.length === 0) {
+      //   this.$message.warning(this.$t("knowledgeManage.pselectKnowledgeTips"));
+      //   return;
+      // }
       if (this.formInline.rerankModelId.length === 0) {
         this.$message.warning("请选择Rerank模型");
         return;
@@ -293,6 +293,11 @@ export default {
         }
         img {
           width: 150px;
+        }
+      }
+      .resultContent{
+        img{
+          width:100%;
         }
       }
       .result {

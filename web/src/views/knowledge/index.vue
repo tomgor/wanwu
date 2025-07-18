@@ -19,7 +19,6 @@
         </div>
         <div>
           <!-- <el-button size="mini" type="primary" @click="$router.push('/knowledge/keyword')">{{$t('knowledgeManage.keyWordManage')}}</el-button> -->
-          <el-button size="mini" type="primary" @click="$router.push('/knowledge/hitTest')">命中测试</el-button>
           <el-button size="mini" type="primary" @click="showCreate()" icon="el-icon-plus">
             {{$t('common.button.create')}}
           </el-button>
