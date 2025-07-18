@@ -27,9 +27,9 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 ###配置鉴权信息
-#APP_ID = config["ACTION"]['APP_ID']
-API_KEY = ''
-#SECRET_KEY = config["ACTION"]['SECRET_KEY']
+APP_ID = config["ACTION"]['APP_ID']
+API_KEY = config["ACTION"]['API_KEY']
+SECRET_KEY = config["ACTION"]['SECRET_KEY']
 
 MODEL_NAME_CONFIG = config["MODELS"]["default_llm"]
 MODEL_NAME = os.getenv('CUAI_DEFAULT_LLM_MODEL_ID', MODEL_NAME_CONFIG)
@@ -127,10 +127,10 @@ def plugin_config(API_KEY,query,plugin_list,function_calls_list,action_type,hist
         messages_input = []
         logger.info(f"---history为：{history}---")
         if history:
-            has_rewrite_query = any("query" in item.keys() for item in history)
+            has_rewrite_query = any("rewrite_query" in item.keys() for item in history)
             if has_rewrite_query:
                 for item in history:         
-                    messages_input.append({"role": "user", "content":item["query"]})
+                    messages_input.append({"role": "user", "content":item["rewrite_query"]})
                     messages_input.append({"role": "assistant", "content":item["response"]})    
             else:
                 history = [item for item in history if item['role'] != "system"]
@@ -166,7 +166,7 @@ def plugin_config(API_KEY,query,plugin_list,function_calls_list,action_type,hist
         logger.info(f"---完成action插件并进行配置，function_list为：{function_list}---")
         if action_type == "modelscope_agent":
             system_message = "你是一个API接口查询助手,你需要选择最优的API接口并严格按照API的入参要求来识别参数，在识别参数时，严禁进行任何形式的自由发挥，必须严格按照用户提供的信息来确定参数"
-        elif action_type == "function_call":
+        elif action_type == "yuanjing_function_call":
             system_message = "作为function查询助手，你的任务是基于用户问题精准地识别出相应的函数及参数。在识别参数时，严禁进行任何形式的自由发挥，必须严格按照用户提供的信息来确定参数"
         else:
             system_message = "你是一个任务规划助手，你需要基于已有的工具对用户问题进行拆分成多个任务task，并对每个任务进行分步推理,请注意，后一步的推理务必用到前一步的结果，最后，请逐步输出结果。在识别参数时，严禁进行任何形式的自由发挥，必须严格按照用户提供的信息来确定参数"
@@ -268,7 +268,7 @@ def plugin_config(API_KEY,query,plugin_list,function_calls_list,action_type,hist
         logger.info(f"jsonarr: {jsonarr}")
         yield jsonarr
         
-@app.route("/agent/action",methods=['POST'])
+@app.route("/agent/action/qwen_agent",methods=['POST'])
 def action_infer():
     data = request.get_json()
     logger.info('request_params: '+ json.dumps(data, ensure_ascii=False))
@@ -302,7 +302,7 @@ def action_infer():
         
 if __name__ == '__main__':
     logger.info("http_action_server start")
-    app.run(host='0.0.0.0', port=1992, threaded=False,debug=False)
+    app.run(host='0.0.0.0', port=4800, threaded=False,debug=False)
    
     
 
