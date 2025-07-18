@@ -138,7 +138,9 @@
                             searchList: n.searchList ? n.searchList : [],
                             filepath: n.responseFileUrls,
                             "gen_file_url_list":n.responseFileUrls || [],
-                            "isOpen":true
+                            "isOpen":true,
+                            toolText:'已使用工具',
+                            thinkText:'已深度思考'
                         }
                     }) : []
                     this.$refs['session-com'].replaceHistory(history)
