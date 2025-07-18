@@ -521,6 +521,7 @@ def agent_start():
 }
                         assistant_reply = ""
                         messages.append({"role": "user", "content": question})
+                        messages.append({"role": "system", "content": system_role})
                         for chunk in llm.stream(messages):
                             if hasattr(chunk, "content"):
                                 print('大模型输出是:',chunk)
@@ -576,6 +577,7 @@ def agent_start():
                     
                     assistant_reply = ""
                     messages.append({"role": "user", "content": question})
+                    messages.append({"role": "system", "content": system_role})
                     for chunk in llm.stream(messages):
                         if hasattr(chunk, "content"):
                             print('大模型输出是:',chunk)

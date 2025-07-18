@@ -348,7 +348,7 @@ export default {
     },
     async getKnowledgeList() {
       //获取文档知识分类
-      const res = await getKnowledgeList();
+      const res = await getKnowledgeList({});
       if (res.code === 0) {
         this.knowledgeData = res.data.knowledgeList || [];
       } else {

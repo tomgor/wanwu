@@ -21,7 +21,6 @@ Print.prototype = {
             this.searchList = privateData.searchList
         }
         this.sentenceArr.push(sentence)
-        console.log(this.sentenceArr,'插入句子的索引')
         this.loop(printingCB, endCB, "truely")
     },
     stop() {
@@ -33,14 +32,10 @@ Print.prototype = {
     loop(printingCB, endCB) {
 
         //如果正在打印或者打印结束
-        // if (this.printStatus) {
-        //     return
-        // }
         if (this.printStatus === 1 || this.sIndex >= this.sentenceArr.length) {
             return;
         }
 
-        console.log(this.sentenceArr,this.sIndex)
         let curSentence = this.sentenceArr[this.sIndex]
         this.printStatus = 1
         if(!curSentence){
@@ -79,10 +74,26 @@ const Looper = function (sIndex, sentence, timer, printCB, endCB,sIndexMap) {
     this.index = 0 //当前打印到的字符位置
     this.printCB = printCB //每打印一个字符的回调
     this.endCB = endCB //句子打印结束的回调
+    this.isCodeBlock = false // 新增：标记是否为代码块
+    this.codeBlockContent = '' // 新增：存储代码块内容
+
+    // 在初始化时检测是否为代码块
+    this.detectCodeBlock()
     this.start()
 }
 
 Looper.prototype = {
+    detectCodeBlock() {
+        // 更宽松的代码块匹配正则
+        const codeBlockRegex = /^```([\s\S]*?)```$/s;
+        const match = this.sentence.match(codeBlockRegex);
+        
+        if (match) {
+            this.isCodeBlock = true;
+            this.codeBlockContent = match[0]; // 整个代码块内容
+            this.sentence = match[1]; // 代码块内部内容（去掉```）
+        }
+    },
     start() {
         if(this.sentence === ''){
             this.printCB('')
@@ -90,6 +101,13 @@ Looper.prototype = {
             this.index++;
             return
         }
+
+        if (this.isCodeBlock) {
+            this.printCB('```' + this.sentence + '```');
+            this.stop();
+            return;
+        }
+
         // 处理索引引文标签
         if(isSub(this.sentence)){
             this.printCB(parseSub(this.sentence))
@@ -103,7 +121,6 @@ Looper.prototype = {
         
         const batchSize = 30; // 推荐每次输出30个字符
         const interval = 10; // 减少输出间隔时间
-        console.log(this.sentence,'sentence',this.index)
         this.t = workerTimer.setInterval(() => {
             if (this.index === this.sentence.length) {
                 this.stop()

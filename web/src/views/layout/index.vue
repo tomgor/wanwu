@@ -328,7 +328,7 @@ export default {
       return currentOrg.name
     },
     justifyIsShowNav(path) {
-      const notShowArr = ['/userInfo', '/permission', '/workflow']
+      const notShowArr = ['/userInfo', '/permission', '/workflow', '/explore/workflow']
       let isShowNav = true
       for (let item of notShowArr) {
         if (item === path) {
