@@ -34,6 +34,7 @@
 
               <div class="content_title">
                 <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload">{{$t('common.gpuDialog.reload')}}</el-button>
+                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/hitTest?knowledgeId=${docQuery.knowledgeId}`)">命中测试</el-button>
                 <el-button
                   size="mini"
                   type="primary"
