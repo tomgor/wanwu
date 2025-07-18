@@ -105,7 +105,7 @@
                 <span class="score">{{$t('knowledgeManage.hitScore')}}: {{score[index]}}</span>
               </div>
               <div>
-                <div v-html="md.render(item.snippet)"></div>
+                <div v-html="md.render(item.snippet)" class="resultContent"></div>
                 <div class="file_name">文件名称：{{item.title}}</div>
               </div>
             </div>
@@ -293,6 +293,11 @@ export default {
         }
         img {
           width: 150px;
+        }
+      }
+      .resultContent{
+        img{
+          width:100%;
         }
       }
       .result {
