@@ -259,7 +259,6 @@ export default {
                 data = '<tool>\n' + data;
               }
             }
-            console.log(n)
             // 统一替换为 section 标签
             return data.replace(/think>/gi, 'section>').replace(/tool>/gi, 'section>');
           },
