@@ -4,7 +4,7 @@ var hljs = require('highlight.js');
 hljs.configure({
     lineNumbers: true
 });
-//import 'highlight.js/styles/atom-one-dark.css';
+import 'highlight.js/styles/atom-one-dark.css';
 
 export const md = MarkdownIt({
     // 在源码中启用 HTML 标签
@@ -15,10 +15,13 @@ export const md = MarkdownIt({
         // 经过highlight.js处理后的html
         let preCode = ""
         try {
-            preCode = hljs.highlightAuto(str).value
+            if(lang && hljs.getLanguage(lang)){
+                preCode = hljs.highlightAuto(lang,str).value
+            }else{
+                preCode = hljs.highlightAuto(str).value;
+            }
         } catch (err) {
-            // console.log('err',err);
-            preCode = markdownIt.utils.escapeHtml(str);
+            preCode = md.utils.escapeHtml(str);
         }
 
         // 以换行进行分割

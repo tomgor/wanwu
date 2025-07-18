@@ -14,6 +14,20 @@ export const saveWorkFlow = (data)=>{
         data
     })
 };
+export const getWorkFlowParams = (params) => {
+    return request({
+        url: "/workflow/api/workflow/parameter",
+        method: "get",
+        params,
+    });
+};
+export const useWorkFlow = (data)=>{
+    return request({
+        url: '/workflow/api/workflow/use',
+        method: 'post',
+        data
+    })
+};
 export const runWorkFlow = (data)=>{
     return request({
         url: '/workflow/api/workflow/run',
@@ -47,6 +61,14 @@ export const getWorkFlowList = (data)=>{
         url: '/workflow/api/workflow/list',
         method: 'get',
         params:data
+    })
+};
+//应用广场工作流列表
+export const getExplorationFlowList = (params)=>{
+    return request({
+        url: '/user/api/v1/exploration/app/list',
+        method: 'get',
+        params
     })
 };
 export const createWorkFlow = (data)=>{

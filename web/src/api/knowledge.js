@@ -180,11 +180,11 @@ export const BatchUrlDemo = ()=>{
 
 //new 获取知识库列表
 const BASE_URL = '/user/api/v1'
-export const getKnowledgeList = (params)=>{
+export const getKnowledgeList = (data)=>{
     return service({
         url: `${BASE_URL}/knowledge/select`,
-        method: 'get',
-        params
+        method: 'post',
+        data
     })
 };
 export const delKnowledgeItem = (data)=>{
@@ -297,6 +297,24 @@ export const editTag = (data)=>{
 export const bindTag = (data)=>{
     return service({
         url: `${BASE_URL}/knowledge/tag/bind`,
+        method: 'post',
+        data
+    })
+};
+
+//查询标签绑定知识库数量
+export const bindTagCount = (params)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/tag/bind/count`,
+        method: 'get',
+        params
+    })
+};
+
+//命中测试接口
+export const hitTest = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/hit`,
         method: 'post',
         data
     })

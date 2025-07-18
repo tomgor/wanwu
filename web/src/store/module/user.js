@@ -29,7 +29,6 @@ export const user = {
           if (lang.code) {
               state.lang = lang.code
               window.localStorage.setItem('locale', lang.code)
-              console.log(lang, '--------------setLang')
           }
       },
       setPermission(state, permission) {

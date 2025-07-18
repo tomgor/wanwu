@@ -62,6 +62,11 @@ const constantRoutes = [
                 meta:{perm: [PERMS.EXPLORE]},
             },
             {
+                path: '/explore/workflow',
+                component:resolve =>require(['@/views/workflowRun'],resolve),
+                meta:{perm: [PERMS.EXPLORE]},
+            },
+            {
                 path: '/explore/rag',
                 component:resolve =>require(['@/views/rag'],resolve),
                 meta:{perm: [PERMS.EXPLORE]},
@@ -115,6 +120,11 @@ const constantRoutes = [
             {
                 path: '/knowledge/keyword',
                 component:resolve =>require(['@/views/knowledge/keyword'],resolve),
+                meta:{perm: [PERMS.KNOWLEDGE]},
+            },
+            {
+                path: '/knowledge/hitTest',
+                component:resolve =>require(['@/views/knowledge/component/hitTest'],resolve),
                 meta:{perm: [PERMS.KNOWLEDGE]},
             },
             {
