@@ -16,7 +16,7 @@
           <el-container>
             <el-header class="classifyTitle">
               <div class="searchInfo">
-                <search-input class="cover-input-icon" :placeholder="$t('knowledgeManage.keyWordPlaceholder')" ref="searchInput" @handleSearch="handleSearch" />
+                <search-input class="cover-input-icon" :placeholder="$t('knowledgeManage.keyWordPlaceholder')" ref="searchInput" @handleSearch="handleSearch" style="width:300px;"/>
               </div>
               <div class="content_title">
                 <el-button size="mini" type="primary" icon="el-icon-plus" @click="create">{{$t('knowledgeManage.newKeyWord')}}</el-button>
@@ -89,6 +89,7 @@
         </el-main>
       </el-container>
     </div>
+    <createKeyWords ref="createKeyWords"/>
   </div>
 </template>
 
@@ -96,8 +97,9 @@
 import Pagination from "@/components/pagination.vue";
 import SearchInput from "@/components/searchInput.vue";
 import {getDocList,delDocItem,uploadFileTips} from "@/api/knowledge";
+import createKeyWords from './create.vue';
 export default {
-  components: { Pagination,SearchInput},
+  components: { Pagination,SearchInput,createKeyWords},
   data() {
     return {
       loading:false,
@@ -119,8 +121,11 @@ export default {
     // this.getTableData(this.docQuery)
   },
   methods: {
+    refreshData(){
+
+    },
     create(){
-        console.log('创建')
+      this.$refs.createKeyWords.showDialog()
     },
     editItem(item){
         console.log(item)
