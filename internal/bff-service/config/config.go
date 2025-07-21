@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/i18n"
+	"github.com/UnicomAI/wanwu/pkg/i18n"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/minio"
 	"github.com/UnicomAI/wanwu/pkg/util"

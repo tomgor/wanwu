@@ -4,7 +4,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util/route"
+	"github.com/UnicomAI/wanwu/pkg/gin-util/route"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/gin-gonic/gin"
 )

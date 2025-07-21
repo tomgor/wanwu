@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
-	mid "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util/mid-wrap"
-	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util/route"
-	jwt_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/jwt-util"
+	mid "github.com/UnicomAI/wanwu/pkg/gin-util/mid-wrap"
+	"github.com/UnicomAI/wanwu/pkg/gin-util/route"
+	jwt_util "github.com/UnicomAI/wanwu/pkg/jwt-util"
 )
 
 func Init() {
