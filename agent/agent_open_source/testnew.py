@@ -11,7 +11,7 @@ question = "帮我搜索评分较高的西安凉皮店铺"
 #question='什么是智能体agent'
 #question='帮我写个冒泡排序代码'
 #question = "北京天气怎么样"
-#question = '上传的这篇文章写的什么总结一下'
+question = '上传的这篇文章写的什么总结一下'
 
 
 headers = {
@@ -25,7 +25,7 @@ headers = {
 response = requests.post(
     url,
 
-    json={"input": question,"plugin_list":[],"search_url":"https://api.bochaai.com/v1/web-search","search_rerank_id":'11',"search_key":"sk-e698027f1ad34c3a8a8d405f9c0f5ec4","upload_file_url":"","function_call":False,"stream":True,"model":'deepseek-v3',"model_url":'http://172.17.0.1:6668/callback/v1/model/1',"use_code":False,"use_search":True,"use_know":False,"do_sample":False,"temperature":0.01,"repetition_penalty":1.1,"auto citation":False,"need_search_list":True,"kn_params":{'knowledgeBase':'123','threshold':0.7,'topk':3,'rerank_id':'','model':'','model_url':''}},
+    json={"input": question,"upload_file_url":"https://192.168.0.21:8081/minio/download/api/public/tmpt7cc25tv.txt","system_role":'每次回答最后增加免责声明：本AI助手提供的信息基于公开数据和算法生成，仅供参考。',"plugin_list":[],"search_url":"https://api.bochaai.com/v1/web-search","search_rerank_id":'11',"search_key":"sk-e698027f1ad34c3a8a8d405f9c0f5ec4","function_call":False,"stream":True,"model":'deepseek-v3',"model_url":'http://172.17.0.1:6668/callback/v1/model/1',"use_code":False,"use_search":False,"use_know":False,"do_sample":False,"temperature":0.01,"repetition_penalty":1.1,"auto citation":False,"need_search_list":True,"kn_params":{'knowledgeBase':'123','threshold':0.7,'topk':3,'rerank_id':'','model':'','model_url':''}},
     stream=True,
     headers=headers
 )

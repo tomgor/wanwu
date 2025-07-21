@@ -854,6 +854,21 @@ definitions:
     - modelType
     - provider
     type: object
+  request.KnowledgeHitReq:
+    properties:
+      knowledgeIdList:
+        items:
+          type: string
+        type: array
+      question:
+        type: string
+      rerankModelId:
+        type: string
+    required:
+    - knowledgeIdList
+    - question
+    - rerankModelId
+    type: object
   request.KnowledgeSelectReq:
     properties:
       name:
@@ -1147,6 +1162,13 @@ definitions:
     required:
     - name
     - roleId
+    type: object
+  request.TagBindCountReq:
+    properties:
+      tagId:
+        type: string
+    required:
+    - tagId
     type: object
   request.UnPublishAppRequest:
     properties:
@@ -1557,6 +1579,15 @@ definitions:
         description: 0:不存在，1：已完成
         type: integer
     type: object
+  response.ChunkSearchList:
+    properties:
+      knowledgeName:
+        type: string
+      snippet:
+        type: string
+      title:
+        type: string
+    type: object
   response.CleanFileResp:
     properties:
       status:
@@ -1747,6 +1778,22 @@ definitions:
         type: string
       name:
         type: string
+    type: object
+  response.KnowledgeHitResp:
+    properties:
+      prompt:
+        description: 提示词列表
+        type: string
+      score:
+        description: 打分信息
+        items:
+          type: number
+        type: array
+      searchList:
+        description: 种种结果
+        items:
+          $ref: '#/definitions/response.ChunkSearchList'
+        type: array
     type: object
   response.KnowledgeInfo:
     properties:
@@ -4089,6 +4136,35 @@ paths:
       summary: 解析url
       tags:
       - knowledge
+  /knowledge/hit:
+    post:
+      consumes:
+      - application/json
+      description: 知识库命中测试
+      parameters:
+      - description: 知识库命中测试请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.KnowledgeHitReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.KnowledgeHitResp'
+              type: object
+      security:
+      - JWT: []
+      summary: 知识库命中测试
+      tags:
+      - knowledge
   /knowledge/select:
     post:
       consumes:
@@ -4243,6 +4319,35 @@ paths:
       security:
       - JWT: []
       summary: 绑定知识库标签
+      tags:
+      - knowledge.tag
+  /knowledge/tag/bind/count:
+    get:
+      consumes:
+      - application/json
+      description: 查询标签绑定知识库数量
+      parameters:
+      - description: 查询tag绑定数量参数请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.TagBindCountReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.KnowledgeTagListResp'
+              type: object
+      security:
+      - JWT: []
+      summary: 查询标签绑定知识库数量
       tags:
       - knowledge.tag
   /mcp:

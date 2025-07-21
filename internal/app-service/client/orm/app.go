@@ -64,8 +64,16 @@ func (c *Client) PublishApp(ctx context.Context, userId, orgId, appId, appType, 
 	return nil
 }
 
-func (c *Client) UnPublishApp(ctx context.Context, appId, appType string) *errs.Status {
+func (c *Client) UnPublishApp(ctx context.Context, appId, appType, userId string) *errs.Status {
 	err := c.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// 取消发布的时候删除其他用户的ApiKey
+		if err := sqlopt.SQLOptions(
+			sqlopt.WithAppID(appId),
+			sqlopt.WithAppType(appType),
+			sqlopt.WithExcludeUserID(userId),
+		).Apply(tx).Delete(&model.ApiKey{}).Error; err != nil {
+			return fmt.Errorf("failed to delete api key: %v", err)
+		}
 		if err := deleteAppRelatedDataByUnPublish(tx, appId, appType); err != nil {
 			return err
 		}
@@ -75,6 +83,7 @@ func (c *Client) UnPublishApp(ctx context.Context, appId, appType string) *errs.
 		return toErrStatus("app_unpublish", appId, err.Error())
 	}
 	return nil
+
 }
 
 func (c *Client) GetAppList(ctx context.Context, userId, orgId, appType string) ([]*model.App, *errs.Status) {

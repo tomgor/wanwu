@@ -10,6 +10,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
+	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -87,22 +88,16 @@ func ModelChatCompletions(ctx *gin.Context) {
 //	@Summary	Model Embeddings
 //	@Accept		json
 //	@Produce	json
-//	@Param		modelId	path		string					true	"模型ID"
-//	@Param		data	body		map[string]interface{}	true	"请求参数"
-//	@Success	200		{object}	response.Response{}
+//	@Param		modelId	path		string						true	"模型ID"
+//	@Param		data	body		mp_common.EmbeddingReq{}	true	"请求参数"
+//	@Success	200		{object}	mp_common.EmbeddingResp{}
 //	@Router		/model/{modelId}/embeddings [post]
 func ModelEmbeddings(ctx *gin.Context) {
-	body, ok := ctx.Get(gin.BodyBytesKey)
-	if !ok {
-		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, "invalid body"))
+	var data mp_common.EmbeddingReq
+	if !gin_util.Bind(ctx, &data) {
 		return
 	}
-	data := make(map[string]interface{})
-	if err := json.Unmarshal(body.([]byte), &data); err != nil {
-		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, err.Error()))
-		return
-	}
-	service.ModelEmbeddings(ctx, ctx.Param("modelId"), data)
+	service.ModelEmbeddings(ctx, ctx.Param("modelId"), &data)
 }
 
 // ModelRerank
@@ -112,21 +107,15 @@ func ModelEmbeddings(ctx *gin.Context) {
 //	@Accept		json
 //	@Produce	json
 //	@Param		modelId	path		string					true	"模型ID"
-//	@Param		data	body		map[string]interface{}	true	"请求参数"
-//	@Success	200		{object}	response.Response{}
+//	@Param		data	body		mp_common.RerankReq{}	true	"请求参数"
+//	@Success	200		{object}	mp_common.RerankResp{}
 //	@Router		/model/{modelId}/rerank [post]
 func ModelRerank(ctx *gin.Context) {
-	body, ok := ctx.Get(gin.BodyBytesKey)
-	if !ok {
-		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, "invalid body"))
+	var data mp_common.RerankReq
+	if !gin_util.Bind(ctx, &data) {
 		return
 	}
-	data := make(map[string]interface{})
-	if err := json.Unmarshal(body.([]byte), &data); err != nil {
-		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, err.Error()))
-		return
-	}
-	service.ModelRerank(ctx, ctx.Param("modelId"), data)
+	service.ModelRerank(ctx, ctx.Param("modelId"), &data)
 }
 
 // UpdateDocStatus

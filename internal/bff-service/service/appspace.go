@@ -73,6 +73,15 @@ func GetAppSpaceAppList(ctx *gin.Context, userId, orgId, name, appType string) (
 			ret = append(ret, appBriefProto2Model(ctx, assistantInfo))
 		}
 	}
+	if appType == "" || appType == constant.AppTypeWorkflow {
+		resp, err := ListWorkFlow(ctx, userId, orgId, name)
+		if err != nil {
+			return nil, err
+		}
+		for _, workflowInfo := range resp.List {
+			ret = append(ret, workflowInfo2Model(workflowInfo))
+		}
+	}
 	var appIds []string
 	for _, appInfo := range ret {
 		appIds = append(appIds, appInfo.AppId)
@@ -92,20 +101,9 @@ func GetAppSpaceAppList(ctx *gin.Context, userId, orgId, name, appType string) (
 			ret[idx].PublishType = publishType
 		}
 	}
-
-	if appType == "" || appType == constant.AppTypeWorkflow {
-		resp, err := ListWorkFlow(ctx, userId, orgId, name)
-		if err != nil {
-			return nil, err
-		}
-		for _, workflowInfo := range resp.List {
-			ret = append(ret, workflowInfo2Model(workflowInfo))
-		}
-	}
 	sort.SliceStable(ret, func(i, j int) bool {
 		return ret[i].UpdatedAt > ret[j].UpdatedAt
 	})
-
 	return &response.ListResult{
 		List:  ret,
 		Total: int64(len(ret)),
@@ -113,6 +111,12 @@ func GetAppSpaceAppList(ctx *gin.Context, userId, orgId, name, appType string) (
 }
 
 func PublishApp(ctx *gin.Context, userId, orgId string, req request.PublishAppRequest) error {
+	// 特殊处理工作流的发布
+	if req.AppType == constant.AppTypeWorkflow {
+		if err := PublishWorkFlow(ctx, userId, orgId, req.AppId); err != nil {
+			return err
+		}
+	}
 	_, err := app.PublishApp(ctx.Request.Context(), &app_service.PublishAppReq{
 		AppId:       req.AppId,
 		AppType:     req.AppType,
@@ -140,6 +144,16 @@ func UnPublishApp(ctx *gin.Context, userId, orgId string, req request.UnPublishA
 	_, err := app.UnPublishApp(ctx.Request.Context(), &app_service.UnPublishAppReq{
 		AppId:   req.AppId,
 		AppType: req.AppType,
+		UserId:  userId,
 	})
-	return err
+	if err != nil {
+		return err
+	}
+	if req.AppType == constant.AppTypeWorkflow {
+		err = UnPublishWorkFlow(ctx, userId, orgId, req.AppId)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

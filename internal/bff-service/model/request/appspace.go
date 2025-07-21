@@ -53,3 +53,19 @@ type DeleteWorkFlowRequest struct {
 func (o *DeleteWorkFlowRequest) Check() error {
 	return nil
 }
+
+type PublishWorkFlowRequest struct {
+	AppId string `form:"workflowID" json:"workflowID" validate:"required"` // 应用ID
+}
+
+func (p *PublishWorkFlowRequest) Check() error {
+	return nil
+}
+
+type UnPublishWorkFlowRequest struct {
+	AppId string `form:"workflowID" json:"workflowID" validate:"required"` // 应用ID
+}
+
+func (p *UnPublishWorkFlowRequest) Check() error {
+	return nil
+}

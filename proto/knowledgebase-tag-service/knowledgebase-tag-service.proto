@@ -17,6 +17,8 @@ service KnowledgeBaseTagService {
   rpc DeleteKnowledgeTag(DeleteKnowledgeTagReq) returns (google.protobuf.Empty) {}
   // 修改知识库标签
   rpc BindKnowledgeTag(BindKnowledgeTagReq) returns (google.protobuf.Empty) {}
+  // 修改知识库标签
+  rpc TagBindCount(TagBindCountReq) returns (TagBindCountResp) {}
 }
 
 message KnowledgeTagSelectReq {
@@ -64,4 +66,14 @@ message BindKnowledgeTagReq{
   string userId = 2;
   string orgId = 3;
   repeated string tagIdList = 4;
+}
+
+message TagBindCountReq{
+  string tagId = 1;
+  string userId = 2;
+  string orgId = 3;
+}
+
+message TagBindCountResp{
+  int64 bindCount = 1;
 }

@@ -2663,6 +2663,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/knowledge/hit": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "知识库命中测试",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge"
+                ],
+                "summary": "知识库命中测试",
+                "parameters": [
+                    {
+                        "description": "知识库命中测试请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.KnowledgeHitReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.KnowledgeHitResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/knowledge/select": {
             "post": {
                 "security": [
@@ -2922,6 +2973,57 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/knowledge/tag/bind/count": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "查询标签绑定知识库数量",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.tag"
+                ],
+                "summary": "查询标签绑定知识库数量",
+                "parameters": [
+                    {
+                        "description": "查询tag绑定数量参数请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.TagBindCountReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.KnowledgeTagListResp"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -6351,6 +6453,28 @@ const docTemplate = `{
                 }
             }
         },
+        "request.KnowledgeHitReq": {
+            "type": "object",
+            "required": [
+                "knowledgeIdList",
+                "question",
+                "rerankModelId"
+            ],
+            "properties": {
+                "knowledgeIdList": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "question": {
+                    "type": "string"
+                },
+                "rerankModelId": {
+                    "type": "string"
+                }
+            }
+        },
         "request.KnowledgeSelectReq": {
             "type": "object",
             "properties": {
@@ -6779,6 +6903,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "roleId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.TagBindCountReq": {
+            "type": "object",
+            "required": [
+                "tagId"
+            ],
+            "properties": {
+                "tagId": {
                     "type": "string"
                 }
             }
@@ -7386,6 +7521,20 @@ const docTemplate = `{
                 }
             }
         },
+        "response.ChunkSearchList": {
+            "type": "object",
+            "properties": {
+                "knowledgeName": {
+                    "type": "string"
+                },
+                "snippet": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "response.CleanFileResp": {
             "type": "object",
             "properties": {
@@ -7665,6 +7814,29 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "response.KnowledgeHitResp": {
+            "type": "object",
+            "properties": {
+                "prompt": {
+                    "description": "提示词列表",
+                    "type": "string"
+                },
+                "score": {
+                    "description": "打分信息",
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "searchList": {
+                    "description": "种种结果",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.ChunkSearchList"
+                    }
                 }
             }
         },

@@ -41,6 +41,34 @@ type RagDeleteParams struct {
 	KnowledgeBaseName string `json:"knowledgeBase"`
 }
 
+type KnowledgeHitParams struct {
+	UserId        string   `json:"userId"`
+	Question      string   `json:"question" validate:"required"`
+	KnowledgeBase []string `json:"knowledgeBase" validate:"required"`
+	Threshold     float64  `json:"threshold"`
+	TopK          int      `json:"topK"`
+	RerankModelId string   `json:"rerank_model_id"`
+}
+
+type RagKnowledgeHitResp struct {
+	Code    int               `json:"code"`
+	Message string            `json:"message"`
+	Data    *KnowledgeHitData `json:"data"`
+}
+
+type KnowledgeHitData struct {
+	Prompt     string             `json:"prompt"`
+	SearchList []*ChunkSearchList `json:"searchList"`
+	Score      []float64          `json:"score"`
+}
+
+type ChunkSearchList struct {
+	Title    string      `json:"title"`
+	Snippet  string      `json:"snippet"`
+	KbName   string      `json:"kb_name"`
+	MetaData interface{} `json:"meta_data"`
+}
+
 // RagKnowledgeCreate rag创建知识库
 func RagKnowledgeCreate(ctx context.Context, ragCreateParams *RagCreateParams) error {
 	ragServer := config.GetConfig().RagServer
@@ -130,4 +158,33 @@ func RagKnowledgeDelete(ctx context.Context, ragDeleteParams *RagDeleteParams) e
 		return errors.New(resp.Message)
 	}
 	return nil
+}
+
+// RagKnowledgeHit rag命中测试
+func RagKnowledgeHit(ctx context.Context, knowledgeHitParams *KnowledgeHitParams) (*RagKnowledgeHitResp, error) {
+	ragServer := config.GetConfig().RagServer
+	url := ragServer.Endpoint + ragServer.KnowledgeHitUri
+	paramsByte, err := json.Marshal(knowledgeHitParams)
+	if err != nil {
+		return nil, err
+	}
+	result, err := http.GetClient().PostJson(ctx, &http_client.HttpRequestParams{
+		Url:        url,
+		Body:       paramsByte,
+		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
+		MonitorKey: "rag_knowledge_hit",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var resp RagKnowledgeHitResp
+	if err := json.Unmarshal(result, &resp); err != nil {
+		log.Errorf(err.Error())
+		return nil, err
+	}
+	if resp.Code != successCode {
+		return nil, errors.New(resp.Message)
+	}
+	return &resp, nil
 }
