@@ -2,9 +2,8 @@ package v1
 
 import (
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
-	"github.com/UnicomAI/wanwu/internal/bff-service/config"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 )
@@ -94,33 +93,33 @@ func GetDocCenter(ctx *gin.Context) {
 
 // 获取当前用户ID
 func getUserID(ctx *gin.Context) string {
-	return ctx.GetString(config.USER_ID)
+	return ctx.GetString(gin_util.USER_ID)
 }
 
 // 获取当前组织ID
 func getOrgID(ctx *gin.Context) string {
-	return ctx.GetHeader(config.X_ORG_ID)
+	return ctx.GetHeader(gin_util.X_ORG_ID)
 }
 
 // 获取当前系统语言
 func getLanguage(ctx *gin.Context) string {
-	return ctx.GetHeader(config.X_LANGUAGE)
+	return ctx.GetHeader(gin_util.X_LANGUAGE)
 }
 
 // 当前用户是否是当前组织内置管理员角色
 func isAdmin(ctx *gin.Context) bool {
-	return ctx.GetBool(config.IS_ADMIN)
+	return ctx.GetBool(gin_util.IS_ADMIN)
 }
 
 // 当前组织是否是内置顶级【系统】组织
 func isSystem(ctx *gin.Context) bool {
-	return ctx.GetBool(config.IS_SYSTEM)
+	return ctx.GetBool(gin_util.IS_SYSTEM)
 }
 
 func getPageNo(ctx *gin.Context) int32 {
-	return util.MustI32(ctx.Query(config.PageNo))
+	return util.MustI32(ctx.Query(gin_util.PageNo))
 }
 
 func getPageSize(ctx *gin.Context) int32 {
-	return util.MustI32(ctx.Query(config.PageSize))
+	return util.MustI32(ctx.Query(gin_util.PageSize))
 }

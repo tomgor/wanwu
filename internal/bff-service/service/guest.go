@@ -8,9 +8,9 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
-	mid "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util/mid-wrap"
-	jwt_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/jwt-util"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
+	mid "github.com/UnicomAI/wanwu/pkg/gin-util/mid-wrap"
+	jwt_util "github.com/UnicomAI/wanwu/pkg/jwt-util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -92,7 +92,7 @@ func Login(ctx *gin.Context, login *request.Login, language string) (*response.L
 	if err != nil {
 		return nil, err
 	}
-	ctx.Set(config.CLAIMS, &claims)
+	ctx.Set(gin_util.CLAIMS, &claims)
 	// resp
 	return &response.Login{
 		UID:           resp.User.GetUserId(),

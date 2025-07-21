@@ -6,14 +6,41 @@ import (
 	"net/http"
 
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
-	"github.com/UnicomAI/wanwu/internal/bff-service/config"
-	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/i18n"
-	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/util"
+	"github.com/UnicomAI/wanwu/pkg/i18n"
+	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+)
+
+// gin.Contex key
+const (
+	CLAIMS = "claims"
+	STATUS = "STATUS"
+	RESULT = "RESULT"
+
+	// http header
+	X_LANGUAGE = "X-Language" // 当前语言
+	X_ORG_ID   = "X-Org-Id"   // 当前组织
+
+	// gin.Context
+	USER_ID   = "USER_ID"   // 当前用户
+	IS_ADMIN  = "IS_ADMIN"  // USER_ID是否当前组织X_ORG_ID的内置管理员角色
+	IS_SYSTEM = "IS_SYSTEM" // 当前组织X_ORG_ID是否是【系统】
+
+	// openapi相关
+	APP_ID   = "APP_ID"
+	APP_TYPE = "APP_TYPE"
+
+	ANSWER = "ANSWER"
+)
+
+// http common query key
+const (
+	PageNo   = "pageNo"
+	PageSize = "pageSize"
 )
 
 var (
@@ -155,8 +182,8 @@ func ResponseDetail(ctx *gin.Context, httpStatus int, code codes.Code, data inte
 		Msg:  msg,
 	}
 	b, _ := json.Marshal(resp)
-	ctx.Set(config.STATUS, httpStatus)
-	ctx.Set(config.RESULT, string(b))
+	ctx.Set(STATUS, httpStatus)
+	ctx.Set(RESULT, string(b))
 	ctx.JSON(httpStatus, resp)
 }
 
@@ -185,14 +212,14 @@ func I18nCodeOrKey(ctx *gin.Context, code err_code.Code, key string, args ...str
 
 func getLanguage(ctx *gin.Context) i18n.Lang {
 	// 1. 优先header的language
-	language := ctx.GetHeader(config.X_LANGUAGE)
-	// 2. 其次用户本设置的language
+	language := ctx.GetHeader(X_LANGUAGE)
+	// 2. 其次用户设置的language
 	if language == "" {
-		language = ctx.GetString(config.X_LANGUAGE)
+		language = ctx.GetString(X_LANGUAGE)
 	}
 	// 3. 再次系统默认的language
 	if language == "" {
-		language = config.Cfg().I18n.DefaultLang
+		language = string(i18n.DefaultLang())
 	}
 	return i18n.Lang(language)
 }

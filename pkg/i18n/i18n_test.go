@@ -20,9 +20,9 @@ type YamlConfig struct {
 }
 
 func TestMain(m *testing.M) {
-	flag.StringVar(&yamlFile, "config", "../../../../configs/microservice/bff-service/configs/config.yaml", "conf yaml file")
-	flag.StringVar(&xlsxFile, "xlsx", "../../../../configs/microservice/bff-service/configs/wanwu-i18n.xlsx", "i18n xlsx file")
-	flag.StringVar(&jsonlFile, "jsonl", "../../../../configs/microservice/bff-service/configs/wanwu-i18n.jsonl", "i18n jsonl file")
+	flag.StringVar(&yamlFile, "config", "../../configs/microservice/bff-service/configs/config.yaml", "conf yaml file")
+	flag.StringVar(&xlsxFile, "xlsx", "../../configs/microservice/bff-service/configs/wanwu-i18n.xlsx", "i18n xlsx file")
+	flag.StringVar(&jsonlFile, "jsonl", "../../configs/microservice/bff-service/configs/wanwu-i18n.jsonl", "i18n jsonl file")
 
 	flag.Parse()
 	os.Exit(m.Run())

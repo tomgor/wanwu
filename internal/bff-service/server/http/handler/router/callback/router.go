@@ -3,8 +3,8 @@ package callback
 import (
 	"net/http"
 
-	mid "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util/mid-wrap"
 	"github.com/UnicomAI/wanwu/internal/bff-service/server/http/handler/callback"
+	mid "github.com/UnicomAI/wanwu/pkg/gin-util/mid-wrap"
 	"github.com/gin-gonic/gin"
 )
 

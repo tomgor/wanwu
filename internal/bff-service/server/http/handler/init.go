@@ -6,16 +6,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/internal/bff-service/server/http/handler/router/callback"
 	"github.com/UnicomAI/wanwu/internal/bff-service/server/http/handler/router/openapi"
 	v1 "github.com/UnicomAI/wanwu/internal/bff-service/server/http/handler/router/v1"
 	"github.com/UnicomAI/wanwu/internal/bff-service/server/http/middleware"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
+	"github.com/gin-gonic/gin"
 )
 
 var (
