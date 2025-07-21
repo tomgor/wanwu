@@ -11,9 +11,9 @@ import (
 
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	assistant_template "github.com/UnicomAI/wanwu/internal/bff-service/pkg/assistant-template"
-	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/i18n"
 	"github.com/UnicomAI/wanwu/internal/bff-service/server/http/handler"
 	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
+	"github.com/UnicomAI/wanwu/pkg/i18n"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/minio"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"

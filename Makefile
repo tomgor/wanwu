@@ -88,7 +88,7 @@ grpc-protoc:
 	protoc --proto_path=. --go_out=paths=source_relative:api --go-grpc_out=paths=source_relative:api proto/*/*.proto
 
 i18n-jsonl:
-	go test ./internal/bff-service/pkg/i18n -run TestI18nConvertXlsx2Jsonl
+	go test ./pkg/i18n -run TestI18nConvertXlsx2Jsonl
 
 init:
 	go mod tidy

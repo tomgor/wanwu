@@ -7,9 +7,9 @@ import (
 	iam_service "github.com/UnicomAI/wanwu/api/proto/iam-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
-	mid "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util/mid-wrap"
-	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util/route"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
+	mid "github.com/UnicomAI/wanwu/pkg/gin-util/mid-wrap"
+	"github.com/UnicomAI/wanwu/pkg/gin-util/route"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 )

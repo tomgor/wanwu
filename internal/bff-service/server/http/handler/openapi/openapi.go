@@ -5,11 +5,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	sse_util "github.com/UnicomAI/wanwu/pkg/sse-util"
 	"github.com/gin-gonic/gin"
@@ -113,8 +112,8 @@ func ChatAgent(ctx *gin.Context) {
 	resp.Response = output
 	b, _ := json.Marshal(resp)
 	status := http.StatusOK
-	ctx.Set(config.STATUS, status)
-	ctx.Set(config.RESULT, string(b))
+	ctx.Set(gin_util.STATUS, status)
+	ctx.Set(gin_util.RESULT, string(b))
 	ctx.JSON(status, resp)
 }
 
@@ -168,8 +167,8 @@ func ChatRag(ctx *gin.Context) {
 	resp.Data.Output = output
 	b, _ := json.Marshal(resp)
 	status := http.StatusOK
-	ctx.Set(config.STATUS, status)
-	ctx.Set(config.RESULT, string(b))
+	ctx.Set(gin_util.STATUS, status)
+	ctx.Set(gin_util.RESULT, string(b))
 	ctx.JSON(status, resp)
 }
 
@@ -177,15 +176,15 @@ func ChatRag(ctx *gin.Context) {
 
 // 获取当前用户ID
 func getUserID(ctx *gin.Context) string {
-	return ctx.GetString(config.USER_ID)
+	return ctx.GetString(gin_util.USER_ID)
 }
 
 // 获取当前组织ID
 func getOrgID(ctx *gin.Context) string {
-	return ctx.GetString(config.X_ORG_ID)
+	return ctx.GetString(gin_util.X_ORG_ID)
 }
 
 // 获取当前appID
 func getAppID(ctx *gin.Context) string {
-	return ctx.GetString(config.APP_ID)
+	return ctx.GetString(gin_util.APP_ID)
 }
