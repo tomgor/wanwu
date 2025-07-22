@@ -28,10 +28,13 @@ type ActionInfos struct {
 }
 
 type WorkFlowInfos struct {
-	Id         string `json:"id"`
-	WorkFlowId string `json:"workFlowId"`
-	ApiName    string `json:"apiName"`
-	Enable     bool   `json:"enable"`
+	Id           string `json:"id"`
+	WorkFlowId   string `json:"workFlowId"`
+	ApiName      string `json:"apiName"`
+	Enable       bool   `json:"enable"`
+	WorkFlowName string `json:"workFlowName"`
+	WorkFlowDesc string `json:"workFlowDesc"`
+	Valid        bool   `json:"valid"`
 }
 
 type Action struct {

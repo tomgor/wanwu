@@ -18,6 +18,36 @@ TOOL_DESC = (
     '{name_for_model}: Call this tool to interact with the {name_for_human} API. '
     'What is the {name_for_human} API useful for? {description_for_model} Parameters: {parameters} {args_format}')
 
+'''
+
+
+
+PROMPT_REACT = """尽可能回答以下问题。您可以使用以下工具：
+{tool_descs}
+
+请使用以下格式回答：
+
+Question: 需要你回答的问题
+Thought: 你应该思考该做什么
+Action: 选择要调用的工具名称，必须是 [{tool_names}] 中的一个，请直接输出工具名称，不要加句号
+Action Input: 调用这个工具所需的全部参数，如果无法识别，请不要随意编造。格式应为标准 JSON。
+Observation: 动作的结果
+... （此 Thought/Action/Action Input/Observation 可以重复零次或多次）
+Thought: 输出最终答案
+Final Answer: 用 Markdown 格式回答原始问题。
+
+开始！
+
+Question: {query}
+
+必须严格按照上述格式输出答案。
+请在最终输出时用简体中文作答和分析，禁止输出繁体中文。"""
+
+
+'''
+
+
+
 PROMPT_REACT = """Answer the following questions as best you can. You have access to the following tools:
 {tool_descs}
 
@@ -30,7 +60,7 @@ Action Input: the all parameters required for the chosen action, If it cannot be
 Observation: the result of the action
 ... (this Thought/Action/Action Input/Observation can be repeated zero or more times)
 Thought: I now know the final answer
-Final Answer: the final answer to the all original input question. using Markdown formatting in the final answer
+Final Answer: the final answer to the all original input question. Must use standard  Markdown formatting in the final answer,Please use <br> as the line break instead of \n
 
 Begin!
 
@@ -39,6 +69,7 @@ Question: {query}
 Must output strictly in the above format to answer the Question.
 Please answer and analyze in Simplified Chinese during the final output, and prohibit outputting Traditional Chinese
 """
+
 
 TOOL_DESC_MODELSCOPE = (
     '{name_for_model}: Call this tool to interact with the {name_for_human} API. '
@@ -54,7 +85,6 @@ based on the above information,please must be  Use the following format:
 Action: please return the appropriate toolname from [{tool_names}] to answer the question  or  Return None if no tool applies directly. Do not include any additional information.
 
 """
-
 
 ANSWER_PROMPT = "Based on the above information, think about what to do next. "
 
@@ -102,6 +132,7 @@ class ReActChat(FnCallAgent):
         keys_identify = []
         Invalid_character = ["无","{}","","NONE","[]","未知"]
         count_qs = 0
+        first_index = 0
         
         try:
             ####1、yuanjing_function_call模型输出格式与其他架构不一致，需单独处理------直接调用
@@ -267,6 +298,22 @@ class ReActChat(FnCallAgent):
                                 response_new = re.sub('<TOOL>.*?</TOOL>', '', response, flags=re.DOTALL)
                                 if "</TOOL>" in response and ("ACTION INPUT" in response_new.upper() and "}" in response_new.upper()):
                                     break
+                            # ####如果直接是答案行，则无需校验，直接输出结果
+                            # elif "Final Answer" in response:
+                            #     if first_index == 0 and "Final Answer:" in response:
+                            #         final_answer_pos = response.upper().index("Final Answer:")
+                            #         res = response[final_answer_pos:]
+                            #     elif first_index == 0 and "Final Answer" in response:
+                            #         final_answer_pos = response.upper().index("Final Answer")
+                            #         res = response[final_answer_pos:]
+                            #     result = {"action_code": 0, "description": "", "func_names": func_names,
+                            #               "func_params": func_params, "thought_inference": thought_inference,
+                            #               "qa_type": qa_type, "action_output": f"{res}"}
+                            #     result = json.dumps(result, ensure_ascii=False)
+                            #     yield [Message(role=ASSISTANT, content=res)]
+                            #     # logger.info(f"action最终的输出结果为：{result}")
+                            #     first_index += 1
+
                             else:
                                 # logger.info(f"-----非 deepseek截断提取：stop_token效果------")
                                 if "OBSERVATION" in response.upper() or ("ACTION INPUT" in response.upper() and "}" in response.upper()):
@@ -275,15 +322,25 @@ class ReActChat(FnCallAgent):
                     time_output2 = time.time()
                     time_output = time_output2 - time_output1
                     logger.info(f"第{t}次提取response的响应时间为:{time_output}")
+
                     ####大模型报错，直接退出
                     if not response:
                         result = {"action_code": 1,"description":f"调用大模型报错：{output_stream.text}","func_names":[],"func_params":[],"thought_inference":"","qa_type":None,"action_output":f"调用大模型报错：{output_stream.text}"}
                         result = json.dumps(result, ensure_ascii=False)
                         yield [Message(role=ASSISTANT, content=result)]
                         break
+
+                    # elif "FINAL ANSWER" in response.upper():
+                    #     break
+
+                    else:
+                        response = re.sub('<think>.*?</think>', '', response, flags=re.DOTALL)
+                        response = re.sub('<THINK>.*?</THINK>', '', response, flags=re.DOTALL)
+
                     logger.info(f"第{t}次调用的response:\n{response}\n")
                     ###剔除思考过程后提取工具调用结果
                     response = re.sub('<tool>.*?</tool>', '', response, flags=re.DOTALL)
+                    response = re.sub('<think>.*?</think>', '', response, flags=re.DOTALL | re.IGNORECASE)
                     ##结构化提取大模型识别的参数：兼容元景模型及ds模型（输出内容不一致）
                     counts = {
                         "OBSERVATION": response.upper().count("OBSERVATION") + response.upper().count("OBSERVATION:"),
@@ -291,6 +348,7 @@ class ReActChat(FnCallAgent):
                     }
                     num = counts["OBSERVATION"] if counts["OBSERVATION"] else counts["ACTION"]
                     logger.info(f"需要调用call的次数为：{num}")
+                    #logger.info(f"处理了的response:{response}")
                     action_results = find_tools(response,num) 
                     action = action_results['func_name']
                     action_input = action_results['func_params']
@@ -385,7 +443,8 @@ class ReActChat(FnCallAgent):
                         else:
                             ###判断是否是对问题的进一步追问
                             time_add1  = time.time()
-                            is_add = is_answer_additional_remarks(query,action_results['final_result'],model_name = self.model_name,model_url = self.model_url)
+                            # is_add = is_answer_additional_remarks(query,action_results['final_result'],model_name = self.model_name,model_url = self.model_url)
+                            is_add = is_answer_additional_remarks(query, final_result,model_name=self.model_name, model_url=self.model_url)
                             time_add2  = time.time()
                             time_add = time_add2 - time_add1
                             logger.info(f"is_answer_additional_remarks的响应时间:{time_add}")
@@ -432,7 +491,7 @@ class ReActChat(FnCallAgent):
 
                             please Use the following format:
 
-                            Question: the input question you must answer:{query} 
+                            Question: the input question you must answer:{query} ::::
                             Action: the action to take 【{function_to_call}】
                             Action Input: the parameters required for the chosen action 【{function_to_call}】, formatted in standard JSON Observation .
                             Observation: the result of the action 
@@ -473,6 +532,7 @@ class ReActChat(FnCallAgent):
                             end_pattern = "Begin!"
                             pattern = re.compile(re.escape(start_pattern) + r'.*?' + re.escape(end_pattern), re.DOTALL)
                             text_messages[-1].content = re.sub(pattern, "", text_messages[-1].content)
+                                
                             action_output = action_results['final_result']  if qa_type == 20 else  f"已基于{action}完成参数提取"
                             result = {"action_code": 0,"description":"","func_names":func_names,"func_params":func_params,"thought_inference":thought_inference,"qa_type":qa_type,"action_output":action_output}
                             result = json.dumps(result, ensure_ascii=False)
@@ -484,7 +544,7 @@ class ReActChat(FnCallAgent):
                                 logger.info(f"第{t}次调用_call_tool:开始执行_call_tool")
                                 action = action[-1]
                                 action_input = action_input[-1] if action_input else {}   ###存在插件无需必填参数的情况
-                                is_use_api_output = "TRUE" in str(action_input.get("is_use_api_output", "FALSE")).upper()
+                                is_use_api_output = "TRUE" in str(action_input.get("is_use_api_output", "false")).upper()
                                 api_stream = action_input.get("stream",False)
                                 logger.info(f"_call_tool的入参为：action:{action}，action_input:{action_input}\n")
                                 
@@ -512,6 +572,7 @@ class ReActChat(FnCallAgent):
                                             # logger.info(f"--line--:{line}")
                                             yield [Message(role=ASSISTANT, content=line)]
                                         break
+
                                     except Exception as e:
                                         ####API内部服务异常
                                         logger.info(f"----流式API返回异常----")
@@ -524,13 +585,15 @@ class ReActChat(FnCallAgent):
                                 elif is_use_api_output and (not api_stream):
                                     observation = json.loads(observation)
                                     plugin_result = observation["description"]
-                                    plugin_result = re.sub('<think>.*?</think>', '', plugin_result, flags=re.DOTALL)
-                                    plugin_result = re.sub('<THINK>.*?</THINK>', '', plugin_result, flags=re.DOTALL)
-                                    yield [Message(role=ASSISTANT,content=f"\n\n```工具调用结果：\n{plugin_result}\n```\n\n")]
+                                    # plugin_result = re.sub('<think>.*?</think>', '', plugin_result, flags=re.DOTALL)
+                                    # plugin_result = re.sub('<THINK>.*?</THINK>', '', plugin_result, flags=re.DOTALL)
+                                    plugin_result = re.sub(r'<think>.*?</think>', '', plugin_result,flags=re.DOTALL | re.IGNORECASE)
+                                    plugin_result_output = json.loads(plugin_result)
+                                    yield [Message(role=ASSISTANT,content=f"\n\n```工具调用结果：\n{plugin_result_output}\n```\n\n")]
                                     # yield [Message(role=ASSISTANT, content=f"</tool>\n")]
                                     try:
                                         output_result = json.loads(plugin_result)
-                                        action_output = output_result['data']['choices'][0]['message']['content']  if output_result.get("data",{}).get("choices",{}) else observation['description']
+                                        action_output = output_result['data']['choices'][0]['message']['content']  if output_result.get("data",{}).get("choices",{}) else (output_result.values()[0] if len(output_result.keys()) == 1 else observation['description'])
                                     except Exception as e:
                                         action_output = plugin_result
                                     try:
@@ -550,9 +613,9 @@ class ReActChat(FnCallAgent):
                                 else:
                                     observation = json.loads(observation)
                                     plugin_result = observation["description"]
-                                    plugin_result = re.sub('<think>.*?</think>', '', plugin_result, flags=re.DOTALL)
-                                    plugin_result = re.sub('<THINK>.*?</THINK>', '', plugin_result, flags=re.DOTALL)
-                                    yield [Message(role=ASSISTANT, content=f"\n\n```工具调用结果：\n{plugin_result}\n```\n\n")]
+                                    logger.info(f"plugin_result:{plugin_result}   type:{type(plugin_result)}")
+                                    plugin_result_output = re.sub(r'<think>.*?</think>', '', plugin_result,flags=re.DOTALL | re.IGNORECASE)
+                                    yield [Message(role=ASSISTANT, content=f"\n\n```工具调用结果：\n{plugin_result_output}\n```\n\n")]
                                     
                                     if observation['action_code'] == 1:
                                         action_code = 1
@@ -560,7 +623,6 @@ class ReActChat(FnCallAgent):
                                     elif observation['action_code'] == 0 and all(value is None for value in json.loads(plugin_result).values()):
                                         action_code = 1
                                         action_output = f"插件调用结果无效：{observation['description']}"
-
 
                                 logger.info(f"第{t}次调用_call_tool的action_code为:{action_code}")
                                 if is_use_api_output or ( (not is_use_api_output) and action_code == 1):
@@ -573,13 +635,13 @@ class ReActChat(FnCallAgent):
                                     #     yield [Message(role=ASSISTANT, content=line)]
                                     break
                                 else:
-                                    observation = f"\nObservation: {observation}\n" 
+                                    observation_result = f"\nObservation: {observation}\n"
                                     if (not text_messages[-1].content.endswith('\nThought: ')) and (not thought.startswith('\n')):
                                         text_messages[-1].content += '\n'
                                     if str(action_input).startswith('```'):
                                         # Add a newline for proper markdown rendering of code
                                         action_input = '\n' + action_input
-                                    action_result = thought + f"\nAction: {action}\nAction Input: {action_input}" + observation + ANSWER_PROMPT
+                                    action_result = thought + f"\nAction: {action}\nAction Input: {action_input}" + observation_result + ANSWER_PROMPT
                                     thought_inference += action_result
                                     text_messages[-1].content += action_result
                                     continue
@@ -716,6 +778,11 @@ def find_tools(text: str,num: int) -> Tuple[bool, str, str, str]:
         special_args_token = '\nAction Input:'
         special_obs_token = '\nObservation:'
         special_final_token = '\nFinal Answer:'
+    elif '"Action":' in text or '"Final Answer:"' in text:
+        special_func_token = '"Action":'
+        special_args_token = '"Action Input":'
+        special_obs_token = '\nObservation:'
+        special_final_token = '\nFinal Answer:'
     ####适配deepseek模型输出
     else:
         special_func_token = 'Action'
@@ -744,6 +811,7 @@ def find_tools(text: str,num: int) -> Tuple[bool, str, str, str]:
     text = text.replace("https://192.168.0.218081","https://192.168.0.21:8081")
     text = text.replace("http//", "http://")
     text = text.replace("minio-wanwu9000","minio-wanwu:9000")
+
     ###适配deepseek系列模型的action及参数输出格式
     if special_args_token not in text and special_obs_token not in text:
         logger.info(f"-----当前text无{special_args_token}、{special_obs_token}----")
@@ -758,7 +826,8 @@ def find_tools(text: str,num: int) -> Tuple[bool, str, str, str]:
                              "description": ''}
             return action_result
 
-        match = re.search(r'Action: (.*?)(?=\n|Parameters:|$)', text)
+        # match = re.search(r'Action: (.*?)(?=\n|Parameters:|$)', text)
+        match = re.search(r'Actions?\s*[:：]?\s*(.*?)(?=(?:Parameters|Action Input)s?\s*[:：]?\s*|$)', text, re.DOTALL)
         if match:
             action_name = match.group(1).replace("\n","").replace("【","").replace("】","")
             action_names.append(action_name)
@@ -791,8 +860,9 @@ def find_tools(text: str,num: int) -> Tuple[bool, str, str, str]:
             logger.info(f"处理前的func_name:{func_name}")
             logger.info(f"处理前的func_args:{func_args}")
             ###正则化提取function_name(剔除所有的标点符号和空白字符)
-            pattern_funcname = r'[\W\s]+'
-            func_name = re.sub(pattern_funcname, '', func_name)
+            #pattern_funcname = r'[\W\s]+'
+            #func_name = re.sub(pattern_funcname, '', func_name)
+            func_name = re.sub(r'^[",]+|[",]+$', '', func_name)
             logger.info(f"正则化之后的func_name:{func_name}")
             ###正则化提取function_args(提取{}之间的内容)
             func_args = func_args.replace("'", '"')

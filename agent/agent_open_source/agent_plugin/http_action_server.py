@@ -37,7 +37,6 @@ MODEL_NAME = os.getenv('CUAI_DEFAULT_LLM_MODEL_ID', MODEL_NAME_CONFIG)
 MODEL_URL_CONFIG = config["MODELS"]["model_url"]
 MODEL_URL = os.getenv('CUAI_DEFAULT_LLM_MODEL_URL', MODEL_URL_CONFIG)
 
-
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
@@ -203,16 +202,7 @@ def plugin_config(API_KEY,query,plugin_list,function_calls_list,action_type,hist
                 total_tokens = completion_tokens + prompt_tokens
 
                 line = line + "\n\n" if "</tool>" in line else line  ###适配链接的markdown输出
-                result = {"code": 0, "data": {"choices": [{"finish_reason": "", "index": 0, "message": {"content": line, "role": "assistant"}}], "model": model, "object": "chat.completion", "usage": {"completion_tokens": completion_tokens, "prompt_tokens": prompt_tokens, "total_tokens": total_tokens}}, "msg": "ok"}
-                jsonarr = json.dumps(result, ensure_ascii=False)
-                str_out = f'id:{id}\nevent:result\ndata:{jsonarr}\n\n'
-                yield str_out 
-                
-            ####特殊情况处理：API原始为流式结果，直接输出结果    
-            elif ("<tool>"  in total_result and "</tool>"  in total_result) and (not isinstance(line,dict)):
-                completion_tokens += len(line)
-                prompt_tokens = prompt_tokens
-                total_tokens = completion_tokens + prompt_tokens
+
                 result = {"code": 0, "data": {"choices": [{"finish_reason": "", "index": 0, "message": {"content": line, "role": "assistant"}}], "model": model, "object": "chat.completion", "usage": {"completion_tokens": completion_tokens, "prompt_tokens": prompt_tokens, "total_tokens": total_tokens}}, "msg": "ok"}
                 jsonarr = json.dumps(result, ensure_ascii=False)
                 str_out = f'id:{id}\nevent:result\ndata:{jsonarr}\n\n'
@@ -265,6 +255,7 @@ def plugin_config(API_KEY,query,plugin_list,function_calls_list,action_type,hist
                     jsonarr = json.dumps(result, ensure_ascii=False)
                     str_out = f'id:{id}\nevent:result\ndata:{jsonarr}\n\n'
                     yield str_out
+
             id += 1
                         
     except Exception as e:

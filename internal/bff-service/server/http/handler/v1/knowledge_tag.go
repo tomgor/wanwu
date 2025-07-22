@@ -28,6 +28,27 @@ func GetKnowledgeTagSelect(ctx *gin.Context) {
 	gin_util.Response(ctx, resp, err)
 }
 
+// SelectTagBindCount
+//
+//	@Tags			knowledge.tag
+//	@Summary		查询标签绑定知识库数量
+//	@Description	查询标签绑定知识库数量
+//	@Security		JWT
+//	@Accept			json
+//	@Param			data	body	request.TagBindCountReq	true	"查询tag绑定数量参数请求参数"
+//	@Produce		json
+//	@Success		200	{object}	response.Response{data=response.KnowledgeTagListResp}
+//	@Router			/knowledge/tag/bind/count [get]
+func SelectTagBindCount(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.TagBindCountReq
+	if !gin_util.BindQuery(ctx, &req) {
+		return
+	}
+	resp, err := service.SelectTagBindCount(ctx, userId, orgId, &req)
+	gin_util.Response(ctx, resp, err)
+}
+
 // CreateKnowledgeTag
 //
 //	@Tags			knowledge.tag

@@ -114,6 +114,7 @@ message PublishAppReq {
 message UnPublishAppReq {
   string appId = 1;
   string appType = 2;
+  string userId = 3;
 }
 
 message GetAppListReq {

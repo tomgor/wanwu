@@ -55,12 +55,16 @@ func (s *Service) CreateKnowledgeTag(ctx context.Context, req *knowledgebase_tag
 
 func (s *Service) UpdateKnowledgeTag(ctx context.Context, req *knowledgebase_tag_service.UpdateKnowledgeTagReq) (*emptypb.Empty, error) {
 	//1.查询知识库标签详情
-	knowledgeTag, err := orm.SelectKnowledgeTagDetail(ctx, req.TagId, req.UserId, req.OrgId)
+	knowledgeTag, err := orm.SelectKnowledgeTagDetail(ctx, req.UserId, req.OrgId, req.TagId)
 	if err != nil {
 		log.Errorf(fmt.Sprintf("没有操作该标签的权限 参数(%v)", req))
 		return nil, util.ErrCode(errs.Code_KnowledgeTagAccessDenied)
 	}
 	//2.重名校验
+	if knowledgeTag.Name == req.TagName {
+		//如何修改得名称和原名称一样无需修改
+		return &emptypb.Empty{}, nil
+	}
 	err = orm.CheckSameKnowledgeTagName(ctx, req.UserId, req.OrgId, req.TagName)
 	if err != nil {
 		return nil, err
@@ -101,6 +105,17 @@ func (s *Service) BindKnowledgeTag(ctx context.Context, req *knowledgebase_tag_s
 		return nil, util.ErrCode(errs.Code_KnowledgeTagBindFailed)
 	}
 	return &emptypb.Empty{}, nil
+}
+
+func (s *Service) TagBindCount(ctx context.Context, req *knowledgebase_tag_service.TagBindCountReq) (*knowledgebase_tag_service.TagBindCountResp, error) {
+	//1.查询知识库标签详情
+	knowledgeTag, err := orm.SelectKnowledgeTagDetail(ctx, req.UserId, req.OrgId, req.TagId)
+	if err != nil {
+		log.Errorf(fmt.Sprintf("没有操作该标签的权限 参数(%v)", req))
+		return nil, util.ErrCode(errs.Code_KnowledgeTagAccessDenied)
+	}
+	count, _ := orm.SelectKnowledgeCountByTagId(ctx, knowledgeTag.TagId)
+	return &knowledgebase_tag_service.TagBindCountResp{BindCount: count}, nil
 }
 
 // buildKnowledgeTagListResp 构造知识库标签列表返回结果

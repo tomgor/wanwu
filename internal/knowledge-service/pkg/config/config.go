@@ -126,6 +126,7 @@ type RagServerConfig struct {
 	InitKnowledgeUri          string `mapstructure:"init-knowledge-uri" json:"init-knowledge-uri"`
 	UpdateKnowledgeUri        string `mapstructure:"update-knowledge-uri" json:"update-knowledge-uri"`
 	DeleteKnowledgeUri        string `mapstructure:"delete-knowledge-uri" json:"delete-knowledge-uri"`
+	KnowledgeHitUri           string `mapstructure:"knowledge-hit-uri" json:"knowledge-hit-uri"`
 	GetDocSegmentUri          string `mapstructure:"get-doc-segment-uri" json:"get-doc-segment-uri"`
 	DocSegmentUpdateStatusUri string `mapstructure:"doc-segment-update-status-uri" json:"doc-segment-update-status-uri"`
 	DocDeleteUri              string `mapstructure:"doc-delete-uri" json:"doc-delete-uri"`

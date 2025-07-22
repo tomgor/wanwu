@@ -18,6 +18,14 @@ type Rerank struct {
 	EndpointUrl string `json:"endpointUrl"` // 推理url
 }
 
+func (cfg *Rerank) NewReq(req *mp_common.RerankReq) (mp_common.IRerankReq, error) {
+	m := map[string]interface{}{
+		"texts": req.Documents,
+		"query": req.Query,
+	}
+	return mp_common.NewRerankReq(m), nil
+}
+
 func (cfg *Rerank) Rerank(ctx context.Context, req mp_common.IRerankReq, headers ...mp_common.Header) (mp_common.IRerankResp, error) {
 	if cfg.ApiKey != "" {
 		headers = append(headers, mp_common.Header{
@@ -62,6 +70,10 @@ func (cfg *Rerank) rerankUrl() string {
 
 type rerankResp struct {
 	raw string
+
+	Index    int     `json:"index"`
+	Score    float64 `json:"score"`
+	Document string  `json:"document"`
 }
 
 func (resp *rerankResp) String() string {
@@ -71,8 +83,39 @@ func (resp *rerankResp) String() string {
 func (resp *rerankResp) Data() (interface{}, bool) {
 	ret := []map[string]interface{}{}
 	if err := json.Unmarshal([]byte(resp.raw), &ret); err != nil {
-		log.Errorf("rerank resp (%v) convert to data err: %v", resp.raw, err)
+		log.Errorf("yuanjing rerank resp (%v) convert to data err: %v", resp.raw, err)
 		return nil, false
 	}
 	return ret, true
+}
+func (resp *rerankResp) ConvertResp() (*mp_common.RerankResp, bool) {
+	var data []map[string]interface{}
+	if err := json.Unmarshal([]byte(resp.raw), &data); err != nil {
+		log.Errorf("yuanjing rerank resp (%v) convert to data err: %v", resp.raw, err)
+		return nil, false
+	}
+
+	var results []mp_common.Result
+	for _, item := range data {
+		b, err := json.Marshal(item)
+		if err != nil {
+			log.Errorf("yuanjing rerank resp (%v) item (%v) convert err: %v", resp.raw, item, err)
+			return nil, false
+		}
+		if err = json.Unmarshal(b, resp); err != nil {
+			log.Errorf("yuanjing rerank resp (%v) item (%v) unmarshal err: %v", resp.raw, item, err)
+			return nil, false
+		}
+		results = append(results, mp_common.Result{
+			Index:          resp.Index,
+			RelevanceScore: resp.Score,
+			Document: &mp_common.Document{
+				Text: resp.Document,
+			},
+		})
+	}
+
+	return &mp_common.RerankResp{
+		Results: results,
+	}, true
 }

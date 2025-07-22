@@ -90,3 +90,24 @@ func DeleteKnowledge(ctx *gin.Context) {
 	resp, err := service.DeleteKnowledge(ctx, userId, orgId, &req)
 	gin_util.Response(ctx, resp, err)
 }
+
+// KnowledgeHit
+//
+//	@Tags			knowledge
+//	@Summary		知识库命中测试
+//	@Description	知识库命中测试
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.KnowledgeHitReq	true	"知识库命中测试请求参数"
+//	@Success		200		{object}	response.Response{data=response.KnowledgeHitResp}
+//	@Router			/knowledge/hit [post]
+func KnowledgeHit(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.KnowledgeHitReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	resp, err := service.KnowledgeHit(ctx, userId, orgId, &req)
+	gin_util.Response(ctx, resp, err)
+}
