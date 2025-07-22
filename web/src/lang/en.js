@@ -106,7 +106,8 @@ export default {
             modelNameLimit: '2-50个字符',
             modelId: '支持英文、数字、下划线(_)、中划线(-)、(.)，2-50个字符，不能以下划线为开头',
             version: '支持英文、数字、(.)',
-            inferUrl: '请输入',
+            inferUrl: 'Base Url，例如：',
+            apiKey: '输入APIKey, 例如：'
         },
         select: {
             placeholder: '请选择'
