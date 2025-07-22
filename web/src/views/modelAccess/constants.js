@@ -9,8 +9,9 @@ export const MODEL_TYPE_OBJ = {
 export const MODEL_TYPE = Object.keys(MODEL_TYPE_OBJ).map(key => ({key, name: MODEL_TYPE_OBJ[key]}))
 
 export const YUAN_JING = 'YuanJing'
+export const OPENAI_API = 'OpenAI-API-compatible'
 export const PROVIDER_OBJ = {
-    'OpenAI-API-compatible': 'OpenAI-API-compatible',
+    [OPENAI_API]: 'OpenAI-API-compatible',
     [YUAN_JING]: '联通元景'
 }
 
@@ -23,3 +24,14 @@ export const FUNC_CALLING = [
     {key: 'toolCall', name: 'Tool call'},
     {key: 'functionCall', name: 'Function call'},
 ]
+
+export const TYPE_OBJ = {
+    apiKey: {
+        [YUAN_JING]: 'sk-abc********************xyz',
+        [OPENAI_API]: 'sk_7e4*************4s-BpI1l'
+    },
+    inferUrl: {
+        [YUAN_JING]: 'https://maas.ai-yuanjing.com/openapi/compatible-mode/v1',
+        [OPENAI_API]: 'https://api.siliconflow.cn/v1'
+    },
+}
