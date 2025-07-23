@@ -4,10 +4,10 @@
       <div class="left-nav" v-if="isShowNav">
         <!--不展示平台的图标-->
         <div style="padding: 0 15px">
-          <div style="padding: 10px 0 14px; border-bottom: 1px solid #D9D9D9;">
+          <div style="padding: 10px 0 14px; border-bottom: 1px solid #D9D9D9;" v-if="homeLogoPath">
             <img
               style="width: 50px; margin-left: -5px"
-              :src="homeLogoPath ? (basePath + '/user/api' + homeLogoPath) : require('@/assets/imgs/wanwu_logo.png')"
+              :src="basePath + '/user/api' + homeLogoPath"
             />
           </div>
         </div>
@@ -250,7 +250,8 @@ export default {
             window.open('https://github.com/UnicomAI/wanwu')
           }},
           {name: this.$t('menu.about'), img: require('@/assets/imgs/about_icon.svg'), version: 'version', redirect: () => {
-            this.showAboutDialog()
+            // 不展示关于弹窗
+            // this.showAboutDialog()
           }}
         ],
         [
@@ -267,6 +268,7 @@ export default {
         // this.justifyIsShowMenu(val.path)
         this.justifyIsShowNav(val.path)
         this.getMenuList(val.path)
+        this.redirectUserInfo()
       },
       // 深度观察监听
       deep: true
@@ -289,9 +291,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('user', ['orgInfo', 'userInfo','commonInfo']),
+    ...mapGetters('user', ['orgInfo', 'userInfo', 'commonInfo', 'permission']),
   },
   async created() {
+    // 如果没修改过密码，重新向到修改密码
+    this.redirectUserInfo()
+
     // 判断是否展示左侧菜单
     this.justifyIsShowNav(this.$route.path)
     // this.justifyIsShowMenu(this.$route.path)
@@ -326,6 +331,12 @@ export default {
     getCurrentOrgName() {
       const currentOrg = this.orgList.filter(item => item.id === this.org.orgId)[0] || {}
       return currentOrg.name
+    },
+    redirectUserInfo() {
+      if (!this.permission.isUpdatePassword) {
+        this.$router.push('/userInfo?showPwd=1')
+        return null
+      }
     },
     justifyIsShowNav(path) {
       const notShowArr = ['/userInfo', '/permission', '/workflow', '/explore/workflow']

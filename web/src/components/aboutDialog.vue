@@ -8,17 +8,17 @@
     :before-close="handleClose"
   >
     <div class="about-wrap">
-      <div>
+      <div v-if="about.logoPath">
         <img
           style="height: 60px; margin: 0 auto"
-          :src="about.logoPath ? (basePath + '/user/api' + about.logoPath) : require('@/assets/imgs/logo_icon.png')"
+          :src="basePath + '/user/api' + about.logoPath"
         />
       </div>
       <div class="about-version">
         {{$t('about.version')}}: {{about.version || '1.0'}}
       </div>
       <div>
-        {{about.copyright || $t('about.company')}}
+        {{about.copyright}}
       </div>
     </div>
   </el-dialog>
