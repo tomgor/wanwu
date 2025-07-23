@@ -8941,7 +8941,16 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "valid": {
+                    "type": "boolean"
+                },
+                "workFlowDesc": {
+                    "type": "string"
+                },
                 "workFlowId": {
+                    "type": "string"
+                },
+                "workFlowName": {
                     "type": "string"
                 }
             }

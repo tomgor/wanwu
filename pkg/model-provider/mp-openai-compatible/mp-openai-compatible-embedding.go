@@ -3,6 +3,7 @@ package mp_openai_compatible
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/url"
@@ -17,12 +18,14 @@ type Embedding struct {
 }
 
 func (cfg *Embedding) NewReq(req *mp_common.EmbeddingReq) (mp_common.IEmbeddingReq, error) {
-	m := map[string]interface{}{
-		"model": req.Model,
-		"input": req.Input,
+	m := make(map[string]interface{})
+	b, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
 	}
-	if req.EncodingFormat != "" {
-		m["encoding_format"] = req.EncodingFormat
+	err = json.Unmarshal(b, &m)
+	if err != nil {
+		return nil, err
 	}
 	return mp_common.NewRerankReq(m), nil
 }

@@ -64,22 +64,16 @@ func GetModelById(ctx *gin.Context) {
 //	@Summary	Model Chat Completions
 //	@Accept		json
 //	@Produce	json
-//	@Param		modelId	path		string					true	"模型ID"
-//	@Param		data	body		map[string]interface{}	true	"请求参数"
-//	@Success	200		{object}	response.Response{}
+//	@Param		modelId	path		string				true	"模型ID"
+//	@Param		data	body		mp_common.LLMReq{}	true	"请求参数"
+//	@Success	200		{object}	mp_common.LLMResp{}
 //	@Router		/model/{modelId}/chat/completions [post]
 func ModelChatCompletions(ctx *gin.Context) {
-	body, ok := ctx.Get(gin.BodyBytesKey)
-	if !ok {
-		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, "invalid body"))
+	var data mp_common.LLMReq
+	if !gin_util.Bind(ctx, &data) {
 		return
 	}
-	data := make(map[string]interface{})
-	if err := json.Unmarshal(body.([]byte), &data); err != nil {
-		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, err.Error()))
-		return
-	}
-	service.ModelChatCompletions(ctx, ctx.Param("modelId"), data)
+	service.ModelChatCompletions(ctx, ctx.Param("modelId"), &data)
 }
 
 // ModelEmbeddings

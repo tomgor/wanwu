@@ -1,14 +1,16 @@
 package service
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
-	"strings"
-	"sync"
-
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
+	"github.com/UnicomAI/wanwu/pkg/log"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	"github.com/gin-gonic/gin"
+	"strings"
+	"sync"
 )
 
 // 定义校验函数类型
@@ -42,17 +44,63 @@ func ValidateLLMModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) erro
 		return fmt.Errorf("invalid provider")
 	}
 	// mock  request
-	req := map[string]interface{}{
-		"model": modelInfo.Model,
-		"messages": []map[string]interface{}{
+	var stream bool = false
+	req := &mp_common.LLMReq{
+		Model: modelInfo.Model,
+		Messages: []mp_common.OpenAIMsg{
 			{
-				"role":    "user",
-				"content": "hello",
+				Role:    mp_common.MsgRoleUser,
+				Content: "几点了",
 			},
 		},
-		"stream": false,
+		Stream: &stream,
 	}
-	llmReq := mp_common.NewLLMReq(req)
+	// ToolCall 校验
+	var result map[string]interface{}
+	err = json.Unmarshal([]byte(modelInfo.ProviderConfig), &result)
+	if err != nil {
+		return err
+	}
+	fc, ok := result["functionCalling"].(string)
+	if ok && fc == mp_common.FCTypeToolCall {
+		tools := []mp_common.OpenAITool{
+			{
+				Type: mp_common.ToolTypeFunction,
+				Function: &mp_common.OpenAIFunction{
+					Name:        "get_current_time",
+					Description: "当你想知道现在的时间时非常有用。",
+					Parameters: &mp_common.OpenAIFunctionParameters{
+						Type:       "object",
+						Properties: map[string]mp_common.OpenAIFunctionParametersProperty{},
+					},
+				},
+			},
+		}
+		req.Tools = &tools
+		llmReq, err := iLLM.NewReq(req)
+		if err != nil {
+			return err
+		}
+		resp, _, err := iLLM.ChatCompletions(context.Background(), llmReq)
+		if err != nil {
+			return err
+		}
+		openAIResp, ok := resp.ConvertResp()
+		if !ok {
+			return fmt.Errorf("invalid resp: %v", err)
+		}
+		if len(openAIResp.Choices) == 0 || openAIResp.Choices[0].Message.ToolCalls == nil {
+			return fmt.Errorf("Model does not support toolcall functionality.")
+		} else {
+			data, _ := json.MarshalIndent(openAIResp.Choices[0].Message.ToolCalls, "", "  ")
+			log.Infof("tool call: %v", string(data))
+		}
+		return nil
+	}
+	llmReq, err := iLLM.NewReq(req)
+	if err != nil {
+		return err
+	}
 	_, _, err = iLLM.ChatCompletions(ctx.Request.Context(), llmReq)
 	if err != nil {
 		return fmt.Errorf("invalid resp: %v", err)
