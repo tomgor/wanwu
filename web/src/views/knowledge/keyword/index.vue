@@ -39,22 +39,22 @@
                 :header-cell-style="{ background: '#F9F9F9', color: '#999999' }"
               >
                 <el-table-column
-                  prop="docType"
+                  prop="name"
                   :label="$t('keyword.quesKeyword')"
                 >
                 </el-table-column>
                 <el-table-column
-                  prop="uploadTime"
+                  prop="alias"
                   :label="$t('keyword.docWord')"
                 >
                 </el-table-column>
                 <el-table-column
-                  prop="uploadTime"
+                  prop="knowledgeBaseNames"
                   :label="$t('keyword.linkKnowledge')"
                 >
                 </el-table-column>
                 <el-table-column
-                  prop="uploadTime"
+                  prop="updatedAt"
                   :label="$t('keyword.undateTime')"
                 >
                 </el-table-column>
@@ -96,21 +96,18 @@
 <script>
 import Pagination from "@/components/pagination.vue";
 import SearchInput from "@/components/searchInput.vue";
-import {getDocList,delDocItem,uploadFileTips} from "@/api/knowledge";
+import {delDocItem} from "@/api/knowledge";
+import {getKeyWord,delKeyWord} from "@/api/keyword";
 import createKeyWords from './create.vue';
 export default {
   components: { Pagination,SearchInput,createKeyWords},
   data() {
     return {
-      loading:false,
       tableLoading:false,
       docQuery: {
-        docName:'',
-        knowledgeId:this.$route.params.id,
-        status: -1
+        name:''
       },
-      fileList: [],
-      listApi: getDocList,
+      listApi: getKeyWord,
       title_tips:'',
       showTips:false,
       tableData: [],
@@ -118,35 +115,30 @@ export default {
     };
   },
   mounted(){
-    // this.getTableData(this.docQuery)
+    this.getTableData(this.docQuery)
   },
   methods: {
-    refreshData(){
-
+    refreshData(data){
+      this.tableData = data
+    },
+    updateData(){
+      this.getTableData(this.docQuery)
     },
     create(){
       this.$refs.createKeyWords.showDialog()
     },
     editItem(item){
-        console.log(item)
+      this.$refs.createKeyWords.showDialog(item)
     },
     goBack(){
       this.$router.push({path:'/knowledge'})
     },
     handleSearch(val){
-      this.docQuery.docName = val;
+      this.docQuery.name = val.value;
       this.getTableData(this.docQuery)
     },
-    handleRemove(item){
-      this.fileList = this.fileList.filter((files) => files.name !== item.name);
-    },
-    handelText(data){
-      if(data.length > 0){
-        return data.join(',')
-      }
-    },
     handleDel(data){
-       this.$confirm(this.$t('knowledgeManage.deleteTips'),this.$t('knowledgeManage.tip'),
+       this.$confirm('确定要删除当前数据吗？',this.$t('knowledgeManage.tip'),
         {
           confirmButtonText:  this.$t('common.button.confirm'),
           cancelButtonText: this.$t('common.button.cancel'),
@@ -154,14 +146,14 @@ export default {
         }
       )
         .then(async () => {
-          let jsondata = {docIdList:[data.docId]}
-          this.loading = true;
-          let res = await delDocItem(jsondata);
+          let jsondata = {id:data.id}
+          this.tableLoading = true;
+          let res = await delKeyWord(jsondata);
           if (res.code === 0) {
             this.$message.success(this.$t('common.info.delInfo'));
             this.getTableData(this.docQuery)//获取知识分类数据
           }
-          this.loading = false;
+          this.tableLoading = false;
         })
         .catch((error) => {
           this.getTableData(this.docQuery)
