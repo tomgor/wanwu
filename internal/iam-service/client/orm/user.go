@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/iam-service/client/model"
@@ -427,7 +428,8 @@ func (c *Client) UpdateUserPassword(ctx context.Context, userID uint32, pwd, new
 			return toErrStatus("iam_user_password_update", util.Int2Str(userID), "password error")
 		}
 		if err := tx.Model(user).Updates(map[string]interface{}{
-			"password": util.SHA256(newPwd),
+			"password":                util.SHA256(newPwd),
+			"last_update_password_at": time.Now().UnixMilli(),
 		}).Error; err != nil {
 			return toErrStatus("iam_user_password_update", util.Int2Str(userID), err.Error())
 		}
@@ -697,6 +699,13 @@ func getUserPermission(tx *gorm.DB, userID, orgID uint32) (*Permission, error) {
 		IsSystem: orgID == config.TopOrgID(),
 		Org:      IDName{ID: org.ID, Name: org.Name},
 	}
+	// user
+	user := &model.User{}
+	if err := sqlopt.WithID(userID).Apply(tx).First(user).Error; err != nil {
+		return nil, fmt.Errorf("get user %v err: %v", userID, err)
+	}
+	ret.LastUpdatePasswordAt = user.LastUpdatePasswordAt
+
 	for _, userRole := range userRoles {
 		for _, orgRole := range orgRoles {
 			if orgRole.RoleID == userRole.RoleID {

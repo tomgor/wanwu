@@ -26,6 +26,8 @@ type User struct {
 	Remark string
 	// 密码
 	Password string
+	// 最后更新密码时间
+	LastUpdatePasswordAt int64
 	// 最后一次登录时间（毫秒时间戳）
 	LastLoginAt int64
 	// 最新token有效时间（毫秒时间戳，此前生成的token都无效）
