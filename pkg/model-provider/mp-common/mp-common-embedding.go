@@ -11,7 +11,7 @@ import (
 type EmbeddingReq struct {
 	Model          string   `json:"model" validate:"required"`
 	Input          []string `json:"input" validate:"required"`
-	EncodingFormat string   `json:"encoding_format"`
+	EncodingFormat *string  `json:"encoding_format,omitempty"`
 }
 
 func (req *EmbeddingReq) Check() error { return nil }
