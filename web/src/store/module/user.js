@@ -66,7 +66,7 @@ export const user = {
               })
               commit('setOrgInfo', {orgs})
               commit('setToken', res.data.token)
-              commit('setPermission', {...permission, isAdmin, isSystem})
+              commit('setPermission', {...permission, isAdmin, isSystem, isUpdatePassword: res.data.isUpdatePassword})
               //配置导航用户logo和名称以及欢迎文字
               commit('setCommonInfo', {data: res.data.custom || {}})
 
