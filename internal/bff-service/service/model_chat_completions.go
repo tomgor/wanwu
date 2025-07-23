@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ModelChatCompletions(ctx *gin.Context, modelID string, req map[string]interface{}) {
+func ModelChatCompletions(ctx *gin.Context, modelID string, req *mp_common.LLMReq) {
 	// modelInfo by modelID
 	modelInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: modelID})
 	if err != nil {
@@ -23,11 +23,9 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req map[string]inter
 	}
 	// 校验model字段
 	if req != nil {
-		if _, exists := req["model"]; exists {
-			if req["model"] != modelInfo.Model {
-				gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v chat completions err: model mismatch!", modelInfo.ModelId)))
-				return
-			}
+		if req.Model != modelInfo.Model {
+			gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v chat completions err: model mismatch!", modelInfo.ModelId)))
+			return
 		}
 	}
 
@@ -43,7 +41,11 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req map[string]inter
 		return
 	}
 	// chat completions
-	llmReq := mp_common.NewLLMReq(req)
+	llmReq, err := iLLM.NewReq(req)
+	if err != nil {
+		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v chat completions NewReq err: %v", modelInfo.ModelId, err)))
+		return
+	}
 	resp, sseCh, err := iLLM.ChatCompletions(ctx.Request.Context(), llmReq)
 	if err != nil {
 		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v chat completions err: %v", modelInfo.ModelId, err)))
@@ -51,7 +53,7 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req map[string]inter
 	}
 	// unary
 	if !llmReq.Stream() {
-		if data, ok := resp.Data(); ok {
+		if data, ok := resp.ConvertResp(); ok {
 			status := http.StatusOK
 			ctx.Set(gin_util.STATUS, status)
 			ctx.Set(gin_util.RESULT, resp.String())
@@ -67,7 +69,7 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req map[string]inter
 	ctx.Header("Connection", "keep-alive")
 	ctx.Header("Content-Type", "text/event-stream; charset=utf-8")
 	for sseResp := range sseCh {
-		if data, ok := sseResp.OpenAIResp(); ok {
+		if data, ok := sseResp.ConvertResp(); ok {
 			if len(data.Choices) > 0 && data.Choices[0].Delta != nil {
 				answer = answer + data.Choices[0].Delta.Content
 			}

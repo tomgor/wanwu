@@ -11,6 +11,9 @@ const (
 const (
 	ProviderOpenAICompatible = "OpenAI-API-compatible"
 	ProviderYuanJing         = "YuanJing"
+	ProviderHuoshan          = "Huoshan"
+	ProviderOllama           = "Ollama"
+	ProviderQwen             = "Qwen"
 )
 
 var (
