@@ -96,11 +96,12 @@ type UserOrg struct {
 }
 
 type Permission struct {
-	IsAdmin  bool // 是否是当前组织的内置管理角色
-	IsSystem bool
-	Org      IDName
-	Roles    []RoleIDName
-	Perms    []Perm
+	IsAdmin              bool // 是否是当前组织的内置管理角色
+	IsSystem             bool
+	Org                  IDName
+	Roles                []RoleIDName
+	Perms                []Perm
+	LastUpdatePasswordAt int64
 }
 
 type Perm struct {
