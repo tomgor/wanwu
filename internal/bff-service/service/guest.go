@@ -95,15 +95,16 @@ func Login(ctx *gin.Context, login *request.Login, language string) (*response.L
 	ctx.Set(gin_util.CLAIMS, &claims)
 	// resp
 	return &response.Login{
-		UID:           resp.User.GetUserId(),
-		Username:      resp.User.GetUserName(),
-		Nickname:      resp.User.GetNickName(),
-		Token:         token,
-		ExpiresAt:     claims.StandardClaims.ExpiresAt * 1000, // 超时事件戳毫秒
-		ExpireIn:      strconv.FormatInt(jwt_util.UserTokenTimeout, 10),
-		Orgs:          toOrgIDNames(ctx, orgs.Selects, resp.User.GetUserId() == config.SystemAdminUserID),
-		OrgPermission: toOrgPermission(ctx, resp.Permission),
-		Language:      getLanguageByCode(resp.User.Language),
+		UID:              resp.User.GetUserId(),
+		Username:         resp.User.GetUserName(),
+		Nickname:         resp.User.GetNickName(),
+		Token:            token,
+		ExpiresAt:        claims.StandardClaims.ExpiresAt * 1000, // 超时事件戳毫秒
+		ExpireIn:         strconv.FormatInt(jwt_util.UserTokenTimeout, 10),
+		Orgs:             toOrgIDNames(ctx, orgs.Selects, resp.User.GetUserId() == config.SystemAdminUserID),
+		OrgPermission:    toOrgPermission(ctx, resp.Permission),
+		Language:         getLanguageByCode(resp.User.Language),
+		IsUpdatePassword: resp.Permission.LastUpdatePasswordAt != 0,
 	}, nil
 }
 

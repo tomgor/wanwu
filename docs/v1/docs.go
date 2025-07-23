@@ -7996,6 +7996,10 @@ const docTemplate = `{
                 "expiresAt": {
                     "type": "integer"
                 },
+                "isUpdatePassword": {
+                    "description": "是否已更新密码",
+                    "type": "boolean"
+                },
                 "language": {
                     "description": "语言",
                     "allOf": [

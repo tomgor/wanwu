@@ -1901,6 +1901,9 @@ definitions:
         type: string
       expiresAt:
         type: integer
+      isUpdatePassword:
+        description: 是否已更新密码
+        type: boolean
       language:
         allOf:
         - $ref: '#/definitions/response.Language'
