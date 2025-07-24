@@ -101,6 +101,14 @@
               </el-collapse-transition>
             </div>
           </div>
+          <!--loading-->
+          <div v-if="n.finish === 0 && sessionStatus == 0 && i === session_data.history.length - 1"
+            class="text-loading"
+          >
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
           <!--停止生成 重新生成 点赞   session code 是0时不可操作-->
           <div class="answer-operation">
             <div class="opera-left">
@@ -578,7 +586,7 @@ export default {
       }
       .answer-content{
         // width: calc(100% - 30px);
-        padding:10px 15px;
+        padding:0 15px 10px 15px;
         position: relative;
         color: #333;
         .answer-content-query{
@@ -831,6 +839,59 @@ export default {
   cursor:pointer;
 }
 
+}
+
+.text-loading,
+.text-loading > div {
+  position: relative;
+  box-sizing: border-box;
+}
+
+.text-loading {
+  display: block;
+  font-size: 0;
+  color: #c8c8c8;
+}
+
+.text-loading.la-dark {
+  color: #e8e8e8;
+}
+
+.text-loading > div {
+  display: inline-block;
+  float: none;
+  background-color: currentColor;
+  border: 0 solid currentColor;
+}
+
+.text-loading {
+  width: 54px;
+  height: 18px;
+  margin: 0 0 0 55px;
+}
+
+.text-loading > div {
+  width: 8px;
+  height: 8px;
+  margin: 4px;
+  border-radius: 100%;
+  animation: ball-beat 0.7s -0.15s infinite linear;
+}
+
+.text-loading > div:nth-child(2n-1) {
+  animation-delay: -0.5s;
+}
+
+@keyframes ball-beat {
+  50% {
+    opacity: 0.2;
+    transform: scale(0.75);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 </style>
