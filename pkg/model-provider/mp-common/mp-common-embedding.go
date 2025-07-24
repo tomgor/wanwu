@@ -21,7 +21,7 @@ func (req *EmbeddingReq) Check() error { return nil }
 type EmbeddingResp struct {
 	Id      *string         `json:"id,omitempty"`
 	Model   string          `json:"model"`
-	Object  string          `json:"object"`
+	Object  *string         `json:"object,omitempty"`
 	Data    []EmbeddingData `json:"data"`
 	Usage   Usage           `json:"usage"`
 	Created *int            `json:"created,omitempty"`

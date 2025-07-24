@@ -7,6 +7,29 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/log"
 )
 
+type MsgRole string
+
+const (
+	MsgRoleSystem    MsgRole = "system"
+	MsgRoleUser      MsgRole = "user"
+	MsgRoleAssistant MsgRole = "assistant"
+	MsgRoleFunction  MsgRole = "tool"
+)
+
+type ToolType string
+
+const (
+	ToolTypeFunction ToolType = "function"
+)
+
+type FCType string
+
+const (
+	FCTypeFunctionCall FCType = "functionCall"
+	FCTypeNoSupport    FCType = "noSupport"
+	FCTypeToolCall     FCType = "toolCall"
+)
+
 type Header struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
@@ -23,7 +46,7 @@ type LLMReq struct {
 	Stop           *string               `json:"stop,omitempty"`
 	ResponseFormat *OpenAIResponseFormat `json:"response_format,omitempty"`
 	Temperature    *float64              `json:"temperature,omitempty"`
-	Tools          *[]OpenAITool         `json:"tools,omitempty"`
+	Tools          []OpenAITool          `json:"tools,omitempty"`
 
 	// custom
 	Thinking            *Thinking      `json:"thinking,omitempty"` // 控制模型是否开启深度思考模式。
@@ -78,22 +101,6 @@ type OpenAIMsg struct {
 type Thinking struct {
 	Type string `json:"type" default:"enabled"`
 }
-type MsgRole string
-
-const (
-	MsgRoleSystem    MsgRole = "system"
-	MsgRoleUser      MsgRole = "user"
-	MsgRoleAssistant MsgRole = "assistant"
-	MsgRoleFunction  MsgRole = "tool"
-
-	ToolTypeFunction ToolType = "function"
-
-	FCTypeFunctionCall string = "functionCall"
-	FCTypeNoSupport    string = "noSupport"
-	FCTypeToolCall     string = "toolCall"
-)
-
-type ToolType string
 
 type ToolCall struct {
 	ID       string       `json:"id"`

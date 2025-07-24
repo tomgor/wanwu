@@ -6,12 +6,13 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/url"
+
 	"github.com/UnicomAI/wanwu/pkg/log"
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/go-resty/resty/v2"
-	"io"
-	"net/url"
 )
 
 type LLM struct {
@@ -32,6 +33,7 @@ func (cfg *LLM) NewReq(req *mp_common.LLMReq) (mp_common.ILLMReq, error) {
 	}
 	return mp_common.NewLLMReq(m), nil
 }
+
 func (cfg *LLM) ChatCompletions(ctx context.Context, req mp_common.ILLMReq, headers ...mp_common.Header) (mp_common.ILLMResp, <-chan mp_common.ILLMResp, error) {
 	if cfg.ApiKey != "" {
 		headers = append(headers, mp_common.Header{
@@ -54,7 +56,7 @@ func (cfg *LLM) chatCompletionsUrl() string {
 
 func chatCompletionsUnary(ctx context.Context, req mp_common.ILLMReq, url string, headers ...mp_common.Header) (mp_common.ILLMResp, error) {
 	if req.Stream() {
-		return nil, fmt.Errorf("request %v huoshan chat completions unary but stream", url)
+		return nil, fmt.Errorf("request %v qwen chat completions unary but stream", url)
 	}
 
 	request := resty.New().
@@ -71,20 +73,20 @@ func chatCompletionsUnary(ctx context.Context, req mp_common.ILLMReq, url string
 	}
 	resp, err := request.Post(url)
 	if err != nil {
-		return nil, fmt.Errorf("request %v huoshan chat completions unary err: %v", url, err)
+		return nil, fmt.Errorf("request %v qwen chat completions unary err: %v", url, err)
 	} else if resp.StatusCode() >= 300 {
-		return nil, fmt.Errorf("request %v huoshan chat completions unary http status %v msg: %v", url, resp.StatusCode(), resp.String())
+		return nil, fmt.Errorf("request %v qwen chat completions unary http status %v msg: %v", url, resp.StatusCode(), resp.String())
 	}
 	b, err := io.ReadAll(resp.RawResponse.Body)
 	if err != nil {
-		return nil, fmt.Errorf("request %v huoshan chat completions unary read response body err: %v", url, err)
+		return nil, fmt.Errorf("request %v qwen chat completions unary read response body err: %v", url, err)
 	}
 	return mp_common.NewLLMResp(false, string(b)), nil
 }
 
 func chatCompletionsStream(ctx context.Context, req mp_common.ILLMReq, url string, headers ...mp_common.Header) (<-chan mp_common.ILLMResp, error) {
 	if !req.Stream() {
-		return nil, fmt.Errorf("request %v huoshan chat completions stream but unary", url)
+		return nil, fmt.Errorf("request %v qwen chat completions stream but unary", url)
 	}
 
 	ret := make(chan mp_common.ILLMResp, 1024)
@@ -104,10 +106,10 @@ func chatCompletionsStream(ctx context.Context, req mp_common.ILLMReq, url strin
 		}
 		resp, err := request.Post(url)
 		if err != nil {
-			log.Errorf("request %v huoshan chat completions stream err: %v", url, err)
+			log.Errorf("request %v qwen chat completions stream err: %v", url, err)
 			return
 		} else if resp.StatusCode() >= 300 {
-			log.Errorf("request %v huoshan chat completions stream http status %v msg: %v", url, resp.StatusCode(), resp.String())
+			log.Errorf("request %v qwen chat completions stream http status %v msg: %v", url, resp.StatusCode(), resp.String())
 			return
 		}
 		scan := bufio.NewScanner(resp.RawResponse.Body)

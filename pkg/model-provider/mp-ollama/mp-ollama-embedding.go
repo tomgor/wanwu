@@ -5,10 +5,11 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
-	"github.com/go-resty/resty/v2"
 	"io"
 	url_p "net/url"
+
+	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
+	"github.com/go-resty/resty/v2"
 )
 
 type Embedding struct {

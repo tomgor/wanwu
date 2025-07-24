@@ -33,6 +33,7 @@ func (cfg *LLM) NewReq(req *mp_common.LLMReq) (mp_common.ILLMReq, error) {
 	}
 	return mp_common.NewLLMReq(m), nil
 }
+
 func (cfg *LLM) ChatCompletions(ctx context.Context, req mp_common.ILLMReq, headers ...mp_common.Header) (mp_common.ILLMResp, <-chan mp_common.ILLMResp, error) {
 	if cfg.ApiKey != "" {
 		headers = append(headers, mp_common.Header{
