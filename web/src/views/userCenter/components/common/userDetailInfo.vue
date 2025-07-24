@@ -41,6 +41,10 @@ export default {
       pwdVisible: false
     }
   },
+  mounted() {
+    const {showPwd} = this.$route.query || {}
+    if (showPwd === '1') this.showPwd()
+  },
   methods:{
     setData(data){
       const {userId, username, company, phone, email, remark} = data || {}

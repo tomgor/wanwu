@@ -2,7 +2,6 @@
 export default {
     login: {
         title: '登 录',
-        welcomeText: '嗨！欢迎来到元景万悟智能体平台',
         form: {
             username: '用户名',
             password: '密码',
@@ -17,7 +16,6 @@ export default {
     },
     about: {
         version: '版本',
-        company: '◎ 联通数据智能有限公司'
     },
     menu: {
         explore: '应用广场',
@@ -39,7 +37,7 @@ export default {
         about: '关于'
     },
     header: {
-        title: '元景万悟',
+        title: '智能体平台',
         doc: '文档中心',
         logout: '登出',
         login: '登录',

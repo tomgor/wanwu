@@ -12,8 +12,8 @@ type RerankReq struct {
 	Documents       []string `json:"documents" validate:"required"`
 	Model           string   `json:"model" validate:"required"`
 	Query           string   `json:"query" validate:"required"`
-	ReturnDocuments bool     `json:"return_documents"`
-	TopN            int      `json:"top_n" validate:"gte=0"`
+	ReturnDocuments *bool    `json:"return_documents"`
+	TopN            *int     `json:"top_n" validate:"gte=0"`
 }
 
 func (req *RerankReq) Check() error { return nil }

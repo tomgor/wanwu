@@ -52,13 +52,10 @@ export const user = {
           const orgPermission = res.data.orgPermission || {}
           const orgId = orgPermission.org ? orgPermission.org.id : ''
           const {isAdmin, isSystem} = orgPermission || {}
-          console.log(res.data, orgPermission, orgId, formatPerms(orgPermission.permissions), res.code, '-----------------------123====')
 
           let permission = {}
           permission.orgPermission = formatPerms(orgPermission.permissions)
           permission.roles = orgPermission.roles || []
-
-          console.log(res.code, permission,  '-----------------------code')
 
           if (res.code === 0) {
               commit('setUserInfo', {
@@ -69,7 +66,7 @@ export const user = {
               })
               commit('setOrgInfo', {orgs})
               commit('setToken', res.data.token)
-              commit('setPermission', {...permission, isAdmin, isSystem})
+              commit('setPermission', {...permission, isAdmin, isSystem, isUpdatePassword: res.data.isUpdatePassword})
               //配置导航用户logo和名称以及欢迎文字
               commit('setCommonInfo', {data: res.data.custom || {}})
 
@@ -84,15 +81,13 @@ export const user = {
       async getPermissionInfo({ commit }) {
           return new Promise(async(resolve, reject) => {
               let res = await getPermission()
-              const orgPermission =  res.data.orgPermission || {}
+              const orgPermission = res.data.orgPermission || {}
               const {isAdmin, isSystem} = orgPermission || {}
               const permissions = {}
               permissions.orgPermission = formatPerms(orgPermission.permissions)
               permissions.roles = orgPermission.roles || []
-              permissions.platform = orgPermission.platform || '' // 环境变量，用于判断环境：1-英伟达，2-华为，3-星罗
-              permissions.edition = orgPermission.edition || ''  // 环境变量，用于判断rag：aio_std-标准版，aio_rag-低成本rag版本
 
-              const permission = {...permissions, isAdmin, isSystem}
+              const permission = {...permissions, isAdmin, isSystem, isUpdatePassword: res.data.isUpdatePassword}
               if (res.code === 0) {
                   commit('setPermission', permission)
                   if (res.data.language) commit('setLang', res.data.language)

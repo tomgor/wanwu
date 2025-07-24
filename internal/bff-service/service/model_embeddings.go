@@ -6,8 +6,7 @@ import (
 
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
-	"github.com/UnicomAI/wanwu/internal/bff-service/config"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
@@ -54,7 +53,7 @@ func ModelEmbeddings(ctx *gin.Context, modelID string, req *mp_common.EmbeddingR
 	}
 	if data, ok := resp.ConvertResp(); ok {
 		status := http.StatusOK
-		ctx.Set(config.STATUS, status)
+		ctx.Set(gin_util.STATUS, status)
 		//ctx.Set(config.RESULT, resp.String())
 		ctx.JSON(status, data)
 		return

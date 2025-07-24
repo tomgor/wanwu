@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/url"
@@ -20,6 +21,18 @@ type LLM struct {
 	FunctionCalling string `json:"functionCalling" validate:"oneof=noSupport toolCall functionCall"` // 函数调用是否支持
 }
 
+func (cfg *LLM) NewReq(req *mp_common.LLMReq) (mp_common.ILLMReq, error) {
+	m := make(map[string]interface{})
+	b, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &m)
+	if err != nil {
+		return nil, err
+	}
+	return mp_common.NewLLMReq(m), nil
+}
 func (cfg *LLM) ChatCompletions(ctx context.Context, req mp_common.ILLMReq, headers ...mp_common.Header) (mp_common.ILLMResp, <-chan mp_common.ILLMResp, error) {
 	if cfg.ApiKey != "" {
 		headers = append(headers, mp_common.Header{

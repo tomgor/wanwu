@@ -7,11 +7,10 @@ import (
 	"strconv"
 
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
-	"github.com/UnicomAI/wanwu/internal/bff-service/config"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
-	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util/route"
-	jwt_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/jwt-util"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
+	"github.com/UnicomAI/wanwu/pkg/gin-util/route"
+	jwt_util "github.com/UnicomAI/wanwu/pkg/jwt-util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,7 +23,7 @@ func CheckUserEnable(ctx *gin.Context) {
 		ctx.Abort()
 		return
 	}
-	ctx.Set(config.USER_ID, userID)
+	ctx.Set(gin_util.USER_ID, userID)
 	// genTokenTS
 	genTokenTS, err := getGenTokenTS(ctx)
 	if err != nil {
@@ -38,7 +37,7 @@ func CheckUserEnable(ctx *gin.Context) {
 		ctx.Abort()
 		return
 	} else {
-		ctx.Set(config.X_LANGUAGE, resp.Language)
+		ctx.Set(gin_util.X_LANGUAGE, resp.Language)
 	}
 }
 
@@ -51,7 +50,7 @@ func CheckUserPerm(ctx *gin.Context) {
 		ctx.Abort()
 		return
 	}
-	ctx.Set(config.USER_ID, userID)
+	ctx.Set(gin_util.USER_ID, userID)
 	// genTokenTS
 	genTokenTS, err := getGenTokenTS(ctx)
 	if err != nil {
@@ -74,15 +73,15 @@ func CheckUserPerm(ctx *gin.Context) {
 		ctx.Abort()
 		return
 	} else {
-		ctx.Set(config.IS_ADMIN, resp.IsAdmin)
-		ctx.Set(config.IS_SYSTEM, resp.IsSystem)
+		ctx.Set(gin_util.IS_ADMIN, resp.IsAdmin)
+		ctx.Set(gin_util.IS_SYSTEM, resp.IsSystem)
 	}
 }
 
 // --- internal ---
 
 func getUserID(ctx *gin.Context) (string, error) {
-	claims, ok := ctx.Get(config.CLAIMS)
+	claims, ok := ctx.Get(gin_util.CLAIMS)
 	if !ok {
 		return "", errors.New("jwt claims empty")
 	}
@@ -90,11 +89,11 @@ func getUserID(ctx *gin.Context) (string, error) {
 }
 
 func getOrgID(ctx *gin.Context) string {
-	return ctx.GetHeader(config.X_ORG_ID)
+	return ctx.GetHeader(gin_util.X_ORG_ID)
 }
 
 func getGenTokenTS(ctx *gin.Context) (string, error) {
-	claims, ok := ctx.Get(config.CLAIMS)
+	claims, ok := ctx.Get(gin_util.CLAIMS)
 	if !ok {
 		return "", errors.New("jwt claims empty")
 	}

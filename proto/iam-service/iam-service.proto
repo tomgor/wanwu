@@ -208,6 +208,7 @@ message UserPermission {
   IDName org = 3;
   repeated RoleIDName roles = 4;
   repeated Perm perms = 5;
+  int64 lastUpdatePasswordAt = 6;
 }
 
 message ChangeUserLanguageReq{

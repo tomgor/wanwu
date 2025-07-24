@@ -1,4 +1,4 @@
-WanWu Open API
+Open API
 ========
 
 
@@ -70,7 +70,7 @@ curl -k --location 'http://localhost:8081/service/openapi/v1/rag/chat' \
 --header 'Authorization: Bearer <API Key>' \
 --data '{
     "stream": true,
-    "query": "请一句话介绍元景万悟"
+    "query": "请一句话介绍DeepSeek"
 }'
 ```
 
@@ -83,7 +83,7 @@ curl -k --location 'http://localhost:8081/service/api/openapi/v1/rag/chat' \
 --header 'Authorization: Bearer <API Key>' \
 --data '{
     "stream": false,
-    "query": "请一句话介绍元景万悟"
+    "query": "请一句话介绍DeepSeek"
 }'
 ```
 
@@ -92,16 +92,12 @@ curl -k --location 'http://localhost:8081/service/api/openapi/v1/rag/chat' \
 #### 流式
 
 ```json
-data: {"code": 0, "message": "success", "msg_id": "bf10ca0882a09ec6a4e1e26190a841b2", "data": {"output": "元景", "searchList": []}, "history": [], "finish": 0}
-
-
-data: {"code": 0, "message": "success", "msg_id": "bf10ca0882a09ec6a4e1e26190a841b2", "data": {"output": "万悟", "searchList": []}, "history": [], "finish": 0}
-
+data: {"code": 0, "message": "success", "msg_id": "bf10ca0882a09ec6a4e1e26190a841b2", "data": {"output": "DeepSeek", "searchList": []}, "history": [], "finish": 0}
 
 data: {"code": 0, "message": "success", "msg_id": "bf10ca0882a09ec6a4e1e26190a841b2", "data": {"output": "是", "searchList": []}, "history": [], "finish": 0}
 
 
-data: {"code": 0, "message": "success", "msg_id": "bf10ca0882a09ec6a4e1e26190a841b2", "data": {"output": "联通", "searchList": []}, "history": [], "finish": 0}
+data: {"code": 0, "message": "success", "msg_id": "bf10ca0882a09ec6a4e1e26190a841b2", "data": {"output": "深度求索", "searchList": []}, "history": [], "finish": 0}
 
 
 data: {"code": 0, "message": "success", "msg_id": "bf10ca0882a09ec6a4e1e26190a841b2", "data": {"output": "推出的", "searchList": []}, "history": [], "finish": 0}
@@ -211,41 +207,29 @@ data: {"code": 0, "message": "success", "msg_id": "bf10ca0882a09ec6a4e1e26190a84
     "message": "success",
     "msg_id": "f89327a67dc05fec500f009b2c605401",
     "data": {
-        "output": "元景万悟是联通推出的模块化AI工程化平台，提供从模型纳管到应用落地的完整工具链，支持多租户架构和企业级知识库等功能，帮助企业降低AI应用门槛并加速数字化转型。",
+        "output": "DeepSeek是深度求索推出的模块化AI工程化平台，提供从模型纳管到应用落地的完整工具链，支持多租户架构和企业级知识库等功能，帮助企业降低AI应用门槛并加速数字化转型。",
         "searchList": [
             {
-                "kb_name": "元景万悟",
+                "kb_name": "DeepSeek",
                 "title": "README.pdf",
-                "snippet": "库建设、复杂工作流编排等完整功能体系的AI工程化平台。平台采用模块化架构设计，支持灵活的功能扩 展和二次开发，在确保企业数据安全和隐私保护的同时，大幅降低了AI技术的应用门槛。无论是中小型企 业快速构建智能化应用，还是大型企业实现复杂业务场景的智能化改造，联通元景万悟Lite都能提供强有 力的技术支撑，助力企业加速数字化转型进程，实现降本增效和业务创新。 🔥 平台核心优势 ✔ 企业级工程化：提供从模型纳管到应用落地的完整工具链，解决LLM技术落地\"最后一公里\"问题   ✔ 开放开源生态：采用宽松友好的 Apache 2.0 License，支持开发者自由扩展与二次开发   ✔ 全栈技术支持：配备专业团队为生态伙伴提供  架构咨询、性能优化 全周期赋能   ✔ 多租户架构：提供多租户账号体系，满足用户成本控制、数据安全隔离、业务弹性扩展、行业定制\n化、快速上线及生态协同等核心需求 🚩 核心功能模块 1. 模型纳管（Model Hub） ▸ 支持 数百种专有/开源大模型（包括GPT、Claude、Llama等系列）的统一接入与生命周期管理   ▸ 深度适配 OpenAI API 标准 及 联通元景 生态模型，实现异构模型的无缝切换   ▸ 提供 多推理后端支持（vLLM、TGI等）与 自托管解决方案，满足不同规模企业的算力需求   2. 可视化工作流（Workflow Studio） ▸ 通过 低代码拖拽画布 快速构建复杂AI业务流程   ▸ 内置 条件分支、API、大模型、知识库、代码 等多种节点，支持端到端流程调试与性能分析   3. 企业级知识库、RAG Pipeline ▸ 提供 知识库创建→文档解析→向量化→检索→精排 的全流程知识管理能力，支持\npdf/docx/txt/xlsx/csv/pptx等 多种格式 文档，还支持网页资源的抓取和接入 ▸ 集成 多模态检索 、级联切分 与 自适应切分，显著提升问答准确率 4. 智能体开发框架（Agent Framework） ▸ 可基于 函数调用（Function Calling） 的Agent构建范式，支持工具扩展、私域知识库关联与多轮对\n话 ▸ 支持在线调试   5. 后端即服务（BaaS） ▸ 提供 RESTful API ，支持与企业现有系统（OA/CRM/ERP等）深度集成   ▸ 提供 细粒度权限控制，保障生产环境稳定运行  "
+                "snippet": "库建设、复杂工作流编排等完整功能体系的AI工程化平台。平台采用模块化架构设计，支持灵活的功能扩 展和二次开发，在确保企业数据安全和隐私保护的同时，大幅降低了AI技术的应用门槛。无论是中小型企 业快速构建智能化应用，还是大型企业实现复杂业务场景的智能化改造，DeepSeek都能提供强有力的技术支撑，助力企业加速数字化转型进程，实现降本增效和业务创新。 🔥 平台核心优势 ✔ 企业级工程化：提供从模型纳管到应用落地的完整工具链，解决LLM技术落地\"最后一公里\"问题   ✔ 开放开源生态：采用宽松友好的 Apache 2.0 License，支持开发者自由扩展与二次开发  ✔ 全栈技术支持：配备专业团队为生态伙伴提供  架构咨询、性能优化 全周期赋能   ✔ 多租户架构：提供多租户账号体系，满足用户成本控制、数据安全隔离、业务弹性扩展、行业定制\n化、快速上线及生态协同等核心需求 🚩 核心功能模块 1. 模型纳管（Model Hub） ▸ 支持 数百种专有/开源大模型（包括GPT、Claude、Llama等系列）的统一接入与生命周期管理   ▸ 深度适配 OpenAI API 标准 及 DeepSeek 生态模型，实现异构模型的无缝切换   ▸ 提供 多推理后端支持（vLLM、TGI等）与 自托管解决方案，满足不同规模企业的算力需求   2. 可视化工作流（Workflow Studio） ▸ 通过 低代码拖拽画布 快速构建复杂AI业务流程   ▸ 内置 条件分支、API、大模型、知识库、代码 等多种节点，支持端到端流程调试与性能分析   3. 企业级知识库、RAG Pipeline ▸ 提供 知识库创建→文档解析→向量化→检索→精排 的全流程知识管理能力，支持\npdf/docx/txt/xlsx/csv/pptx等 多种格式 文档，还支持网页资源的抓取和接入 ▸ 集成 多模态检索 、级联切分 与 自适应切分，显著提升问答准确率 4. 智能体开发框架（Agent Framework） ▸ 可基于 函数调用（Function Calling） 的Agent构建范式，支持工具扩展、私域知识库关联与多轮对\n话 ▸ 支持在线调试   5. 后端即服务（BaaS） ▸ 提供 RESTful API ，支持与企业现有系统（OA/CRM/ERP等）深度集成   ▸ 提供 细粒度权限控制，保障生产环境稳定运行  "
             },
             {
-                "kb_name": "元景万悟",
+                "kb_name": "DeepSeek",
                 "title": "README.pdf",
-                "snippet": "API + 应用程序导向 API + 应用程序导向 编程方法 ✅ ✅ 支持的LLMs ✅ ✅ RAG引擎 ✅ ✅ Agent ✅ ✅ 工作流 ✅ ✅ 可观测性 ✅ ✅ 本地部署 ✅ ❌ license友好 ✅ ❌ 多租户 🚀 快速开始 Docker安装 从源码安装 🎯 典型应用场景 智能客服：基于RAG+Agent实现高准确率的业务咨询与工单处理   知识管理：构建企业专属知识库，支持语义搜索与智能摘要生成   流程自动化：通过工作流引擎实现合同审核、报销审批等业务的AI辅助决 策   平台已成功应用于 金融、工业、政务 等多个行业，助力企业将LLM技术的理论价值转化为实际业务收 益。我们诚邀开发 者加入开源社区，共同推动AI技术的民主化进程。   ⚖ 许可证 联通元景万悟Lite根据Apache License 2.0发布。"
+                "snippet": "API + 应用程序导向 API + 应用程序导向 编程方法 ✅ ✅ 支持的LLMs ✅ ✅ RAG引擎 ✅ ✅ Agent ✅ ✅ 工作流 ✅ ✅ 可观测性 ✅ ✅ 本地部署 ✅ ❌ license友好 ✅ ❌ 多租户 🚀 快速开始 Docker安装 从源码安装 🎯 典型应用场景 智能客服：基于RAG+Agent实现高准确率的业务咨询与工单处理知识管理：构建企业专属知识库，支持语义搜索与智能摘要生成  流程自动化：通过工作流引擎实现合同审核、报销审批等业务的AI辅助决策平台已成功应用于 金融、工业、政务 等多个行业，助力企业将LLM技术的理论价值转化为实际业务收益。我们诚邀开发者加入开源社区，共同推动AI技术的民主化进程。⚖ 许可证 DeepSeek根据Apache License 2.0发布。"
             }
         ]
     },
     "history": [
         {
-            "query": "请一句话介绍元景万悟",
-            "response": "元景万悟是联通推出的模块化AI工程化平台，提供从模型纳管到应用落地的完整工具链，支持多租户架构和企业级知识库等功能，帮助企业降低AI应用门槛并加速数字化转型。"
+            "query": "请一句话介绍DeepSeek",
+            "response": "DeepSeek是深度求索推出的模块化AI工程化平台，提供从模型纳管到应用落地的完整工具链，支持多租户架构和企业级知识库等功能，帮助企业降低AI应用门槛并加速数字化转型。"
         }
     ],
     "finish": 1
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -293,7 +277,7 @@ curl -k --location 'http://localhost:8081/service/api/openapi/v1/agent/conversat
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer <API Key>' \
 --data '{
-    "title": "你好，元景万悟"
+    "title": "你好，DeepSeek"
 }'
 ```
 
@@ -308,46 +292,6 @@ curl -k --location 'http://localhost:8081/service/api/openapi/v1/agent/conversat
     "msg": ""
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## 智能体对话API
 
@@ -427,7 +371,7 @@ curl -k --location 'http://localhost:8081/service/api/openapi/v1/agent/chat' \
 --data '{
     "stream": true,
     "conversation_id": "56",
-    "query": "请一句话介绍元景万悟"
+    "query": "请一句话介绍DeepSeek"
 }'
 ```
 
@@ -441,7 +385,7 @@ curl -k --location 'http://localhost:8081/service/api/openapi/v1/agent/chat' \
 --data '{
     "stream": false,
     "conversation_id": "56",
-    "query": "请一句话介绍元景万悟"
+    "query": "请一句话介绍DeepSeek"
 }'
 ```
 
@@ -450,16 +394,13 @@ curl -k --location 'http://localhost:8081/service/api/openapi/v1/agent/chat' \
 #### 流式
 
 ```json
-data: {"code": 0, "message": "success", "response": "元景", "gen_file_url_list": [], "history": [], "finish": 0, "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}, "search_list": [], "qa_type": [1]}
-
-
-data: {"code": 0, "message": "success", "response": "万悟", "gen_file_url_list": [], "history": [], "finish": 0, "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}, "search_list": [], "qa_type": [1]}
+data: {"code": 0, "message": "success", "response": "DeepSeek", "gen_file_url_list": [], "history": [], "finish": 0, "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}, "search_list": [], "qa_type": [1]}
 
 
 data: {"code": 0, "message": "success", "response": "是", "gen_file_url_list": [], "history": [], "finish": 0, "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}, "search_list": [], "qa_type": [1]}
 
 
-data: {"code": 0, "message": "success", "response": "联通", "gen_file_url_list": [], "history": [], "finish": 0, "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}, "search_list": [], "qa_type": [1]}
+data: {"code": 0, "message": "success", "response": "深度求索", "gen_file_url_list": [], "history": [], "finish": 0, "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}, "search_list": [], "qa_type": [1]}
 
 
 data: {"code": 0, "message": "success", "response": "推出", "gen_file_url_list": [], "history": [], "finish": 0, "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}, "search_list": [], "qa_type": [1]}
@@ -576,24 +517,26 @@ data: {"code": 0, "message": "success", "response": "", "gen_file_url_list": [],
 {
     "code": 0,
     "message": "success",
-    "response": "元景万悟是联通推出的AI工程化平台，提供从模型纳管到应用落地的完整工具链，支持企业级知识库、RAG Pipeline、智能体开发等功能，助力企业数字化转型【1^】【2^】。",
-    "gen_file_url_list": [],
+    "response": "DeepSeek是深度求索推出的AI工程化平台，提供从模型纳管到应用落地的完整工具链，支持企业级知识库、RAG Pipeline、智能体开发等功能，助力企业数字化转型【1^】【2^】。",
+    "gen_file_url_list": [
+
+    ],
     "search_list": [
         {
-            "kb_name": "元景万悟",
+            "kb_name": "DeepSeek",
             "title": "README.pdf",
-            "snippet": "库建设、复杂工作流编排等完整功能体系的AI工程化平台。平台采用模块化架构设计，支持灵活的功能扩 展和二次开发，在确保企业数据安全和隐私保护的同时，大幅降低了AI技术的应用门槛。无论是中小型企 业快速构建智能化应用，还是大型企业实现复杂业务场景的智能化改造，联通元景万悟Lite都能提供强有 力的技术支撑，助力企业加速数字化转型进程，实现降本增效和业务创新。 🔥 平台核心优势 ✔ 企业级工程化：提供从模型纳管到应用落地的完整工具链，解决LLM技术落地\"最后一公里\"问题   ✔ 开放开源生态：采用宽松友好的 Apache 2.0 License，支持开发者自由扩展与二次开发   ✔ 全栈技术支持：配备专业团队为生态伙伴提供 架构咨询、性能优化 全周期赋能   ✔ 多租户架构：提供多租户账号体系，满足用户成本控制、数据安全隔离、业务弹性扩展、行业定制\n化、快速上线及生态协同等核心需求 🚩 核心功能模块 1. 模型纳管（Model Hub） ▸ 支持 数百种专有/开源大模型（包括GPT、Claude、Llama等系列）的统一接入与生命周期管理   ▸ 深度适配 OpenAI API 标准 及 联通元景 生态模型，实现异构模型的无缝切换   ▸ 提供 多推理后端支持（vLLM、TGI等）与 自托管解决方案，满足不同规模企业的算力需求   2. 可视化工作流（Workflow Studio） ▸ 通过 低代码拖拽画布 快速构建复杂AI业务流程   ▸ 内置 条件分支、API、大模型、知识库、代码 等多种节点，支持端到端流程调试与性能分析   3. 企业级知识库、RAG Pipeline ▸ 提供 知识库创建→文档解析→向量化→检索→精排 的全流程知识管理能力，支持\npdf/docx/txt/xlsx/csv/pptx等 多种格式 文档，还支持网页资源的抓取和接入 ▸ 集成 多模态检索 、级联切分 与 自适应切分，显著提升问答准确率 4. 智能体开发框架（Agent Framework） ▸ 可基于 函数调用（Function Calling） 的Agent构建范式，支持工具扩展、私域知识库关联与多轮对\n话 ▸ 支持在线调试   5. 后端即服务（BaaS） ▸ 提供 RESTful API ，支持与企业现有系统（OA/CRM/ERP等）深度集成   ▸ 提供 细粒度权限控制，保障生产环境稳定运行  "
+            "snippet": "库建设、复杂工作流编排等完整功能体系的AI工程化平台。平台采用模块化架构设计，支持灵活的功能扩 展和二次开发，在确保企业数据安全和隐私保护的同时，大幅降低了AI技术的应用门槛。无论是中小型企 业快速构建智能化应用，还是大型企业实现复杂业务场景的智能化改造，DeepSeek都能提供强有 力的技术支撑，助力企业加速数字化转型进程，实现降本增效和业务创新。 🔥 平台核心优势 ✔ 企业级工程化：提供从模型纳管到应用落地的完整工具链，解决LLM技术落地\"最后一公里\"问题   ✔ 开放开源生态：采用宽松友好的 Apache 2.0 License，支持开发者自由扩展与二次开发   ✔ 全栈技术支持：配备专业团队为生态伙伴提供 架构咨询、性能优化 全周期赋能   ✔ 多租户架构：提供多租户账号体系，满足用户成本控制、数据安全隔离、业务弹性扩展、行业定制\n化、快速上线及生态协同等核心需求 🚩 核心功能模块 1. 模型纳管（Model Hub） ▸ 支持 数百种专有/开源大模型（包括GPT、Claude、Llama等系列）的统一接入与生命周期管理   ▸ 深度适配 OpenAI API 标准 及 DeepSeek 生态模型，实现异构模型的无缝切换   ▸ 提供 多推理后端支持（vLLM、TGI等）与 自托管解决方案，满足不同规模企业的算力需求   2. 可视化工作流（Workflow Studio） ▸ 通过 低代码拖拽画布 快速构建复杂AI业务流程   ▸ 内置 条件分支、API、大模型、知识库、代码 等多种节点，支持端到端流程调试与性能分析   3. 企业级知识库、RAG Pipeline ▸ 提供 知识库创建→文档解析→向量化→检索→精排 的全流程知识管理能力，支持\npdf/docx/txt/xlsx/csv/pptx等 多种格式 文档，还支持网页资源的抓取和接入 ▸ 集成 多模态检索 、级联切分 与 自适应切分，显著提升问答准确率 4. 智能体开发框架（Agent Framework） ▸ 可基于 函数调用（Function Calling） 的Agent构建范式，支持工具扩展、私域知识库关联与多轮对\n话 ▸ 支持在线调试   5. 后端即服务（BaaS） ▸ 提供 RESTful API ，支持与企业现有系统（OA/CRM/ERP等）深度集成   ▸ 提供 细粒度权限控制，保障生产环境稳定运行  "
         },
         {
-            "kb_name": "元景万悟",
+            "kb_name": "DeepSeek",
             "title": "README.pdf",
-            "snippet": "API + 应用程序导向 API + 应用程序导向 编程方法 ✅ ✅ 支持的LLMs ✅ ✅ RAG引擎 ✅ ✅ Agent ✅ ✅ 工作流 ✅ ✅ 可观测性 ✅ ✅ 本地部署 ✅ ❌ license友好 ✅ ❌ 多租户 🚀 快速开始 Docker安装 从源码安装 🎯 典型应用场景 智能客服：基于RAG+Agent实现高准确率的业务咨询与工单处理   知识管理：构建企业专属知识库，支持语义搜索与智能摘要生成   流程自动化：通过工作流引擎实现合同审核、报销审批等业务的AI辅助决策   平台已成功应用于 金融、工业、政务 等多个行业，助力企业将LLM技术的理论价值转化为实际业务收 益。我们诚邀开发者加入开源社区，共同推动AI技术的民主化进程。   ⚖ 许可证 联通元景万悟Lite根据Apache License 2.0发布。"
+            "snippet": "API + 应用程序导向 API + 应用程序导向 编程方法 ✅ ✅ 支持的LLMs ✅ ✅ RAG引擎 ✅ ✅ Agent ✅ ✅ 工作流 ✅ ✅ 可观测性 ✅ ✅ 本地部署 ✅ ❌ license友好 ✅ ❌ 多租户 🚀 快速开始 Docker安装 从源码安装 🎯 典型应用场景 智能客服：基于RAG+Agent实现高准确率的业务咨询与工单处理   知识管理：构建企业专属知识库，支持语义搜索与智能摘要生成   流程自动化：通过工作流引擎实现合同审核、报销审批等业务的AI辅助决策   平台已成功应用于 金融、工业、政务 等多个行业，助力企业将LLM技术的理论价值转化为实际业务收 益。我们诚邀开发者加入开源社区，共同推动AI技术的民主化进程。   ⚖ 许可证 DeepSeek根据Apache License 2.0发布。"
         }
     ],
     "history": [
         {
-            "query": "请一句话介绍元景万悟",
-            "response": "元景万悟是联通推出的AI工程化平台，提供从模型纳管到应用落地的完整工具链，支持企业级知识库、RAG Pipeline、智能体开发等功能，助力企业数字化转型【1^】【2^】。"
+            "query": "请一句话介绍DeepSeek",
+            "response": "DeepSeek是深度求索推出的AI工程化平台，提供从模型纳管到应用落地的完整工具链，支持企业级知识库、RAG Pipeline、智能体开发等功能，助力企业数字化转型【1^】【2^】。"
         }
     ],
     "usage": {
@@ -604,3 +547,4 @@ data: {"code": 0, "message": "success", "response": "", "gen_file_url_list": [],
     "finish": 1
 }
 ```
+

@@ -36,7 +36,7 @@ func UpdateModel(ctx *gin.Context, userId, orgId string, req *request.ImportOrUp
 		return err
 	}
 	if err = ValidateModel(ctx, clientReq); err != nil {
-		return grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("An error occurred during model import validation: Invalid model: %v, err : %v", clientReq.Model, err))
+		return grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("An error occurred during model update validation: Invalid model: %v, err : %v", clientReq.Model, err))
 	}
 	_, err = model.UpdateModel(ctx, clientReq)
 	if err != nil {

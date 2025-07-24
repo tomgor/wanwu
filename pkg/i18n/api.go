@@ -51,6 +51,13 @@ func Init(cfg Config) error {
 	return err
 }
 
+func DefaultLang() Lang {
+	if _i18n != nil {
+		return _i18n.DefaultLang
+	}
+	return ""
+}
+
 func ByCode(lang Lang, code err_code.Code, args []string) string {
 	return ByCodeOrKey(lang, code, "", args)
 }

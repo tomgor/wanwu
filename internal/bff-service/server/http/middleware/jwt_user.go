@@ -7,9 +7,8 @@ import (
 	"time"
 
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
-	"github.com/UnicomAI/wanwu/internal/bff-service/config"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
-	jwt_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/jwt-util"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
+	jwt_util "github.com/UnicomAI/wanwu/pkg/jwt-util"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/codes"
@@ -33,7 +32,7 @@ func jwtUserAuth(ctx *gin.Context, token string) {
 		ctx.Abort()
 		return
 	}
-	if claims.Subject != config.USER {
+	if claims.Subject != jwt_util.USER {
 		gin_util.ResponseDetail(ctx, httpStatus, codes.Code(err_code.Code_BFFJWT), nil, "token subject错误")
 		ctx.Abort()
 		return
@@ -45,7 +44,7 @@ func jwtUserAuth(ctx *gin.Context, token string) {
 		ctx.Header("new-token", newToken)
 		ctx.Header("new-expires-at", util.Int2Str(newClaims.ExpiresAt))
 	}
-	ctx.Set(config.CLAIMS, claims)
+	ctx.Set(gin_util.CLAIMS, claims)
 	ctx.Next()
 }
 
