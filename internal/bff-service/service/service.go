@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	knowledgebase_keywords_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-keywords-service"
 	knowledgebase_tag_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-tag-service"
 
 	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
@@ -25,16 +26,17 @@ const (
 )
 
 var (
-	iam              iam_service.IAMServiceClient
-	perm             perm_service.PermServiceClient
-	model            model_service.ModelServiceClient
-	mcp              mcp_service.MCPServiceClient
-	knowledgeBase    knowledgebase_service.KnowledgeBaseServiceClient
-	knowledgeBaseDoc knowledgebase_doc_service.KnowledgeBaseDocServiceClient
-	knowledgeBaseTag knowledgebase_tag_service.KnowledgeBaseTagServiceClient
-	app              app_service.AppServiceClient
-	rag              rag_service.RagServiceClient
-	assistant        assistant_service.AssistantServiceClient
+	iam                   iam_service.IAMServiceClient
+	perm                  perm_service.PermServiceClient
+	model                 model_service.ModelServiceClient
+	mcp                   mcp_service.MCPServiceClient
+	knowledgeBase         knowledgebase_service.KnowledgeBaseServiceClient
+	knowledgeBaseDoc      knowledgebase_doc_service.KnowledgeBaseDocServiceClient
+	knowledgeBaseTag      knowledgebase_tag_service.KnowledgeBaseTagServiceClient
+	knowledgeBaseKeywords knowledgebase_keywords_service.KnowledgeBaseKeywordsServiceClient
+	app                   app_service.AppServiceClient
+	rag                   rag_service.RagServiceClient
+	assistant             assistant_service.AssistantServiceClient
 )
 
 // --- API ---
@@ -78,6 +80,7 @@ func Init() error {
 	knowledgeBase = knowledgebase_service.NewKnowledgeBaseServiceClient(knowledgeBaseConn)
 	knowledgeBaseDoc = knowledgebase_doc_service.NewKnowledgeBaseDocServiceClient(knowledgeBaseConn)
 	knowledgeBaseTag = knowledgebase_tag_service.NewKnowledgeBaseTagServiceClient(knowledgeBaseConn)
+	knowledgeBaseKeywords = knowledgebase_keywords_service.NewKnowledgeBaseKeywordsServiceClient(knowledgeBaseConn)
 	rag = rag_service.NewRagServiceClient(ragConn)
 	assistant = assistant_service.NewAssistantServiceClient(assistantConn)
 	return nil

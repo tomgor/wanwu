@@ -34,6 +34,7 @@ type RagChatParams struct {
 	CustomModelInfo *CustomModelInfo `json:"custom_model_info"`
 	History         []*HistoryItem   `json:"history"`
 	MaxHistory      int32            `json:"maxHistory"`
+	RewriteQuery    bool             `json:"rewrite_query"` // 是否query改写
 }
 
 type CustomModelInfo struct {
@@ -142,6 +143,7 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	ragChatParams.Chichat = true
 	ragChatParams.RerankModelId = rag.RerankConfig.ModelId
 	ragChatParams.History = []*HistoryItem{}
+	ragChatParams.RewriteQuery = true
 	log.Infof("ragparams = %+v", ragChatParams)
 	return ragChatParams
 }

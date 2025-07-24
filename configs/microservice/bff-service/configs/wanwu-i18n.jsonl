@@ -153,6 +153,7 @@
 {"code":144003,"key":"","langs":{"zh":"修改关键词失败，请稍后重试"}}
 {"code":144004,"key":"","langs":{"zh":"查询关键词列表失败，请稍后重试"}}
 {"code":144005,"key":"","langs":{"zh":"查询关键词详情失败，请稍后重试"}}
+{"code":144006,"key":"","langs":{"zh":"关键词在知识库中已存在，请勿重复添加"}}
 {"code":310001,"key":"mcp_get_square_err","langs":{"zh":"广场MCP不存在"}}
 {"code":310001,"key":"mcp_check_exist_err","langs":{"zh":"检查MCP是否存在来自广场异常: %v"}}
 {"code":310002,"key":"mcp_create_duplicate_square","langs":{"zh":"创建MCP异常: 已存在来自广场"}}
