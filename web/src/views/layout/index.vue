@@ -288,14 +288,21 @@ export default {
         replaceTitle(tab.title)
       },
       deep: true
+    },
+    permission: {
+      handler(val) {
+        // 如果没修改过密码，重新向到修改密码
+        this.redirectUserInfo()
+      },
+      deep: true
     }
   },
   computed: {
     ...mapGetters('user', ['orgInfo', 'userInfo', 'commonInfo', 'permission']),
   },
   async created() {
-    // 如果没修改过密码，重新向到修改密码
-    this.redirectUserInfo()
+    // // 如果没修改过密码，重新向到修改密码
+    // this.redirectUserInfo()
 
     // 判断是否展示左侧菜单
     this.justifyIsShowNav(this.$route.path)
@@ -333,7 +340,7 @@ export default {
       return currentOrg.name
     },
     redirectUserInfo() {
-      if (!this.permission.isUpdatePassword) {
+      if (this.permission.isUpdatePassword !== undefined && !this.permission.isUpdatePassword) {
         this.$router.push('/userInfo?showPwd=1')
         return null
       }
