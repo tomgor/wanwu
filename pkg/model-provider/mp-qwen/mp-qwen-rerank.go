@@ -1,4 +1,4 @@
-package mp_yuanjing
+package mp_qwen
 
 import (
 	"context"
@@ -20,8 +20,21 @@ type Rerank struct {
 
 func (cfg *Rerank) NewReq(req *mp_common.RerankReq) (mp_common.IRerankReq, error) {
 	m := map[string]interface{}{
-		"texts": req.Documents,
-		"query": req.Query,
+		"model": req.Model,
+		"input": map[string]interface{}{
+			"documents": req.Documents,
+			"query":     req.Query,
+		},
+	}
+	if req.TopN != nil || req.ReturnDocuments != nil {
+		parameters := make(map[string]interface{})
+		if req.TopN != nil {
+			parameters["top_n"] = req.TopN
+		}
+		if req.ReturnDocuments != nil {
+			parameters["return_documents"] = req.ReturnDocuments
+		}
+		m["parameters"] = parameters
 	}
 	return mp_common.NewRerankReq(m), nil
 }
@@ -50,19 +63,19 @@ func (cfg *Rerank) Rerank(ctx context.Context, req mp_common.IRerankReq, headers
 	url := cfg.rerankUrl()
 	resp, err := request.Post(url)
 	if err != nil {
-		return nil, fmt.Errorf("request %v yuanjing rerank err: %v", url, err)
+		return nil, fmt.Errorf("request %v qwen rerank err: %v", url, err)
 	} else if resp.StatusCode() >= 300 {
-		return nil, fmt.Errorf("request %v yuanjing rerank http status %v msg: %v", url, resp.StatusCode(), resp.String())
+		return nil, fmt.Errorf("request %v qwen rerank http status %v msg: %v", url, resp.StatusCode(), resp.String())
 	}
 	b, err := io.ReadAll(resp.RawResponse.Body)
 	if err != nil {
-		return nil, fmt.Errorf("request %v yuanjing rerank read response body err: %v", url, err)
+		return nil, fmt.Errorf("request %v qwen rerank read response body err: %v", url, err)
 	}
 	return &rerankResp{raw: string(b)}, nil
 }
 
 func (cfg *Rerank) rerankUrl() string {
-	ret, _ := url.JoinPath(cfg.EndpointUrl, "/rerank")
+	ret, _ := url.JoinPath(cfg.EndpointUrl, "/services/rerank/text-rerank/text-rerank")
 	return ret
 }
 
@@ -71,9 +84,13 @@ func (cfg *Rerank) rerankUrl() string {
 type rerankResp struct {
 	raw string
 
-	Index    int     `json:"index"`
-	Score    float64 `json:"score"`
-	Document string  `json:"document"`
+	Output    rerankRespOutput `json:"output"`
+	Usage     mp_common.Usage  `json:"usage"`
+	RequestId string           `json:"request_id"`
+}
+
+type rerankRespOutput struct {
+	Results []mp_common.Result `json:"results"`
 }
 
 func (resp *rerankResp) String() string {
@@ -81,42 +98,23 @@ func (resp *rerankResp) String() string {
 }
 
 func (resp *rerankResp) Data() (interface{}, bool) {
-	ret := []map[string]interface{}{}
+	ret := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(resp.raw), &ret); err != nil {
-		log.Errorf("yuanjing rerank resp (%v) convert to data err: %v", resp.raw, err)
+		log.Errorf("qwen rerank resp (%v) convert to data err: %v", resp.raw, err)
 		return nil, false
 	}
 	return ret, true
 }
 
 func (resp *rerankResp) ConvertResp() (*mp_common.RerankResp, bool) {
-	var data []map[string]interface{}
-	if err := json.Unmarshal([]byte(resp.raw), &data); err != nil {
-		log.Errorf("yuanjing rerank resp (%v) convert to data err: %v", resp.raw, err)
+	if err := json.Unmarshal([]byte(resp.raw), resp); err != nil {
+		log.Errorf("qwen rerank resp (%v) convert to data err: %v", resp.raw, err)
 		return nil, false
 	}
-
-	var results []mp_common.Result
-	for _, item := range data {
-		b, err := json.Marshal(item)
-		if err != nil {
-			log.Errorf("yuanjing rerank resp (%v) item (%v) convert err: %v", resp.raw, item, err)
-			return nil, false
-		}
-		if err = json.Unmarshal(b, resp); err != nil {
-			log.Errorf("yuanjing rerank resp (%v) item (%v) unmarshal err: %v", resp.raw, item, err)
-			return nil, false
-		}
-		results = append(results, mp_common.Result{
-			Index:          resp.Index,
-			RelevanceScore: resp.Score,
-			Document: &mp_common.Document{
-				Text: resp.Document,
-			},
-		})
+	res := &mp_common.RerankResp{
+		Results:   resp.Output.Results,
+		Usage:     resp.Usage,
+		RequestId: &resp.RequestId,
 	}
-
-	return &mp_common.RerankResp{
-		Results: results,
-	}, true
+	return res, true
 }

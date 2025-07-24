@@ -7,6 +7,29 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/log"
 )
 
+type MsgRole string
+
+const (
+	MsgRoleSystem    MsgRole = "system"
+	MsgRoleUser      MsgRole = "user"
+	MsgRoleAssistant MsgRole = "assistant"
+	MsgRoleFunction  MsgRole = "tool"
+)
+
+type ToolType string
+
+const (
+	ToolTypeFunction ToolType = "function"
+)
+
+type FCType string
+
+const (
+	FCTypeFunctionCall FCType = "functionCall"
+	FCTypeNoSupport    FCType = "noSupport"
+	FCTypeToolCall     FCType = "toolCall"
+)
+
 type Header struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
@@ -23,7 +46,7 @@ type LLMReq struct {
 	Stop           *string               `json:"stop,omitempty"`
 	ResponseFormat *OpenAIResponseFormat `json:"response_format,omitempty"`
 	Temperature    *float64              `json:"temperature,omitempty"`
-	Tools          *[]OpenAITool         `json:"tools,omitempty"`
+	Tools          []OpenAITool          `json:"tools,omitempty"`
 
 	// custom
 	Thinking            *Thinking      `json:"thinking,omitempty"` // 控制模型是否开启深度思考模式。
@@ -78,22 +101,6 @@ type OpenAIMsg struct {
 type Thinking struct {
 	Type string `json:"type" default:"enabled"`
 }
-type MsgRole string
-
-const (
-	MsgRoleSystem    MsgRole = "system"
-	MsgRoleUser      MsgRole = "user"
-	MsgRoleAssistant MsgRole = "assistant"
-	MsgRoleFunction  MsgRole = "tool"
-
-	ToolTypeFunction ToolType = "function"
-
-	FCTypeFunctionCall string = "functionCall"
-	FCTypeNoSupport    string = "noSupport"
-	FCTypeToolCall     string = "toolCall"
-)
-
-type ToolType string
 
 type ToolCall struct {
 	ID       string       `json:"id"`
@@ -136,12 +143,14 @@ func (req *LLMReq) Check() error { return nil }
 // --- openapi response ---
 
 type LLMResp struct {
-	ID      string             `json:"id"`      // 唯一标识
-	Object  string             `json:"object"`  // 固定为 "chat.completion"
-	Created int                `json:"created"` // 时间戳（秒）
-	Model   string             `json:"model"`   // 使用的模型
-	Choices []OpenAIRespChoice `json:"choices"` // 生成结果列表
-	Usage   OpenAIRespUsage    `json:"usage"`   // token 使用统计
+	ID                string             `json:"id"`           // 唯一标识
+	Object            string             `json:"object"`       // 固定为 "chat.completion"
+	Created           int                `json:"created"`      // 时间戳（秒）
+	Model             string             `json:"model"`        // 使用的模型
+	Choices           []OpenAIRespChoice `json:"choices"`      // 生成结果列表
+	Usage             OpenAIRespUsage    `json:"usage"`        // token 使用统计
+	ServiceTier       *string            `json:"service_tier"` // （火山）指定是否使用TPM保障包。生效对象为购买了保障包推理接入点
+	SystemFingerprint *string            `json:"system_fingerprint"`
 }
 
 // OpenAIRespUsage 结构体表示 token 消耗
@@ -153,10 +162,11 @@ type OpenAIRespUsage struct {
 
 // OpenAIRespChoice 结构体表示单个生成选项
 type OpenAIRespChoice struct {
-	Index        int        `json:"index"`             // 选项索引
-	Message      *OpenAIMsg `json:"message,omitempty"` // 非流式生成的消息
-	Delta        *OpenAIMsg `json:"delta,omitempty"`   // 流式生成的消息
-	FinishReason string     `json:"finish_reason"`     // 停止原因
+	Index        int         `json:"index"`             // 选项索引
+	Message      *OpenAIMsg  `json:"message,omitempty"` // 非流式生成的消息
+	Delta        *OpenAIMsg  `json:"delta,omitempty"`   // 流式生成的消息
+	FinishReason string      `json:"finish_reason"`     // 停止原因
+	Logprobs     interface{} `json:"logprobs"`
 }
 
 type OpenAIRespChoiceMsg struct {

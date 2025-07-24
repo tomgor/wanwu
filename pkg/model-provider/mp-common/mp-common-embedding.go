@@ -19,10 +19,12 @@ func (req *EmbeddingReq) Check() error { return nil }
 // --- openapi response ---
 
 type EmbeddingResp struct {
-	Model  string          `json:"model"`
-	Object string          `json:"object"`
-	Data   []EmbeddingData `json:"data"`
-	Usage  Usage           `json:"usage"`
+	Id      *string         `json:"id,omitempty"`
+	Model   string          `json:"model"`
+	Object  *string         `json:"object,omitempty"`
+	Data    []EmbeddingData `json:"data"`
+	Usage   Usage           `json:"usage"`
+	Created *int            `json:"created,omitempty"`
 }
 
 type EmbeddingData struct {
