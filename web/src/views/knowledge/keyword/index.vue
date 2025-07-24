@@ -52,6 +52,9 @@
                   prop="knowledgeBaseNames"
                   :label="$t('keyword.linkKnowledge')"
                 >
+                <template slot-scope="scope">
+                  <span>{{scope.row.knowledgeBaseNames.join(',')}}</span>
+                </template>
                 </el-table-column>
                 <el-table-column
                   prop="updatedAt"
