@@ -58,6 +58,12 @@ enum Code {
   KnowledgeTagBindFailed = 143006; // 知识库标签设置失败，请稍后重试
   KnowledgeTagUnbindFailed = 143007; // 知识库标签取消失败，请稍后重试
   KnowledgeTagAccessDenied = 143008; // 没有操作该知识库标签的权限
+  KnowledgeKeywordsCreateFailed = 144001; // 新建关键词失败，请稍后重试
+  KnowledgeKeywordsDeleteFailed = 144002; // 删除关键词失败，请稍后重试
+  KnowledgeKeywordsUpdateFailed = 144003; // 修改关键词失败，请稍后重试
+  KnowledgeKeywordsListFailed = 144004; // 查询关键词列表失败，请稍后重试
+  KnowledgeKeywordsInfoFailed = 144005; // 查询关键词详情失败，请稍后重试
+  KnowledgeKeywordsRepeated = 144006; // 关键词在知识库中已存在，请勿重复添加
 
   // --- rag-service ---
   // [150000, 159999]
