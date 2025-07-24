@@ -3,12 +3,12 @@ package mp
 import (
 	"encoding/json"
 	"fmt"
-	mp_huoshan "github.com/UnicomAI/wanwu/pkg/model-provider/mp-huoshan"
-	mp_ollama "github.com/UnicomAI/wanwu/pkg/model-provider/mp-ollama"
-	mp_qwen "github.com/UnicomAI/wanwu/pkg/model-provider/mp-qwen"
 	"net/url"
 
+	mp_huoshan "github.com/UnicomAI/wanwu/pkg/model-provider/mp-huoshan"
+	mp_ollama "github.com/UnicomAI/wanwu/pkg/model-provider/mp-ollama"
 	mp_openai_compatible "github.com/UnicomAI/wanwu/pkg/model-provider/mp-openai-compatible"
+	mp_qwen "github.com/UnicomAI/wanwu/pkg/model-provider/mp-qwen"
 	mp_yuanjing "github.com/UnicomAI/wanwu/pkg/model-provider/mp-yuanjing"
 )
 

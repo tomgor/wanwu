@@ -5,11 +5,12 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/url"
+
 	"github.com/UnicomAI/wanwu/pkg/log"
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	"github.com/go-resty/resty/v2"
-	"io"
-	"net/url"
 )
 
 type Rerank struct {
@@ -25,8 +26,8 @@ func (cfg *Rerank) NewReq(req *mp_common.RerankReq) (mp_common.IRerankReq, error
 			"query":     req.Query,
 		},
 	}
-	parameters := make(map[string]interface{})
 	if req.TopN != nil || req.ReturnDocuments != nil {
+		parameters := make(map[string]interface{})
 		if req.TopN != nil {
 			parameters["top_n"] = req.TopN
 		}
@@ -48,7 +49,7 @@ func (cfg *Rerank) Rerank(ctx context.Context, req mp_common.IRerankReq, headers
 
 	request := resty.New().
 		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}). // 关闭证书校验
-		SetTimeout(0). // 关闭请求超时
+		SetTimeout(0).                                             // 关闭请求超时
 		R().
 		SetContext(ctx).
 		SetHeader("Content-Type", "application/json").
@@ -62,13 +63,13 @@ func (cfg *Rerank) Rerank(ctx context.Context, req mp_common.IRerankReq, headers
 	url := cfg.rerankUrl()
 	resp, err := request.Post(url)
 	if err != nil {
-		return nil, fmt.Errorf("request %v huoshan rerank err: %v", url, err)
+		return nil, fmt.Errorf("request %v qwen rerank err: %v", url, err)
 	} else if resp.StatusCode() >= 300 {
-		return nil, fmt.Errorf("request %v huoshan rerank http status %v msg: %v", url, resp.StatusCode(), resp.String())
+		return nil, fmt.Errorf("request %v qwen rerank http status %v msg: %v", url, resp.StatusCode(), resp.String())
 	}
 	b, err := io.ReadAll(resp.RawResponse.Body)
 	if err != nil {
-		return nil, fmt.Errorf("request %v huoshan rerank read response body err: %v", url, err)
+		return nil, fmt.Errorf("request %v qwen rerank read response body err: %v", url, err)
 	}
 	return &rerankResp{raw: string(b)}, nil
 }
@@ -83,12 +84,12 @@ func (cfg *Rerank) rerankUrl() string {
 type rerankResp struct {
 	raw string
 
-	Output    RerankRespOutput `json:"output"`
+	Output    rerankRespOutput `json:"output"`
 	Usage     mp_common.Usage  `json:"usage"`
 	RequestId string           `json:"request_id"`
 }
 
-type RerankRespOutput struct {
+type rerankRespOutput struct {
 	Results []mp_common.Result `json:"results"`
 }
 
@@ -97,23 +98,23 @@ func (resp *rerankResp) String() string {
 }
 
 func (resp *rerankResp) Data() (interface{}, bool) {
-	ret := []map[string]interface{}{}
+	ret := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(resp.raw), &ret); err != nil {
-		log.Errorf("huoshan rerank resp (%v) convert to data err: %v", resp.raw, err)
+		log.Errorf("qwen rerank resp (%v) convert to data err: %v", resp.raw, err)
 		return nil, false
 	}
 	return ret, true
 }
+
 func (resp *rerankResp) ConvertResp() (*mp_common.RerankResp, bool) {
-	data := &rerankResp{}
-	if err := json.Unmarshal([]byte(resp.raw), &data); err != nil {
-		log.Errorf("huoshan rerank resp (%v) convert to data err: %v", resp.raw, err)
+	if err := json.Unmarshal([]byte(resp.raw), resp); err != nil {
+		log.Errorf("qwen rerank resp (%v) convert to data err: %v", resp.raw, err)
 		return nil, false
 	}
 	res := &mp_common.RerankResp{
-		Results:   data.Output.Results,
-		Usage:     data.Usage,
-		RequestId: data.RequestId,
+		Results:   resp.Output.Results,
+		Usage:     resp.Usage,
+		RequestId: &resp.RequestId,
 	}
 	return res, true
 }

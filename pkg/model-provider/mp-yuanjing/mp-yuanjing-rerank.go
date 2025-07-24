@@ -88,6 +88,7 @@ func (resp *rerankResp) Data() (interface{}, bool) {
 	}
 	return ret, true
 }
+
 func (resp *rerankResp) ConvertResp() (*mp_common.RerankResp, bool) {
 	var data []map[string]interface{}
 	if err := json.Unmarshal([]byte(resp.raw), &data); err != nil {

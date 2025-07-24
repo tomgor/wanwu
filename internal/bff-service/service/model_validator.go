@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
+	"sync"
+
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	"github.com/gin-gonic/gin"
-	"strings"
-	"sync"
 )
 
 // 定义校验函数类型
@@ -61,7 +62,7 @@ func ValidateLLMModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) erro
 	if err != nil {
 		return err
 	}
-	fc, ok := result["functionCalling"].(string)
+	fc, ok := result["functionCalling"].(mp_common.FCType)
 	if ok && fc == mp_common.FCTypeToolCall {
 		tools := []mp_common.OpenAITool{
 			{
@@ -76,7 +77,7 @@ func ValidateLLMModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) erro
 				},
 			},
 		}
-		req.Tools = &tools
+		req.Tools = tools
 		llmReq, err := iLLM.NewReq(req)
 		if err != nil {
 			return err
@@ -90,10 +91,10 @@ func ValidateLLMModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) erro
 			return fmt.Errorf("invalid resp: %v", err)
 		}
 		if len(openAIResp.Choices) == 0 || openAIResp.Choices[0].Message.ToolCalls == nil {
-			return fmt.Errorf("Model does not support toolcall functionality.")
+			return fmt.Errorf("model does not support toolcall functionality")
 		} else {
 			data, _ := json.MarshalIndent(openAIResp.Choices[0].Message.ToolCalls, "", "  ")
-			log.Infof("tool call: %v", string(data))
+			log.Debugf("tool call: %v", string(data))
 		}
 		return nil
 	}

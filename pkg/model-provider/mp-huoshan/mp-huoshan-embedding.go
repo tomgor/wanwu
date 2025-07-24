@@ -5,10 +5,11 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/url"
+
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	"github.com/go-resty/resty/v2"
-	"io"
-	url_p "net/url"
 )
 
 type Embedding struct {
@@ -65,6 +66,6 @@ func (cfg *Embedding) Embeddings(ctx context.Context, req mp_common.IEmbeddingRe
 }
 
 func (cfg *Embedding) embeddingsUrl() string {
-	ret, _ := url_p.JoinPath(cfg.EndpointUrl, "/embeddings")
+	ret, _ := url.JoinPath(cfg.EndpointUrl, "/embeddings")
 	return ret
 }

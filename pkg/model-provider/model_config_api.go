@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	mp_huoshan "github.com/UnicomAI/wanwu/pkg/model-provider/mp-huoshan"
-	mp_ollama "github.com/UnicomAI/wanwu/pkg/model-provider/mp-ollama"
-	mp_qwen "github.com/UnicomAI/wanwu/pkg/model-provider/mp-qwen"
 
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
+	mp_huoshan "github.com/UnicomAI/wanwu/pkg/model-provider/mp-huoshan"
+	mp_ollama "github.com/UnicomAI/wanwu/pkg/model-provider/mp-ollama"
 	mp_openai_compatible "github.com/UnicomAI/wanwu/pkg/model-provider/mp-openai-compatible"
+	mp_qwen "github.com/UnicomAI/wanwu/pkg/model-provider/mp-qwen"
 	mp_yuanjing "github.com/UnicomAI/wanwu/pkg/model-provider/mp-yuanjing"
 )
 
@@ -44,7 +44,7 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 		case ModelTypeEmbedding:
 			ret = &mp_openai_compatible.Embedding{}
 		default:
-			return nil, fmt.Errorf("invalid model type: %v", modelType)
+			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
 		}
 	case ProviderYuanJing:
 		switch modelType {
@@ -55,7 +55,7 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 		case ModelTypeEmbedding:
 			ret = &mp_yuanjing.Embedding{}
 		default:
-			return nil, fmt.Errorf("invalid model type: %v", modelType)
+			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
 		}
 	case ProviderHuoshan:
 		switch modelType {
@@ -63,6 +63,8 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 			ret = &mp_huoshan.LLM{}
 		case ModelTypeEmbedding:
 			ret = &mp_huoshan.Embedding{}
+		default:
+			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
 		}
 	case ProviderQwen:
 		switch modelType {
@@ -72,6 +74,8 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 			ret = &mp_qwen.Rerank{}
 		case ModelTypeEmbedding:
 			ret = &mp_qwen.Embedding{}
+		default:
+			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
 		}
 	case ProviderOllama:
 		switch modelType {
@@ -79,6 +83,8 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 			ret = &mp_ollama.LLM{}
 		case ModelTypeEmbedding:
 			ret = &mp_ollama.Embedding{}
+		default:
+			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
 		}
 	default:
 		return nil, fmt.Errorf("invalid provider: %v", modelType)
