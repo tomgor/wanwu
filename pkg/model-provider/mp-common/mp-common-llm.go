@@ -136,12 +136,14 @@ func (req *LLMReq) Check() error { return nil }
 // --- openapi response ---
 
 type LLMResp struct {
-	ID      string             `json:"id"`      // 唯一标识
-	Object  string             `json:"object"`  // 固定为 "chat.completion"
-	Created int                `json:"created"` // 时间戳（秒）
-	Model   string             `json:"model"`   // 使用的模型
-	Choices []OpenAIRespChoice `json:"choices"` // 生成结果列表
-	Usage   OpenAIRespUsage    `json:"usage"`   // token 使用统计
+	ID                string             `json:"id"`           // 唯一标识
+	Object            string             `json:"object"`       // 固定为 "chat.completion"
+	Created           int                `json:"created"`      // 时间戳（秒）
+	Model             string             `json:"model"`        // 使用的模型
+	Choices           []OpenAIRespChoice `json:"choices"`      // 生成结果列表
+	Usage             OpenAIRespUsage    `json:"usage"`        // token 使用统计
+	ServiceTier       *string            `json:"service_tier"` // （火山）指定是否使用TPM保障包。生效对象为购买了保障包推理接入点
+	SystemFingerprint *string            `json:"system_fingerprint"`
 }
 
 // OpenAIRespUsage 结构体表示 token 消耗
@@ -153,10 +155,11 @@ type OpenAIRespUsage struct {
 
 // OpenAIRespChoice 结构体表示单个生成选项
 type OpenAIRespChoice struct {
-	Index        int        `json:"index"`             // 选项索引
-	Message      *OpenAIMsg `json:"message,omitempty"` // 非流式生成的消息
-	Delta        *OpenAIMsg `json:"delta,omitempty"`   // 流式生成的消息
-	FinishReason string     `json:"finish_reason"`     // 停止原因
+	Index        int         `json:"index"`             // 选项索引
+	Message      *OpenAIMsg  `json:"message,omitempty"` // 非流式生成的消息
+	Delta        *OpenAIMsg  `json:"delta,omitempty"`   // 流式生成的消息
+	FinishReason string      `json:"finish_reason"`     // 停止原因
+	Logprobs     interface{} `json:"logprobs"`
 }
 
 type OpenAIRespChoiceMsg struct {
