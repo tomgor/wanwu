@@ -86,7 +86,7 @@ export default {
         editKeyWord(data).then(res =>{
             if(res.code === 0){
                 this.$message.success('success')
-                this.dialogVisible = true
+                this.dialogVisible = false
                 this.$parent.updateData()
             }
         })
@@ -95,7 +95,7 @@ export default {
         addKeyWord(this.form).then(res =>{
             if(res.code === 0){
                 this.$message.success('success')
-                this.dialogVisible = true
+                this.dialogVisible = false
                 this.$parent.updateData()
             }
         })
