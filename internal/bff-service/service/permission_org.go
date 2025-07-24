@@ -5,7 +5,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 )

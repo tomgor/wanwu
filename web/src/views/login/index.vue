@@ -16,7 +16,7 @@
         <p class="login-header">
           <span style="font-weight: bold">{{$t('login.title')}}</span>
           <span style="margin-left: 20px; font-size: 16px; padding-bottom: 2px">
-            {{login.welcomeText || $t('login.welcomeText')}}
+            {{login.welcomeText}}
           </span>
         </p>
         <div class="login-form">

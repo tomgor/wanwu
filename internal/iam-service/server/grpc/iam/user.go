@@ -170,10 +170,11 @@ func toUserInfo(user *orm.UserInfo) *iam_service.UserInfo {
 
 func toPermission(permission *orm.Permission) *iam_service.UserPermission {
 	ret := &iam_service.UserPermission{
-		IsAdmin:  permission.IsAdmin,
-		IsSystem: permission.IsSystem,
-		Org:      toIDName(permission.Org),
-		Roles:    toRoleIDNames(permission.Roles),
+		IsAdmin:              permission.IsAdmin,
+		IsSystem:             permission.IsSystem,
+		Org:                  toIDName(permission.Org),
+		Roles:                toRoleIDNames(permission.Roles),
+		LastUpdatePasswordAt: permission.LastUpdatePasswordAt,
 	}
 	for _, perm := range permission.Perms {
 		ret.Perms = append(ret.Perms, toPerm(perm))

@@ -6,8 +6,7 @@ import (
 	"strings"
 
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
-	"github.com/UnicomAI/wanwu/internal/bff-service/config"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
 
 	"github.com/gin-gonic/gin"
@@ -26,7 +25,7 @@ func Record(ctx *gin.Context) {
 	}
 	ctx.Next()
 
-	resp := ctx.GetString(config.RESULT)
+	resp := ctx.GetString(gin_util.RESULT)
 	log.Debugf("[%v] %v | %v | %v", ctx.Request.Method, requestFullPath(ctx), req, resp)
 }
 

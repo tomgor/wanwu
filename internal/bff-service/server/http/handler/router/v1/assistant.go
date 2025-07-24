@@ -3,10 +3,10 @@ package v1
 import (
 	"net/http"
 
-	mid "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util/mid-wrap"
 	v1 "github.com/UnicomAI/wanwu/internal/bff-service/server/http/handler/v1"
 	"github.com/UnicomAI/wanwu/internal/bff-service/server/http/middleware"
 	"github.com/UnicomAI/wanwu/pkg/constant"
+	mid "github.com/UnicomAI/wanwu/pkg/gin-util/mid-wrap"
 	"github.com/gin-gonic/gin"
 )
 

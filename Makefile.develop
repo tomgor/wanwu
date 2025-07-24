@@ -145,3 +145,17 @@ stop-assistant:
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		down assistant-service
+
+# --- agentscope ---
+run-agentscope: # 启动agentscope后自动重启下nginx
+	docker-compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		up -d agentscope
+	docker restart ${WANWU_NGINX_HOST}
+
+stop-agentscope:
+	docker-compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		down agentscope

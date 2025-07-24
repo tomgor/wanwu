@@ -10,7 +10,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	template "github.com/UnicomAI/wanwu/internal/bff-service/pkg/assistant-template"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/gin-gonic/gin"
 )

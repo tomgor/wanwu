@@ -2,8 +2,8 @@ package v1
 
 import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 )

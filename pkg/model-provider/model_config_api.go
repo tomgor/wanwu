@@ -11,6 +11,7 @@ import (
 )
 
 type ILLM interface {
+	NewReq(req *mp_common.LLMReq) (mp_common.ILLMReq, error)
 	ChatCompletions(ctx context.Context, req mp_common.ILLMReq, headers ...mp_common.Header) (mp_common.ILLMResp, <-chan mp_common.ILLMResp, error)
 }
 

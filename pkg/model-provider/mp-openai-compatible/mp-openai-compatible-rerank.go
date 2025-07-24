@@ -3,6 +3,7 @@ package mp_openai_compatible
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/url"
@@ -17,14 +18,14 @@ type Rerank struct {
 }
 
 func (cfg *Rerank) NewReq(req *mp_common.RerankReq) (mp_common.IRerankReq, error) {
-	m := map[string]interface{}{
-		"documents":        req.Documents,
-		"model":            req.Model,
-		"query":            req.Query,
-		"return_documents": req.ReturnDocuments,
+	m := make(map[string]interface{})
+	b, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
 	}
-	if req.TopN > 0 {
-		m["top_n"] = req.TopN
+	err = json.Unmarshal(b, &m)
+	if err != nil {
+		return nil, err
 	}
 	return mp_common.NewRerankReq(m), nil
 }

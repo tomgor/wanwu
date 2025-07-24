@@ -24,8 +24,9 @@ type IDName struct {
 }
 
 type UserPermission struct {
-	OrgPermission UserOrgPermission `json:"orgPermission"` // 用户所在组织权限
-	Language      Language          `json:"language"`      // 语言
+	OrgPermission    UserOrgPermission `json:"orgPermission"`    // 用户所在组织权限
+	Language         Language          `json:"language"`         // 语言
+	IsUpdatePassword bool              `json:"isUpdatePassword"` // 是否已更新密码
 }
 
 type UserOrgPermission struct {

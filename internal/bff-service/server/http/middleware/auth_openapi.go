@@ -6,9 +6,8 @@ import (
 	"strings"
 
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
-	"github.com/UnicomAI/wanwu/internal/bff-service/config"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/codes"
 )
@@ -32,9 +31,9 @@ func AuthOpenAPI(appType string) func(*gin.Context) {
 			ctx.Abort()
 			return
 		}
-		ctx.Set(config.USER_ID, apiKey.UserId)
-		ctx.Set(config.X_ORG_ID, apiKey.OrgId)
-		ctx.Set(config.APP_ID, apiKey.AppId)
+		ctx.Set(gin_util.USER_ID, apiKey.UserId)
+		ctx.Set(gin_util.X_ORG_ID, apiKey.OrgId)
+		ctx.Set(gin_util.APP_ID, apiKey.AppId)
 	}
 
 }

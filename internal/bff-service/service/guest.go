@@ -8,9 +8,9 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
-	gin_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util"
-	mid "github.com/UnicomAI/wanwu/internal/bff-service/pkg/gin-util/mid-wrap"
-	jwt_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/jwt-util"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
+	mid "github.com/UnicomAI/wanwu/pkg/gin-util/mid-wrap"
+	jwt_util "github.com/UnicomAI/wanwu/pkg/jwt-util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,7 +32,7 @@ func GetLogoCustomInfo(ctx *gin.Context) (response.LogoCustomInfo, error) {
 			BackgroundPath:   config.Cfg().CustomInfo.Login.BackgroundPath,
 			LoginButtonColor: config.Cfg().CustomInfo.Login.LoginButtonColor,
 			WelcomeText:      gin_util.I18nKey(ctx, config.Cfg().CustomInfo.Login.WelcomeText),
-			PlatformDesc:     gin_util.I18nKey(ctx, config.Cfg().CustomInfo.Login.PlatformDesc),
+			//PlatformDesc:     gin_util.I18nKey(ctx, config.Cfg().CustomInfo.Login.PlatformDesc),
 		},
 		Home: response.CustomHome{
 			LogoPath: config.Cfg().CustomInfo.Home.LogoPath,
@@ -92,18 +92,19 @@ func Login(ctx *gin.Context, login *request.Login, language string) (*response.L
 	if err != nil {
 		return nil, err
 	}
-	ctx.Set(config.CLAIMS, &claims)
+	ctx.Set(gin_util.CLAIMS, &claims)
 	// resp
 	return &response.Login{
-		UID:           resp.User.GetUserId(),
-		Username:      resp.User.GetUserName(),
-		Nickname:      resp.User.GetNickName(),
-		Token:         token,
-		ExpiresAt:     claims.StandardClaims.ExpiresAt * 1000, // 超时事件戳毫秒
-		ExpireIn:      strconv.FormatInt(jwt_util.UserTokenTimeout, 10),
-		Orgs:          toOrgIDNames(ctx, orgs.Selects, resp.User.GetUserId() == config.SystemAdminUserID),
-		OrgPermission: toOrgPermission(ctx, resp.Permission),
-		Language:      getLanguageByCode(resp.User.Language),
+		UID:              resp.User.GetUserId(),
+		Username:         resp.User.GetUserName(),
+		Nickname:         resp.User.GetNickName(),
+		Token:            token,
+		ExpiresAt:        claims.StandardClaims.ExpiresAt * 1000, // 超时事件戳毫秒
+		ExpireIn:         strconv.FormatInt(jwt_util.UserTokenTimeout, 10),
+		Orgs:             toOrgIDNames(ctx, orgs.Selects, resp.User.GetUserId() == config.SystemAdminUserID),
+		OrgPermission:    toOrgPermission(ctx, resp.Permission),
+		Language:         getLanguageByCode(resp.User.Language),
+		IsUpdatePassword: resp.Permission.LastUpdatePasswordAt != 0,
 	}, nil
 }
 
