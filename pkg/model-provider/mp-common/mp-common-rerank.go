@@ -21,10 +21,11 @@ func (req *RerankReq) Check() error { return nil }
 // --- openapi response ---
 
 type RerankResp struct {
-	Results []Result `json:"results"`
-	Model   string   `json:"model"`
-	Object  string   `json:"object"`
-	Usage   Usage    `json:"usage"`
+	Results   []Result `json:"results"`
+	Model     string   `json:"model"`
+	Object    string   `json:"object"`
+	Usage     Usage    `json:"usage"`
+	RequestId string   `json:"request_id"`
 }
 type Result struct {
 	Index          int       `json:"index"`
