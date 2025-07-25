@@ -247,7 +247,7 @@ export default {
           {name: this.$t('menu.setting'), path: '/permission', img: require('@/assets/imgs/setting_icon.svg'), perm: PERMS.PERMISSION}
         ],
         [
-          {name: this.$t('menu.helpDoc'), img: require('@/assets/imgs/helpDoc_icon.svg'), redirect: () => {
+          {name: this.$t('menu.helpDoc'), img: require('@/assets/imgs/helpDoc_icon.svg'), icon: require('@/assets/imgs/link_icon.png'), redirect: () => {
             window.open('https://github.com/UnicomAI/wanwu/tree/main/docs/manual')
           }},
           {name: 'Github', img: require('@/assets/imgs/github_icon.svg'), icon: require('@/assets/imgs/link_icon.png'), redirect: () => {
