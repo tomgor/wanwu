@@ -178,31 +178,31 @@
 
 ------
 
-### &#x1F517; 使用的其他开源项目
+### &#x1F517; 致谢
 
-- https://github.com/modelscope/agentscope  作为元景万悟智能体平台中工作流模块的开发框架；
-- https://github.com/langchain-ai/langchain.git  作为元景万悟智能体平台中智能体的各类基础组件开发；
-- https://github.com/QwenLM/Qwen-Agent.git  作为元景万悟智能体平台中react智能体的构建；
+- [AgentScope](https://github.com/modelscope/agentscope)
+- [LangChain](https://github.com/langchain-ai/langchain)
+- [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent)
 
 ------
 
 ### &#x1F4F0; TODO LIST
 
-- 支持知识库OCR解析
-- 支持设定敏感词安全护栏
-- 应用广场支持按照应用名称进行搜索
-- 智能体公开发布为Web URL
-- 智能体直接关联MCP
-- 多模态模型接入
-- RAG出处支持显示全文
-- 推理模型支持reasonning-content
-- 支持自定义MCP Server，即可以把工作流、智能体、或者符合OpenAPI规范的API作为tools添加到MCP Server里进行发布
-- 工作流发布为API
-- 增加工作流节点类型
-- 支持工作流的导入导出
-- 支持自定义工具
-- 知识库共享
-- 支持知识库检索配置
+- [] 支持知识库OCR解析
+- [] 支持设定敏感词安全护栏
+- [] 应用广场支持按照应用名称进行搜索
+- [] 智能体公开发布为Web URL
+- [] 智能体直接关联MCP
+- [] 多模态模型接入
+- [] RAG出处支持显示全文
+- [] 推理模型支持reasonning-content
+- [] 支持自定义MCP Server，即可以把工作流、智能体、或者符合OpenAPI规范的API作为tools添加到MCP Server里进行发布
+- [] 工作流发布为API
+- [] 增加工作流节点类型
+- [] 支持工作流的导入导出
+- [] 支持自定义工具
+- [] 知识库共享
+- [] 支持知识库检索配置
 
 ------
 
