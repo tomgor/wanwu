@@ -34,7 +34,8 @@ export default {
         userInfo: '个人信息',
         org: '组织管理',
         modelAccess: '模型管理',
-        about: '关于'
+        about: '关于',
+        helpDoc: '帮助文档'
     },
     header: {
         title: '智能体平台',
@@ -106,7 +107,8 @@ export default {
             modelNameLimit: '2-50个字符',
             modelId: '支持英文、数字、下划线(_)、中划线(-)、(.)，2-50个字符，不能以下划线为开头',
             version: '支持英文、数字、(.)',
-            inferUrl: '请输入',
+            inferUrl: 'Base Url，例如：',
+            apiKey: '输入APIKey, 例如：'
         },
         select: {
             placeholder: '请选择'

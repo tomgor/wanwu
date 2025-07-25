@@ -15,11 +15,11 @@
           :key="item.key"
           @click="showCreate(item)"
         >
-          <img class="provider-card-img" :src="item.key === yuanjing ? require('@/assets/imgs/yuanjing.png') : require('@/assets/imgs/openAI.png')" alt="" />
+          <img class="provider-card-img" :src="providerImgObj[item.key]" alt="" />
           <div>
             <div class="provider-card-name">{{item.name}}</div>
             <div>
-              <span class="provider-card-tag" v-for="it in item.children" :key="it.key">{{it.name}}</span>
+              <span class="provider-card-tag" v-if="justifyShowModelType(item, it)" v-for="it in item.children" :key="it.key">{{it.name}}</span>
             </div>
           </div>
         </div>
@@ -32,18 +32,22 @@
   </div>
 </template>
 <script>
-import { PROVIDER_TYPE, YUAN_JING } from "../constants"
+import { PROVIDER_TYPE, YUAN_JING, PROVIDER_IMG_OBJ, OLLAMA, HUOSHAN } from "../constants"
 
 export default {
   data() {
     return {
       dialogVisible: false,
+      providerImgObj: PROVIDER_IMG_OBJ,
       providerType: PROVIDER_TYPE,
       currentObj: PROVIDER_TYPE[0],
       yuanjing: YUAN_JING
     }
   },
   methods: {
+    justifyShowModelType(item, it) {
+      return (([OLLAMA].includes(item.key) && it.key !== 'rerank') || ([HUOSHAN].includes(item.key) && it.key === 'llm')) || ![OLLAMA, HUOSHAN].includes(item.key)
+    },
     openDialog() {
       this.dialogVisible = true
       this.currentObj = PROVIDER_TYPE[0]

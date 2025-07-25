@@ -40,10 +40,11 @@
           </div>
         </div>-->
         <div class="nav-bottom">
-          <div>
+          <!--隐藏文档下载菜单-->
+          <!--<div>
             <img class="left-menu-width" src="@/assets/imgs/doc.png" alt="" @click="showDocDownloadDialog" />
             <DocDownloadDialog ref="docDownloadDialog" />
-          </div>
+          </div>-->
           <AboutDialog ref="aboutDialog" />
           <div style="margin-top: 15px;">
             <el-popover
@@ -246,6 +247,9 @@ export default {
           {name: this.$t('menu.setting'), path: '/permission', img: require('@/assets/imgs/setting_icon.svg'), perm: PERMS.PERMISSION}
         ],
         [
+          {name: this.$t('menu.helpDoc'), img: require('@/assets/imgs/helpDoc_icon.svg'), icon: require('@/assets/imgs/link_icon.png'), redirect: () => {
+            window.open('https://github.com/UnicomAI/wanwu/tree/main/docs/manual')
+          }},
           {name: 'Github', img: require('@/assets/imgs/github_icon.svg'), icon: require('@/assets/imgs/link_icon.png'), redirect: () => {
             window.open('https://github.com/UnicomAI/wanwu')
           }},
@@ -288,14 +292,21 @@ export default {
         replaceTitle(tab.title)
       },
       deep: true
+    },
+    permission: {
+      handler(val) {
+        // 如果没修改过密码，重新向到修改密码
+        this.redirectUserInfo()
+      },
+      deep: true
     }
   },
   computed: {
     ...mapGetters('user', ['orgInfo', 'userInfo', 'commonInfo', 'permission']),
   },
   async created() {
-    // 如果没修改过密码，重新向到修改密码
-    this.redirectUserInfo()
+    // // 如果没修改过密码，重新向到修改密码
+    // this.redirectUserInfo()
 
     // 判断是否展示左侧菜单
     this.justifyIsShowNav(this.$route.path)
@@ -333,7 +344,7 @@ export default {
       return currentOrg.name
     },
     redirectUserInfo() {
-      if (!this.permission.isUpdatePassword) {
+      if (this.permission.isUpdatePassword !== undefined && !this.permission.isUpdatePassword) {
         this.$router.push('/userInfo?showPwd=1')
         return null
       }

@@ -12,7 +12,7 @@
       <el-form :model="{...createForm}" :rules="rules" ref="createForm" label-width="110px" class="createForm form">
         <el-form-item :label="$t('modelAccess.table.modelType')" prop="modelType">
           <el-radio-group :disabled="isEdit" v-model="createForm.modelType">
-            <el-radio v-for="item in modelType" :label="item.key" :key="item.key">
+            <el-radio v-if="justifyShowModelType(item)" v-for="item in modelType" :label="item.key" :key="item.key">
               {{item.name}}
             </el-radio>
           </el-radio-group>
@@ -60,11 +60,20 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('modelAccess.table.apiKey')" prop="apiKey">
-          <el-input v-model="createForm.apiKey" :placeholder="$t('common.input.placeholder')"></el-input>
+        <el-form-item v-if="provider.key !== ollama" :label="$t('modelAccess.table.apiKey')" prop="apiKey">
+          <el-input
+            type="password"
+            v-model="createForm.apiKey"
+            :placeholder="$t('common.hint.apiKey') + typeObj.apiKey[provider.key]"
+          >
+          </el-input>
         </el-form-item>
         <el-form-item :label="$t('modelAccess.table.inferUrl')" prop="endpointUrl">
-          <el-input v-model="createForm.endpointUrl" :placeholder="$t('common.hint.inferUrl')"></el-input>
+          <el-input
+            v-model="createForm.endpointUrl"
+            :placeholder="$t('common.hint.inferUrl') + typeObj.inferUrl[provider.key]"
+          >
+          </el-input>
         </el-form-item>
         <el-form-item :label="$t('modelAccess.table.publishTime')" prop="publishDate">
           <el-date-picker
@@ -86,7 +95,16 @@
 <script>
 import { addModel, editModel } from "@/api/modelAccess"
 import { uploadAvatar } from "@/api/user"
-import { MODEL_TYPE, PROVIDER_OBJ, FUNC_CALLING, LLM, DEFAULT_CALLING } from "../constants"
+import {
+  MODEL_TYPE,
+  PROVIDER_OBJ,
+  FUNC_CALLING,
+  LLM,
+  DEFAULT_CALLING,
+  TYPE_OBJ,
+  OLLAMA,
+  HUOSHAN,
+} from "../constants"
 
 export default {
   data() {
@@ -105,7 +123,9 @@ export default {
       dialogVisible: false,
       modelType: MODEL_TYPE,
       functionCalling: FUNC_CALLING,
+      typeObj: TYPE_OBJ,
       llm: LLM,
+      ollama: OLLAMA,
       createForm: {
         model: '',
         displayName: '',
@@ -141,6 +161,9 @@ export default {
     }
   },
   methods: {
+    justifyShowModelType(item) {
+      return (([OLLAMA].includes(this.provider.key) && item.key !== 'rerank') || [HUOSHAN].includes(this.provider.key) && item.key === 'llm') || ![OLLAMA, HUOSHAN].includes(this.provider.key)
+    },
     uploadAvatar(file, key) {
       const formData = new FormData()
       const config = {headers: { "Content-Type": "multipart/form-data" }}
