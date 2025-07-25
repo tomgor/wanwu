@@ -18,7 +18,7 @@ export const PROVIDER_OBJ = {
     [YUAN_JING]: '联通元景',
     [OLLAMA]: 'Ollama',
     [QWEN]: '通义千问',
-    [HUOSHAN]: '火山引擎',
+    // [HUOSHAN]: '火山引擎',
 }
 
 export const PROVIDER_IMG_OBJ = {
