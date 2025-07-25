@@ -77,6 +77,7 @@ const Looper = function (sIndex, sentence, timer, printCB, endCB,sIndexMap) {
     this.isCodeBlock = false // 新增：标记是否为代码块
     this.codeBlockContent = '' // 新增：存储代码块内容
     this.animationFrame = null
+    this.lastTimestamp = performance.now(); // 新增：每次Looper初始化时重置
     // 在初始化时检测是否为代码块
     this.detectCodeBlock()
     this.start()
@@ -91,6 +92,7 @@ Looper.prototype = {
             this.isCodeBlock = true;
             this.codeBlockContent = match[0]; // 整个代码块内容
             this.sentence = match[0]; // 代码块内部内容（去掉```）
+            this.index = this.sentence.length; // 新增：代码块直接打印完毕
         }
     },
     start() {
@@ -100,6 +102,8 @@ Looper.prototype = {
             this.index++;
             return
         }
+
+        this.lastTimestamp = performance.now(); // 新增：每次start都重置
 
         if (this.isCodeBlock) {
             this.printCB(this.sentence);
@@ -141,7 +145,7 @@ Looper.prototype = {
 
         this.index = 0;
         const buffer = [];
-        let lastTimestamp = performance.now();
+        // let lastTimestamp = performance.now(); // 移除局部变量，改用实例属性
         const baseSpeed = 40; // 基础速度
         const maxSpeed = 120; // 最大速度
         const bufferThreshold = 8; // 缓冲阈值
@@ -156,7 +160,7 @@ Looper.prototype = {
             }
 
             // 动态计算应打印的字符数
-            const elapsed = timestamp - lastTimestamp;
+            const elapsed = timestamp - this.lastTimestamp;
             const progress = this.index / this.sentence.length;
             const currentSpeed = baseSpeed + (maxSpeed - baseSpeed) * Math.min(progress / 0.3, 1);
             const targetChars = Math.ceil(elapsed * currentSpeed / 1000);
@@ -165,12 +169,11 @@ Looper.prototype = {
             const endIdx = Math.min(this.index + targetChars, this.sentence.length);
             for (; this.index < endIdx; this.index++) {
                 buffer.push(this.sentence[this.index]);
-                
                 // 达到缓冲阈值时更新DOM
                 if (buffer.length >= bufferThreshold) {
                     this.printCB(buffer.join(''));
                     buffer.length = 0;
-                    lastTimestamp = performance.now(); // 重置计时
+                    this.lastTimestamp = performance.now(); // 只在实际打印时重置
                     break; // 跳出循环，等待下一帧
                 }
             }

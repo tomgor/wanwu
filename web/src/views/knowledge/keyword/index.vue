@@ -137,7 +137,7 @@ export default {
       this.$router.push({path:'/knowledge'})
     },
     handleSearch(val){
-      this.docQuery.name = val.value;
+      this.docQuery.name = val;
       this.getTableData(this.docQuery)
     },
     handleDel(data){
