@@ -126,6 +126,16 @@ func WithName(name string) SQLOption {
 	})
 }
 
+func WithNameOrAliasLike(name string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if len(name) > 0 {
+			// 使用 OR 条件组合模糊查询
+			return db.Where("name LIKE ? OR alias LIKE ?", "%"+name+"%", "%"+name+"%")
+		}
+		return db
+	})
+}
+
 func WithFilePathMd5(filePathMd5 string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		if len(filePathMd5) > 0 {

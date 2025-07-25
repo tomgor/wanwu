@@ -2,6 +2,7 @@ package mp_common
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/UnicomAI/wanwu/pkg/log"
 )
@@ -12,20 +13,27 @@ type RerankReq struct {
 	Documents       []string `json:"documents" validate:"required"`
 	Model           string   `json:"model" validate:"required"`
 	Query           string   `json:"query" validate:"required"`
-	ReturnDocuments *bool    `json:"return_documents"`
-	TopN            *int     `json:"top_n" validate:"gte=0"`
+	ReturnDocuments *bool    `json:"return_documents,omitempty"`
+	TopN            *int     `json:"top_n,omitempty"`
 }
 
-func (req *RerankReq) Check() error { return nil }
+func (req *RerankReq) Check() error {
+	if req.TopN != nil && *req.TopN < 0 {
+		return fmt.Errorf("top_n must greater than 0")
+	}
+	return nil
+}
 
 // --- openapi response ---
 
 type RerankResp struct {
-	Results []Result `json:"results"`
-	Model   string   `json:"model"`
-	Object  string   `json:"object"`
-	Usage   Usage    `json:"usage"`
+	Results   []Result `json:"results"`
+	Model     string   `json:"model"`
+	Object    *string  `json:"object,omitempty"`
+	Usage     Usage    `json:"usage"`
+	RequestId *string  `json:"request_id,omitempty"`
 }
+
 type Result struct {
 	Index          int       `json:"index"`
 	Document       *Document `json:"document,omitempty"`

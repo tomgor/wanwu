@@ -6,7 +6,10 @@ import (
 	"fmt"
 
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
+	mp_huoshan "github.com/UnicomAI/wanwu/pkg/model-provider/mp-huoshan"
+	mp_ollama "github.com/UnicomAI/wanwu/pkg/model-provider/mp-ollama"
 	mp_openai_compatible "github.com/UnicomAI/wanwu/pkg/model-provider/mp-openai-compatible"
+	mp_qwen "github.com/UnicomAI/wanwu/pkg/model-provider/mp-qwen"
 	mp_yuanjing "github.com/UnicomAI/wanwu/pkg/model-provider/mp-yuanjing"
 )
 
@@ -41,7 +44,7 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 		case ModelTypeEmbedding:
 			ret = &mp_openai_compatible.Embedding{}
 		default:
-			return nil, fmt.Errorf("invalid model type: %v", modelType)
+			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
 		}
 	case ProviderYuanJing:
 		switch modelType {
@@ -52,7 +55,36 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 		case ModelTypeEmbedding:
 			ret = &mp_yuanjing.Embedding{}
 		default:
-			return nil, fmt.Errorf("invalid model type: %v", modelType)
+			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
+		}
+	case ProviderHuoshan:
+		switch modelType {
+		case ModelTypeLLM:
+			ret = &mp_huoshan.LLM{}
+		case ModelTypeEmbedding:
+			ret = &mp_huoshan.Embedding{}
+		default:
+			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
+		}
+	case ProviderQwen:
+		switch modelType {
+		case ModelTypeLLM:
+			ret = &mp_qwen.LLM{}
+		case ModelTypeRerank:
+			ret = &mp_qwen.Rerank{}
+		case ModelTypeEmbedding:
+			ret = &mp_qwen.Embedding{}
+		default:
+			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
+		}
+	case ProviderOllama:
+		switch modelType {
+		case ModelTypeLLM:
+			ret = &mp_ollama.LLM{}
+		case ModelTypeEmbedding:
+			ret = &mp_ollama.Embedding{}
+		default:
+			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
 		}
 	default:
 		return nil, fmt.Errorf("invalid provider: %v", modelType)
@@ -67,6 +99,9 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 type ProviderModelConfig struct {
 	ProviderYuanJing         ProviderModelByYuanjing         `json:"providerYuanJing"`
 	ProviderOpenAICompatible ProviderModelByOpenAICompatible `json:"providerOpenAICompatible"`
+	ProviderHuoshan          ProviderModelByHuoshan          `json:"providerHuoshan"`
+	ProviderQwen             ProviderModelByQwen             `json:"providerQwen"`
+	ProviderOllama           ProviderModelByOllama           `json:"providerOllama"`
 }
 
 type ProviderModelByOpenAICompatible struct {
@@ -79,4 +114,20 @@ type ProviderModelByYuanjing struct {
 	Llm       mp_yuanjing.LLM       `json:"llm"`
 	Rerank    mp_yuanjing.Rerank    `json:"rerank"`
 	Embedding mp_yuanjing.Embedding `json:"embedding"`
+}
+
+type ProviderModelByHuoshan struct {
+	Llm       mp_huoshan.LLM       `json:"llm"`
+	Embedding mp_huoshan.Embedding `json:"embedding"`
+}
+
+type ProviderModelByQwen struct {
+	Llm       mp_qwen.LLM       `json:"llm"`
+	Rerank    mp_qwen.Rerank    `json:"rerank"`
+	Embedding mp_qwen.Embedding `json:"embedding"`
+}
+
+type ProviderModelByOllama struct {
+	Llm       mp_ollama.LLM       `json:"llm"`
+	Embedding mp_ollama.Embedding `json:"embedding"`
 }

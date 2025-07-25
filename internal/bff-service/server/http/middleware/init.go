@@ -30,9 +30,6 @@ func Init() {
 	// --- knowledge ---
 	mid.NewSub("knowledge", "知识库", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
 
-	// permission.user
-	mid.Sub("knowledge").NewSub("tag", "知识库标签", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
-
 	// --- mcp ---
 	mid.NewSub("mcp", "MCP广场", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
 

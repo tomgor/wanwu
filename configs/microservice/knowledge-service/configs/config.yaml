@@ -102,6 +102,7 @@ rag-server:
   doc-delete-uri: '/rag/del-knowledge-file'
   doc-url-analysis-uri: '/url_pra'
   doc-url-import-uri: '/url_insert'
+  keywords-uri: '/rag/proper_noun'
   timeout: 60
 
 usage-limit:
