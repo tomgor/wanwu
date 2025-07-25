@@ -162,7 +162,7 @@ export default {
   },
   methods: {
     justifyShowModelType(item) {
-      return ([OLLAMA, HUOSHAN].includes(this.provider.key) && item.key !== 'rerank') || ![OLLAMA, HUOSHAN].includes(this.provider.key)
+      return (([OLLAMA].includes(this.provider.key) && item.key !== 'rerank') || [HUOSHAN].includes(this.provider.key) && item.key === 'llm') || ![OLLAMA, HUOSHAN].includes(this.provider.key)
     },
     uploadAvatar(file, key) {
       const formData = new FormData()

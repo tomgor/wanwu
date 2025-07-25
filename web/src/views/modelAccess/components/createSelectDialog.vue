@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     justifyShowModelType(item, it) {
-      return ([OLLAMA, HUOSHAN].includes(item.key) && it.key !== 'rerank') || ![OLLAMA, HUOSHAN].includes(item.key)
+      return (([OLLAMA].includes(item.key) && it.key !== 'rerank') || ([HUOSHAN].includes(item.key) && it.key === 'llm')) || ![OLLAMA, HUOSHAN].includes(item.key)
     },
     openDialog() {
       this.dialogVisible = true
