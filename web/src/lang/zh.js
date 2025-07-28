@@ -35,7 +35,8 @@ export default {
         userInfo: '个人信息',
         org: '组织管理',
         modelAccess: '模型管理',
-        about: '关于'
+        about: '关于',
+        helpDoc: '帮助文档'
     },
     header: {
         title: '智能体平台',
