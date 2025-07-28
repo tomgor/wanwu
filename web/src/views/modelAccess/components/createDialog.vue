@@ -12,7 +12,7 @@
       <el-form :model="{...createForm}" :rules="rules" ref="createForm" label-width="110px" class="createForm form">
         <el-form-item :label="$t('modelAccess.table.modelType')" prop="modelType">
           <el-radio-group :disabled="isEdit" v-model="createForm.modelType">
-            <el-radio v-if="justifyShowModelType(item)" v-for="item in modelType" :label="item.key" :key="item.key">
+            <el-radio v-for="item in modelType" :label="item.key" :key="item.key">
               {{item.name}}
             </el-radio>
           </el-radio-group>
@@ -103,7 +103,6 @@ import {
   DEFAULT_CALLING,
   TYPE_OBJ,
   OLLAMA,
-  HUOSHAN,
 } from "../constants"
 
 export default {
@@ -161,9 +160,6 @@ export default {
     }
   },
   methods: {
-    justifyShowModelType(item) {
-      return (([OLLAMA].includes(this.provider.key) && item.key !== 'rerank') || [HUOSHAN].includes(this.provider.key) && item.key === 'llm') || ![OLLAMA, HUOSHAN].includes(this.provider.key)
-    },
     uploadAvatar(file, key) {
       const formData = new FormData()
       const config = {headers: { "Content-Type": "multipart/form-data" }}

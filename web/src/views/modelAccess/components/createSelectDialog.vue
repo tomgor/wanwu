@@ -19,7 +19,7 @@
           <div>
             <div class="provider-card-name">{{item.name}}</div>
             <div>
-              <span class="provider-card-tag" v-if="justifyShowModelType(item, it)" v-for="it in item.children" :key="it.key">{{it.name}}</span>
+              <span class="provider-card-tag" v-for="it in item.children" :key="it.key">{{it.name}}</span>
             </div>
           </div>
         </div>
@@ -32,7 +32,7 @@
   </div>
 </template>
 <script>
-import { PROVIDER_TYPE, YUAN_JING, PROVIDER_IMG_OBJ, OLLAMA, HUOSHAN } from "../constants"
+import { PROVIDER_TYPE, YUAN_JING, PROVIDER_IMG_OBJ } from "../constants"
 
 export default {
   data() {
@@ -45,9 +45,6 @@ export default {
     }
   },
   methods: {
-    justifyShowModelType(item, it) {
-      return (([OLLAMA].includes(item.key) && it.key !== 'rerank') || ([HUOSHAN].includes(item.key) && it.key === 'llm')) || ![OLLAMA, HUOSHAN].includes(item.key)
-    },
     openDialog() {
       this.dialogVisible = true
       this.currentObj = PROVIDER_TYPE[0]
