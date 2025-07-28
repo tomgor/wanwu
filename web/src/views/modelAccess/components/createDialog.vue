@@ -96,7 +96,7 @@
 import { addModel, editModel } from "@/api/modelAccess"
 import { uploadAvatar } from "@/api/user"
 import {
-  MODEL_TYPE,
+  PROVIDER_TYPE,
   PROVIDER_OBJ,
   FUNC_CALLING,
   LLM,
@@ -120,7 +120,7 @@ export default {
       basePath: this.$basePath,
       defaultLogo: require("@/assets/imgs/bg-logo.png"),
       dialogVisible: false,
-      modelType: MODEL_TYPE,
+      modelType: [],
       functionCalling: FUNC_CALLING,
       typeObj: TYPE_OBJ,
       llm: LLM,
@@ -184,10 +184,11 @@ export default {
     },
     openDialog(title, row){
       this.provider = {key: title, name: PROVIDER_OBJ[title]}
+      const currentProvider = PROVIDER_TYPE.find(item => item.key === title) || {}
+      this.modelType = currentProvider.children || []
       this.dialogVisible = true
 
       this.isEdit = Boolean(row)
-      console.log(row, title, '-----------------row')
       if (this.isEdit) {
         this.row = row || {}
         this.formatValue(row)
