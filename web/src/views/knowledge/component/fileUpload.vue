@@ -148,7 +148,7 @@
             >
             <el-checkbox-group v-model="ruleForm.docAnalyzer">
                 <el-checkbox label="text" disabled>文本提取</el-checkbox>
-                <!-- <el-checkbox label="ocr">启用ocr解析</el-checkbox> -->
+                <el-checkbox label="ocr">启用ocr解析</el-checkbox>
             </el-checkbox-group>
             </el-form-item>
           </el-form>

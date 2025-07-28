@@ -21,6 +21,7 @@ export default {
         explore: '应用广场',
         workspace: '工作室',
         mcp: 'MCP广场',
+        safetyGuard:'安全护栏',
         app: {
             index: '应用空间',
             all: '全部',
