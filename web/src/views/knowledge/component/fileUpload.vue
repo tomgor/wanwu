@@ -223,7 +223,7 @@ export default {
       fileUrl:'',
       docInfoList:[],
       ruleForm:{
-        docAnalyzer:['text'],
+        docAnalyzer:['text','ocr'],
         docSegment:{
           segmentType:'0',
           splitter:["！","。","？","?","!",".","......"],
