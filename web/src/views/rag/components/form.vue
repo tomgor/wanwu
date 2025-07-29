@@ -124,6 +124,21 @@
             </div>
           </div>
         </div>
+        <div class="block prompt-box safety-box">
+            <p class="block-title tool-title">
+            <span>
+              安全护栏配置
+              <el-tooltip class="item" effect="dark" content="实时拦截高风险内容的输入和输出，保障内容安全合规。" placement="top">
+                  <span class="el-icon-question question-tips"></span>
+              </el-tooltip>
+            </span>
+            <span class="common-add">
+              <span class="el-icon-s-operation"></span>
+              <span class="handleBtn" style="margin-right:10px;" @click="showSafety">配置</span>
+              <el-switch v-model="editForm.safetyConfig.enable"></el-switch>
+            </span>
+          </p>
+        </div>
       </div>
       <div class="drawer-test">
         <Chat :chatType="'test'" :editForm="editForm"/>
@@ -137,6 +152,7 @@
     <knowledgeSet @setKnowledgeSet="setKnowledgeSet" ref="knowledgeSetDialog" :knowledgeConfig="editForm.knowledgeConfig" />
     <!-- apikey -->
     <ApiKeyDialog ref="apiKeyDialog" :appId="editForm.appId" :appType="'rag'" />
+    <setSafety ref="setSafety" @sendSafety="sendSafety" />
   </div>
 </template>
 
@@ -147,6 +163,7 @@ import CreateTxtQues from "@/components/createApp/createRag.vue"
 import ModelSet from "./modelSetDialog.vue";
 import knowledgeSet from "./knowledgeSetDialog.vue"
 import ApiKeyDialog from "./ApiKeyDialog";
+import setSafety from "@/components/setSafety";
 import { getRerankList,selectModelList } from "@/api/modelAccess";
 import { getRagInfo,updateRagConfig } from "@/api/rag";
 import Chat from "./chat";
@@ -156,10 +173,12 @@ export default {
     CreateTxtQues,
     ModelSet,
     knowledgeSet,
-    ApiKeyDialog
+    ApiKeyDialog,
+    setSafety
   },
   data() {
     return {
+      switchValue:'',
       rerankOptions:[],
       showOperation:false,
       scope:'public',
@@ -186,6 +205,10 @@ export default {
           maxHistoryEnable:true,
           thresholdEnable:true,
           topKEnable:true
+        },
+        safetyConfig:{
+          enable: false,
+          tables:[]
         }
       },
       initialEditForm:null,
@@ -217,7 +240,7 @@ export default {
         clearTimeout(this.debounceTimer)
       }
       this.debounceTimer = setTimeout(() =>{
-          const props = ['modelParams', 'modelConfig', 'rerankParams', 'knowledgeBaseIds', 'knowledgeConfig'];
+          const props = ['modelParams', 'modelConfig', 'rerankParams', 'knowledgeBaseIds', 'knowledgeConfig','safetyConfig'];
           const changed = props.some(prop => {
           return JSON.stringify(newVal[prop]) !== JSON.stringify(
               (this.initialEditForm || {})[prop]
@@ -249,6 +272,12 @@ export default {
     }
   },
   methods: {
+    sendSafety(data){
+      this.editForm.safetyConfig.tables = data;
+    },
+    showSafety(){
+      this.$refs.setSafety.showDialog(this.editForm.safetyConfig.tables);
+    },
     goBack(){
       this.$router.go(-1);
     },
@@ -259,6 +288,9 @@ export default {
             this.editForm.name = res.data.name;
             this.editForm.desc = res.data.desc;
             this.editForm.modelParams = res.data.modelConfig.modelId;
+            if(res.data.safetyConfig && res.data.safetyConfig !== null){
+              this.editForm.safetyConfig = res.data.safetyConfig;
+            }
             if(res.data.modelConfig.config !== null){
               this.editForm.modelConfig = res.data.modelConfig.config;
             }
@@ -519,6 +551,26 @@ export default {
     margin-bottom:10px;
     .block{
       margin-bottom:10px;
+    }
+  }
+  .safety-box{
+    background:#F7F8FA;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+    border-radius:8px;
+    padding:10px 15px;
+    margin-top:14px;
+    .block-title{
+      line-height: 30px;
+      font-size: 15px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      .handleBtn{
+        cursor: pointer;
+      }
+    }
+    .tool-title{
+      justify-content: space-between;
     }
   }
   .common-set{

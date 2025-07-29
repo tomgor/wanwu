@@ -56,6 +56,14 @@
                   </template>
                 </el-table-column>
               </el-table>
+               <!-- 分页 -->
+              <Pagination
+                class="pagination table-pagination"
+                ref="pagination"
+                :listApi="listApi"
+                :page_size="10"
+                @refreshData="refreshData"
+              />
             </el-main>
           </el-container>
         </el-main>
@@ -67,17 +75,20 @@
 </template>
 
 <script>
+import Pagination from "@/components/pagination.vue";
 import createWord from './createWord.vue';
 import setReply from './setReply.vue';
 import {getSensitiveWord,delSensitiveWord} from "@/api/safety";
 export default {
-  components:{createWord,setReply},
+  components:{createWord,setReply,Pagination},
   data() {
     return {
       loading:false,
       tableLoading:false,
       docQuery: {
         tableId:this.$route.params.id,
+        page:1,
+        pageSize:10
       },
       fileList: [],
       listApi: getSensitiveWord,

@@ -231,6 +231,33 @@
             </div>
           </div>
         </div>
+         <div class="block prompt-box link-box">
+          <p class="block-title tool-title">
+            <span>
+              安全护栏配置
+              <el-tooltip class="item" effect="dark" content="实时拦截高风险内容的输入和输出，保障内容安全合规。" placement="top">
+                  <span class="el-icon-question question-tips"></span>
+              </el-tooltip>
+            </span>
+            <span class="common-add">
+              <span class="el-icon-s-operation"></span>
+              <span class="handleBtn" style="margin-right:10px;" @click="showSafety">配置</span>
+              <el-switch v-model="switchValue"></el-switch>
+            </span>
+          </p>
+          <!-- <div class="rl">
+            <div class="block-link" style="width:50%;">
+              <span class="link-text">
+                <img :src="require('@/assets/imgs/bocha.png')" style="width:20px;margin-right:8px;" />
+                <span>博查</span>
+              </span>
+              <span>
+                <span class="el-icon-s-operation link-operation" @click="showLinkDiglog"></span>
+                <el-switch v-model="editForm.onlineSearchConfig.enable"></el-switch>
+              </span>
+            </div>
+          </div> -->
+        </div>
       </div>
       <div  class="actionConfig" v-if="showActionConfig">
         <ActionConfig @closeAction="closeAction" :assistantId="this.editForm.assistantId" />
@@ -292,6 +319,7 @@
     <ToolDiaglog ref="toolDiaglog" @selectTool="selectTool" />
     <!-- 联网检索 -->
     <LinkDialog ref="linkDialog" @setLinkSet="setLinkSet" :linkform="editForm.onlineSearchConfig" />
+    <setSafety ref="setSafety" @sendSafety="sendSafety" />
   </div>
 </template>
 
@@ -301,6 +329,7 @@ import { store } from "@/store/index";
 import { mapGetters } from "vuex";
 import { getKnowledgeList } from "@/api/knowledge";
 import CreateIntelligent from "@/components/createApp/createIntelligent";
+import setSafety from "@/components/setSafety";
 import ModelSet from "./modelSetDialog";
 import ApiKeyDialog from "./ApiKeyDialog";
 import { selectModelList,getRerankList} from "@/api/modelAccess";
@@ -319,7 +348,8 @@ export default {
     ActionConfig,
     ApiKeyDialog,
     ToolDiaglog,
-    LinkDialog
+    LinkDialog,
+    setSafety
   },
   watch: {
     editForm: {
@@ -351,6 +381,7 @@ export default {
   },
   data() {
     return {
+      switchValue:false,
       showOperation:false,
       appId:'',
       scope:'public',
@@ -437,6 +468,12 @@ export default {
     store.dispatch("app/initState");
   },
   methods: {
+    showSafety(){
+      this.$refs.setSafety.showDialog();
+    },
+    sendSafety(data){
+      console.log(data)
+    },
     actionSwitch(id){
       enableAction({actionId:id}).then(res =>{
         if(res.code === 0){
@@ -973,6 +1010,9 @@ export default {
         color: #999;
         margin-left: 20px;
         font-weight: normal;
+      }
+      .question-tips{
+        margin-left:5px;
       }
     }
     .block-link{

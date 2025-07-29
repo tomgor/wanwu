@@ -33,28 +33,6 @@
           :inline="false"
           class="test_form"
         >
-          <!-- <el-form-item
-            label="选择知识库"
-            class="vertical-form-item"
-          >
-            <el-select
-              v-model="formInline.knowledgeIdList"
-              placeholder="请选择"
-              multiple
-              clearable
-              filterable 
-              style="width:100%;"
-              @visible-change="visibleChange($event,'knowledge')"
-            >
-              <el-option
-                v-for="item in knowledgeOptions"
-                :key="item.knowledgeId"
-                :label="item.name"
-                :value="item.knowledgeId"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item> -->
           <el-form-item
             label="Rerank模型"
             class="vertical-form-item"
@@ -76,6 +54,12 @@
               >
               </el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item
+            label="检索方式配置"
+            class="vertical-form-item"
+          >
+          <div>123</div>
           </el-form-item>
         </el-form>
       </div>
@@ -140,6 +124,36 @@ export default {
       resultLoading: false,
       searchList: [],
       score: [],
+      searchTypeData:[
+        {
+          name:'向量检索',
+          value:'',
+          desc:'向量检索解释',
+          rerank:'',
+          topK:'',
+          Score:'',
+          isWeight:false
+        },
+        {
+          name:'全文检索',
+          value:'',
+          desc:'全文检索解释',
+          rerank:'',
+          topK:'',
+          Score:'',
+          isWeight:false
+        },
+        {
+          name:'混合检索',
+          value:'',
+          desc:'混合检索解释',
+          rerank:'',
+          topK:'',
+          Score:'',
+          isWeight:true,
+          Weight:''
+        }
+      ]
     };
   },
   created() {
