@@ -98,18 +98,17 @@ export default {
             this.$refs.ruleForm.clearValidate()
         },
         submitForm(formName){
-            this.$router.push({path:`/safety/wordList/1`});
-            // this.$refs[formName].validate((valid) =>{
-            //     if(valid){
-            //         if(this.tableId !== ''){
-            //           this.editSensitive()
-            //         }else{
-            //           this.createSensitive()
-            //         }
-            //     }else{
-            //         return false;
-            //     }
-            // })
+            this.$refs[formName].validate((valid) =>{
+                if(valid){
+                    if(this.tableId !== ''){
+                      this.editSensitive()
+                    }else{
+                      this.createSensitive()
+                    }
+                }else{
+                    return false;
+                }
+            })
         },
         createSensitive(){
             createSensitive(this.ruleForm).then(res =>{

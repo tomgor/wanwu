@@ -34,32 +34,92 @@
           class="test_form"
         >
           <el-form-item
-            label="Rerank模型"
-            class="vertical-form-item"
-          >
-            <el-select
-              clearable
-              filterable 
-              style="width:100%;"
-              loading-text="模型加载中..."
-              v-model="formInline.rerankModelId"
-              @visible-change="visibleChange($event,'rerank')"
-              placeholder="请选择"
-            >
-              <el-option
-                v-for="item in rerankOptions"
-                :key="item.modelId"
-                :label="item.displayName"
-                :value="item.modelId"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item
             label="检索方式配置"
             class="vertical-form-item"
           >
-          <div>123</div>
+          <div v-for="item in searchTypeData" :class="['searchType-list',{ 'active': item.showContent }]" @click="clickSearch(item)">
+            <div class="searchType-title">
+              <span class="el-icon-menu img"></span>
+              <div class="title-content">
+                <div class="title-box">
+                  <h3 class="title-name">{{item.name}}</h3>
+                  <p class="title-desc">{{item.desc}}</p>
+                </div>
+                <span :class="item.showContent?'el-icon-arrow-up':'el-icon-arrow-down'"></span>
+              </div>
+            </div>
+            <div class="searchType-content" v-if="item.showContent">
+              <div v-if="item.isWeight" class="weightType-box">
+                <div v-for="mixItem in item.mixType" class="weightType">
+                  <p class="weightType-name">{{mixItem.name}}</p>
+                  <p class="weightType-desc">{{mixItem.desc}}</p>
+                </div>
+              </div>
+              <el-slider
+                v-if="item.isWeight && item.mixTypeValue === 'weight'"
+                v-model="item.mixTypeValue"
+                range
+                show-stops
+                :max="1">
+              </el-slider>
+              <el-row>
+                <el-col class="content-name">Rerank模型</el-col>
+                <el-col>
+                  <el-select
+                  clearable
+                  filterable 
+                  style="width:100%;"
+                  loading-text="模型加载中..."
+                  v-model="formInline.knowledgeMatchParams.rerankModelId"
+                  @visible-change="visibleChange($event,'rerank')"
+                  placeholder="请选择"
+                >
+                  <el-option
+                    v-for="item in rerankOptions"
+                    :key="item.modelId"
+                    :label="item.displayName"
+                    :value="item.modelId"
+                  >
+                  </el-option>
+                  </el-select>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col>
+                  <span class="content-name">TopK</span>
+                  <el-tooltip class="item" effect="dark" content="用于控制检索阶段返回的最相关的文档片段的数量。这些文档片段将被送入生成模型中，用于 生成最终的回答。" placement="right">
+                    <span class="el-icon-question tips"></span>
+                  </el-tooltip>
+                </el-col>
+                <el-col>
+                  <el-slider
+                    min="1"
+                    max="10"
+                    step="1"
+                    v-model="formInline.topK"
+                    show-input>
+                  </el-slider>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col>
+                  <span class="content-name">Score阈值</span>
+                   <el-tooltip class="item" effect="dark" content="检索结果的相似度阈值，低于该值的结果将被过滤。" placement="right">
+                      <span class="el-icon-question tips"></span>
+                   </el-tooltip>
+                </el-col>
+                <el-col>
+                  <el-slider
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    v-model="formInline.score"
+                    show-input>
+                  </el-slider>
+                </el-col>
+              </el-row>
+            </div>
+          </div>
           </el-form-item>
         </el-form>
       </div>
@@ -114,11 +174,18 @@ export default {
   data() {
     return {
       md: md,
-      knowledgeOptions: [],
       rerankOptions: [],
       formInline: {
         knowledgeIdList: [this.$route.query.knowledgeId],
-        rerankModelId: "",
+        knowledgeMatchParams:{
+          keywordPriority:0,//关键词权重
+          matchType:'',//vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+          priorityMatch:'',//权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+          rerankModelId:'',//rerank模型id
+          score:0,//过滤分数阈值
+          semanticsPriority:0,//语义权重
+          topK:0//topK 获取最高的几行
+        }
       },
       question: "",
       resultLoading: false,
@@ -127,48 +194,61 @@ export default {
       searchTypeData:[
         {
           name:'向量检索',
-          value:'',
-          desc:'向量检索解释',
+          value:'vector',
+          desc:'通过向量相似度找到语义相近、表达多样的文本片段，适用于理解和召回语义相关信息。',
           rerank:'',
           topK:'',
           Score:'',
-          isWeight:false
+          isWeight:false,
+          showContent:false
         },
         {
           name:'全文检索',
-          value:'',
-          desc:'全文检索解释',
+          value:'text',
+          desc:'基于关键词匹配，能够高效查询包含指定词汇的文本片段，适用于精确查找',
           rerank:'',
           topK:'',
           Score:'',
-          isWeight:false
+          isWeight:false,
+          showContent:false
         },
         {
           name:'混合检索',
-          value:'',
-          desc:'混合检索解释',
+          value:'mix',
+          desc:'结合向量和关键词检索，融合语义理解与关键词匹配，兼顾相关性和准确性，提升检索效果。',
           rerank:'',
           topK:'',
           Score:'',
           isWeight:true,
-          Weight:''
+          Weight:'',
+          mixTypeValue:'weight',
+          showContent:false,
+          mixTypeRange:[0,1],
+          mixType:[
+            {
+              name:'权重设置',
+              value:'weight',
+              desc:'权重设置功能用于调整不同检索方式的影响力。通过设置权重，可以控制语义相似度和关键词匹配在最终排序中的占比。'
+            },
+            {
+              name:'Rerank模型',
+              value:'rerank',
+              desc:'重排序模型会根据候选文档与用户问题的语义匹配度，对初步检索结果进行重新排序从而进一步提升最终返回结果的相关性和准确性。'
+            }
+            ]
         }
       ]
     };
   },
   created() {
-    // this.getKnowledgeList();
     this.getRerankData();
   },
   methods: {
-    async getKnowledgeList() {
-      //获取文档知识分类
-      const res = await getKnowledgeList({});
-      if (res.code === 0) {
-        this.knowledgeOptions = res.data.knowledgeList || [];
-      } else {
-        this.$message.error(res.message);
-      }
+    clickSearch(n){
+      this.searchTypeData = this.searchTypeData.map(item => ({
+        ...item,
+        showContent: item.value === n.value ? !item.showContent : false
+      }));
     },
     getRerankData() {
       getRerankList().then((res) => {
@@ -248,6 +328,9 @@ export default {
     width: 100%;
   }
 }
+.active{
+  border:1px solid #384bf7!important;
+}
 .full-content {
   display: flex;
   flex-direction: column;
@@ -287,6 +370,68 @@ export default {
         background: #fff;
         border-radius: 6px;
         border: 1px solid #e9ecef;
+        .searchType-list:hover{
+          border:1px solid #384bf7;
+          // background:#ECEEFE;
+        }
+        .searchType-list{
+          border:1px solid #C0C4CC;
+          border-radius:4px;
+          margin:20px 0;
+          padding:0 10px;
+          cursor: pointer;
+          .searchType-title{
+            display:flex;
+            align-items: center;
+            .img{
+              font-size:18px;
+            }
+            .title-content{
+              flex:1;
+              display:flex;
+              margin-left:10px;
+              justify-content:space-between;
+              align-items:center;
+              .title-name{
+                font-size: 16px;
+                font-weight: bold;
+                line-height: 1;
+                padding-top:10px;
+              }
+              .title-desc{
+                color:#888;
+              }
+            }
+          }
+          .searchType-content{
+            padding:20px;
+            .tips{
+              color:#888;
+              margin-left:5px;
+            }
+            .content-name{
+              font-weight:bold;
+            }
+            .weightType-box{
+              display:flex;
+              gap: 20px;
+              .weightType{
+                border:1px solid #C0C4CC;
+                border-radius:4px;
+                .weightType-name{
+                  text-align:center;
+                  font-weight:bold;
+                  line-height: 2;
+                }
+                .weightType-desc{
+                  text-align:center;
+                  line-height:1.5;
+                  padding: 10px;
+                }
+              }
+            }
+          }
+        }
       }
     }
     .test-right {
