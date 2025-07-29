@@ -9,6 +9,7 @@ type RagInfo struct {
 	ModelConfig         AppModelConfig      `gorm:"embedded;embeddedPrefix:model_"`
 	RerankConfig        AppModelConfig      `gorm:"embedded;embeddedPrefix:rerank_"`
 	KnowledgeBaseConfig KnowledgeBaseConfig `gorm:"embedded;embeddedPrefix:kb_"`
+	SensitiveConfig     SensitiveConfig     `gorm:"embedded;embeddedPrefix:sensitive_"`
 	PublicModel
 }
 
@@ -34,6 +35,11 @@ type KnowledgeBaseConfig struct {
 	ThresholdEnable  bool    `json:"thresholdEnable" gorm:"column:threshold_enable;type:tinyint(1);comment:是否启用阈值"`
 	TopK             int64   `json:"topK" gorm:"column:top_k;type:bigint(20);comment:TopK"`
 	TopKEnable       bool    `json:"topKEnable" gorm:"column:top_k_enable;type:tinyint(1);comment:是否启用TopK"`
+}
+
+type SensitiveConfig struct {
+	Enable   bool   `json:"enable" gorm:"column:enable;type:tinyint(1);comment:是否启用安全护栏"`
+	TableIds string `json:"tableIds" gorm:"column:table_ids;type:text;comment:敏感词表ID列表"`
 }
 
 type PublicModel struct {
