@@ -42,6 +42,10 @@ func UpdateRagConfig(ctx *gin.Context, req request.RagConfig) error {
 	if err != nil {
 		return err
 	}
+	var sensitiveTableIds []string
+	for _, v := range req.SafetyConfig.Tables {
+		sensitiveTableIds = append(sensitiveTableIds, v.TableId)
+	}
 	_, err = rag.UpdateRagConfig(ctx.Request.Context(), &rag_service.UpdateRagConfigReq{
 		RagId:        req.RagID,
 		ModelConfig:  modelConfig,
@@ -54,6 +58,10 @@ func UpdateRagConfig(ctx *gin.Context, req request.RagConfig) error {
 			ThresholdEnable:  req.KnowledgeBaseConfig.Config.ThresholdEnable,
 			TopK:             req.KnowledgeBaseConfig.Config.TopK,
 			TopKEnable:       req.KnowledgeBaseConfig.Config.TopKEnable,
+		},
+		SensitiveConfig: &rag_service.RagSensitiveConfig{
+			Enable:   req.SafetyConfig.Enable,
+			TableIds: sensitiveTableIds,
 		},
 	})
 	return err
@@ -100,6 +108,14 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 			KnowledgeId: resp.KnowledgeBaseConfig.KnowledgeBaseId,
 		})
 	}
+	var sensitiveTableList []request.SensitiveTable
+	if resp.SensitiveConfig.TableIds != nil {
+		for _, tableId := range resp.SensitiveConfig.TableIds {
+			sensitiveTableList = append(sensitiveTableList, request.SensitiveTable{
+				TableId: tableId,
+			})
+		}
+	}
 	ragInfo = &response.RagInfo{
 		RagID:          resp.RagId,
 		AppBriefConfig: appBriefConfigProto2Model(ctx, resp.BriefConfig),
@@ -114,6 +130,10 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 				TopK:             resp.KnowledgeBaseConfig.TopK,
 				TopKEnable:       resp.KnowledgeBaseConfig.TopKEnable,
 			},
+		},
+		SafetyConfig: request.AppSafetyConfig{
+			Enable: resp.SensitiveConfig.Enable,
+			Tables: sensitiveTableList,
 		},
 	}
 	if knowledgeInfo != nil {

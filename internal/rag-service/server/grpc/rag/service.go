@@ -2,6 +2,7 @@ package rag
 
 import (
 	"context"
+	"encoding/json"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
@@ -107,6 +108,14 @@ func (s *Service) UpdateRag(ctx context.Context, in *rag_service.UpdateRagReq) (
 }
 
 func (s *Service) UpdateRagConfig(ctx context.Context, in *rag_service.UpdateRagConfigReq) (*emptypb.Empty, error) {
+	var sensitiveIds string
+	if in.SensitiveConfig.TableIds != nil {
+		sensitiveIdBytes, err := json.Marshal(in.SensitiveConfig.TableIds)
+		if err != nil {
+			return nil, grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_update_err", "marshal err:", err.Error())
+		}
+		sensitiveIds = string(sensitiveIdBytes)
+	}
 	if err := s.cli.UpdateRagConfig(ctx, &model.RagInfo{
 		RagID: in.RagId,
 		ModelConfig: model.AppModelConfig{
@@ -131,6 +140,10 @@ func (s *Service) UpdateRagConfig(ctx context.Context, in *rag_service.UpdateRag
 			ThresholdEnable:  in.KnowledgeBaseConfig.ThresholdEnable,
 			TopK:             int64(in.KnowledgeBaseConfig.TopK),
 			TopKEnable:       in.KnowledgeBaseConfig.TopKEnable,
+		},
+		SensitiveConfig: model.SensitiveConfig{
+			Enable:   in.SensitiveConfig.Enable,
+			TableIds: sensitiveIds,
 		},
 	}); err != nil {
 		return nil, errStatus(errs.Code_RagUpdateErr, err)

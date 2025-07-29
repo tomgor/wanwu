@@ -2,6 +2,7 @@ package orm
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 
 	"github.com/UnicomAI/wanwu/api/proto/common"
@@ -39,6 +40,14 @@ func (c *Client) GetRag(ctx context.Context, req *rag_service.RagDetailReq) (*ra
 		return nil, toErrStatus("rag_get_err", err.Error())
 	}
 
+	// 反序列化敏感词表
+	var sensitiveIds []string
+	if info.SensitiveConfig.TableIds != "" {
+		err = json.Unmarshal([]byte(info.SensitiveConfig.TableIds), &sensitiveIds)
+		if err != nil {
+			return nil, toErrStatus("rag_get_err", err.Error())
+		}
+	}
 	// 填充 rag 的信息
 	resp := &rag_service.RagInfo{
 		RagId: info.RagID,
@@ -61,18 +70,20 @@ func (c *Client) GetRag(ctx context.Context, req *rag_service.RagDetailReq) (*ra
 			ModelType: info.RerankConfig.ModelType,
 			Config:    info.RerankConfig.Config,
 		},
+		KnowledgeBaseConfig: &rag_service.RagKnowledgeBaseConfig{
+			KnowledgeBaseId:  info.KnowledgeBaseConfig.KnowId,
+			MaxHistoryEnable: info.KnowledgeBaseConfig.MaxHistoryEnable,
+			ThresholdEnable:  info.KnowledgeBaseConfig.ThresholdEnable,
+			TopKEnable:       info.KnowledgeBaseConfig.TopKEnable,
+			MaxHistory:       int32(info.KnowledgeBaseConfig.MaxHistory),
+			Threshold:        float32(info.KnowledgeBaseConfig.Threshold),
+			TopK:             int32(info.KnowledgeBaseConfig.TopK),
+		},
+		SensitiveConfig: &rag_service.RagSensitiveConfig{
+			Enable:   info.SensitiveConfig.Enable,
+			TableIds: sensitiveIds,
+		},
 	}
-
-	resp.KnowledgeBaseConfig = &rag_service.RagKnowledgeBaseConfig{
-		KnowledgeBaseId:  info.KnowledgeBaseConfig.KnowId,
-		MaxHistoryEnable: info.KnowledgeBaseConfig.MaxHistoryEnable,
-		ThresholdEnable:  info.KnowledgeBaseConfig.ThresholdEnable,
-		TopKEnable:       info.KnowledgeBaseConfig.TopKEnable,
-		MaxHistory:       int32(info.KnowledgeBaseConfig.MaxHistory),
-		Threshold:        float32(info.KnowledgeBaseConfig.Threshold),
-		TopK:             int32(info.KnowledgeBaseConfig.TopK),
-	}
-
 	return resp, nil
 }
 
@@ -234,6 +245,9 @@ func (c *Client) UpdateRagConfig(ctx context.Context, rag *model.RagInfo) *err_c
 				"kb_max_history":        rag.KnowledgeBaseConfig.MaxHistory,
 				"kb_threshold":          rag.KnowledgeBaseConfig.Threshold,
 				"kb_top_k":              rag.KnowledgeBaseConfig.TopK,
+
+				"sensitive_enable":    rag.SensitiveConfig.Enable,
+				"sensitive_table_ids": rag.SensitiveConfig.TableIds,
 			}
 
 			// 只更新指定 ragID 的记录

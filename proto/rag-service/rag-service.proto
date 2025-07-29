@@ -50,6 +50,7 @@ message UpdateRagConfigReq{
   common.AppModelConfig modelConfig = 2;                  // 模型
   common.AppModelConfig rerankConfig = 3;                 // Rerank模型
   RagKnowledgeBaseConfig knowledgeBaseConfig = 4;         // 知识库
+  RagSensitiveConfig sensitiveConfig = 5;                 // 安全护栏
 }
 
 message CreateRagReq {
@@ -67,7 +68,8 @@ message RagInfo {
   common.AppModelConfig modelConfig = 3;                  // 模型
   common.AppModelConfig rerankConfig = 4;                 // Rerank模型
   RagKnowledgeBaseConfig knowledgeBaseConfig = 5;         // 知识库
-  Identity identity = 6;
+  RagSensitiveConfig sensitiveConfig = 6; // 安全护栏
+  Identity identity = 7;
 }
 
 message RagDeleteReq {
@@ -86,6 +88,11 @@ message RagKnowledgeBaseConfig {
   bool thresholdEnable = 5;                       // 是否启用过滤阈值
   int32 topK = 6;                                 // topK
   bool topKEnable = 7;                            // 是否启用topK
+}
+
+message RagSensitiveConfig{
+  bool enable = 1; // 是否启用安全护栏
+  repeated string tableIds = 2; // 敏感词表id
 }
 
 message RagListReq {
