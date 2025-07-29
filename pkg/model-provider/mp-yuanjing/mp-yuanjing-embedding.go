@@ -27,7 +27,7 @@ func (cfg *Embedding) NewReq(req *mp_common.EmbeddingReq) (mp_common.IEmbeddingR
 	if err != nil {
 		return nil, err
 	}
-	return mp_common.NewRerankReq(m), nil
+	return mp_common.NewEmbeddingReq(m), nil
 }
 
 func (cfg *Embedding) Embeddings(ctx context.Context, req mp_common.IEmbeddingReq, headers ...mp_common.Header) (mp_common.IEmbeddingResp, error) {
