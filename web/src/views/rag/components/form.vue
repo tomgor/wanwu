@@ -178,7 +178,6 @@ export default {
   },
   data() {
     return {
-      switchValue:'',
       rerankOptions:[],
       showOperation:false,
       scope:'public',

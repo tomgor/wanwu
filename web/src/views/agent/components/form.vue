@@ -242,7 +242,7 @@
             <span class="common-add">
               <span class="el-icon-s-operation"></span>
               <span class="handleBtn" style="margin-right:10px;" @click="showSafety">配置</span>
-              <el-switch v-model="switchValue"></el-switch>
+              <el-switch v-model="editForm.safetyConfig.enable"></el-switch>
             </span>
           </p>
           <!-- <div class="rl">
@@ -358,7 +358,7 @@ export default {
             clearTimeout(this.debounceTimer)
           }
         this.debounceTimer = setTimeout(() =>{
-            const props = ['modelParams', 'modelConfig', 'prologue', 'knowledgeBaseIds','instructions','recommendQuestion','onlineSearchConfig'];
+            const props = ['modelParams', 'modelConfig', 'prologue', 'knowledgeBaseIds','instructions','recommendQuestion','onlineSearchConfig','safetyConfig'];
             const changed = props.some(prop => {
             return JSON.stringify(newVal[prop]) !== JSON.stringify(
                 (this.initialEditForm || {})[prop]
@@ -381,7 +381,6 @@ export default {
   },
   data() {
     return {
-      switchValue:false,
       showOperation:false,
       appId:'',
       scope:'public',
@@ -416,6 +415,10 @@ export default {
           searchKey:'',
           searchUrl:'',
           searchRerankId:''
+        },
+        safetyConfig:{
+          enable: false,
+          tables:[]
         }
       },
       apiURL:'',
@@ -469,10 +472,10 @@ export default {
   },
   methods: {
     showSafety(){
-      this.$refs.setSafety.showDialog();
+      this.$refs.setSafety.showDialog(this.editForm.safetyConfig.tables);
     },
     sendSafety(data){
-      console.log(data)
+      this.editForm.safetyConfig.tables = data;
     },
     actionSwitch(id){
       enableAction({actionId:id}).then(res =>{
@@ -678,7 +681,8 @@ export default {
               })
             : [],
           actionInfos: data.actionInfos || [],
-          onlineSearchConfig:data.onlineSearchConfig
+          onlineSearchConfig:data.onlineSearchConfig,
+          safetyConfig:data.safetyConfig !== null ? data.safetyConfig:this.editForm.safetyConfig
         };
 
         //回显自定义插件
