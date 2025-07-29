@@ -188,6 +188,18 @@ func (s *Service) AssistantConfigUpdate(ctx context.Context, req *assistant_serv
 		existingAssistant.OnlineSearchConfig = string(onlineSearchConfigBytes)
 	}
 
+	// 处理safetyConfig，转换成json字符串之后再更新
+	if req.SafetyConfig != nil {
+		safetyConfigBytes, err := json.Marshal(req.SafetyConfig)
+		if err != nil {
+			return nil, errStatus(errs.Code_AssistantErr, &errs.Status{
+				TextKey: "assistant_safetyConfig_marshal",
+				Args:    []string{err.Error()},
+			})
+		}
+		existingAssistant.SafetyConfig = string(safetyConfigBytes)
+	}
+
 	// 调用client方法更新智能体
 	if status := s.cli.UpdateAssistant(ctx, existingAssistant); status != nil {
 		return nil, errStatus(errs.Code_AssistantErr, status)
@@ -312,6 +324,18 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 		}
 	}
 
+	// 处理assistant.SafetyConfig，转换成AssistantSafetyConfig
+	var safetyConfig *assistant_service.AssistantSafetyConfig
+	if assistant.SafetyConfig != "" {
+		safetyConfig = &assistant_service.AssistantSafetyConfig{}
+		if err := json.Unmarshal([]byte(assistant.SafetyConfig), safetyConfig); err != nil {
+			return nil, errStatus(errs.Code_AssistantErr, &errs.Status{
+				TextKey: "assistant_safetyConfig_unmarshal",
+				Args:    []string{err.Error()},
+			})
+		}
+	}
+
 	return &assistant_service.AssistantInfo{
 		AssistantId: strconv.FormatUint(uint64(assistant.ID), 10),
 		AssistantBrief: &common.AppBriefConfig{
@@ -326,6 +350,7 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 		KnowledgeBaseConfig: knowledgeBaseConfig,
 		RerankConfig:        rerankConfig,
 		OnlineSearchConfig:  onlineSearchConfig,
+		SafetyConfig:        safetyConfig,
 		Scope:               int32(assistant.Scope),
 		WorkFlowInfos:       workFlowInfos,
 		ActionInfos:         actionInfos,
