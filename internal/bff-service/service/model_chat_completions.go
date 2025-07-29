@@ -73,15 +73,12 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req *mp_common.LLMRe
 	for sseResp := range sseCh {
 		data, ok = sseResp.ConvertResp()
 		dataStr := ""
-		if ok {
+		if ok && data != nil {
 			if len(data.Choices) > 0 && data.Choices[0].Delta != nil {
 				answer = answer + data.Choices[0].Delta.Content
 			}
 			dataByte, _ := json.Marshal(data)
 			dataStr = fmt.Sprintf("data: %v\n", string(dataByte))
-			if data == nil {
-				dataStr = ""
-			}
 		} else {
 			dataStr = fmt.Sprintf("%v\n", sseResp.String())
 		}

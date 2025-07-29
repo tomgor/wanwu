@@ -1,9 +1,14 @@
 package mp_common
 
 import (
+	"context"
+	"crypto/tls"
 	"encoding/json"
+	"fmt"
+	"io"
 
 	"github.com/UnicomAI/wanwu/pkg/log"
+	"github.com/go-resty/resty/v2"
 )
 
 // --- openapi request ---
@@ -15,6 +20,18 @@ type EmbeddingReq struct {
 }
 
 func (req *EmbeddingReq) Check() error { return nil }
+
+func (req *EmbeddingReq) Data() (map[string]interface{}, error) {
+	m := make(map[string]interface{})
+	b, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	if err = json.Unmarshal(b, &m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
 
 // --- openapi response ---
 
@@ -89,4 +106,40 @@ func (resp *embeddingResp) ConvertResp() (*EmbeddingResp, bool) {
 		return nil, false
 	}
 	return ret, true
+}
+
+// --- embedding ---
+
+func Embeddings(ctx context.Context, provider, apiKey, url string, req map[string]interface{}, headers ...Header) ([]byte, error) {
+	if apiKey != "" {
+		headers = append(headers, Header{
+			Key:   "Authorization",
+			Value: "Bearer " + apiKey,
+		})
+	}
+
+	request := resty.New().
+		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}). // 关闭证书校验
+		SetTimeout(0).                                             // 关闭请求超时
+		R().
+		SetContext(ctx).
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Accept", "application/json").
+		SetBody(req).
+		SetDoNotParseResponse(true)
+	for _, header := range headers {
+		request.SetHeader(header.Key, header.Value)
+	}
+
+	resp, err := request.Post(url)
+	if err != nil {
+		return nil, fmt.Errorf("request %v %v embeddings err: %v", url, provider, err)
+	} else if resp.StatusCode() >= 300 {
+		return nil, fmt.Errorf("request %v %v embeddings http status %v msg: %v", url, provider, resp.StatusCode(), resp.String())
+	}
+	b, err := io.ReadAll(resp.RawResponse.Body)
+	if err != nil {
+		return nil, fmt.Errorf("request %v %v embeddings read response body err: %v", url, provider, err)
+	}
+	return b, nil
 }
