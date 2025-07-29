@@ -74,6 +74,10 @@ func AssistantConfigUpdate(ctx *gin.Context, userId, orgId string, req request.A
 			Enable:         req.OnlineSearchConfig.Enable,
 			SearchRerankId: req.OnlineSearchConfig.SearchRerankId,
 		},
+		SafetyConfig: &assistant_service.AssistantSafetyConfig{
+			Enable:         req.SafetyConfig.Enable,
+			SensitiveTable: transSafetyConfig2Proto(req.SafetyConfig.Tables),
+		},
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
@@ -373,6 +377,20 @@ func transKnowledgebases2Proto(kbs []request.AppKnowledgeBase) []*assistant_serv
 	return result
 }
 
+func transSafetyConfig2Proto(tables []request.SensitiveTable) []*assistant_service.SensitiveTable {
+	if tables == nil {
+		return nil
+	}
+	result := make([]*assistant_service.SensitiveTable, 0, len(tables))
+	for _, table := range tables {
+		result = append(result, &assistant_service.SensitiveTable{
+			TableId:   table.TableId,
+			TableName: table.TableName,
+		})
+	}
+	return result
+}
+
 func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.AssistantInfo, accessedWorkFlowList *response.ListResult) (response.Assistant, error) {
 	log.Debugf("开始转换Assistant响应到模型，响应内容: %+v", resp)
 	if resp == nil {
@@ -485,6 +503,22 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		}
 	}
 
+	var safetyConfig request.AppSafetyConfig
+	if resp.SafetyConfig != nil {
+		safetyConfig = request.AppSafetyConfig{
+			Enable: resp.SafetyConfig.Enable,
+		}
+		if resp.SafetyConfig.SensitiveTable != nil {
+			safetyConfig.Tables = make([]request.SensitiveTable, 0, len(resp.SafetyConfig.SensitiveTable))
+			for _, table := range resp.SafetyConfig.SensitiveTable {
+				safetyConfig.Tables = append(safetyConfig.Tables, request.SensitiveTable{
+					TableId:   table.TableId,
+					TableName: table.TableName,
+				})
+			}
+		}
+	}
+
 	assistantModel := response.Assistant{
 		AssistantId:       resp.AssistantId,
 		AppBriefConfig:    appBriefConfigProto2Model(ctx, resp.AssistantBrief),
@@ -512,6 +546,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		ModelConfig:        modelConfig,
 		RerankConfig:       rerankConfig,
 		OnlineSearchConfig: onlineSearchConfig,
+		SafetyConfig:       safetyConfig,
 		Scope:              resp.Scope,
 		ActionInfos:        actionInfos,
 		WorkFlowInfos:      workFlowInfos,
