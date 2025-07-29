@@ -37,6 +37,7 @@ func (c *Client) UpdateAssistant(ctx context.Context, assistant *model.Assistant
 			"scope":                assistant.Scope,
 			"rerank_config":        assistant.RerankConfig,
 			"online_search_config": assistant.OnlineSearchConfig,
+			"safety_config":        assistant.SafetyConfig,
 		}).Error; err != nil {
 			return toErrStatus("assistant_update", err.Error())
 		}

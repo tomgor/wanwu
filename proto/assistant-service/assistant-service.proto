@@ -81,6 +81,17 @@ message AssistantConfigUpdateReq {
   common.AppModelConfig rerankConfig = 7;                         // Rerank模型
   AssistantOnlineSearchConfig onlineSearchConfig = 8;             // 在线搜索配置
   Identity identity = 9;
+  AssistantSafetyConfig safetyConfig = 10;
+}
+
+message AssistantSafetyConfig {
+  bool enable = 1;
+  repeated SensitiveTable SensitiveTable = 2;
+}
+
+message SensitiveTable {
+  string tableId = 1;
+  string tableName = 2;
 }
 
 message AssistantDeleteReq {
@@ -129,6 +140,7 @@ message AssistantInfo {
   repeated ActionInfos actionInfos = 12;
   int64 creatTime = 13;
   int64 updateTime = 14;
+  AssistantSafetyConfig safetyConfig = 15;
 }
 
 message ActionInfos{
