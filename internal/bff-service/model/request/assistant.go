@@ -16,6 +16,7 @@ type AssistantConfig struct {
 	RecommendQuestion   []string               `json:"recommendQuestion"`   // 推荐问题
 	ModelConfig         AppModelConfig         `json:"modelConfig"`         // 模型
 	KnowledgeBaseConfig AppKnowledgebaseConfig `json:"knowledgeBaseConfig"` // 知识库
+	SafetyConfig        AppSafetyConfig        `json:"safetyConfig"`        // 敏感词表配置
 	RerankConfig        AppModelConfig         `json:"rerankConfig"`        // Rerank模型
 	OnlineSearchConfig  OnlineSearchConfig     `json:"onlineSearchConfig"`  // 在线搜索
 }

@@ -25,6 +25,20 @@ definitions:
         - $ref: '#/definitions/mp_yuanjing.LLMParams'
         description: 大语言模型配置
     type: object
+  mp.ProviderModelByHuoshan:
+    properties:
+      embedding:
+        $ref: '#/definitions/mp_huoshan.Embedding'
+      llm:
+        $ref: '#/definitions/mp_huoshan.LLM'
+    type: object
+  mp.ProviderModelByOllama:
+    properties:
+      embedding:
+        $ref: '#/definitions/mp_ollama.Embedding'
+      llm:
+        $ref: '#/definitions/mp_ollama.LLM'
+    type: object
   mp.ProviderModelByOpenAICompatible:
     properties:
       embedding:
@@ -33,6 +47,15 @@ definitions:
         $ref: '#/definitions/mp_openai_compatible.LLM'
       rerank:
         $ref: '#/definitions/mp_openai_compatible.Rerank'
+    type: object
+  mp.ProviderModelByQwen:
+    properties:
+      embedding:
+        $ref: '#/definitions/mp_qwen.Embedding'
+      llm:
+        $ref: '#/definitions/mp_qwen.LLM'
+      rerank:
+        $ref: '#/definitions/mp_qwen.Rerank'
     type: object
   mp.ProviderModelByYuanjing:
     properties:
@@ -45,10 +68,66 @@ definitions:
     type: object
   mp.ProviderModelConfig:
     properties:
+      providerHuoshan:
+        $ref: '#/definitions/mp.ProviderModelByHuoshan'
+      providerOllama:
+        $ref: '#/definitions/mp.ProviderModelByOllama'
       providerOpenAICompatible:
         $ref: '#/definitions/mp.ProviderModelByOpenAICompatible'
+      providerQwen:
+        $ref: '#/definitions/mp.ProviderModelByQwen'
       providerYuanJing:
         $ref: '#/definitions/mp.ProviderModelByYuanjing'
+    type: object
+  mp_huoshan.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_huoshan.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        - functionCall
+        type: string
+    type: object
+  mp_ollama.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_ollama.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        - functionCall
+        type: string
     type: object
   mp_openai_compatible.Embedding:
     properties:
@@ -109,6 +188,40 @@ definitions:
         type: boolean
     type: object
   mp_openai_compatible.Rerank:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_qwen.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_qwen.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        - functionCall
+        type: string
+    type: object
+  mp_qwen.Rerank:
     properties:
       apiKey:
         description: ApiKey
@@ -428,6 +541,16 @@ definitions:
         description: 模型供应商
         type: string
     type: object
+  request.AppSafetyConfig:
+    properties:
+      enable:
+        description: 安全护栏(开关)
+        type: boolean
+      tables:
+        items:
+          $ref: '#/definitions/request.SensitiveTable'
+        type: array
+    type: object
   request.AssistantBrief:
     properties:
       assistantId:
@@ -477,6 +600,10 @@ definitions:
         allOf:
         - $ref: '#/definitions/request.AppModelConfig'
         description: Rerank模型
+      safetyConfig:
+        allOf:
+        - $ref: '#/definitions/request.AppSafetyConfig'
+        description: 敏感词表配置
     required:
     - assistantId
     type: object
@@ -1132,6 +1259,10 @@ definitions:
         allOf:
         - $ref: '#/definitions/request.AppModelConfig'
         description: Rerank模型
+      safetyConfig:
+        allOf:
+        - $ref: '#/definitions/request.AppSafetyConfig'
+        description: 敏感词表配置
     required:
     - knowledgeBaseConfig
     - modelConfig
@@ -1197,6 +1328,17 @@ definitions:
     required:
     - name
     - roleId
+    type: object
+  request.SensitiveTable:
+    properties:
+      tableId:
+        description: 敏感词表id
+        type: string
+      tableName:
+        description: 敏感词表名称(请求非必填)
+        type: string
+    required:
+    - tableId
     type: object
   request.TagBindCountReq:
     properties:
@@ -1542,6 +1684,10 @@ definitions:
         allOf:
         - $ref: '#/definitions/request.AppModelConfig'
         description: Rerank模型
+      safetyConfig:
+        allOf:
+        - $ref: '#/definitions/request.AppSafetyConfig'
+        description: 敏感词表配置
       scope:
         description: 作用域
         type: integer
@@ -2424,6 +2570,10 @@ definitions:
         allOf:
         - $ref: '#/definitions/request.AppModelConfig'
         description: Rerank模型
+      safetyConfig:
+        allOf:
+        - $ref: '#/definitions/request.AppSafetyConfig'
+        description: 敏感词表配置
     required:
     - knowledgeBaseConfig
     - modelConfig
@@ -2624,50 +2774,24 @@ definitions:
     type: object
 info:
   contact: {}
-  description: |-
-    ## HTTP Header
-    | Header        | 说明      |
-    | ------------- | --------- |
-    | Authorization | JWT token |
-    | X-Language    | 语言Code  |
-    | X-Org-Id      | 组织ID    |
-
-    ## HTTP Status
-    | HTTP Status             | 说明                   |
-    | ----------------------- | ---------------------- |
-    | 200, StatusOK           | 请求返回成功           |
-    | 400, StatusBadRequest   | 请求返回失败，用于业务 |
-    | 401, StatusUnauthorized | JWT认证失败            |
-    | 403, StatusForbidden    | 没有权限               |
-
-    ## 权限-菜单对应表
-    | 一级权限        | 二级权限  | 三级权限 | 一级菜单 | 二级菜单 | 三级菜单 |
-    |-------------|-------|------|------|------|------|
-    | guest       |       |      | 【访客】 |      |      |
-    | common      |       |      | 【通用】 |      |      |
-    | permission  |       |      | 权限管理 |      |      |
-    | permission  | user  |      | 权限管理 | 用户管理 |      |
-    | permission  | org   |      | 权限管理 | 组织管理 |      |
-    | permission  | role  |      | 权限管理 | 角色管理 |      |
-
-    ## `/v1/user/permission`返回用例
-    ```json
-    {
-      "code": 0,
-      "data": {
-        "orgPermission": {
-          "org": {"id": "test-org-id", "name": "test-org-name"},
-          "permissions": [
-            {"perm": "permission"},
-            {"perm": "permission.user"},
-            {"perm": "permission.org"},
-            {"perm": "permission.role"}
-          ]
-        }
-      },
-      "msg": "操作成功"
-    }
-    ```
+  description: "## HTTP Header\r\n| Header        | 说明      |\r\n| ------------- |
+    --------- |\r\n| Authorization | JWT token |\r\n| X-Language    | 语言Code  |\r\n|
+    X-Org-Id      | 组织ID    |\r\n\r\n## HTTP Status\r\n| HTTP Status             |
+    说明                   |\r\n| ----------------------- | ---------------------- |\r\n|
+    200, StatusOK           | 请求返回成功           |\r\n| 400, StatusBadRequest   | 请求返回失败，用于业务
+    |\r\n| 401, StatusUnauthorized | JWT认证失败            |\r\n| 403, StatusForbidden
+    \   | 没有权限               |\r\n\r\n## 权限-菜单对应表\r\n| 一级权限        | 二级权限  | 三级权限
+    | 一级菜单 | 二级菜单 | 三级菜单 |\r\n|-------------|-------|------|------|------|------|\r\n|
+    guest       |       |      | 【访客】 |      |      |\r\n| common      |       |      |
+    【通用】 |      |      |\r\n| permission  |       |      | 权限管理 |      |      |\r\n|
+    permission  | user  |      | 权限管理 | 用户管理 |      |\r\n| permission  | org   |      |
+    权限管理 | 组织管理 |      |\r\n| permission  | role  |      | 权限管理 | 角色管理 |      |\r\n\r\n##
+    `/v1/user/permission`返回用例\r\n```json\r\n{\r\n  \"code\": 0,\r\n  \"data\": {\r\n
+    \   \"orgPermission\": {\r\n      \"org\": {\"id\": \"test-org-id\", \"name\":
+    \"test-org-name\"},\r\n      \"permissions\": [\r\n        {\"perm\": \"permission\"},\r\n
+    \       {\"perm\": \"permission.user\"},\r\n        {\"perm\": \"permission.org\"},\r\n
+    \       {\"perm\": \"permission.role\"}\r\n      ]\r\n    }\r\n  },\r\n  \"msg\":
+    \"操作成功\"\r\n}\r\n```"
   title: AI Agent Productivity Platform API
   version: v0.0.1
 paths:
