@@ -1,10 +1,17 @@
 package mp_common
 
 import (
+	"bufio"
+	"context"
+	"crypto/tls"
 	"encoding/json"
+	"fmt"
+	"io"
 	"strings"
 
 	"github.com/UnicomAI/wanwu/pkg/log"
+	"github.com/UnicomAI/wanwu/pkg/util"
+	"github.com/go-resty/resty/v2"
 )
 
 type MsgRole string
@@ -74,6 +81,18 @@ type LLMReq struct {
 	User      *string    `json:"user,omitempty"`
 	// Yuanjing
 	DoSample *bool `json:"do_sample,omitempty"`
+}
+
+func (req *LLMReq) Data() (map[string]interface{}, error) {
+	m := make(map[string]interface{})
+	b, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	if err = json.Unmarshal(b, &m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 type StreamOptions struct {
@@ -284,4 +303,95 @@ func (resp *llmResp) ConvertResp() (*LLMResp, bool) {
 		return nil, false
 	}
 	return ret, true
+}
+
+// --- ChatCompletions ---
+
+func ChatCompletions(ctx context.Context, provider, apiKey, url string, req ILLMReq, respConverter func(bool, string) ILLMResp, headers ...Header) (ILLMResp, <-chan ILLMResp, error) {
+	if req.Stream() {
+		ret, err := chatCompletionsStream(ctx, provider, apiKey, url, req, respConverter, headers...)
+		return nil, ret, err
+	}
+	ret, err := chatCompletionsUnary(ctx, provider, apiKey, url, req, respConverter, headers...)
+	return ret, nil, err
+}
+
+func chatCompletionsUnary(ctx context.Context, provider, apiKey, url string, req ILLMReq, respConverter func(bool, string) ILLMResp, headers ...Header) (ILLMResp, error) {
+	if req.Stream() {
+		return nil, fmt.Errorf("request %v %v chat completions unary but stream", url, provider)
+	}
+
+	if apiKey != "" {
+		headers = append(headers, Header{
+			Key:   "Authorization",
+			Value: "Bearer " + apiKey,
+		})
+	}
+
+	request := resty.New().
+		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}). // 关闭证书校验
+		SetTimeout(0).                                             // 关闭请求超时
+		R().
+		SetContext(ctx).
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Accept", "application/json").
+		SetBody(req.Data()).
+		SetDoNotParseResponse(true)
+	for _, header := range headers {
+		request.SetHeader(header.Key, header.Value)
+	}
+	resp, err := request.Post(url)
+	if err != nil {
+		return nil, fmt.Errorf("request %v %v chat completions unary err: %v", url, provider, err)
+	} else if resp.StatusCode() >= 300 {
+		return nil, fmt.Errorf("request %v %v chat completions unary http status %v msg: %v", url, provider, resp.StatusCode(), resp.String())
+	}
+	b, err := io.ReadAll(resp.RawResponse.Body)
+	if err != nil {
+		return nil, fmt.Errorf("request %v %v chat completions unary read response body err: %v", url, provider, err)
+	}
+	return respConverter(false, string(b)), nil
+}
+
+func chatCompletionsStream(ctx context.Context, provider, apiKey, url string, req ILLMReq, respConverter func(bool, string) ILLMResp, headers ...Header) (<-chan ILLMResp, error) {
+	if !req.Stream() {
+		return nil, fmt.Errorf("request %v %v chat completions stream but unary", url, provider)
+	}
+
+	if apiKey != "" {
+		headers = append(headers, Header{
+			Key:   "Authorization",
+			Value: "Bearer " + apiKey,
+		})
+	}
+
+	ret := make(chan ILLMResp, 1024)
+	go func() {
+		defer util.PrintPanicStack()
+		defer close(ret)
+		request := resty.New().
+			SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}). // 关闭证书校验
+			R().
+			SetContext(ctx).
+			SetHeader("Content-Type", "application/json").
+			SetHeader("Accept", "application/json").
+			SetBody(req.Data()).
+			SetDoNotParseResponse(true)
+		for _, header := range headers {
+			request.SetHeader(header.Key, header.Value)
+		}
+		resp, err := request.Post(url)
+		if err != nil {
+			log.Errorf("request %v %v chat completions stream err: %v", url, provider, err)
+			return
+		} else if resp.StatusCode() >= 300 {
+			log.Errorf("request %v %v chat completions stream http status %v msg: %v", url, provider, resp.StatusCode(), resp.String())
+			return
+		}
+		scan := bufio.NewScanner(resp.RawResponse.Body)
+		for scan.Scan() {
+			ret <- respConverter(true, scan.Text())
+		}
+	}()
+	return ret, nil
 }
