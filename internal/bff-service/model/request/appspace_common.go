@@ -75,3 +75,13 @@ type AppKnowledgebaseParams struct {
 	TopK             int32   `json:"topK"`             // 知识条数
 	TopKEnable       bool    `json:"topKEnable"`       // 知识条数(开关)
 }
+
+type AppSafetyConfig struct {
+	Enable bool             `json:"enable"` // 安全护栏(开关)
+	Tables []SensitiveTable `json:"tables"`
+}
+
+type SensitiveTable struct {
+	TableId   string `json:"tableId" validate:"required"` // 敏感词表id
+	TableName string `json:"tableName"`                   // 敏感词表名称(请求非必填)
+}

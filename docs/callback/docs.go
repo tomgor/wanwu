@@ -294,6 +294,28 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "mp.ProviderModelByHuoshan": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_huoshan.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_huoshan.LLM"
+                }
+            }
+        },
+        "mp.ProviderModelByOllama": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_ollama.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_ollama.LLM"
+                }
+            }
+        },
         "mp.ProviderModelByOpenAICompatible": {
             "type": "object",
             "properties": {
@@ -305,6 +327,20 @@ const docTemplate = `{
                 },
                 "rerank": {
                     "$ref": "#/definitions/mp_openai_compatible.Rerank"
+                }
+            }
+        },
+        "mp.ProviderModelByQwen": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_qwen.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_qwen.LLM"
+                },
+                "rerank": {
+                    "$ref": "#/definitions/mp_qwen.Rerank"
                 }
             }
         },
@@ -325,8 +361,17 @@ const docTemplate = `{
         "mp.ProviderModelConfig": {
             "type": "object",
             "properties": {
+                "providerHuoshan": {
+                    "$ref": "#/definitions/mp.ProviderModelByHuoshan"
+                },
+                "providerOllama": {
+                    "$ref": "#/definitions/mp.ProviderModelByOllama"
+                },
                 "providerOpenAICompatible": {
                     "$ref": "#/definitions/mp.ProviderModelByOpenAICompatible"
+                },
+                "providerQwen": {
+                    "$ref": "#/definitions/mp.ProviderModelByQwen"
                 },
                 "providerYuanJing": {
                     "$ref": "#/definitions/mp.ProviderModelByYuanjing"
@@ -382,11 +427,17 @@ const docTemplate = `{
         "mp_common.EmbeddingResp": {
             "type": "object",
             "properties": {
+                "created": {
+                    "type": "integer"
+                },
                 "data": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/mp_common.EmbeddingData"
                     }
+                },
+                "id": {
+                    "type": "string"
                 },
                 "model": {
                     "type": "string"
@@ -566,6 +617,13 @@ const docTemplate = `{
                     "description": "固定为 \"chat.completion\"",
                     "type": "string"
                 },
+                "service_tier": {
+                    "description": "（火山）指定是否使用TPM保障包。生效对象为购买了保障包推理接入点",
+                    "type": "string"
+                },
+                "system_fingerprint": {
+                    "type": "string"
+                },
                 "usage": {
                     "description": "token 使用统计",
                     "allOf": [
@@ -696,6 +754,7 @@ const docTemplate = `{
                     "description": "选项索引",
                     "type": "integer"
                 },
+                "logprobs": {},
                 "message": {
                     "description": "非流式生成的消息",
                     "allOf": [
@@ -771,8 +830,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "top_n": {
-                    "type": "integer",
-                    "minimum": 0
+                    "type": "integer"
                 }
             }
         },
@@ -783,6 +841,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "object": {
+                    "type": "string"
+                },
+                "request_id": {
                     "type": "string"
                 },
                 "results": {
@@ -887,6 +948,76 @@ const docTemplate = `{
                 }
             }
         },
+        "mp_huoshan.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_huoshan.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
+                }
+            }
+        },
+        "mp_ollama.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_ollama.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
+                }
+            }
+        },
         "mp_openai_compatible.Embedding": {
             "type": "object",
             "properties": {
@@ -923,6 +1054,54 @@ const docTemplate = `{
             }
         },
         "mp_openai_compatible.Rerank": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_qwen.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_qwen.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
+                }
+            }
+        },
+        "mp_qwen.Rerank": {
             "type": "object",
             "properties": {
                 "apiKey": {

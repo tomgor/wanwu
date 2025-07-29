@@ -14,6 +14,7 @@ type Assistant struct {
 	KnowledgeBaseConfig    request.AppKnowledgebaseConfig `json:"knowledgeBaseConfig"` // 知识库
 	RerankConfig           request.AppModelConfig         `json:"rerankConfig"`        // Rerank模型
 	OnlineSearchConfig     request.OnlineSearchConfig     `json:"onlineSearchConfig"`  // 在线搜索配置
+	SafetyConfig           request.AppSafetyConfig        `json:"safetyConfig"`        // 敏感词表配置
 	Scope                  int32                          `json:"scope"`               // 作用域
 	ActionInfos            []*ActionInfos                 `json:"actionInfos"`         // action信息
 	WorkFlowInfos          []*WorkFlowInfos               `json:"workFlowInfos"`       // 工作流信息

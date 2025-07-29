@@ -5429,6 +5429,28 @@ const docTemplate = `{
                 }
             }
         },
+        "mp.ProviderModelByHuoshan": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_huoshan.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_huoshan.LLM"
+                }
+            }
+        },
+        "mp.ProviderModelByOllama": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_ollama.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_ollama.LLM"
+                }
+            }
+        },
         "mp.ProviderModelByOpenAICompatible": {
             "type": "object",
             "properties": {
@@ -5440,6 +5462,20 @@ const docTemplate = `{
                 },
                 "rerank": {
                     "$ref": "#/definitions/mp_openai_compatible.Rerank"
+                }
+            }
+        },
+        "mp.ProviderModelByQwen": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_qwen.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_qwen.LLM"
+                },
+                "rerank": {
+                    "$ref": "#/definitions/mp_qwen.Rerank"
                 }
             }
         },
@@ -5460,11 +5496,90 @@ const docTemplate = `{
         "mp.ProviderModelConfig": {
             "type": "object",
             "properties": {
+                "providerHuoshan": {
+                    "$ref": "#/definitions/mp.ProviderModelByHuoshan"
+                },
+                "providerOllama": {
+                    "$ref": "#/definitions/mp.ProviderModelByOllama"
+                },
                 "providerOpenAICompatible": {
                     "$ref": "#/definitions/mp.ProviderModelByOpenAICompatible"
                 },
+                "providerQwen": {
+                    "$ref": "#/definitions/mp.ProviderModelByQwen"
+                },
                 "providerYuanJing": {
                     "$ref": "#/definitions/mp.ProviderModelByYuanjing"
+                }
+            }
+        },
+        "mp_huoshan.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_huoshan.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
+                }
+            }
+        },
+        "mp_ollama.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_ollama.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
                 }
             }
         },
@@ -5549,6 +5664,54 @@ const docTemplate = `{
             }
         },
         "mp_openai_compatible.Rerank": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_qwen.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_qwen.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
+                }
+            }
+        },
+        "mp_qwen.Rerank": {
             "type": "object",
             "properties": {
                 "apiKey": {
@@ -6006,6 +6169,21 @@ const docTemplate = `{
                 }
             }
         },
+        "request.AppSafetyConfig": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "description": "安全护栏(开关)",
+                    "type": "boolean"
+                },
+                "tables": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.SensitiveTable"
+                    }
+                }
+            }
+        },
         "request.AssistantBrief": {
             "type": "object",
             "required": [
@@ -6087,6 +6265,14 @@ const docTemplate = `{
                     "allOf": [
                         {
                             "$ref": "#/definitions/request.AppModelConfig"
+                        }
+                    ]
+                },
+                "safetyConfig": {
+                    "description": "敏感词表配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.AppSafetyConfig"
                         }
                     ]
                 }
@@ -7058,6 +7244,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/request.AppModelConfig"
                         }
                     ]
+                },
+                "safetyConfig": {
+                    "description": "敏感词表配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.AppSafetyConfig"
+                        }
+                    ]
                 }
             }
         },
@@ -7145,6 +7339,22 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "roleId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.SensitiveTable": {
+            "type": "object",
+            "required": [
+                "tableId"
+            ],
+            "properties": {
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                },
+                "tableName": {
+                    "description": "敏感词表名称(请求非必填)",
                     "type": "string"
                 }
             }
@@ -7660,6 +7870,14 @@ const docTemplate = `{
                     "allOf": [
                         {
                             "$ref": "#/definitions/request.AppModelConfig"
+                        }
+                    ]
+                },
+                "safetyConfig": {
+                    "description": "敏感词表配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.AppSafetyConfig"
                         }
                     ]
                 },
@@ -8983,6 +9201,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/request.AppModelConfig"
                         }
                     ]
+                },
+                "safetyConfig": {
+                    "description": "敏感词表配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.AppSafetyConfig"
+                        }
+                    ]
                 }
             }
         },
@@ -9297,7 +9523,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/v1",
 	Schemes:          []string{},
 	Title:            "AI Agent Productivity Platform API",
-	Description:      "## HTTP Header\n| Header        | 说明      |\n| ------------- | --------- |\n| Authorization | JWT token |\n| X-Language    | 语言Code  |\n| X-Org-Id      | 组织ID    |\n\n## HTTP Status\n| HTTP Status             | 说明                   |\n| ----------------------- | ---------------------- |\n| 200, StatusOK           | 请求返回成功           |\n| 400, StatusBadRequest   | 请求返回失败，用于业务 |\n| 401, StatusUnauthorized | JWT认证失败            |\n| 403, StatusForbidden    | 没有权限               |\n\n## 权限-菜单对应表\n| 一级权限        | 二级权限  | 三级权限 | 一级菜单 | 二级菜单 | 三级菜单 |\n|-------------|-------|------|------|------|------|\n| guest       |       |      | 【访客】 |      |      |\n| common      |       |      | 【通用】 |      |      |\n| permission  |       |      | 权限管理 |      |      |\n| permission  | user  |      | 权限管理 | 用户管理 |      |\n| permission  | org   |      | 权限管理 | 组织管理 |      |\n| permission  | role  |      | 权限管理 | 角色管理 |      |\n\n## `/v1/user/permission`返回用例\n```json\n{\n  \"code\": 0,\n  \"data\": {\n    \"orgPermission\": {\n      \"org\": {\"id\": \"test-org-id\", \"name\": \"test-org-name\"},\n      \"permissions\": [\n        {\"perm\": \"permission\"},\n        {\"perm\": \"permission.user\"},\n        {\"perm\": \"permission.org\"},\n        {\"perm\": \"permission.role\"}\n      ]\n    }\n  },\n  \"msg\": \"操作成功\"\n}\n```",
+	Description:      "## HTTP Header\r\n| Header        | 说明      |\r\n| ------------- | --------- |\r\n| Authorization | JWT token |\r\n| X-Language    | 语言Code  |\r\n| X-Org-Id      | 组织ID    |\r\n\r\n## HTTP Status\r\n| HTTP Status             | 说明                   |\r\n| ----------------------- | ---------------------- |\r\n| 200, StatusOK           | 请求返回成功           |\r\n| 400, StatusBadRequest   | 请求返回失败，用于业务 |\r\n| 401, StatusUnauthorized | JWT认证失败            |\r\n| 403, StatusForbidden    | 没有权限               |\r\n\r\n## 权限-菜单对应表\r\n| 一级权限        | 二级权限  | 三级权限 | 一级菜单 | 二级菜单 | 三级菜单 |\r\n|-------------|-------|------|------|------|------|\r\n| guest       |       |      | 【访客】 |      |      |\r\n| common      |       |      | 【通用】 |      |      |\r\n| permission  |       |      | 权限管理 |      |      |\r\n| permission  | user  |      | 权限管理 | 用户管理 |      |\r\n| permission  | org   |      | 权限管理 | 组织管理 |      |\r\n| permission  | role  |      | 权限管理 | 角色管理 |      |\r\n\r\n## `/v1/user/permission`返回用例\r\n```json\r\n{\r\n  \"code\": 0,\r\n  \"data\": {\r\n    \"orgPermission\": {\r\n      \"org\": {\"id\": \"test-org-id\", \"name\": \"test-org-name\"},\r\n      \"permissions\": [\r\n        {\"perm\": \"permission\"},\r\n        {\"perm\": \"permission.user\"},\r\n        {\"perm\": \"permission.org\"},\r\n        {\"perm\": \"permission.role\"}\r\n      ]\r\n    }\r\n  },\r\n  \"msg\": \"操作成功\"\r\n}\r\n```",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
