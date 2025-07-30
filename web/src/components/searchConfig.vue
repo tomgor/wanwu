@@ -6,9 +6,11 @@
     class="searchConfig"
   >
     <el-form-item
-      label="检索方式配置"
       class="vertical-form-item"
     >
+    <template #label>
+        <span v-if="!setType">检索方式配置</span>
+    </template>
       <div
         v-for="item in searchTypeData"
         :class="['searchType-list',{ 'active': item.showContent }]"
@@ -48,13 +50,12 @@
             @click.stop
           >
             <el-col class="mixTypeRange-title">
-              <span>语义[{{item.mixTypeRange[0]}}]</span>
-              <span>关键词[{{item.mixTypeRange[1]}}]</span>
+              <span>语义[{{item.mixTypeRange}}]</span>
+              <span>关键词[{{(1 - (item.mixTypeRange || 0)).toFixed(1)}}]</span>
             </el-col>
             <el-col>
               <el-slider
                 v-model="item.mixTypeRange"
-                range
                 show-stops
                 :step="0.1"
                 :max="1"
@@ -108,6 +109,29 @@
               </el-slider>
             </el-col>
           </el-row>
+          <el-row v-if="showHistory(item)">
+            <el-col>
+              <span class="content-name">最长上下文</span>
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="保存的最长的上下文对话轮数。"
+                placement="right"
+              >
+                <span class="el-icon-question tips"></span>
+              </el-tooltip>
+            </el-col>
+            <el-col>
+              <el-slider
+                :min="0"
+                :max="100"
+                :step="1"
+                v-model="formInline.knowledgeMatchParams.maxHistory"
+                show-input
+              >
+              </el-slider>
+            </el-col>
+          </el-row>
           <el-row>
             <el-col>
               <span class="content-name">Score阈值</span>
@@ -139,6 +163,7 @@
 <script>
 import { getRerankList } from "@/api/modelAccess";
 export default {
+  props:['setType','config'],
   data() {
     return {
       debounceTimer:null,
@@ -152,6 +177,7 @@ export default {
           score: 0.4, //过滤分数阈值
           semanticsPriority: 0.2, //语义权重
           topK: 1, //topK 获取最高的几行
+          maxHistory:0//最长上下文
         },
       },
       initialEditForm:null,
@@ -190,7 +216,7 @@ export default {
           Weight: "",
           mixTypeValue: "weight",
           showContent: false,
-          mixTypeRange: [0.2, 0.8],
+          mixTypeRange: 0.2,
           mixType: [
             {
               name: "权重设置",
@@ -221,9 +247,26 @@ export default {
               );
             });
           if (changed) {
+            if(!this.setType){
+              delete this.formInline.knowledgeMatchParams.maxHistory;
+            }
             this.$emit('sendConfigInfo', this.formInline);
           }
         }, 500);
+      },
+      deep: true,
+      immediate: false
+    },
+    config:{
+      handler(newVal) {
+        if(newVal && newVal.rerankModelId !== ''){
+          this.formInline.knowledgeMatchParams = JSON.parse(JSON.stringify(newVal))
+          const { matchType } = this.formInline.knowledgeMatchParams
+          this.searchTypeData = this.searchTypeData.map((item) => ({
+            ...item,
+            showContent: item.value === matchType ? true : false,
+          }));
+        }
       },
       deep: true,
       immediate: false
@@ -239,8 +282,8 @@ export default {
   },
   methods: {
     rangeChage(val){
-      this.formInline.knowledgeMatchParams.keywordPriority = val[1];
-      this.formInline.knowledgeMatchParams.semanticsPriority = val[0];
+      this.formInline.knowledgeMatchParams.keywordPriority = (1 - (val || 0)).toFixed(1);
+      this.formInline.knowledgeMatchParams.semanticsPriority = val;
     },
     mixTypeClick(item, n) {
       item.mixTypeValue = n.value;
@@ -253,6 +296,15 @@ export default {
         n.value === "text" ||
         (n.value === "mix" && n.mixTypeValue === "rerank")
       );
+    },
+    showHistory(n){
+      return (
+        this.setType === 'rag' &&
+        (n.value === "vector" ||
+         n.value === "text" ||
+         (n.value === "mix" && n.mixTypeValue === "rerank")
+        )
+      )
     },
     clickSearch(n) {
       this.formInline.knowledgeMatchParams.matchType = n.value;

@@ -18,14 +18,14 @@
         >
             <el-form-item class="itemCenter">
               <el-radio-group v-model="ruleForm.importType">
-                <el-radio-button :label="0">单条添加</el-radio-button>
-                <el-radio-button :label="1">批量上传</el-radio-button>
+                <el-radio-button :label="'single'">单条添加</el-radio-button>
+                <el-radio-button :label="'file'">批量上传</el-radio-button>
               </el-radio-group>  
             </el-form-item>
             <el-form-item
             label="敏感词表名"
             prop="word"
-            v-if="ruleForm.importType === 0"
+            v-if="ruleForm.importType === 'single'"
             >
             <el-input
                 v-model="ruleForm.word"
@@ -35,7 +35,7 @@
             <el-form-item
             label="敏感词类型"
             prop="sensitiveType"
-            v-if="ruleForm.importType === 0"
+            v-if="ruleForm.importType === 'single'"
             >
             <el-select v-model="ruleForm.sensitiveType" placeholder="请选择" style="width:100%;">
                 <el-option
@@ -49,7 +49,7 @@
             <el-form-item
             label="批量上传"
             prop="fileName"
-            v-if="ruleForm.importType === 1"
+            v-if="ruleForm.importType === 'file'"
             >
             <el-upload
                 class="upload-box"
@@ -66,7 +66,11 @@
               <div>
                 <div>
                     <img :src="require('@/assets/imgs/uploadImg.png')" class="upload-img" />
-                    <p class="click-text">将文件拖到此处，或<span class="clickUpload">点击上传</span></p>
+                    <p class="click-text">
+                        将文件拖到此处，或
+                        <span class="clickUpload">点击上传</span>
+                        <a class="clickUpload template" :href="`/user/api/v1/static/docs/sensitive.xlsx`" download @click.stop>模版下载</a>
+                    </p>
                 </div>
               </div>
               </el-upload>
@@ -165,7 +169,7 @@ export default {
             title:"新建词表",
             dialogVisible:false,
             ruleForm:{
-                importType:0,
+                importType:'single',
                 word:'',
                 sensitiveType:'',
                 fileName:'',
@@ -197,14 +201,20 @@ export default {
             this.clearform()
         },
         clearform(){
-            this.tableId = ''
+            this.ruleForm.tableId = ''
             this.$refs.ruleForm.resetFields()
             this.$refs.ruleForm.clearValidate()
         },
         submitForm(formName){
             this.$refs[formName].validate((valid) =>{
                 if(valid){
-                   
+                   uploadSensitiveWord(this.ruleForm).then(res =>{
+                    if(res.code == 0){
+                        this.$message.success('操作成功')
+                        this.$emit('reload')
+                        this.dialogVisible = false;
+                    }
+                   })
                 }else{
                     return false;
                 }
@@ -231,9 +241,12 @@ export default {
         height:56px;
         margin-top: 10px;
     }
-    .clickUpload{
+    .clickUpload,.template{
        color: #384bf7;
        font-weight: bold;
+    }
+    .template{
+        margin-left:10px;
     }
 }
 .file-list{

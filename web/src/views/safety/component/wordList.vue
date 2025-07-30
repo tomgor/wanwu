@@ -69,7 +69,7 @@
         </el-main>
       </el-container>
     </div>
-    <createWord ref="createWord" />
+    <createWord ref="createWord" @reload="reload"/>
     <setReply ref="setReply" />
   </div>
 </template>
@@ -86,9 +86,7 @@ export default {
       loading:false,
       tableLoading:false,
       docQuery: {
-        tableId:this.$route.params.id,
-        page:1,
-        pageSize:10
+        tableId:this.$route.params.id
       },
       fileList: [],
       listApi: getSensitiveWord,
@@ -99,9 +97,12 @@ export default {
     };
   },
   mounted(){
-    // this.getTableData(this.docQuery)
+    this.getTableData(this.docQuery)
   },
   methods: {
+    reload(){
+      this.getTableData(this.docQuery)
+    },
     showCreate(){
       this.$refs.createWord.showDialog(this.docQuery.tableId)
     },
@@ -140,7 +141,6 @@ export default {
        this.tableLoading = true;
        this.tableData = await this.$refs["pagination"].getTableData(data);
        this.tableLoading = false;
-       this.getTips();
     },
     async download(url,name){
       const res = await downDoc(url)

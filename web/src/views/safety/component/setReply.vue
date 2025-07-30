@@ -13,7 +13,6 @@
             ref="ruleForm"
             label-width="140px"
             class="demo-ruleForm"
-            :rules="rules"
             @submit.native.prevent
         >
             <el-form-item

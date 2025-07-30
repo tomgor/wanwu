@@ -242,21 +242,9 @@
             <span class="common-add">
               <span class="el-icon-s-operation"></span>
               <span class="handleBtn" style="margin-right:10px;" @click="showSafety">配置</span>
-              <el-switch v-model="editForm.safetyConfig.enable"></el-switch>
+              <el-switch v-model="editForm.safetyConfig.enable" :disabled="!(editForm.safetyConfig.tables || []).length"></el-switch>
             </span>
           </p>
-          <!-- <div class="rl">
-            <div class="block-link" style="width:50%;">
-              <span class="link-text">
-                <img :src="require('@/assets/imgs/bocha.png')" style="width:20px;margin-right:8px;" />
-                <span>博查</span>
-              </span>
-              <span>
-                <span class="el-icon-s-operation link-operation" @click="showLinkDiglog"></span>
-                <el-switch v-model="editForm.onlineSearchConfig.enable"></el-switch>
-              </span>
-            </div>
-          </div> -->
         </div>
       </div>
       <div  class="actionConfig" v-if="showActionConfig">
