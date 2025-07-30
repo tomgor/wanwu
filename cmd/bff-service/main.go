@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
+	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/ahocorasick"
 	assistant_template "github.com/UnicomAI/wanwu/internal/bff-service/pkg/assistant-template"
 	"github.com/UnicomAI/wanwu/internal/bff-service/server/http/handler"
 	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
@@ -67,6 +68,11 @@ func main() {
 	// init minio: custom
 	if err := minio.InitCustom(ctx, config.Cfg().Minio); err != nil {
 		log.Fatalf("init minio err: %v", err)
+	}
+
+	// init aho
+	if err := ahocorasick.Init(); err != nil {
+		log.Fatalf("init aho err: %v", err)
 	}
 
 	// init minio: fileupload
