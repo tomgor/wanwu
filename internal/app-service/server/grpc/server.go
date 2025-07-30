@@ -8,9 +8,11 @@ import (
 	"time"
 
 	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
+	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 	"github.com/UnicomAI/wanwu/internal/app-service/client"
 	"github.com/UnicomAI/wanwu/internal/app-service/config"
 	"github.com/UnicomAI/wanwu/internal/app-service/server/grpc/app"
+	"github.com/UnicomAI/wanwu/internal/app-service/server/grpc/safety"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -25,13 +27,15 @@ type Server struct {
 	cfg  *config.Config
 	serv *grpc.Server
 
-	app *app.Service
+	app    *app.Service
+	safety *safety.Service
 }
 
 func NewServer(cfg *config.Config, cli client.IClient) (*Server, error) {
 	s := &Server{
-		cfg: cfg,
-		app: app.NewService(cli),
+		cfg:    cfg,
+		app:    app.NewService(cli),
+		safety: safety.NewService(cli),
 	}
 	return s, nil
 }
@@ -61,6 +65,7 @@ func (s *Server) Start(ctx context.Context) error {
 
 	// register service
 	app_service.RegisterAppServiceServer(s.serv, s.app)
+	safety_service.RegisterSafetyServiceServer(s.serv, s.safety)
 
 	// listen
 	lis, err := net.Listen("tcp", s.cfg.Server.GrpcEndpoint)

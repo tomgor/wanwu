@@ -64,6 +64,15 @@ func WithID(Id string) SQLOption {
 	})
 }
 
+func WithIDs(Ids []string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if len(Ids) > 0 {
+			return db.Where("id IN (?)", Ids)
+		}
+		return db
+	})
+}
+
 func WithAppID(appID string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		if appID != "" {
@@ -166,5 +175,41 @@ func WithSearchType(userID, searchType string) SQLOption {
 			args = append(args, userID, constant.AppPublishPrivate)
 		}
 		return db.Where(query, args...)
+	})
+}
+
+func WithTableID(tableID string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if tableID != "" {
+			return db.Where("table_id = ?", tableID)
+		}
+		return db
+	})
+}
+
+func WithTableIDs(tableIDs []string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if len(tableIDs) > 0 {
+			return db.Where("table_id IN (?)", tableIDs)
+		}
+		return db
+	})
+}
+
+func WithContent(content string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if content != "" {
+			return db.Where("content = ?", content)
+		}
+		return db
+	})
+}
+
+func WithContents(contents []string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if len(contents) > 0 {
+			return db.Where("content IN ?", contents)
+		}
+		return db
 	})
 }

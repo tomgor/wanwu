@@ -2,8 +2,10 @@ package service
 
 import (
 	"fmt"
+
 	knowledgebase_keywords_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-keywords-service"
 	knowledgebase_tag_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-tag-service"
+	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 
 	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
@@ -37,6 +39,7 @@ var (
 	app                   app_service.AppServiceClient
 	rag                   rag_service.RagServiceClient
 	assistant             assistant_service.AssistantServiceClient
+	safety                safety_service.SafetyServiceClient
 )
 
 // --- API ---
@@ -83,6 +86,7 @@ func Init() error {
 	knowledgeBaseKeywords = knowledgebase_keywords_service.NewKnowledgeBaseKeywordsServiceClient(knowledgeBaseConn)
 	rag = rag_service.NewRagServiceClient(ragConn)
 	assistant = assistant_service.NewAssistantServiceClient(assistantConn)
+	safety = safety_service.NewSafetyServiceClient(appConn)
 	return nil
 }
 
