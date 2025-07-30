@@ -37,9 +37,9 @@
             label="检索方式配置"
             class="vertical-form-item"
           >
-          <div v-for="item in searchTypeData" :class="['searchType-list',{ 'active': item.showContent }]" @click="clickSearch(item)">
-            <div class="searchType-title">
-              <span class="el-icon-menu img"></span>
+          <div v-for="item in searchTypeData" :class="['searchType-list',{ 'active': item.showContent }]">
+            <div class="searchType-title" @click="clickSearch(item)">
+              <span :class="[item.icon,'img']"></span>
               <div class="title-content">
                 <div class="title-box">
                   <h3 class="title-name">{{item.name}}</h3>
@@ -49,20 +49,29 @@
               </div>
             </div>
             <div class="searchType-content" v-if="item.showContent">
-              <div v-if="item.isWeight" class="weightType-box">
-                <div v-for="mixItem in item.mixType" class="weightType">
+              <div v-if="item.isWeight" class="weightType-box" >
+                <div v-for="mixItem in item.mixType" :class="['weightType',{ 'active': mixItem.value === item.mixTypeValue }]" @click.stop="mixTypeClick(item,mixItem)">
                   <p class="weightType-name">{{mixItem.name}}</p>
                   <p class="weightType-desc">{{mixItem.desc}}</p>
                 </div>
               </div>
-              <el-slider
-                v-if="item.isWeight && item.mixTypeValue === 'weight'"
-                v-model="item.mixTypeValue"
-                range
-                show-stops
-                :max="1">
-              </el-slider>
-              <el-row>
+              <el-row v-if="item.isWeight && item.mixTypeValue === 'weight'" @click.stop>
+                <el-col class="mixTypeRange-title">
+                  <span>语义[{{item.mixTypeRange[0]}}]</span>
+                  <span>关键词[{{item.mixTypeRange[1]}}]</span>
+                </el-col>
+                <el-col>
+                  <el-slider
+                  v-model="item.mixTypeRange"
+                  range
+                  show-stops
+                  :step="0.1"
+                  :max="1"
+                  >
+                </el-slider>
+                </el-col>
+              </el-row>
+              <el-row v-if="showRerank(item)">
                 <el-col class="content-name">Rerank模型</el-col>
                 <el-col>
                   <el-select
@@ -71,7 +80,7 @@
                   style="width:100%;"
                   loading-text="模型加载中..."
                   v-model="formInline.knowledgeMatchParams.rerankModelId"
-                  @visible-change="visibleChange($event,'rerank')"
+                  @visible-change="visibleChange($event)"
                   placeholder="请选择"
                 >
                   <el-option
@@ -93,10 +102,10 @@
                 </el-col>
                 <el-col>
                   <el-slider
-                    min="1"
-                    max="10"
-                    step="1"
-                    v-model="formInline.topK"
+                    :min="1"
+                    :max="10"
+                    :step="1"
+                    v-model="formInline.knowledgeMatchParams.topK"
                     show-input>
                   </el-slider>
                 </el-col>
@@ -110,10 +119,10 @@
                 </el-col>
                 <el-col>
                   <el-slider
-                    min="0"
-                    max="1"
-                    step="0.1"
-                    v-model="formInline.score"
+                    :min="0"
+                    :max="1"
+                    :step="0.1"
+                    v-model="formInline.knowledgeMatchParams.score"
                     show-input>
                   </el-slider>
                 </el-col>
@@ -167,7 +176,7 @@
   </div>
 </template>
 <script>
-import { getKnowledgeList, hitTest } from "@/api/knowledge";
+import { hitTest } from "@/api/knowledge";
 import { getRerankList } from "@/api/modelAccess";
 import { md } from "@/mixins/marksown-it";
 export default {
@@ -178,13 +187,13 @@ export default {
       formInline: {
         knowledgeIdList: [this.$route.query.knowledgeId],
         knowledgeMatchParams:{
-          keywordPriority:0,//关键词权重
+          keywordPriority:0.8,//关键词权重
           matchType:'',//vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
-          priorityMatch:'',//权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+          priorityMatch:1,//权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
           rerankModelId:'',//rerank模型id
-          score:0,//过滤分数阈值
-          semanticsPriority:0,//语义权重
-          topK:0//topK 获取最高的几行
+          score:0.4,//过滤分数阈值
+          semanticsPriority:0.2,//语义权重
+          topK:1//topK 获取最高的几行
         }
       },
       question: "",
@@ -197,8 +206,9 @@ export default {
           value:'vector',
           desc:'通过向量相似度找到语义相近、表达多样的文本片段，适用于理解和召回语义相关信息。',
           rerank:'',
-          topK:'',
-          Score:'',
+          icon:'el-icon-menu',
+          topK:0,
+          Score:0.4,
           isWeight:false,
           showContent:false
         },
@@ -207,8 +217,9 @@ export default {
           value:'text',
           desc:'基于关键词匹配，能够高效查询包含指定词汇的文本片段，适用于精确查找',
           rerank:'',
-          topK:'',
-          Score:'',
+          topK:0,
+          Score:0.4,
+          icon:'el-icon-document',
           isWeight:false,
           showContent:false
         },
@@ -217,13 +228,14 @@ export default {
           value:'mix',
           desc:'结合向量和关键词检索，融合语义理解与关键词匹配，兼顾相关性和准确性，提升检索效果。',
           rerank:'',
-          topK:'',
-          Score:'',
+          icon:'el-icon-s-grid',
+          topK:0,
+          Score:0.4,
           isWeight:true,
           Weight:'',
           mixTypeValue:'weight',
           showContent:false,
-          mixTypeRange:[0,1],
+          mixTypeRange:[0.2,0.8],
           mixType:[
             {
               name:'权重设置',
@@ -244,11 +256,28 @@ export default {
     this.getRerankData();
   },
   methods: {
+    mixTypeClick(item,n){
+      item.mixTypeValue = n.value;
+      this.formInline.knowledgeMatchParams.priorityMatch = n.value === 'weight' ? 1 : 0 ; 
+    },
+    showRerank(n){
+      return (n.value === 'vector' || n.value === 'text') || (n.value === 'mix' && n.mixTypeValue === 'rerank');
+    },
     clickSearch(n){
+      this.formInline.knowledgeMatchParams.matchType = n.value;
       this.searchTypeData = this.searchTypeData.map(item => ({
         ...item,
         showContent: item.value === n.value ? !item.showContent : false
       }));
+      this.clear();
+    },
+    clear(){
+      this.formInline.knowledgeMatchParams.rerankModelId = '';
+      this.formInline.knowledgeMatchParams.keywordPriority = 0.8;
+      this.formInline.knowledgeMatchParams.semanticsPriority = 0.2;
+      this.formInline.knowledgeMatchParams.priorityMatch = 1;
+      this.formInline.knowledgeMatchParams.score = 0.4;
+      this.formInline.knowledgeMatchParams.topK = 1;
     },
     getRerankData() {
       getRerankList().then((res) => {
@@ -257,30 +286,33 @@ export default {
         }
       });
     },
-    visibleChange(val, type) {
+    visibleChange(val) {
       if (val) {
-        if (type === "knowledge") {
-          this.getKnowledgeList();
-        } else {
-          this.getRerankData();
-        }
+        this.getRerankData();
       }
     },
     goBack() {
       this.$router.go(-1);
     },
     startTest() {
+      const { matchType, priorityMatch, rerankModelId } = this.formInline.knowledgeMatchParams;
       if (this.question === "") {
         this.$message.warning("请输入问题");
         return;
       }
-      // if (this.formInline.knowledgeIdList.length === 0) {
-      //   this.$message.warning(this.$t("knowledgeManage.pselectKnowledgeTips"));
-      //   return;
-      // }
-      if (this.formInline.rerankModelId.length === 0) {
-        this.$message.warning("请选择Rerank模型");
+
+      if(matchType === ''){
+        this.$message.warning("请选择检索方式");
         return;
+      }
+      if(matchType === 'mix' && priorityMatch === 1){
+        this.formInline.knowledgeMatchParams.keywordPriority = this.searchTypeData[2]['mixTypeRange'][1];
+        this.formInline.knowledgeMatchParams.semanticsPriority = this.searchTypeData[2]['mixTypeRange'][0];
+      }else{
+        if(rerankModelId === '') {
+          this.$message.warning("请选择Rerank模型");
+          return;
+        }
       }
       const data = {
         ...this.formInline,
@@ -345,6 +377,7 @@ export default {
     .test-box {
        flex:1;
        height:100%;
+       overflow-y:auto;
       .hitTest_input {
         background: #fff;
         border-radius: 6px;
@@ -372,7 +405,6 @@ export default {
         border: 1px solid #e9ecef;
         .searchType-list:hover{
           border:1px solid #384bf7;
-          // background:#ECEEFE;
         }
         .searchType-list{
           border:1px solid #C0C4CC;
@@ -384,7 +416,16 @@ export default {
             display:flex;
             align-items: center;
             .img{
-              font-size:18px;
+              font-size:30px;
+              text-align:center;
+              line-height:50px;
+              color: #384bf7;
+              background-color:#fff;
+              width:50px;
+              height:50px;
+              border-radius:8px;
+              border:1px solid #e9e9eb;
+              box-shadow:4px 2px 4px #f1f1f1 ;
             }
             .title-content{
               flex:1;
@@ -422,13 +463,24 @@ export default {
                   text-align:center;
                   font-weight:bold;
                   line-height: 2;
+                  font-size: 16px;
+                  padding-top:5px;
                 }
                 .weightType-desc{
                   text-align:center;
                   line-height:1.5;
                   padding: 10px;
+                  color:#888;
                 }
               }
+            }
+            .mixTypeRange-title{
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
+              font-weight:bold;
+              margin-top:20px;
+              line-height:1;
             }
           }
         }
