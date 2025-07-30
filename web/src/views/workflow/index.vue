@@ -99,6 +99,14 @@
               输入txt、pdf、docx、xlsx、csv、pptx等格式文档的URL，可以解析提取出文档的文本内容
             </div>
           </div>
+          <div @click="preAddNode('templateTransform')" class="node-items-box">
+            <span>
+              <img :src="iconObj.TemplateTransformNode" />&nbsp; 模版转换
+            </span>
+            <div class="nodeSelectDesc">
+              使用 Jinja2 模版语法将数据转换为字符串
+            </div>
+          </div>
           <!--<div class="node-items-box"> &lt;!&ndash;@click="preAddNode('gui')"&ndash;&gt;
             <span>
               <img :src="iconObj.GUIAgentNode" />&nbsp; GUI 智能体节点
@@ -129,14 +137,6 @@
             </span>
             <div class="nodeSelectDesc">
               利用LLM从自然语言内推理解析出结构化参数，用于后置的工具调用或HTTP请求
-            </div>
-          </div>
-          <div class="node-items-box">
-            <span>
-              <img :src="iconObj.TransformNode" />&nbsp; 模版转换
-            </span>
-            <div class="nodeSelectDesc">
-              使用 Jinja 模版语法将数据转换为字符串
             </div>
           </div>
           <div class="node-items-box">
@@ -319,6 +319,7 @@ import { mockData } from "./mock/res";
 import {
   apiNode_initData,
   pythonNode_initData,
+  templateTransformNode_initData,
   LLMNode_initData,
   LLMStreamingNode_initData,
   SwitchNode_initData,
@@ -395,7 +396,7 @@ export default {
         GUIAgentNode: require("./components/img/gui.png"),
         LoopNode: require("./components/img/loop.png"),
         ParameterParserNode: require("./components/img/parameter-parser.png"),
-        TransformNode: require("./components/img/transform.png"),
+        TemplateTransformNode: require("./components/img/transform.png"),
         VariableNode: require("./components/img/variable-aggregator.png"),
         AssignerNode: require("./components/img/assigner.png"),
         FileGenerateNode: require("./components/img/filegenerate.png"),
@@ -594,6 +595,15 @@ export default {
             fileparse_initData,
             true,
             true
+          );
+          break;
+        case "templateTransform":
+          this.initNodeData(
+              "templatetransformnode",
+              "模板转换",
+              templateTransformNode_initData,
+              true,
+              true
           );
           break;
       }
