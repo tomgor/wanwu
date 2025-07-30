@@ -240,7 +240,7 @@
 <script>
 import { mapState } from "vuex";
 import nodeMethod from "@/views/workflow/mixins/nodeMethod";
-import AutoComplete from "./autoComplete.vue";
+import AutoComplete from "../common/autoComplete.vue";
 import {getModels} from "@/api/workflow";
 
 export default {

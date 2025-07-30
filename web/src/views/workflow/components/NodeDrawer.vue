@@ -50,6 +50,15 @@
         :key="datekey"
       />
 
+      <!--模板转换-->
+      <TransformSetting
+        v-if="nodeData.type === 'TemplateTransformNode'"
+        ref="templateTransform"
+        :graph="graph"
+        :node="node"
+        :key="datekey"
+      />
+
       <!--大模型-->
       <ModelSetting
         v-if="nodeData.type === 'LLMNode'"
@@ -151,6 +160,7 @@ import FilegenerateSetting from "./filegenerate/index.vue";
 import FileparseSetting from "./fileparse/index.vue";
 import McpSetting from "./mcp/setting.vue";
 import IntentionSetting from "./intention/index.vue";
+import TransformSetting from "./templateTransform/TransformSetting.vue";
 
 import { nodeDescConfig } from "../mock/nodeConfig";
 
@@ -171,6 +181,7 @@ export default {
     FileparseSetting,
     McpSetting,
     IntentionSetting,
+    TransformSetting
   },
   data() {
     return {
