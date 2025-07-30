@@ -49,9 +49,6 @@ func Start(ctx context.Context) {
 		log.Fatalf("init service err: %v", err)
 	}
 
-	// addChatContainer
-	service.InitAddChatContainer()
-
 	// start http server
 	httpServ = &http.Server{
 		Addr:    ":" + strconv.Itoa(config.Cfg().Server.Port),

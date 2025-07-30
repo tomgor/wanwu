@@ -17,69 +17,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AgentChatService struct{}
-
-// buildContent implements ChatService.
-func (a *AgentChatService) buildContent(text string) (contentList []string, id string) {
-	text = strings.TrimPrefix(text, "data:")
-	text = strings.TrimSpace(text)
-	if text == "" {
-		return nil, ""
-	}
-	resp := struct {
-		Code           int      `json:"code"`
-		Message        string   `json:"message"`
-		Response       string   `json:"response"`
-		MsgID          string   `json:"msg_id"`
-		GenFileURLList []string `json:"gen_file_url_list"`
-		History        []struct {
-			Response string `json:"response"`
-		} `json:"history"`
-		Finish int `json:"finish"`
-		Usage  struct {
-			PromptTokens     int `json:"prompt_tokens"`
-			CompletionTokens int `json:"completion_tokens"`
-			TotalTokens      int `json:"total_tokens"`
-		} `json:"usage"`
-		SearchList []string `json:"search_list"`
-		QAType     []int    `json:"qa_type"`
-	}{}
-	if err := json.Unmarshal([]byte(text), &resp); err != nil {
-		return nil, ""
-	}
-	var contents []string
-	if resp.Response != "" {
-		contents = append(contents, resp.Response)
-	}
-	return contents, resp.MsgID
-}
-
-// buildChatType implements ChatService.
-func (a *AgentChatService) buildChatType() string {
-	return constant.AppTypeAgent
-}
-
-// buildSensitiveResp implements ChatService.
-func (a *AgentChatService) buildSensitiveResp(id string, content string) string {
-	resp := map[string]interface{}{
-		"code":              0,
-		"message":           "success",
-		"response":          content,
-		"gen_file_url_list": []interface{}{},
-		"history":           []interface{}{},
-		"finish":            1, // Note: The original JSON has "finish" misspelled as "finish"
-		"usage": map[string]interface{}{
-			"prompt_tokens":     0,
-			"completion_tokens": 0,
-			"total_tokens":      0,
-		},
-		"search_list": []interface{}{},
-		"qa_type":     []int{1},
-	}
-
-	marshal, _ := json.Marshal(resp)
-	return "data:" + string(marshal)
-}
 func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req request.ConversionStreamRequest) (<-chan string, error) {
 	// 根据agentID获取敏感词配置
 	agentInfo, err := assistant.GetAssistantInfo(ctx, &assistant_service.GetAssistantInfoReq{
@@ -90,9 +27,9 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 	}
 	var matchDicts []ahocorasick.DictConfig
 	// 如果Enable为true,则处理敏感词
-	if agentInfo.SafetyConfig.Enable {
+	if agentInfo.SafetyConfig.GetEnable() {
 		var ids []string
-		for _, idx := range agentInfo.SafetyConfig.SensitiveTable {
+		for _, idx := range agentInfo.SafetyConfig.GetSensitiveTable() {
 			ids = append(ids, idx.TableId)
 		}
 		matchDicts, err = BuildSensitiveDict(ctx, ids)
@@ -154,11 +91,11 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 			ret <- s.Content
 		}
 	}()
-	if !agentInfo.SafetyConfig.Enable {
+	if !agentInfo.SafetyConfig.GetEnable() {
 		return ret, nil
 	}
 	// 敏感词过滤
-	filteredCh := ProcessSensitiveWords(ctx, ret, matchDicts, constant.AppTypeAgent)
+	filteredCh := ProcessSensitiveWords(ret, matchDicts, &agentSensitiveService{})
 	return filteredCh, nil
 }
 
@@ -187,4 +124,65 @@ func buildAgentChatRespLineProcessor() func(*gin.Context, string, interface{}) (
 		}
 		return "data:" + lineText + "\n\n", false, nil
 	}
+}
+
+// --- agent sensitive ---
+
+type agentSensitiveService struct{}
+
+func (s *agentSensitiveService) serviceType() string {
+	return constant.AppTypeAgent
+}
+
+// parseContent implements ChatService.
+func (s *agentSensitiveService) parseContent(raw string) (id, content string) {
+	raw = strings.TrimPrefix(raw, "data:")
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return "", ""
+	}
+	resp := struct {
+		Code           int      `json:"code"`
+		Message        string   `json:"message"`
+		Response       string   `json:"response"`
+		MsgID          string   `json:"msg_id"`
+		GenFileURLList []string `json:"gen_file_url_list"`
+		History        []struct {
+			Response string `json:"response"`
+		} `json:"history"`
+		Finish int `json:"finish"`
+		Usage  struct {
+			PromptTokens     int `json:"prompt_tokens"`
+			CompletionTokens int `json:"completion_tokens"`
+			TotalTokens      int `json:"total_tokens"`
+		} `json:"usage"`
+		SearchList []string `json:"search_list"`
+		QAType     []int    `json:"qa_type"`
+	}{}
+	if err := json.Unmarshal([]byte(raw), &resp); err != nil {
+		return "", ""
+	}
+	return resp.MsgID, resp.Response
+}
+
+// buildSensitiveResp implements ChatService.
+func (s *agentSensitiveService) buildSensitiveResp(id string, content string) []string {
+	resp := map[string]interface{}{
+		"code":              0,
+		"message":           "success",
+		"response":          content,
+		"gen_file_url_list": []interface{}{},
+		"history":           []interface{}{},
+		"finish":            1, // Note: The original JSON has "finish" misspelled as "finish"
+		"usage": map[string]interface{}{
+			"prompt_tokens":     0,
+			"completion_tokens": 0,
+			"total_tokens":      0,
+		},
+		"search_list": []interface{}{},
+		"qa_type":     []int{1},
+	}
+
+	marshal, _ := json.Marshal(resp)
+	return []string{"data: " + string(marshal)}
 }

@@ -24,11 +24,6 @@ import (
 )
 
 const docCenterLocalDir = "static/docs"
-const (
-	defaultCheckWindowSize  = 20
-	defaultOutputWindowSize = 3
-	defaultChannelSize      = 20
-)
 
 var (
 	avatarCacheMu       sync.Mutex

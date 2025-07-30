@@ -6,71 +6,17 @@ import (
 	"io"
 	"strings"
 
+	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	rag_service "github.com/UnicomAI/wanwu/api/proto/rag-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/ahocorasick"
 	"github.com/UnicomAI/wanwu/pkg/constant"
+	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	sse_util "github.com/UnicomAI/wanwu/pkg/sse-util"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 )
-
-type RagChatService struct{}
-
-func (dp *RagChatService) buildContent(text string) (contentList []string, id string) {
-	// 1. 清理数据前缀
-	text = strings.TrimPrefix(text, "data:")
-	text = strings.TrimSpace(text)
-	if text == "" {
-		return nil, ""
-	}
-	// 2. 解析JSON
-	resp := struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		MsgID   string `json:"msg_id"`
-		Data    struct {
-			Output string `json:"output"`
-		} `json:"data"`
-		History []struct {
-			Response string `json:"response"`
-		} `json:"history"`
-		Finish int `json:"finish"`
-	}{}
-
-	if err := json.Unmarshal([]byte(text), &resp); err != nil {
-		return nil, ""
-	}
-	// 3. 构建返回内容
-	var contents []string
-	// 主输出内容
-	if resp.Data.Output != "" {
-		contents = append(contents, resp.Data.Output)
-	}
-	return contents, resp.MsgID
-}
-
-func (dp *RagChatService) buildSensitiveResp(id string, content string) string {
-	resp := map[string]interface{}{
-		"code":    0,
-		"message": "success",
-		"msg_id":  id,
-		"data": map[string]interface{}{
-			"output":     content,
-			"searchList": []interface{}{},
-		},
-		"history": []interface{}{},
-		"finish":  0,
-	}
-
-	marshal, _ := json.Marshal(resp)
-	return "data:" + string(marshal)
-}
-
-func (dp *RagChatService) buildChatType() string {
-	return constant.AppTypeRag
-}
 
 // ChatRagStream rag私域问答
 func ChatRagStream(ctx *gin.Context, userId, orgId string, req request.ChatRagRequest) error {
@@ -96,17 +42,17 @@ func CallRagChatStream(ctx *gin.Context, userId, orgId string, req request.ChatR
 	}
 	var matchDicts []ahocorasick.DictConfig
 	// 如果Enable为true,则处理敏感词
-	if ragInfo.SensitiveConfig.Enable {
-		matchDicts, err = BuildSensitiveDict(ctx, ragInfo.SensitiveConfig.TableIds)
+	if ragInfo.SensitiveConfig.GetEnable() {
+		matchDicts, err = BuildSensitiveDict(ctx, ragInfo.SensitiveConfig.GetTableIds())
 		if err != nil {
 			return nil, err
 		}
 		ret, err := ahocorasick.ContentMatch(req.Question, matchDicts, true)
 		if err != nil {
-			return nil, err
+			return nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, err.Error())
 		}
 		if len(ret) > 0 {
-			return nil, fmt.Errorf("您的提问中含有敏感词:%v", ret[0].Reply)
+			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_sensitive_check_req", ret[0].Reply)
 		}
 	}
 	stream, err := rag.ChatRag(ctx, &rag_service.ChatRagReq{
@@ -139,11 +85,11 @@ func CallRagChatStream(ctx *gin.Context, userId, orgId string, req request.ChatR
 			ret <- s.Content
 		}
 	}()
-	if !ragInfo.SensitiveConfig.Enable {
+	if !ragInfo.SensitiveConfig.GetEnable() {
 		return ret, nil
 	}
 	// 敏感词过滤
-	filteredCh := ProcessSensitiveWords(ctx, ret, matchDicts, constant.AppTypeRag)
+	filteredCh := ProcessSensitiveWords(ret, matchDicts, &ragSensitiveService{})
 	return filteredCh, nil
 }
 
@@ -159,4 +105,57 @@ func buildRagChatRespLineProcessor() func(*gin.Context, string, interface{}) (st
 		}
 		return lineText + "\n\n", false, nil
 	}
+}
+
+// --- rag sensitive ---
+
+type ragSensitiveService struct{}
+
+func (s *ragSensitiveService) serviceType() string {
+	return constant.AppTypeRag
+}
+
+func (s *ragSensitiveService) parseContent(raw string) (id, content string) {
+	// 1. 清理数据前缀
+	raw = strings.TrimPrefix(raw, "data:")
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return "", ""
+	}
+	// 2. 解析JSON
+	resp := struct {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+		MsgID   string `json:"msg_id"`
+		Data    struct {
+			Output string `json:"output"`
+		} `json:"data"`
+		History []struct {
+			Response string `json:"response"`
+		} `json:"history"`
+		Finish int `json:"finish"`
+	}{}
+
+	if err := json.Unmarshal([]byte(raw), &resp); err != nil {
+		return "", ""
+	}
+	// 3. 返回content
+	return resp.MsgID, resp.Data.Output
+}
+
+func (s *ragSensitiveService) buildSensitiveResp(id string, content string) []string {
+	resp := map[string]interface{}{
+		"code":    0,
+		"message": "success",
+		"msg_id":  id,
+		"data": map[string]interface{}{
+			"output":     content,
+			"searchList": []interface{}{},
+		},
+		"history": []interface{}{},
+		"finish":  0,
+	}
+
+	marshal, _ := json.Marshal(resp)
+	return []string{"data: " + string(marshal)}
 }

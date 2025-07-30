@@ -65,14 +65,14 @@ func main() {
 		log.Fatalf("init i18n err: %v", err)
 	}
 
+	// init aho-corasick
+	if err := ahocorasick.Init(); err != nil {
+		log.Fatalf("init aho-corasick err: %v", err)
+	}
+
 	// init minio: custom
 	if err := minio.InitCustom(ctx, config.Cfg().Minio); err != nil {
 		log.Fatalf("init minio err: %v", err)
-	}
-
-	// init aho
-	if err := ahocorasick.Init(); err != nil {
-		log.Fatalf("init aho err: %v", err)
 	}
 
 	// init minio: fileupload
