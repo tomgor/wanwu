@@ -42,7 +42,18 @@ message KnowledgeHitReq{
   string userId = 2;
   string question = 3; //问题
   repeated string knowledgeIdList = 4;//知识库id 列表
-  string rerankModelId = 5; //重排序模型id
+  KnowledgeMatchParams knowledgeMatchParams = 5; //模型匹配方式
+}
+
+
+message KnowledgeMatchParams{
+  string  matchType = 1; //matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+  string  rerankModelId = 2;//rerank模型id
+  int32 priorityMatch = 3;// 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+  float semanticsPriority = 4;// 语义权重
+  float keywordPriority = 5;// 关键词权重
+  int32 topK = 6;//topK 获取最高的几行
+  float score = 7;//score 过滤分数阈值
 }
 
 message CreateKnowledgeReq{

@@ -133,13 +133,18 @@ func (s *Service) KnowledgeHit(ctx context.Context, req *knowledgebase_service.K
 	if err != nil {
 		return nil, err
 	}
+	matchParams := req.KnowledgeMatchParams
+	priorityMatch := matchParams.PriorityMatch
 	hitResp, err := rag_service.RagKnowledgeHit(ctx, &rag_service.KnowledgeHitParams{
-		UserId:        req.UserId,
-		Question:      req.Question,
-		KnowledgeBase: buildKnowledgeNameList(list),
-		TopK:          HitTopK,
-		Threshold:     HitThreshold,
-		RerankModelId: req.RerankModelId,
+		UserId:         req.UserId,
+		Question:       req.Question,
+		KnowledgeBase:  buildKnowledgeNameList(list),
+		TopK:           matchParams.TopK,
+		Threshold:      float64(matchParams.Score),
+		RerankModelId:  matchParams.RerankModelId,
+		RetrieveMethod: buildRetrieveMethod(matchParams.MatchType),
+		RerankMod:      buildRerankMod(priorityMatch),
+		Weight:         buildWeight(priorityMatch, matchParams.SemanticsPriority, matchParams.KeywordPriority),
 	})
 	if err != nil {
 		log.Errorf("RagKnowledgeHit error %s", err)
@@ -266,5 +271,37 @@ func buildKnowledgeBaseHitResp(ragKnowledgeHitResp *rag_service.RagKnowledgeHitR
 		Prompt:     knowledgeHitData.Prompt,
 		Score:      knowledgeHitData.Score,
 		SearchList: searchList,
+	}
+}
+
+// buildRetrieveMethod 构造检索方式
+func buildRetrieveMethod(matchType string) string {
+	switch matchType {
+	case "vector":
+		return "semantic_search"
+	case "text":
+		return "full_text_search"
+	case "mix":
+		return "hybrid_search"
+	}
+	return ""
+}
+
+// buildRerankMod 构造重排序模式
+func buildRerankMod(priorityType int32) string {
+	if priorityType == 1 {
+		return "weighted_score"
+	}
+	return "rerank_model"
+}
+
+// buildWeight 构造权重信息
+func buildWeight(priorityType int32, semanticsPriority float32, keywordPriority float32) *rag_service.WeightParams {
+	if priorityType != 1 {
+		return nil
+	}
+	return &rag_service.WeightParams{
+		VectorWeight: semanticsPriority,
+		TextWeight:   keywordPriority,
 	}
 }

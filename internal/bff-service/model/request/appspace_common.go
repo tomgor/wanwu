@@ -74,6 +74,11 @@ type AppKnowledgebaseParams struct {
 	ThresholdEnable  bool    `json:"thresholdEnable"`  // 过滤阈值(开关)
 	TopK             int32   `json:"topK"`             // 知识条数
 	TopKEnable       bool    `json:"topKEnable"`       // 知识条数(开关)
+
+	MatchType         string  `json:"matchType"`         //matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+	PriorityMatch     int32   `json:"priorityMatch"`     // 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+	SemanticsPriority float32 `json:"semanticsPriority"` // 语义权重
+	KeywordPriority   float32 `json:"keywordPriority"`   // 关键词权重
 }
 
 type AppSafetyConfig struct {

@@ -34,7 +34,15 @@ type RagChatParams struct {
 	CustomModelInfo *CustomModelInfo `json:"custom_model_info"`
 	History         []*HistoryItem   `json:"history"`
 	MaxHistory      int32            `json:"maxHistory"`
-	RewriteQuery    bool             `json:"rewrite_query"` // 是否query改写
+	RewriteQuery    bool             `json:"rewrite_query"`   // 是否query改写
+	RerankMod       string           `json:"rerank_mod"`      // rerank_model:重排序模式，weighted_score：权重搜索
+	RetrieveMethod  string           `json:"retrieve_method"` // hybrid_search:混合搜索， semantic_search:向量搜索， full_text_search：文本搜索
+	Weight          *WeightParams    `json:"weights"`         // 权重搜索下的权重配置
+}
+
+type WeightParams struct {
+	VectorWeight float32 `json:"vector_weight"` //语义权重
+	TextWeight   float32 `json:"text_weight"`   //关键字权重
 }
 
 type CustomModelInfo struct {
@@ -121,22 +129,27 @@ func buildHttpParams(userId string, req *RagChatParams) (*http_client.HttpReques
 func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, knowledge *knowledgeBase_service.KnowledgeInfo) *RagChatParams {
 	// 判断enable状态
 	ragChatParams := &RagChatParams{}
-	if !rag.KnowledgeBaseConfig.MaxHistoryEnable {
+	knowledgeConfig := rag.KnowledgeBaseConfig
+	if !knowledgeConfig.MaxHistoryEnable {
 		ragChatParams.MaxHistory = DefaultMaxHistory
 	} else {
-		ragChatParams.MaxHistory = int32(rag.KnowledgeBaseConfig.MaxHistory)
+		ragChatParams.MaxHistory = int32(knowledgeConfig.MaxHistory)
 	}
-	if !rag.KnowledgeBaseConfig.ThresholdEnable {
+	if !knowledgeConfig.ThresholdEnable {
 		ragChatParams.Threshold = DefaultThreshold
 	} else {
-		ragChatParams.Threshold = float32(rag.KnowledgeBaseConfig.Threshold)
+		ragChatParams.Threshold = float32(knowledgeConfig.Threshold)
 	}
-	if !rag.KnowledgeBaseConfig.TopKEnable {
+	if !knowledgeConfig.TopKEnable {
 		ragChatParams.TopK = DefaultTopK
 	} else {
-		ragChatParams.TopK = int32(rag.KnowledgeBaseConfig.TopK)
+		ragChatParams.TopK = int32(knowledgeConfig.TopK)
 	}
-	ragChatParams.CustomModelInfo = &CustomModelInfo{LlmModelID: rag.ModelConfig.ModelId}
+	ragChatParams.RetrieveMethod = buildRetrieveMethod(knowledgeConfig.MatchType)
+	ragChatParams.RerankMod = buildRerankMod(knowledgeConfig.PriorityMatch)
+	ragChatParams.Weight = buildWeight(knowledgeConfig)
+
+	ragChatParams.CustomModelInfo = &CustomModelInfo{LlmModelID: rag.RerankConfig.ModelId}
 	ragChatParams.KnowledgeBase = knowledge.Name
 	ragChatParams.Question = req.Question
 	ragChatParams.Stream = true
@@ -144,6 +157,39 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	ragChatParams.RerankModelId = rag.RerankConfig.ModelId
 	ragChatParams.History = []*HistoryItem{}
 	ragChatParams.RewriteQuery = true
+
 	log.Infof("ragparams = %+v", ragChatParams)
 	return ragChatParams
+}
+
+// buildRetrieveMethod 构造检索方式
+func buildRetrieveMethod(matchType string) string {
+	switch matchType {
+	case "vector":
+		return "semantic_search"
+	case "text":
+		return "full_text_search"
+	case "mix":
+		return "hybrid_search"
+	}
+	return ""
+}
+
+// buildRerankMod 构造重排序模式
+func buildRerankMod(priorityType int32) string {
+	if priorityType == 1 {
+		return "weighted_score"
+	}
+	return "rerank_model"
+}
+
+// buildWeight 构造权重信息
+func buildWeight(knowConfig model.KnowledgeBaseConfig) *WeightParams {
+	if knowConfig.PriorityMatch != 1 {
+		return nil
+	}
+	return &WeightParams{
+		VectorWeight: float32(knowConfig.SemanticsPriority),
+		TextWeight:   float32(knowConfig.KeywordPriority),
+	}
 }

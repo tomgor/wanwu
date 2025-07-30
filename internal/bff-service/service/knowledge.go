@@ -93,12 +93,21 @@ func DeleteKnowledge(ctx *gin.Context, userId, orgId string, r *request.DeleteKn
 
 // KnowledgeHit 知识库命中
 func KnowledgeHit(ctx *gin.Context, userId, orgId string, r *request.KnowledgeHitReq) (*response.KnowledgeHitResp, error) {
+	matchParams := r.KnowledgeMatchParams
 	resp, err := knowledgeBase.KnowledgeHit(ctx.Request.Context(), &knowledgebase_service.KnowledgeHitReq{
 		Question:        r.Question,
 		UserId:          userId,
 		OrgId:           orgId,
 		KnowledgeIdList: r.KnowledgeIdList,
-		RerankModelId:   r.RerankModelId,
+		KnowledgeMatchParams: &knowledgebase_service.KnowledgeMatchParams{
+			MatchType:         matchParams.MatchType,
+			RerankModelId:     matchParams.RerankModelId,
+			PriorityMatch:     matchParams.PriorityMatch,
+			SemanticsPriority: matchParams.SemanticsPriority,
+			KeywordPriority:   matchParams.KeywordPriority,
+			TopK:              matchParams.TopK,
+			Score:             matchParams.Score,
+		},
 	})
 	if err != nil {
 		return nil, err

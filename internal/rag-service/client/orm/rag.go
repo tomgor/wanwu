@@ -48,6 +48,7 @@ func (c *Client) GetRag(ctx context.Context, req *rag_service.RagDetailReq) (*ra
 			return nil, toErrStatus("rag_get_err", err.Error())
 		}
 	}
+	knowledgeConfig := info.KnowledgeBaseConfig
 	// 填充 rag 的信息
 	resp := &rag_service.RagInfo{
 		RagId: info.RagID,
@@ -71,19 +72,24 @@ func (c *Client) GetRag(ctx context.Context, req *rag_service.RagDetailReq) (*ra
 			Config:    info.RerankConfig.Config,
 		},
 		KnowledgeBaseConfig: &rag_service.RagKnowledgeBaseConfig{
-			KnowledgeBaseId:  info.KnowledgeBaseConfig.KnowId,
-			MaxHistoryEnable: info.KnowledgeBaseConfig.MaxHistoryEnable,
-			ThresholdEnable:  info.KnowledgeBaseConfig.ThresholdEnable,
-			TopKEnable:       info.KnowledgeBaseConfig.TopKEnable,
-			MaxHistory:       int32(info.KnowledgeBaseConfig.MaxHistory),
-			Threshold:        float32(info.KnowledgeBaseConfig.Threshold),
-			TopK:             int32(info.KnowledgeBaseConfig.TopK),
+			KnowledgeBaseId:   knowledgeConfig.KnowId,
+			MaxHistoryEnable:  knowledgeConfig.MaxHistoryEnable,
+			ThresholdEnable:   knowledgeConfig.ThresholdEnable,
+			TopKEnable:        knowledgeConfig.TopKEnable,
+			MaxHistory:        int32(knowledgeConfig.MaxHistory),
+			Threshold:         float32(knowledgeConfig.Threshold),
+			TopK:              int32(knowledgeConfig.TopK),
+			MatchType:         knowledgeConfig.MatchType,
+			PriorityMatch:     knowledgeConfig.PriorityMatch,
+			SemanticsPriority: float32(knowledgeConfig.SemanticsPriority),
+			KeywordPriority:   float32(knowledgeConfig.KeywordPriority),
 		},
 		SensitiveConfig: &rag_service.RagSensitiveConfig{
 			Enable:   info.SensitiveConfig.Enable,
 			TableIds: sensitiveIds,
 		},
 	}
+
 	return resp, nil
 }
 
