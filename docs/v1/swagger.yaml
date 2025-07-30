@@ -498,12 +498,27 @@ definitions:
     type: object
   request.AppKnowledgebaseParams:
     properties:
+      keywordPriority:
+        description: 关键词权重
+        type: number
+      matchType:
+        description: matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+        type: string
       maxHistory:
         description: 最长上下文
         type: integer
       maxHistoryEnable:
         description: 最长上下文(开关)
         type: boolean
+      priorityMatch:
+        description: 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+        type: integer
+      rerankModelId:
+        description: rerank模型id
+        type: string
+      semanticsPriority:
+        description: 语义权重
+        type: number
       threshold:
         description: 过滤阈值
         type: number
@@ -1012,14 +1027,40 @@ definitions:
         items:
           type: string
         type: array
+      knowledgeMatchParams:
+        $ref: '#/definitions/request.KnowledgeMatchParams'
       question:
-        type: string
-      rerankModelId:
         type: string
     required:
     - knowledgeIdList
+    - knowledgeMatchParams
     - question
-    - rerankModelId
+    type: object
+  request.KnowledgeMatchParams:
+    properties:
+      keywordPriority:
+        description: 关键词权重
+        type: number
+      matchType:
+        description: matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+        type: string
+      priorityMatch:
+        description: 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+        type: integer
+      rerankModelId:
+        description: rerank模型id
+        type: string
+      score:
+        description: score 过滤分数阈值
+        type: number
+      semanticsPriority:
+        description: 语义权重
+        type: number
+      topK:
+        description: topK 获取最高的几行
+        type: integer
+    required:
+    - matchType
     type: object
   request.KnowledgeSelectReq:
     properties:

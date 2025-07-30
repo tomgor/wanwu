@@ -42,6 +42,8 @@ func UpdateRagConfig(ctx *gin.Context, req request.RagConfig) error {
 	if err != nil {
 		return err
 	}
+
+	configParams := req.KnowledgeBaseConfig.Config
 	var sensitiveTableIds []string
 	for _, v := range req.SafetyConfig.Tables {
 		sensitiveTableIds = append(sensitiveTableIds, v.TableId)
@@ -51,13 +53,17 @@ func UpdateRagConfig(ctx *gin.Context, req request.RagConfig) error {
 		ModelConfig:  modelConfig,
 		RerankConfig: rerankConfig,
 		KnowledgeBaseConfig: &rag_service.RagKnowledgeBaseConfig{
-			KnowledgeBaseId:  req.KnowledgeBaseConfig.Knowledgebases[0].ID,
-			MaxHistory:       req.KnowledgeBaseConfig.Config.MaxHistory,
-			MaxHistoryEnable: req.KnowledgeBaseConfig.Config.MaxHistoryEnable,
-			Threshold:        req.KnowledgeBaseConfig.Config.Threshold,
-			ThresholdEnable:  req.KnowledgeBaseConfig.Config.ThresholdEnable,
-			TopK:             req.KnowledgeBaseConfig.Config.TopK,
-			TopKEnable:       req.KnowledgeBaseConfig.Config.TopKEnable,
+			KnowledgeBaseId:   req.KnowledgeBaseConfig.Knowledgebases[0].ID,
+			MaxHistory:        configParams.MaxHistory,
+			MaxHistoryEnable:  configParams.MaxHistoryEnable,
+			Threshold:         configParams.Threshold,
+			ThresholdEnable:   configParams.ThresholdEnable,
+			TopK:              configParams.TopK,
+			TopKEnable:        configParams.TopKEnable,
+			MatchType:         configParams.MatchType,
+			PriorityMatch:     configParams.PriorityMatch,
+			SemanticsPriority: configParams.SemanticsPriority,
+			KeywordPriority:   configParams.KeywordPriority,
 		},
 		SensitiveConfig: &rag_service.RagSensitiveConfig{
 			Enable:   req.SafetyConfig.Enable,
@@ -108,6 +114,7 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 			KnowledgeId: resp.KnowledgeBaseConfig.KnowledgeBaseId,
 		})
 	}
+
 	var sensitiveTableList []request.SensitiveTable
 	if resp.SensitiveConfig.TableIds != nil {
 		for _, tableId := range resp.SensitiveConfig.TableIds {
@@ -116,6 +123,8 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 			})
 		}
 	}
+
+	knowledgeConfig := resp.KnowledgeBaseConfig
 	ragInfo = &response.RagInfo{
 		RagID:          resp.RagId,
 		AppBriefConfig: appBriefConfigProto2Model(ctx, resp.BriefConfig),
@@ -123,12 +132,16 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 		RerankConfig:   rerankConfig,
 		KnowledgeBaseConfig: request.AppKnowledgebaseConfig{
 			Config: request.AppKnowledgebaseParams{
-				MaxHistory:       resp.KnowledgeBaseConfig.MaxHistory,
-				MaxHistoryEnable: resp.KnowledgeBaseConfig.MaxHistoryEnable,
-				Threshold:        resp.KnowledgeBaseConfig.Threshold,
-				ThresholdEnable:  resp.KnowledgeBaseConfig.ThresholdEnable,
-				TopK:             resp.KnowledgeBaseConfig.TopK,
-				TopKEnable:       resp.KnowledgeBaseConfig.TopKEnable,
+				MaxHistory:        knowledgeConfig.MaxHistory,
+				MaxHistoryEnable:  knowledgeConfig.MaxHistoryEnable,
+				Threshold:         knowledgeConfig.Threshold,
+				ThresholdEnable:   knowledgeConfig.ThresholdEnable,
+				TopK:              knowledgeConfig.TopK,
+				TopKEnable:        knowledgeConfig.TopKEnable,
+				MatchType:         knowledgeConfig.MatchType,
+				KeywordPriority:   knowledgeConfig.KeywordPriority,
+				PriorityMatch:     knowledgeConfig.PriorityMatch,
+				SemanticsPriority: knowledgeConfig.SemanticsPriority,
 			},
 		},
 		SafetyConfig: request.AppSafetyConfig{
