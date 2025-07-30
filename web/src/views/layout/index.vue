@@ -484,7 +484,7 @@ export default {
       .left-nav-content-wrap {
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 260px);
+        height: calc(100vh - 200px);
         min-height: 480px;
         justify-content: space-around;
       }
@@ -496,7 +496,7 @@ export default {
         min-height: 480px;
         align-items: center;
         justify-content: space-around;
-        max-height: 600px;
+        max-height: 660px;
       }
       .total-create {
         width: 24px;
