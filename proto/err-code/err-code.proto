@@ -107,6 +107,12 @@ enum Code {
   AppGeneral = 300000; // 通用错误
   AppApikey = 300001; // ApiKey相关错误
   AppExploration = 300002; // APP应用广场相关错误
+  AppSafety = 300003; // 安全护栏相关错误
+  AppSafetySensitiveWordTable = 300004; // 安全护栏敏感词表相关错误
+  AppSafetySensitiveVocabulary = 300005; // 安全护栏敏感词数据相关错误
+  AppSensitiveSameWordError = 300006; // 此词表内存在相同的敏感词，请修改后重试
+  AppSensitiveExistSensitiveError = 300007; // 存在敏感词：%v
+  AppSafetyImportUrlFailed = 300008; // 获取上传文档失败，请稍后重试
 
   // --- mcp-service ---
   // [310000, 319999]

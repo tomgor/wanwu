@@ -14,6 +14,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/app-service/server/grpc"
 	"github.com/UnicomAI/wanwu/pkg/db"
 	"github.com/UnicomAI/wanwu/pkg/log"
+	"github.com/UnicomAI/wanwu/pkg/minio"
 )
 
 var (
@@ -46,6 +47,15 @@ func main() {
 
 	if err := log.InitLog(config.Cfg().Log.Std, config.Cfg().Log.Level, config.Cfg().Log.Logs...); err != nil {
 		log.Fatalf("init log err: %v", err)
+	}
+
+	err := minio.InitSafety(ctx, minio.Config{
+		Endpoint: config.Cfg().Minio.Endpoint,
+		User:     config.Cfg().Minio.User,
+		Password: config.Cfg().Minio.Password,
+	}, config.Cfg().Minio.Bucket)
+	if err != nil {
+		log.Fatalf("init minio safety client err: %v", err)
 	}
 
 	db, err := db.New(config.Cfg().DB)

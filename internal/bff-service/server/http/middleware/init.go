@@ -33,6 +33,9 @@ func Init() {
 	// --- mcp ---
 	mid.NewSub("mcp", "MCP广场", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
 
+	// --- safety ---
+	mid.NewSub("safety", "安全护栏", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
+
 	// --- rag ---
 	mid.NewSub("rag", "文本问答", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
 

@@ -4979,6 +4979,434 @@
                 }
             }
         },
+        "/safe/sensitive/table": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "编辑敏感词表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "编辑敏感词表",
+                "parameters": [
+                    {
+                        "description": "编辑敏感词表请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateSensitiveWordTableReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "创建敏感词表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "创建敏感词表",
+                "parameters": [
+                    {
+                        "description": "创建敏感词表请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateSensitiveWordTableReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CreateSensitiveWordTableResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "删除敏感词表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "删除敏感词表",
+                "parameters": [
+                    {
+                        "description": "删除敏感词表请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DeleteSensitiveWordTableReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/safe/sensitive/table/list": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "获取敏感词表列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "获取敏感词表列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.SensitiveWordTableDetail"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/safe/sensitive/table/reply": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "编辑回复设置",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "编辑回复设置",
+                "parameters": [
+                    {
+                        "description": "编辑回复设置请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateSensitiveWordTableReplyReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/safe/sensitive/table/select": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "获取敏感词表列表（用于下拉选择）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "获取敏感词表列表（用于下拉选择）",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.SensitiveWordTableDetail"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/safe/sensitive/word": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "上传敏感词",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "上传敏感词",
+                "parameters": [
+                    {
+                        "description": "上传敏感词参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UploadSensitiveVocabularyReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "删除敏感词",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "删除敏感词",
+                "parameters": [
+                    {
+                        "description": "删除敏感词参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DeleteSensitiveVocabularyReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/safe/sensitive/word/list": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "获取词表数据列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "获取词表数据列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "敏感词表id",
+                        "name": "tableId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页面编号，从1开始",
+                        "name": "pageNo",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "单页数量，从1开始",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.SensitiveWordVocabularyDetail"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "put": {
                 "security": [
@@ -6120,10 +6548,6 @@
                     "description": "权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1",
                     "type": "integer"
                 },
-                "rerankModelId": {
-                    "description": "rerank模型id",
-                    "type": "string"
-                },
                 "semanticsPriority": {
                     "description": "语义权重",
                     "type": "number"
@@ -6532,6 +6956,22 @@
                 }
             }
         },
+        "request.CreateSensitiveWordTableReq": {
+            "type": "object",
+            "required": [
+                "tableName"
+            ],
+            "properties": {
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "tableName": {
+                    "description": "敏感词表名",
+                    "type": "string"
+                }
+            }
+        },
         "request.DelApiKeyRequest": {
             "type": "object",
             "required": [
@@ -6644,6 +7084,35 @@
                 },
                 "provider": {
                     "description": "模型供应商",
+                    "type": "string"
+                }
+            }
+        },
+        "request.DeleteSensitiveVocabularyReq": {
+            "type": "object",
+            "required": [
+                "tableId",
+                "wordId"
+            ],
+            "properties": {
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                },
+                "wordId": {
+                    "description": "敏感词id",
+                    "type": "string"
+                }
+            }
+        },
+        "request.DeleteSensitiveWordTableReq": {
+            "type": "object",
+            "required": [
+                "tableId"
+            ],
+            "properties": {
+                "tableId": {
+                    "description": "敏感词表id",
                     "type": "string"
                 }
             }
@@ -7513,6 +7982,72 @@
                 }
             }
         },
+        "request.UpdateSensitiveWordTableReplyReq": {
+            "type": "object",
+            "required": [
+                "tableId"
+            ],
+            "properties": {
+                "reply": {
+                    "description": "回复设置",
+                    "type": "string"
+                },
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                }
+            }
+        },
+        "request.UpdateSensitiveWordTableReq": {
+            "type": "object",
+            "required": [
+                "tableId",
+                "tableName"
+            ],
+            "properties": {
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                },
+                "tableName": {
+                    "description": "敏感词表名",
+                    "type": "string"
+                }
+            }
+        },
+        "request.UploadSensitiveVocabularyReq": {
+            "type": "object",
+            "required": [
+                "importType",
+                "tableId"
+            ],
+            "properties": {
+                "fileName": {
+                    "description": "文件名",
+                    "type": "string"
+                },
+                "importType": {
+                    "description": "上传敏感词方式，single：单条添加，file：批量上传",
+                    "type": "string"
+                },
+                "sensitiveType": {
+                    "description": "敏感词类型 (涉政:Political, 辱骂:Revile, 涉黄:Pornography, 暴恐:ViolentTerror, 违禁:Illegal, 信息安全:InformationSecurity, 其他:Other)",
+                    "type": "string"
+                },
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                },
+                "word": {
+                    "description": "敏感词",
+                    "type": "string"
+                }
+            }
+        },
         "request.UserCreate": {
             "type": "object",
             "required": [
@@ -8164,6 +8699,15 @@
             "type": "object",
             "properties": {
                 "knowledgeId": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.CreateSensitiveWordTableResp": {
+            "type": "object",
+            "properties": {
+                "tableId": {
+                    "description": "敏感词表id",
                     "type": "string"
                 }
             }
@@ -9382,6 +9926,48 @@
                     "items": {
                         "$ref": "#/definitions/response.IDName"
                     }
+                }
+            }
+        },
+        "response.SensitiveWordTableDetail": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "敏感词表创建时间",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "reply": {
+                    "description": "回复设置",
+                    "type": "string"
+                },
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                },
+                "tableName": {
+                    "description": "敏感词表名",
+                    "type": "string"
+                }
+            }
+        },
+        "response.SensitiveWordVocabularyDetail": {
+            "type": "object",
+            "properties": {
+                "sensitiveType": {
+                    "description": "敏感词类型",
+                    "type": "string"
+                },
+                "word": {
+                    "description": "敏感词",
+                    "type": "string"
+                },
+                "wordId": {
+                    "description": "敏感词id",
+                    "type": "string"
                 }
             }
         },
