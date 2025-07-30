@@ -386,6 +386,7 @@ export default {
       scope:'public',
       showActionConfig:false,
       rerankOptions:[],
+      initialEditForm:null,
       editForm:{
         assistantId:'',
         avatar:{},
@@ -443,6 +444,9 @@ export default {
       defaultLogo: require("@/assets/imgs/bg-logo.png"),
       debounceTimer:null //防抖计时器
     };
+  },
+  mounted() {
+    this.initialEditForm = JSON.parse(JSON.stringify(this.editForm));
   },
   created() {
     this.getKnowledgeList();
