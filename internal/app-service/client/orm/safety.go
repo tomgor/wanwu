@@ -45,16 +45,27 @@ var SensitiveTypeToString = map[SensitiveType]string{
 }
 
 func (c *Client) CreateSensitiveWordTable(ctx context.Context, userId, orgId, tableName, remark string) (string, *errs.Status) {
-	table := &model.SensitiveWordTable{
-		Name:   tableName,
-		Remark: remark,
-		UserID: userId,
-		OrgID:  orgId,
+	err := sqlopt.SQLOptions(
+		sqlopt.WithOrgID(orgId),
+		sqlopt.WithUserID(userId),
+		sqlopt.WithName(tableName),
+	).Apply(c.db.WithContext(ctx)).First(&model.SensitiveWordTable{}).Error
+	if err == nil {
+		return "", toErrStatus("app_safety_sensitive_table_exist")
 	}
-	if err := c.db.WithContext(ctx).Create(table).Error; err != nil {
-		return "", toErrStatus("app_safety_sensitive_table_create", tableName, err.Error())
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		table := &model.SensitiveWordTable{
+			Name:   tableName,
+			Remark: remark,
+			UserID: userId,
+			OrgID:  orgId,
+		}
+		if err := c.db.WithContext(ctx).Create(table).Error; err != nil {
+			return "", toErrStatus("app_safety_sensitive_table_create", tableName, err.Error())
+		}
+		return util.Int2Str(table.ID), nil
 	}
-	return util.Int2Str(table.ID), nil
+	return "", toErrStatus("app_safety_sensitive_table_get", tableName)
 }
 
 func (c *Client) UpdateSensitiveWordTable(ctx context.Context, tableId, tableName, remark string) *errs.Status {
