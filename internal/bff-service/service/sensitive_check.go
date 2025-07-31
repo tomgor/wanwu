@@ -8,6 +8,7 @@ import (
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/ahocorasick"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/util"
@@ -87,7 +88,7 @@ func BuildSensitiveDict(ctx *gin.Context, tableIds []string) ([]ahocorasick.Dict
 }
 
 // ProcessSensitiveWords 中间处理函数，负责敏感词检测并返回处理后的通道
-func ProcessSensitiveWords(rawCh <-chan string, matchDicts []ahocorasick.DictConfig, chatSrv chatService) <-chan string {
+func ProcessSensitiveWords(ctx *gin.Context, rawCh <-chan string, matchDicts []ahocorasick.DictConfig, chatSrv chatService) <-chan string {
 	outputCh := make(chan string, 128)
 	go func() {
 		defer util.PrintPanicStack()
@@ -135,7 +136,16 @@ func ProcessSensitiveWords(rawCh <-chan string, matchDicts []ahocorasick.DictCon
 
 		// 检测到敏感词
 		if len(matchResults) > 0 {
-			for _, sensitiveMsg := range chatSrv.buildSensitiveResp(id, matchResults[0].Reply) {
+			if matchResults[0].Reply != "" {
+				reply := grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_chek_resp", matchResults[0].Reply)
+				for _, sensitiveMsg := range chatSrv.buildSensitiveResp(id, reply.Error()) {
+					outputCh <- "\n" // 流式返回 两次返回之间一定要加空行，否则前端或者智能体解析有问题
+					outputCh <- sensitiveMsg
+					outputCh <- "\n"
+					return
+				}
+			}
+			for _, sensitiveMsg := range chatSrv.buildSensitiveResp(id, gin_util.I18nKey(ctx, "bff_sensitive_check_resp_default_reply")) {
 				outputCh <- "\n" // 流式返回 两次返回之间一定要加空行，否则前端或者智能体解析有问题
 				outputCh <- sensitiveMsg
 				outputCh <- "\n"
