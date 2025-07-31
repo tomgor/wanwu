@@ -319,3 +319,9 @@ export const hitTest = (data)=>{
         data
     })
 };
+export const ocrSelectList = ()=>{
+    return service({
+        url: `${BASE_URL}/model/select/ocr`,
+        method: 'get',
+    })
+};

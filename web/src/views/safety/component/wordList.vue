@@ -41,6 +41,9 @@
                   prop="sensitiveType"
                   label="类型"
                 >
+                <template slot-scope="scope">
+                  <span>{{safetyType[scope.row.sensitiveType]}}</span>
+                </template>
                 </el-table-column>
                 <el-table-column
                   :label="$t('knowledgeManage.operate')"
@@ -78,11 +81,13 @@
 import Pagination from "@/components/pagination.vue";
 import createWord from './createWord.vue';
 import setReply from './setReply.vue';
+import { SafetyType } from "@/utils/commonSet";
 import {getSensitiveWord,delSensitiveWord} from "@/api/safety";
 export default {
   components:{createWord,setReply,Pagination},
   data() {
     return {
+      safetyType:SafetyType,
       loading:false,
       tableLoading:false,
       docQuery: {
