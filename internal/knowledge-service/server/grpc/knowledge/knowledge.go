@@ -141,7 +141,7 @@ func (s *Service) KnowledgeHit(ctx context.Context, req *knowledgebase_service.K
 		KnowledgeBase:  buildKnowledgeNameList(list),
 		TopK:           matchParams.TopK,
 		Threshold:      float64(matchParams.Score),
-		RerankModelId:  matchParams.RerankModelId,
+		RerankModelId:  buildRerankId(priorityMatch, matchParams.RerankModelId),
 		RetrieveMethod: buildRetrieveMethod(matchParams.MatchType),
 		RerankMod:      buildRerankMod(priorityMatch),
 		Weight:         buildWeight(priorityMatch, matchParams.SemanticsPriority, matchParams.KeywordPriority),
@@ -272,6 +272,14 @@ func buildKnowledgeBaseHitResp(ragKnowledgeHitResp *rag_service.RagKnowledgeHitR
 		Score:      knowledgeHitData.Score,
 		SearchList: searchList,
 	}
+}
+
+// buildRerankId 构造重排序模型id
+func buildRerankId(priorityType int32, rerankId string) string {
+	if priorityType == 1 {
+		return ""
+	}
+	return rerankId
 }
 
 // buildRetrieveMethod 构造检索方式

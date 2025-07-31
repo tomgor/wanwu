@@ -56,11 +56,8 @@ func UpdateRagConfig(ctx *gin.Context, req request.RagConfig) error {
 		KnowledgeBaseConfig: &rag_service.RagKnowledgeBaseConfig{
 			KnowledgeBaseId:   req.KnowledgeBaseConfig.Knowledgebases[0].ID,
 			MaxHistory:        configParams.MaxHistory,
-			MaxHistoryEnable:  configParams.MaxHistoryEnable,
 			Threshold:         configParams.Threshold,
-			ThresholdEnable:   configParams.ThresholdEnable,
 			TopK:              configParams.TopK,
-			TopKEnable:        configParams.TopKEnable,
 			MatchType:         configParams.MatchType,
 			PriorityMatch:     configParams.PriorityMatch,
 			SemanticsPriority: configParams.SemanticsPriority,
@@ -129,11 +126,8 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 		KnowledgeBaseConfig: request.AppKnowledgebaseConfig{
 			Config: request.AppKnowledgebaseParams{
 				MaxHistory:        knowledgeConfig.MaxHistory,
-				MaxHistoryEnable:  knowledgeConfig.MaxHistoryEnable,
 				Threshold:         knowledgeConfig.Threshold,
-				ThresholdEnable:   knowledgeConfig.ThresholdEnable,
 				TopK:              knowledgeConfig.TopK,
-				TopKEnable:        knowledgeConfig.TopKEnable,
 				MatchType:         knowledgeConfig.MatchType,
 				KeywordPriority:   knowledgeConfig.KeywordPriority,
 				PriorityMatch:     knowledgeConfig.PriorityMatch,
