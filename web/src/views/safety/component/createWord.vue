@@ -243,6 +243,8 @@ export default {
                         this.$emit('reload')
                         this.dialogVisible = false;
                     }
+                   }).catch(err =>{
+                     
                    })
                 }else{
                     return false;

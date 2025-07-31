@@ -252,12 +252,18 @@ export default {
       t: null,
       logoFileList: [],
       debounceTimer:null, //防抖计时器
-      isUpdating: false // 防止重复更新标记
+      isUpdating: false, // 防止重复更新标记
+      isSettingFromDetail: false // 防止详情数据触发更新标记
     };
   },
   watch:{
     editForm: {
     handler(newVal) {
+      // 如果是从详情设置的数据，不触发更新逻辑
+      if (this.isSettingFromDetail) {
+        return;
+      }
+      
       if(this.debounceTimer){
         clearTimeout(this.debounceTimer)
       }
@@ -308,6 +314,7 @@ export default {
       this.$router.go(-1);
     },
     getDetail(){//获取详情
+      this.isSettingFromDetail = true; // 设置标志位，防止触发更新逻辑
       getRagInfo({ragId:this.editForm.appId}).then(res =>{
         if(res.code === 0){
             this.editForm.avatar = res.data.avatar;
@@ -325,10 +332,18 @@ export default {
             if(knowledgeData && knowledgeData.length > 0){
               this.editForm.knowledgeBaseIds = knowledgeData.map(item => item.id);
             }
-            this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
             this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;//需要后端修改
+            this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
+            // 使用nextTick确保所有数据设置完成后再重置标志位
+            this.$nextTick(() => {
+              this.isSettingFromDetail = false;
+            });
+        } else {
+          this.isSettingFromDetail = false;
         }
-      })
+      }).catch(() => {
+        this.isSettingFromDetail = false;
+      });
     },
     getRerankData(){
       getRerankList().then(res =>{

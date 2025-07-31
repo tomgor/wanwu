@@ -342,6 +342,11 @@ export default {
   watch: {
     editForm: {
       handler(newVal) {
+          // 如果是从详情设置的数据，不触发更新逻辑
+          if (this.isSettingFromDetail) {
+            return;
+          }
+
          if(this.debounceTimer){
             clearTimeout(this.debounceTimer)
           }
@@ -430,7 +435,8 @@ export default {
       logoFileList: [],
       imageUrl: "",
       defaultLogo: require("@/assets/imgs/bg-logo.png"),
-      debounceTimer:null //防抖计时器
+      debounceTimer:null, //防抖计时器
+      isSettingFromDetail: false // 防止详情数据触发更新标记
     };
   },
   mounted() {
@@ -648,6 +654,7 @@ export default {
     },
     async getAppDetail() {
       this.startLoading(0);
+      this.isSettingFromDetail = true; // 设置标志位，防止触发更新逻辑
       let res = await getAgentInfo({ assistantId: this.editForm.assistantId });
       if (res.code === 0) {
         this.startLoading(100);
@@ -682,6 +689,11 @@ export default {
         //回显自定义插件
         this.workFlowInfos = data.workFlowInfos || []
         this.getWorkflowList(data.workFlowInfos || []);
+        this.$nextTick(() => {
+          this.isSettingFromDetail = false;
+        });
+      }else{
+        this.isSettingFromDetail = false;
       }
     },
     async getWorkflowList(workFlowInfos) {
