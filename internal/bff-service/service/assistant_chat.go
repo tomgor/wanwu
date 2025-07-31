@@ -147,22 +147,8 @@ func (s *agentSensitiveService) parseContent(raw string) (id, content string) {
 		return "", ""
 	}
 	resp := struct {
-		Code           int      `json:"code"`
-		Message        string   `json:"message"`
-		Response       string   `json:"response"`
-		MsgID          string   `json:"msg_id"`
-		GenFileURLList []string `json:"gen_file_url_list"`
-		History        []struct {
-			Response string `json:"response"`
-		} `json:"history"`
-		Finish int `json:"finish"`
-		Usage  struct {
-			PromptTokens     int `json:"prompt_tokens"`
-			CompletionTokens int `json:"completion_tokens"`
-			TotalTokens      int `json:"total_tokens"`
-		} `json:"usage"`
-		SearchList []string `json:"search_list"`
-		QAType     []int    `json:"qa_type"`
+		MsgID    string `json:"msg_id"`
+		Response string `json:"response"`
 	}{}
 	if err := json.Unmarshal([]byte(raw), &resp); err != nil {
 		return "", ""
@@ -185,9 +171,7 @@ func (s *agentSensitiveService) buildSensitiveResp(id string, content string) []
 			"total_tokens":      0,
 		},
 		"search_list": []interface{}{},
-		"qa_type":     []int{1},
 	}
-
 	marshal, _ := json.Marshal(resp)
 	return []string{"data: " + string(marshal)}
 }
