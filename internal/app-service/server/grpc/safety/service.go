@@ -138,6 +138,7 @@ func toProtoSensitiveWordTable(sensitiveWordTable *model.SensitiveWordTable) *sa
 		TableName: sensitiveWordTable.Name,
 		Remark:    sensitiveWordTable.Remark,
 		Reply:     sensitiveWordTable.Reply,
+		Version:   sensitiveWordTable.Version,
 		CreatedAt: sensitiveWordTable.CreatedAt,
 	}
 }
