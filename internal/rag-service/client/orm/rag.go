@@ -243,6 +243,11 @@ func (c *Client) UpdateRagConfig(ctx context.Context, rag *model.RagInfo) *err_c
 				"kb_threshold":   rag.KnowledgeBaseConfig.Threshold,
 				"kb_top_k":       rag.KnowledgeBaseConfig.TopK,
 
+				"kb_match_type":         rag.KnowledgeBaseConfig.MatchType,
+				"kb_priority_match":     rag.KnowledgeBaseConfig.PriorityMatch,
+				"kb_semantics_priority": rag.KnowledgeBaseConfig.SemanticsPriority,
+				"kb_keyword_priority":   rag.KnowledgeBaseConfig.KeywordPriority,
+
 				"sensitive_enable":    rag.SensitiveConfig.Enable,
 				"sensitive_table_ids": rag.SensitiveConfig.TableIds,
 			}
