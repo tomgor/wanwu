@@ -88,7 +88,7 @@ func BuildSensitiveDict(ctx *gin.Context, tableIds []string) ([]ahocorasick.Dict
 }
 
 // ProcessSensitiveWords 中间处理函数，负责敏感词检测并返回处理后的通道
-func ProcessSensitiveWords(ctx *gin.Context, originCh <-chan string, matchDicts []ahocorasick.DictConfig, chatSrv chatService) <-chan string {
+func ProcessSensitiveWords(ctx *gin.Context, rawCh <-chan string, matchDicts []ahocorasick.DictConfig, chatSrv chatService) <-chan string {
 	outputCh := make(chan string, 128)
 	go func() {
 		defer util.PrintPanicStack()
@@ -99,14 +99,16 @@ func ProcessSensitiveWords(ctx *gin.Context, originCh <-chan string, matchDicts 
 		var err error
 		contentQueue := queue_util.NewOverridableQueue(defaultCheckWindowSize)
 		rawQueue := queue_util.NewBoundedQueue(defaultRawCacheSize)
-		for raw := range originCh {
-			currId, content := chatSrv.parseContent(raw)
+		for raw := range rawCh {
+			currId, currContent := chatSrv.parseContent(raw)
+			log.Debugf("[%v] raw (%v) parse id (%v) content (%v)", chatSrv.serviceType(), raw, currId, currContent)
 			id = currId
-			contentQueue.EnQueue(content)
+			contentQueue.EnQueue(currContent)
 			if rawQueue.IsFull() {
 				// 校验敏感词
 				content := contentQueue.AllValue()
 				matchResults, err = ahocorasick.ContentMatch(content, matchDicts, true)
+				log.Debugf("[%v] content (%v) check %+v sensitive results: %+v", chatSrv.serviceType(), content, matchDicts, matchResults)
 				if err != nil {
 					log.Errorf("[%v] content (%v) check sensitive err: %v", chatSrv.serviceType(), content, err)
 				} else if len(matchResults) > 0 {
@@ -126,6 +128,7 @@ func ProcessSensitiveWords(ctx *gin.Context, originCh <-chan string, matchDicts 
 		if len(matchResults) == 0 {
 			content := contentQueue.AllValue()
 			matchResults, err = ahocorasick.ContentMatch(content, matchDicts, true)
+			log.Debugf("[%v] rest content (%v) check %+v sensitive results: %+v", chatSrv.serviceType(), content, matchDicts, matchResults)
 			if err != nil {
 				log.Errorf("[%v] content (%v) check sensitive err: %v", chatSrv.serviceType(), content, err)
 			}

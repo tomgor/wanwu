@@ -127,16 +127,10 @@ func (s *ragSensitiveService) parseContent(raw string) (id, content string) {
 	}
 	// 2. 解析JSON
 	resp := struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		MsgID   string `json:"msg_id"`
-		Data    struct {
+		MsgID string `json:"msg_id"`
+		Data  struct {
 			Output string `json:"output"`
 		} `json:"data"`
-		History []struct {
-			Response string `json:"response"`
-		} `json:"history"`
-		Finish int `json:"finish"`
 	}{}
 
 	if err := json.Unmarshal([]byte(raw), &resp); err != nil {
@@ -156,9 +150,8 @@ func (s *ragSensitiveService) buildSensitiveResp(id string, content string) []st
 			"searchList": []interface{}{},
 		},
 		"history": []interface{}{},
-		"finish":  0,
+		"finish":  1,
 	}
-
 	marshal, _ := json.Marshal(resp)
 	return []string{"data: " + string(marshal)}
 }
