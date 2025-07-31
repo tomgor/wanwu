@@ -5333,6 +5333,32 @@ paths:
       summary: llm模型列表
       tags:
       - model
+  /model/select/ocr:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        $ref: '#/definitions/response.ModelBrief'
+                    type: object
+              type: object
+      security:
+      - JWT: []
+      summary: ocr模型列表
+      tags:
+      - model
   /model/select/rerank:
     get:
       consumes:
