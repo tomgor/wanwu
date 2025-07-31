@@ -30,11 +30,8 @@ type AppModelConfig struct {
 type KnowledgeBaseConfig struct {
 	KnowId            string  `json:"knowId" gorm:"column:know_id;type:text;comment:知识库ID"`
 	MaxHistory        int64   `json:"maxHistory" gorm:"column:max_history;type:bigint(20);comment:最大历史记录"`
-	MaxHistoryEnable  bool    `json:"maxHistoryEnable" gorm:"column:max_history_enable;type:tinyint(1);comment:是否启用最大历史记录"`
 	Threshold         float64 `json:"threshold" gorm:"column:threshold;type:float(10,2);comment:阈值"`
-	ThresholdEnable   bool    `json:"thresholdEnable" gorm:"column:threshold_enable;type:tinyint(1);comment:是否启用阈值"`
 	TopK              int64   `json:"topK" gorm:"column:top_k;type:bigint(20);comment:TopK"`
-	TopKEnable        bool    `json:"topKEnable" gorm:"column:top_k_enable;type:tinyint(1);comment:是否启用TopK"`
 	MatchType         string  `json:"matchType" gorm:"column:match_type;type:varchar(32);not null;default:'';comment:matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）"`
 	PriorityMatch     int32   `json:"priorityMatch" gorm:"column:priority_match;type:tinyint(1);not null;default:0;comment:权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1"`
 	SemanticsPriority float64 `json:"semanticsPriority" gorm:"column:semantics_priority;type:float(10,2);not null;default:0;comment:语义权重"`

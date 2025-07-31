@@ -130,21 +130,9 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	// 判断enable状态
 	ragChatParams := &RagChatParams{}
 	knowledgeConfig := rag.KnowledgeBaseConfig
-	if !knowledgeConfig.MaxHistoryEnable {
-		ragChatParams.MaxHistory = DefaultMaxHistory
-	} else {
-		ragChatParams.MaxHistory = int32(knowledgeConfig.MaxHistory)
-	}
-	if !knowledgeConfig.ThresholdEnable {
-		ragChatParams.Threshold = DefaultThreshold
-	} else {
-		ragChatParams.Threshold = float32(knowledgeConfig.Threshold)
-	}
-	if !knowledgeConfig.TopKEnable {
-		ragChatParams.TopK = DefaultTopK
-	} else {
-		ragChatParams.TopK = int32(knowledgeConfig.TopK)
-	}
+	ragChatParams.MaxHistory = int32(knowledgeConfig.MaxHistory)
+	ragChatParams.Threshold = float32(knowledgeConfig.Threshold)
+	ragChatParams.TopK = int32(knowledgeConfig.TopK)
 	ragChatParams.RetrieveMethod = buildRetrieveMethod(knowledgeConfig.MatchType)
 	ragChatParams.RerankMod = buildRerankMod(knowledgeConfig.PriorityMatch)
 	ragChatParams.Weight = buildWeight(knowledgeConfig)
@@ -154,12 +142,20 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	ragChatParams.Question = req.Question
 	ragChatParams.Stream = true
 	ragChatParams.Chichat = true
-	ragChatParams.RerankModelId = rag.RerankConfig.ModelId
+	ragChatParams.RerankModelId = buildRerankId(knowledgeConfig.PriorityMatch, rag.RerankConfig.ModelId)
 	ragChatParams.History = []*HistoryItem{}
 	ragChatParams.RewriteQuery = true
 
 	log.Infof("ragparams = %+v", ragChatParams)
 	return ragChatParams
+}
+
+// buildRerankId 构造重排序模型id
+func buildRerankId(priorityType int32, rerankId string) string {
+	if priorityType == 1 {
+		return ""
+	}
+	return rerankId
 }
 
 // buildRetrieveMethod 构造检索方式

@@ -83,17 +83,12 @@ message RagDetailReq {
 message RagKnowledgeBaseConfig {
   string knowledgeBaseId = 1;                     // 知识库id
   int32 maxHistory = 2;                           // 最长上下文
-  bool maxHistoryEnable = 3;                      // 是否启用最长上下文
-  float threshold = 4;                            // 过滤阈值
-  bool thresholdEnable = 5;                       // 是否启用过滤阈值
-  int32 topK = 6;                                 // topK
-  bool topKEnable = 7;                            // 是否启用topK
-
-  string  matchType = 8; //matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
-  float keywordPriority = 9;// 关键词权重
-  int32 priorityMatch = 10;// 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
-  float semanticsPriority = 11;// 语义权重
-
+  float threshold = 3;                            // 过滤阈值
+  int32 topK = 4;                                 // topK
+  string  matchType = 5; //matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+  float keywordPriority = 6;// 关键词权重
+  int32 priorityMatch = 7;// 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+  float semanticsPriority = 8;// 语义权重
 }
 
 message RagSensitiveConfig{
