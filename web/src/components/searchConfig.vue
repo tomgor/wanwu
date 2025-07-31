@@ -272,7 +272,7 @@ export default {
           this.isSettingFromConfig = true; // 设置标志位
           const formData = JSON.parse(JSON.stringify(newVal))
           this.formInline.knowledgeMatchParams = formData;
-          const { matchType } = this.formInline.
+          const { matchType } = this.formInline.knowledgeMatchParams;
           this.searchTypeData = this.searchTypeData.map((item) => ({
             ...item,
             showContent: item.value === matchType ? true : false,
