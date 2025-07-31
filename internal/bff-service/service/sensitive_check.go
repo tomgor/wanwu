@@ -46,7 +46,7 @@ func BuildSensitiveDict(ctx *gin.Context, tableIds []string) ([]ahocorasick.Dict
 	// 检测内存中的敏感词表
 	dictStatus, err := ahocorasick.CheckDictStatus(dicts)
 	if err != nil {
-		return nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, err.Error())
+		return nil, grpc_util.ErrorStatus(err_code.Code_BFFSensitiveWordCheck, err.Error())
 	}
 	// 拼接id,version与内存不匹配的tableID
 	var needLoadTableIDs []string

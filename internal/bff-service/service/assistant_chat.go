@@ -8,9 +8,11 @@ import (
 
 	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
+	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/ahocorasick"
 	"github.com/UnicomAI/wanwu/pkg/constant"
+	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	sse_util "github.com/UnicomAI/wanwu/pkg/sse-util"
 	"github.com/UnicomAI/wanwu/pkg/util"
@@ -34,14 +36,14 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 		}
 		matchDicts, err = BuildSensitiveDict(ctx, ids)
 		if err != nil {
-			return nil, err
+			return nil, grpc_util.ErrorStatus(err_code.Code_BFFSensitiveWordCheck, err.Error())
 		}
 		ret, err := ahocorasick.ContentMatch(req.Prompt, matchDicts, true)
 		if err != nil {
 			return nil, err
 		}
 		if len(ret) > 0 {
-			return nil, fmt.Errorf("您的提问中含有敏感词:%v", ret[0].Reply)
+			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req", ret[0].Reply)
 		}
 	}
 	appList, err := app.GetAppListByIds(ctx.Request.Context(), &app_service.GetAppListByIdsReq{
