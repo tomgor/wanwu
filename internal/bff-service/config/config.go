@@ -24,7 +24,7 @@ type Config struct {
 	Minio minio.Config `json:"minio" mapstructure:"minio"`
 	// microservice
 	Iam       ServiceConfig         `json:"iam" mapstructure:"iam"`
-	Model     ServiceConfig         `json:"model" mapstructure:"model"`
+	Model     ModelConfig           `json:"model" mapstructure:"model"`
 	MCP       ServiceConfig         `json:"mcp" mapstructure:"mcp"`
 	App       ServiceConfig         `json:"app" mapstructure:"app"`
 	Knowledge ServiceConfig         `json:"knowledge" mapstructure:"knowledge"`
@@ -42,6 +42,11 @@ type ServerConfig struct {
 	WebBaseUrl   string `json:"web_base_url" mapstructure:"web_base_url"`
 	ApiBaseUrl   string `json:"api_base_url" mapstructure:"api_base_url"`
 	CallbackUrl  string `json:"callback_url" mapstructure:"callback_url"`
+}
+
+type ModelConfig struct {
+	Host        string `json:"host" mapstructure:"host"`
+	OcrFilePath string `json:"ocr_file_path" mapstructure:"ocr_file_path"`
 }
 
 type LogConfig struct {
