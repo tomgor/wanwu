@@ -325,6 +325,7 @@ export default {
             if(knowledgeData && knowledgeData.length > 0){
               this.editForm.knowledgeBaseIds = knowledgeData.map(item => item.id);
             }
+            this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
             this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;//需要后端修改
         }
       })
@@ -344,7 +345,7 @@ export default {
         this.$message.warning('请选择模型！')
         return false
       }
-      if(this.editForm.rerankParams === ''){
+      if(this.editForm.knowledgeConfig.rerankModelId === ''){
         this.$message.warning('请选rerank择模型！')
         return false
       }

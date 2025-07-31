@@ -265,7 +265,7 @@
                 if (this.chatType === 'chat') return true;
                 const conditions = [
                     { check: !this.editForm.modelParams, message: '请选择模型' },
-                    { check: !this.editForm.rerankParams, message: '请选择rerank模型' },
+                    { check: !this.editForm.knowledgeConfig.rerankModelId, message: '请选择rerank模型' },
                     { check: this.editForm.knowledgeBaseIds.length === 0, message: '请选择知识库' }
                 ];
                 for (const condition of conditions) {

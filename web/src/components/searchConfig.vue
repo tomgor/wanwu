@@ -74,7 +74,9 @@
                 loading-text="模型加载中..."
                 v-model="formInline.knowledgeMatchParams.rerankModelId"
                 @visible-change="visibleChange($event)"
+                @change="handleRerankChange"
                 placeholder="请选择"
+                :loading="rerankLoading"
               >
                 <el-option
                   v-for="item in rerankOptions"
@@ -168,6 +170,7 @@ export default {
     return {
       debounceTimer:null,
       rerankOptions: [],
+      rerankLoading: false,
       isSettingFromConfig: false, // 添加标志位，用于区分是否是从config设置的值
       formInline: {
         knowledgeMatchParams: {
@@ -177,7 +180,7 @@ export default {
           rerankModelId: "", //rerank模型id
           score: 0.4, //过滤分数阈值
           semanticsPriority: 0.2, //语义权重
-          topK: 1, //topK 获取最高的几行
+          topK:5, //topK 获取最高的几行
           maxHistory:0//最长上下文
         },
       },
@@ -258,18 +261,19 @@ export default {
             }
             this.$emit('sendConfigInfo', this.formInline);
           }
-        }, 500);
+        }, 200);
       },
       deep: true,
       immediate: false
     },
     config:{
       handler(newVal) {
-        if(newVal && newVal.rerankModelId !== null){
+        if(newVal && newVal.rerankModelId !==''){
           this.isSettingFromConfig = true; // 设置标志位
           const formData = JSON.parse(JSON.stringify(newVal))
           this.formInline.knowledgeMatchParams = formData;
-          const { matchType } = this.formInline.knowledgeMatchParams
+          const { matchType } = this.formInline.
+          console.log(matchType)
           this.searchTypeData = this.searchTypeData.map((item) => ({
             ...item,
             showContent: item.value === matchType ? true : false,
@@ -291,6 +295,7 @@ export default {
     });
   },
   created() {
+    // 预加载数据，避免首次打开下拉框时的延迟
     this.getRerankData();
   },
   methods: {
@@ -336,15 +341,28 @@ export default {
       this.formInline.knowledgeMatchParams.topK = 1;
     },
     getRerankData() {
+      this.rerankLoading = true;
       getRerankList().then((res) => {
         if (res.code === 0) {
           this.rerankOptions = res.data.list || [];
         }
+      }).finally(() => {
+        this.rerankLoading = false;
       });
     },
     visibleChange(val) {
-      if (val) {
+      if (val && this.rerankOptions.length === 0) {
         this.getRerankData();
+      }
+    },
+    handleRerankChange(value) {
+      // 直接触发事件，避免防抖延迟
+      if(!this.setType){
+        const formData = JSON.parse(JSON.stringify(this.formInline));
+        delete formData.knowledgeMatchParams.maxHistory;
+        this.$emit('sendConfigInfo', formData);
+      } else {
+        this.$emit('sendConfigInfo', this.formInline);
       }
     },
   },
