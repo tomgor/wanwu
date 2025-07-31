@@ -5,7 +5,7 @@
         title="添加敏感词"
         :close-on-click-modal="false"
         :visible.sync="dialogVisible"
-        width="30%"
+        width="50%"
         :before-close="handleClose"
         >
         <el-form
@@ -57,8 +57,6 @@
                 action=""
                 :show-file-list="false"
                 :auto-upload="false"
-                :limit="5"
-                multiple
                 accept=".xlsx"
                 :file-list="fileList"
                 :on-change="uploadOnChange"
@@ -135,6 +133,7 @@
 </template>
 <script>
 import uploadChunk from "@/mixins/uploadChunk";
+import { delfile } from "@/api/chunkFile";
 import { uploadSensitiveWord } from "@/api/safety";
 export default {
     mixins: [uploadChunk],
@@ -146,19 +145,23 @@ export default {
                     name:'涉政'
                 },
                 {
-                    value:'Abuse',
-                    name:'辱骂涉黄'
+                    value:'Revile',
+                    name:'辱骂'
                 },
                 {
-                    value:'Terror',
+                    value:'Pornography',
+                    name:'涉黄'
+                },
+                {
+                    value:'ViolentTerror',
                     name:'暴恐'
                 },
                 {
-                    value:'Banned',
+                    value:'Illegal',
                     name:'违禁'
                 },
                 {
-                    value:'Security',
+                    value:'InformationSecurity',
                     name:'信息安全'
                 },
                 {
@@ -185,12 +188,37 @@ export default {
     },
     methods:{
         uploadOnChange(file, fileList){
-            this.fileList = [];
-            this.fileList.push(file);
+            if (!fileList.length) return;
+            this.fileList = fileList;
             if(this.fileList.length > 0){
                 this.maxSizeBytes = 0;
                 this.isExpire = true;
                 this.startUpload();
+            }
+        },
+        filterSize(size) {
+            if (!size) return "";
+            var num = 1024.0; //byte
+            if (size < num) return size + "B";
+            if (size < Math.pow(num, 2)) return (size / num).toFixed(2) + "KB"; //kb
+            if (size < Math.pow(num, 3))
+                return (size / Math.pow(num, 2)).toFixed(2) + "MB"; //M
+            if (size < Math.pow(num, 4))
+                return (size / Math.pow(num, 3)).toFixed(2) + "G"; //G
+            return (size / Math.pow(num, 4)).toFixed(2) + "T"; //T
+        },
+        handleRemove(item,index){
+            const data = {fileList:[this.resList[index]['name']],isExpired:true}
+            delfile(data).then(res =>{
+                if(res.code === 0){
+                this.$message.success('删除成功')
+                }
+            })
+            this.fileList = this.fileList.filter((files) => files.name !== item.name);
+            if(this.fileList.length === 0){
+                this.file = null
+            }else{
+                this.fileIndex--
             }
         },
         uploadFile(chunkFileName){
@@ -198,10 +226,11 @@ export default {
         },
         handleClose(){
             this.dialogVisible = false;
+            this.ruleForm.tableId = '';
             this.clearform()
         },
         clearform(){
-            this.ruleForm.tableId = ''
+            this.fileList = []
             this.$refs.ruleForm.resetFields()
             this.$refs.ruleForm.clearValidate()
         },
@@ -223,6 +252,7 @@ export default {
         showDialog(tableId){
             this.dialogVisible = true;
             this.ruleForm.tableId = tableId;
+            this.clearform();
         }
     }
 }
@@ -250,14 +280,13 @@ export default {
     }
 }
 .file-list{
-  padding: 20px;
+  padding: 20px 0;
   .document_lise_item{
     cursor: pointer;
-    padding:5px 10px;
+    padding:0 10px;
     list-style: none;
-    background: #fff;
     border-radius:4px;
-    box-shadow: 1px 2px 2px #ddd;
+    border:1px solid #7684fd;
     display:flex;
     align-items:center;
     margin-bottom:10px;
@@ -268,9 +297,10 @@ export default {
       justify-content:space-between;
       .size{
           display:flex;
+          flex:1;
           align-items:center;
           .progress{
-            width:400px;
+            width:200px;
             margin-left:30px;
           }
           img{

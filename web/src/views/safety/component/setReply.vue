@@ -5,7 +5,7 @@
         title="回复设置"
         :close-on-click-modal="false"
         :visible.sync="dialogVisible"
-        width="40%"
+        width="50%"
         :before-close="handleClose"
         >
         <el-form
@@ -62,12 +62,16 @@ export default {
         showDialog(tableId){
             this.dialogVisible = true;
             this.ruleForm.tableId = tableId;
+            this.clear();
         },
         handleClose(){
+            this.clear()
+            this.dialogVisible = false;
+        },
+        clear(){
             this.ruleForm.reply = '';
             this.$refs.ruleForm.resetFields();
             this.$refs.ruleForm.clearValidate();
-            this.dialogVisible = false;
         },
         submitForm(formName){
             this.$refs[formName].validate((valid) =>{
@@ -87,5 +91,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.tips{color:#888888;}
+.tips{color:#888888;line-height:1.5;margin-top: 10px;}
 </style>
