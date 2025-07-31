@@ -13,6 +13,7 @@ enum Code {
   BFFInvalidArg = 110001; // 参数错误
   BFFJWT = 110002; // JWT错误
   BFFAuth = 110003; // Auth错误
+  BFFSensitiveWordCheck = 110005; // 敏感词校验错误
 
   // --- iam-service ---
   // [120000, 129999]
