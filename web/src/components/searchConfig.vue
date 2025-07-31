@@ -273,7 +273,6 @@ export default {
           const formData = JSON.parse(JSON.stringify(newVal))
           this.formInline.knowledgeMatchParams = formData;
           const { matchType } = this.formInline.
-          console.log(matchType)
           this.searchTypeData = this.searchTypeData.map((item) => ({
             ...item,
             showContent: item.value === matchType ? true : false,
@@ -300,7 +299,7 @@ export default {
   },
   methods: {
     rangeChage(val){
-      this.formInline.knowledgeMatchParams.keywordPriority = (1 - (val || 0)).toFixed(1);
+      this.formInline.knowledgeMatchParams.keywordPriority = Number((1 - (val || 0)).toFixed(1));
       this.formInline.knowledgeMatchParams.semanticsPriority = val;
     },
     mixTypeClick(item, n) {
