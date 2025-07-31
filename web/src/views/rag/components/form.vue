@@ -224,7 +224,7 @@ export default {
           rerankModelId: "", //rerank模型id
           semanticsPriority: 0.2, //语义权重
           topK: 1, //topK 获取最高的几行
-          score: 0.4, //过滤分数阈值
+          threshold: 0.4, //过滤分数阈值
           maxHistory:0//最长上下文
         },
         safetyConfig:{
@@ -341,11 +341,13 @@ export default {
       this.showOperation = !this.showOperation;
     },
     savePublish(){
+      const { matchType, priorityMatch, rerankModelId } = this.editForm.knowledgeConfig;
+      const isMixPriorityMatch = matchType === 'mix' && priorityMatch;
       if(this.editForm.modelParams === ''){
         this.$message.warning('请选择模型！')
         return false
       }
-      if(this.editForm.knowledgeConfig.rerankModelId === ''){
+      if(!isMixPriorityMatch && !rerankModelId){
         this.$message.warning('请选rerank择模型！')
         return false
       }

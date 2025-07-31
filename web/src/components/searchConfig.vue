@@ -151,7 +151,7 @@
                 :min="0"
                 :max="1"
                 :step="0.1"
-                v-model="formInline.knowledgeMatchParams.score"
+                v-model="formInline.knowledgeMatchParams.threshold"
                 show-input
               >
               </el-slider>
@@ -178,7 +178,7 @@ export default {
           matchType: "", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
           priorityMatch: 1, //权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
           rerankModelId: "", //rerank模型id
-          score: 0.4, //过滤分数阈值
+          threshold: 0.4, //过滤分数阈值
           semanticsPriority: 0.2, //语义权重
           topK:5, //topK 获取最高的几行
           maxHistory:0//最长上下文
@@ -190,10 +190,7 @@ export default {
           name: "向量检索",
           value: "vector",
           desc: "通过向量相似度找到语义相近、表达多样的文本片段，适用于理解和召回语义相关信息。",
-          rerank: "",
           icon: "el-icon-menu",
-          topK: 0,
-          Score: 0.4,
           isWeight: false,
           showContent: false,
         },
@@ -201,9 +198,6 @@ export default {
           name: "全文检索",
           value: "text",
           desc: "基于关键词匹配，能够高效查询包含指定词汇的文本片段，适用于精确查找",
-          rerank: "",
-          topK: 0,
-          Score: 0.4,
           icon: "el-icon-document",
           isWeight: false,
           showContent: false,
@@ -212,10 +206,7 @@ export default {
           name: "混合检索",
           value: "mix",
           desc: "结合向量和关键词检索，融合语义理解与关键词匹配，兼顾相关性和准确性，提升检索效果。",
-          rerank: "",
           icon: "el-icon-s-grid",
-          topK: 0,
-          Score: 0.4,
           isWeight: true,
           Weight: "",
           mixTypeValue: "weight",
@@ -336,7 +327,7 @@ export default {
       this.formInline.knowledgeMatchParams.rerankModelId = "";
       this.formInline.knowledgeMatchParams.keywordPriority = 0.8;
       this.formInline.knowledgeMatchParams.semanticsPriority = 0.2;
-      this.formInline.knowledgeMatchParams.score = 0.4;
+      this.formInline.knowledgeMatchParams.threshold = 0.4;
       this.formInline.knowledgeMatchParams.topK = 1;
     },
     getRerankData() {
