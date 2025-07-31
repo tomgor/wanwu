@@ -3,7 +3,6 @@ package callback
 import (
 	"encoding/json"
 	"fmt"
-
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
@@ -110,6 +109,24 @@ func ModelRerank(ctx *gin.Context) {
 		return
 	}
 	service.ModelRerank(ctx, ctx.Param("modelId"), &data)
+}
+
+// ModelOcr
+//
+//	@Tags		callback
+//	@Summary	Model Ocr
+//	@Accept		multipart/form-data
+//	@Produce	json
+//	@Param		modelId	path		string	true	"模型ID"
+//	@Param		file	formData	file	true	"文件"
+//	@Success	200		{object}	mp_common.OcrResp{}
+//	@Router		/model/{modelId}/ocr [post]
+func ModelOcr(ctx *gin.Context) {
+	var data mp_common.OcrReq
+	if !gin_util.BindForm(ctx, &data) {
+		return
+	}
+	service.ModelOcr(ctx, ctx.Param("modelId"), &data)
 }
 
 // UpdateDocStatus

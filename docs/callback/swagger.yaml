@@ -235,6 +235,38 @@ definitions:
     - MsgRoleUser
     - MsgRoleAssistant
     - MsgRoleFunction
+  mp_common.OcrData:
+    properties:
+      length:
+        type: integer
+      page_num:
+        items:
+          type: integer
+        type: array
+      text:
+        type: string
+      type:
+        type: string
+    type: object
+  mp_common.OcrResp:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/mp_common.OcrData'
+        type: array
+      id:
+        type: string
+      message:
+        type: string
+      time_cost:
+        type: number
+      timestamp:
+        type: string
+      version:
+        type: string
+    type: object
   mp_common.OpenAIFunction:
     properties:
       description:
@@ -824,6 +856,31 @@ paths:
           schema:
             $ref: '#/definitions/mp_common.EmbeddingResp'
       summary: Model Embeddings
+      tags:
+      - callback
+  /model/{modelId}/ocr:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 模型ID
+        in: path
+        name: modelId
+        required: true
+        type: string
+      - description: 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mp_common.OcrResp'
+      summary: Model Ocr
       tags:
       - callback
   /model/{modelId}/rerank:

@@ -1,9 +1,15 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/UnicomAI/wanwu/internal/bff-service/config"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"os"
 	"strings"
 	"sync"
 
@@ -23,6 +29,7 @@ var validators = sync.OnceValue(func() map[string]ModelValidator {
 		mp.ModelTypeLLM:       ValidateLLMModel,
 		mp.ModelTypeRerank:    ValidateRerankModel,
 		mp.ModelTypeEmbedding: ValidateEmbeddingModel,
+		mp.ModelTypeOcr:       ValidateOcrModel,
 	}
 })
 
@@ -159,6 +166,62 @@ func ValidateRerankModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) e
 		return err
 	}
 	_, err = iRerank.Rerank(ctx.Request.Context(), rerankReq)
+	if err != nil {
+		return fmt.Errorf("invalid resp: %v", err)
+	}
+	return nil
+}
+
+func ValidateOcrModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) error {
+	rerank, err := mp.ToModelConfig(modelInfo.Provider, modelInfo.ModelType, modelInfo.ProviderConfig)
+	if err != nil {
+		return err
+	}
+	iOcr, ok := rerank.(mp.IOcr)
+	if !ok {
+		return fmt.Errorf("invalid provider")
+	}
+	// mock  request
+
+	file, err := os.Open(config.Cfg().Model.OcrFilePath)
+	if err != nil {
+		return fmt.Errorf("open file failed: %v", err)
+	}
+	defer file.Close()
+
+	// 创建内存缓冲区
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	// 创建表单文件字段
+	part, err := writer.CreateFormFile("file", file.Name())
+	if err != nil {
+		return fmt.Errorf("create form file failed: %v", err)
+	}
+
+	// 复制文件内容
+	if _, err := io.Copy(part, file); err != nil {
+		return fmt.Errorf("copy file content failed: %v", err)
+	}
+	writer.Close()
+
+	// 模拟HTTP请求
+	mockReq, _ := http.NewRequest("POST", "", body)
+	mockReq.Header.Set("Content-Type", writer.FormDataContentType())
+	ctx.Request = mockReq
+	// 获取FileHeader对象
+	_, fileH, err := ctx.Request.FormFile("file")
+	if err != nil {
+		return fmt.Errorf("get file header failed: %v", err)
+	}
+	req := &mp_common.OcrReq{
+		Files: fileH,
+	}
+	ocrReq, err := iOcr.NewReq(req)
+	if err != nil {
+		return err
+	}
+	_, err = iOcr.Ocr(ctx, ocrReq)
 	if err != nil {
 		return fmt.Errorf("invalid resp: %v", err)
 	}

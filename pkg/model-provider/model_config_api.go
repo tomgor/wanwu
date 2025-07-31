@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	mp_huoshan "github.com/UnicomAI/wanwu/pkg/model-provider/mp-huoshan"
@@ -26,6 +27,11 @@ type IEmbedding interface {
 type IRerank interface {
 	NewReq(req *mp_common.RerankReq) (mp_common.IRerankReq, error)
 	Rerank(ctx context.Context, req mp_common.IRerankReq, headers ...mp_common.Header) (mp_common.IRerankResp, error)
+}
+
+type IOcr interface {
+	NewReq(req *mp_common.OcrReq) (mp_common.IOcrReq, error)
+	Ocr(ctx *gin.Context, req mp_common.IOcrReq, headers ...mp_common.Header) (mp_common.IOcrResp, error)
 }
 
 // ToModelConfig 返回ILLM、IEmbedding或IRerank
@@ -54,6 +60,8 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 			ret = &mp_yuanjing.Rerank{}
 		case ModelTypeEmbedding:
 			ret = &mp_yuanjing.Embedding{}
+		case ModelTypeOcr:
+			ret = &mp_yuanjing.Ocr{}
 		default:
 			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
 		}

@@ -1081,11 +1081,11 @@ definitions:
       rerankModelId:
         description: rerank模型id
         type: string
-      score:
-        description: score 过滤分数阈值
-        type: number
       semanticsPriority:
         description: 语义权重
+        type: number
+      threshold:
+        description: threshold 过滤分数阈值
         type: number
       topK:
         description: topK 获取最高的几行
@@ -5334,6 +5334,32 @@ paths:
       security:
       - JWT: []
       summary: llm模型列表
+      tags:
+      - model
+  /model/select/ocr:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        $ref: '#/definitions/response.ModelBrief'
+                    type: object
+              type: object
+      security:
+      - JWT: []
+      summary: ocr模型列表
       tags:
       - model
   /model/select/rerank:

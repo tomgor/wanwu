@@ -4021,6 +4021,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/model/select/ocr": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "model"
+                ],
+                "summary": "ocr模型列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "$ref": "#/definitions/response.ModelBrief"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/model/select/rerank": {
             "get": {
                 "security": [
@@ -7403,12 +7454,12 @@ const docTemplate = `{
                     "description": "rerank模型id",
                     "type": "string"
                 },
-                "score": {
-                    "description": "score 过滤分数阈值",
-                    "type": "number"
-                },
                 "semanticsPriority": {
                     "description": "语义权重",
+                    "type": "number"
+                },
+                "threshold": {
+                    "description": "threshold 过滤分数阈值",
                     "type": "number"
                 },
                 "topK": {
