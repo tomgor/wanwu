@@ -5,7 +5,7 @@
         title="添加敏感词"
         :close-on-click-modal="false"
         :visible.sync="dialogVisible"
-        width="30%"
+        width="50%"
         :before-close="handleClose"
         >
         <el-form
@@ -18,14 +18,14 @@
         >
             <el-form-item class="itemCenter">
               <el-radio-group v-model="ruleForm.importType">
-                <el-radio-button :label="0">单条添加</el-radio-button>
-                <el-radio-button :label="1">批量上传</el-radio-button>
+                <el-radio-button :label="'single'">单条添加</el-radio-button>
+                <el-radio-button :label="'file'">批量上传</el-radio-button>
               </el-radio-group>  
             </el-form-item>
             <el-form-item
             label="敏感词表名"
             prop="word"
-            v-if="ruleForm.importType === 0"
+            v-if="ruleForm.importType === 'single'"
             >
             <el-input
                 v-model="ruleForm.word"
@@ -35,7 +35,7 @@
             <el-form-item
             label="敏感词类型"
             prop="sensitiveType"
-            v-if="ruleForm.importType === 0"
+            v-if="ruleForm.importType === 'single'"
             >
             <el-select v-model="ruleForm.sensitiveType" placeholder="请选择" style="width:100%;">
                 <el-option
@@ -49,7 +49,7 @@
             <el-form-item
             label="批量上传"
             prop="fileName"
-            v-if="ruleForm.importType === 1"
+            v-if="ruleForm.importType === 'file'"
             >
             <el-upload
                 class="upload-box"
@@ -57,8 +57,6 @@
                 action=""
                 :show-file-list="false"
                 :auto-upload="false"
-                :limit="5"
-                multiple
                 accept=".xlsx"
                 :file-list="fileList"
                 :on-change="uploadOnChange"
@@ -66,7 +64,11 @@
               <div>
                 <div>
                     <img :src="require('@/assets/imgs/uploadImg.png')" class="upload-img" />
-                    <p class="click-text">将文件拖到此处，或<span class="clickUpload">点击上传</span></p>
+                    <p class="click-text">
+                        将文件拖到此处，或
+                        <span class="clickUpload">点击上传</span>
+                        <a class="clickUpload template" :href="`/user/api/v1/static/docs/sensitive.xlsx`" download @click.stop>模版下载</a>
+                    </p>
                 </div>
               </div>
               </el-upload>
@@ -131,6 +133,7 @@
 </template>
 <script>
 import uploadChunk from "@/mixins/uploadChunk";
+import { delfile } from "@/api/chunkFile";
 import { uploadSensitiveWord } from "@/api/safety";
 export default {
     mixins: [uploadChunk],
@@ -142,19 +145,23 @@ export default {
                     name:'涉政'
                 },
                 {
-                    value:'Abuse',
-                    name:'辱骂涉黄'
+                    value:'Revile',
+                    name:'辱骂'
                 },
                 {
-                    value:'Terror',
+                    value:'Pornography',
+                    name:'涉黄'
+                },
+                {
+                    value:'ViolentTerror',
                     name:'暴恐'
                 },
                 {
-                    value:'Banned',
+                    value:'Illegal',
                     name:'违禁'
                 },
                 {
-                    value:'Security',
+                    value:'InformationSecurity',
                     name:'信息安全'
                 },
                 {
@@ -165,7 +172,7 @@ export default {
             title:"新建词表",
             dialogVisible:false,
             ruleForm:{
-                importType:0,
+                importType:'single',
                 word:'',
                 sensitiveType:'',
                 fileName:'',
@@ -181,12 +188,37 @@ export default {
     },
     methods:{
         uploadOnChange(file, fileList){
-            this.fileList = [];
-            this.fileList.push(file);
+            if (!fileList.length) return;
+            this.fileList = fileList;
             if(this.fileList.length > 0){
                 this.maxSizeBytes = 0;
                 this.isExpire = true;
                 this.startUpload();
+            }
+        },
+        filterSize(size) {
+            if (!size) return "";
+            var num = 1024.0; //byte
+            if (size < num) return size + "B";
+            if (size < Math.pow(num, 2)) return (size / num).toFixed(2) + "KB"; //kb
+            if (size < Math.pow(num, 3))
+                return (size / Math.pow(num, 2)).toFixed(2) + "MB"; //M
+            if (size < Math.pow(num, 4))
+                return (size / Math.pow(num, 3)).toFixed(2) + "G"; //G
+            return (size / Math.pow(num, 4)).toFixed(2) + "T"; //T
+        },
+        handleRemove(item,index){
+            const data = {fileList:[this.resList[index]['name']],isExpired:true}
+            delfile(data).then(res =>{
+                if(res.code === 0){
+                this.$message.success('删除成功')
+                }
+            })
+            this.fileList = this.fileList.filter((files) => files.name !== item.name);
+            if(this.fileList.length === 0){
+                this.file = null
+            }else{
+                this.fileIndex--
             }
         },
         uploadFile(chunkFileName){
@@ -194,17 +226,24 @@ export default {
         },
         handleClose(){
             this.dialogVisible = false;
+            this.ruleForm.tableId = '';
             this.clearform()
         },
         clearform(){
-            this.tableId = ''
+            this.fileList = []
             this.$refs.ruleForm.resetFields()
             this.$refs.ruleForm.clearValidate()
         },
         submitForm(formName){
             this.$refs[formName].validate((valid) =>{
                 if(valid){
-                   
+                   uploadSensitiveWord(this.ruleForm).then(res =>{
+                    if(res.code == 0){
+                        this.$message.success('操作成功')
+                        this.$emit('reload')
+                        this.dialogVisible = false;
+                    }
+                   })
                 }else{
                     return false;
                 }
@@ -213,6 +252,7 @@ export default {
         showDialog(tableId){
             this.dialogVisible = true;
             this.ruleForm.tableId = tableId;
+            this.clearform();
         }
     }
 }
@@ -231,20 +271,22 @@ export default {
         height:56px;
         margin-top: 10px;
     }
-    .clickUpload{
+    .clickUpload,.template{
        color: #384bf7;
        font-weight: bold;
     }
+    .template{
+        margin-left:10px;
+    }
 }
 .file-list{
-  padding: 20px;
+  padding: 20px 0;
   .document_lise_item{
     cursor: pointer;
-    padding:5px 10px;
+    padding:0 10px;
     list-style: none;
-    background: #fff;
     border-radius:4px;
-    box-shadow: 1px 2px 2px #ddd;
+    border:1px solid #7684fd;
     display:flex;
     align-items:center;
     margin-bottom:10px;
@@ -255,9 +297,10 @@ export default {
       justify-content:space-between;
       .size{
           display:flex;
+          flex:1;
           align-items:center;
           .progress{
-            width:400px;
+            width:200px;
             margin-left:30px;
           }
           img{

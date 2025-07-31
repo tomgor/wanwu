@@ -6,9 +6,11 @@
     class="searchConfig"
   >
     <el-form-item
-      label="检索方式配置"
       class="vertical-form-item"
     >
+    <template #label>
+        <span v-if="!setType">检索方式配置</span>
+    </template>
       <div
         v-for="item in searchTypeData"
         :class="['searchType-list',{ 'active': item.showContent }]"
@@ -48,13 +50,12 @@
             @click.stop
           >
             <el-col class="mixTypeRange-title">
-              <span>语义[{{item.mixTypeRange[0]}}]</span>
-              <span>关键词[{{item.mixTypeRange[1]}}]</span>
+              <span>语义[{{item.mixTypeRange}}]</span>
+              <span>关键词[{{(1 - (item.mixTypeRange || 0)).toFixed(1)}}]</span>
             </el-col>
             <el-col>
               <el-slider
                 v-model="item.mixTypeRange"
-                range
                 show-stops
                 :step="0.1"
                 :max="1"
@@ -73,7 +74,9 @@
                 loading-text="模型加载中..."
                 v-model="formInline.knowledgeMatchParams.rerankModelId"
                 @visible-change="visibleChange($event)"
+                @change="handleRerankChange"
                 placeholder="请选择"
+                :loading="rerankLoading"
               >
                 <el-option
                   v-for="item in rerankOptions"
@@ -103,6 +106,29 @@
                 :max="10"
                 :step="1"
                 v-model="formInline.knowledgeMatchParams.topK"
+                show-input
+              >
+              </el-slider>
+            </el-col>
+          </el-row>
+          <el-row v-if="showHistory(item)">
+            <el-col>
+              <span class="content-name">最长上下文</span>
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="保存的最长的上下文对话轮数。"
+                placement="right"
+              >
+                <span class="el-icon-question tips"></span>
+              </el-tooltip>
+            </el-col>
+            <el-col>
+              <el-slider
+                :min="0"
+                :max="100"
+                :step="1"
+                v-model="formInline.knowledgeMatchParams.maxHistory"
                 show-input
               >
               </el-slider>
@@ -139,10 +165,13 @@
 <script>
 import { getRerankList } from "@/api/modelAccess";
 export default {
+  props:['setType','config'],
   data() {
     return {
       debounceTimer:null,
       rerankOptions: [],
+      rerankLoading: false,
+      isSettingFromConfig: false, // 添加标志位，用于区分是否是从config设置的值
       formInline: {
         knowledgeMatchParams: {
           keywordPriority: 0.8, //关键词权重
@@ -151,7 +180,8 @@ export default {
           rerankModelId: "", //rerank模型id
           score: 0.4, //过滤分数阈值
           semanticsPriority: 0.2, //语义权重
-          topK: 1, //topK 获取最高的几行
+          topK:5, //topK 获取最高的几行
+          maxHistory:0//最长上下文
         },
       },
       initialEditForm:null,
@@ -190,7 +220,7 @@ export default {
           Weight: "",
           mixTypeValue: "weight",
           showContent: false,
-          mixTypeRange: [0.2, 0.8],
+          mixTypeRange: 0.2,
           mixType: [
             {
               name: "权重设置",
@@ -210,6 +240,11 @@ export default {
   watch: {
     formInline: {
       handler(newVal) {
+        // 如果是从config设置的值，不触发sendConfigInfo
+        if (this.isSettingFromConfig) {
+          return;
+        }
+        
         if (this.debounceTimer) {
           clearTimeout(this.debounceTimer);
         }
@@ -221,9 +256,33 @@ export default {
               );
             });
           if (changed) {
+            if(!this.setType){
+              delete this.formInline.knowledgeMatchParams.maxHistory;
+            }
             this.$emit('sendConfigInfo', this.formInline);
           }
-        }, 500);
+        }, 200);
+      },
+      deep: true,
+      immediate: false
+    },
+    config:{
+      handler(newVal) {
+        if(newVal && newVal.rerankModelId !==''){
+          this.isSettingFromConfig = true; // 设置标志位
+          const formData = JSON.parse(JSON.stringify(newVal))
+          this.formInline.knowledgeMatchParams = formData;
+          const { matchType } = this.formInline.
+          this.searchTypeData = this.searchTypeData.map((item) => ({
+            ...item,
+            showContent: item.value === matchType ? true : false,
+          }));
+          
+          // 使用nextTick确保DOM更新完成后再重置标志位
+          this.$nextTick(() => {
+            this.isSettingFromConfig = false;
+          });
+        }
       },
       deep: true,
       immediate: false
@@ -235,12 +294,13 @@ export default {
     });
   },
   created() {
+    // 预加载数据，避免首次打开下拉框时的延迟
     this.getRerankData();
   },
   methods: {
     rangeChage(val){
-      this.formInline.knowledgeMatchParams.keywordPriority = val[1];
-      this.formInline.knowledgeMatchParams.semanticsPriority = val[0];
+      this.formInline.knowledgeMatchParams.keywordPriority = Number((1 - (val || 0)).toFixed(1));
+      this.formInline.knowledgeMatchParams.semanticsPriority = val;
     },
     mixTypeClick(item, n) {
       item.mixTypeValue = n.value;
@@ -253,6 +313,15 @@ export default {
         n.value === "text" ||
         (n.value === "mix" && n.mixTypeValue === "rerank")
       );
+    },
+    showHistory(n){
+      return (
+        this.setType === 'rag' &&
+        (n.value === "vector" ||
+         n.value === "text" ||
+         (n.value === "mix" && n.mixTypeValue === "rerank")
+        )
+      )
     },
     clickSearch(n) {
       this.formInline.knowledgeMatchParams.matchType = n.value;
@@ -271,15 +340,28 @@ export default {
       this.formInline.knowledgeMatchParams.topK = 1;
     },
     getRerankData() {
+      this.rerankLoading = true;
       getRerankList().then((res) => {
         if (res.code === 0) {
           this.rerankOptions = res.data.list || [];
         }
+      }).finally(() => {
+        this.rerankLoading = false;
       });
     },
     visibleChange(val) {
-      if (val) {
+      if (val && this.rerankOptions.length === 0) {
         this.getRerankData();
+      }
+    },
+    handleRerankChange(value) {
+      // 直接触发事件，避免防抖延迟
+      if(!this.setType){
+        const formData = JSON.parse(JSON.stringify(this.formInline));
+        delete formData.knowledgeMatchParams.maxHistory;
+        this.$emit('sendConfigInfo', formData);
+      } else {
+        this.$emit('sendConfigInfo', this.formInline);
       }
     },
   },

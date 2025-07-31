@@ -7,10 +7,10 @@
         <el-form :model="ruleForm" ref="ruleForm"  class="demo-ruleForm">
             <el-form-item 
             label="敏感词表" 
-            prop="tableId"
+            prop="tables"
             :rules="[{ required: true, message: '请选择敏感词表', trigger: 'blur'}]"
             >
-                <el-select v-model="ruleForm.tables" placeholder="请选择" @visible-change="visibleChange" style="width:65%;" multiple>
+                <el-select v-model="ruleForm.tables" placeholder="请选择" @visible-change="visibleChange" style="width:65%;" multiple value-key="tableId">
                     <el-option
                     v-for="item in safetyOptions"
                     :key="item.tableId"
@@ -38,6 +38,9 @@ export default {
             safetyOptions:[]
         }
     },
+    created(){
+        this.getList();
+    },
     methods:{
         handleClose(){
             this.dialogVisible = false;
@@ -50,11 +53,19 @@ export default {
         showDialog(row=null){
             this.dialogVisible = true;
             if(row !== null){
-                this.ruleForm.tables = row.tables;
+                this.$nextTick(() =>{
+                    this.ruleForm.tables = this.safetyOptions.filter(item => 
+                        row.some(i => i.tableId === item.tableId)
+                    );
+                })
             }else{
                 this.ruleForm.tables = [];
-                this.$refs.ruleForm.clearValidate();
-                this.$refs.ruleForm.resetFields();
+                this.$nextTick(() => {
+                    if (this.$refs.ruleForm) {
+                        this.$refs.ruleForm.clearValidate();
+                        this.$refs.ruleForm.resetFields();
+                    }
+                });
             }
         },
         getList(){

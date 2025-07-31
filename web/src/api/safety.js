@@ -56,7 +56,7 @@ export const delSensitiveWord = (data)=>{
 //查询词表数据列表
 export const getSensitiveWord = (data)=>{
     return request({
-        url: '/user/api/v1/safe/sensitive/word',
+        url: '/user/api/v1/safe/sensitive/word/list',
         method: 'get',
         params:data
     })
@@ -64,7 +64,7 @@ export const getSensitiveWord = (data)=>{
 //上传敏感词
 export const uploadSensitiveWord = (data)=>{
     return request({
-        url: '/user/api/v1/safe/sensitive/word/upload',
+        url: '/user/api/v1/safe/sensitive/word',
         method: 'post',
         data
     })

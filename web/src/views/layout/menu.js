@@ -32,7 +32,7 @@ export const menuList = [
         img: require('@/assets/imgs/safety.png'),
         imgActive: require('@/assets/imgs/safety_active.png'),
         path: '/safety',
-        perm: PERMS.MCP,
+        perm: PERMS.SAFRTY,
     },
     {
         key: 'line',

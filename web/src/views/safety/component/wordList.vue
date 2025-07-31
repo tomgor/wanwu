@@ -41,6 +41,9 @@
                   prop="sensitiveType"
                   label="类型"
                 >
+                <template slot-scope="scope">
+                  <span>{{safetyType[scope.row.sensitiveType]}}</span>
+                </template>
                 </el-table-column>
                 <el-table-column
                   :label="$t('knowledgeManage.operate')"
@@ -69,7 +72,7 @@
         </el-main>
       </el-container>
     </div>
-    <createWord ref="createWord" />
+    <createWord ref="createWord" @reload="reload"/>
     <setReply ref="setReply" />
   </div>
 </template>
@@ -78,17 +81,17 @@
 import Pagination from "@/components/pagination.vue";
 import createWord from './createWord.vue';
 import setReply from './setReply.vue';
+import { SafetyType } from "@/utils/commonSet";
 import {getSensitiveWord,delSensitiveWord} from "@/api/safety";
 export default {
   components:{createWord,setReply,Pagination},
   data() {
     return {
+      safetyType:SafetyType,
       loading:false,
       tableLoading:false,
       docQuery: {
-        tableId:this.$route.params.id,
-        page:1,
-        pageSize:10
+        tableId:this.$route.params.id
       },
       fileList: [],
       listApi: getSensitiveWord,
@@ -99,9 +102,12 @@ export default {
     };
   },
   mounted(){
-    // this.getTableData(this.docQuery)
+    this.getTableData(this.docQuery)
   },
   methods: {
+    reload(){
+      this.getTableData(this.docQuery)
+    },
     showCreate(){
       this.$refs.createWord.showDialog(this.docQuery.tableId)
     },
@@ -140,7 +146,6 @@ export default {
        this.tableLoading = true;
        this.tableData = await this.$refs["pagination"].getTableData(data);
        this.tableLoading = false;
-       this.getTips();
     },
     async download(url,name){
       const res = await downDoc(url)
