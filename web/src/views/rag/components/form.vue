@@ -194,6 +194,7 @@ export default {
       rerankOptions:[],
       showOperation:false,
       scope:'public',
+      localKnowledgeConfig:{},
       editForm:{
         appId:'',
         avatar:{},
@@ -267,14 +268,12 @@ export default {
               (this.initialEditForm || {})[prop]
             );
           });
-          console.log(changed,!this.isUpdating)
           if (changed && !this.isUpdating) {
-            console.log(newVal['knowledgeConfig']['rerankModelId'])
             if(newVal['modelParams']!== '' && newVal['knowledgeBaseIds'].length > 0 && newVal['knowledgeConfig']['rerankModelId'] !==''){
               this.updateInfo();
             }
           }
-      },1000) // 增加防抖时间到 1 秒
+      },500)
     },
     deep: true
     }
@@ -296,12 +295,11 @@ export default {
   },
   methods: {
     sendConfigInfo(data){
-      this.editForm.knowledgeConfig = data.knowledgeMatchParams;
-      console.log(data)
-      console.log(this.editForm.knowledgeConfig)
+      this.editForm.knowledgeConfig = { ...data.knowledgeMatchParams };;
     },
     sendSafety(data){
-      this.editForm.safetyConfig.tables = data;
+      const tablesData = data.map(({ tableId, tableName }) => ({ tableId, tableName }));
+      this.editForm.safetyConfig.tables = tablesData;
     },
     showSafety(){
       this.$refs.setSafety.showDialog(this.editForm.safetyConfig.tables);
@@ -449,7 +447,8 @@ export default {
             modelId: rerankInfo ? rerankInfo.modelId : '',
             modelType: rerankInfo ? rerankInfo.modelType : '',
             provider: rerankInfo ? rerankInfo.provider : '',
-          }
+          },
+          safetyConfig:this.editForm.safetyConfig,
         }
         const res = await updateRagConfig(fromParams)
         

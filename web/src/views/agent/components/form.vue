@@ -467,7 +467,8 @@ export default {
       this.$refs.setSafety.showDialog(this.editForm.safetyConfig.tables);
     },
     sendSafety(data){
-      this.editForm.safetyConfig.tables = data;
+      const tablesData = data.map(({ tableId, tableName }) => ({ tableId, tableName }));
+      this.editForm.safetyConfig.tables = tablesData;
     },
     actionSwitch(id){
       enableAction({actionId:id}).then(res =>{
@@ -622,6 +623,7 @@ export default {
           provider: modeInfo.provider,
         },
         onlineSearchConfig:this.editForm.onlineSearchConfig,
+        safetyConfig:this.editForm.safetyConfig,
         rerankConfig:rerankInfo?{
           displayName: rerankInfo.displayName,
           model: rerankInfo.model,

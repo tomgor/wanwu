@@ -168,6 +168,7 @@ export default {
     return {
       debounceTimer:null,
       rerankOptions: [],
+      isSettingFromConfig: false, // 添加标志位，用于区分是否是从config设置的值
       formInline: {
         knowledgeMatchParams: {
           keywordPriority: 0.8, //关键词权重
@@ -236,6 +237,11 @@ export default {
   watch: {
     formInline: {
       handler(newVal) {
+        // 如果是从config设置的值，不触发sendConfigInfo
+        if (this.isSettingFromConfig) {
+          return;
+        }
+        
         if (this.debounceTimer) {
           clearTimeout(this.debounceTimer);
         }
@@ -259,13 +265,20 @@ export default {
     },
     config:{
       handler(newVal) {
-        if(newVal && newVal.rerankModelId !== ''){
-          this.formInline.knowledgeMatchParams = JSON.parse(JSON.stringify(newVal))
+        if(newVal && newVal.rerankModelId !== null){
+          this.isSettingFromConfig = true; // 设置标志位
+          const formData = JSON.parse(JSON.stringify(newVal))
+          this.formInline.knowledgeMatchParams = formData;
           const { matchType } = this.formInline.knowledgeMatchParams
           this.searchTypeData = this.searchTypeData.map((item) => ({
             ...item,
             showContent: item.value === matchType ? true : false,
           }));
+          
+          // 使用nextTick确保DOM更新完成后再重置标志位
+          this.$nextTick(() => {
+            this.isSettingFromConfig = false;
+          });
         }
       },
       deep: true,
