@@ -4,6 +4,7 @@ import (
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	rag_service "github.com/UnicomAI/wanwu/api/proto/rag-service"
+	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	"github.com/gin-gonic/gin"
@@ -88,6 +89,7 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 	var modelInfo, rerankInfo *model_service.ModelInfo
 	var modelConfig, rerankConfig request.AppModelConfig
 	var knowledgeInfo *knowledgebase_service.KnowledgeInfo
+	var sensitiveWordTable *safety_service.SensitiveWordTables
 	var ragInfo = &response.RagInfo{}
 	if resp.ModelConfig.ModelId != "" {
 		modelInfo, err = model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: resp.ModelConfig.ModelId})
@@ -114,14 +116,8 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 			KnowledgeId: resp.KnowledgeBaseConfig.KnowledgeBaseId,
 		})
 	}
-
-	var sensitiveTableList []request.SensitiveTable
-	if resp.SensitiveConfig.TableIds != nil {
-		for _, tableId := range resp.SensitiveConfig.TableIds {
-			sensitiveTableList = append(sensitiveTableList, request.SensitiveTable{
-				TableId: tableId,
-			})
-		}
+	if len(resp.SensitiveConfig.GetTableIds()) != 0 {
+		sensitiveWordTable, _ = safety.GetSensitiveWordTableListByIDs(ctx, &safety_service.GetSensitiveWordTableListByIDsReq{TableIds: resp.SensitiveConfig.GetTableIds()})
 	}
 
 	knowledgeConfig := resp.KnowledgeBaseConfig
@@ -145,9 +141,18 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 			},
 		},
 		SafetyConfig: request.AppSafetyConfig{
-			Enable: resp.SensitiveConfig.Enable,
-			Tables: sensitiveTableList,
+			Enable: resp.SensitiveConfig.GetEnable(),
 		},
+	}
+	if sensitiveWordTable != nil {
+		var sensitiveTableList []request.SensitiveTable
+		for _, table := range sensitiveWordTable.List {
+			sensitiveTableList = append(sensitiveTableList, request.SensitiveTable{
+				TableId:   table.TableId,
+				TableName: table.TableName,
+			})
+		}
+		ragInfo.SafetyConfig.Tables = sensitiveTableList
 	}
 	if knowledgeInfo != nil {
 		ragInfo.KnowledgeBaseConfig.Knowledgebases = []request.AppKnowledgeBase{

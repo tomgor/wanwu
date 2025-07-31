@@ -16,6 +16,7 @@ type Config struct {
 	Log    LogConfig    `json:"log" mapstructure:"log"`
 	DB     db.Config    `json:"db" mapstructure:"db"`
 	Redis  redis.Config `json:"redis" mapstructure:"redis"`
+	Minio  MinioConfig  `json:"minio" mapstructure:"minio"` // 新增 MinIO 配置
 }
 
 type ServerConfig struct {
@@ -31,6 +32,13 @@ type LogConfig struct {
 
 type DBConfig struct {
 	Name string `json:"name" mapstructure:"name"`
+}
+
+type MinioConfig struct {
+	Endpoint string `json:"endpoint" mapstructure:"endpoint"`
+	User     string `json:"user" mapstructure:"user"`
+	Password string `json:"password" mapstructure:"password"`
+	Bucket   string `json:"bucket" mapstructure:"bucket"` // 安全模块的 bucket
 }
 
 func LoadConfig(in string) error {

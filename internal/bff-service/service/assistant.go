@@ -6,6 +6,7 @@ import (
 
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
+	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -502,23 +503,14 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 			SearchRerankId: resp.OnlineSearchConfig.SearchRerankId,
 		}
 	}
-
-	var safetyConfig request.AppSafetyConfig
-	if resp.SafetyConfig != nil {
-		safetyConfig = request.AppSafetyConfig{
-			Enable: resp.SafetyConfig.Enable,
+	var sensitiveWordTable *safety_service.SensitiveWordTables
+	if len(resp.SafetyConfig.GetSensitiveTable()) != 0 {
+		var tableIds []string
+		for _, table := range resp.SafetyConfig.SensitiveTable {
+			tableIds = append(tableIds, table.TableId)
 		}
-		if resp.SafetyConfig.SensitiveTable != nil {
-			safetyConfig.Tables = make([]request.SensitiveTable, 0, len(resp.SafetyConfig.SensitiveTable))
-			for _, table := range resp.SafetyConfig.SensitiveTable {
-				safetyConfig.Tables = append(safetyConfig.Tables, request.SensitiveTable{
-					TableId:   table.TableId,
-					TableName: table.TableName,
-				})
-			}
-		}
+		sensitiveWordTable, _ = safety.GetSensitiveWordTableListByIDs(ctx, &safety_service.GetSensitiveWordTableListByIDsReq{TableIds: tableIds})
 	}
-
 	assistantModel := response.Assistant{
 		AssistantId:       resp.AssistantId,
 		AppBriefConfig:    appBriefConfigProto2Model(ctx, resp.AssistantBrief),
@@ -546,12 +538,22 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		ModelConfig:        modelConfig,
 		RerankConfig:       rerankConfig,
 		OnlineSearchConfig: onlineSearchConfig,
-		SafetyConfig:       safetyConfig,
+		SafetyConfig:       request.AppSafetyConfig{Enable: resp.SafetyConfig.GetEnable()},
 		Scope:              resp.Scope,
 		ActionInfos:        actionInfos,
 		WorkFlowInfos:      workFlowInfos,
 		CreatedAt:          util.Time2Str(resp.CreatTime),
 		UpdatedAt:          util.Time2Str(resp.UpdateTime),
+	}
+	if sensitiveWordTable != nil {
+		var sensitiveTableList []request.SensitiveTable
+		for _, table := range sensitiveWordTable.List {
+			sensitiveTableList = append(sensitiveTableList, request.SensitiveTable{
+				TableId:   table.TableId,
+				TableName: table.TableName,
+			})
+		}
+		assistantModel.SafetyConfig.Tables = sensitiveTableList
 	}
 	log.Debugf("Assistant响应到模型转换完成，结果: %+v", assistantModel)
 	return assistantModel, nil

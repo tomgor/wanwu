@@ -513,9 +513,6 @@ definitions:
       priorityMatch:
         description: 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
         type: integer
-      rerankModelId:
-        description: rerank模型id
-        type: string
       semanticsPriority:
         description: 语义权重
         type: number
@@ -784,6 +781,17 @@ definitions:
     required:
     - tagName
     type: object
+  request.CreateSensitiveWordTableReq:
+    properties:
+      remark:
+        description: 备注
+        type: string
+      tableName:
+        description: 敏感词表名
+        type: string
+    required:
+    - tableName
+    type: object
   request.DelApiKeyRequest:
     properties:
       apiId:
@@ -862,6 +870,26 @@ definitions:
     - model
     - modelType
     - provider
+    type: object
+  request.DeleteSensitiveVocabularyReq:
+    properties:
+      tableId:
+        description: 敏感词表id
+        type: string
+      wordId:
+        description: 敏感词id
+        type: string
+    required:
+    - tableId
+    - wordId
+    type: object
+  request.DeleteSensitiveWordTableReq:
+    properties:
+      tableId:
+        description: 敏感词表id
+        type: string
+    required:
+    - tableId
     type: object
   request.DocImportReq:
     properties:
@@ -1452,6 +1480,54 @@ definitions:
     - tagId
     - tagName
     type: object
+  request.UpdateSensitiveWordTableReplyReq:
+    properties:
+      reply:
+        description: 回复设置
+        type: string
+      tableId:
+        description: 敏感词表id
+        type: string
+    required:
+    - tableId
+    type: object
+  request.UpdateSensitiveWordTableReq:
+    properties:
+      remark:
+        description: 备注
+        type: string
+      tableId:
+        description: 敏感词表id
+        type: string
+      tableName:
+        description: 敏感词表名
+        type: string
+    required:
+    - tableId
+    - tableName
+    type: object
+  request.UploadSensitiveVocabularyReq:
+    properties:
+      fileName:
+        description: 文件名
+        type: string
+      importType:
+        description: 上传敏感词方式，single：单条添加，file：批量上传
+        type: string
+      sensitiveType:
+        description: 敏感词类型 (涉政:Political, 辱骂:Revile, 涉黄:Pornography, 暴恐:ViolentTerror,
+          违禁:Illegal, 信息安全:InformationSecurity, 其他:Other)
+        type: string
+      tableId:
+        description: 敏感词表id
+        type: string
+      word:
+        description: 敏感词
+        type: string
+    required:
+    - importType
+    - tableId
+    type: object
   request.UserCreate:
     properties:
       company:
@@ -1890,6 +1966,12 @@ definitions:
   response.CreateKnowledgeTagResp:
     properties:
       knowledgeId:
+        type: string
+    type: object
+  response.CreateSensitiveWordTableResp:
+    properties:
+      tableId:
+        description: 敏感词表id
         type: string
     type: object
   response.CustomAbout:
@@ -2704,6 +2786,36 @@ definitions:
         items:
           $ref: '#/definitions/response.IDName'
         type: array
+    type: object
+  response.SensitiveWordTableDetail:
+    properties:
+      createdAt:
+        description: 敏感词表创建时间
+        type: string
+      remark:
+        description: 备注
+        type: string
+      reply:
+        description: 回复设置
+        type: string
+      tableId:
+        description: 敏感词表id
+        type: string
+      tableName:
+        description: 敏感词表名
+        type: string
+    type: object
+  response.SensitiveWordVocabularyDetail:
+    properties:
+      sensitiveType:
+        description: 敏感词类型
+        type: string
+      word:
+        description: 敏感词
+        type: string
+      wordId:
+        description: 敏感词id
+        type: string
     type: object
   response.UploadFileResp:
     properties:
@@ -5780,6 +5892,255 @@ paths:
       summary: 获取角色模板（用于创建角色）
       tags:
       - permission.role
+  /safe/sensitive/table:
+    delete:
+      consumes:
+      - application/json
+      description: 删除敏感词表
+      parameters:
+      - description: 删除敏感词表请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DeleteSensitiveWordTableReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 删除敏感词表
+      tags:
+      - safety
+    post:
+      consumes:
+      - application/json
+      description: 创建敏感词表
+      parameters:
+      - description: 创建敏感词表请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateSensitiveWordTableReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CreateSensitiveWordTableResp'
+              type: object
+      security:
+      - JWT: []
+      summary: 创建敏感词表
+      tags:
+      - safety
+    put:
+      consumes:
+      - application/json
+      description: 编辑敏感词表
+      parameters:
+      - description: 编辑敏感词表请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateSensitiveWordTableReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 编辑敏感词表
+      tags:
+      - safety
+  /safe/sensitive/table/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取敏感词表列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.SensitiveWordTableDetail'
+                        type: array
+                    type: object
+              type: object
+      security:
+      - JWT: []
+      summary: 获取敏感词表列表
+      tags:
+      - safety
+  /safe/sensitive/table/reply:
+    put:
+      consumes:
+      - application/json
+      description: 编辑回复设置
+      parameters:
+      - description: 编辑回复设置请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateSensitiveWordTableReplyReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 编辑回复设置
+      tags:
+      - safety
+  /safe/sensitive/table/select:
+    get:
+      consumes:
+      - application/json
+      description: 获取敏感词表列表（用于下拉选择）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.SensitiveWordTableDetail'
+                        type: array
+                    type: object
+              type: object
+      security:
+      - JWT: []
+      summary: 获取敏感词表列表（用于下拉选择）
+      tags:
+      - safety
+  /safe/sensitive/word:
+    delete:
+      consumes:
+      - application/json
+      description: 删除敏感词
+      parameters:
+      - description: 删除敏感词参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DeleteSensitiveVocabularyReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 删除敏感词
+      tags:
+      - safety
+    post:
+      consumes:
+      - application/json
+      description: 上传敏感词
+      parameters:
+      - description: 上传敏感词参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UploadSensitiveVocabularyReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 上传敏感词
+      tags:
+      - safety
+  /safe/sensitive/word/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取词表数据列表
+      parameters:
+      - description: 敏感词表id
+        in: query
+        name: tableId
+        required: true
+        type: string
+      - description: 页面编号，从1开始
+        in: query
+        name: pageNo
+        required: true
+        type: integer
+      - description: 单页数量，从1开始
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.SensitiveWordVocabularyDetail'
+                        type: array
+                    type: object
+              type: object
+      security:
+      - JWT: []
+      summary: 获取词表数据列表
+      tags:
+      - safety
   /user:
     delete:
       consumes:
