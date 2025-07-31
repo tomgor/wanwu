@@ -40,7 +40,7 @@ type KnowledgeMatchParams struct {
 	SemanticsPriority float32 `json:"semanticsPriority"`              // 语义权重
 	KeywordPriority   float32 `json:"keywordPriority"`                // 关键词权重
 	TopK              int32   `json:"topK"`                           //topK 获取最高的几行
-	Score             float32 `json:"score"`                          //score 过滤分数阈值
+	Threshold         float32 `json:"threshold"`                      //threshold 过滤分数阈值
 	CommonCheck
 }
 

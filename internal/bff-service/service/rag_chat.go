@@ -49,10 +49,10 @@ func CallRagChatStream(ctx *gin.Context, userId, orgId string, req request.ChatR
 		}
 		ret, err := ahocorasick.ContentMatch(req.Question, matchDicts, true)
 		if err != nil {
-			return nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, err.Error())
+			return nil, grpc_util.ErrorStatus(err_code.Code_BFFSensitiveWordCheck, err.Error())
 		}
 		if len(ret) > 0 {
-			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_sensitive_check_req", ret[0].Reply)
+			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req", ret[0].Reply)
 		}
 	}
 	stream, err := rag.ChatRag(ctx, &rag_service.ChatRagReq{

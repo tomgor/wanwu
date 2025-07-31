@@ -133,10 +133,14 @@ func (s *Service) UpdateRagConfig(ctx context.Context, in *rag_service.UpdateRag
 			Config:    in.RerankConfig.Config,
 		},
 		KnowledgeBaseConfig: model.KnowledgeBaseConfig{
-			KnowId:     in.KnowledgeBaseConfig.KnowledgeBaseId,
-			MaxHistory: int64(in.KnowledgeBaseConfig.MaxHistory),
-			Threshold:  float64(in.KnowledgeBaseConfig.Threshold),
-			TopK:       int64(in.KnowledgeBaseConfig.TopK),
+			KnowId:            in.KnowledgeBaseConfig.KnowledgeBaseId,
+			MaxHistory:        int64(in.KnowledgeBaseConfig.MaxHistory),
+			Threshold:         float64(in.KnowledgeBaseConfig.Threshold),
+			TopK:              int64(in.KnowledgeBaseConfig.TopK),
+			MatchType:         in.KnowledgeBaseConfig.MatchType,
+			PriorityMatch:     in.KnowledgeBaseConfig.PriorityMatch,
+			SemanticsPriority: float64(in.KnowledgeBaseConfig.SemanticsPriority),
+			KeywordPriority:   float64(in.KnowledgeBaseConfig.KeywordPriority),
 		},
 		SensitiveConfig: model.SensitiveConfig{
 			Enable:   in.SensitiveConfig.Enable,
