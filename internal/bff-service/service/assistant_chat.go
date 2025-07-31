@@ -43,7 +43,10 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 			return nil, err
 		}
 		if len(ret) > 0 {
-			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req", ret[0].Reply)
+			if ret[0].Reply != "" {
+				return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req", ret[0].Reply)
+			}
+			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req_default_reply")
 		}
 	}
 	appList, err := app.GetAppListByIds(ctx.Request.Context(), &app_service.GetAppListByIdsReq{
@@ -97,7 +100,7 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 		return ret, nil
 	}
 	// 敏感词过滤
-	filteredCh := ProcessSensitiveWords(ret, matchDicts, &agentSensitiveService{})
+	filteredCh := ProcessSensitiveWords(ctx, ret, matchDicts, &agentSensitiveService{})
 	return filteredCh, nil
 }
 

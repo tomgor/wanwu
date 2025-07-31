@@ -52,7 +52,10 @@ func CallRagChatStream(ctx *gin.Context, userId, orgId string, req request.ChatR
 			return nil, grpc_util.ErrorStatus(err_code.Code_BFFSensitiveWordCheck, err.Error())
 		}
 		if len(ret) > 0 {
-			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req", ret[0].Reply)
+			if ret[0].Reply != "" {
+				return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req", ret[0].Reply)
+			}
+			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req_default_reply")
 		}
 	}
 	stream, err := rag.ChatRag(ctx, &rag_service.ChatRagReq{
@@ -89,7 +92,7 @@ func CallRagChatStream(ctx *gin.Context, userId, orgId string, req request.ChatR
 		return ret, nil
 	}
 	// 敏感词过滤
-	filteredCh := ProcessSensitiveWords(ret, matchDicts, &ragSensitiveService{})
+	filteredCh := ProcessSensitiveWords(ctx, ret, matchDicts, &ragSensitiveService{})
 	return filteredCh, nil
 }
 
