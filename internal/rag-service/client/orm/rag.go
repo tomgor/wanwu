@@ -73,9 +73,6 @@ func (c *Client) GetRag(ctx context.Context, req *rag_service.RagDetailReq) (*ra
 		},
 		KnowledgeBaseConfig: &rag_service.RagKnowledgeBaseConfig{
 			KnowledgeBaseId:   knowledgeConfig.KnowId,
-			MaxHistoryEnable:  knowledgeConfig.MaxHistoryEnable,
-			ThresholdEnable:   knowledgeConfig.ThresholdEnable,
-			TopKEnable:        knowledgeConfig.TopKEnable,
 			MaxHistory:        int32(knowledgeConfig.MaxHistory),
 			Threshold:         float32(knowledgeConfig.Threshold),
 			TopK:              int32(knowledgeConfig.TopK),
@@ -175,11 +172,8 @@ func (c *Client) CreateRag(ctx context.Context, rag *model.RagInfo) *err_code.St
 		}
 
 		// 默认开关开启 + 默认值
-		rag.KnowledgeBaseConfig.MaxHistoryEnable = true
 		rag.KnowledgeBaseConfig.MaxHistory = 0
-		rag.KnowledgeBaseConfig.ThresholdEnable = true
 		rag.KnowledgeBaseConfig.Threshold = 0.4
-		rag.KnowledgeBaseConfig.TopKEnable = true
 		rag.KnowledgeBaseConfig.TopK = 5
 
 		if err := tx.Create(rag).Error; err != nil {
@@ -244,13 +238,10 @@ func (c *Client) UpdateRagConfig(ctx context.Context, rag *model.RagInfo) *err_c
 				"rerank_model_type": rag.RerankConfig.ModelType,
 				"rerank_config":     rag.RerankConfig.Config,
 
-				"kb_know_id":            rag.KnowledgeBaseConfig.KnowId,
-				"kb_max_history_enable": rag.KnowledgeBaseConfig.MaxHistoryEnable,
-				"kb_threshold_enable":   rag.KnowledgeBaseConfig.ThresholdEnable,
-				"kb_top_k_enable":       rag.KnowledgeBaseConfig.TopKEnable,
-				"kb_max_history":        rag.KnowledgeBaseConfig.MaxHistory,
-				"kb_threshold":          rag.KnowledgeBaseConfig.Threshold,
-				"kb_top_k":              rag.KnowledgeBaseConfig.TopK,
+				"kb_know_id":     rag.KnowledgeBaseConfig.KnowId,
+				"kb_max_history": rag.KnowledgeBaseConfig.MaxHistory,
+				"kb_threshold":   rag.KnowledgeBaseConfig.Threshold,
+				"kb_top_k":       rag.KnowledgeBaseConfig.TopK,
 
 				"sensitive_enable":    rag.SensitiveConfig.Enable,
 				"sensitive_table_ids": rag.SensitiveConfig.TableIds,
