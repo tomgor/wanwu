@@ -93,16 +93,16 @@
             color: #fff;
         }
         .tag-app.agent-tag {
-            background: #FF85C0;
+            background: linear-gradient( 180deg, #6ED2ED 0%, #50C7E7 100%);
         }
         .tag-app.agentTemplate-tag {
             background: #8ff7eb;
         }
         .tag-app.workflow-tag {
-            background: #B3A7FF;
+            background: linear-gradient( 180deg, #85A8F9 0%, #6E98F9 100%);
         }
         .tag-app.rag-tag {
-            background: #FFD666;
+            background: linear-gradient( 180deg, #C098FF 0%, #A16FF4 100%);
         }
         .logo{
             width: 60px;
