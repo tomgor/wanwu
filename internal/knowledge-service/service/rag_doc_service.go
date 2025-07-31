@@ -47,6 +47,7 @@ type RagImportDocParams struct {
 	SegmentType   string   `json:"chunk_type"`
 	Separators    []string `json:"separators"`
 	ParserChoices []string `json:"parser_choices"`
+	OcrModelId    string   `json:"ocr_model_id"`
 }
 
 type RagImportUrlDocParams struct {

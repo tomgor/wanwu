@@ -14,6 +14,7 @@ type DocImportReq struct {
 	DocInfo       []*DocInfo  `json:"docInfoList" validate:"required"` //上传文档列表
 	DocSegment    *DocSegment `json:"docSegment" validate:"required"`  //文档分段配置
 	DocAnalyzer   []string    `json:"docAnalyzer" validate:"required"` //文档解析类型
+	OcrModelId    string      `json:"ocrModelId"`                      //ocr模型id
 	CommonCheck
 }
 

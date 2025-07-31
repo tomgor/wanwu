@@ -43,6 +43,7 @@ type KnowledgeImportTask struct {
 	DocInfo       string `gorm:"column:doc_info;type:longtext;not null;comment:'文件信息'" json:"docInfo"`
 	SegmentConfig string `gorm:"column:segment_config;type:text;not null;comment:'分段配置信息'" json:"segmentConfig"`
 	DocAnalyzer   string `gorm:"column:doc_analyzer;type:text;not null;comment:'文档解析配置'" json:"docAnalyzer"`
+	OcrModelId    string `gorm:"column:ocr_model_id;type:varchar(64);not null;default:'';comment:'ocr模型id'" json:"ocrModelId"`
 	CreatedAt     int64  `gorm:"column:create_at;type:bigint(20);not null;" json:"createAt"` // Create Time
 	UpdatedAt     int64  `gorm:"column:update_at;type:bigint(20);not null;" json:"updateAt"` // Update Time
 	UserId        string `gorm:"column:user_id;type:varchar(64);not null;default:'';" json:"userId"`

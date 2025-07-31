@@ -107,7 +107,7 @@ func (s *Service) DeleteSensitiveVocabulary(ctx context.Context, req *safety_ser
 }
 
 func (s *Service) GetSensitiveWordTableListWithWordsByIDs(ctx context.Context, req *safety_service.GetSensitiveWordTableListByIDsReq) (*safety_service.SensitiveWordTableListWithWords, error) {
-	tables, err := s.cli.GetSensitiveWordTableWithWord(ctx, req.TableIds)
+	tables, err := s.cli.GetSensitiveWordTableListWithWordsByIDs(ctx, req.TableIds)
 	if err != nil {
 		return nil, errStatus(errs.Code_AppSafety, err)
 	}
@@ -119,7 +119,7 @@ func (s *Service) GetSensitiveWordTableListWithWordsByIDs(ctx context.Context, r
 }
 
 func (s *Service) GetSensitiveWordTableListByIDs(ctx context.Context, req *safety_service.GetSensitiveWordTableListByIDsReq) (*safety_service.SensitiveWordTables, error) {
-	tables, err := s.cli.GetSensitiveWordTableByIds(ctx, req.TableIds)
+	tables, err := s.cli.GetSensitiveWordTableListByIDs(ctx, req.TableIds)
 	if err != nil {
 		return nil, errStatus(errs.Code_AppSafety, err)
 	}
@@ -138,6 +138,7 @@ func toProtoSensitiveWordTable(sensitiveWordTable *model.SensitiveWordTable) *sa
 		TableName: sensitiveWordTable.Name,
 		Remark:    sensitiveWordTable.Remark,
 		Reply:     sensitiveWordTable.Reply,
+		Version:   sensitiveWordTable.Version,
 		CreatedAt: sensitiveWordTable.CreatedAt,
 	}
 }

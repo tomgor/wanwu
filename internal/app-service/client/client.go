@@ -36,6 +36,6 @@ type IClient interface {
 	GetSensitiveVocabularyList(ctx context.Context, tableId string, offset, limit int32) ([]*model.SensitiveWordVocabulary, int64, *err_code.Status)
 	UploadSensitiveVocabulary(ctx context.Context, userId, orgId, tableId, importType, word, sensitiveType, filePath string) *err_code.Status
 	DeleteSensitiveVocabulary(ctx context.Context, tableId, wordId string) *err_code.Status
-	GetSensitiveWordTableWithWord(ctx context.Context, tableIds []string) ([]*orm.SensitiveWordTableWithWord, *err_code.Status)
-	GetSensitiveWordTableByIds(ctx context.Context, tableIds []string) ([]*model.SensitiveWordTable, *err_code.Status)
+	GetSensitiveWordTableListWithWordsByIDs(ctx context.Context, tableIds []string) ([]*orm.SensitiveWordTableWithWord, *err_code.Status)
+	GetSensitiveWordTableListByIDs(ctx context.Context, tableIds []string) ([]*model.SensitiveWordTable, *err_code.Status)
 }

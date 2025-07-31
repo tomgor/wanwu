@@ -55,7 +55,7 @@ func DeleteSensitiveWordTable(ctx *gin.Context, req *request.DeleteSensitiveWord
 }
 
 func GetSensitiveWordTableList(ctx *gin.Context, userId, orgId string) (*response.ListResult, error) {
-	ListResult, err := safety.GetSensitiveWordTableList(ctx, &safety_service.GetSensitiveWordTableListReq{
+	listResult, err := safety.GetSensitiveWordTableList(ctx, &safety_service.GetSensitiveWordTableListReq{
 		OrgId:  orgId,
 		UserId: userId,
 	})
@@ -63,7 +63,7 @@ func GetSensitiveWordTableList(ctx *gin.Context, userId, orgId string) (*respons
 		return nil, err
 	}
 	var retList = make([]*response.SensitiveWordTableDetail, 0)
-	for _, detail := range ListResult.List {
+	for _, detail := range listResult.List {
 		retList = append(retList, &response.SensitiveWordTableDetail{
 			TableId:   detail.TableId,
 			TableName: detail.TableName,
@@ -73,13 +73,13 @@ func GetSensitiveWordTableList(ctx *gin.Context, userId, orgId string) (*respons
 		})
 	}
 	return &response.ListResult{
-		Total: ListResult.Total,
+		Total: listResult.Total,
 		List:  retList,
 	}, nil
 }
 
 func GetSensitiveVocabularyList(ctx *gin.Context, userId, orgId string, pageNo, pageSize int32, req *request.GetSensitiveVocabularyReq) (*response.PageResult, error) {
-	ListResult, err := safety.GetSensitiveVocabularyList(ctx, &safety_service.GetSensitiveVocabularyListReq{
+	listResult, err := safety.GetSensitiveVocabularyList(ctx, &safety_service.GetSensitiveVocabularyListReq{
 		OrgId:    orgId,
 		UserId:   userId,
 		TableId:  req.TableId,
@@ -90,8 +90,8 @@ func GetSensitiveVocabularyList(ctx *gin.Context, userId, orgId string, pageNo, 
 		return nil, err
 	}
 	var list = make([]*response.SensitiveWordVocabularyDetail, 0)
-	if len(ListResult.List) > 0 {
-		for _, resp := range ListResult.List {
+	if len(listResult.List) > 0 {
+		for _, resp := range listResult.List {
 			list = append(list, &response.SensitiveWordVocabularyDetail{
 				WordId:        resp.WordId,
 				Word:          resp.Word,
@@ -101,7 +101,7 @@ func GetSensitiveVocabularyList(ctx *gin.Context, userId, orgId string, pageNo, 
 	}
 	return &response.PageResult{
 		List:     list,
-		Total:    ListResult.Total,
+		Total:    listResult.Total,
 		PageNo:   int(pageNo),
 		PageSize: int(pageSize),
 	}, nil

@@ -44,6 +44,7 @@
 {"code":110000,"key":"bff_workflow_apps_list_internal","langs":{"en":"get unauthenticated workflow app list err: %v","zh":"获取无鉴权工作流应用列表错误：%v"}}
 {"code":0,"key":"------ assistant ------","langs":{}}
 {"code":0,"key":"bff_assistant_template_name","langs":{"en":"%v_copy%v","zh":"%v_副本%v"}}
+{"code":110005,"key":"bff_sensitive_check_req","langs":{"en":"sensitive words detected: %v","zh":"检测到敏感词: %v"}}
 {"code":0,"key":"------ custom ------","langs":{}}
 {"code":0,"key":"bff_custom_home_title","langs":{"en":"Intelligent agent platform","zh":"智能体平台"}}
 {"code":0,"key":"bff_custom_tab_title","langs":{"en":"Intelligent agent platform","zh":"智能体平台"}}
@@ -219,16 +220,18 @@
 {"code":300002,"key":"app_favorite_app_delete","langs":{"zh":"取消App:%v收藏错误:%v"}}
 {"code":300003,"key":"app_safety_sensitive_table_create","langs":{"zh":"创建敏感词表(%v)错误: %v"}}
 {"code":300003,"key":"app_safety_sensitive_table_get","langs":{"zh":"获取敏感词表(%v)错误: %v"}}
+{"code":300003,"key":"app_safety_sensitive_table_exist","langs":{"zh":"存在同名的敏感词表，请修改名称后重试"}}
 {"code":300003,"key":"app_safety_sensitive_table_update","langs":{"zh":"更新敏感词表(%v)错误: %v"}}
 {"code":300003,"key":"app_safety_sensitive_table_reply_update","langs":{"zh":"更新敏感词表(%v)回复设置错误: %v"}}
 {"code":300003,"key":"app_safety_sensitive_table_delete","langs":{"zh":"删除敏感词表(%v)错误: %v"}}
 {"code":300003,"key":"app_safety_sensitive_table_full","langs":{"zh":"超出敏感词表最大容量: %v"}}
 {"code":300003,"key":"app_safety_sensitive_table_list_get","langs":{"zh":"获取敏感词表列表错误: %v"}}
-{"code":300003,"key":"app_safety_sensitive_vocabulary_list_get","langs":{"zh":"获取敏感词数据错误: %v"}}
+{"code":300003,"key":"app_safety_sensitive_vocabulary_list_get","langs":{"zh":"获取敏感词表(%v)数据错误: %v"}}
+{"code":300003,"key":"app_safety_sensitive_vocabulary_count_get","langs":{"zh":"获取敏感词表(%v)敏感词数量错误: %v"}}
 {"code":300003,"key":"app_safety_sensitive_vocabulary_create","langs":{"zh":"创建敏感词(%v)错误: %v"}}
 {"code":300003,"key":"app_safety_sensitive_vocabulary_exist","langs":{"zh":"敏感词(%v)已存在"}}
-{"code":300003,"key":"app_safety_sensitive_word_file_create_err","langs":{"zh":"批量创建出错"}}
-{"code":300003,"key":"app_safety_sensitive_vocabulary_count_get","langs":{"zh":"获取敏感词数量错误: %v"}}
+{"code":300003,"key":"app_safety_sensitive_word_file_create_err","langs":{"zh":"敏感词表(%v)批量创建错误: %v"}}
 {"code":300008,"key":"","langs":{"zh":"获取上传文档失败，请稍后重试"}}
 {"code":300003,"key":"app_safety_sensitive_vocabulary_delete","langs":{"zh":"删除敏感词(%v)错误: %v"}}
 {"code":300003,"key":"app_safety_sensitive_download_fail","langs":{"zh":"文件下载失败: %v"}}
+{"code":300003,"key":"app_safety_sensitive_vocabulary_list_get_by_ids","langs":{"zh":"批量获取敏感词失败: %v"}}

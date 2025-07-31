@@ -7213,6 +7213,10 @@ const docTemplate = `{
                 "knowledgeId": {
                     "description": "知识库id",
                     "type": "string"
+                },
+                "ocrModelId": {
+                    "description": "ocr模型id",
+                    "type": "string"
                 }
             }
         },

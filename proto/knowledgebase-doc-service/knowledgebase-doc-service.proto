@@ -53,6 +53,7 @@ message ImportDocReq {
   repeated DocFileInfo docInfoList = 5; //上传文档列表
   DocSegment docSegment = 6; //分段信息配置
   repeated string docAnalyzer = 7;//文档解析类型
+  string ocrModelId = 8; //ocr模型id
 }
 
 message UpdateDocStatusReq {
