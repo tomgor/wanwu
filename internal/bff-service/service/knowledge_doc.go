@@ -15,6 +15,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	DocAnalyzerOCR = "ocr"
+)
+
 // GetDocList 查询知识库所属文档列表
 func GetDocList(ctx *gin.Context, userId, orgId string, r *request.DocListReq) (*response.PageResult, error) {
 	resp, err := knowledgeBaseDoc.GetDocList(ctx.Request.Context(), &knowledgebase_doc_service.GetDocListReq{
@@ -64,6 +68,13 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 			DocSize: info.DocSize,
 		})
 	}
+	for _, v := range req.DocAnalyzer {
+		if v == DocAnalyzerOCR {
+			if req.OcrModelId == "" {
+				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "ocr模型id为空")
+			}
+		}
+	}
 	_, err := knowledgeBaseDoc.ImportDoc(ctx.Request.Context(), &knowledgebase_doc_service.ImportDocReq{
 		UserId:        userId,
 		OrgId:         orgId,
@@ -77,6 +88,7 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 		},
 		DocAnalyzer: req.DocAnalyzer,
 		DocInfoList: docInfoList,
+		OcrModelId:  req.OcrModelId,
 	})
 	if err != nil {
 		log.Errorf("上传失败(保存上传任务 失败(%v) ", err)

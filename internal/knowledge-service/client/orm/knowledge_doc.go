@@ -147,6 +147,7 @@ func CreateKnowledgeDoc(ctx context.Context, doc *model.KnowledgeDoc, importTask
 			ObjectName:    objectName,
 			OriginalName:  doc.Name,
 			IsEnhanced:    "false",
+			OcrModelId:    importTask.OcrModelId,
 		})
 	})
 }

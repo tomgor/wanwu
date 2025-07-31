@@ -290,6 +290,7 @@ func buildImportTask(req *knowledgebase_doc_service.ImportDocReq) (*model.Knowle
 		CreatedAt:     time.Now().UnixMilli(),
 		UpdatedAt:     time.Now().UnixMilli(),
 		DocInfo:       string(docImportInfo),
+		OcrModelId:    req.OcrModelId,
 		UserId:        req.UserId,
 		OrgId:         req.OrgId,
 	}, nil
