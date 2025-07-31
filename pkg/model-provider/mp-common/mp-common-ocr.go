@@ -8,12 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 	"io"
+	"mime/multipart"
 )
 
 // --- openapi request ---
 
 type OcrReq struct {
-	FileName string `json:"file_name" form:"file_name" validate:"required"`
+	Files *multipart.FileHeader `form:"file" json:"file" validate:"required"`
 }
 
 func (req *OcrReq) Check() error {
@@ -117,10 +118,11 @@ func Ocr(ctx *gin.Context, provider, apiKey, url string, req *OcrReq, headers ..
 			Value: "Bearer " + apiKey,
 		})
 	}
-	file, _, err := ctx.Request.FormFile("file")
+	file, err := req.Files.Open()
 	if err != nil {
 		return nil, fmt.Errorf("request %v %v ocr err: %v", url, provider, err)
 	}
+	defer file.Close()
 	request := resty.New().
 		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}). // 关闭证书校验
 		SetTimeout(0).                                             // 关闭请求超时
@@ -128,7 +130,7 @@ func Ocr(ctx *gin.Context, provider, apiKey, url string, req *OcrReq, headers ..
 		SetContext(ctx).
 		SetHeader("Content-Type", "multipart/form-data").
 		SetHeader("Accept", "application/json").
-		SetFileReader("file", req.FileName, file).
+		SetFileReader("file", req.Files.Filename, file).
 		SetDoNotParseResponse(true)
 	for _, header := range headers {
 		request.SetHeader(header.Key, header.Value)

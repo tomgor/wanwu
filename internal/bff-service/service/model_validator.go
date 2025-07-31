@@ -210,8 +210,12 @@ func ValidateOcrModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) erro
 	mockReq.Header.Set("Content-Type", writer.FormDataContentType())
 	ctx.Request = mockReq
 	// 获取FileHeader对象
+	_, fileH, err := ctx.Request.FormFile("file")
+	if err != nil {
+		return fmt.Errorf("get file header failed: %v", err)
+	}
 	req := &mp_common.OcrReq{
-		FileName: file.Name(),
+		Files: fileH,
 	}
 	ocrReq, err := iOcr.NewReq(req)
 	if err != nil {

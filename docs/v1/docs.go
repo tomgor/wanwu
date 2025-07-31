@@ -7454,12 +7454,12 @@ const docTemplate = `{
                     "description": "rerank模型id",
                     "type": "string"
                 },
-                "score": {
-                    "description": "score 过滤分数阈值",
-                    "type": "number"
-                },
                 "semanticsPriority": {
                     "description": "语义权重",
+                    "type": "number"
+                },
+                "threshold": {
+                    "description": "threshold 过滤分数阈值",
                     "type": "number"
                 },
                 "topK": {

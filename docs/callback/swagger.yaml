@@ -868,11 +868,6 @@ paths:
         name: modelId
         required: true
         type: string
-      - description: 原始文件名
-        in: formData
-        name: fileName
-        required: true
-        type: string
       - description: 文件
         in: formData
         name: file

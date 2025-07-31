@@ -117,10 +117,9 @@ func ModelRerank(ctx *gin.Context) {
 //	@Summary	Model Ocr
 //	@Accept		multipart/form-data
 //	@Produce	json
-//	@Param		modelId		path		string	true	"模型ID"
-//	@Param		fileName	formData	string	true	"原始文件名"
-//	@Param		file		formData	file	true	"文件"
-//	@Success	200			{object}	mp_common.OcrResp{}
+//	@Param		modelId	path		string	true	"模型ID"
+//	@Param		file	formData	file	true	"文件"
+//	@Success	200		{object}	mp_common.OcrResp{}
 //	@Router		/model/{modelId}/ocr [post]
 func ModelOcr(ctx *gin.Context) {
 	var data mp_common.OcrReq

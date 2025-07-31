@@ -265,13 +265,6 @@
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "原始文件名",
-                        "name": "fileName",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
                         "type": "file",
                         "description": "文件",
                         "name": "file",
