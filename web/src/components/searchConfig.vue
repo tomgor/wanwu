@@ -263,11 +263,14 @@ export default {
           this.isSettingFromConfig = true; // 设置标志位
           const formData = JSON.parse(JSON.stringify(newVal))
           this.formInline.knowledgeMatchParams = formData;
-          const { matchType } = this.formInline.knowledgeMatchParams;
+          const { matchType,priorityMatch } = this.formInline.knowledgeMatchParams;
           this.searchTypeData = this.searchTypeData.map((item) => ({
             ...item,
             showContent: item.value === matchType ? true : false,
           }));
+          if(matchType === 'mix'){
+            this.searchTypeData[2]['mixTypeValue'] = priorityMatch === 1 ? 'weight' : 'rerank';
+          }
           
           // 使用nextTick确保DOM更新完成后再重置标志位
           this.$nextTick(() => {
