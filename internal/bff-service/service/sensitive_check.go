@@ -71,17 +71,17 @@ func BuildSensitiveDict(ctx *gin.Context, tableIds []string) ([]ahocorasick.Dict
 		return nil, err
 	}
 	// 重新构建version不匹配的词表
-	for _, detail := range tableWithWords.Details {
+	for _, table := range tableWithWords.Details {
 		dict := ahocorasick.DictConfig{
-			DictID:  detail.Table.TableId,
-			Version: detail.Table.Version,
+			DictID:  table.Table.TableId,
+			Version: table.Table.Version,
 		}
-		if err := ahocorasick.BuildDict(dict, detail.Table.Reply, detail.SensitiveWords); err != nil {
+		if err := ahocorasick.BuildDict(dict, table.Table.Reply, table.SensitiveWords); err != nil {
 			return nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("build dict id %v & dict version %v err: %v", dict.DictID, dict.Version, err))
 		}
 		ret = append(ret, ahocorasick.DictConfig{
-			DictID:  detail.Table.TableId,
-			Version: detail.Table.Version,
+			DictID:  table.Table.TableId,
+			Version: table.Table.Version,
 		})
 	}
 	return ret, nil
@@ -137,18 +137,13 @@ func ProcessSensitiveWords(ctx *gin.Context, rawCh <-chan string, matchDicts []a
 		// 检测到敏感词
 		if len(matchResults) > 0 {
 			if matchResults[0].Reply != "" {
-				reply := grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_chek_resp", matchResults[0].Reply)
-				for _, sensitiveMsg := range chatSrv.buildSensitiveResp(id, reply.Error()) {
-					outputCh <- "\n" // 流式返回 两次返回之间一定要加空行，否则前端或者智能体解析有问题
+				for _, sensitiveMsg := range chatSrv.buildSensitiveResp(id, gin_util.I18nKey(ctx, "bff_sensitive_chek_resp", matchResults[0].Reply)) {
 					outputCh <- sensitiveMsg
-					outputCh <- "\n"
 					return
 				}
 			}
 			for _, sensitiveMsg := range chatSrv.buildSensitiveResp(id, gin_util.I18nKey(ctx, "bff_sensitive_check_resp_default_reply")) {
-				outputCh <- "\n" // 流式返回 两次返回之间一定要加空行，否则前端或者智能体解析有问题
 				outputCh <- sensitiveMsg
-				outputCh <- "\n"
 				return
 			}
 		}

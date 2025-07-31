@@ -19,6 +19,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func AssistantConversionStream(ctx *gin.Context, userId, orgId string, req request.ConversionStreamRequest) error {
+	// 1. CallAssistantConversationStream
+	chatCh, err := CallAssistantConversationStream(ctx, userId, orgId, req)
+	if err != nil {
+		return err
+	}
+	// 2. 流式返回结果
+	_ = sse_util.NewSSEWriter(ctx, fmt.Sprintf("[Agent] %v conversation %v user %v org %v recv", req.AssistantId, req.ConversationId, userId, orgId), sse_util.DONE_MSG).
+		WriteStream(chatCh, nil, buildAgentChatRespLineProcessor(), nil)
+	return nil
+}
+
 func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req request.ConversionStreamRequest) (<-chan string, error) {
 	// 根据agentID获取敏感词配置
 	agentInfo, err := assistant.GetAssistantInfo(ctx, &assistant_service.GetAssistantInfoReq{
@@ -38,13 +50,13 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 		if err != nil {
 			return nil, grpc_util.ErrorStatus(err_code.Code_BFFSensitiveWordCheck, err.Error())
 		}
-		ret, err := ahocorasick.ContentMatch(req.Prompt, matchDicts, true)
+		matchResults, err := ahocorasick.ContentMatch(req.Prompt, matchDicts, true)
 		if err != nil {
 			return nil, err
 		}
-		if len(ret) > 0 {
-			if ret[0].Reply != "" {
-				return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req", ret[0].Reply)
+		if len(matchResults) > 0 {
+			if matchResults[0].Reply != "" {
+				return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req", matchResults[0].Reply)
 			}
 			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req_default_reply")
 		}
@@ -78,10 +90,11 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 	if err != nil {
 		return nil, err
 	}
-	ret := make(chan string, 128)
+
+	rawCh := make(chan string, 128)
 	go func() {
 		defer util.PrintPanicStack()
-		defer close(ret)
+		defer close(rawCh)
 		log.Infof("[Agent] %v conversation %v user %v org %v start, query: %s", req.AssistantId, req.ConversationId, userId, orgId, req.Prompt)
 		for {
 			s, err := stream.Recv()
@@ -93,28 +106,15 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 				log.Errorf("[Agent] %v conversation %v user %v org %v recv err: %v", req.AssistantId, req.ConversationId, userId, orgId, err)
 				break
 			}
-			ret <- s.Content
+			rawCh <- s.Content
 		}
 	}()
 	if !agentInfo.SafetyConfig.GetEnable() {
-		return ret, nil
+		return rawCh, nil
 	}
 	// 敏感词过滤
-	filteredCh := ProcessSensitiveWords(ctx, ret, matchDicts, &agentSensitiveService{})
-	return filteredCh, nil
-}
-
-func AssistantConversionStream(ctx *gin.Context, userId, orgId string, req request.ConversionStreamRequest) error {
-
-	// 1. CallAssistantConversationStream
-	chatCh, err := CallAssistantConversationStream(ctx, userId, orgId, req)
-	if err != nil {
-		return err
-	}
-	// 2. 流式返回结果
-	_ = sse_util.NewSSEWriter(ctx, fmt.Sprintf("[Agent] %v conversation %v user %v org %v recv", req.AssistantId, req.ConversationId, userId, orgId), sse_util.DONE_MSG).
-		WriteStream(chatCh, nil, buildAgentChatRespLineProcessor(), nil)
-	return nil
+	outputCh := ProcessSensitiveWords(ctx, rawCh, matchDicts, &agentSensitiveService{})
+	return outputCh, nil
 }
 
 // buildAgentChatRespLineProcessor 构造agent对话结果行处理器

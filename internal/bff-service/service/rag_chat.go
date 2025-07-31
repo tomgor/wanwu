@@ -47,13 +47,13 @@ func CallRagChatStream(ctx *gin.Context, userId, orgId string, req request.ChatR
 		if err != nil {
 			return nil, err
 		}
-		ret, err := ahocorasick.ContentMatch(req.Question, matchDicts, true)
+		matchResults, err := ahocorasick.ContentMatch(req.Question, matchDicts, true)
 		if err != nil {
 			return nil, grpc_util.ErrorStatus(err_code.Code_BFFSensitiveWordCheck, err.Error())
 		}
-		if len(ret) > 0 {
-			if ret[0].Reply != "" {
-				return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req", ret[0].Reply)
+		if len(matchResults) > 0 {
+			if matchResults[0].Reply != "" {
+				return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req", matchResults[0].Reply)
 			}
 			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req_default_reply")
 		}
@@ -70,10 +70,10 @@ func CallRagChatStream(ctx *gin.Context, userId, orgId string, req request.ChatR
 		return nil, err
 	}
 
-	ret := make(chan string, 128)
+	rawCh := make(chan string, 128)
 	go func() {
 		defer util.PrintPanicStack()
-		defer close(ret)
+		defer close(rawCh)
 		log.Infof("[RAG] %v user %v org %v start, query: %s", req.RagID, userId, orgId, req.Question)
 		for {
 			s, err := stream.Recv()
@@ -85,15 +85,15 @@ func CallRagChatStream(ctx *gin.Context, userId, orgId string, req request.ChatR
 				log.Errorf("[RAG] %v user %v org %v recv err: %v", req.RagID, userId, orgId, err)
 				break
 			}
-			ret <- s.Content
+			rawCh <- s.Content
 		}
 	}()
 	if !ragInfo.SensitiveConfig.GetEnable() {
-		return ret, nil
+		return rawCh, nil
 	}
 	// 敏感词过滤
-	filteredCh := ProcessSensitiveWords(ctx, ret, matchDicts, &ragSensitiveService{})
-	return filteredCh, nil
+	retCh := ProcessSensitiveWords(ctx, rawCh, matchDicts, &ragSensitiveService{})
+	return retCh, nil
 }
 
 // buildRagChatRespLineProcessor 构造rag对话结果行处理器
