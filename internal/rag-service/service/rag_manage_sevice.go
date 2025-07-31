@@ -137,7 +137,7 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	ragChatParams.RerankMod = buildRerankMod(knowledgeConfig.PriorityMatch)
 	ragChatParams.Weight = buildWeight(knowledgeConfig)
 
-	ragChatParams.CustomModelInfo = &CustomModelInfo{LlmModelID: rag.RerankConfig.ModelId}
+	ragChatParams.CustomModelInfo = &CustomModelInfo{LlmModelID: rag.ModelConfig.ModelId}
 	ragChatParams.KnowledgeBase = knowledge.Name
 	ragChatParams.Question = req.Question
 	ragChatParams.Stream = true
