@@ -276,7 +276,7 @@ export default {
           });
           if (changed && !this.isUpdating) {
             const isMixPriorityMatch = newVal['knowledgeConfig']['matchType'] === 'mix' && newVal['knowledgeConfig']['priorityMatch']
-            if(newVal['modelParams']!== '' && newVal['knowledgeBaseIds'].length > 0 && ( !isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
+            if(newVal['modelParams']!== '' && newVal['knowledgeBaseIds'].length > 0 || (!isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
               this.updateInfo();
             }
           }
