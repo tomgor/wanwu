@@ -93,7 +93,7 @@
 | license友好 |         ✅          |   ❌（商用有限制）    |   ❌（商用有限制）    |     未完全开源     | ✅ |
 |   多租户    |         ✅          |   ❌（商用有限制）    |   ❌（商用有限制）    |         ✅          | ✅（但用户间不互通） |
 
-​                                                                                                                                                    截止2025年8月1日对比。
+> 截止2025年8月1日对比。
 
 ------
 
@@ -192,9 +192,9 @@
 
 ### &#x1F517; 使用的其他开源项目
 
-- https://github.com/modelscope/agentscope  作为元景万悟智能体平台中工作流模块的开发框架；
-- https://github.com/langchain-ai/langchain.git  作为元景万悟智能体平台中智能体的各类基础组件开发；
-- https://github.com/QwenLM/Qwen-Agent.git  作为元景万悟智能体平台中react智能体的构建；
+- [AgentScope](https://github.com/modelscope/agentscope)
+- [LangChain](https://github.com/langchain-ai/langchain)
+- [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent)
 
 ------
 
