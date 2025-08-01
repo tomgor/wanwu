@@ -48,7 +48,7 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 		}
 		matchDicts, err = BuildSensitiveDict(ctx, ids)
 		if err != nil {
-			return nil, grpc_util.ErrorStatus(err_code.Code_BFFSensitiveWordCheck, err.Error())
+			return nil, err
 		}
 		matchResults, err := ahocorasick.ContentMatch(req.Prompt, matchDicts, true)
 		if err != nil {
