@@ -38,4 +38,5 @@ type IClient interface {
 	DeleteSensitiveVocabulary(ctx context.Context, tableId, wordId string) *err_code.Status
 	GetSensitiveWordTableListWithWordsByIDs(ctx context.Context, tableIds []string) ([]*orm.SensitiveWordTableWithWord, *err_code.Status)
 	GetSensitiveWordTableListByIDs(ctx context.Context, tableIds []string) ([]*model.SensitiveWordTable, *err_code.Status)
+	GetSensitiveWordTableByID(ctx context.Context, tableId string) (*model.SensitiveWordTable, *err_code.Status)
 }

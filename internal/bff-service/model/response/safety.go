@@ -17,8 +17,3 @@ type SensitiveWordVocabularyDetail struct {
 	Word          string `json:"word"`          // 敏感词
 	SensitiveType string `json:"sensitiveType"` // 敏感词类型
 }
-
-type SensitiveWordTableSelect struct {
-	TableId   string `json:"tableId"`   // 敏感词表id
-	TableName string `json:"tableName"` // 敏感词表名
-}
