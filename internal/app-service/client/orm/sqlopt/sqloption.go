@@ -66,7 +66,7 @@ func WithID(Id string) SQLOption {
 
 func WithIDs(Ids []string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
-		if len(Ids) > 0 {
+		if len(Ids) >= 0 {
 			return db.Where("id IN (?)", Ids)
 		}
 		return db
@@ -189,7 +189,7 @@ func WithTableID(tableID string) SQLOption {
 
 func WithTableIDs(tableIDs []string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
-		if len(tableIDs) > 0 {
+		if len(tableIDs) >= 0 {
 			return db.Where("table_id IN (?)", tableIDs)
 		}
 		return db
@@ -216,7 +216,7 @@ func WithContent(content string) SQLOption {
 
 func WithContents(contents []string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
-		if len(contents) > 0 {
+		if len(contents) >= 0 {
 			return db.Where("content IN ?", contents)
 		}
 		return db

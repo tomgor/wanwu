@@ -178,3 +178,23 @@ func GetSensitiveWordTableSelect(ctx *gin.Context) {
 	resp, err := service.GetSensitiveWordTableList(ctx, getUserID(ctx), getOrgID(ctx))
 	gin_util.Response(ctx, resp, err)
 }
+
+// GetSensitiveWordTable
+//
+//	@Tags			safety
+//	@Summary		获取敏感词表
+//	@Description	获取敏感词表
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data		body		request.GetSensitiveVocabularyReq	true	"查询敏感词表参数"
+//	@Success		200	{object}	response.Response{data=response.SensitiveWordTableDetail}
+//	@Router			/safe/sensitive/table [get]
+func GetSensitiveWordTable(ctx *gin.Context) {
+	var req request.GetSensitiveVocabularyReq
+	if !gin_util.BindQuery(ctx, &req) {
+		return
+	}
+	resp, err := service.GetSensitiveWordTableByID(ctx, &req)
+	gin_util.Response(ctx, resp, err)
+}

@@ -19,8 +19,10 @@ service SafetyService {
   rpc DeleteSensitiveWordTable(DeleteSensitiveWordTableReq) returns (google.protobuf.Empty) {}
   // 获取敏感词表列表
   rpc GetSensitiveWordTableList(GetSensitiveWordTableListReq) returns (SensitiveWordTables) {}
-  // 通过敏感词表id获取敏感词表信息
+  // 通过敏感词表id列表获取敏感词表信息
   rpc GetSensitiveWordTableListByIDs(GetSensitiveWordTableListByIDsReq) returns (SensitiveWordTables){}
+  // 通过敏感词表id获取敏感词表信息
+  rpc GetSensitiveWordTableByID(GetSensitiveWordTableByIDReq) returns (SensitiveWordTable){}
 
   // 敏感词相关
   // 上传敏感词
@@ -89,6 +91,10 @@ message GetSensitiveVocabularyListReq {
 
 message GetSensitiveWordTableListByIDsReq {
   repeated string tableIds = 1; // 敏感词表id
+}
+
+message GetSensitiveWordTableByIDReq {
+  string tableId = 1; // 敏感词表id
 }
 
 message CreateSensitiveWordTableResp {

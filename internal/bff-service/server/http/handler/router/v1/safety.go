@@ -12,6 +12,7 @@ func registerSafety(apiV1 *gin.RouterGroup) {
 	// safety
 	mid.Sub("safety").Reg(apiV1, "/safe/sensitive/table", http.MethodPost, v1.CreateSensitiveWordTable, "创建敏感词表")
 	mid.Sub("safety").Reg(apiV1, "/safe/sensitive/table", http.MethodPut, v1.UpdateSensitiveWordTable, "编辑敏感词表")
+	mid.Sub("safety").Reg(apiV1, "/safe/sensitive/table", http.MethodGet, v1.GetSensitiveWordTable, "获取敏感词表")
 	mid.Sub("safety").Reg(apiV1, "/safe/sensitive/table/reply", http.MethodPut, v1.UpdateSensitiveWordTableReply, "编辑回复设置")
 	mid.Sub("safety").Reg(apiV1, "/safe/sensitive/table", http.MethodDelete, v1.DeleteSensitiveWordTable, "删除敏感词表")
 	mid.Sub("safety").Reg(apiV1, "/safe/sensitive/table/list", http.MethodGet, v1.GetSensitiveWordTableList, "获取敏感词表列表")

@@ -155,3 +155,17 @@ func UpdateSensitiveWordTableReply(ctx *gin.Context, userId, orgId string, req *
 	}
 	return nil
 }
+
+func GetSensitiveWordTableByID(ctx *gin.Context, req *request.GetSensitiveVocabularyReq) (*response.SensitiveWordTableDetail, error) {
+	resp, err := safety.GetSensitiveWordTableByID(ctx, &safety_service.GetSensitiveWordTableByIDReq{TableId: req.TableId})
+	if err != nil {
+		return nil, err
+	}
+	return &response.SensitiveWordTableDetail{
+		TableId:   resp.TableId,
+		TableName: resp.TableName,
+		Remark:    resp.Remark,
+		Reply:     resp.Reply,
+		CreatedAt: util.Time2Str(resp.CreatedAt),
+	}, nil
+}

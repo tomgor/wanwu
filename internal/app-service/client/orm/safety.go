@@ -55,10 +55,11 @@ func (c *Client) CreateSensitiveWordTable(ctx context.Context, userId, orgId, ta
 	}
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		table := &model.SensitiveWordTable{
-			Name:   tableName,
-			Remark: remark,
-			UserID: userId,
-			OrgID:  orgId,
+			Name:    tableName,
+			Remark:  remark,
+			Version: getSensitiveTableVersion(),
+			UserID:  userId,
+			OrgID:   orgId,
 		}
 		if err := c.db.WithContext(ctx).Create(table).Error; err != nil {
 			return "", toErrStatus("app_safety_sensitive_table_create", tableName, err.Error())
@@ -70,14 +71,23 @@ func (c *Client) CreateSensitiveWordTable(ctx context.Context, userId, orgId, ta
 
 func (c *Client) UpdateSensitiveWordTable(ctx context.Context, tableId, tableName, remark string) *errs.Status {
 	var table model.SensitiveWordTable
-	updates := map[string]interface{}{
-		"name":   tableName,
-		"remark": remark,
+	err := sqlopt.SQLOptions(
+		sqlopt.WithName(tableName),
+	).Apply(c.db.WithContext(ctx)).First(&model.SensitiveWordTable{}).Error
+	if err == nil {
+		return toErrStatus("app_safety_sensitive_table_exist")
 	}
-	if err := sqlopt.WithID(tableId).Apply(c.db.WithContext(ctx)).Model(&table).Updates(updates).Error; err != nil {
-		return toErrStatus("app_safety_sensitive_table_update", tableId, err.Error())
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		updates := map[string]interface{}{
+			"name":   tableName,
+			"remark": remark,
+		}
+		if err := sqlopt.WithID(tableId).Apply(c.db.WithContext(ctx)).Model(&table).Updates(updates).Error; err != nil {
+			return toErrStatus("app_safety_sensitive_table_update", tableId, err.Error())
+		}
+		return nil
 	}
-	return nil
+	return toErrStatus("app_safety_sensitive_table_get", tableName)
 }
 
 func (c *Client) UpdateSensitiveWordTableReply(ctx context.Context, tableId, reply string) *errs.Status {
@@ -290,6 +300,19 @@ func (c *Client) GetSensitiveWordTableListByIDs(ctx context.Context, tableIds []
 		return nil, toErrStatus("app_safety_sensitive_table_list_get", err.Error())
 	}
 	return tables, nil
+}
+
+func (c *Client) GetSensitiveWordTableByID(ctx context.Context, tableId string) (*model.SensitiveWordTable, *errs.Status) {
+	var table model.SensitiveWordTable
+	if err := sqlopt.SQLOptions(
+		sqlopt.WithID(tableId),
+	).Apply(c.db.WithContext(ctx)).First(&table).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, toErrStatus("app_safety_sensitive_table_not_found", tableId)
+		}
+		return nil, toErrStatus("app_safety_sensitive_table_get", tableId, err.Error())
+	}
+	return &table, nil
 }
 
 func (c *Client) checkSensitiveWordCount(ctx context.Context, tableId string) (int64, bool, error) {

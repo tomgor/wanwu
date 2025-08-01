@@ -132,6 +132,15 @@ func (s *Service) GetSensitiveWordTableListByIDs(ctx context.Context, req *safet
 	return ret, nil
 }
 
+func (s *Service) GetSensitiveWordTableByID(ctx context.Context, req *safety_service.GetSensitiveWordTableByIDReq) (*safety_service.SensitiveWordTable, error) {
+	table, err := s.cli.GetSensitiveWordTableByID(ctx, req.TableId)
+	if err != nil {
+		return nil, errStatus(errs.Code_AppSafety, err)
+	}
+	ret := toProtoSensitiveWordTable(table)
+	return ret, nil
+}
+
 func toProtoSensitiveWordTable(sensitiveWordTable *model.SensitiveWordTable) *safety_service.SensitiveWordTable {
 	return &safety_service.SensitiveWordTable{
 		TableId:   util.Int2Str(sensitiveWordTable.ID),
