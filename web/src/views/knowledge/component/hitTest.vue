@@ -27,57 +27,9 @@
             >开始测试<span class="el-icon-caret-right"></span></el-button>
           </div>
         </div>
-        <el-form
-          :model="formInline"
-          ref="formInline"
-          :inline="false"
-          class="test_form"
-        >
-          <!-- <el-form-item
-            label="选择知识库"
-            class="vertical-form-item"
-          >
-            <el-select
-              v-model="formInline.knowledgeIdList"
-              placeholder="请选择"
-              multiple
-              clearable
-              filterable 
-              style="width:100%;"
-              @visible-change="visibleChange($event,'knowledge')"
-            >
-              <el-option
-                v-for="item in knowledgeOptions"
-                :key="item.knowledgeId"
-                :label="item.name"
-                :value="item.knowledgeId"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item> -->
-          <el-form-item
-            label="Rerank模型"
-            class="vertical-form-item"
-          >
-            <el-select
-              clearable
-              filterable 
-              style="width:100%;"
-              loading-text="模型加载中..."
-              v-model="formInline.rerankModelId"
-              @visible-change="visibleChange($event,'rerank')"
-              placeholder="请选择"
-            >
-              <el-option
-                v-for="item in rerankOptions"
-                :key="item.modelId"
-                :label="item.displayName"
-                :value="item.modelId"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-        </el-form>
+        <div class="test_form">
+          <searchConfig ref="searchConfig" @sendConfigInfo="sendConfigInfo" />
+        </div>
       </div>
       <div class="test-right test-box">
         <div class="result_title">
@@ -123,73 +75,46 @@
   </div>
 </template>
 <script>
-import { getKnowledgeList, hitTest } from "@/api/knowledge";
-import { getRerankList } from "@/api/modelAccess";
+import { hitTest } from "@/api/knowledge";
 import { md } from "@/mixins/marksown-it";
+import searchConfig from '@/components/searchConfig.vue';
 export default {
+  components:{searchConfig},
   data() {
     return {
       md: md,
-      knowledgeOptions: [],
-      rerankOptions: [],
-      formInline: {
-        knowledgeIdList: [this.$route.query.knowledgeId],
-        rerankModelId: "",
-      },
       question: "",
       resultLoading: false,
+      knowledgeIdList:[this.$route.query.knowledgeId],
       searchList: [],
       score: [],
+      formInline:null
     };
   },
-  created() {
-    // this.getKnowledgeList();
-    this.getRerankData();
-  },
   methods: {
-    async getKnowledgeList() {
-      //获取文档知识分类
-      const res = await getKnowledgeList({});
-      if (res.code === 0) {
-        this.knowledgeOptions = res.data.knowledgeList || [];
-      } else {
-        this.$message.error(res.message);
-      }
-    },
-    getRerankData() {
-      getRerankList().then((res) => {
-        if (res.code === 0) {
-          this.rerankOptions = res.data.list || [];
-        }
-      });
-    },
-    visibleChange(val, type) {
-      if (val) {
-        if (type === "knowledge") {
-          this.getKnowledgeList();
-        } else {
-          this.getRerankData();
-        }
-      }
-    },
     goBack() {
       this.$router.go(-1);
+    },
+    sendConfigInfo(data){
+      this.formInline = data;
     },
     startTest() {
       if (this.question === "") {
         this.$message.warning("请输入问题");
         return;
       }
-      // if (this.formInline.knowledgeIdList.length === 0) {
-      //   this.$message.warning(this.$t("knowledgeManage.pselectKnowledgeTips"));
-      //   return;
-      // }
-      if (this.formInline.rerankModelId.length === 0) {
+      if(this.formInline === null){
+        this.$message.warning("请选择检索方式");
+        return;
+      }
+      const { matchType, priorityMatch, rerankModelId } = this.formInline.knowledgeMatchParams;
+      if ((matchType !== 'mix' || priorityMatch !== 1) && !rerankModelId) {
         this.$message.warning("请选择Rerank模型");
         return;
       }
       const data = {
         ...this.formInline,
+        knowledgeIdList:this.knowledgeIdList,
         question: this.question,
       };
       this.test(data);
@@ -219,21 +144,22 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-/deep/ {
-  .vertical-form-item {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .vertical-form-item .el-form-item__label {
-    line-height: unset;
-    font-size: 14px;
-    font-weight: bold;
-  }
-  .el-form-item__content {
-    width: 100%;
-  }
-}
+// /deep/ {
+//   .vertical-form-item {
+//     display: flex;
+//     flex-direction: column;
+//     align-items: flex-start;
+//   }
+//   .vertical-form-item .el-form-item__label {
+//     line-height: unset;
+//     font-size: 14px;
+//     font-weight: bold;
+//   }
+//   .el-form-item__content {
+//     width: 100%;
+//   }
+// }
+
 .full-content {
   display: flex;
   flex-direction: column;
@@ -248,6 +174,7 @@ export default {
     .test-box {
        flex:1;
        height:100%;
+       overflow-y:auto;
       .hitTest_input {
         background: #fff;
         border-radius: 6px;

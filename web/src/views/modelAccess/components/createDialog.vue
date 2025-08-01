@@ -12,7 +12,7 @@
       <el-form :model="{...createForm}" :rules="rules" ref="createForm" label-width="110px" class="createForm form">
         <el-form-item :label="$t('modelAccess.table.modelType')" prop="modelType">
           <el-radio-group :disabled="isEdit" v-model="createForm.modelType">
-            <el-radio v-if="justifyShowModelType(item)" v-for="item in modelType" :label="item.key" :key="item.key">
+            <el-radio v-for="item in modelType" :label="item.key" :key="item.key">
               {{item.name}}
             </el-radio>
           </el-radio-group>
@@ -96,14 +96,13 @@
 import { addModel, editModel } from "@/api/modelAccess"
 import { uploadAvatar } from "@/api/user"
 import {
-  MODEL_TYPE,
+  PROVIDER_TYPE,
   PROVIDER_OBJ,
   FUNC_CALLING,
   LLM,
   DEFAULT_CALLING,
   TYPE_OBJ,
   OLLAMA,
-  HUOSHAN,
 } from "../constants"
 
 export default {
@@ -121,7 +120,7 @@ export default {
       basePath: this.$basePath,
       defaultLogo: require("@/assets/imgs/bg-logo.png"),
       dialogVisible: false,
-      modelType: MODEL_TYPE,
+      modelType: [],
       functionCalling: FUNC_CALLING,
       typeObj: TYPE_OBJ,
       llm: LLM,
@@ -161,9 +160,6 @@ export default {
     }
   },
   methods: {
-    justifyShowModelType(item) {
-      return (([OLLAMA].includes(this.provider.key) && item.key !== 'rerank') || [HUOSHAN].includes(this.provider.key) && item.key === 'llm') || ![OLLAMA, HUOSHAN].includes(this.provider.key)
-    },
     uploadAvatar(file, key) {
       const formData = new FormData()
       const config = {headers: { "Content-Type": "multipart/form-data" }}
@@ -188,10 +184,11 @@ export default {
     },
     openDialog(title, row){
       this.provider = {key: title, name: PROVIDER_OBJ[title]}
+      const currentProvider = PROVIDER_TYPE.find(item => item.key === title) || {}
+      this.modelType = currentProvider.children || []
       this.dialogVisible = true
 
       this.isEdit = Boolean(row)
-      console.log(row, title, '-----------------row')
       if (this.isEdit) {
         this.row = row || {}
         this.formatValue(row)

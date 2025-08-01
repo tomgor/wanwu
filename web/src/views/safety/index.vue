@@ -1,0 +1,62 @@
+<template>
+  <div class="page-wrapper">
+    <div class="page-title">
+      <img class="page-title-img" src="@/assets/imgs/safety.png" alt="" />
+      <span class="page-title-name">安全护栏</span>
+      <p class="page-tips">支持用户自定义敏感词表，配置行业敏感词，实时拦截高风险内容的输入和输出，保障内容安全合规。可在创建应用时关联配置。</p>
+    </div>
+    <div style="padding: 0 20px 20px 20px;">
+      <safetyList :appData="knowledgeData" @editItem="showCreate" @reloadData="getTableData" ref="knowledgeList" v-loading="tableLoading" />
+      <createSafety ref="createSafety" @reloadData="getTableData" />
+    </div>
+  </div>
+</template>
+<script>
+import { getSensitiveList } from "@/api/safety";
+import safetyList from './component/safetyList.vue';
+import createSafety from './component/create.vue';
+export default {
+    components: { safetyList,createSafety },
+    data(){
+       return{
+        knowledgeData:[],
+        tableLoading:false
+       } 
+    },
+    mounted(){
+      this.getTableData();
+    },
+    methods:{
+        getTableData(){
+            this.tableLoading = true
+            getSensitiveList().then(res => {
+                this.knowledgeData = res.data.list || [];
+                this.tableLoading = false
+            }).catch((error) =>{
+                this.tableLoading = false
+                this.$message.error(error)
+            })
+        },
+        showCreate(row){
+            this.$refs.createSafety.showDialog(row)
+        }
+    }
+}
+</script>
+<style lang="scss" scoped>
+.search-box {
+ display:flex;
+ justify-content:space-between;
+}
+
+/deep/{
+  .el-loading-mask{
+    background: none !important;
+  }
+}
+.page-tips{
+  color:#888888;
+  padding-top:15px;
+  font-weight:normal;
+}
+</style>

@@ -231,6 +231,21 @@
             </div>
           </div>
         </div>
+         <div class="block prompt-box link-box">
+          <p class="block-title tool-title">
+            <span>
+              安全护栏配置
+              <el-tooltip class="item" effect="dark" content="实时拦截高风险内容的输入和输出，保障内容安全合规。" placement="top">
+                  <span class="el-icon-question question-tips"></span>
+              </el-tooltip>
+            </span>
+            <span class="common-add">
+              <span class="el-icon-s-operation"></span>
+              <span class="handleBtn" style="margin-right:10px;" @click="showSafety">配置</span>
+              <el-switch v-model="editForm.safetyConfig.enable" :disabled="!(editForm.safetyConfig.tables || []).length"></el-switch>
+            </span>
+          </p>
+        </div>
       </div>
       <div  class="actionConfig" v-if="showActionConfig">
         <ActionConfig @closeAction="closeAction" :assistantId="this.editForm.assistantId" />
@@ -292,6 +307,7 @@
     <ToolDiaglog ref="toolDiaglog" @selectTool="selectTool" />
     <!-- 联网检索 -->
     <LinkDialog ref="linkDialog" @setLinkSet="setLinkSet" :linkform="editForm.onlineSearchConfig" />
+    <setSafety ref="setSafety" @sendSafety="sendSafety" />
   </div>
 </template>
 
@@ -301,6 +317,7 @@ import { store } from "@/store/index";
 import { mapGetters } from "vuex";
 import { getKnowledgeList } from "@/api/knowledge";
 import CreateIntelligent from "@/components/createApp/createIntelligent";
+import setSafety from "@/components/setSafety";
 import ModelSet from "./modelSetDialog";
 import ApiKeyDialog from "./ApiKeyDialog";
 import { selectModelList,getRerankList} from "@/api/modelAccess";
@@ -319,16 +336,22 @@ export default {
     ActionConfig,
     ApiKeyDialog,
     ToolDiaglog,
-    LinkDialog
+    LinkDialog,
+    setSafety
   },
   watch: {
     editForm: {
       handler(newVal) {
+          // 如果是从详情设置的数据，不触发更新逻辑
+          if (this.isSettingFromDetail) {
+            return;
+          }
+
          if(this.debounceTimer){
             clearTimeout(this.debounceTimer)
           }
         this.debounceTimer = setTimeout(() =>{
-            const props = ['modelParams', 'modelConfig', 'prologue', 'knowledgeBaseIds','instructions','recommendQuestion','onlineSearchConfig'];
+            const props = ['modelParams', 'modelConfig', 'prologue', 'knowledgeBaseIds','instructions','recommendQuestion','onlineSearchConfig','safetyConfig'];
             const changed = props.some(prop => {
             return JSON.stringify(newVal[prop]) !== JSON.stringify(
                 (this.initialEditForm || {})[prop]
@@ -356,6 +379,7 @@ export default {
       scope:'public',
       showActionConfig:false,
       rerankOptions:[],
+      initialEditForm:null,
       editForm:{
         assistantId:'',
         avatar:{},
@@ -385,6 +409,10 @@ export default {
           searchKey:'',
           searchUrl:'',
           searchRerankId:''
+        },
+        safetyConfig:{
+          enable: false,
+          tables:[]
         }
       },
       apiURL:'',
@@ -407,8 +435,12 @@ export default {
       logoFileList: [],
       imageUrl: "",
       defaultLogo: require("@/assets/imgs/bg-logo.png"),
-      debounceTimer:null //防抖计时器
+      debounceTimer:null, //防抖计时器
+      isSettingFromDetail: false // 防止详情数据触发更新标记
     };
+  },
+  mounted() {
+    this.initialEditForm = JSON.parse(JSON.stringify(this.editForm));
   },
   created() {
     this.getKnowledgeList();
@@ -437,6 +469,13 @@ export default {
     store.dispatch("app/initState");
   },
   methods: {
+    showSafety(){
+      this.$refs.setSafety.showDialog(this.editForm.safetyConfig.tables);
+    },
+    sendSafety(data){
+      const tablesData = data.map(({ tableId, tableName }) => ({ tableId, tableName }));
+      this.editForm.safetyConfig.tables = tablesData;
+    },
     actionSwitch(id){
       enableAction({actionId:id}).then(res =>{
         if(res.code === 0){
@@ -590,6 +629,7 @@ export default {
           provider: modeInfo.provider,
         },
         onlineSearchConfig:this.editForm.onlineSearchConfig,
+        safetyConfig:this.editForm.safetyConfig,
         rerankConfig:rerankInfo?{
           displayName: rerankInfo.displayName,
           model: rerankInfo.model,
@@ -614,6 +654,7 @@ export default {
     },
     async getAppDetail() {
       this.startLoading(0);
+      this.isSettingFromDetail = true; // 设置标志位，防止触发更新逻辑
       let res = await getAgentInfo({ assistantId: this.editForm.assistantId });
       if (res.code === 0) {
         this.startLoading(100);
@@ -641,12 +682,18 @@ export default {
               })
             : [],
           actionInfos: data.actionInfos || [],
-          onlineSearchConfig:data.onlineSearchConfig
+          onlineSearchConfig:data.onlineSearchConfig,
+          safetyConfig:data.safetyConfig !== null ? data.safetyConfig:this.editForm.safetyConfig
         };
 
         //回显自定义插件
         this.workFlowInfos = data.workFlowInfos || []
         this.getWorkflowList(data.workFlowInfos || []);
+        this.$nextTick(() => {
+          this.isSettingFromDetail = false;
+        });
+      }else{
+        this.isSettingFromDetail = false;
       }
     },
     async getWorkflowList(workFlowInfos) {
@@ -973,6 +1020,9 @@ export default {
         color: #999;
         margin-left: 20px;
         font-weight: normal;
+      }
+      .question-tips{
+        margin-left:5px;
       }
     }
     .block-link{

@@ -27,6 +27,14 @@ export const menuList = [
         perm: PERMS.MCP,
     },
     {
+        name: i18n.t('menu.safetyGuard'),
+        key: 'safetyGuard',
+        img: require('@/assets/imgs/safety.png'),
+        imgActive: require('@/assets/imgs/safety_active.png'),
+        path: '/safety',
+        perm: PERMS.SAFRTY,
+    },
+    {
         key: 'line',
         perm: [PERMS.MODEL, PERMS.KNOWLEDGE, PERMS.MCP]
     },

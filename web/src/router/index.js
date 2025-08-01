@@ -128,6 +128,16 @@ const constantRoutes = [
                 meta:{perm: [PERMS.KNOWLEDGE]},
             },
             {
+                path:'/safety',
+                component:resolve =>require(['@/views/safety'],resolve),
+                meta:{perm: [PERMS.SAFRTY]},
+            },
+            {
+                path:'/safety/wordList/:id',
+                component:resolve =>require(['@/views/safety/component/wordList'],resolve),
+                meta:{perm: [PERMS.SAFRTY]},
+            },
+            {
                 path: '/userCenter/*',
                 name:'userCenter',
                 component:resolve =>require(['@/views/userCenter'],resolve),
