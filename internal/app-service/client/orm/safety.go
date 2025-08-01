@@ -70,19 +70,19 @@ func (c *Client) CreateSensitiveWordTable(ctx context.Context, userId, orgId, ta
 }
 
 func (c *Client) UpdateSensitiveWordTable(ctx context.Context, tableId, tableName, remark string) *errs.Status {
-	var table model.SensitiveWordTable
+	var checkTable model.SensitiveWordTable
 	err := sqlopt.SQLOptions(
 		sqlopt.WithName(tableName),
-	).Apply(c.db.WithContext(ctx)).First(&model.SensitiveWordTable{}).Error
-	if err == nil {
+	).Apply(c.db.WithContext(ctx)).First(&checkTable).Error
+	if err == nil && (util.Int2Str(checkTable.ID) != tableId) {
 		return toErrStatus("app_safety_sensitive_table_exist")
 	}
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	if errors.Is(err, gorm.ErrRecordNotFound) || (util.Int2Str(checkTable.ID) == tableId) {
 		updates := map[string]interface{}{
 			"name":   tableName,
 			"remark": remark,
 		}
-		if err := sqlopt.WithID(tableId).Apply(c.db.WithContext(ctx)).Model(&table).Updates(updates).Error; err != nil {
+		if err := sqlopt.WithID(tableId).Apply(c.db.WithContext(ctx)).Model(&model.SensitiveWordTable{}).Updates(updates).Error; err != nil {
 			return toErrStatus("app_safety_sensitive_table_update", tableId, err.Error())
 		}
 		return nil
