@@ -65,7 +65,17 @@
             </el-col>
           </el-row>
           <el-row v-if="showRerank(item)">
-            <el-col class="content-name">Rerank模型</el-col>
+            <el-col>
+              <span class="content-name">Rerank模型</span>
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="重排序模型会根据候选文档与用户问题的语义匹配度，对初步检索结果进行重新排序从而进一步提升最终返回结果的相关性和准确性。"
+                placement="right"
+              >
+                <span class="el-icon-question tips"></span>
+              </el-tooltip>
+            </el-col>
             <el-col>
               <el-select
                 clearable
@@ -331,7 +341,7 @@ export default {
       this.formInline.knowledgeMatchParams.keywordPriority = 0.8;
       this.formInline.knowledgeMatchParams.semanticsPriority = 0.2;
       this.formInline.knowledgeMatchParams.threshold = 0.4;
-      this.formInline.knowledgeMatchParams.topK = 1;
+      this.formInline.knowledgeMatchParams.topK = 5;
     },
     getRerankData() {
       this.rerankLoading = true;

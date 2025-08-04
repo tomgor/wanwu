@@ -223,7 +223,7 @@ export default {
           priorityMatch: 1, //权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
           rerankModelId: "", //rerank模型id
           semanticsPriority: 0.2, //语义权重
-          topK: 1, //topK 获取最高的几行
+          topK: 5, //topK 获取最高的几行
           threshold: 0.4, //过滤分数阈值
           maxHistory:0//最长上下文
         },
@@ -275,7 +275,8 @@ export default {
             );
           });
           if (changed && !this.isUpdating) {
-            if(newVal['modelParams']!== '' && newVal['knowledgeBaseIds'].length > 0 && newVal['knowledgeConfig']['rerankModelId'] !==''){
+            const isMixPriorityMatch = newVal['knowledgeConfig']['matchType'] === 'mix' && newVal['knowledgeConfig']['priorityMatch']
+            if(newVal['modelParams']!== '' && newVal['knowledgeBaseIds'].length > 0 && ( !isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
               this.updateInfo();
             }
           }
