@@ -269,19 +269,21 @@ export default {
     },
     config:{
       handler(newVal) {
-        if(newVal && newVal.rerankModelId !==''){
+        if(newVal && Object.keys(newVal).length > 0){
           this.isSettingFromConfig = true; // 设置标志位
           const formData = JSON.parse(JSON.stringify(newVal))
           this.formInline.knowledgeMatchParams = formData;
           const { matchType,priorityMatch } = this.formInline.knowledgeMatchParams;
-          this.searchTypeData = this.searchTypeData.map((item) => ({
-            ...item,
-            showContent: item.value === matchType ? true : false,
-          }));
-          if(matchType === 'mix'){
-            this.searchTypeData[2]['mixTypeValue'] = priorityMatch === 1 ? 'weight' : 'rerank';
+          if(matchType !== ''){
+              this.searchTypeData = this.searchTypeData.map((item) => ({
+              ...item,
+              showContent: item.value === matchType ? true : false,
+            }));
+            if(matchType === 'mix'){
+              this.searchTypeData[2]['mixTypeValue'] = priorityMatch === 1 ? 'weight' : 'rerank';
+            }
           }
-          
+
           // 使用nextTick确保DOM更新完成后再重置标志位
           this.$nextTick(() => {
             this.isSettingFromConfig = false;
@@ -289,7 +291,7 @@ export default {
         }
       },
       deep: true,
-      immediate: false
+      immediate: true
     }
   },
   mounted() {

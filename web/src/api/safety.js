@@ -69,3 +69,11 @@ export const uploadSensitiveWord = (data)=>{
         data
     })
 };
+//获取敏感词回复设置
+export const getReplay = (data)=>{
+    return request({
+        url: '/user/api/v1/safe/sensitive/table',
+        method: 'get',
+        params:data
+    })
+};

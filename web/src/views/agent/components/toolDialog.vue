@@ -1,14 +1,33 @@
 <template>
     <div>
         <el-dialog
-            title="新增变量"
+            title="新增工具"
             :visible.sync="dialogVisible"
-            width="35%"
+            width="40%"
             :before-close="handleClose">
             <div class="tool-typ">
-                <div v-for="(item,index) in toolList" :key="index" @click="clickTool(item,index)" :class="{'active':toolIndex === index}">
-                    {{item.name}}
+                <div class="toolbtn">
+                    <div v-for="(item,index) in toolList" :key="index" @click="clickTool(item,index)" :class="[{'active':toolIndex === index}]">
+                        {{item.name}}
+                    </div>
                 </div>
+                <el-input v-model="toolName" placeholder="搜索工具" class="tool-input" suffix-icon="el-icon-search" @keyup.enter.native="searchTool" clearable></el-input>
+            </div>
+            <div class="toolContent">
+                <template v-for="(items, type) in contentMap">
+                    <div 
+                    v-if="activeValue === type"
+                    v-for="item in items"
+                    :key="item[type + 'Id'] || item.id"
+                    class="toolContent_item"
+                    >
+                    <span>{{ item.apiName || item.name }}</span>
+                    <el-switch
+                        v-model="item.enabled"
+                        active-color="#384BF7"
+                    />
+                    </div>
+                </template>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="submit">确 定</el-button>
@@ -17,16 +36,35 @@
     </div>
 </template>
 <script>
+import { getList } from '@/api/workflow.js';
+import { getExplorationFlowList} from "@/api/workflow";
 export default {
     data(){
         return {
+            toolName:'',
             dialogVisible:false,
-            toolIndex:-1,
-            activeValue:'',
+            toolIndex:0,
+            activeValue:'auto',
+            actionInfos:[
+                {
+                 actionId: "167a540d-de19-45c1-967e-42da882c300d",
+                 apiName: "api.seniverse.com"
+                },
+                {
+                 actionId: "167a540d-de19-45c1-967e-42da882c3045",
+                 apiName: "ssde.seniverse.com"
+                }
+            ],
+            workFlowInfos:[],
+            mcpInfos:[],
             toolList:[
                 {
-                    value:'action',
-                    name:'action API'
+                    value:'auto',
+                    name:'自定义'
+                },
+                {
+                    value:'mcp',
+                    name:'MCP'
                 },
                 {
                     value:'workflow',
@@ -35,7 +73,48 @@ export default {
             ]
         }
     },
+    computed:{
+         contentMap() {
+            return {
+            auto: this.actionInfos,
+            mcp: this.mcpInfos,
+            workflow: this.workFlowInfos
+            }
+        }
+    },
+    created(){
+        this.getMcpSelect();
+        this.getWorkflowList('');
+    },
     methods:{
+        searchTool(){
+            console.log(this.toolName)
+            if(this.activeValue === 'auto'){
+                console.log('自定义')
+            }else if(this.activeValue === 'mcp'){
+                console.log('mcp')
+            }else{
+                console.log(this.toolName)
+                this.getWorkflowList(this.toolName)
+            }
+        },
+        getMcpSelect(){
+            getList().then(res => {
+                if(res.code === 0){
+                     this.mcpInfos = res.data.list || [];
+                }
+               
+            }).catch(err => {
+
+            })
+            },
+            getWorkflowList(name) {
+                getExplorationFlowList({name,appType:'workflow',searchType:'all'}).then(res =>{
+                    if (res.code === 0) {
+                        this.workFlowInfos = res.data.list || []
+                    }
+                })
+        },
         showDialog(){
             this.dialogVisible = true;
         },
@@ -56,20 +135,52 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+/deep/{
+    .el-dialog__body{
+        padding:10px 20px;
+    }
+}
 .tool-typ{
     display:flex;
-    justify-content:space-around;
-    div{
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom: 1px solid #dbdbdb;
+    .toolbtn{
+        display:flex;
+        justify-content:flex-start;
+        gap:20px;
+        div{
+            text-align: center;
+            padding:5px 20px;
+            border-radius:6px;
+            border:1px solid #ddd;
+            cursor: pointer;
+        }
+    }
+    .tool-input{
         width:200px;
-        text-align: center;
-        padding:15px 40px;
+    }
+}
+.toolContent{
+    padding:10px 0;
+    max-height:300px;
+    overflow-y:auto;
+    .toolContent_item{
+        padding:15px 20px;
+        border:1px solid #dbdbdb;
         border-radius:6px;
-        border:1px solid #ddd;
+        margin-bottom:10px;
         cursor: pointer;
+        display: flex;
+        justify-content:space-between;
+    }
+    .toolContent_item:hover{
+        background:#f4f5ff;
     }
 }
 .active{
     border:1px solid #384BF7 !important;
-    color: #384BF7;
+    color: #fff;
+    background:#384BF7;
 }
 </style>
