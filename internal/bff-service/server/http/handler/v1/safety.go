@@ -187,7 +187,7 @@ func GetSensitiveWordTableSelect(ctx *gin.Context) {
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			data		body		request.GetSensitiveVocabularyReq	true	"查询敏感词表参数"
+//	@Param			data		query		request.GetSensitiveVocabularyReq	true	"查询敏感词表参数"
 //	@Success		200	{object}	response.Response{data=response.SensitiveWordTableDetail}
 //	@Router			/safe/sensitive/table [get]
 func GetSensitiveWordTable(ctx *gin.Context) {

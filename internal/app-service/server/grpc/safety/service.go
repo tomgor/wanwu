@@ -31,7 +31,7 @@ func errStatus(code errs.Code, status *errs.Status) error {
 func (s *Service) CreateSensitiveWordTable(ctx context.Context, req *safety_service.CreateSensitiveWordTableReq) (*safety_service.CreateSensitiveWordTableResp, error) {
 	tableId, err := s.cli.CreateSensitiveWordTable(ctx, req.UserId, req.OrgId, req.TableName, req.Remark)
 	if err != nil {
-		return nil, errStatus(errs.Code_AppSafety, err) //TODO
+		return nil, errStatus(errs.Code_AppSafety, err)
 	}
 	return &safety_service.CreateSensitiveWordTableResp{TableId: tableId}, nil
 }

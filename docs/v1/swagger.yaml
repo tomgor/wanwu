@@ -1068,14 +1068,6 @@ definitions:
       id:
         type: integer
     type: object
-  request.GetSensitiveVocabularyReq:
-    properties:
-      tableId:
-        description: 敏感词表id
-        type: string
-    required:
-    - tableId
-    type: object
   request.ImportOrUpdateModelRequest:
     properties:
       avatar:
@@ -6494,12 +6486,11 @@ paths:
       - application/json
       description: 获取敏感词表
       parameters:
-      - description: 查询敏感词表参数
-        in: body
-        name: data
+      - description: 敏感词表id
+        in: query
+        name: tableId
         required: true
-        schema:
-          $ref: '#/definitions/request.GetSensitiveVocabularyReq'
+        type: string
       produces:
       - application/json
       responses:
