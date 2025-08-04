@@ -5,7 +5,13 @@
       <img class="page-title-img" src="@/assets/imgs/org.png" alt="" />
       <span class="page-title-name">{{$t('menu.setting')}}</span>
     </div>
-    <div style="margin: 10px 20px 0 20px;">
+    <!-- tabs -->
+    <div class="setting-tabs">
+      <div :class="['setting-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">{{$t('org.title')}}</div>
+      <div :class="['setting-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">{{$t('infoSetting.title')}}</div>
+    </div>
+
+    <div v-if="tabActive === 0" style="margin: 0 20px">
       <div style="margin-bottom: -30px">
         <span
           v-for="item in list"
@@ -21,7 +27,9 @@
       <Role v-if="radio === 'role'" />
       <Org v-if="radio === 'org'" />
     </div>
-    <!--<router-view />-->
+    <div v-if="tabActive === 1" style="margin: 30px 20px 0 20px;">
+      <InfoSetting />
+    </div>
   </div>
 </template>
 
@@ -29,14 +37,15 @@
 import User from "./user/index.vue"
 import Role from "./role/index.vue"
 import Org from "./org/index.vue"
+import InfoSetting from "@/views/infoSetting/index.vue";
 import { checkPerm, PERMS } from "@/router/permission"
-import role from "@/views/permission/role/index.vue";
 
 export default {
-  components: {User, Role, Org},
+  components: {User, Role, Org, InfoSetting},
   data() {
     return {
       radio: '',
+      tabActive: 0,
       list: [
         {name: '用户', key: 'user', perm: PERMS.PERMISSION_USER},
         {name: '角色', key: 'role', perm: PERMS.PERMISSION_ROLE},
@@ -56,7 +65,10 @@ export default {
     checkPerm,
     changeTab(key) {
       this.radio = key
-    }
+    },
+    tabClick(status){
+      this.tabActive = status
+    },
   }
 }
 </script>
@@ -84,4 +96,24 @@ export default {
     color: $color_title;
   }
 }
+.setting-tabs{
+  margin: 20px;
+  .setting-tab{
+    display: inline-block;
+    vertical-align: middle;
+    width: 160px;
+    height: 40px;
+    border-bottom: 1px solid #333;
+    font-size: 14px;
+    line-height: 40px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .active{
+    background: #333;
+    color: #fff;
+    font-weight: bold;
+  }
+}
+
 </style>
