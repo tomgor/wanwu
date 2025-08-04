@@ -107,6 +107,19 @@ stop-app:
 		--env-file .env \
 		down app-service
 
+# --- operate-service ---
+run-operate:
+	docker-compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		up -d operate-service
+
+stop-operate:
+	docker-compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		down operate-service
+
 # --- rag-service ---
 run-rag:
 	docker-compose -f docker-compose-develop.yaml \

@@ -136,6 +136,26 @@ services:
     working_dir: /app
     command: ./bin/mcp-service
 
+  operate-service:
+    restart: always
+    image: ${WANWU_GO_IMAGE}
+    container_name: operate-service
+    networks:
+      - ${WANWU_DOCKER_NETWORK}
+    ports:
+      - 9797:9797
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./bin/${WANWU_ARCH}/operate-service:/app/bin/operate-service
+      - ${WANWU_PROJECT_DIR}/operate-service/log:/app/log
+      - ./configs/microservice/operate-service/configs:/app/configs/microservice/operate-service/configs
+    environment:
+      DB_NAME: ${WANWU_DB_NAME}
+      DB_MYSQL_ADDRESS: ${WANWU_MYSQL_ADDRESS}
+      DB_MYSQL_PASSWORD: ${WANWU_MYSQL_PASSWORD}
+    working_dir: /app
+    command: ./bin/operate-service
+
   rag-service:
     restart: always
     image: ${WANWU_GO_IMAGE}
