@@ -128,9 +128,15 @@
         </div>
         <div class="common-box">
           <div class="block recommend-box">
-            <p class="block-title">关联知识库</p>
+            <p class="block-title tool-title">
+              <span>关联知识库</span>
+              <span class="common-add" @click="showKnowledgeSet">
+                <span class="el-icon-s-operation"></span>
+                <span class="handleBtn set">配置</span>
+              </span>
+              </p>
             <div class="rl">
-              <el-select v-model="editForm.knowledgeBaseIds" placeholder="请选择关联知识库" style="width:100%;" multiple>
+              <el-select v-model="editForm.knowledgeBaseIds" placeholder="请选择关联知识库" style="width:100%;" multiple filterable clearable>
                 <el-option
                   v-for="item in knowledgeData"
                   :key="item.knowledgeId"
@@ -140,7 +146,7 @@
               </el-select>
             </div>
           </div>
-          <div class="block prompt-box">
+          <!-- <div class="block prompt-box">
             <p class="block-title">Rerank模型</p>
             <div class="rl">
               <el-select
@@ -163,7 +169,7 @@
                 </el-option>
               </el-select>
             </div>
-          </div>
+          </div> -->
         </div>
         <div class="block prompt-box link-box">
           <p class="block-title">联网检索</p>
@@ -308,6 +314,7 @@
     <!-- 联网检索 -->
     <LinkDialog ref="linkDialog" @setLinkSet="setLinkSet" :linkform="editForm.onlineSearchConfig" />
     <setSafety ref="setSafety" @sendSafety="sendSafety" />
+    <knowledgeSetDialog ref="knowledgeSetDialog" />
   </div>
 </template>
 
@@ -325,6 +332,7 @@ import { getAgentInfo,addWorkFlowInfo,delWorkFlowInfo,delActionInfo,putAgentInfo
 import ActionConfig from "./action";
 import ToolDiaglog from "./toolDialog";
 import LinkDialog from "./linkDialog";
+import knowledgeSetDialog from "./knowledgeSetDialog";
 import { getWorkFlowList,readWorkFlow,getExplorationFlowList} from "@/api/workflow";
 import { Base64 } from "js-base64";
 import Chat from "./chat";
@@ -337,7 +345,8 @@ export default {
     ApiKeyDialog,
     ToolDiaglog,
     LinkDialog,
-    setSafety
+    setSafety,
+    knowledgeSetDialog
   },
   watch: {
     editForm: {
@@ -390,6 +399,16 @@ export default {
         prologue:'',//开场白
         instructions:'',//系统提示词
         knowledgeBaseIds:[],
+        knowledgeConfig:{
+          keywordPriority: 0.8, //关键词权重
+          matchType: "mix", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+          priorityMatch: 1, //权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+          rerankModelId: "", //rerank模型id
+          semanticsPriority: 0.2, //语义权重
+          topK: 5, //topK 获取最高的几行
+          threshold: 0.4, //过滤分数阈值
+          maxHistory:0//最长上下文
+        },
         recommendQuestion:[{ value: "", hover:false }],
         actionInfos:[],//action
         modelConfig:{
@@ -469,6 +488,48 @@ export default {
     store.dispatch("app/initState");
   },
   methods: {
+    showKnowledgeSet(){
+      this.$refs.knowledgeSetDialog.showDialog(this.editForm.knowledgeConfig);
+    },
+    //获取模型列表
+    getModelData() {
+      selectModelList().then(res => {
+        if (res.code === 0) {
+          this.modleOptions = res.data.map(item => {
+            return {
+              label: item.name,
+              value: item.id
+            };
+          });
+        }
+      });
+    },
+    //获取rerank模型
+    getRerankData() {
+      getRerankList().then(res => {
+        if (res.code === 0) {
+          this.rerankOptions = res.data.map(item => {
+            return {
+              label: item.name,
+              value: item.id
+            };
+          });
+        }
+      });
+    },
+    //获取知识库列表
+    getKnowledgeList() {
+      getKnowledgeList().then(res => {
+        if (res.code === 0) {
+          this.knowledgeData = res.data.map(item => {
+            return {
+              label: item.name,
+              value: item.id
+            };
+          });
+        }
+      });
+    },
     showSafety(){
       this.$refs.setSafety.showDialog(this.editForm.safetyConfig.tables);
     },
@@ -501,8 +562,8 @@ export default {
       }
     },
     addTool(){
-      this.wfDialogVisible = true
-      // this.$refs.toolDiaglog.showDialog();
+      // this.wfDialogVisible = true
+      this.$refs.toolDiaglog.showDialog();
     },
     rerankVisible(val){
       if(val){
@@ -610,7 +671,7 @@ export default {
       }).filter(Boolean);
       //模型数据
       const modeInfo = this.modleOptions.find(item => item.modelId === this.editForm.modelParams)
-      const rerankInfo = this.rerankOptions.find(item => item.modelId === this.editForm.rerankParams)
+      const rerankInfo = this.rerankOptions.find(item => item.modelId === this.editForm.knowledgeConfig.rerankModelId)
       const recommendQuestion = this.editForm.recommendQuestion.map(item => item.value)
       const params = {
         assistantId:this.editForm.assistantId,
@@ -619,6 +680,7 @@ export default {
         instructions:this.editForm.instructions,
         knowledgeBaseConfig:{
           knowledgebases:!knowledgeData.length ? [] : knowledgeData,
+          config:this.editForm.knowledgeConfig
         },
         modelConfig:{
           config:this.editForm.modelConfig,
@@ -659,6 +721,8 @@ export default {
       if (res.code === 0) {
         this.startLoading(100);
         let data = res.data;
+        // this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;//需要后端修改
+        // this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
         const knowledgeData = res.data.knowledgeBaseConfig.knowledgebases;
         if(knowledgeData && knowledgeData.length > 0){
           this.editForm.knowledgeBaseIds = knowledgeData.map(item => item.id);
@@ -814,6 +878,9 @@ export default {
   .handleBtn,.el-icon-plus{
     font-size: 13px!important;
     padding:0 2px;
+  }
+  .set{
+    margin-left:1px;
   }
   .el-icon-plus{
     font-weight:bold;

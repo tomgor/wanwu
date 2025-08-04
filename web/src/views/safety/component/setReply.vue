@@ -47,7 +47,7 @@
     </div>
 </template>
 <script>
-import { setReply } from "@/api/safety";
+import { setReply,getReplay } from "@/api/safety";
 export default {
     data(){
         return{
@@ -59,9 +59,19 @@ export default {
         }
     },
     methods:{
+        getReplayInfo(tableId){
+            getReplay({tableId}).then(res => {
+                if(res.code === 0){
+                    this.ruleForm.reply = res.data.reply || '';
+                }
+            }).catch(err => {
+                console.log(err)
+            })
+        },
         showDialog(tableId){
             this.dialogVisible = true;
             this.ruleForm.tableId = tableId;
+            this.getReplayInfo(this.ruleForm.tableId)
             this.clear();
         },
         handleClose(){
@@ -69,9 +79,10 @@ export default {
             this.dialogVisible = false;
         },
         clear(){
-            this.ruleForm.reply = '';
-            this.$refs.ruleForm.resetFields();
-            this.$refs.ruleForm.clearValidate();
+            this.$nextTick(() =>{
+                this.$refs.ruleForm.resetFields();
+                this.$refs.ruleForm.clearValidate();
+            })
         },
         submitForm(formName){
             this.$refs[formName].validate((valid) =>{
