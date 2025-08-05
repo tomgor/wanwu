@@ -2,34 +2,68 @@
   <div class="agent-from-content">
     <div class="form-header">
       <div class="header-left">
-        <span class="el-icon-arrow-left btn" @click="goBack"></span>
+        <span
+          class="el-icon-arrow-left btn"
+          @click="goBack"
+        ></span>
         <span class="header-left-title">智能体编辑</span>
       </div>
       <div class="header-right">
-          <div class="header-api">
-            <el-tag  effect="plain" class="root-url">API根地址</el-tag>
-            {{apiURL}}
+        <div class="header-api">
+          <el-tag
+            effect="plain"
+            class="root-url"
+          >API根地址</el-tag>
+          {{apiURL}}
+        </div>
+        <el-button
+          size="small"
+          @click="openApiDialog"
+          class="apikeyBtn"
+        >
+          <img :src="require('@/assets/imgs/apikey.png')" />
+          API秘钥
+        </el-button>
+        <el-button
+          size="small"
+          type="primary"
+          @click="handlePublish"
+          style="padding:13px 12px;"
+        >发布<span
+            class="el-icon-arrow-down"
+            style="margin-left:5px;"
+          ></span></el-button>
+        <div
+          class="popover-operation"
+          v-if="showOperation"
+        >
+          <div>
+            <el-radio
+              :label="'private'"
+              v-model="scope"
+            >私密发布：仅自己可见</el-radio>
           </div>
-          <el-button size="small" @click="openApiDialog" class="apikeyBtn">
-            <img :src="require('@/assets/imgs/apikey.png')" />
-            API秘钥
-          </el-button>
-          <el-button size="small" type="primary" @click="handlePublish" style="padding:13px 12px;">发布<span class="el-icon-arrow-down" style="margin-left:5px;"></span></el-button>
-          <div class="popover-operation" v-if="showOperation">
-            <div>
-              <el-radio :label="'private'" v-model="scope">私密发布：仅自己可见</el-radio>
-            </div>
-            <div>
-              <el-radio :label="'public'" v-model="scope">公开发布：组织内可见</el-radio>
-            </div>
-            <div class="saveBtn">
-              <el-button size="mini" type="primary" @click="savePublish">保 存</el-button>
-            </div>
+          <div>
+            <el-radio
+              :label="'public'"
+              v-model="scope"
+            >公开发布：组织内可见</el-radio>
           </div>
+          <div class="saveBtn">
+            <el-button
+              size="mini"
+              type="primary"
+              @click="savePublish"
+            >保 存</el-button>
+          </div>
+        </div>
       </div>
     </div>
     <div class="agent_form">
-      <div class="drawer-form" v-if="!showActionConfig">
+      <div
+        class="drawer-form"
+        v-if="!showActionConfig"
+      >
         <div class="block prompt-box">
           <div class="basicInfo">
             <div class="img">
@@ -37,7 +71,10 @@
             </div>
             <div class="basicInfo-desc">
               <span class="basicInfo-title">{{editForm.name || '无信息'}}</span>
-              <span class="el-icon-edit-outline editIcon" @click="editAgent"></span>
+              <span
+                class="el-icon-edit-outline editIcon"
+                @click="editAgent"
+              ></span>
               <p>{{editForm.desc || '无信息'}}</p>
             </div>
           </div>
@@ -47,10 +84,16 @@
           <div class="block prompt-box">
             <p class="block-title model-title">
               <span class="label">
-                <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+                <img
+                  :src="require('@/assets/imgs/require.png')"
+                  class="required-label"
+                />
                 模型选择
               </span>
-              <span class="el-icon-s-operation operation" @click="showModelSet"></span>
+              <span
+                class="el-icon-s-operation operation"
+                @click="showModelSet"
+              ></span>
             </p>
             <div class="rl">
               <el-select
@@ -75,7 +118,10 @@
           </div>
           <div class="block prompt-box">
             <p class="block-title">
-              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+              <img
+                :src="require('@/assets/imgs/require.png')"
+                class="required-label"
+              />
               开场白
             </p>
             <div class="rl">
@@ -105,7 +151,10 @@
           <div class="block recommend-box">
             <p class="block-title recommend-title">
               <span>推荐问题</span>
-              <span @click="addRecommend" class="common-add">
+              <span
+                @click="addRecommend"
+                class="common-add"
+              >
                 <span class="el-icon-plus"></span>
                 <span class="handleBtn">添加</span>
               </span>
@@ -113,7 +162,7 @@
             <div
               class="recommend-item"
               v-for="(n,i) in editForm.recommendQuestion"
-              @mouseenter="mouseEnter(n)" 
+              @mouseenter="mouseEnter(n)"
               @mouseleave="mouseLeave(n)"
             >
               <el-input
@@ -122,7 +171,11 @@
                 maxlength="50"
                 :key="`${i}rml`"
               ></el-input>
-              <span class="el-icon-delete recommend-del" @click="clearRecommend(n,i)" v-if="n.hover && n.hover === true"></span>
+              <span
+                class="el-icon-delete recommend-del"
+                @click="clearRecommend(n,i)"
+                v-if="n.hover && n.hover === true"
+              ></span>
             </div>
           </div>
         </div>
@@ -130,18 +183,29 @@
           <div class="block recommend-box">
             <p class="block-title tool-title">
               <span>关联知识库</span>
-              <span class="common-add" @click="showKnowledgeSet">
+              <span
+                class="common-add"
+                @click="showKnowledgeSet"
+              >
                 <span class="el-icon-s-operation"></span>
                 <span class="handleBtn set">配置</span>
               </span>
-              </p>
+            </p>
             <div class="rl">
-              <el-select v-model="editForm.knowledgeBaseIds" placeholder="请选择关联知识库" style="width:100%;" multiple filterable clearable>
+              <el-select
+                v-model="editForm.knowledgeBaseIds"
+                placeholder="请选择关联知识库"
+                style="width:100%;"
+                multiple
+                filterable
+                clearable
+              >
                 <el-option
                   v-for="item in knowledgeData"
                   :key="item.knowledgeId"
                   :label="item.name"
-                  :value="item.knowledgeId">
+                  :value="item.knowledgeId"
+                >
                 </el-option>
               </el-select>
             </div>
@@ -174,13 +238,22 @@
         <div class="block prompt-box link-box">
           <p class="block-title">联网检索</p>
           <div class="rl">
-            <div class="block-link" style="width:50%;">
+            <div
+              class="block-link"
+              style="width:50%;"
+            >
               <span class="link-text">
-                <img :src="require('@/assets/imgs/bocha.png')" style="width:20px;margin-right:8px;" />
+                <img
+                  :src="require('@/assets/imgs/bocha.png')"
+                  style="width:20px;margin-right:8px;"
+                />
                 <span>博查</span>
               </span>
               <span>
-                <span class="el-icon-s-operation link-operation" @click="showLinkDiglog"></span>
+                <span
+                  class="el-icon-s-operation link-operation"
+                  @click="showLinkDiglog"
+                ></span>
                 <el-switch v-model="editForm.onlineSearchConfig.enable"></el-switch>
               </span>
             </div>
@@ -189,13 +262,16 @@
         <div class="block recommend-box tool-box">
           <p class="block-title tool-title">
             <span>工具</span>
-            <span @click="addTool" class="common-add">
+            <span
+              @click="addTool"
+              class="common-add"
+            >
               <span class="el-icon-plus"></span>
               <span class="handleBtn">添加</span>
             </span>
           </p>
           <div class="rl tool-conent">
-            <div class="tool-left tool" v-show="editForm.actionInfos.length">
+            <!-- <div class="tool-left tool" v-show="editForm.actionInfos.length">
               <div class="action-list">
               <div
                 class="action-item"
@@ -212,56 +288,86 @@
                 </div>
               </div>
               </div>
-            </div>
-            <div class="tool-right tool" v-show="workFlowInfos.length">
+            </div> -->
+            <div
+              class="tool-right tool"
+              v-show="allTools.length"
+            >
               <div class="action-list">
                 <div
                   class="action-item"
-                  v-for="(n, i) in workFlowInfos"
+                  v-for="(n, i) in allTools"
                   :key="`${i}ac`"
                 >
                   <div
                     class="name"
                     style="color: #333"
                   >
-                    <span v-if="n.valid">{{ n.workFlowName }}</span>
-                    <span v-else>工具已失效</span>
+                    <span>{{ displayName(n) }}</span>
                   </div>
-
                   <div class="bt">
-                    <el-switch v-model="n.enable" class="bt-switch" @change="workflowSwitch(n.id)" v-if="n.valid"></el-switch>
-                    <span @click="workflowRemove(n.id)" class="el-icon-delete del"></span>
+                    <el-switch
+                      v-model="n.enable"
+                      class="bt-switch"
+                      @change="toolSwitch(n.id,n.type)"
+                      v-if="n.valid"
+                    ></el-switch>
+                    <span
+                      @click="toolRemove(n.id,n.type)"
+                      class="el-icon-delete del"
+                    ></span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-         <div class="block prompt-box link-box">
+        <div class="block prompt-box link-box">
           <p class="block-title tool-title">
             <span>
               安全护栏配置
-              <el-tooltip class="item" effect="dark" content="实时拦截高风险内容的输入和输出，保障内容安全合规。" placement="top">
-                  <span class="el-icon-question question-tips"></span>
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="实时拦截高风险内容的输入和输出，保障内容安全合规。"
+                placement="top"
+              >
+                <span class="el-icon-question question-tips"></span>
               </el-tooltip>
             </span>
             <span class="common-add">
               <span class="el-icon-s-operation"></span>
-              <span class="handleBtn" style="margin-right:10px;" @click="showSafety">配置</span>
-              <el-switch v-model="editForm.safetyConfig.enable" :disabled="!(editForm.safetyConfig.tables || []).length"></el-switch>
+              <span
+                class="handleBtn"
+                style="margin-right:10px;"
+                @click="showSafety"
+              >配置</span>
+              <el-switch
+                v-model="editForm.safetyConfig.enable"
+                :disabled="!(editForm.safetyConfig.tables || []).length"
+              ></el-switch>
             </span>
           </p>
         </div>
       </div>
-      <div  class="actionConfig" v-if="showActionConfig">
-        <ActionConfig @closeAction="closeAction" :assistantId="this.editForm.assistantId" />
+      <div
+        class="actionConfig"
+        v-if="showActionConfig"
+      >
+        <ActionConfig
+          @closeAction="closeAction"
+          :assistantId="this.editForm.assistantId"
+        />
       </div>
       <div class="drawer-test">
-        <Chat :editForm="editForm" :chatType="'test'"/>
+        <Chat
+          :editForm="editForm"
+          :chatType="'test'"
+        />
       </div>
     </div>
     <!-- 添加自定义插件 -->
-    <el-dialog
+    <!-- <el-dialog
       top="10vh"
       :title="$t('agent.addComponent')"
       :close-on-click-modal="false"
@@ -302,24 +408,52 @@
           </div>
         </div>
       </div>
-    </el-dialog>
+    </el-dialog> -->
     <!-- 编辑智能体 -->
-    <CreateIntelligent ref="createIntelligentDialog" :type="'edit'" :editForm="editForm" @updateInfo="getAppDetail" />
+    <CreateIntelligent
+      ref="createIntelligentDialog"
+      :type="'edit'"
+      :editForm="editForm"
+      @updateInfo="getAppDetail"
+    />
     <!-- 模型设置 -->
-    <ModelSet @setModelSet="setModelSet" ref="modelSetDialog" :modelform="editForm.modelConfig" />
+    <ModelSet
+      @setModelSet="setModelSet"
+      ref="modelSetDialog"
+      :modelform="editForm.modelConfig"
+    />
     <!-- apikey -->
-    <ApiKeyDialog ref="apiKeyDialog" :appId="editForm.assistantId" :appType="'agent'" />
+    <ApiKeyDialog
+      ref="apiKeyDialog"
+      :appId="editForm.assistantId"
+      :appType="'agent'"
+    />
     <!-- 选择工作类型 -->
-    <ToolDiaglog ref="toolDiaglog" @selectTool="selectTool" />
+    <ToolDiaglog
+      ref="toolDiaglog"
+      @selectTool="selectTool"
+      @updateDetail="updateDetail"
+      :assistantId="editForm.assistantId"
+    />
     <!-- 联网检索 -->
-    <LinkDialog ref="linkDialog" @setLinkSet="setLinkSet" :linkform="editForm.onlineSearchConfig" />
-    <setSafety ref="setSafety" @sendSafety="sendSafety" />
-    <knowledgeSetDialog ref="knowledgeSetDialog" />
+    <LinkDialog
+      ref="linkDialog"
+      @setLinkSet="setLinkSet"
+      :linkform="editForm.onlineSearchConfig"
+    />
+    <!-- 敏感词设置 -->
+    <setSafety
+      ref="setSafety"
+      @sendSafety="sendSafety"
+    />
+    <!-- 知识库召回参数配置 -->
+    <knowledgeSetDialog ref="knowledgeSetDialog" @setKnowledgeSet="setKnowledgeSet" />
   </div>
 </template>
 
 <script>
-import {getApiKeyRoot,appPublish} from "@/api/appspace";
+import { getApiKeyRoot, appPublish } from "@/api/appspace";
+import { deleteMcp,enableMcp } from "@/api/agent";
 import { store } from "@/store/index";
 import { mapGetters } from "vuex";
 import { getKnowledgeList } from "@/api/knowledge";
@@ -327,13 +461,25 @@ import CreateIntelligent from "@/components/createApp/createIntelligent";
 import setSafety from "@/components/setSafety";
 import ModelSet from "./modelSetDialog";
 import ApiKeyDialog from "./ApiKeyDialog";
-import { selectModelList,getRerankList} from "@/api/modelAccess";
-import { getAgentInfo,addWorkFlowInfo,delWorkFlowInfo,delActionInfo,putAgentInfo,enableWorkFlow,enableAction } from "@/api/agent";
+import { selectModelList, getRerankList } from "@/api/modelAccess";
+import {
+  getAgentInfo,
+  addWorkFlowInfo,
+  delWorkFlowInfo,
+  delActionInfo,
+  putAgentInfo,
+  enableWorkFlow,
+  enableAction,
+} from "@/api/agent";
 import ActionConfig from "./action";
 import ToolDiaglog from "./toolDialog";
 import LinkDialog from "./linkDialog";
 import knowledgeSetDialog from "./knowledgeSetDialog";
-import { getWorkFlowList,readWorkFlow,getExplorationFlowList} from "@/api/workflow";
+import {
+  getWorkFlowList,
+  readWorkFlow,
+  getExplorationFlowList,
+} from "@/api/workflow";
 import { Base64 } from "js-base64";
 import Chat from "./chat";
 export default {
@@ -346,60 +492,69 @@ export default {
     ToolDiaglog,
     LinkDialog,
     setSafety,
-    knowledgeSetDialog
+    knowledgeSetDialog,
   },
   watch: {
     editForm: {
       handler(newVal) {
-          // 如果是从详情设置的数据，不触发更新逻辑
-          if (this.isSettingFromDetail) {
-            return;
-          }
+        // 如果是从详情设置的数据，不触发更新逻辑
+        if (this.isSettingFromDetail) {
+          return;
+        }
 
-         if(this.debounceTimer){
-            clearTimeout(this.debounceTimer)
-          }
-        this.debounceTimer = setTimeout(() =>{
-            const props = ['modelParams', 'modelConfig', 'prologue', 'knowledgeBaseIds','instructions','recommendQuestion','onlineSearchConfig','safetyConfig'];
-            const changed = props.some(prop => {
-            return JSON.stringify(newVal[prop]) !== JSON.stringify(
-                (this.initialEditForm || {})[prop]
-              );
-            });
-            if (changed) {
-              if(newVal['modelParams']!== '' && newVal['prologue']!== ''){
-                this.updateInfo();
-              }
+        if (this.debounceTimer) {
+          clearTimeout(this.debounceTimer);
+        }
+        this.debounceTimer = setTimeout(() => {
+          const props = [
+            "modelParams",
+            "modelConfig",
+            "prologue",
+            "knowledgeBaseIds",
+            "instructions",
+            "recommendQuestion",
+            "onlineSearchConfig",
+            "safetyConfig",
+          ];
+          const changed = props.some((prop) => {
+            return (
+              JSON.stringify(newVal[prop]) !==
+              JSON.stringify((this.initialEditForm || {})[prop])
+            );
+          });
+          if (changed) {
+            if (newVal["modelParams"] !== "" && newVal["prologue"] !== "") {
+              this.updateInfo();
             }
-        },500)
-
+          }
+        }, 500);
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   computed: {
     ...mapGetters("app", ["cacheData"]),
-    ...mapGetters('user', ['commonInfo']),
+    ...mapGetters("user", ["commonInfo"]),
   },
   data() {
     return {
-      showOperation:false,
-      appId:'',
-      scope:'public',
-      showActionConfig:false,
-      rerankOptions:[],
-      initialEditForm:null,
-      editForm:{
-        assistantId:'',
-        avatar:{},
-        name:'',
-        desc:'',
-        rerankParams:'',
-        modelParams:'',
-        prologue:'',//开场白
-        instructions:'',//系统提示词
-        knowledgeBaseIds:[],
-        knowledgeConfig:{
+      showOperation: false,
+      appId: "",
+      scope: "public",
+      showActionConfig: false,
+      rerankOptions: [],
+      initialEditForm: null,
+      editForm: {
+        assistantId: "",
+        avatar: {},
+        name: "",
+        desc: "",
+        rerankParams: "",
+        modelParams: "",
+        prologue: "", //开场白
+        instructions: "", //系统提示词
+        knowledgeBaseIds: [],
+        knowledgeConfig: {
           keywordPriority: 0.8, //关键词权重
           matchType: "mix", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
           priorityMatch: 1, //权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
@@ -407,38 +562,40 @@ export default {
           semanticsPriority: 0.2, //语义权重
           topK: 5, //topK 获取最高的几行
           threshold: 0.4, //过滤分数阈值
-          maxHistory:0//最长上下文
+          maxHistory: 0, //最长上下文
         },
-        recommendQuestion:[{ value: "", hover:false }],
-        actionInfos:[],//action
-        modelConfig:{
-          temperature:0.7,
-          topP:1,
-          frequencyPenalty:0,
-          presencePenalty:0,
-          maxTokens:512, 
-          maxTokensEnable:true,
-          frequencyPenaltyEnable:true,
-          temperatureEnable:true,
-          topPEnable:true,
-          presencePenaltyEnable:true
+        recommendQuestion: [{ value: "", hover: false }],
+        modelConfig: {
+          temperature: 0.7,
+          topP: 1,
+          frequencyPenalty: 0,
+          presencePenalty: 0,
+          maxTokens: 512,
+          maxTokensEnable: true,
+          frequencyPenaltyEnable: true,
+          temperatureEnable: true,
+          topPEnable: true,
+          presencePenaltyEnable: true,
         },
-        onlineSearchConfig:{
-          enable:false,
-          searchKey:'',
-          searchUrl:'',
-          searchRerankId:''
-        },
-        safetyConfig:{
+        onlineSearchConfig: {
           enable: false,
-          tables:[]
-        }
+          searchKey: "",
+          searchUrl: "",
+          searchRerankId: "",
+        },
+        safetyConfig: {
+          enable: false,
+          tables: [],
+        },
       },
-      apiURL:'',
-      hasPluginPermission:false,
-      modelLoading:false,
+      apiURL: "",
+      hasPluginPermission: false,
+      modelLoading: false,
       wfDialogVisible: false,
       workFlowInfos: [],
+      actionInfos: [],
+      mcpInfos: [],
+      allTools: [], //所有的工具
       workflowList: [],
       modelParams: {},
       platform: this.$platform,
@@ -454,8 +611,27 @@ export default {
       logoFileList: [],
       imageUrl: "",
       defaultLogo: require("@/assets/imgs/bg-logo.png"),
-      debounceTimer:null, //防抖计时器
-      isSettingFromDetail: false // 防止详情数据触发更新标记
+      debounceTimer: null, //防抖计时器
+      isSettingFromDetail: false, // 防止详情数据触发更新标记
+      nameMap: {
+        workflow: {
+          displayName: "工作流",
+          propName: "workFlowName",
+        },
+        mcp: {
+          displayName: "MCP工具",
+          propName: "mcpName",
+        },
+        action: {
+          displayName: "自定义工具",
+          propName: "actionName",
+        },
+        // 可以继续添加其他类型
+        default: {
+          displayName: "未知工具",
+          propName: "name", // 默认属性名
+        },
+      },
     };
   },
   mounted() {
@@ -463,13 +639,13 @@ export default {
   },
   created() {
     this.getKnowledgeList();
-    this.getModelData();    //获取模型列表
-     this.getRerankData(); //获取rerank模型
+    this.getModelData(); //获取模型列表
+    this.getRerankData(); //获取rerank模型
     if (this.$route.query.id) {
       this.editForm.assistantId = this.$route.query.id;
       setTimeout(() => {
         this.getAppDetail();
-        this.apiKeyRootUrl() //获取api跟地址
+        this.apiKeyRootUrl(); //获取api跟地址
       }, 500);
     }
     //判断是否发布
@@ -477,28 +653,44 @@ export default {
       this.isPublish = true;
     }
     //判断是否有插件管理的权限
-    const accessCert = localStorage.getItem('access_cert');
-    const permission = accessCert ? JSON.parse(accessCert).user.permission.orgPermission : '';
-    this.hasPluginPermission = permission.indexOf('plugin') !== -1;
+    const accessCert = localStorage.getItem("access_cert");
+    const permission = accessCert
+      ? JSON.parse(accessCert).user.permission.orgPermission
+      : "";
+    this.hasPluginPermission = permission.indexOf("plugin") !== -1;
 
     //自定义插件列表
-    this.getWorkflowList([])
+    // this.getWorkflowList([]);
   },
   beforeDestroy() {
     store.dispatch("app/initState");
   },
   methods: {
-    showKnowledgeSet(){
+    setKnowledgeSet(data){
+      this.editForm.knowledgeConfig = data;
+    },
+    displayName() {
+      return (item) => {
+        if (!item.valid) return `工具已失效`;
+        const config = this.nameMap[item.type] || this.nameMap["default"];
+        return item[config.propName] +''+`(${item[config.displayName]})`;
+      };
+    },
+    updateDetail() {
+      this.getAppDetail();
+    },
+    showKnowledgeSet() {
+      if(!this.editForm.knowledgeBaseIds.length) return;
       this.$refs.knowledgeSetDialog.showDialog(this.editForm.knowledgeConfig);
     },
     //获取模型列表
     getModelData() {
-      selectModelList().then(res => {
+      selectModelList().then((res) => {
         if (res.code === 0) {
-          this.modleOptions = res.data.map(item => {
+          this.modleOptions = res.data.map((item) => {
             return {
               label: item.name,
-              value: item.id
+              value: item.id,
             };
           });
         }
@@ -506,12 +698,12 @@ export default {
     },
     //获取rerank模型
     getRerankData() {
-      getRerankList().then(res => {
+      getRerankList().then((res) => {
         if (res.code === 0) {
-          this.rerankOptions = res.data.map(item => {
+          this.rerankOptions = res.data.map((item) => {
             return {
               label: item.name,
-              value: item.id
+              value: item.id,
             };
           });
         }
@@ -519,110 +711,135 @@ export default {
     },
     //获取知识库列表
     getKnowledgeList() {
-      getKnowledgeList().then(res => {
+      getKnowledgeList().then((res) => {
         if (res.code === 0) {
-          this.knowledgeData = res.data.map(item => {
+          this.knowledgeData = res.data.map((item) => {
             return {
               label: item.name,
-              value: item.id
+              value: item.id,
             };
           });
         }
       });
     },
-    showSafety(){
+    showSafety() {
       this.$refs.setSafety.showDialog(this.editForm.safetyConfig.tables);
     },
-    sendSafety(data){
-      const tablesData = data.map(({ tableId, tableName }) => ({ tableId, tableName }));
+    sendSafety(data) {
+      const tablesData = data.map(({ tableId, tableName }) => ({
+        tableId,
+        tableName,
+      }));
       this.editForm.safetyConfig.tables = tablesData;
     },
-    actionSwitch(id){
-      enableAction({actionId:id}).then(res =>{
-        if(res.code === 0){
+    actionSwitch(id) {
+      enableAction({ actionId: id }).then((res) => {
+        if (res.code === 0) {
           this.getAppDetail();
         }
-      })
+      });
     },
-    workflowSwitch(id){
-      enableWorkFlow({workFlowId:id}).then(res => {
-        if(res.code === 0){
-          this.getAppDetail();
-        }
-      })
-    },
-    showLinkDiglog(){
-      this.$refs.linkDialog.showDialog()
-    },
-    selectTool(val){
-      if(val === 'action'){
-        this.preCreateAction()
-      }else{
-        this.preAddWorkflow()
+    toolSwitch(id,type){
+      if(type === 'workflow'){
+        this.workflowSwitch(id)
+      }else if(type === 'mcp'){
+        this.mcpSwitch(id)
       }
     },
-    addTool(){
-      // this.wfDialogVisible = true
-      this.$refs.toolDiaglog.showDialog();
+    mcpSwitch(mcpId){
+      enableMcp({ mcpId}).then((res) => {
+        if (res.code === 0) {
+          this.getAppDetail();
+        }
+      }).catch(() => {});
     },
-    rerankVisible(val){
-      if(val){
+    workflowSwitch(id) {
+      enableWorkFlow({ workFlowId: id }).then((res) => {
+        if (res.code === 0) {
+          this.getAppDetail();
+        }
+      }).catch(() => {});
+    },
+    showLinkDiglog() {
+      this.$refs.linkDialog.showDialog();
+    },
+    selectTool(val) {
+      if (val === "action") {
+        this.preCreateAction();
+      } else {
+        this.preAddWorkflow();
+      }
+    },
+    addTool() {
+      // this.wfDialogVisible = true
+      const data = {
+        mcpInfos: this.mcpInfos,
+        workFlowInfos: this.workFlowInfos,
+      };
+      this.$refs.toolDiaglog.showDialog(data);
+    },
+    rerankVisible(val) {
+      if (val) {
         this.getRerankData();
       }
     },
-    getRerankData(){
-      getRerankList().then(res =>{
-        if(res.code === 0){
-          this.rerankOptions = res.data.list || []
+    getRerankData() {
+      getRerankList().then((res) => {
+        if (res.code === 0) {
+          this.rerankOptions = res.data.list || [];
         }
-      })
+      });
     },
-    goBack(){
-      this.$router.go(-1)
+    goBack() {
+      this.$router.go(-1);
     },
-    handlePublish(){
+    handlePublish() {
       this.showOperation = !this.showOperation;
     },
-    savePublish(){
-      if(this.editForm.modelParams === ''){
-        this.$message.warning('请选择模型！')
-        return false
+    savePublish() {
+      if (this.editForm.modelParams === "") {
+        this.$message.warning("请选择模型！");
+        return false;
       }
-      if(this.editForm.prologue === ''){
-        this.$message.warning('请输入开场白！')
-        return false
+      if (this.editForm.prologue === "") {
+        this.$message.warning("请输入开场白！");
+        return false;
       }
-      const data = {appId:this.editForm.assistantId,appType:'agent',publishType:this.scope}
-      appPublish(data).then(res =>{
-        if(res.code === 0){
-          this.$router.push({path:'/explore'})
+      const data = {
+        appId: this.editForm.assistantId,
+        appType: "agent",
+        publishType: this.scope,
+      };
+      appPublish(data).then((res) => {
+        if (res.code === 0) {
+          this.$router.push({ path: "/explore" });
         }
-      })
+      });
     },
-    apiKeyRootUrl(){
-      const data = {appId:this.editForm.assistantId,appType:'agent'}
-      getApiKeyRoot(data).then(res =>{
-        if(res.code === 0){
-          this.apiURL = res.data || ''
+    apiKeyRootUrl() {
+      const data = { appId: this.editForm.assistantId, appType: "agent" };
+      getApiKeyRoot(data).then((res) => {
+        if (res.code === 0) {
+          this.apiURL = res.data || "";
         }
-      })
+      });
     },
-    openApiDialog(){
-      this.$refs.apiKeyDialog.showDialog()
+    openApiDialog() {
+      this.$refs.apiKeyDialog.showDialog();
     },
-    setModelSet(data){
+    setModelSet(data) {
       this.editForm.modelConfig = data;
     },
-    setLinkSet(data){
+    setLinkSet(data) {
       this.editForm.onlineSearchConfig.searchKey = data.searchKey;
       this.editForm.onlineSearchConfig.searchUrl = data.searchUrl;
       this.editForm.onlineSearchConfig.searchRerankId = data.searchRerankId;
     },
-    showModelSet(){
-      this.$refs.modelSetDialog.showDialog()
+    showModelSet() {
+      this.$refs.modelSetDialog.showDialog();
     },
-    editAgent(){
-      this.$refs.createIntelligentDialog.openDialog()
+    editAgent() {
+      this.$refs.createIntelligentDialog.openDialog();
     },
     async getWorkFlowDetail(n, index) {
       let params = {
@@ -636,12 +853,25 @@ export default {
     preAddWorkflow() {
       this.wfDialogVisible = true;
     },
-     workflowRemove(val) {
-      this.doDeleteWorkflow(val);
+    toolRemove(id,type){
+      if(type === 'workflow'){
+        this.doDeleteWorkflow(id);
+      }else if(type === 'mcp'){
+        this.mcpRemove(id);
+      }
     },
-    visibleChange(val){//下拉框显示的时候请求模型列表
-      if(val){
-        this.getModelData()
+    mcpRemove(mcpId){
+      deleteMcp({mcpId}).then((res) => {
+        if (res.code === 0) {
+          this.$message.success("删除成功");
+          this.getAppDetail();
+        }
+      }).catch((err) => {});
+    },
+    visibleChange(val) {
+      //下拉框显示的时候请求模型列表
+      if (val) {
+        this.getModelData();
       }
     },
     async getModelData() {
@@ -663,44 +893,58 @@ export default {
       }
     },
     async updateInfo() {
-         //知识库数据
-      const knowledgeMap = new Map(this.knowledgeData.map(item => [item.knowledgeId, item]));
-      const knowledgeData = this.editForm.knowledgeBaseIds.map(id => {
-        const found = knowledgeMap.get(id);
-        return found ? { id: found.knowledgeId, name: found.name } : null;
-      }).filter(Boolean);
+      //知识库数据
+      const knowledgeMap = new Map(
+        this.knowledgeData.map((item) => [item.knowledgeId, item])
+      );
+      const knowledgeData = this.editForm.knowledgeBaseIds
+        .map((id) => {
+          const found = knowledgeMap.get(id);
+          return found ? { id: found.knowledgeId, name: found.name } : null;
+        })
+        .filter(Boolean);
       //模型数据
-      const modeInfo = this.modleOptions.find(item => item.modelId === this.editForm.modelParams)
-      const rerankInfo = this.rerankOptions.find(item => item.modelId === this.editForm.knowledgeConfig.rerankModelId)
-      const recommendQuestion = this.editForm.recommendQuestion.map(item => item.value)
+      const modeInfo = this.modleOptions.find(
+        (item) => item.modelId === this.editForm.modelParams
+      );
+      const rerankInfo = this.rerankOptions.find(
+        (item) => item.modelId === this.editForm.knowledgeConfig.rerankModelId
+      );
+      const recommendQuestion = this.editForm.recommendQuestion.map(
+        (item) => item.value
+      );
       const params = {
-        assistantId:this.editForm.assistantId,
-        prologue:this.editForm.prologue,
-        recommendQuestion:recommendQuestion.length > 0 && recommendQuestion[0] !== '' ? recommendQuestion : [],
-        instructions:this.editForm.instructions,
-        knowledgeBaseConfig:{
-          knowledgebases:!knowledgeData.length ? [] : knowledgeData,
-          config:this.editForm.knowledgeConfig
+        assistantId: this.editForm.assistantId,
+        prologue: this.editForm.prologue,
+        recommendQuestion:
+          recommendQuestion.length > 0 && recommendQuestion[0] !== ""
+            ? recommendQuestion
+            : [],
+        instructions: this.editForm.instructions,
+        knowledgeBaseConfig: {
+          knowledgebases: !knowledgeData.length ? [] : knowledgeData,
+          config: this.editForm.knowledgeConfig,
         },
-        modelConfig:{
-          config:this.editForm.modelConfig,
+        modelConfig: {
+          config: this.editForm.modelConfig,
           displayName: modeInfo.displayName,
           model: modeInfo.model,
           modelId: modeInfo.modelId,
           modelType: modeInfo.modelType,
           provider: modeInfo.provider,
         },
-        onlineSearchConfig:this.editForm.onlineSearchConfig,
-        safetyConfig:this.editForm.safetyConfig,
-        rerankConfig:rerankInfo?{
-          displayName: rerankInfo.displayName,
-          model: rerankInfo.model,
-          modelId: rerankInfo.modelId,
-          modelType: rerankInfo.modelType,
-          provider: rerankInfo.provider,
-        }:{}
-
-      }
+        onlineSearchConfig: this.editForm.onlineSearchConfig,
+        safetyConfig: this.editForm.safetyConfig,
+        rerankConfig: rerankInfo
+          ? {
+              displayName: rerankInfo.displayName,
+              model: rerankInfo.model,
+              modelId: rerankInfo.modelId,
+              modelType: rerankInfo.modelType,
+              provider: rerankInfo.provider,
+            }
+          : {},
+      };
       let res = await putAgentInfo(params);
     },
     startLoading(val) {
@@ -721,102 +965,115 @@ export default {
       if (res.code === 0) {
         this.startLoading(100);
         let data = res.data;
-        // this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;//需要后端修改
-        // this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
+        this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;
+        this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
         const knowledgeData = res.data.knowledgeBaseConfig.knowledgebases;
-        if(knowledgeData && knowledgeData.length > 0){
-          this.editForm.knowledgeBaseIds = knowledgeData.map(item => item.id);
+        if (knowledgeData && knowledgeData.length > 0) {
+          this.editForm.knowledgeBaseIds = knowledgeData.map((item) => item.id);
         }
         this.editForm = {
           ...this.editForm,
           avatar: data.avatar || {},
-          prologue: data.prologue || "",//开场白
+          prologue: data.prologue || "", //开场白
           name: data.name || "",
           desc: data.desc || "",
-          instructions:data.instructions || "",//系统提示词
-          rerankParams:data.rerankConfig.modelId || "",
-          modelConfig:data.modelConfig.config !== null ?data.modelConfig.config : this.editForm.modelConfig,
+          instructions: data.instructions || "", //系统提示词
+          rerankParams: data.rerankConfig.modelId || "",
+          modelConfig:
+            data.modelConfig.config !== null
+              ? data.modelConfig.config
+              : this.editForm.modelConfig,
           modelParams: data.modelConfig.modelId || "",
-          recommendQuestion:data.recommendQuestion && data.recommendQuestion.length >0
-            ? data.recommendQuestion.map((n,index) => {
-                return { 
-                  value: n,
-                  hover:false
-                };
-              })
-            : [],
-          actionInfos: data.actionInfos || [],
-          onlineSearchConfig:data.onlineSearchConfig,
-          safetyConfig:data.safetyConfig !== null ? data.safetyConfig:this.editForm.safetyConfig
+          recommendQuestion:
+            data.recommendQuestion && data.recommendQuestion.length > 0
+              ? data.recommendQuestion.map((n, index) => {
+                  return {
+                    value: n,
+                    hover: false,
+                  };
+                })
+              : [],
+          onlineSearchConfig: data.onlineSearchConfig,
+          safetyConfig:
+            data.safetyConfig !== null
+              ? data.safetyConfig
+              : this.editForm.safetyConfig,
         };
 
         //回显自定义插件
-        this.workFlowInfos = data.workFlowInfos || []
-        this.getWorkflowList(data.workFlowInfos || []);
+        this.workFlowInfos = data.workFlowInfos || [];
+        this.mcpInfos = data.mcpInfos || [];
+        this.actionInfos = data.actionInfos || [];
+        this.allTools = [
+          ...this.workFlowInfos.map((item) => ({ ...item, type: "workflow" })),
+          ...this.mcpInfos.map((item) => ({ ...item, type: "mcp" })),
+          ...this.actionInfos.map((item) => ({ ...item, type: "action" })),
+        ];
+        // this.getWorkflowList(data.workFlowInfos || []);
         this.$nextTick(() => {
           this.isSettingFromDetail = false;
         });
-      }else{
+      } else {
         this.isSettingFromDetail = false;
       }
     },
-    async getWorkflowList(workFlowInfos) {
-      let res = await getExplorationFlowList({name:'',appType:'workflow',searchType:'all'});
-      if (res.code === 0) {
-         this.workflowList = res.data.list || []
-        //对比数据回显已选插件
-        workFlowInfos.forEach((n) => {
-          this.workflowList.forEach((m, j) => {
-            if (n.workFlowId === m.appId) {
-              const updatedItem = {
-                    ...m,         
-                    enable:n.enable,
-                    workFlowId: n.id,
-                    checked: true
-                  };
-              this.$set(this.workflowList, j, updatedItem);
-            }
-          });
-        });
-      }
-    },
-    async doCreateWorkFlow(workFlowId, schema, index) {
-      let params = {
-        assistantId: this.editForm.assistantId,
-        schema: Base64.decode(schema),
-        workFlowId,
-        apiAuth: {
-          type: "none",
-        },
-      };
-      let res = await addWorkFlowInfo(params);
-      if (res.code === 0) {
-        this.$message.success(this.$t('agent.addPluginTips'));
-        this.getAppDetail();
-      }
-    },
-     async doDeleteWorkflow(workFlowId) {
+    // async getWorkflowList(workFlowInfos) {
+    //   let res = await getExplorationFlowList({name:'',appType:'workflow',searchType:'all'});
+    //   if (res.code === 0) {
+    //      this.workflowList = res.data.list || []
+    //     //对比数据回显已选插件
+    //     workFlowInfos.forEach((n) => {
+    //       this.workflowList.forEach((m, j) => {
+    //         if (n.workFlowId === m.appId) {
+    //           const updatedItem = {
+    //                 ...m,
+    //                 enable:n.enable,
+    //                 workFlowId: n.id,
+    //                 checked: true
+    //               };
+    //           this.$set(this.workflowList, j, updatedItem);
+    //         }
+    //       });
+    //     });
+    //   }
+    // },
+    // async doCreateWorkFlow(workFlowId, schema, index) {
+    //   let params = {
+    //     assistantId: this.editForm.assistantId,
+    //     schema: Base64.decode(schema),
+    //     workFlowId,
+    //     apiAuth: {
+    //       type: "none",
+    //     },
+    //   };
+    //   let res = await addWorkFlowInfo(params);
+    //   if (res.code === 0) {
+    //     this.$message.success(this.$t('agent.addPluginTips'));
+    //     this.getAppDetail();
+    //   }
+    // },
+    async doDeleteWorkflow(workFlowId) {
       if (this.editForm.assistantId) {
         let res = await delWorkFlowInfo({
           workFlowId,
           assistantId: this.editForm.assistantId,
         });
         if (res.code === 0) {
-          this.$message.success(this.$t('agent.delPluginTips'));
+          this.$message.success(this.$t("agent.delPluginTips"));
           this.getAppDetail();
         }
       } else {
-        this.$message.error(this.$t('agent.otherTips'));
+        this.$message.error(this.$t("agent.otherTips"));
       }
     },
-    mouseEnter(n){
-      if(n.hover !== undefined){
-        n.hover = true
+    mouseEnter(n) {
+      if (n.hover !== undefined) {
+        n.hover = true;
       }
     },
-    mouseLeave(n){
-      if(n.hover !== undefined){
-        n.hover = false
+    mouseLeave(n) {
+      if (n.hover !== undefined) {
+        n.hover = false;
       }
     },
     //推荐问题
@@ -824,31 +1081,35 @@ export default {
       if (this.editForm.recommendQuestion.length > 3) {
         return;
       }
-      this.editForm.recommendQuestion.push({ value: "",hover:false});
+      this.editForm.recommendQuestion.push({ value: "", hover: false });
     },
     clearRecommend(n, index) {
-      if(this.editForm.recommendQuestion.length === 1) return;
+      if (this.editForm.recommendQuestion.length === 1) return;
       this.editForm.recommendQuestion.splice(index, 1);
     },
-    closeAction(){
-      this.showActionConfig = false
+    closeAction() {
+      this.showActionConfig = false;
     },
     preCreateAction() {
-      this.showActionConfig = true
+      this.showActionConfig = true;
     },
     preUpdateAction(actionId) {
-      this.showActionConfig = true
+      this.showActionConfig = true;
     },
     async preDelAction(actionId) {
-      this.$confirm(this.$t('createApp.delActionTips'),this.$t('knowledgeManage.tip'), {
-        confirmButtonText: this.$t('createApp.save'),
-        cancelButtonText: this.$t('createApp.cancel'),
-        type: "warning",
-      })
+      this.$confirm(
+        this.$t("createApp.delActionTips"),
+        this.$t("knowledgeManage.tip"),
+        {
+          confirmButtonText: this.$t("createApp.save"),
+          cancelButtonText: this.$t("createApp.cancel"),
+          type: "warning",
+        }
+      )
         .then(async () => {
           let res = await delActionInfo({ actionId });
           if (res.code === 0) {
-            this.$message.success(this.$t('createApp.delSuccess'));
+            this.$message.success(this.$t("createApp.delSuccess"));
             this.getAppDetail();
           }
         })
@@ -859,40 +1120,41 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/deep/{
-  .apikeyBtn{
-    border:1px solid #384BF7;
+/deep/ {
+  .apikeyBtn {
+    border: 1px solid #384bf7;
     padding: 12px 10px;
-    color: #384BF7;
-    display:flex;
+    color: #384bf7;
+    display: flex;
     align-items: center;
-    img{
-      height:14px;
+    img {
+      height: 14px;
     }
   }
 }
 //通用添加按钮
-.common-add{
-  color:#595959;
+.common-add {
+  color: #595959;
   cursor: pointer;
-  .handleBtn,.el-icon-plus{
-    font-size: 13px!important;
-    padding:0 2px;
+  .handleBtn,
+  .el-icon-plus {
+    font-size: 13px !important;
+    padding: 0 2px;
   }
-  .set{
-    margin-left:1px;
+  .set {
+    margin-left: 1px;
   }
-  .el-icon-plus{
-    font-weight:bold;
+  .el-icon-plus {
+    font-weight: bold;
   }
 }
-.model-title{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  .label{
+.model-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .label {
     display: flex;
-    align-items:center;
+    align-items: center;
     font-size: 15px;
   }
 }
@@ -910,412 +1172,412 @@ export default {
   color: #ccc;
   margin-left: 6px;
 }
-.form-header{
-  width:100%;
-  height:60px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:0 20px;
-  position:relative;
-  border-bottom:1px solid #dbdbdb;
-  .popover-operation{
-    position:absolute;
-    bottom:-100px;
-    right:20px;
-    background:#fff;
+.form-header {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  position: relative;
+  border-bottom: 1px solid #dbdbdb;
+  .popover-operation {
+    position: absolute;
+    bottom: -100px;
+    right: 20px;
+    background: #fff;
     box-shadow: 0px 1px 7px rgba(0, 0, 0, 0.3);
-    padding:10px 20px;
-    border-radius:6px;
-    z-index:999;
-    .saveBtn{
-      display:flex;
-      justify-content:center;
-      padding:10px 0;
+    padding: 10px 20px;
+    border-radius: 6px;
+    z-index: 999;
+    .saveBtn {
+      display: flex;
+      justify-content: center;
+      padding: 10px 0;
     }
   }
-  .header-left{
-    .btn{
-      margin-right:10px;
-      font-size:18px;
+  .header-left {
+    .btn {
+      margin-right: 10px;
+      font-size: 18px;
       cursor: pointer;
     }
-    .header-left-title{
-      font-size:18px;
-      color: #434C6C;
+    .header-left-title {
+      font-size: 18px;
+      color: #434c6c;
       font-weight: bold;
     }
   }
-  .header-right{
+  .header-right {
     display: flex;
-    align-items:center;
-    .header-api{
+    align-items: center;
+    .header-api {
       padding: 6px 10px;
       box-shadow: 1px 2px 2px #ddd;
       background-color: #fff;
-      margin:0 10px;
-      border-radius:6px;
-      .root-url{
-        background-color:#ECEEFE;
-        color:#384BF7;
-        border:none;
+      margin: 0 10px;
+      border-radius: 6px;
+      .root-url {
+        background-color: #eceefe;
+        color: #384bf7;
+        border: none;
       }
     }
   }
-
 }
-.agent-from-content{
-  height:100%;
-  width:100%;
+.agent-from-content {
+  height: 100%;
+  width: 100%;
   overflow: hidden;
 }
-.agent_form{
-  padding:0 10px;
+.agent_form {
+  padding: 0 10px;
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  height:calc(100% - 60px);
-  .actionConfig{
+  height: calc(100% - 60px);
+  .actionConfig {
     overflow-y: auto;
-    width:40% ;
-    padding:0 40px;
+    width: 40%;
+    padding: 0 40px;
   }
   .drawer-form {
-    width:50%;
+    width: 50%;
     position: relative;
-    height:100%;
-    padding:0 10px;
+    height: 100%;
+    padding: 0 10px;
     border-radius: 6px;
     overflow-y: auto;
-    .editIcon{
+    .editIcon {
       font-size: 16px;
       margin-left: 5px;
       cursor: pointer;
     }
-  /deep/.el-input__inner,
-  /deep/.el-textarea__inner {
-    background-color: transparent !important;
-    border: 1px solid #d3d7dd !important;
-    font-family: "Microsoft YaHei", Arial, sans-serif;
-    padding: 15px;
-  }
-  .flex {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-  }
-  .link-box{
-    background: #F7F8FA;
-    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
-    border-radius:8px;
-    padding:10px 20px;
-  }
-  .common-box{
-    background: #F7F8FA;
-    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
-    border-radius:8px;
-    padding:5px 20px;
-    margin-bottom: 15px;
-    .block{
-      margin-bottom:10px;
+    /deep/.el-input__inner,
+    /deep/.el-textarea__inner {
+      background-color: transparent !important;
+      border: 1px solid #d3d7dd !important;
+      font-family: "Microsoft YaHei", Arial, sans-serif;
+      padding: 15px;
     }
-  }
-  .tool-box{
-    background: #F7F8FA;
-    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
-    border-radius:8px;
-    padding:10px 20px;
-  }
-
-  .agnetSet{
-    background:#F7F8FA;
-    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
-    border-radius:8px;
-    margin-bottom:15px;
-    .block{
-      padding:5px 20px;
-      margin-bottom:0px !important;
-    }
-    .labelTitle{
-      font-size: 18px;
-      font-weight:800;
-      padding:10px 20px;
-    }
-  }
-  /*通用*/
-  .block {
-    margin-bottom: 15px;
-    .basicInfo{
-      display: flex;
-      align-items:center;
-      background:#F7F8FA;
-      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
-      border-radius:8px;
-      padding:10px 0;
-      margin-top:10px;
-      .img{
-        padding:10px;
-        img{
-          border-radius:50%;
-          border:1px solid #eee;
-          width:60px;
-          height:60px;
-          object-fit: cover;
-        }
-        .basicInfo-desc{
-          flex:1;
-        }
-      }
-      .basicInfo-title{
-        display:inline-block;
-        font-weight:800;
-        font-size:18px;
-      }
-    }
-    .tool-title{
-      display:flex;
-      justify-content:space-between;
-      span{font-size: 15px;}
-    }
-    .block-title {
-      line-height: 30px;
-      font-size: 15px;
-      font-weight: bold;
-      display: flex;
-      align-items:center;
-      .title_tips {
-        color: #999;
-        margin-left: 20px;
-        font-weight: normal;
-      }
-      .question-tips{
-        margin-left:5px;
-      }
-    }
-    .block-link{
-      width:300px;
-      border:1px solid #ddd;
-      padding: 6px 10px;
-      border-radius:6px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      .link-text{
-        color:#384BF7;
-        display:flex;
-        align-items:center;
-      }
-      .link-operation{
-        cursor: pointer;
-        margin-right:5px;
-        font-size:16px;
-      }
-    }
-    .tool-conent{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      .tool{
-        width:100%;
-        max-height:300px;
-        .action-list{
-          width:100%;
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 10px;
-        }
-      }
-    }
-    .model-select{
-      width:100%;
-    }
-    .operation{
-      text-align:center;
-      cursor:pointer;
-      font-size: 16px;
-      padding-right:10px;
-    }
-    .operation:hover{
-      color:#384BF7;
-    }
-    .tips {
-      display: flex;
-      align-items: center;
-      margin-bottom: 5px;
-      .block-title-tips {
-        color: #ccc;
-        margin-right: 10px;
-      }
-    }
-    .paramsSet {
-      padding: 10px;
-    }
-    .required-label {
-      width: 18px;
-      height:18px;
-      margin-right: 4px;
-    }
-    .block-tip {
-      color: #919eac;
-    }
-  }
-  .el-input__count {
-    color: #909399;
-    background: #fafafa;
-    position: absolute;
-    font-size: 12px;
-    bottom: 5px;
-    right: 10px;
-  }
-  /*新建应用*/
-  .name-box {
-    height: 90px;
-    line-height: 90px;
-    font-size: 22px;
-    display: flex;
-    .name-input {
+    .flex {
       width: 100%;
+      display: flex;
+      justify-content: space-between;
     }
-    .input-echo {
-      font-size: 22px;
-      .name-edit {
-        margin-left: 20px;
-        cursor: pointer;
-        font-size: 16px;
+    .link-box {
+      background: #f7f8fa;
+      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      padding: 10px 20px;
+    }
+    .common-box {
+      background: #f7f8fa;
+      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      padding: 5px 20px;
+      margin-bottom: 15px;
+      .block {
+        margin-bottom: 10px;
       }
     }
-  }
-  .logo-box {
-    margin-top: 20px;
-    .right-input-box {
-      flex: 1;
-      width: 0;
-      margin-left: 20px;
+    .tool-box {
+      background: #f7f8fa;
+      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      padding: 10px 20px;
     }
-    .instructions-input {
-      margin-top: 10px;
-    }
-  }
-  .logo-upload {
-    width: 120px;
-    height: 120px;
-    margin-top: 3px;
-    /deep/ {
-      .el-upload {
-        width: 100%;
-        height: 100%;
+
+    .agnetSet {
+      background: #f7f8fa;
+      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      margin-bottom: 15px;
+      .block {
+        padding: 5px 20px;
+        margin-bottom: 0px !important;
       }
-      .echo-img {
-        img {
-          object-fit: cover;
-          height: 100%;
+      .labelTitle {
+        font-size: 18px;
+        font-weight: 800;
+        padding: 10px 20px;
+      }
+    }
+    /*通用*/
+    .block {
+      margin-bottom: 15px;
+      .basicInfo {
+        display: flex;
+        align-items: center;
+        background: #f7f8fa;
+        box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
+        padding: 10px 0;
+        margin-top: 10px;
+        .img {
+          padding: 10px;
+          img {
+            border-radius: 50%;
+            border: 1px solid #eee;
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+          }
+          .basicInfo-desc {
+            flex: 1;
+          }
         }
-        .echo-img-tip {
-          position: absolute;
+        .basicInfo-title {
+          display: inline-block;
+          font-weight: 800;
+          font-size: 18px;
+        }
+      }
+      .tool-title {
+        display: flex;
+        justify-content: space-between;
+        span {
+          font-size: 15px;
+        }
+      }
+      .block-title {
+        line-height: 30px;
+        font-size: 15px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        .title_tips {
+          color: #999;
+          margin-left: 20px;
+          font-weight: normal;
+        }
+        .question-tips {
+          margin-left: 5px;
+        }
+      }
+      .block-link {
+        width: 300px;
+        border: 1px solid #ddd;
+        padding: 6px 10px;
+        border-radius: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .link-text {
+          color: #384bf7;
+          display: flex;
+          align-items: center;
+        }
+        .link-operation {
+          cursor: pointer;
+          margin-right: 5px;
+          font-size: 16px;
+        }
+      }
+      .tool-conent {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        .tool {
           width: 100%;
-          bottom: 0;
-          background: #33333396;
-          color: #fff !important;
-          font-size: 12px;
-          line-height: 26px;
-          z-index: 10;
+          max-height: 300px;
+          .action-list {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+          }
         }
       }
-    }
-  }
-  /deep/.desc-input {
-    .el-textarea__inner {
-      height: 90px !important;
-    }
-  }
-  .systemPrompt-tip {
-    background-color: #f1f1f1;
-    border-radius: 6px;
-    line-height: 24px;
-    color: #919eac;
-    margin-top: 10px;
-    padding: 8px 20px;
-  }
-  /*推荐问题*/
-  .recommend-box {
-    .recommend-title{
-      display:flex;
-      justify-content: space-between;
-      span{
-        font-size:15px;
+      .model-select {
+        width: 100%;
       }
-    }
-    .recommend-item {
-      margin-bottom: 12px;
-      display:flex;
-      justify-content: space-between;
-      position:relative;
-      .recommend--input {
-        width:100%;
-      }
-      .recommend-del{
-        position:absolute;
-        right:10px;
-        top:10px;
-        color:#595959;
-        cursor: pointer;
-      }
-      .close--icon {
-        display: inline-block;
-        width: 60px;
-        line-height: 40px;
+      .operation {
         text-align: center;
         cursor: pointer;
-        color: #333;
-        &:hover {
-          font-weight: bold;
+        font-size: 16px;
+        padding-right: 10px;
+      }
+      .operation:hover {
+        color: #384bf7;
+      }
+      .tips {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+        .block-title-tips {
+          color: #ccc;
+          margin-right: 10px;
+        }
+      }
+      .paramsSet {
+        padding: 10px;
+      }
+      .required-label {
+        width: 18px;
+        height: 18px;
+        margin-right: 4px;
+      }
+      .block-tip {
+        color: #919eac;
+      }
+    }
+    .el-input__count {
+      color: #909399;
+      background: #fafafa;
+      position: absolute;
+      font-size: 12px;
+      bottom: 5px;
+      right: 10px;
+    }
+    /*新建应用*/
+    .name-box {
+      height: 90px;
+      line-height: 90px;
+      font-size: 22px;
+      display: flex;
+      .name-input {
+        width: 100%;
+      }
+      .input-echo {
+        font-size: 22px;
+        .name-edit {
+          margin-left: 20px;
+          cursor: pointer;
+          font-size: 16px;
         }
       }
     }
-  }
+    .logo-box {
+      margin-top: 20px;
+      .right-input-box {
+        flex: 1;
+        width: 0;
+        margin-left: 20px;
+      }
+      .instructions-input {
+        margin-top: 10px;
+      }
+    }
+    .logo-upload {
+      width: 120px;
+      height: 120px;
+      margin-top: 3px;
+      /deep/ {
+        .el-upload {
+          width: 100%;
+          height: 100%;
+        }
+        .echo-img {
+          img {
+            object-fit: cover;
+            height: 100%;
+          }
+          .echo-img-tip {
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+            background: #33333396;
+            color: #fff !important;
+            font-size: 12px;
+            line-height: 26px;
+            z-index: 10;
+          }
+        }
+      }
+    }
+    /deep/.desc-input {
+      .el-textarea__inner {
+        height: 90px !important;
+      }
+    }
+    .systemPrompt-tip {
+      background-color: #f1f1f1;
+      border-radius: 6px;
+      line-height: 24px;
+      color: #919eac;
+      margin-top: 10px;
+      padding: 8px 20px;
+    }
+    /*推荐问题*/
+    .recommend-box {
+      .recommend-title {
+        display: flex;
+        justify-content: space-between;
+        span {
+          font-size: 15px;
+        }
+      }
+      .recommend-item {
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        .recommend--input {
+          width: 100%;
+        }
+        .recommend-del {
+          position: absolute;
+          right: 10px;
+          top: 10px;
+          color: #595959;
+          cursor: pointer;
+        }
+        .close--icon {
+          display: inline-block;
+          width: 60px;
+          line-height: 40px;
+          text-align: center;
+          cursor: pointer;
+          color: #333;
+          &:hover {
+            font-weight: bold;
+          }
+        }
+      }
+    }
 
-  /*知识增强*/
-  .knowledge-config-com {
-    margin-top: 10px;
-  }
-
-  /*action*/
-  .api-box {
-    padding-bottom: 60px;
-  }
-
-  /*插件*/
-  .plugin-box {
-    .el-checkbox-group {
+    /*知识增强*/
+    .knowledge-config-com {
       margin-top: 10px;
     }
-    .plugin-checkbox /deep/.el-checkbox__inner.is-checked.el-checkbox__inner {
-      background-color: #409eff;
-      border-color: #409eff;
+
+    /*action*/
+    .api-box {
+      padding-bottom: 60px;
+    }
+
+    /*插件*/
+    .plugin-box {
+      .el-checkbox-group {
+        margin-top: 10px;
+      }
+      .plugin-checkbox /deep/.el-checkbox__inner.is-checked.el-checkbox__inner {
+        background-color: #409eff;
+        border-color: #409eff;
+      }
+    }
+
+    /*footer*/
+    .footer {
+      position: absolute;
+      height: 80px;
+      padding: 20px 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      border-top: 1px solid #d3d7dd;
     }
   }
-
-  /*footer*/
-  .footer {
-    position: absolute;
-    height: 80px;
-    padding: 20px 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    text-align: center;
-    border-top: 1px solid #d3d7dd;
+  .drawer-test {
+    width: 50%;
+    background: #f7f8fa;
+    border-radius: 8px;
+    margin: 10px 0;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
   }
 }
-.drawer-test{
-  width:50%;
-  background:#F7F8FA;
-  border-radius:8px;
-  margin:10px 0;
-  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
-}
-}
-
 
 .loading-progress {
   width: 100%;
@@ -1327,39 +1589,39 @@ export default {
 }
 .action-list {
   margin: 10px 0 15px 0;
-  width:100%;
+  width: 100%;
   .action-item {
     display: flex;
     justify-content: space-between;
-    align-items:center;
+    align-items: center;
     border: 1px solid #ddd;
-    border-radius:6px;
+    border-radius: 6px;
     margin-bottom: 5px;
-    width:100%;
+    width: 100%;
     .name {
-      width:60%;
-      box-sizing:border-box;
+      width: 60%;
+      box-sizing: border-box;
       padding: 10px 20px;
       cursor: pointer;
       color: #2c7eea;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis; 
+      text-overflow: ellipsis;
     }
     .bt {
       text-align: center;
-      width:40%;
-      display:flex;
-      justify-content:flex-end;
-      padding-right:10px;
-      box-sizing:border-box;
+      width: 40%;
+      display: flex;
+      justify-content: flex-end;
+      padding-right: 10px;
+      box-sizing: border-box;
       cursor: pointer;
-      .del{
-        color:#384BF7;
-        font-size:16px;
+      .del {
+        color: #384bf7;
+        font-size: 16px;
       }
-      .bt-switch{
-        margin-right:10px;
+      .bt-switch {
+        margin-right: 10px;
       }
     }
   }

@@ -75,10 +75,10 @@
                     </el-popover>
                   </template>
                 </el-table-column>
-                <!-- <el-table-column
-                  prop="fileSize"
-                  :label="$t('knowledgeManage.fileSize')"
-                ></el-table-column> -->
+                <el-table-column
+                  prop="tagList"
+                  label="标签"
+                ></el-table-column>
                 <el-table-column
                   prop="docType"
                   :label="$t('knowledgeManage.fileStyle')"
