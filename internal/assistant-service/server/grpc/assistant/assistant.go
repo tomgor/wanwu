@@ -62,7 +62,7 @@ func (s *Service) AssistantCreate(ctx context.Context, req *assistant_service.As
 		OrgId:      req.Identity.OrgId,
 	}
 	// 查找否存在相同名称智能体
-	if err := s.cli.CheckSameAssistantName(ctx, req.Identity.UserId, req.Identity.OrgId, req.AssistantBrief.Name); err != nil {
+	if err := s.cli.CheckSameAssistantName(ctx, req.Identity.UserId, req.Identity.OrgId, req.AssistantBrief.Name, ""); err != nil {
 		return nil, errStatus(errs.Code_AssistantErr, err)
 	}
 	// 调用client方法创建智能体
@@ -82,15 +82,16 @@ func (s *Service) AssistantUpdate(ctx context.Context, req *assistant_service.As
 	if err != nil {
 		return nil, err
 	}
-	// 查找否存在相同名称智能体
-	if err := s.cli.CheckSameAssistantName(ctx, req.Identity.UserId, req.Identity.OrgId, req.AssistantBrief.Name); err != nil {
-		return nil, errStatus(errs.Code_AssistantErr, err)
-	}
 
 	// 获取现有智能体信息
 	existingAssistant, status := s.cli.GetAssistant(ctx, uint32(assistantID))
 	if status != nil {
 		return nil, errStatus(errs.Code_AssistantErr, status)
+	}
+
+	// 查找否存在相同名称智能体
+	if err := s.cli.CheckSameAssistantName(ctx, req.Identity.UserId, req.Identity.OrgId, req.AssistantBrief.Name, req.AssistantId); err != nil {
+		return nil, errStatus(errs.Code_AssistantErr, err)
 	}
 
 	existingAssistant.AvatarPath = req.AssistantBrief.AvatarPath
