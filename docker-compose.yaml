@@ -469,6 +469,29 @@ services:
       retries: 99
       start_period: 10s
   
+  operate-service:
+    restart: always
+    image: ${WANWU_BACKEND_IMAGE}
+    container_name: operate-service
+    networks:
+      - ${WANWU_DOCKER_NETWORK}
+    # ports:
+    #   - 9797:9797
+    volumes:
+      - ${WANWU_PROJECT_DIR}/operate-service/log:/app/log
+    environment:
+      DB_NAME: ${WANWU_DB_NAME}
+      DB_MYSQL_ADDRESS: ${WANWU_MYSQL_ADDRESS}
+      DB_MYSQL_PASSWORD: ${WANWU_MYSQL_PASSWORD}
+    working_dir: /app
+    command: ./bin/operate-service
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9797"]
+      interval: 15s
+      timeout: 5s
+      retries: 99
+      start_period: 10s
+  
   app-service:
     depends_on:
       mysql:
@@ -502,7 +525,7 @@ services:
       timeout: 5s
       retries: 99
       start_period: 10s
-  
+
   agentscope:
     depends_on:
       mysql:
