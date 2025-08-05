@@ -6,9 +6,13 @@
       <span class="page-title-name">{{$t('menu.setting')}}</span>
     </div>
     <!-- tabs -->
-    <div class="setting-tabs">
-      <div :class="['setting-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">{{$t('org.title')}}</div>
-      <div :class="['setting-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">{{$t('infoSetting.title')}}</div>
+    <div class="setting-tabs" v-if="checkPerm(settingPerm)">
+      <div :class="['setting-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">
+        {{$t('org.title')}}
+      </div>
+      <div :class="['setting-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">
+        {{$t('infoSetting.title')}}
+      </div>
     </div>
 
     <div v-if="tabActive === 0" style="margin: 0 20px">
@@ -46,6 +50,7 @@ export default {
     return {
       radio: '',
       tabActive: 0,
+      settingPerm: PERMS.SETTING,
       list: [
         {name: '用户', key: 'user', perm: PERMS.PERMISSION_USER},
         {name: '角色', key: 'role', perm: PERMS.PERMISSION_ROLE},

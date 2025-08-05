@@ -45,6 +45,7 @@ export default {
         org: {
             placeholder: '选择组织'
         },
+        noData: '暂无匹配内容'
     },
     common: {
         datePicker: {
@@ -302,24 +303,26 @@ export default {
             upload: '点击上传',
             save: '保存配置',
             labelIcon: '标签页图标',
-            headerColor: '导航栏颜色',
-            loginButtonColor: '"登录"按钮颜色'
+            bgColor: '平台背景色',
+            loginButtonColor: '"登录"按钮颜色',
+            logoWelcome: '登录页欢迎语',
         },
-        titleSet: '标题配置',
-        logoSet: 'LOGO配置',
-        loginBgSet: '登录页背景图配置',
+        tabSet: '标签页配置',
+        platformSet: '平台配置',
+        loginBgSet: '登录页配置',
         hint: {
             labelTitle: '显示在浏览器标签页上的标题',
             color: '颜色',
-            platformTitle: '显示在登录页面用户名和密码左上方的标题、登录后平台界面左上方的标题',
+            platformTitle: '显示“帮助文档”页面上方',
             imgUpload: '点击图标上传，可上传 .png、.jpg、.jpeg文件',
             labelIcon: '显示在浏览器标签页上的图标',
-            logo: '显示在登录页面用户名和密码左上方的LOGO、登录后平台界面左上方的LOGO',
+            logo: '显示在平台左上方的LOGO',
             oneColor: '单色',
             linearColor: '渐变',
-            headerColor: '显示在平台界面上方的填充色',
+            bgColor: '显示在平台主界面的填充色',
             loginBg: '显示在登录页面的背景图',
-            loginButtonColor: '显示在登录框中登录按钮的颜色'
+            loginButtonColor: '显示在登录框中登录按钮的颜色',
+            logoWelcome: '显示在登录页的欢迎语',
         }
     },
     modelAccess: {

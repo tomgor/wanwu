@@ -5,7 +5,7 @@
       <div slot="header">
         <span class="card-title">{{$t('infoSetting.tabSet')}}</span>
       </div>
-      <el-form label-width="120px" :model="tabForm" :rules="titleRules" ref="tabForm">
+      <el-form label-width="120px" :model="tabForm" :rules="tabRules" ref="tabForm">
         <el-form-item :label="$t('infoSetting.form.labelTitle')" prop="tabTitle">
           <el-input v-model="tabForm.tabTitle" style="width: 300px" />
           <div style="font-size: 11px; color: #aaa; margin-top: -9px">
@@ -22,8 +22,8 @@
             :on-error="handleUploadError"
             accept=".png,.jpg,.jpeg"
           >
-            <img v-if="tabLogo" :src="tabLogo" class="avatar">
-            <i v-if="!tabLogo" class="el-icon-plus avatar-uploader-icon"></i>
+            <img v-if="tabForm.tabLogo.path" :src="getLogoPath(tabForm.tabLogo.path)" class="avatar">
+            <i v-if="!tabForm.tabLogo.path" class="el-icon-plus avatar-uploader-icon"></i>
             <span style="margin-left: 12px; color: #aaa !important;">
               {{$t('infoSetting.hint.imgUpload')}}
             </span>
@@ -35,7 +35,7 @@
       </el-form>
       <div class="card-footer">
         <el-button
-          :loading="titleLoading"
+          :loading="tabLoading"
           type="primary"
           @click="handleSubmitTab()"
         >
@@ -59,8 +59,8 @@
             :on-error="handleUploadError"
             accept=".png,.jpg,.jpeg"
           >
-            <img v-if="loginBg" :src="loginBg" class="avatar">
-            <i v-if="!loginBg" class="el-icon-plus avatar-uploader-icon"></i>
+            <img v-if="loginForm.loginBg.path" :src="getLogoPath(loginForm.loginBg.path)" class="avatar">
+            <i v-if="!loginForm.loginBg.path" class="el-icon-plus avatar-uploader-icon"></i>
             <span style="margin-left: 12px; color: #aaa !important;">
               {{$t('infoSetting.hint.imgUpload')}}
             </span>
@@ -84,7 +84,7 @@
       </el-form>
       <div class="card-footer">
         <el-button
-          :loading="backgroundLoading"
+          :loading="loginLoading"
           type="primary"
           @click="handelSubmitLogin()"
         >
@@ -98,13 +98,13 @@
         <span class="card-title">{{$t('infoSetting.platformSet')}}</span>
       </div>
       <el-form label-width="120px" :model="form" :rules="rules" ref="form">
-        <el-form-item :label="$t('infoSetting.form.platformTitle')" prop="platformTitle">
-          <el-input v-model="form.platformTitle" style="width: 300px" />
+        <el-form-item :label="$t('infoSetting.form.platformTitle')" prop="homeName">
+          <el-input v-model="form.homeName" style="width: 300px" />
           <div style="font-size: 11px; color: #aaa; margin-top: -9px">
             {{$t('infoSetting.hint.platformTitle')}}
           </div>
         </el-form-item>
-        <el-form-item :label="$t('infoSetting.form.logo')" prop="platformLogo">
+        <el-form-item :label="$t('infoSetting.form.logo')" prop="homeLogo">
           <el-upload
             class="avatar-uploader"
             action=""
@@ -114,8 +114,8 @@
             :on-error="handleUploadError"
             accept=".png,.jpg,.jpeg"
           >
-            <img v-if="platformLogo" :src="platformLogo" class="avatar">
-            <i v-if="!platformLogo" class="el-icon-plus avatar-uploader-icon"></i>
+            <img v-if="form.homeLogo.path" :src="getLogoPath(form.homeLogo.path)" class="avatar">
+            <i v-if="!form.homeLogo.path" class="el-icon-plus avatar-uploader-icon"></i>
             <span style="margin-left: 12px; color: #aaa !important;">
               {{$t('infoSetting.hint.imgUpload')}}
             </span>
@@ -124,17 +124,17 @@
             </div>
           </el-upload>
         </el-form-item>
-        <el-form-item :label="$t('infoSetting.form.bgColor')" prop="color">
+        <el-form-item :label="$t('infoSetting.form.bgColor')" prop="homeBgColor">
           <el-radio-group v-model="radio">
             <el-radio label="0">{{$t('infoSetting.hint.oneColor')}}</el-radio>
             <el-radio label="1">{{$t('infoSetting.hint.linearColor')}}</el-radio>
           </el-radio-group>
           <div v-if="radio === '0'">
-            <el-color-picker v-model="form.color" show-alpha></el-color-picker>
+            <el-color-picker v-model="form.homeBgColor" show-alpha></el-color-picker>
           </div>
           <div v-if="radio === '1'">
-            <el-input v-model="form.color" style="width: 300px" />
-            <span :style="`display: inline-block; vertical-align: middle; width: 32px; height: 32px; border-radius: 2px; margin-left: 14px; background: ${form.color}`"></span>
+            <el-input v-model="form.homeBgColor" style="width: 300px" />
+            <span :style="`display: inline-block; vertical-align: middle; width: 32px; height: 32px; border-radius: 2px; margin-left: 14px; background: ${form.homeBgColor}`"></span>
           </div>
           <div style="text-align: left; font-size: 11px; color: #aaa; margin-top: -9px">
             {{$t('infoSetting.hint.bgColor')}}
@@ -143,7 +143,7 @@
       </el-form>
       <div class="card-footer">
         <el-button
-          :loading="logoLoading"
+          :loading="homeLoading"
           type="primary"
           @click="handleSubmit()"
         >
@@ -154,8 +154,8 @@
   </div>
 </template>
 <script>
-
 import { setPlatformInfo } from "@/api/setInfo"
+import { uploadAvatar } from "@/api/user"
 import { mapActions, mapGetters } from "vuex"
 
 export default {
@@ -169,40 +169,37 @@ export default {
       }
     }
     return {
-      titleLoading: false,
-      logoLoading: false,
-      backgroundLoading: false,
+      tabLoading: false,
+      homeLoading: false,
+      loginLoading: false,
       tabForm: {
         tabTitle: '',
-        tabLogo: '',
+        tabLogo: {},
       },
-      radio: '0',
       form: {
-        platformTitle: '',
-        platformLogo: '',
-        color: ''
+        homeName: '',
+        homeLogo: {},
+        homeBgColor: ''
       },
       loginForm: {
-        loginBg: '',
+        loginBg: {},
         loginButtonColor: '',
         loginWelcomeText: ''
       },
-      tabLogo: '',
-      platformLogo: '',
-      loginBg: '',
+      radio: '0',
       tabRules: {
         tabTitle: [{required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'}],
-        tabLogo: [{required: true, validator: (...params) => checkImage(this.tabLogo, ...params), trigger: 'change'}],
+        tabLogo: [{required: true, validator: (...params) => checkImage(this.tabForm.tabLogo.path, ...params), trigger: 'change'}],
       },
       rules: {
-        platformTitle: [{required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'}],
-        platformLogo: [{required: true, validator: (...params) => checkImage(this.platformLogo, ...params), trigger: 'change'}],
-        color: [{required: true, message: this.$t('common.select.placeholder'), trigger: 'change'}],
+        homeName: [{required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'}],
+        homeLogo: [{required: true, validator: (...params) => checkImage(this.form.homeLogo.path, ...params), trigger: 'change'}],
+        homeBgColor: [{required: true, message: this.$t('common.select.placeholder'), trigger: 'change'}],
       },
       loginRules: {
-        loginBg: [{required: true, validator: (...params) => checkImage(this.loginBg, ...params), trigger: 'change'}],
+        loginBg: [{required: true, validator: (...params) => checkImage(this.loginForm.loginBg.path, ...params), trigger: 'change'}],
         loginButtonColor: [{required: true, message: this.$t('common.select.placeholder'), trigger: 'change'}],
-        logoWelcomeText: [{required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'}],
+        loginWelcomeText: [{required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'}],
       }
     }
   },
@@ -216,20 +213,17 @@ export default {
         console.log(val, '----------------info')
 
         this.tabForm.tabTitle = tab.title
-        this.tabForm.tabLogo = tab.logoPath
-        this.tabLogo = tab.logoPath ? this.$basePath + '/user/api' + tab.logoPath : ''
-        
-        this.form.platformTitle = home.title
-        this.form.platformLogo = home.logoPath
-        this.platformLogo = home.logoPath ? this.$basePath + '/user/api' + home.logoPath : ''
-        const color = home.navigationColor || 'linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%)'
-        this.radio = color.includes('linear-gradient') ? '1' : '0'
-        this.form.color = color
+        this.tabForm.tabLogo = tab.logo || {}
 
-        this.loginForm.loginBg = login.backgroundPath
-        this.loginBg = login.backgroundPath ? this.$basePath + '/user/api' + login.backgroundPath : ''
+        this.form.homeName = home.title
+        this.form.homeLogo = home.logo || {}
+        const color = home.backgroundColor || 'linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%)'
+        this.radio = color.includes('linear-gradient') ? '1' : '0'
+        this.form.homeBgColor = color
+
+        this.loginForm.loginBg = login.background || {}
         this.loginForm.loginWelcomeText = login.welcomeText || ''
-        this.loginForm.loginButtonColor = login.loginButtonColor || '#d33a3a'
+        this.loginForm.loginButtonColor = login.loginButtonColor || ''
       },
       deep: true
     }
@@ -239,36 +233,43 @@ export default {
   },
   methods: {
     ...mapActions('user', ['getCommonInfo']),
+    getLogoPath(path) {
+      return path ? this.$basePath + '/user/api' + path : ''
+    },
+    uploadAvatar(file) {
+      const formData = new FormData()
+      const config = {headers: { "Content-Type": "multipart/form-data" }}
+      formData.append('avatar', file)
+      return uploadAvatar(formData, config)
+    },
     handleUploadLogo(data) {
       if (data.file) {
-        this.form.platformLogo = data.file
-        this.platformLogo = URL.createObjectURL(data.file)
+        this.uploadAvatar(data.file).then(res => {
+          this.form.homeLogo = res.data || {}
+        })
       }
     },
     handleUploadLoginBg(data) {
       if (data.file) {
-        this.loginForm.loginBg = data.file
-        this.loginBg = URL.createObjectURL(data.file)
+        this.uploadAvatar(data.file).then(res => {
+          this.loginForm.loginBg = res.data || {}
+        })
       }
     },
     handleUploadLabelIcon(data) {
       if (data.file) {
-        this.tabForm.tabLogo = data.file
-        this.tabLogo = URL.createObjectURL(data.file)
+        this.uploadAvatar(data.file).then(res => {
+          this.tabForm.tabLogo = res.data || {}
+        })
       }
     },
     handleUploadError() {
       this.$message.error(this.$t('common.message.uploadError'))
     },
-    async submitData(type, data, isJson) {
+    async submitData(type, data) {
       try {
-        const config = isJson ? {} : {headers: { "Content-Type": "multipart/form-data" }}
-        const formData = new FormData()
-        for (let key in data) {
-          formData.append(key, data[key])
-        }
         this[`${type}Loading`] = true
-        const res = await setPlatformInfo(type, isJson ? data : formData, config)
+        const res = await setPlatformInfo(type, data)
         if (res.code === 0) this.$message.success(this.$t('common.message.success'))
         if (type !== 'login') window.location.reload()
       } finally {
@@ -277,12 +278,12 @@ export default {
     },
     handleSubmitTab() {
       this.$refs.tabForm.validate((valid) => {
-        if (valid) this.submitData('tab', this.tabForm, true)
+        if (valid) this.submitData('tab', this.tabForm)
       })
     },
     handleSubmit() {
       this.$refs.form.validate((valid) => {
-        if (valid) this.submitData('platform', this.form)
+        if (valid) this.submitData('home', this.form)
       })
     },
     handelSubmitLogin() {
