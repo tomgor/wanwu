@@ -4957,6 +4957,11 @@ paths:
       consumes:
       - application/json
       description: 获取自定义MCP列表（用于下拉选择）
+      parameters:
+      - description: mcp名称
+        in: query
+        name: name
+        type: string
       produces:
       - application/json
       responses:

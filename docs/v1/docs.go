@@ -3397,6 +3397,14 @@ const docTemplate = `{
                     "mcp"
                 ],
                 "summary": "获取自定义MCP列表（用于下拉选择）",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mcp名称",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
