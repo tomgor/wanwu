@@ -44,8 +44,7 @@
 {"code":110000,"key":"bff_workflow_apps_list_internal","langs":{"en":"get unauthenticated workflow app list err: %v","zh":"获取无鉴权工作流应用列表错误：%v"}}
 {"code":0,"key":"------ assistant ------","langs":{}}
 {"code":0,"key":"bff_assistant_template_name","langs":{"en":"%v_copy%v","zh":"%v_副本%v"}}
-{"code":110005,"key":"bff_sensitive_check_req","langs":{"en":"question sensitive words detected: %v","zh":"您的提问中检测到敏感词: %v"}}
-{"code":110005,"key":"bff_sensitive_chek_resp","langs":{"en":"sensitive words detected in the answer: %v","zh":"回答中检测到敏感词: %v"}}
+{"code":110005,"key":"bff_sensitive_check_req","langs":{"en":"%v","zh":"%v"}}
 {"code":110005,"key":"bff_sensitive_check_req_default_reply","langs":{"en":"your current request or history contains sensitive content. In accordance with relevant security requirements, this round of dialogue has been terminated. Please clear your history or start a new dialogue","zh":"您当前请求或者历史信息中包含敏感内容，根据相关安全要求，该轮对话终止，请清除历史信息或者重新开启新的对话"}}
 {"code":110005,"key":"bff_sensitive_check_resp_default_reply","langs":{"en":"the response contains sensitive content. In accordance with relevant security requirements, this round of dialogue has been terminated. Please clear the history or start a new dialogue.","zh":"回答中包含敏感内容，根据相关安全要求，该轮对话终止，请清除历史信息或者重新开启新的对话"}}
 {"code":0,"key":"------ custom ------","langs":{}}
