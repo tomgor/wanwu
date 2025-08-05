@@ -291,6 +291,37 @@ export default {
             stopHint: '该组织状态开启中，是否确定停用？'
         },
     },
+    infoSetting: {
+        title: '平台配置',
+        form: {
+            labelTitle: '标签页标题',
+            platformTitle: '平台标题',
+            logo: '平台LOGO',
+            loginBg: '登录页背景图',
+            uploadHint: '请上传',
+            upload: '点击上传',
+            save: '保存配置',
+            labelIcon: '标签页图标',
+            headerColor: '导航栏颜色',
+            loginButtonColor: '"登录"按钮颜色'
+        },
+        titleSet: '标题配置',
+        logoSet: 'LOGO配置',
+        loginBgSet: '登录页背景图配置',
+        hint: {
+            labelTitle: '显示在浏览器标签页上的标题',
+            color: '颜色',
+            platformTitle: '显示在登录页面用户名和密码左上方的标题、登录后平台界面左上方的标题',
+            imgUpload: '点击图标上传，可上传 .png、.jpg、.jpeg文件',
+            labelIcon: '显示在浏览器标签页上的图标',
+            logo: '显示在登录页面用户名和密码左上方的LOGO、登录后平台界面左上方的LOGO',
+            oneColor: '单色',
+            linearColor: '渐变',
+            headerColor: '显示在平台界面上方的填充色',
+            loginBg: '显示在登录页面的背景图',
+            loginButtonColor: '显示在登录框中登录按钮的颜色'
+        }
+    },
     modelAccess: {
         title: '模型管理',
         import: '模型导入',
