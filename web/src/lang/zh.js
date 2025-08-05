@@ -46,6 +46,7 @@ export default {
         org: {
             placeholder: '选择组织'
         },
+        noData: '暂无匹配内容'
     },
     common: {
         fileUpload:{

@@ -37,6 +37,11 @@ const constantRoutes = [
                 meta:{perm: [PERMS.PERMISSION]},
             },
             {
+                path: '/docCenter/pages/:id(.*)*',
+                component:resolve => require(['@/views/docCenter'], resolve),
+                // meta:{perm: [PERMS.DOC_CENTER]}
+            },
+            {
                 path: '/modelAccess',
                 component:resolve =>require(['@/views/modelAccess'],resolve),
                 meta:{perm: [PERMS.MODEL]},
