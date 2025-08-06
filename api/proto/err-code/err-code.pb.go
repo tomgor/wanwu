@@ -7,10 +7,11 @@
 package err_code
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
+
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -140,6 +141,10 @@ const (
 	Code_MCPDeleteCustomMCPErr  Code = 310004 // 删除自定义MCP错误
 	Code_MCPGetCustomMCPListErr Code = 310005 // 获取自定义MCP列表错误
 	Code_MCPGetMCPAvatarErr     Code = 310006 // 获取MCP头像错误
+	// --- operate-service ---
+	// [320000, 329999]
+	Code_OperateGeneral Code = 320000 // 通用错误
+	Code_OperateCustom  Code = 320001 // 自定义配置相关错误
 )
 
 // Enum value maps for Code.
@@ -242,6 +247,8 @@ var (
 		310004: "MCPDeleteCustomMCPErr",
 		310005: "MCPGetCustomMCPListErr",
 		310006: "MCPGetMCPAvatarErr",
+		320000: "OperateGeneral",
+		320001: "OperateCustom",
 	}
 	Code_value = map[string]int32{
 		"OK":                                  0,
@@ -341,6 +348,8 @@ var (
 		"MCPDeleteCustomMCPErr":               310004,
 		"MCPGetCustomMCPListErr":              310005,
 		"MCPGetMCPAvatarErr":                  310006,
+		"OperateGeneral":                      320000,
+		"OperateCustom":                       320001,
 	}
 )
 

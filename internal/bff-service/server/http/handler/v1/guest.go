@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
 	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
@@ -60,7 +61,7 @@ func GetCaptcha(ctx *gin.Context) {
 //	@Success	200			{object}	response.Response{data=response.LogoCustomInfo}
 //	@Router		/base/custom [get]
 func GetLogoCustomInfo(ctx *gin.Context) {
-	resp, err := service.GetLogoCustomInfo(ctx)
+	resp, err := service.GetLogoCustomInfo(ctx, config.Cfg().CustomInfo.DefaultMode)
 	gin_util.Response(ctx, resp, err)
 }
 

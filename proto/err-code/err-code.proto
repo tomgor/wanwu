@@ -132,5 +132,10 @@ enum Code {
   MCPDeleteCustomMCPErr = 310004; // 删除自定义MCP错误
   MCPGetCustomMCPListErr = 310005; // 获取自定义MCP列表错误
   MCPGetMCPAvatarErr = 310006; // 获取MCP头像错误
+
+  // --- operate-service ---
+  // [320000, 329999]
+  OperateGeneral = 320000; // 通用错误
+  OperateCustom = 320001; // 自定义配置相关错误
 }
 
