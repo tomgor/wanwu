@@ -699,7 +699,7 @@ func (x *KnowledgeDetailSelectReq) GetKnowledgeName() string {
 	return ""
 }
 
-// 知识库信息
+//知识库信息
 type KnowledgeInfo struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

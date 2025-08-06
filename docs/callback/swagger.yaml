@@ -628,6 +628,10 @@ definitions:
         type: string
       status:
         type: integer
+      tagList:
+        items:
+          type: string
+        type: array
     required:
     - id
     - status

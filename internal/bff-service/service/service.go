@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	knowledgebase_keywords_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-keywords-service"
+	knowledgebase_splitter_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-splitter-service"
 	knowledgebase_tag_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-tag-service"
 	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 
@@ -35,6 +36,7 @@ var (
 	knowledgeBase         knowledgebase_service.KnowledgeBaseServiceClient
 	knowledgeBaseDoc      knowledgebase_doc_service.KnowledgeBaseDocServiceClient
 	knowledgeBaseTag      knowledgebase_tag_service.KnowledgeBaseTagServiceClient
+	knowledgeBaseSplitter knowledgebase_splitter_service.KnowledgeBaseSplitterServiceClient
 	knowledgeBaseKeywords knowledgebase_keywords_service.KnowledgeBaseKeywordsServiceClient
 	app                   app_service.AppServiceClient
 	rag                   rag_service.RagServiceClient
@@ -84,6 +86,7 @@ func Init() error {
 	knowledgeBaseDoc = knowledgebase_doc_service.NewKnowledgeBaseDocServiceClient(knowledgeBaseConn)
 	knowledgeBaseTag = knowledgebase_tag_service.NewKnowledgeBaseTagServiceClient(knowledgeBaseConn)
 	knowledgeBaseKeywords = knowledgebase_keywords_service.NewKnowledgeBaseKeywordsServiceClient(knowledgeBaseConn)
+	knowledgeBaseSplitter = knowledgebase_splitter_service.NewKnowledgeBaseSplitterServiceClient(knowledgeBaseConn)
 	rag = rag_service.NewRagServiceClient(ragConn)
 	assistant = assistant_service.NewAssistantServiceClient(assistantConn)
 	safety = safety_service.NewSafetyServiceClient(appConn)

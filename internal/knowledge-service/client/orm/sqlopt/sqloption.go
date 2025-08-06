@@ -57,6 +57,12 @@ func WithTagID(id string) SQLOption {
 	})
 }
 
+func WithSplitterID(id string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("splitter_id = ?", id)
+	})
+}
+
 func WithImportID(id string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		return db.Where("import_id = ?", id)
@@ -149,6 +155,15 @@ func LikeName(name string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		if name != "" {
 			return db.Where("name LIKE ?", "%"+name+"%")
+		}
+		return db
+	})
+}
+
+func LikeTag(tag string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if tag != "" {
+			return db.Where("tag LIKE ?", "%"+tag+"%")
 		}
 		return db
 	})

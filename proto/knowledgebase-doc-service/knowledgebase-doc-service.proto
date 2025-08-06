@@ -13,6 +13,8 @@ service KnowledgeBaseDocService {
   rpc ImportDoc(ImportDocReq) returns (google.protobuf.Empty) {}
   // 更新文档状态
   rpc UpdateDocStatus(UpdateDocStatusReq) returns (google.protobuf.Empty) {}
+  // 更新文档标签
+  rpc UpdateDocTag(UpdateDocTagReq) returns (google.protobuf.Empty) {}
   // 初始化文档状态
   rpc InitDocStatus(InitDocStatusReq) returns (google.protobuf.Empty) {}
   // 删除文档
@@ -36,6 +38,7 @@ message GetDocListReq{
   int32 pageNum = 5;
   string userId = 6;
   string orgId = 7;
+  string docTag = 8; //文档标签
 }
 
 message GetDocListResp {
@@ -59,6 +62,14 @@ message ImportDocReq {
 message UpdateDocStatusReq {
   string docId = 1; //文档id
   int32 status = 2;//文档状态
+  repeated string tagList = 3;//文档标签列
+}
+
+message UpdateDocTagReq {
+  string orgId = 1;
+  string userId = 2;
+  string docId = 3; //文档id
+  repeated string tagList = 4;//文档标签列
 }
 
 message InitDocStatusReq {
@@ -129,6 +140,7 @@ message DocInfo{
   string uploadTime = 6;
   int32 status = 7;
   string errorMsg = 8;
+  repeated string tagList = 9;//文档标签列表
 }
 
 message DocSegmentListReq{
