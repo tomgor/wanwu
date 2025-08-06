@@ -41,11 +41,12 @@ export default {
         },
         submit(){
             // 验证模型选择
-            const checkModel = this.configInfo.matchType === 'vector' || 
-                                this.configInfo.matchType === 'text' ||
-                                this.configInfo.priorityMatch !== 1;
+            const { matchType, priorityMatch, rerankModelId } = this.configInfo;
+            const needRerankModel = matchType === 'vector' || 
+                                   matchType === 'text' || 
+                                   (matchType === 'mix' && priorityMatch === 0);
             
-            if (checkModel && !this.configInfo.rerankModelId) {
+            if (needRerankModel && !rerankModelId) {
                 this.$message.error('请选择模型');
                 return;
             }
