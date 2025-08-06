@@ -54,8 +54,9 @@ type DeleteKnowledge struct {
 }
 
 type CallbackUpdateDocStatusReq struct {
-	DocId  string `json:"id" validate:"required"`
-	Status int32  `json:"status" validate:"required"`
+	DocId   string   `json:"id" validate:"required"`
+	Status  int32    `json:"status" validate:"required"`
+	TagList []string `json:"tagList"`
 	CommonCheck
 }
 

@@ -6,6 +6,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/assistant-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/client/orm/sqlopt"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 func (c *Client) CreateAssistant(ctx context.Context, assistant *model.Assistant) *err_code.Status {
@@ -97,12 +98,18 @@ func (c *Client) GetAssistantList(ctx context.Context, userID, orgID string, nam
 	})
 }
 
-func (c *Client) CheckSameAssistantName(ctx context.Context, userID, orgID, name string) *err_code.Status {
+func (c *Client) CheckSameAssistantName(ctx context.Context, userID, orgID, name, assistantID string) *err_code.Status {
 	// 同一组织下不允许重名
 	return c.transaction(ctx, func(tx *gorm.DB) *err_code.Status {
 		query := sqlopt.SQLOptions(
 			sqlopt.WithOrgID(orgID),
 		).Apply(tx.Model(&model.Assistant{}))
+
+		if assistantID != "" {
+			id, _ := strconv.ParseUint(assistantID, 10, 32)
+			query = query.Where("id != ?", uint32(id))
+		}
+
 		if name != "" {
 			query = query.Where("name = ?", name)
 		}

@@ -51,6 +51,8 @@ enum Code {
   KnowledgeDocSplitFailed = 142005; // 文档分片查询失败，请稍后重试
   KnowledgeDocUpdateStatusFailed = 142006; // 更新文档状态失败，请稍后重试
   KnowledgeDocImportUrlFailed = 142007; // 获取上传文档失败，请稍后重试
+  KnowledgeDocUpdateTagFailed = 142008; // 更新文档标签失败，请稍后重试
+  KnowledgeDocUpdateTagStatusFailed = 142009; // 非处理完成文档无法更新标签，请稍后重试
   KnowledgeTagCreateFailed = 143001; // 新建知识库标签失败，请稍后重试
   KnowledgeTagDeleteFailed = 143002; // 删除知识库标签失败，请稍后重试
   KnowledgeTagUpdateFailed = 143003; // 修改知识库标签失败，请稍后重试
@@ -65,6 +67,12 @@ enum Code {
   KnowledgeKeywordsListFailed = 144004; // 查询关键词列表失败，请稍后重试
   KnowledgeKeywordsInfoFailed = 144005; // 查询关键词详情失败，请稍后重试
   KnowledgeKeywordsRepeated = 144006; // 关键词在知识库中已存在，请勿重复添加
+  KnowledgeSplitterCreateFailed = 145001; // 新建知识库分隔符失败，请稍后重试
+  KnowledgeSplitterDeleteFailed = 145002; // 删除知识库分隔符失败，请稍后重试
+  KnowledgeSplitterUpdateFailed = 145003; // 修改知识库分隔符失败，请稍后重试
+  KnowledgeSplitterDuplicateName = 145004; // 已存在同名知识库分隔符
+  KnowledgeSplitterSelectFailed = 145005; // 查询知识库标分隔符表失败，请稍后重试
+  KnowledgeSplitterAccessDenied = 145008; // 没有操作该知识库分隔符的权限
 
   // --- rag-service ---
   // [150000, 159999]
