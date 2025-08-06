@@ -8,6 +8,7 @@
       >
       </i>
       {{$t('knowledgeManage.hitTest')}}
+      <LinkIcon type="knowledge-hit" />
     </div>
     <div class="block wrap-fullheight">
       <div class="test-left test-box">
@@ -78,8 +79,9 @@
 import { hitTest } from "@/api/knowledge";
 import { md } from "@/mixins/marksown-it";
 import searchConfig from '@/components/searchConfig.vue';
+import LinkIcon from "@/components/linkIcon.vue";
 export default {
-  components:{searchConfig},
+  components:{LinkIcon, searchConfig},
   data() {
     return {
       md: md,

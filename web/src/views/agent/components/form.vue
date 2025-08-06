@@ -7,6 +7,7 @@
           @click="goBack"
         ></span>
         <span class="header-left-title">智能体编辑</span>
+        <LinkIcon type="agent" />
       </div>
       <div class="header-right">
         <div class="header-api">
@@ -482,8 +483,10 @@ import {
 } from "@/api/workflow";
 import { Base64 } from "js-base64";
 import Chat from "./chat";
+import LinkIcon from "@/components/linkIcon.vue";
 export default {
   components: {
+    LinkIcon,
     Chat,
     CreateIntelligent,
     ModelSet,

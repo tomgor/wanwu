@@ -87,7 +87,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose">{{$t('common.button.cancel')}}</el-button>
-        <el-button type="primary" @click="handleSubmit">{{$t('common.button.confirm')}}</el-button>
+        <el-button :loading="loading" type="primary" @click="handleSubmit">{{$t('common.button.confirm')}}</el-button>
       </span>
     </el-dialog>
   </div>
@@ -157,6 +157,7 @@ export default {
       row: {},
       provider: {},
       isEdit: false,
+      loading: false
     }
   },
   methods: {
@@ -218,13 +219,18 @@ export default {
           delete form.endpointUrl
           delete form.functionCalling
 
-          const res = this.isEdit
-            ? await editModel({...form, modelId: this.row.modelId})
-            : await addModel(form)
-          if (res.code === 0) {
-            this.$message.success(this.$t('common.message.success'))
-            this.handleClose()
-            this.$emit('reloadData')
+          try {
+            this.loading = true
+            const res = this.isEdit
+              ? await editModel({...form, modelId: this.row.modelId})
+              : await addModel(form)
+            if (res.code === 0) {
+              this.$message.success(this.$t('common.message.success'))
+              this.handleClose()
+              this.$emit('reloadData', !this.isEdit)
+            }
+          } finally {
+            this.loading = false
           }
         }
       })
