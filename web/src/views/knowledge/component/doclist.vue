@@ -88,15 +88,12 @@
                           :content="tag" 
                           placement="top"
                         >
-                          <span class="doc_tag">
-                            <i class="doc_tag_mark">#</i>
-                            <span class="doc_tag_name">{{tag.length > 8 ?tag.slice(0, 8) + '...':tag}}</span>
-                          </span>
+                          <el-tag class="doc_tag" type="info">{{tag.length > 8 ?tag.slice(0, 8) + '...':tag}}</el-tag>
                         </el-tooltip>
                       </template>
-                      <span v-if="scope.row.tagList.length > 3" >
-                        +{{scope.row.tagList.length - 3}}
-                      </span>
+                      <template v-if="scope.row.tagList.length > 3" >
+                        <el-tag class="doc_tag" type="info">+{{scope.row.tagList.length - 3}}</el-tag>
+                      </template>
                     </template>
                     <span v-else>-</span>
                     <span class="el-icon-edit-outline edit-icon" @click="showTag(scope.row)"></span>
@@ -434,10 +431,7 @@ export default {
   margin-left: 5px;
 }
 .doc_tag{
-  padding:0 2px;
-  .doc_tag_mark{
-    color:#ccc;
-  }
+  margin:0 2px;
 }
 /deep/ {
   .el-button.is-disabled,

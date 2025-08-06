@@ -33,6 +33,7 @@
           <el-input
             v-model="item.tagName"
             v-if="item.showIpt"
+            maxlength="50"
             @keydown.backspace.native="handleDelete(item,index)" 
             @keyup.enter.native="inputBlur(item)"
             @blur="inputBlur(item)"
