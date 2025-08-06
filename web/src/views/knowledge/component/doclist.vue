@@ -107,7 +107,6 @@
                           {{tag}}
                         </el-tag>
                       </template>
-                      <!-- 如果标签超过3个，显示更多标签 -->
                       <el-tooltip 
                         v-if="scope.row.tagList.length > 3" 
                         :content="scope.row.tagList.slice(3).join(', ')" 
@@ -123,7 +122,7 @@
                       </el-tooltip>
                     </template>
                     <span v-else>-</span>
-                    <span class="el-icon-edit-outline edit-icon"></span>
+                    <span class="el-icon-edit-outline edit-icon" @click="showTag(scope.row)"></span>
                   </template>
                 </el-table-column>
                 <el-table-column
@@ -194,7 +193,7 @@
         </el-main>
       </el-container>
     </div>
-    <tagDialog ref="tagDialog" @relodaData="relodaData"/>
+    <tagDialog ref="tagDialog" @relodaData="relodaData" type="doc" :tagList="tagList"/>
   </div>
 </template>
 
@@ -212,7 +211,7 @@ export default {
       tableLoading:false,
       docQuery: {
         docName:'',
-        tagName:'',
+        docTag:'',
         knowledgeId:this.$route.params.id,
         status: -1
       },
@@ -225,7 +224,8 @@ export default {
       knowledgeData: [],
       currentKnowValue:null,
       timer:null,
-      refreshCount:0
+      refreshCount:0,
+      tagList:[]
     };
   },
   watch:{
@@ -245,6 +245,14 @@ export default {
     this.clearTimer()
   },
   methods: {
+    relodaData(){
+      this.getTableData(this.docQuery)
+    },
+    showTag(row){
+      if(row.status !== 1) return;
+      this.tagList = row.tagList;
+      this.$refs.tagDialog.showDiaglog(row.docId);
+    },
     startTimer(){
       this.clearTimer();
       if (this.refreshCount >= 2) {
@@ -274,7 +282,7 @@ export default {
       this.getTableData(this.docQuery)
     },
     handleTagSearch(val){
-      this.docQuery.tagName = val;
+      this.docQuery.docTag = val;
       this.getTableData(this.docQuery)
     },
     getKnowOptions(){

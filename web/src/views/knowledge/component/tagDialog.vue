@@ -7,6 +7,7 @@
   >
     <div>
       <el-input
+        v-if="type === 'knowledge'"
         placeholder="搜索标签"
         suffix-icon="el-icon-search"
         @keyup.enter.native="addByEnterKey"
@@ -26,18 +27,20 @@
         >
           <el-checkbox
             v-model="item.selected"
-            v-if="!item.showIpt"
+            v-if="!item.showIpt && type === 'knowledge'"
           >{{item.tagName}}</el-checkbox>
+          <span v-if="!item.showIpt && type === 'doc'">{{item.tagName}}</span>
           <el-input
             v-model="item.tagName"
             v-if="item.showIpt"
             @keydown.backspace.native="handleDelete(item,index)" 
             @keyup.enter.native="inputBlur(item)"
+            @blur="inputBlur(item)"
           ></el-input>
           <span
             class="el-icon-close del-icon"
             v-if="item.showDel && !item.showIpt"
-            @click="delTag(item)"
+            @click="type=== 'doc' ? delDocTag(index) : delTag(item,index)"
           ></span>
         </div>
       </div>
@@ -54,21 +57,54 @@
   </el-dialog>
 </template>
 <script>
-import { delTag, tagList, createTag, editTag, bindTag,bindTagCount} from "@/api/knowledge";
+import { delTag, tagList, createTag, editTag, bindTag,bindTagCount,updateDocTag} from "@/api/knowledge";
 export default {
+  props:['type','tagList'],
   data() {
     return {
       dialogVisible: false,
       tagList: [],
       tagName: "",
       knowledgeId: "",
+      docId:""
     };
+  },
+  watch:{
+    tagList:{
+      handler(val){
+        if(val && val.length){
+          this.tagList = val.map(item =>({
+            ...item,
+            tagName:item,
+            checked: false,
+            showDel: false,
+            showIpt: true,
+          }))
+        }
+      },
+      deep:true,
+      immediate:true
+    }
   },
   methods: {
     submitDialog() {
-      const ids = this.tagList
-        .filter((item) => item.selected)
-        .map((item) => item.tagId);
+      if(this.type === 'doc'){
+        this.updateTag()
+      }else{
+        this.bindTag()
+      }
+    },
+    updateTag(){
+      const docTagList = this.tagList.map((item) => item.tagName)
+      updateDocTag({docId:this.docId,docTagList}).then(res =>{
+        if(res === 0){
+          this.dialogVisible = false;
+          this.$emit("relodaData");
+        }
+      })
+    },
+    bindTag(){
+      const ids = this.tagList.filter((item) => item.selected).map((item) => item.tagId);
       bindTag({ knowledgeId: this.knowledgeId, tagIdList: ids }).then((res) => {
         if (res.code === 0) {
           this.$emit("relodaData");
@@ -115,17 +151,21 @@ export default {
         .then(async() => {
           const res = await delTag({ tagId: item.tagId })
             if (res.code === 0) {
-              this.getList();
+                this.getList();
             }
         })
         .catch((error) => {
-          this.getList();
+            this.getList();
         });
     },
     showDiaglog(id) {
-      this.knowledgeId = id;
       this.dialogVisible = true;
-      this.getList();
+      if (this.type === 'doc') {
+        this.docId = id;
+      } else {
+        this.knowledgeId = id;
+        this.getList();
+      }
     },
     handleClose() {
       this.dialogVisible = false;
@@ -140,8 +180,10 @@ export default {
       n.showIpt = true;
     },
     inputBlur(n) {
-      if(!n.tagName){
-        return
+      if(!n.tagName) return;
+      if(this.type === 'doc') {
+        n.showIpt = false;
+        return;
       }
       if (n.tagId) {
         this.edit_tag(n);
@@ -153,6 +195,9 @@ export default {
       if(n.tagName === '' && !n.tagId){
           this.tagList.splice(i,1)
       }
+    },
+    delDocTag(i){
+      this.tagList.splice(i,1)
     },
     add_Tag(n) {
       createTag({ tagName: n.tagName }).then((res) => {
@@ -182,6 +227,10 @@ export default {
     },
     addByEnterKey(e) {
       if (e.keyCode === 13) {
+        // 当type为doc时，不应该调用getList方法
+        if (this.type === 'doc') {
+          return;
+        }
         this.getList();
       }
     },
