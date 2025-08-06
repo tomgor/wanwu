@@ -12,7 +12,7 @@
             :placeholder="$t('modelAccess.table.publisher')"
             class="modelAccess-select no-border-select"
             clearable
-            @change="searchData"
+            @change="searchData()"
           >
             <el-option v-for="item in providerList" :key="item.key" :label="item.name" :value="item.key" />
           </el-select>
@@ -24,7 +24,7 @@
               style="width: 240px; margin-right: 10px"
               :placeholder="$t('modelAccess.table.modelName')"
               @keyup.enter.native="searchName"
-              @clear="searchData"
+              @clear="searchData()"
               clearable
             />
             <el-button class="add-bt" size="mini" type="primary" @click="preInsert">
@@ -148,10 +148,12 @@
           this.loading = false
         }
       },
-      reloadData() {
-        this.getTableData()
-      },
-      searchData() {
+      searchData(isCreate) {
+        console.log(isCreate, '----------------------')
+        if (isCreate) {
+          this.params.provider = ''
+          this.params.displayName = ''
+        }
         this.getTableData({...this.params})
       },
       searchName(e) {
