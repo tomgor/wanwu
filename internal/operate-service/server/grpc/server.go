@@ -9,8 +9,10 @@ import (
 
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 
+	operate_service "github.com/UnicomAI/wanwu/api/proto/operate-service"
 	"github.com/UnicomAI/wanwu/internal/operate-service/client"
 	"github.com/UnicomAI/wanwu/internal/operate-service/config"
+	"github.com/UnicomAI/wanwu/internal/operate-service/server/grpc/operate"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -22,11 +24,14 @@ import (
 type Server struct {
 	cfg  *config.Config
 	serv *grpc.Server
+
+	operate *operate.Service
 }
 
 func NewServer(cfg *config.Config, cli client.IClient) (*Server, error) {
 	s := &Server{
-		cfg: cfg,
+		operate: operate.NewService(cli),
+		cfg:     cfg,
 	}
 	return s, nil
 }
@@ -55,6 +60,7 @@ func (s *Server) Start(ctx context.Context) error {
 	healthpb.RegisterHealthServer(s.serv, healthcheck)
 
 	// register service
+	operate_service.RegisterOperateServiceServer(s.serv, s.operate)
 
 	// listen
 	lis, err := net.Listen("tcp", s.cfg.Server.GrpcEndpoint)
