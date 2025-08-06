@@ -669,12 +669,10 @@ export default {
     setKnowledgeSet(data){
       this.editForm.knowledgeConfig = data;
     },
-    displayName() {
-      return (item) => {
-        if (!item.valid) return `工具已失效`;
-        const config = this.nameMap[item.type] || this.nameMap["default"];
-        return item[config.propName] +''+`(${item[config.displayName]})`;
-      };
+    displayName(item) {
+      if (!item.valid) return `工具已失效`;
+      const config = this.nameMap[item.type] || this.nameMap["default"];
+      return item[config.propName] + ' ' + `(${item[config.displayName]})`;
     },
     updateDetail() {
       this.getAppDetail();

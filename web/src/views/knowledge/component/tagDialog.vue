@@ -28,7 +28,6 @@
             v-model="item.selected"
             v-if="!item.showIpt"
           >{{item.tagName}}</el-checkbox>
-          <!-- @blur="inputBlur(item)" -->
           <el-input
             v-model="item.tagName"
             v-if="item.showIpt"

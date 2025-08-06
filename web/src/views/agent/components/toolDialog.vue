@@ -22,7 +22,7 @@
                     class="toolContent_item"
                     >
                     <span>{{ item.apiName || item.name }}</span>
-                    <el-checkbox v-model="item.checked" @change="openTool($event,item,type)" :disabled="item.enabled"></el-checkbox>
+                    <el-checkbox v-model="item.checked" @change="openTool($event,item,type)" :disabled="item.checked"></el-checkbox>
                     </div>
                 </template>
             </div>
