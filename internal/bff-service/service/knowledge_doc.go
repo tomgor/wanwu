@@ -208,6 +208,10 @@ func AnalysisDocUrl(ctx *gin.Context, userId, orgId string, r *request.AnalysisU
 func buildDocRespList(ctx *gin.Context, dataList []*knowledgebase_doc_service.DocInfo) []*response.ListDocResp {
 	var retList []*response.ListDocResp
 	for _, data := range dataList {
+		var tagList = make([]string, 0)
+		if len(data.TagList) > 0 {
+			tagList = data.TagList
+		}
 		retList = append(retList, &response.ListDocResp{
 			DocId:      data.DocId,
 			DocName:    data.DocName,
@@ -216,7 +220,7 @@ func buildDocRespList(ctx *gin.Context, dataList []*knowledgebase_doc_service.Do
 			Status:     int(data.Status),
 			ErrorMsg:   gin_util.I18nKey(ctx, data.ErrorMsg),
 			FileSize:   util.ToFileSizeStr(data.DocSize),
-			TagList:    data.TagList,
+			TagList:    tagList,
 		})
 	}
 	return retList
