@@ -28,8 +28,8 @@ const (
 )
 
 func (s *Service) GetDocList(ctx context.Context, req *knowledgebase_doc_service.GetDocListReq) (*knowledgebase_doc_service.GetDocListResp, error) {
-	list, total, err := orm.GetDocList(ctx, req.UserId, req.OrgId,
-		req.KnowledgeId, req.DocName, util.BuildDocReqStatusList(int(req.Status)), req.PageSize, req.PageNum)
+	list, total, err := orm.GetDocList(ctx, req.UserId, req.OrgId, req.KnowledgeId,
+		req.DocName, req.DocTag, util.BuildDocReqStatusList(int(req.Status)), req.PageSize, req.PageNum)
 	if err != nil {
 		log.Errorf(fmt.Sprintf("获取知识库列表失败(%v)  参数(%v)", err, req))
 		return nil, util.ErrCode(errs.Code_KnowledgeBaseSelectFailed)
@@ -52,10 +52,43 @@ func (s *Service) ImportDoc(ctx context.Context, req *knowledgebase_doc_service.
 }
 
 func (s *Service) UpdateDocStatus(ctx context.Context, req *knowledgebase_doc_service.UpdateDocStatusReq) (*emptypb.Empty, error) {
-	err := orm.UpdateDocStatusDocId(ctx, req.DocId, int(req.Status))
+	err := orm.UpdateDocStatusDocId(ctx, req.DocId, int(req.Status), buildTagStr(req.TagList))
 	if err != nil {
 		log.Errorf(fmt.Sprintf("update doc fail %v", err), req.DocId)
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateStatusFailed)
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *Service) UpdateDocTag(ctx context.Context, req *knowledgebase_doc_service.UpdateDocTagReq) (*emptypb.Empty, error) {
+	//1.查询文档详情
+	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf(fmt.Sprintf("没有操作该知识库文档的权限 参数(%v)", req))
+		return nil, err
+	}
+	doc := docList[0]
+	//2.状态校验
+	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
+		log.Errorf(fmt.Sprintf("非处理完成文档无法增加标签 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req))
+		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateTagFailed)
+	}
+	//3.查询知识库信息
+	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf(fmt.Sprintf("没有操作该知识库的权限 参数(%v)", req))
+		return nil, err
+	}
+	//4.更新标签
+	err = orm.UpdateDocStatusDocTag(ctx, req.DocId, buildTagStr(req.TagList), &service.RagDocTagParams{
+		FileName:      doc.Name,
+		KnowledgeBase: knowledge.Name,
+		TagList:       req.TagList,
+		UserId:        req.UserId,
+	})
+	if err != nil {
+		log.Errorf(fmt.Sprintf("update doc tag fail %v", err), req.DocId)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateTagStatusFailed)
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -238,6 +271,7 @@ func buildDocListResp(list []*model.KnowledgeDoc, total int64, pageSize int32, p
 				UploadTime:  util2.Time2Str(item.CreatedAt),
 				Status:      int32(util.BuildDocRespStatus(item.Status)),
 				ErrorMsg:    item.ErrorMsg,
+				TagList:     buildTagArray(item.Tag),
 			})
 		}
 	}
@@ -317,6 +351,20 @@ func buildSegmentListResp(importTask *model.KnowledgeImportTask, doc *model.Know
 		ContentList:     buildContentList(segmentListResp.List, pageNo, pageSize),
 	}
 	return resp, nil
+}
+
+func buildTagStr(tagList []string) string {
+	if len(tagList) == 0 {
+		return ""
+	}
+	return strings.Join(tagList, ",")
+}
+
+func buildTagArray(tag string) []string {
+	if len(tag) == 0 {
+		return make([]string, 0)
+	}
+	return strings.Split(tag, ",")
 }
 
 func buildSplitter(splitterList []string) string {

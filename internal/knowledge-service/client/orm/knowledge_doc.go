@@ -18,10 +18,12 @@ import (
 )
 
 // GetDocList 查询知识库文件列表
-func GetDocList(ctx context.Context, userId, orgId, knowledgeId, name string, statusList []int, pageSize int32, pageNum int32) ([]*model.KnowledgeDoc, int64, error) {
+func GetDocList(ctx context.Context, userId, orgId, knowledgeId, name, tag string,
+	statusList []int, pageSize int32, pageNum int32) ([]*model.KnowledgeDoc, int64, error) {
 	tx := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId),
 		sqlopt.WithKnowledgeID(knowledgeId),
 		sqlopt.LikeName(name),
+		sqlopt.LikeTag(tag),
 		sqlopt.WithStatusList(statusList),
 		sqlopt.WithDelete(0)).
 		Apply(db.GetHandle(ctx), &model.KnowledgeDoc{})
@@ -216,12 +218,27 @@ func CreateKnowledgeUrlDoc(ctx context.Context, doc *model.KnowledgeDoc, importT
 }
 
 // UpdateDocStatusDocId 更新文档状态
-func UpdateDocStatusDocId(ctx context.Context, docId string, status int) error {
+func UpdateDocStatusDocId(ctx context.Context, docId string, status int, tag string) error {
 	var updateParams = map[string]interface{}{
 		"status":    status,
 		"error_msg": util.BuildDocErrMessage(status),
+		"tag":       tag,
 	}
 	return db.GetHandle(ctx).Model(&model.KnowledgeDoc{}).Where("doc_id = ?", docId).Updates(updateParams).Error
+}
+
+// UpdateDocStatusDocTag 更新文档tag
+func UpdateDocStatusDocTag(ctx context.Context, docId string, tag string, ragDocTagParams *service.RagDocTagParams) error {
+	return db.GetHandle(ctx).Transaction(func(tx *gorm.DB) error {
+		var updateParams = map[string]interface{}{
+			"tag": tag,
+		}
+		err := tx.Model(&model.KnowledgeDoc{}).Where("doc_id = ?", docId).Updates(updateParams).Error
+		if err != nil {
+			return err
+		}
+		return service.RagDocTag(ctx, ragDocTagParams)
+	})
 }
 
 // InitDocStatus 初始化文档状态

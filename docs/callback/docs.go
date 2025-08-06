@@ -1274,6 +1274,12 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "integer"
+                },
+                "tagList": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

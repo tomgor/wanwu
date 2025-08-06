@@ -20,7 +20,7 @@ import (
 // GetKnowledgeKeywordsList 返回关键词列表
 func (s *Service) GetKnowledgeKeywordsList(ctx context.Context, req *knowledgebase_keywords_service.GetKnowledgeKeywordsListReq) (*knowledgebase_keywords_service.GetKnowledgeKeywordsListResp, error) {
 	// 查询关键词列表
-	keywordsList, total, err := orm.GetKeywordsList(ctx, req, false)
+	keywordsList, total, err := orm.GetKeywordsList(ctx, req)
 	if err != nil {
 		log.Errorf(fmt.Sprintf("GetKnowledgeKeywordsList 失败(%v)  参数(%v)", err, req))
 		return nil, util.ErrCode(errs.Code_KnowledgeKeywordsListFailed)
@@ -140,7 +140,7 @@ func buildKeywordsModel(req *knowledgebase_keywords_service.CreateKnowledgeKeywo
 // CreateKnowledgeKeywords 新增关键词
 func (s *Service) CreateKnowledgeKeywords(ctx context.Context, req *knowledgebase_keywords_service.CreateKnowledgeKeywordsReq) (*emptypb.Empty, error) {
 	// 检查有无同名关键词
-	err := CheckRepeatedKeywords(ctx, req)
+	err := orm.CheckRepeatedKeywords(ctx, req)
 	if errors.Is(err, gorm.ErrDuplicatedKey) {
 		return nil, util.ErrCode(errs.Code_KnowledgeKeywordsRepeated)
 	} else if err != nil {
@@ -160,36 +160,6 @@ func (s *Service) CreateKnowledgeKeywords(ctx context.Context, req *knowledgebas
 	return nil, nil
 }
 
-func CheckRepeatedKeywords(ctx context.Context, req *knowledgebase_keywords_service.CreateKnowledgeKeywordsReq) error {
-	// 查找同名关键词列表
-	keywordsList, total, err := orm.GetKeywordsList(ctx, &knowledgebase_keywords_service.GetKnowledgeKeywordsListReq{
-		PageSize: 100000,
-		PageNum:  1,
-		Name:     req.Name,
-		Identity: &knowledgebase_keywords_service.Identity{
-			UserId: req.Identity.UserId,
-			OrgId:  req.Identity.OrgId,
-		},
-	}, true)
-	if err != nil {
-		return err
-	}
-	// 已有关键词，检查同名知识库
-	if total != 0 {
-		for _, kw := range keywordsList {
-			dbKnowledgeIds, err := orm.JsonToList(kw.KnowledgeBaseIds)
-			if err != nil {
-				return err
-			}
-			if util.HasDuplicate(dbKnowledgeIds, req.KnowledgeBaseIds) {
-				log.Errorf("有同名关键词")
-				return gorm.ErrDuplicatedKey
-			}
-		}
-	}
-	return nil
-}
-
 // DeleteKnowledgeKeywords 删除关键词
 func (s *Service) DeleteKnowledgeKeywords(ctx context.Context, req *knowledgebase_keywords_service.DeleteKnowledgeKeywordsReq) (*emptypb.Empty, error) {
 	err := orm.DeleteKeywords(ctx, req.Id)
@@ -202,7 +172,7 @@ func (s *Service) DeleteKnowledgeKeywords(ctx context.Context, req *knowledgebas
 // UpdateKnowledgeKeywords 更新关键词
 func (s *Service) UpdateKnowledgeKeywords(ctx context.Context, req *knowledgebase_keywords_service.UpdateKnowledgeKeywordsReq) (*emptypb.Empty, error) {
 	// 检查有无同名关键词
-	err := CheckRepeatedKeywords(ctx, req.Detail)
+	err := orm.CheckRepeatedKeywords(ctx, req.Detail)
 	if errors.Is(err, gorm.ErrDuplicatedKey) {
 		return nil, util.ErrCode(errs.Code_KnowledgeKeywordsRepeated)
 	} else if err != nil {

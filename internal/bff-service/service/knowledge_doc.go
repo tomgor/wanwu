@@ -29,6 +29,7 @@ func GetDocList(ctx *gin.Context, userId, orgId string, r *request.DocListReq) (
 		PageNum:     int32(r.PageNo),
 		UserId:      userId,
 		OrgId:       orgId,
+		DocTag:      r.DocTag,
 	})
 	if err != nil {
 		return nil, err
@@ -95,6 +96,17 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 		return err
 	}
 	return nil
+}
+
+// UpdateDocTag 更新文档标签
+func UpdateDocTag(ctx *gin.Context, userId, orgId string, r *request.DocTagReq) error {
+	_, err := knowledgeBaseDoc.UpdateDocTag(ctx.Request.Context(), &knowledgebase_doc_service.UpdateDocTagReq{
+		UserId:  userId,
+		OrgId:   orgId,
+		DocId:   r.DocId,
+		TagList: r.DocTagList,
+	})
+	return err
 }
 
 func UpdateDocStatus(ctx *gin.Context, r *request.CallbackUpdateDocStatusReq) error {
@@ -204,6 +216,7 @@ func buildDocRespList(ctx *gin.Context, dataList []*knowledgebase_doc_service.Do
 			Status:     int(data.Status),
 			ErrorMsg:   gin_util.I18nKey(ctx, data.ErrorMsg),
 			FileSize:   util.ToFileSizeStr(data.DocSize),
+			TagList:    data.TagList,
 		})
 	}
 	return retList
