@@ -325,3 +325,10 @@ export const ocrSelectList = ()=>{
         method: 'get',
     })
 };
+export const updateDocTag = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/doc/tag`,
+        method: 'post',
+        data
+    })
+};

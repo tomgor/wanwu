@@ -30,6 +30,7 @@
                   />
                 </el-select>
                 <search-input class="cover-input-icon" :placeholder="$t('knowledgeManage.docPlaceholder')" ref="searchInput" @handleSearch="handleSearch" />
+                <search-input class="cover-input-icon" placeholder="按照文件标签搜索" ref="searchInput" @handleSearch="handleTagSearch" />
               </div>
 
               <div class="content_title">
@@ -62,7 +63,7 @@
                 <el-table-column
                   prop="docName"
                   :label="$t('knowledgeManage.fileName')"
-                  min-width="350"
+                  min-width="200"
                 >
                   <template slot-scope="scope">
                     <el-popover
@@ -77,8 +78,53 @@
                 </el-table-column>
                 <el-table-column
                   prop="tagList"
-                  label="标签"
-                ></el-table-column>
+                  label="文件标签"
+                >
+                <template slot-scope="scope">
+                    <template v-if="scope.row.tagList && scope.row.tagList.length > 0">
+                      <template v-for="(tag, index) in scope.row.tagList.slice(0, 3)">
+                        <el-tooltip 
+                          :key="tag+'TAG'"
+                          :content="tag.length > 8 ? tag : ''" 
+                          placement="top"
+                          v-if="tag.length > 8"
+                        >
+                          <el-tag 
+                            type="info" 
+                            size="mini"
+                            style="margin-right: 4px; margin-bottom: 4px;"
+                          >
+                            {{tag.slice(0, 8) + '...'}}
+                          </el-tag>
+                        </el-tooltip>
+                        <el-tag 
+                          v-else
+                          :key="tag+'TAG2'"
+                          type="info" 
+                          size="mini"
+                          style="margin-right: 4px; margin-bottom: 4px;"
+                        >
+                          {{tag}}
+                        </el-tag>
+                      </template>
+                      <el-tooltip 
+                        v-if="scope.row.tagList.length > 3" 
+                        :content="scope.row.tagList.slice(3).join(', ')" 
+                        placement="top"
+                      >
+                        <el-tag 
+                          type="info" 
+                          size="mini"
+                          style="margin-right: 4px; margin-bottom: 4px; cursor: pointer;"
+                        >
+                          +{{scope.row.tagList.length - 3}}
+                        </el-tag>
+                      </el-tooltip>
+                    </template>
+                    <span v-else>-</span>
+                    <span class="el-icon-edit-outline edit-icon" @click="showTag(scope.row)"></span>
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="docType"
                   :label="$t('knowledgeManage.fileStyle')"
@@ -147,15 +193,17 @@
         </el-main>
       </el-container>
     </div>
+    <tagDialog ref="tagDialog" @relodaData="relodaData" type="doc" :tagList="tagList"/>
   </div>
 </template>
 
 <script>
+import tagDialog from './tagDialog.vue';
 import Pagination from "@/components/pagination.vue";
 import SearchInput from "@/components/searchInput.vue";
 import {getDocList,delDocItem,uploadFileTips} from "@/api/knowledge";
 export default {
-  components: { Pagination,SearchInput},
+  components: { Pagination,SearchInput,tagDialog},
   data() {
     return {
       knowledgeName:this.$route.query.name || '',
@@ -163,6 +211,7 @@ export default {
       tableLoading:false,
       docQuery: {
         docName:'',
+        docTag:'',
         knowledgeId:this.$route.params.id,
         status: -1
       },
@@ -175,7 +224,8 @@ export default {
       knowledgeData: [],
       currentKnowValue:null,
       timer:null,
-      refreshCount:0
+      refreshCount:0,
+      tagList:[]
     };
   },
   watch:{
@@ -195,6 +245,14 @@ export default {
     this.clearTimer()
   },
   methods: {
+    relodaData(){
+      this.getTableData(this.docQuery)
+    },
+    showTag(row){
+      if(row.status !== 1) return;
+      this.tagList = row.tagList;
+      this.$refs.tagDialog.showDiaglog(row.docId);
+    },
     startTimer(){
       this.clearTimer();
       if (this.refreshCount >= 2) {
@@ -221,6 +279,10 @@ export default {
     },
     handleSearch(val){
       this.docQuery.docName = val;
+      this.getTableData(this.docQuery)
+    },
+    handleTagSearch(val){
+      this.docQuery.docTag = val;
       this.getTableData(this.docQuery)
     },
     getKnowOptions(){
@@ -388,6 +450,12 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.edit-icon{
+  color: #384BF7;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 5px;
+}
 /deep/ {
   .el-button.is-disabled,
   .el-button--info.is-disabled {
