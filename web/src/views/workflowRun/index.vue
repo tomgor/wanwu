@@ -209,14 +209,14 @@ export default {
   h2{
     font-weight:400;
   }
-  .iten-item{
+  /*.iten-item{
     line-height:30px;
     background:#ffffff;
     margin-top:10px;
     padding-left:15px;
     border-radius:3px;
     height: 30px;
-  }
+  }*/
   .params-type {
     .params-type-span {
       margin-left: 10px;
