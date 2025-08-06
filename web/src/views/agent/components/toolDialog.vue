@@ -17,15 +17,12 @@
                 <template v-for="(items, type) in contentMap">
                     <div 
                     v-if="activeValue === type"
-                    v-for="item in items"
+                    v-for="(item,i) in items"
                     :key="item[type + 'Id'] || item.id"
                     class="toolContent_item"
                     >
                     <span>{{ item.apiName || item.name }}</span>
-                    <el-switch
-                        v-model="item.enabled"
-                        active-color="#384BF7"
-                    />
+                    <el-checkbox v-model="item.checked" @change="openTool($event,item,type)" :disabled="item.enabled"></el-checkbox>
                     </div>
                 </template>
             </div>
@@ -37,31 +34,25 @@
 </template>
 <script>
 import { getList } from '@/api/workflow.js';
-import { getExplorationFlowList} from "@/api/workflow";
+import { addWorkFlowInfo, addMcp } from "@/api/agent";
+import { getExplorationFlowList,readWorkFlow} from "@/api/workflow";
+import { Base64 } from "js-base64";
 export default {
+    props:['assistantId'],
     data(){
         return {
             toolName:'',
             dialogVisible:false,
             toolIndex:0,
-            activeValue:'auto',
-            actionInfos:[
-                {
-                 actionId: "167a540d-de19-45c1-967e-42da882c300d",
-                 apiName: "api.seniverse.com"
-                },
-                {
-                 actionId: "167a540d-de19-45c1-967e-42da882c3045",
-                 apiName: "ssde.seniverse.com"
-                }
-            ],
+            activeValue:'mcp',
+            actionInfos:[],
             workFlowInfos:[],
             mcpInfos:[],
             toolList:[
-                {
-                    value:'auto',
-                    name:'自定义'
-                },
+                // {
+                //     value:'auto',
+                //     name:'自定义'
+                // },
                 {
                     value:'mcp',
                     name:'MCP'
@@ -83,25 +74,69 @@ export default {
         }
     },
     created(){
-        this.getMcpSelect();
+        this.getMcpSelect('');
         this.getWorkflowList('');
     },
     methods:{
+        openTool(e,item,type){
+            if(!e) return;
+            item.checked = !item.checked
+            if(type === 'workflow'){
+                this.addWorkFlow(item)
+            }else if(type === 'mcp'){
+                this.addMcpItem(item)
+            }
+        },
+        addMcpItem(n){
+            addMcp({assistantId:this.assistantId,mcpId:n.mcpId}).then(res =>{
+                if(res.code === 0){
+                    n.checked = true;
+                    this.$message.success('工具添加成功');
+                    this.$emit('updateDetail');
+                }
+            }).catch(() =>{
+
+            })
+        },
+        addWorkFlow(n){
+            let params = { workflowID: n.appId};
+            readWorkFlow(params).then(res => {
+                if(res.code === 0){
+                    this.doCreateWorkFlow(n,n.appId, res.data.base64OpenAPISchema);
+                }
+            })
+        },
+        async doCreateWorkFlow(n,workFlowId, schema){
+            let params = {
+                assistantId: this.editForm.assistantId,
+                schema: Base64.decode(schema),
+                workFlowId,
+                apiAuth: {
+                type: "none",
+                },
+            };
+            let res = await addWorkFlowInfo(params);
+            if (res.code === 0) {
+                n.checked = true;
+                this.$message.success(this.$t('agent.addPluginTips'));
+                this.$emit('updateDetail');
+            }
+        },
         searchTool(){
-            console.log(this.toolName)
             if(this.activeValue === 'auto'){
                 console.log('自定义')
             }else if(this.activeValue === 'mcp'){
-                console.log('mcp')
+                this.getMcpSelect(this.toolName)
             }else{
-                console.log(this.toolName)
                 this.getWorkflowList(this.toolName)
             }
         },
-        getMcpSelect(){
-            getList().then(res => {
+        getMcpSelect(name){
+            getList({name}).then(res => {
                 if(res.code === 0){
-                     this.mcpInfos = res.data.list || [];
+                     this.mcpInfos = (res.data.list || []).map(item => 
+                        Object.assign({}, item, { checked: false })
+                    );
                 }
                
             }).catch(err => {
@@ -111,12 +146,28 @@ export default {
             getWorkflowList(name) {
                 getExplorationFlowList({name,appType:'workflow',searchType:'all'}).then(res =>{
                     if (res.code === 0) {
-                        this.workFlowInfos = res.data.list || []
+                        this.workFlowInfos = (res.data.list || []).map(item => 
+                            Object.assign({}, item, { checked: false })
+                        );
                     }
                 })
         },
-        showDialog(){
+        showDialog(row){
             this.dialogVisible = true;
+            this.setMcp(row.mcpInfos);
+            this.setWorkflow(row.workFlowInfos);
+        },
+        setMcp(data){
+           this.mcpInfos = this.mcpInfos.map(m => ({
+            ...m,
+            checked: data.includes(m.mcpId)
+            }));
+        },
+        setWorkflow(data){
+            this.workFlowInfos = this.workFlowInfos.map(m => ({
+            ...m,
+            checked: data.includes(m.appId)
+            }));
         },
         handleClose(){
             this.toolIndex = -1;

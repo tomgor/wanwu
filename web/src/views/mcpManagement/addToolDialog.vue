@@ -1,5 +1,10 @@
 <template>
-    <div class="action">
+   <el-dialog
+    title="提示"
+    :visible.sync="dialogVisible"
+    width="30%"
+    :before-close="handleClose">
+        <div class="action">
         <el-row>
             <el-col :span="24" class="left-col">
                 <div class="left-col-header rl">
@@ -12,7 +17,7 @@
                         <div class="rl" @click="preAuthorize">
                             <!--<el-input class="name-input" v-model="basicForm.apiKey" @blur="listenerUpdate" @focus="apiKeyOnFocus" maxlength="10" placeholder="" ></el-input>-->
                             <div class="api-key">{{basicForm.apiKey}}</div>
-                            <img class="auth-icon" src="./auth.png" />
+                            <img class="auth-icon" src="@/assets/imgs/auth.png" />
                         </div>
                     </div>
 
@@ -62,7 +67,6 @@
                     </div>
                 </div>
             </el-col>
-
         </el-row>
 
         <!--认证弹窗-->
@@ -100,30 +104,30 @@
                         </el-form-item>
                     </div>
                 </el-form>
-
             </div>
-
             <span slot="footer" class="dialog-footer">
                 <el-button @click="beforeAuthFormClose">取 消</el-button>
                 <el-button type="primary" @click="listenerApiKey">确 定</el-button>
             </span>
         </el-dialog>
-
     </div>
+    <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+    </span>
+    </el-dialog> 
 </template>
-
 <script>
-    import { batchUpload,createApp,getAppDetail,updateApp } from '@/api/chat'
-    import { addAction,updateAction,deleteAction,getActionDetail } from '@/api/cubm'
     import { addActionInfo,editActionInfo,getActionInfo } from "@/api/agent";
-    import {schemaConfig} from './schema.conf'
+    import {schemaConfig} from '@/utils/schema.conf';
 
     export default {
         props:['assistantId'],
         data(){
             return{
+                dialogVisible:false,
                 actionId:'',
-                apiList:[],//{name: "getWeatherNow", method: "GET", path: "/weather/now.json"}
+                apiList:[],
                 basicForm:{
                     example:'',
                     apiKey:'None',
@@ -147,6 +151,9 @@
             }
         },
         methods:{
+            showDiglog(){
+                this.dialogVisible = true;
+            },
             setActionData(data){
                 this.initData()
                 switch (data.type){

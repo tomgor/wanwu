@@ -40,6 +40,16 @@ export default {
             this.dialogVisible = false;
         },
         submit(){
+            // 验证模型选择
+            const checkModel = this.configInfo.matchType === 'vector' || 
+                                this.configInfo.matchType === 'text' ||
+                                this.configInfo.priorityMatch !== 1;
+            
+            if (checkModel && !this.configInfo.rerankModelId) {
+                this.$message.error('请选择模型');
+                return;
+            }
+
             this.dialogVisible = false;
             this.$emit('setKnowledgeSet',this.configInfo)
         }
