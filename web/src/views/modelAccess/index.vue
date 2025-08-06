@@ -105,7 +105,7 @@
         <el-empty class="noData" v-if="!(tableData && tableData.length)" :description="$t('common.noData')"></el-empty>
       </div>
       <CreateSelectDialog ref="createSelectDialog" @showCreate="showCreate" />
-      <CreateDialog ref="createDialog" @reloadData="reloadData" />
+      <CreateDialog ref="createDialog" @reloadData="searchData" />
     </div>
   </div>
 </template>
