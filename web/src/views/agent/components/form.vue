@@ -965,7 +965,7 @@ export default {
       if (res.code === 0) {
         this.startLoading(100);
         let data = res.data;
-        this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;
+        this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config.matchType === '' ? this.editForm.knowledgeConfig : res.data.knowledgeBaseConfig.config;
         this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
         const knowledgeData = res.data.knowledgeBaseConfig.knowledgebases;
         if (knowledgeData && knowledgeData.length > 0) {
