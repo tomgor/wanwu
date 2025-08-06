@@ -2,19 +2,21 @@
   <div class="node-config" v-if="visible">
     <div class="node-box">
       <div class="config-header">
-        <i class="el-icon-close close-icon" @click="preClose"></i>
-        <img class="header-icon" :src="node.store.data.icon" />
-        <span v-if="!editStatus" class="header-name">{{ nodeData.name }}</span>
-        <el-input
-          v-else
-          id="edit_name"
-          class="edit-input"
-          size="mini"
-          v-on:blur="onBlur"
-          v-model="nodeData.name"
-        ></el-input>
-
-        <i class="el-icon-edit edit-icon" @click="preEditName"></i>
+        <div style="display: flex; align-items: center">
+          <i class="el-icon-close close-icon" @click="preClose"></i>
+          <img class="header-icon" :src="node.store.data.icon" />
+          <span v-if="!editStatus" class="header-name">{{ nodeData.name }}</span>
+          <el-input
+            v-else
+            id="edit_name"
+            class="edit-input"
+            size="mini"
+            v-on:blur="onBlur"
+            v-model="nodeData.name"
+          ></el-input>
+          <LinkIcon :type="'workflow-' + nodeData.type" />
+          <i class="el-icon-edit edit-icon" @click="preEditName"></i>
+        </div>
         <p class="desc">{{ nodeDescConfig[nodeData.type] }}</p>
       </div>
 
@@ -161,13 +163,13 @@ import FileparseSetting from "./fileparse/index.vue";
 import McpSetting from "./mcp/setting.vue";
 import IntentionSetting from "./intention/index.vue";
 import TransformSetting from "./templateTransform/TransformSetting.vue";
-
+import LinkIcon from "@/components/linkIcon.vue";
 import { nodeDescConfig } from "../mock/nodeConfig";
-
 import {getModels} from "@/api/workflow";
 
 export default {
   components: {
+    LinkIcon,
     StartSetting,
     CodeSetting,
     ApiSetting,

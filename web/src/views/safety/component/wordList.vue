@@ -8,6 +8,7 @@
       >
       </i>
       安全护栏
+      <LinkIcon type="safety" />
     </div>
     <div class="block table-wrap list-common wrap-fullheight">
       <el-container class="konw_container">
@@ -83,8 +84,9 @@ import createWord from './createWord.vue';
 import setReply from './setReply.vue';
 import { SafetyType } from "@/utils/commonSet";
 import {getSensitiveWord,delSensitiveWord} from "@/api/safety";
+import LinkIcon from "@/components/linkIcon.vue";
 export default {
-  components:{createWord,setReply,Pagination},
+  components:{LinkIcon, createWord,setReply,Pagination},
   data() {
     return {
       safetyType:SafetyType,

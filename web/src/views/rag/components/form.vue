@@ -4,6 +4,7 @@
       <div class="header-left">
         <span class="el-icon-arrow-left btn" @click="goBack"></span>
         <span class="header-left-title">文本问答编辑</span>
+        <LinkIcon type="rag" />
       </div>
       <div class="header-right">
         <div class="header-api">
@@ -153,8 +154,10 @@ import { getRerankList,selectModelList } from "@/api/modelAccess";
 import { getRagInfo,updateRagConfig } from "@/api/rag";
 import Chat from "./chat";
 import searchConfig from '@/components/searchConfig.vue';
+import LinkIcon from "@/components/linkIcon.vue";
 export default {
   components: {
+    LinkIcon,
     Chat,
     CreateTxtQues,
     ModelSet,

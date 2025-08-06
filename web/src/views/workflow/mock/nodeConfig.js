@@ -973,7 +973,7 @@ export const nodeDescConfig = {
     'StartNode':'工作流运行的起点。定义此工作流所需的输入参数。自定义的参数，会在工作流被应用调用时，由思考模型根据参数描述从用户输入的原始内容中抽取并传入。',
     'EndNode':'工作流的最终节点，输出工作流运行后的最终结果。',
     'EndStreamingNode': '工作流的最终节点，输出工作流运行后的最终结果。',
-    'APINode':'配置外部 API 服务，并调用该服务。',
+    'ApiNode':'配置外部 API 服务，并调用该服务。',
     'PythonNode':'编写代码，处理输入输出变量来生成返回值。',
     'TemplateTransformNode': '使用 Jinja2 模版语法将数据转换为字符串',
     'LLMNode':'调用大语言模型，根据输入参数和提示词生成回复。',

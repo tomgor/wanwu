@@ -3,8 +3,9 @@
     <div class="mcp-content">
       <div class="card-search card-search-cust">
         <div>
-          <p class="card-search-des">
-            集合各MCP server，即选即用。可支持在插件编排工具中使用。如使用自定义MCP，请在自定义TAB中进行添加和查看&nbsp;
+          <p class="card-search-des" style="display: flex; align-items: center">
+            <span>集合各MCP server，即选即用。可支持在插件编排工具中使用。如使用自定义MCP，请在自定义TAB中进行添加和查看</span>
+            <LinkIcon type="mcp" />
           </p>
           <!--<div class="radio-box" >
             <el-radio-group v-model="source" @input="radioChange" size="mini">
@@ -72,8 +73,9 @@
 import addDialog from "./addDialog.vue";
 import SearchInput from "@/components/searchInput.vue"
 import { getList, setDelete } from "@/api/mcp";
+import LinkIcon from "@/components/linkIcon.vue"
 export default {
-  components: { SearchInput, addDialog },
+  components: { LinkIcon, SearchInput, addDialog },
   data() {
     return {
       basePath: this.$basePath,
