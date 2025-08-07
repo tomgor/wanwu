@@ -2,11 +2,12 @@ package orm
 
 import (
 	"context"
+	"strconv"
+
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/client/orm/sqlopt"
 	"gorm.io/gorm"
-	"strconv"
 )
 
 func (c *Client) CreateAssistant(ctx context.Context, assistant *model.Assistant) *err_code.Status {

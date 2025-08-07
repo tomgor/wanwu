@@ -1,10 +1,10 @@
 package mp_yuanjing
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/url"
 
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
+	"github.com/gin-gonic/gin"
 )
 
 type Ocr struct {

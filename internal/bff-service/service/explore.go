@@ -2,10 +2,11 @@ package service
 
 import (
 	"errors"
-	"gorm.io/gorm"
 	"sort"
 	"strconv"
 	"strings"
+
+	"gorm.io/gorm"
 
 	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"

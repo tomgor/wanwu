@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	mp_huoshan "github.com/UnicomAI/wanwu/pkg/model-provider/mp-huoshan"
@@ -12,6 +11,7 @@ import (
 	mp_openai_compatible "github.com/UnicomAI/wanwu/pkg/model-provider/mp-openai-compatible"
 	mp_qwen "github.com/UnicomAI/wanwu/pkg/model-provider/mp-qwen"
 	mp_yuanjing "github.com/UnicomAI/wanwu/pkg/model-provider/mp-yuanjing"
+	"github.com/gin-gonic/gin"
 )
 
 type ILLM interface {
@@ -122,6 +122,7 @@ type ProviderModelByYuanjing struct {
 	Llm       mp_yuanjing.LLM       `json:"llm"`
 	Rerank    mp_yuanjing.Rerank    `json:"rerank"`
 	Embedding mp_yuanjing.Embedding `json:"embedding"`
+	Ocr       mp_yuanjing.Ocr       `json:"ocr"`
 }
 
 type ProviderModelByHuoshan struct {

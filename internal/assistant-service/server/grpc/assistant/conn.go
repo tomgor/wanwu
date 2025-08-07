@@ -2,9 +2,9 @@ package assistant
 
 import (
 	"fmt"
-	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
 
 	knowledgeBase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
+	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/config"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"google.golang.org/grpc"

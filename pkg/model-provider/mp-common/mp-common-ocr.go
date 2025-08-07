@@ -4,12 +4,13 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
+	"mime/multipart"
+
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
-	"io"
-	"mime/multipart"
 )
 
 // --- openapi request ---
@@ -149,7 +150,6 @@ func Ocr(ctx *gin.Context, provider, apiKey, url string, req *OcrReq, headers ..
 		return nil, fmt.Errorf("request %v %v ocr http status %v msg: %v", url, provider, resp.StatusCode(), resp.String())
 	}
 	b, err := io.ReadAll(resp.RawResponse.Body)
-	log.Infof("Raw response: %s", string(b))
 	if err != nil {
 		return nil, fmt.Errorf("request %v %v ocr read response body err: %v", url, provider, err)
 	}

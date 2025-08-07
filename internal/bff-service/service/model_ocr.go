@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"net/http"
+
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
@@ -9,7 +11,6 @@ import (
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func ModelOcr(ctx *gin.Context, modelID string, req *mp_common.OcrReq) {
