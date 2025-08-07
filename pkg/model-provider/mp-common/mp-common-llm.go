@@ -162,13 +162,13 @@ func (req *LLMReq) Check() error { return nil }
 // --- openapi response ---
 
 type LLMResp struct {
-	ID                string             `json:"id"`           // 唯一标识
-	Object            string             `json:"object"`       // 固定为 "chat.completion"
-	Created           int                `json:"created"`      // 时间戳（秒）
-	Model             string             `json:"model"`        // 使用的模型
-	Choices           []OpenAIRespChoice `json:"choices"`      // 生成结果列表
-	Usage             OpenAIRespUsage    `json:"usage"`        // token 使用统计
-	ServiceTier       *string            `json:"service_tier"` // （火山）指定是否使用TPM保障包。生效对象为购买了保障包推理接入点
+	ID                string             `json:"id"`                               // 唯一标识
+	Object            string             `json:"object"`                           // 固定为 "chat.completion"
+	Created           int                `json:"created"`                          // 时间戳（秒）
+	Model             string             `json:"model" validate:"required"`        // 使用的模型
+	Choices           []OpenAIRespChoice `json:"choices" validate:"required,dive"` // 生成结果列表
+	Usage             OpenAIRespUsage    `json:"usage"`                            // token 使用统计
+	ServiceTier       *string            `json:"service_tier"`                     // （火山）指定是否使用TPM保障包。生效对象为购买了保障包推理接入点
 	SystemFingerprint *string            `json:"system_fingerprint"`
 }
 
@@ -300,6 +300,11 @@ func (resp *llmResp) ConvertResp() (*LLMResp, bool) {
 	ret := &LLMResp{}
 	if err := json.Unmarshal([]byte(raw), ret); err != nil {
 		log.Errorf("llm stream resp (%v) convert to openai resp err: %v", raw, err)
+		return nil, false
+	}
+
+	if err := util.Validate(ret); err != nil {
+		log.Errorf("llm resp validate err: %v", err)
 		return nil, false
 	}
 	return ret, true

@@ -3,6 +3,7 @@ package mp_yuanjing
 import (
 	"context"
 	"encoding/json"
+	"github.com/UnicomAI/wanwu/pkg/util"
 	"net/url"
 
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -41,8 +42,8 @@ type rerankResp struct {
 	raw string
 
 	Index    int     `json:"index"`
-	Score    float64 `json:"score"`
-	Document string  `json:"document"`
+	Score    float64 `json:"score" validate:"required" `
+	Document string  `json:"document" validate:"required"`
 }
 
 func (resp *rerankResp) String() string {
@@ -76,6 +77,12 @@ func (resp *rerankResp) ConvertResp() (*mp_common.RerankResp, bool) {
 			log.Errorf("yuanjing rerank resp (%v) item (%v) unmarshal err: %v", resp.raw, item, err)
 			return nil, false
 		}
+
+		if err := util.Validate(resp); err != nil {
+			log.Errorf("yuanjing rerank resp validate err: %v", err)
+			return nil, false
+		}
+
 		results = append(results, mp_common.Result{
 			Index:          resp.Index,
 			RelevanceScore: resp.Score,

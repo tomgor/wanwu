@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/UnicomAI/wanwu/pkg/util"
 	"io"
 
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -43,8 +44,8 @@ func (req *RerankReq) Data() (map[string]interface{}, error) {
 // --- openapi response ---
 
 type RerankResp struct {
-	Results   []Result `json:"results"`
-	Model     string   `json:"model"`
+	Results   []Result `json:"results" validate:"required,dive"`
+	Model     string   `json:"model" validate:"required"`
 	Object    *string  `json:"object,omitempty"`
 	Usage     Usage    `json:"usage"`
 	RequestId *string  `json:"request_id,omitempty"`
@@ -53,7 +54,7 @@ type RerankResp struct {
 type Result struct {
 	Index          int       `json:"index"`
 	Document       *Document `json:"document,omitempty"`
-	RelevanceScore float64   `json:"relevance_score"`
+	RelevanceScore float64   `json:"relevance_score" validate:"required"`
 }
 
 type Document struct {
@@ -121,6 +122,11 @@ func (resp *rerankResp) ConvertResp() (*RerankResp, bool) {
 		log.Errorf("rerank resp (%v) convert to data err: %v", resp.raw, err)
 		return nil, false
 	}
+
+	if err := util.Validate(ret); err != nil {
+		log.Errorf("rerank resp validate err: %v", err)
+		return nil, false
+	}
 	return ret, true
 }
 
@@ -136,7 +142,7 @@ func Rerank(ctx context.Context, provider, apiKey, url string, req map[string]in
 
 	request := resty.New().
 		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}). // 关闭证书校验
-		SetTimeout(0).                                             // 关闭请求超时
+		SetTimeout(0). // 关闭请求超时
 		R().
 		SetContext(ctx).
 		SetHeader("Content-Type", "application/json").
