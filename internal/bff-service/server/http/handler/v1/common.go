@@ -86,6 +86,8 @@ func UploadAvatar(ctx *gin.Context) {
 //	@Success	200		{object}	response.Response{data=[]response.DocSearchResp}
 //	@Router		/doc_center/search [get]
 func SearchDocCenter(ctx *gin.Context) {
+	resp, err := service.SearchDocCenter(ctx, ctx.Query("content"))
+	gin_util.Response(ctx, resp, err)
 }
 
 // GetDocCenterMenu
@@ -98,6 +100,8 @@ func SearchDocCenter(ctx *gin.Context) {
 //	@Success	200	{object}	response.Response{data=[]response.DocMenu}
 //	@Router		/doc_center/menu [get]
 func GetDocCenterMenu(ctx *gin.Context) {
+	resp, err := service.GetDocCenterMenu(ctx)
+	gin_util.Response(ctx, resp, err)
 }
 
 // GetDocCenterMarkdown
@@ -111,6 +115,8 @@ func GetDocCenterMenu(ctx *gin.Context) {
 //	@Success	200		{object}	response.Response{data=string}
 //	@Router		/doc_center/markdown [get]
 func GetDocCenterMarkdown(ctx *gin.Context) {
+	resp, err := service.GetDocCenterMarkdown(ctx, ctx.Query("path"))
+	gin_util.Response(ctx, resp, err)
 }
 
 // --- internal ---

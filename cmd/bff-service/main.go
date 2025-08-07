@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/UnicomAI/wanwu/internal/bff-service/service"
 	"os"
 	"os/signal"
 	"runtime"
@@ -68,6 +69,11 @@ func main() {
 	// init aho-corasick
 	if err := ahocorasick.Init(); err != nil {
 		log.Fatalf("init aho-corasick err: %v", err)
+	}
+
+	// doc-center
+	if err := service.InitDocCenter(ctx); err != nil {
+		log.Fatalf("init doc-center err: %v", err)
 	}
 
 	// init minio: custom

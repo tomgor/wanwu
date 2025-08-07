@@ -69,7 +69,7 @@ custom-info:
     tab_logo_path: "/v1/static/logo/tab_logo.png"
   about:
     logo_path: "/v1/static/logo/about_logo.png"
-    version: v0.1.3
+    version: v0.1.5
     copyright: bff_custom_about_copyright
 
 doc-center:
@@ -113,7 +113,7 @@ doc-center:
       val: static/manual/6.工作流.md
     - key: workflow-StartNode
       val: static/manual/6.工作流.md
-    
+
 
 
 # --- middleware ---
