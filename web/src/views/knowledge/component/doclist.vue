@@ -85,41 +85,15 @@
                       <template v-for="(tag, index) in scope.row.tagList.slice(0, 3)">
                         <el-tooltip 
                           :key="tag+'TAG'"
-                          :content="tag.length > 8 ? tag : ''" 
+                          :content="tag" 
                           placement="top"
-                          v-if="tag.length > 8"
                         >
-                          <el-tag 
-                            type="info" 
-                            size="mini"
-                            style="margin-right: 4px; margin-bottom: 4px;"
-                          >
-                            {{tag.slice(0, 8) + '...'}}
-                          </el-tag>
+                          <el-tag class="doc_tag" type="info">{{tag.length > 8 ?tag.slice(0, 8) + '...':tag}}</el-tag>
                         </el-tooltip>
-                        <el-tag 
-                          v-else
-                          :key="tag+'TAG2'"
-                          type="info" 
-                          size="mini"
-                          style="margin-right: 4px; margin-bottom: 4px;"
-                        >
-                          {{tag}}
-                        </el-tag>
                       </template>
-                      <el-tooltip 
-                        v-if="scope.row.tagList.length > 3" 
-                        :content="scope.row.tagList.slice(3).join(', ')" 
-                        placement="top"
-                      >
-                        <el-tag 
-                          type="info" 
-                          size="mini"
-                          style="margin-right: 4px; margin-bottom: 4px; cursor: pointer;"
-                        >
-                          +{{scope.row.tagList.length - 3}}
-                        </el-tag>
-                      </el-tooltip>
+                      <template v-if="scope.row.tagList.length > 3" >
+                        <el-tag class="doc_tag" type="info">+{{scope.row.tagList.length - 3}}</el-tag>
+                      </template>
                     </template>
                     <span v-else>-</span>
                     <span class="el-icon-edit-outline edit-icon" @click="showTag(scope.row)"></span>
@@ -193,7 +167,7 @@
         </el-main>
       </el-container>
     </div>
-    <tagDialog ref="tagDialog" @relodaData="relodaData" type="doc" :tagList="tagList"/>
+    <tagDialog ref="tagDialog" @relodaData="relodaData" type="doc" :docTagList="tagList"/>
   </div>
 </template>
 
@@ -453,8 +427,11 @@ export default {
 .edit-icon{
   color: #384BF7;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
   margin-left: 5px;
+}
+.doc_tag{
+  margin:0 2px;
 }
 /deep/ {
   .el-button.is-disabled,

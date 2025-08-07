@@ -33,6 +33,7 @@
           <el-input
             v-model="item.tagName"
             v-if="item.showIpt"
+            maxlength="50"
             @keydown.backspace.native="handleDelete(item,index)" 
             @keyup.enter.native="inputBlur(item)"
             @blur="inputBlur(item)"
@@ -59,7 +60,7 @@
 <script>
 import { delTag, tagList, createTag, editTag, bindTag,bindTagCount,updateDocTag} from "@/api/knowledge";
 export default {
-  props:['type','tagList'],
+  props:['type','docTagList'],
   data() {
     return {
       dialogVisible: false,
@@ -70,7 +71,7 @@ export default {
     };
   },
   watch:{
-    tagList:{
+    docTagList:{
       handler(val){
         if(val && val.length){
           this.tagList = val.map(item =>({
@@ -78,7 +79,7 @@ export default {
             tagName:item,
             checked: false,
             showDel: false,
-            showIpt: true,
+            showIpt: false,
           }))
         }
       },
@@ -97,7 +98,7 @@ export default {
     updateTag(){
       const docTagList = this.tagList.map((item) => item.tagName)
       updateDocTag({docId:this.docId,docTagList}).then(res =>{
-        if(res === 0){
+        if(res.code === 0){
           this.dialogVisible = false;
           this.$emit("relodaData");
         }
