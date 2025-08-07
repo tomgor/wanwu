@@ -109,9 +109,13 @@ func ValidateLLMModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) erro
 	if err != nil {
 		return err
 	}
-	_, _, err = iLLM.ChatCompletions(ctx.Request.Context(), llmReq)
+	resp, _, err := iLLM.ChatCompletions(ctx.Request.Context(), llmReq)
 	if err != nil {
-		return fmt.Errorf("invalid resp: %v", err)
+		return fmt.Errorf("model API call failed: %v", err)
+	}
+	_, ok = resp.ConvertResp()
+	if !ok {
+		return fmt.Errorf("invalid response format")
 	}
 	return nil
 }
@@ -134,11 +138,15 @@ func ValidateEmbeddingModel(ctx *gin.Context, modelInfo *model_service.ModelInfo
 	if err != nil {
 		return err
 	}
-	_, err = iEmbedding.Embeddings(ctx.Request.Context(), embeddingReq)
+	resp, err := iEmbedding.Embeddings(ctx.Request.Context(), embeddingReq)
 	if err != nil {
 		{
-			return fmt.Errorf("invalid resp: %v", err)
+			return fmt.Errorf("model API call failed: %v", err)
 		}
+	}
+	_, ok = resp.ConvertResp()
+	if !ok {
+		return fmt.Errorf("invalid response format")
 	}
 	return nil
 }
@@ -165,9 +173,13 @@ func ValidateRerankModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) e
 	if err != nil {
 		return err
 	}
-	_, err = iRerank.Rerank(ctx.Request.Context(), rerankReq)
+	resp, err := iRerank.Rerank(ctx.Request.Context(), rerankReq)
 	if err != nil {
-		return fmt.Errorf("invalid resp: %v", err)
+		return fmt.Errorf("model API call failed: %v", err)
+	}
+	_, ok = resp.ConvertResp()
+	if !ok {
+		return fmt.Errorf("invalid response format")
 	}
 	return nil
 }
@@ -221,9 +233,13 @@ func ValidateOcrModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) erro
 	if err != nil {
 		return err
 	}
-	_, err = iOcr.Ocr(ctx, ocrReq)
+	resp, err := iOcr.Ocr(ctx, ocrReq)
 	if err != nil {
-		return fmt.Errorf("invalid resp: %v", err)
+		return fmt.Errorf("model API call failed: %v", err)
+	}
+	_, ok = resp.ConvertResp()
+	if !ok {
+		return fmt.Errorf("invalid response format")
 	}
 	return nil
 }

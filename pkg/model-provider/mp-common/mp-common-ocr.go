@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/UnicomAI/wanwu/pkg/log"
+	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 	"io"
@@ -37,17 +38,17 @@ func (req *OcrReq) Data() (map[string]interface{}, error) {
 
 type OcrResp struct {
 	Code      int       `json:"code"`
-	Message   string    `json:"message"`
+	Message   string    `json:"message" validate:"required"`
 	Version   string    `json:"version"`
 	TimeStamp string    `json:"timestamp"`
 	Id        string    `json:"id"`
 	TimeCost  float64   `json:"time_cost"`
-	OcrData   []OcrData `json:"data"`
+	OcrData   []OcrData `json:"data" validate:"required,dive"`
 }
 type OcrData struct {
-	PageNum []int  `json:"page_num"`
-	Type    string `json:"type"`
-	Text    string `json:"text"`
+	PageNum []int  `json:"page_num" validate:"required,min=1"`
+	Type    string `json:"type" validate:"required"`
+	Text    string `json:"text" validate:"required"`
 	Length  int    `json:"length"`
 }
 
@@ -104,6 +105,11 @@ func (resp *ocrResp) ConvertResp() (*OcrResp, bool) {
 	var ret *OcrResp
 	if err := json.Unmarshal([]byte(resp.raw), &ret); err != nil {
 		log.Errorf("ocr resp (%v) convert to data err: %v", resp.raw, err)
+		return nil, false
+	}
+
+	if err := util.Validate(ret); err != nil {
+		log.Errorf("ocr resp validate err: %v", err)
 		return nil, false
 	}
 	return ret, true

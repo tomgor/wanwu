@@ -37,4 +37,7 @@ func Register(apiV1 *gin.RouterGroup) {
 
 	// permission
 	registerPermission(apiV1)
+
+	// setting
+	registerSetting(apiV1)
 }

@@ -11,6 +11,8 @@ service KnowledgeBaseService {
   rpc SelectKnowledgeList(KnowledgeSelectReq) returns (KnowledgeSelectListResp) {}
   // 获取知识库详情
   rpc SelectKnowledgeDetailById(KnowledgeDetailSelectReq) returns (KnowledgeInfo) {}
+  // 获取知识库详情列表
+  rpc SelectKnowledgeDetailByIdList(KnowledgeDetailSelectListReq) returns (KnowledgeDetailSelectListResp) {}
   // 获取知识库详情
   rpc SelectKnowledgeDetailByName(KnowledgeDetailSelectReq) returns (KnowledgeInfo) {}
   // 新增知识库
@@ -88,6 +90,17 @@ message KnowledgeDetailSelectReq {
   string orgId = 2;
   string knowledgeId = 3; //知识库id
   string knowledgeName = 4; // 知识库名称
+}
+
+message KnowledgeDetailSelectListReq{
+  string userId = 1;
+  string orgId = 2;
+  repeated string knowledgeIds = 3; //知识库id列表
+}
+
+message KnowledgeDetailSelectListResp{
+  repeated KnowledgeInfo list = 1; // 知识库详情列表
+  int32 total = 2;
 }
 
 //知识库信息

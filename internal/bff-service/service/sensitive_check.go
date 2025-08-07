@@ -137,7 +137,7 @@ func ProcessSensitiveWords(ctx *gin.Context, rawCh <-chan string, matchDicts []a
 		// 检测到敏感词
 		if len(matchResults) > 0 {
 			if matchResults[0].Reply != "" {
-				for _, sensitiveMsg := range chatSrv.buildSensitiveResp(id, gin_util.I18nKey(ctx, "bff_sensitive_chek_resp", matchResults[0].Reply)) {
+				for _, sensitiveMsg := range chatSrv.buildSensitiveResp(id, matchResults[0].Reply) {
 					outputCh <- sensitiveMsg
 					return
 				}

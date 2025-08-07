@@ -1,7 +1,10 @@
 package service
 
 import (
+	"errors"
+	"gorm.io/gorm"
 	"sort"
+	"strconv"
 	"strings"
 
 	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
@@ -222,4 +225,47 @@ func explorerationFilterWorkFlow(ctx *gin.Context, apps []*app_service.Explorati
 		return filteredList, nil
 	}
 	return retAppList, nil
+}
+
+func GetUserMCPList(ctx *gin.Context, assistantId, userId, orgId string) ([]*response.MCPInfos, error) {
+	// 获取该用户的所有 MCP 列表
+	resp, err := assistant.AssistantMCPGetList(ctx.Request.Context(), &assistant_service.AssistantMCPGetListReq{
+		AssistantId: assistantId,
+		Identity: &assistant_service.Identity{
+			UserId: userId,
+			OrgId:  orgId,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// 获取MCP 详情
+	valid := true
+	var retMCPInfos []*response.MCPInfos
+	for _, m := range resp.AssistantMCPInfos {
+		mcpInfo, err := GetMCP(ctx, m.McpId)
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				valid = false
+			} else {
+				return nil, err
+			}
+		}
+
+		// 组装为 MCPInfos
+		retMCPInfos = append(retMCPInfos, &response.MCPInfos{
+			Id:            strconv.Itoa(int(m.Id)),
+			MCPId:         m.McpId,
+			MCPSquareId:   mcpInfo.MCPSquareID,
+			Enable:        m.Enable,
+			MCPName:       mcpInfo.MCPInfo.Name,
+			MCPDesc:       mcpInfo.MCPInfo.Desc,
+			MCPServerFrom: mcpInfo.MCPInfo.From,
+			MCPServerUrl:  mcpInfo.MCPInfo.SSEURL,
+			Valid:         valid,
+		})
+	}
+
+	return retMCPInfos, nil
 }

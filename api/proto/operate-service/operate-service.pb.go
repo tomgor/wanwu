@@ -9,8 +9,9 @@ package operate_service
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/emptypb"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
+	sync "sync"
 )
 
 const (
@@ -20,6 +21,510 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type CreateSystemCustomTabReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	OrgId  string `protobuf:"bytes,1,opt,name=orgId,proto3" json:"orgId,omitempty"`   // 租户ID
+	UserId string `protobuf:"bytes,2,opt,name=userId,proto3" json:"userId,omitempty"` // 用户ID
+	Mode   string `protobuf:"bytes,3,opt,name=mode,proto3" json:"mode,omitempty"`     // 模式
+	Tab    *Tab   `protobuf:"bytes,4,opt,name=tab,proto3" json:"tab,omitempty"`       // 标签页信息
+}
+
+func (x *CreateSystemCustomTabReq) Reset() {
+	*x = CreateSystemCustomTabReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_operate_service_operate_service_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateSystemCustomTabReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateSystemCustomTabReq) ProtoMessage() {}
+
+func (x *CreateSystemCustomTabReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_operate_service_operate_service_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateSystemCustomTabReq.ProtoReflect.Descriptor instead.
+func (*CreateSystemCustomTabReq) Descriptor() ([]byte, []int) {
+	return file_proto_operate_service_operate_service_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *CreateSystemCustomTabReq) GetOrgId() string {
+	if x != nil {
+		return x.OrgId
+	}
+	return ""
+}
+
+func (x *CreateSystemCustomTabReq) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CreateSystemCustomTabReq) GetMode() string {
+	if x != nil {
+		return x.Mode
+	}
+	return ""
+}
+
+func (x *CreateSystemCustomTabReq) GetTab() *Tab {
+	if x != nil {
+		return x.Tab
+	}
+	return nil
+}
+
+type CreateSystemCustomLoginReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	OrgId  string `protobuf:"bytes,1,opt,name=orgId,proto3" json:"orgId,omitempty"`   // 租户ID
+	UserId string `protobuf:"bytes,2,opt,name=userId,proto3" json:"userId,omitempty"` // 用户ID
+	Mode   string `protobuf:"bytes,3,opt,name=mode,proto3" json:"mode,omitempty"`
+	Login  *Login `protobuf:"bytes,4,opt,name=login,proto3" json:"login,omitempty"` // 登录页
+}
+
+func (x *CreateSystemCustomLoginReq) Reset() {
+	*x = CreateSystemCustomLoginReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_operate_service_operate_service_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateSystemCustomLoginReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateSystemCustomLoginReq) ProtoMessage() {}
+
+func (x *CreateSystemCustomLoginReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_operate_service_operate_service_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateSystemCustomLoginReq.ProtoReflect.Descriptor instead.
+func (*CreateSystemCustomLoginReq) Descriptor() ([]byte, []int) {
+	return file_proto_operate_service_operate_service_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *CreateSystemCustomLoginReq) GetOrgId() string {
+	if x != nil {
+		return x.OrgId
+	}
+	return ""
+}
+
+func (x *CreateSystemCustomLoginReq) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CreateSystemCustomLoginReq) GetMode() string {
+	if x != nil {
+		return x.Mode
+	}
+	return ""
+}
+
+func (x *CreateSystemCustomLoginReq) GetLogin() *Login {
+	if x != nil {
+		return x.Login
+	}
+	return nil
+}
+
+type CreateSystemCustomHomeReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	OrgId  string `protobuf:"bytes,1,opt,name=orgId,proto3" json:"orgId,omitempty"`   // 租户ID
+	UserId string `protobuf:"bytes,2,opt,name=userId,proto3" json:"userId,omitempty"` // 用户ID
+	Mode   string `protobuf:"bytes,3,opt,name=mode,proto3" json:"mode,omitempty"`
+	Home   *Home  `protobuf:"bytes,4,opt,name=home,proto3" json:"home,omitempty"` // 标题
+}
+
+func (x *CreateSystemCustomHomeReq) Reset() {
+	*x = CreateSystemCustomHomeReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_operate_service_operate_service_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateSystemCustomHomeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateSystemCustomHomeReq) ProtoMessage() {}
+
+func (x *CreateSystemCustomHomeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_operate_service_operate_service_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateSystemCustomHomeReq.ProtoReflect.Descriptor instead.
+func (*CreateSystemCustomHomeReq) Descriptor() ([]byte, []int) {
+	return file_proto_operate_service_operate_service_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CreateSystemCustomHomeReq) GetOrgId() string {
+	if x != nil {
+		return x.OrgId
+	}
+	return ""
+}
+
+func (x *CreateSystemCustomHomeReq) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CreateSystemCustomHomeReq) GetMode() string {
+	if x != nil {
+		return x.Mode
+	}
+	return ""
+}
+
+func (x *CreateSystemCustomHomeReq) GetHome() *Home {
+	if x != nil {
+		return x.Home
+	}
+	return nil
+}
+
+type GetSystemCustomReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Mode string `protobuf:"bytes,1,opt,name=mode,proto3" json:"mode,omitempty"` // 模式
+}
+
+func (x *GetSystemCustomReq) Reset() {
+	*x = GetSystemCustomReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_operate_service_operate_service_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetSystemCustomReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSystemCustomReq) ProtoMessage() {}
+
+func (x *GetSystemCustomReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_operate_service_operate_service_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSystemCustomReq.ProtoReflect.Descriptor instead.
+func (*GetSystemCustomReq) Descriptor() ([]byte, []int) {
+	return file_proto_operate_service_operate_service_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetSystemCustomReq) GetMode() string {
+	if x != nil {
+		return x.Mode
+	}
+	return ""
+}
+
+type SystemCustom struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Login *Login `protobuf:"bytes,1,opt,name=login,proto3" json:"login,omitempty"` // 登录页
+	Tab   *Tab   `protobuf:"bytes,2,opt,name=tab,proto3" json:"tab,omitempty"`     // logo
+	Home  *Home  `protobuf:"bytes,3,opt,name=home,proto3" json:"home,omitempty"`   // 标题
+}
+
+func (x *SystemCustom) Reset() {
+	*x = SystemCustom{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_operate_service_operate_service_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SystemCustom) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SystemCustom) ProtoMessage() {}
+
+func (x *SystemCustom) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_operate_service_operate_service_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SystemCustom.ProtoReflect.Descriptor instead.
+func (*SystemCustom) Descriptor() ([]byte, []int) {
+	return file_proto_operate_service_operate_service_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *SystemCustom) GetLogin() *Login {
+	if x != nil {
+		return x.Login
+	}
+	return nil
+}
+
+func (x *SystemCustom) GetTab() *Tab {
+	if x != nil {
+		return x.Tab
+	}
+	return nil
+}
+
+func (x *SystemCustom) GetHome() *Home {
+	if x != nil {
+		return x.Home
+	}
+	return nil
+}
+
+type Tab struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TabLogoPath string `protobuf:"bytes,1,opt,name=tabLogoPath,proto3" json:"tabLogoPath,omitempty"` // 标签页logo路径
+	TabTitle    string `protobuf:"bytes,2,opt,name=tabTitle,proto3" json:"tabTitle,omitempty"`       // 标签页标题
+}
+
+func (x *Tab) Reset() {
+	*x = Tab{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_operate_service_operate_service_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Tab) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Tab) ProtoMessage() {}
+
+func (x *Tab) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_operate_service_operate_service_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Tab.ProtoReflect.Descriptor instead.
+func (*Tab) Descriptor() ([]byte, []int) {
+	return file_proto_operate_service_operate_service_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *Tab) GetTabLogoPath() string {
+	if x != nil {
+		return x.TabLogoPath
+	}
+	return ""
+}
+
+func (x *Tab) GetTabTitle() string {
+	if x != nil {
+		return x.TabTitle
+	}
+	return ""
+}
+
+type Login struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	LoginBgPath      string `protobuf:"bytes,1,opt,name=loginBgPath,proto3" json:"loginBgPath,omitempty"`           // 登录页背景图
+	LoginWelcomeText string `protobuf:"bytes,2,opt,name=loginWelcomeText,proto3" json:"loginWelcomeText,omitempty"` // 登录页欢迎词
+	LoginButtonColor string `protobuf:"bytes,3,opt,name=loginButtonColor,proto3" json:"loginButtonColor,omitempty"` // 登录按钮颜色
+}
+
+func (x *Login) Reset() {
+	*x = Login{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_operate_service_operate_service_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Login) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Login) ProtoMessage() {}
+
+func (x *Login) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_operate_service_operate_service_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Login.ProtoReflect.Descriptor instead.
+func (*Login) Descriptor() ([]byte, []int) {
+	return file_proto_operate_service_operate_service_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *Login) GetLoginBgPath() string {
+	if x != nil {
+		return x.LoginBgPath
+	}
+	return ""
+}
+
+func (x *Login) GetLoginWelcomeText() string {
+	if x != nil {
+		return x.LoginWelcomeText
+	}
+	return ""
+}
+
+func (x *Login) GetLoginButtonColor() string {
+	if x != nil {
+		return x.LoginButtonColor
+	}
+	return ""
+}
+
+type Home struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	HomeLogoPath string `protobuf:"bytes,1,opt,name=homeLogoPath,proto3" json:"homeLogoPath,omitempty"` // 平台logo路径
+	HomeName     string `protobuf:"bytes,2,opt,name=homeName,proto3" json:"homeName,omitempty"`         // 平台名称
+	HomeBgColor  string `protobuf:"bytes,3,opt,name=homeBgColor,proto3" json:"homeBgColor,omitempty"`   // 平台背景颜色
+}
+
+func (x *Home) Reset() {
+	*x = Home{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_operate_service_operate_service_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Home) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Home) ProtoMessage() {}
+
+func (x *Home) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_operate_service_operate_service_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Home.ProtoReflect.Descriptor instead.
+func (*Home) Descriptor() ([]byte, []int) {
+	return file_proto_operate_service_operate_service_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *Home) GetHomeLogoPath() string {
+	if x != nil {
+		return x.HomeLogoPath
+	}
+	return ""
+}
+
+func (x *Home) GetHomeName() string {
+	if x != nil {
+		return x.HomeName
+	}
+	return ""
+}
+
+func (x *Home) GetHomeBgColor() string {
+	if x != nil {
+		return x.HomeBgColor
+	}
+	return ""
+}
+
 var File_proto_operate_service_operate_service_proto protoreflect.FileDescriptor
 
 var file_proto_operate_service_operate_service_proto_rawDesc = []byte{
@@ -28,21 +533,139 @@ var file_proto_operate_service_operate_service_proto_rawDesc = []byte{
 	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0f, 0x6f,
 	0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x1a, 0x1b,
 	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f,
-	0x65, 0x6d, 0x70, 0x74, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0x10, 0x0a, 0x0e, 0x4f,
-	0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x42, 0x35, 0x5a,
-	0x33, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x55, 0x6e, 0x69, 0x63,
-	0x6f, 0x6d, 0x41, 0x49, 0x2f, 0x77, 0x61, 0x6e, 0x77, 0x75, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x2d, 0x73, 0x65, 0x72,
-	0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x65, 0x6d, 0x70, 0x74, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x84, 0x01, 0x0a, 0x18,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x43, 0x75, 0x73, 0x74,
+	0x6f, 0x6d, 0x54, 0x61, 0x62, 0x52, 0x65, 0x71, 0x12, 0x14, 0x0a, 0x05, 0x6f, 0x72, 0x67, 0x49,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6f, 0x72, 0x67, 0x49, 0x64, 0x12, 0x16,
+	0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
+	0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x6f, 0x64, 0x65, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6d, 0x6f, 0x64, 0x65, 0x12, 0x26, 0x0a, 0x03, 0x74, 0x61,
+	0x62, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74,
+	0x65, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x54, 0x61, 0x62, 0x52, 0x03, 0x74,
+	0x61, 0x62, 0x22, 0x8c, 0x01, 0x0a, 0x1a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x79, 0x73,
+	0x74, 0x65, 0x6d, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65,
+	0x71, 0x12, 0x14, 0x0a, 0x05, 0x6f, 0x72, 0x67, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x6f, 0x72, 0x67, 0x49, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49,
+	0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12,
+	0x12, 0x0a, 0x04, 0x6d, 0x6f, 0x64, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6d,
+	0x6f, 0x64, 0x65, 0x12, 0x2c, 0x0a, 0x05, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x18, 0x04, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x16, 0x2e, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x5f, 0x73, 0x65, 0x72,
+	0x76, 0x69, 0x63, 0x65, 0x2e, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x05, 0x6c, 0x6f, 0x67, 0x69,
+	0x6e, 0x22, 0x88, 0x01, 0x0a, 0x19, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x79, 0x73, 0x74,
+	0x65, 0x6d, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x48, 0x6f, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x12,
+	0x14, 0x0a, 0x05, 0x6f, 0x72, 0x67, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
+	0x6f, 0x72, 0x67, 0x49, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x12, 0x0a,
+	0x04, 0x6d, 0x6f, 0x64, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6d, 0x6f, 0x64,
+	0x65, 0x12, 0x29, 0x0a, 0x04, 0x68, 0x6f, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x15, 0x2e, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63,
+	0x65, 0x2e, 0x48, 0x6f, 0x6d, 0x65, 0x52, 0x04, 0x68, 0x6f, 0x6d, 0x65, 0x22, 0x28, 0x0a, 0x12,
+	0x47, 0x65, 0x74, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x52,
+	0x65, 0x71, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x04, 0x6d, 0x6f, 0x64, 0x65, 0x22, 0x8f, 0x01, 0x0a, 0x0c, 0x53, 0x79, 0x73, 0x74, 0x65,
+	0x6d, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x12, 0x2c, 0x0a, 0x05, 0x6c, 0x6f, 0x67, 0x69, 0x6e,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65,
+	0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x05,
+	0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x26, 0x0a, 0x03, 0x74, 0x61, 0x62, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x14, 0x2e, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x5f, 0x73, 0x65, 0x72,
+	0x76, 0x69, 0x63, 0x65, 0x2e, 0x54, 0x61, 0x62, 0x52, 0x03, 0x74, 0x61, 0x62, 0x12, 0x29, 0x0a,
+	0x04, 0x68, 0x6f, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x6f, 0x70,
+	0x65, 0x72, 0x61, 0x74, 0x65, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x48, 0x6f,
+	0x6d, 0x65, 0x52, 0x04, 0x68, 0x6f, 0x6d, 0x65, 0x22, 0x43, 0x0a, 0x03, 0x54, 0x61, 0x62, 0x12,
+	0x20, 0x0a, 0x0b, 0x74, 0x61, 0x62, 0x4c, 0x6f, 0x67, 0x6f, 0x50, 0x61, 0x74, 0x68, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x74, 0x61, 0x62, 0x4c, 0x6f, 0x67, 0x6f, 0x50, 0x61, 0x74,
+	0x68, 0x12, 0x1a, 0x0a, 0x08, 0x74, 0x61, 0x62, 0x54, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x08, 0x74, 0x61, 0x62, 0x54, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x81, 0x01,
+	0x0a, 0x05, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x20, 0x0a, 0x0b, 0x6c, 0x6f, 0x67, 0x69, 0x6e,
+	0x42, 0x67, 0x50, 0x61, 0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x6c, 0x6f,
+	0x67, 0x69, 0x6e, 0x42, 0x67, 0x50, 0x61, 0x74, 0x68, 0x12, 0x2a, 0x0a, 0x10, 0x6c, 0x6f, 0x67,
+	0x69, 0x6e, 0x57, 0x65, 0x6c, 0x63, 0x6f, 0x6d, 0x65, 0x54, 0x65, 0x78, 0x74, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x10, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x57, 0x65, 0x6c, 0x63, 0x6f, 0x6d,
+	0x65, 0x54, 0x65, 0x78, 0x74, 0x12, 0x2a, 0x0a, 0x10, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x42, 0x75,
+	0x74, 0x74, 0x6f, 0x6e, 0x43, 0x6f, 0x6c, 0x6f, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x10, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x42, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x43, 0x6f, 0x6c, 0x6f,
+	0x72, 0x22, 0x68, 0x0a, 0x04, 0x48, 0x6f, 0x6d, 0x65, 0x12, 0x22, 0x0a, 0x0c, 0x68, 0x6f, 0x6d,
+	0x65, 0x4c, 0x6f, 0x67, 0x6f, 0x50, 0x61, 0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0c, 0x68, 0x6f, 0x6d, 0x65, 0x4c, 0x6f, 0x67, 0x6f, 0x50, 0x61, 0x74, 0x68, 0x12, 0x1a, 0x0a,
+	0x08, 0x68, 0x6f, 0x6d, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x08, 0x68, 0x6f, 0x6d, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x68, 0x6f, 0x6d,
+	0x65, 0x42, 0x67, 0x43, 0x6f, 0x6c, 0x6f, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b,
+	0x68, 0x6f, 0x6d, 0x65, 0x42, 0x67, 0x43, 0x6f, 0x6c, 0x6f, 0x72, 0x32, 0x89, 0x03, 0x0a, 0x0e,
+	0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x5c,
+	0x0a, 0x15, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x43, 0x75,
+	0x73, 0x74, 0x6f, 0x6d, 0x54, 0x61, 0x62, 0x12, 0x29, 0x2e, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74,
+	0x65, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x54, 0x61, 0x62, 0x52,
+	0x65, 0x71, 0x1a, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x60, 0x0a, 0x17,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x43, 0x75, 0x73, 0x74,
+	0x6f, 0x6d, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x12, 0x2b, 0x2e, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74,
+	0x65, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x4c, 0x6f, 0x67, 0x69,
+	0x6e, 0x52, 0x65, 0x71, 0x1a, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x5e,
+	0x0a, 0x16, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x43, 0x75,
+	0x73, 0x74, 0x6f, 0x6d, 0x48, 0x6f, 0x6d, 0x65, 0x12, 0x2a, 0x2e, 0x6f, 0x70, 0x65, 0x72, 0x61,
+	0x74, 0x65, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x48, 0x6f, 0x6d,
+	0x65, 0x52, 0x65, 0x71, 0x1a, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x57,
+	0x0a, 0x0f, 0x47, 0x65, 0x74, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x43, 0x75, 0x73, 0x74, 0x6f,
+	0x6d, 0x12, 0x23, 0x2e, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x5f, 0x73, 0x65, 0x72, 0x76,
+	0x69, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x43, 0x75, 0x73,
+	0x74, 0x6f, 0x6d, 0x52, 0x65, 0x71, 0x1a, 0x1d, 0x2e, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x65,
+	0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x43,
+	0x75, 0x73, 0x74, 0x6f, 0x6d, 0x22, 0x00, 0x42, 0x35, 0x5a, 0x33, 0x67, 0x69, 0x74, 0x68, 0x75,
+	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x55, 0x6e, 0x69, 0x63, 0x6f, 0x6d, 0x41, 0x49, 0x2f, 0x77,
+	0x61, 0x6e, 0x77, 0x75, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x6f,
+	0x70, 0x65, 0x72, 0x61, 0x74, 0x65, 0x2d, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
-var file_proto_operate_service_operate_service_proto_goTypes = []interface{}{}
+var (
+	file_proto_operate_service_operate_service_proto_rawDescOnce sync.Once
+	file_proto_operate_service_operate_service_proto_rawDescData = file_proto_operate_service_operate_service_proto_rawDesc
+)
+
+func file_proto_operate_service_operate_service_proto_rawDescGZIP() []byte {
+	file_proto_operate_service_operate_service_proto_rawDescOnce.Do(func() {
+		file_proto_operate_service_operate_service_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_operate_service_operate_service_proto_rawDescData)
+	})
+	return file_proto_operate_service_operate_service_proto_rawDescData
+}
+
+var file_proto_operate_service_operate_service_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_proto_operate_service_operate_service_proto_goTypes = []interface{}{
+	(*CreateSystemCustomTabReq)(nil),   // 0: operate_service.CreateSystemCustomTabReq
+	(*CreateSystemCustomLoginReq)(nil), // 1: operate_service.CreateSystemCustomLoginReq
+	(*CreateSystemCustomHomeReq)(nil),  // 2: operate_service.CreateSystemCustomHomeReq
+	(*GetSystemCustomReq)(nil),         // 3: operate_service.GetSystemCustomReq
+	(*SystemCustom)(nil),               // 4: operate_service.SystemCustom
+	(*Tab)(nil),                        // 5: operate_service.Tab
+	(*Login)(nil),                      // 6: operate_service.Login
+	(*Home)(nil),                       // 7: operate_service.Home
+	(*emptypb.Empty)(nil),              // 8: google.protobuf.Empty
+}
 var file_proto_operate_service_operate_service_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	5,  // 0: operate_service.CreateSystemCustomTabReq.tab:type_name -> operate_service.Tab
+	6,  // 1: operate_service.CreateSystemCustomLoginReq.login:type_name -> operate_service.Login
+	7,  // 2: operate_service.CreateSystemCustomHomeReq.home:type_name -> operate_service.Home
+	6,  // 3: operate_service.SystemCustom.login:type_name -> operate_service.Login
+	5,  // 4: operate_service.SystemCustom.tab:type_name -> operate_service.Tab
+	7,  // 5: operate_service.SystemCustom.home:type_name -> operate_service.Home
+	0,  // 6: operate_service.OperateService.CreateSystemCustomTab:input_type -> operate_service.CreateSystemCustomTabReq
+	1,  // 7: operate_service.OperateService.CreateSystemCustomLogin:input_type -> operate_service.CreateSystemCustomLoginReq
+	2,  // 8: operate_service.OperateService.CreateSystemCustomHome:input_type -> operate_service.CreateSystemCustomHomeReq
+	3,  // 9: operate_service.OperateService.GetSystemCustom:input_type -> operate_service.GetSystemCustomReq
+	8,  // 10: operate_service.OperateService.CreateSystemCustomTab:output_type -> google.protobuf.Empty
+	8,  // 11: operate_service.OperateService.CreateSystemCustomLogin:output_type -> google.protobuf.Empty
+	8,  // 12: operate_service.OperateService.CreateSystemCustomHome:output_type -> google.protobuf.Empty
+	4,  // 13: operate_service.OperateService.GetSystemCustom:output_type -> operate_service.SystemCustom
+	10, // [10:14] is the sub-list for method output_type
+	6,  // [6:10] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_proto_operate_service_operate_service_proto_init() }
@@ -50,18 +673,117 @@ func file_proto_operate_service_operate_service_proto_init() {
 	if File_proto_operate_service_operate_service_proto != nil {
 		return
 	}
+	if !protoimpl.UnsafeEnabled {
+		file_proto_operate_service_operate_service_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateSystemCustomTabReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_operate_service_operate_service_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateSystemCustomLoginReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_operate_service_operate_service_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateSystemCustomHomeReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_operate_service_operate_service_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetSystemCustomReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_operate_service_operate_service_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SystemCustom); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_operate_service_operate_service_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Tab); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_operate_service_operate_service_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Login); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_operate_service_operate_service_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Home); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_operate_service_operate_service_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   0,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_proto_operate_service_operate_service_proto_goTypes,
 		DependencyIndexes: file_proto_operate_service_operate_service_proto_depIdxs,
+		MessageInfos:      file_proto_operate_service_operate_service_proto_msgTypes,
 	}.Build()
 	File_proto_operate_service_operate_service_proto = out.File
 	file_proto_operate_service_operate_service_proto_rawDesc = nil

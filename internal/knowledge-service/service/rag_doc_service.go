@@ -69,6 +69,13 @@ type RagDeleteDocParams struct {
 	FileName      string `json:"fileName"`
 }
 
+type RagDocMetaParams struct {
+	UserId        string                 `json:"userId"`
+	KnowledgeBase string                 `json:"knowledgeBase"`
+	FileName      string                 `json:"file_name"`
+	MetaList      map[string]interface{} `json:"tags"`
+}
+
 type RagGetDocSegmentResp struct {
 	RagCommonResp
 	Data *ContentListResp `json:"data"`
@@ -217,6 +224,35 @@ func RagDeleteDoc(ctx context.Context, ragDeleteDocParams *RagDeleteDocParams) e
 		}
 		return errors.New(resp.Message)
 	}
+	return nil
+}
+
+// RagDocTag 给文档打标签
+func RagDocTag(ctx context.Context, ragDocTagParams *RagDocMetaParams) error {
+	//ragServer := config.GetConfig().RagServer
+	//url := ragServer.Endpoint + ragServer.DocDeleteUri
+	//paramsByte, err := json.Marshal(ragDocTagParams)
+	//if err != nil {
+	//	return err
+	//}
+	//result, err := http.GetClient().PostJson(ctx, &http_client.HttpRequestParams{
+	//	Url:        url,
+	//	Body:       paramsByte,
+	//	Timeout:    time.Duration(ragServer.Timeout) * time.Second,
+	//	MonitorKey: "rag_doc_tag",
+	//	LogLevel:   http_client.LogAll,
+	//})
+	//if err != nil {
+	//	return err
+	//}
+	//var resp RagCommonResp
+	//if err := json.Unmarshal(result, &resp); err != nil {
+	//	log.Errorf(err.Error())
+	//	return err
+	//}
+	//if resp.Code != successCode {
+	//	return errors.New(resp.Message)
+	//}
 	return nil
 }
 

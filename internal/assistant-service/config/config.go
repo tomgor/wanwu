@@ -20,6 +20,16 @@ type Config struct {
 	ES        es.Config    `json:"es" mapstructure:"es"`
 	Assistant Assistant    `json:"assistant" mapstructure:"assistant"`
 	Minio     *MinioConfig `mapstructure:"minio" json:"minio"`
+	Knowledge Knowledge    `mapstructure:"knowledge" json:"knowledge" yaml:"knowledge"`
+	MCP       Mcp          `mapstructure:"mcp" json:"mcp"`
+}
+
+type Knowledge struct {
+	Host string `mapstructure:"host" json:"host" yaml:"host"`
+}
+
+type Mcp struct {
+	Host string `mapstructure:"host" json:"host" yaml:"host"`
 }
 
 type ServerConfig struct {

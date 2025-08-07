@@ -1214,6 +1214,121 @@ const docTemplate = `{
                 }
             }
         },
+        "/assistant/mcp": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "为智能体绑定已发布的mcp工具",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "添加mcp工具",
+                "parameters": [
+                    {
+                        "description": "mcp新增参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MCPAddRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "为智能体解绑mcp",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "删除mcp",
+                "parameters": [
+                    {
+                        "description": "mcp id",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MCPIdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assistant/mcp/enable": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "修改智能体绑定的MCP的启用状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "启用/停用 MCP",
+                "parameters": [
+                    {
+                        "description": "mcp id",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MCPIdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/assistant/stream": {
             "post": {
                 "security": [
@@ -1755,7 +1870,124 @@ const docTemplate = `{
                 }
             }
         },
-        "/doc_center/markdown": {
+        "/custom/home": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "配置平台名称、平台图标、平台背景色",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "setting"
+                ],
+                "summary": "平台自定义配置",
+                "parameters": [
+                    {
+                        "description": "平台配置请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CustomHomeConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/custom/login": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "上传登录页背景图、登录页欢迎语、登录按钮颜色",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "setting"
+                ],
+                "summary": "登录页自定义配置",
+                "parameters": [
+                    {
+                        "description": "登录页配置请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CustomLoginConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/custom/tab": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "上传标签页图标、标签页标题",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "setting"
+                ],
+                "summary": "标签页自定义配置",
+                "parameters": [
+                    {
+                        "description": "标签页配置请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CustomTabConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/doc_center": {
             "get": {
                 "security": [
                     {
@@ -2624,6 +2856,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/knowledge/doc/meta": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "更新文档元数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge"
+                ],
+                "summary": "更新文档元数据",
+                "parameters": [
+                    {
+                        "description": "文档更新元数据请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DocMetaDataReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/knowledge/doc/segment/list": {
             "get": {
                 "security": [
@@ -3051,6 +3322,168 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    }
+                }
+            }
+        },
+        "/knowledge/splitter": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "查询知识库分隔符列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.splitter"
+                ],
+                "summary": "查询知识库分隔符列表",
+                "parameters": [
+                    {
+                        "description": "查询知识库请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.KnowledgeSplitterSelectReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.KnowledgeSplitterListResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "修改知识库分隔符",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.splitter"
+                ],
+                "summary": "修改知识库分隔符",
+                "parameters": [
+                    {
+                        "description": "修改知识库分隔符请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateKnowledgeSplitterReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "创建知识库分隔符",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.splitter"
+                ],
+                "summary": "创建知识库分隔符",
+                "parameters": [
+                    {
+                        "description": "创建知识库分隔符请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateKnowledgeSplitterReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "删除知识库分隔符",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.splitter"
+                ],
+                "summary": "删除知识库分隔符",
+                "parameters": [
+                    {
+                        "description": "删除知识库分隔符请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DeleteKnowledgeSplitterReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -3499,6 +3932,14 @@ const docTemplate = `{
                     "mcp"
                 ],
                 "summary": "获取自定义MCP列表（用于下拉选择）",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mcp名称",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -6749,10 +7190,6 @@ const docTemplate = `{
                     "description": "最长上下文",
                     "type": "integer"
                 },
-                "maxHistoryEnable": {
-                    "description": "最长上下文(开关)",
-                    "type": "boolean"
-                },
                 "priorityMatch": {
                     "description": "权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1",
                     "type": "integer"
@@ -6765,17 +7202,9 @@ const docTemplate = `{
                     "description": "过滤阈值",
                     "type": "number"
                 },
-                "thresholdEnable": {
-                    "description": "过滤阈值(开关)",
-                    "type": "boolean"
-                },
                 "topK": {
                     "description": "知识条数",
                     "type": "integer"
-                },
-                "topKEnable": {
-                    "description": "知识条数(开关)",
-                    "type": "boolean"
                 }
             }
         },
@@ -7154,6 +7583,21 @@ const docTemplate = `{
                 }
             }
         },
+        "request.CreateKnowledgeSplitterReq": {
+            "type": "object",
+            "required": [
+                "splitterName",
+                "splitterValue"
+            ],
+            "properties": {
+                "splitterName": {
+                    "type": "string"
+                },
+                "splitterValue": {
+                    "type": "string"
+                }
+            }
+        },
         "request.CreateKnowledgeTagReq": {
             "type": "object",
             "required": [
@@ -7177,6 +7621,65 @@ const docTemplate = `{
                 },
                 "tableName": {
                     "description": "敏感词表名",
+                    "type": "string"
+                }
+            }
+        },
+        "request.CustomHomeConfig": {
+            "type": "object",
+            "properties": {
+                "homeBgColor": {
+                    "description": "平台背景颜色",
+                    "type": "string"
+                },
+                "homeLogo": {
+                    "description": "平台图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "homeName": {
+                    "description": "平台名称",
+                    "type": "string"
+                }
+            }
+        },
+        "request.CustomLoginConfig": {
+            "type": "object",
+            "properties": {
+                "loginBg": {
+                    "description": "登录页背景图",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "loginButtonColor": {
+                    "description": "登录按钮颜色",
+                    "type": "string"
+                },
+                "loginWelcomeText": {
+                    "description": "登录页欢迎语",
+                    "type": "string"
+                }
+            }
+        },
+        "request.CustomTabConfig": {
+            "type": "object",
+            "properties": {
+                "tabLogo": {
+                    "description": "标签页图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "tabTitle": {
+                    "description": "标签页标题",
                     "type": "string"
                 }
             }
@@ -7255,6 +7758,17 @@ const docTemplate = `{
             ],
             "properties": {
                 "knowledgeId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.DeleteKnowledgeSplitterReq": {
+            "type": "object",
+            "required": [
+                "splitterId"
+            ],
+            "properties": {
+                "splitterId": {
                     "type": "string"
                 }
             }
@@ -7418,6 +7932,24 @@ const docTemplate = `{
                 "status": {
                     "description": "当前状态  -1-全部， 0-待处理， 1- 处理完成， 2-正在审核中，3-正在解析中，4-审核未通过，5-解析失败",
                     "type": "integer"
+                }
+            }
+        },
+        "request.DocMetaDataReq": {
+            "type": "object",
+            "required": [
+                "docId"
+            ],
+            "properties": {
+                "docId": {
+                    "type": "string"
+                },
+                "metaDataList": {
+                    "description": "文档元数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.MetaData"
+                    }
                 }
             }
         },
@@ -7645,6 +8177,14 @@ const docTemplate = `{
                 }
             }
         },
+        "request.KnowledgeSplitterSelectReq": {
+            "type": "object",
+            "properties": {
+                "splitterName": {
+                    "type": "string"
+                }
+            }
+        },
         "request.KnowledgeTagSelectReq": {
             "type": "object",
             "properties": {
@@ -7698,6 +8238,17 @@ const docTemplate = `{
                 }
             }
         },
+        "request.MCPAddRequest": {
+            "type": "object",
+            "properties": {
+                "assistantId": {
+                    "type": "string"
+                },
+                "mcpId": {
+                    "type": "string"
+                }
+            }
+        },
         "request.MCPCreate": {
             "type": "object",
             "required": [
@@ -7740,6 +8291,17 @@ const docTemplate = `{
                 }
             }
         },
+        "request.MCPIdRequest": {
+            "type": "object",
+            "required": [
+                "mcpId"
+            ],
+            "properties": {
+                "mcpId": {
+                    "type": "string"
+                }
+            }
+        },
         "request.MergeFileReq": {
             "type": "object",
             "required": [
@@ -7766,6 +8328,24 @@ const docTemplate = `{
                 "isExpired": {
                     "description": "minio存储文件是否过期 0:过期，1:不过期",
                     "type": "boolean"
+                }
+            }
+        },
+        "request.MetaData": {
+            "type": "object",
+            "required": [
+                "key",
+                "value"
+            ],
+            "properties": {
+                "dataId": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         },
@@ -8188,6 +8768,25 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.UpdateKnowledgeSplitterReq": {
+            "type": "object",
+            "required": [
+                "splitterId",
+                "splitterName",
+                "splitterValue"
+            ],
+            "properties": {
+                "splitterId": {
+                    "type": "string"
+                },
+                "splitterName": {
+                    "type": "string"
+                },
+                "splitterValue": {
                     "type": "string"
                 }
             }
@@ -8643,6 +9242,13 @@ const docTemplate = `{
                         }
                     ]
                 },
+                "mcpInfos": {
+                    "description": "MCP信息",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MCPInfos"
+                    }
+                },
                 "modelConfig": {
                     "description": "模型",
                     "allOf": [
@@ -8956,12 +9562,20 @@ const docTemplate = `{
         "response.CustomHome": {
             "type": "object",
             "properties": {
-                "logoPath": {
-                    "description": "首页logo路径，例如/v1/static/logo/title_logo.png",
+                "backgroundColor": {
+                    "description": "平台背景色",
                     "type": "string"
                 },
+                "logo": {
+                    "description": "首页logo",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
                 "title": {
-                    "description": "首页标题",
+                    "description": "平台名称",
                     "type": "string"
                 }
             }
@@ -8969,9 +9583,13 @@ const docTemplate = `{
         "response.CustomLogin": {
             "type": "object",
             "properties": {
-                "backgroundPath": {
-                    "description": "登录页背景图路径",
-                    "type": "string"
+                "background": {
+                    "description": "登录页背景图",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
                 },
                 "loginButtonColor": {
                     "description": "登录按钮颜色",
@@ -8990,9 +9608,13 @@ const docTemplate = `{
         "response.CustomTab": {
             "type": "object",
             "properties": {
-                "logoPath": {
-                    "description": "标签页图标路径",
-                    "type": "string"
+                "logo": {
+                    "description": "标签页图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
                 },
                 "title": {
                     "description": "标签页标题",
@@ -9073,6 +9695,13 @@ const docTemplate = `{
         "response.DocSegmentResp": {
             "type": "object",
             "properties": {
+                "MetaDataList": {
+                    "description": "文档元数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MetaData"
+                    }
+                },
                 "contentList": {
                     "description": "内容",
                     "type": "array",
@@ -9289,6 +9918,34 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.KnowledgeInfo"
+                    }
+                }
+            }
+        },
+        "response.KnowledgeSplitter": {
+            "type": "object",
+            "properties": {
+                "splitterId": {
+                    "description": "知识库分隔符id",
+                    "type": "string"
+                },
+                "splitterName": {
+                    "description": "知识库分隔符名称",
+                    "type": "string"
+                },
+                "splitterValue": {
+                    "description": "知识库分隔符值",
+                    "type": "string"
+                }
+            }
+        },
+        "response.KnowledgeSplitterListResp": {
+            "type": "object",
+            "properties": {
+                "knowledgeSplitterList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.KnowledgeSplitter"
                     }
                 }
             }
@@ -9589,6 +10246,38 @@ const docTemplate = `{
                 }
             }
         },
+        "response.MCPInfos": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "mcpDesc": {
+                    "type": "string"
+                },
+                "mcpId": {
+                    "type": "string"
+                },
+                "mcpName": {
+                    "type": "string"
+                },
+                "mcpServerFrom": {
+                    "type": "string"
+                },
+                "mcpServerUrl": {
+                    "type": "string"
+                },
+                "mcpSquareId": {
+                    "type": "string"
+                },
+                "valid": {
+                    "type": "boolean"
+                }
+            }
+        },
         "response.MCPSelect": {
             "type": "object",
             "properties": {
@@ -9796,6 +10485,20 @@ const docTemplate = `{
                 },
                 "filePath": {
                     "description": "minio文件的完整路径",
+                    "type": "string"
+                }
+            }
+        },
+        "response.MetaData": {
+            "type": "object",
+            "properties": {
+                "dataId": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "value": {
                     "type": "string"
                 }
             }

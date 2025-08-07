@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/UnicomAI/wanwu/pkg/util"
 	"io"
 
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -37,16 +38,16 @@ func (req *EmbeddingReq) Data() (map[string]interface{}, error) {
 
 type EmbeddingResp struct {
 	Id      *string         `json:"id,omitempty"`
-	Model   string          `json:"model"`
+	Model   string          `json:"model" validate:"required"`
 	Object  *string         `json:"object,omitempty"`
-	Data    []EmbeddingData `json:"data"`
+	Data    []EmbeddingData `json:"data" validate:"required,dive"`
 	Usage   Usage           `json:"usage"`
 	Created *int            `json:"created,omitempty"`
 }
 
 type EmbeddingData struct {
 	Object    string    `json:"object"`
-	Embedding []float64 `json:"embedding"`
+	Embedding []float64 `json:"embedding" validate:"required,min=1"`
 	Index     int       `json:"index"`
 }
 
@@ -103,6 +104,10 @@ func (resp *embeddingResp) ConvertResp() (*EmbeddingResp, bool) {
 	var ret *EmbeddingResp
 	if err := json.Unmarshal([]byte(resp.raw), &ret); err != nil {
 		log.Errorf("embedding resp (%v) convert to data err: %v", resp.raw, err)
+		return nil, false
+	}
+	if err := util.Validate(ret); err != nil {
+		log.Errorf("embedding resp validate err: %v", err)
 		return nil, false
 	}
 	return ret, true

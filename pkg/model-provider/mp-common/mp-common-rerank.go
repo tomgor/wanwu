@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/UnicomAI/wanwu/pkg/util"
 	"io"
 
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -43,7 +44,7 @@ func (req *RerankReq) Data() (map[string]interface{}, error) {
 // --- openapi response ---
 
 type RerankResp struct {
-	Results   []Result `json:"results"`
+	Results   []Result `json:"results" validate:"required,dive"`
 	Model     string   `json:"model"`
 	Object    *string  `json:"object,omitempty"`
 	Usage     Usage    `json:"usage"`
@@ -53,7 +54,7 @@ type RerankResp struct {
 type Result struct {
 	Index          int       `json:"index"`
 	Document       *Document `json:"document,omitempty"`
-	RelevanceScore float64   `json:"relevance_score"`
+	RelevanceScore float64   `json:"relevance_score" validate:"required"`
 }
 
 type Document struct {
@@ -119,6 +120,11 @@ func (resp *rerankResp) ConvertResp() (*RerankResp, bool) {
 	var ret *RerankResp
 	if err := json.Unmarshal([]byte(resp.raw), &ret); err != nil {
 		log.Errorf("rerank resp (%v) convert to data err: %v", resp.raw, err)
+		return nil, false
+	}
+
+	if err := util.Validate(ret); err != nil {
+		log.Errorf("rerank resp validate err: %v", err)
 		return nil, false
 	}
 	return ret, true

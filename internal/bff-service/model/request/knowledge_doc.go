@@ -18,6 +18,12 @@ type DocImportReq struct {
 	CommonCheck
 }
 
+type DocMetaDataReq struct {
+	DocId        string      `json:"docId" validate:"required"`
+	MetaDataList []*MetaData `json:"metaDataList"` //文档元数据
+	CommonCheck
+}
+
 type DocInfo struct {
 	DocId   string `json:"docId"`   //文档id
 	DocName string `json:"docName"` //文档名称

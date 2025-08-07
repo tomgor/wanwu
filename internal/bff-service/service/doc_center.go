@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/url"
@@ -57,7 +56,7 @@ type mdInfo struct {
 	content     string
 }
 
-func InitDocCenter(ctx context.Context) error {
+func InitDocCenter() error {
 	if _docCenter != nil {
 		return errors.New("already init")
 	}
@@ -73,7 +72,7 @@ func InitDocCenter(ctx context.Context) error {
 			// 读取文件内容
 			content, err := os.ReadFile(filePath)
 			if err != nil {
-				return fmt.Errorf("read %v err: %v", filePath)
+				return fmt.Errorf("read %v err: %v", filePath, err)
 			}
 			fileName := fileInfo.Name()
 			// 将markdown文本中图片引用 ![](xxxxx )与链接引用[](xxxxx )里的 xxxxx 处理为前端可访问的地址

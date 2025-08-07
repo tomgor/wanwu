@@ -59,4 +59,7 @@ func Init() {
 
 	// permission.role
 	mid.Sub("permission").NewSub("role", "角色", route.PermNeedCheck, true, true)
+
+	// --- setting ---
+	mid.NewSub("setting", "平台配置", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
 }

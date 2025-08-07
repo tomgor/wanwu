@@ -20,13 +20,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	KnowledgeBaseService_SelectKnowledgeList_FullMethodName         = "/knowledgebase_service.KnowledgeBaseService/SelectKnowledgeList"
-	KnowledgeBaseService_SelectKnowledgeDetailById_FullMethodName   = "/knowledgebase_service.KnowledgeBaseService/SelectKnowledgeDetailById"
-	KnowledgeBaseService_SelectKnowledgeDetailByName_FullMethodName = "/knowledgebase_service.KnowledgeBaseService/SelectKnowledgeDetailByName"
-	KnowledgeBaseService_CreateKnowledge_FullMethodName             = "/knowledgebase_service.KnowledgeBaseService/CreateKnowledge"
-	KnowledgeBaseService_UpdateKnowledge_FullMethodName             = "/knowledgebase_service.KnowledgeBaseService/UpdateKnowledge"
-	KnowledgeBaseService_DeleteKnowledge_FullMethodName             = "/knowledgebase_service.KnowledgeBaseService/DeleteKnowledge"
-	KnowledgeBaseService_KnowledgeHit_FullMethodName                = "/knowledgebase_service.KnowledgeBaseService/KnowledgeHit"
+	KnowledgeBaseService_SelectKnowledgeList_FullMethodName           = "/knowledgebase_service.KnowledgeBaseService/SelectKnowledgeList"
+	KnowledgeBaseService_SelectKnowledgeDetailById_FullMethodName     = "/knowledgebase_service.KnowledgeBaseService/SelectKnowledgeDetailById"
+	KnowledgeBaseService_SelectKnowledgeDetailByIdList_FullMethodName = "/knowledgebase_service.KnowledgeBaseService/SelectKnowledgeDetailByIdList"
+	KnowledgeBaseService_SelectKnowledgeDetailByName_FullMethodName   = "/knowledgebase_service.KnowledgeBaseService/SelectKnowledgeDetailByName"
+	KnowledgeBaseService_CreateKnowledge_FullMethodName               = "/knowledgebase_service.KnowledgeBaseService/CreateKnowledge"
+	KnowledgeBaseService_UpdateKnowledge_FullMethodName               = "/knowledgebase_service.KnowledgeBaseService/UpdateKnowledge"
+	KnowledgeBaseService_DeleteKnowledge_FullMethodName               = "/knowledgebase_service.KnowledgeBaseService/DeleteKnowledge"
+	KnowledgeBaseService_KnowledgeHit_FullMethodName                  = "/knowledgebase_service.KnowledgeBaseService/KnowledgeHit"
 )
 
 // KnowledgeBaseServiceClient is the client API for KnowledgeBaseService service.
@@ -37,6 +38,8 @@ type KnowledgeBaseServiceClient interface {
 	SelectKnowledgeList(ctx context.Context, in *KnowledgeSelectReq, opts ...grpc.CallOption) (*KnowledgeSelectListResp, error)
 	// 获取知识库详情
 	SelectKnowledgeDetailById(ctx context.Context, in *KnowledgeDetailSelectReq, opts ...grpc.CallOption) (*KnowledgeInfo, error)
+	// 获取知识库详情列表
+	SelectKnowledgeDetailByIdList(ctx context.Context, in *KnowledgeDetailSelectListReq, opts ...grpc.CallOption) (*KnowledgeDetailSelectListResp, error)
 	// 获取知识库详情
 	SelectKnowledgeDetailByName(ctx context.Context, in *KnowledgeDetailSelectReq, opts ...grpc.CallOption) (*KnowledgeInfo, error)
 	// 新增知识库
@@ -71,6 +74,16 @@ func (c *knowledgeBaseServiceClient) SelectKnowledgeDetailById(ctx context.Conte
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(KnowledgeInfo)
 	err := c.cc.Invoke(ctx, KnowledgeBaseService_SelectKnowledgeDetailById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *knowledgeBaseServiceClient) SelectKnowledgeDetailByIdList(ctx context.Context, in *KnowledgeDetailSelectListReq, opts ...grpc.CallOption) (*KnowledgeDetailSelectListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(KnowledgeDetailSelectListResp)
+	err := c.cc.Invoke(ctx, KnowledgeBaseService_SelectKnowledgeDetailByIdList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -135,6 +148,8 @@ type KnowledgeBaseServiceServer interface {
 	SelectKnowledgeList(context.Context, *KnowledgeSelectReq) (*KnowledgeSelectListResp, error)
 	// 获取知识库详情
 	SelectKnowledgeDetailById(context.Context, *KnowledgeDetailSelectReq) (*KnowledgeInfo, error)
+	// 获取知识库详情列表
+	SelectKnowledgeDetailByIdList(context.Context, *KnowledgeDetailSelectListReq) (*KnowledgeDetailSelectListResp, error)
 	// 获取知识库详情
 	SelectKnowledgeDetailByName(context.Context, *KnowledgeDetailSelectReq) (*KnowledgeInfo, error)
 	// 新增知识库
@@ -160,6 +175,9 @@ func (UnimplementedKnowledgeBaseServiceServer) SelectKnowledgeList(context.Conte
 }
 func (UnimplementedKnowledgeBaseServiceServer) SelectKnowledgeDetailById(context.Context, *KnowledgeDetailSelectReq) (*KnowledgeInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SelectKnowledgeDetailById not implemented")
+}
+func (UnimplementedKnowledgeBaseServiceServer) SelectKnowledgeDetailByIdList(context.Context, *KnowledgeDetailSelectListReq) (*KnowledgeDetailSelectListResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SelectKnowledgeDetailByIdList not implemented")
 }
 func (UnimplementedKnowledgeBaseServiceServer) SelectKnowledgeDetailByName(context.Context, *KnowledgeDetailSelectReq) (*KnowledgeInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SelectKnowledgeDetailByName not implemented")
@@ -229,6 +247,24 @@ func _KnowledgeBaseService_SelectKnowledgeDetailById_Handler(srv interface{}, ct
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KnowledgeBaseServiceServer).SelectKnowledgeDetailById(ctx, req.(*KnowledgeDetailSelectReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KnowledgeBaseService_SelectKnowledgeDetailByIdList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(KnowledgeDetailSelectListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KnowledgeBaseServiceServer).SelectKnowledgeDetailByIdList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KnowledgeBaseService_SelectKnowledgeDetailByIdList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KnowledgeBaseServiceServer).SelectKnowledgeDetailByIdList(ctx, req.(*KnowledgeDetailSelectListReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -337,6 +373,10 @@ var KnowledgeBaseService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SelectKnowledgeDetailById",
 			Handler:    _KnowledgeBaseService_SelectKnowledgeDetailById_Handler,
+		},
+		{
+			MethodName: "SelectKnowledgeDetailByIdList",
+			Handler:    _KnowledgeBaseService_SelectKnowledgeDetailByIdList_Handler,
 		},
 		{
 			MethodName: "SelectKnowledgeDetailByName",

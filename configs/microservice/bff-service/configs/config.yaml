@@ -56,21 +56,26 @@ assistant-template:
   configPath: configs/microservice/bff-service/configs/assistant_template_config.yaml
 
 custom-info:
-  login:
-    background_path: "/v1/static/logo/login_bg.png"
-    login_button_color: "#384BF7"
-    welcome_text: bff_custom_login_welcome_text
-    platform_desc: bff_custom_login_platform_desc
-  home:
-    logo_path: "/v1/static/logo/title_logo.png"
-    title: bff_custom_home_title
-  tab:
-    tab_title: bff_custom_tab_title
-    tab_logo_path: "/v1/static/logo/tab_logo.png"
-  about:
-    logo_path: "/v1/static/logo/about_logo.png"
-    version: v0.1.5
-    copyright: bff_custom_about_copyright
+  default_mode: light
+  modes:
+    - mode: light
+      login:
+        background_path: "/v1/static/logo/login_bg.png"
+        login_button_color: "#384BF7"
+        welcome_text: bff_custom_login_welcome_text
+        platform_desc: bff_custom_login_platform_desc
+      home:
+        logo_path: "/v1/static/logo/title_logo.png"
+        title: bff_custom_home_title
+        background_color: "linear-gradient(1deg,#fff 42%,#fff 0,#ebedfe 98%,#eef0ff 0)"
+      tab:
+        title: bff_custom_tab_title
+        logo_path: "/v1/static/logo/tab_logo.png"
+      about:
+        logo_path: "/v1/static/logo/about_logo.png"
+        version: v0.1.0
+        copyright: bff_custom_about_copyright
+    - mode: dark
 
 doc-center:
   frontend_prefix: /aibase/docCenter/pages
@@ -160,3 +165,6 @@ agent:
   upload_minio:
       port: 15001
       uri: /upload
+
+operate:
+  host: operate-service:9797

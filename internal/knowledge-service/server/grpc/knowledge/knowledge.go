@@ -61,6 +61,15 @@ func (s *Service) SelectKnowledgeDetailByName(ctx context.Context, req *knowledg
 	return buildKnowledgeInfo(knowledgeInfo), nil
 }
 
+func (s *Service) SelectKnowledgeDetailByIdList(ctx context.Context, req *knowledgebase_service.KnowledgeDetailSelectListReq) (*knowledgebase_service.KnowledgeDetailSelectListResp, error) {
+	knowledgeInfoList, err := orm.SelectKnowledgeByIdList(ctx, req.KnowledgeIds, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf(fmt.Sprintf("根据id列表获取知识库详情列表失败(%v)  参数(%v)", err, req))
+		return nil, err
+	}
+	return buildKnowledgeInfoList(knowledgeInfoList), nil
+}
+
 func (s *Service) CreateKnowledge(ctx context.Context, req *knowledgebase_service.CreateKnowledgeReq) (*knowledgebase_service.CreateKnowledgeResp, error) {
 	//1.重名校验
 	err := orm.CheckSameKnowledgeName(ctx, req.UserId, req.OrgId, req.Name)
@@ -220,6 +229,19 @@ func buildKnowledgeInfo(knowledge *model.KnowledgeBase) *knowledgebase_service.K
 		Description:        knowledge.Description,
 		DocCount:           int32(knowledge.DocCount),
 		EmbeddingModelInfo: embeddingModelInfo,
+	}
+}
+
+// buildKnowledgeInfoList 构造知识库信息列表
+func buildKnowledgeInfoList(knowledgeList []*model.KnowledgeBase) *knowledgebase_service.KnowledgeDetailSelectListResp {
+	var retList []*knowledgebase_service.KnowledgeInfo
+	for _, v := range knowledgeList {
+		info := buildKnowledgeInfo(v)
+		retList = append(retList, info)
+	}
+	return &knowledgebase_service.KnowledgeDetailSelectListResp{
+		List:  retList,
+		Total: int32(len(retList)),
 	}
 }
 

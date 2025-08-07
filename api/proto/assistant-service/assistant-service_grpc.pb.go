@@ -30,6 +30,10 @@ const (
 	AssistantService_AssistantWorkFlowCreate_FullMethodName         = "/assistant_service.AssistantService/AssistantWorkFlowCreate"
 	AssistantService_AssistantWorkFlowDelete_FullMethodName         = "/assistant_service.AssistantService/AssistantWorkFlowDelete"
 	AssistantService_AssistantWorkFlowEnableSwitch_FullMethodName   = "/assistant_service.AssistantService/AssistantWorkFlowEnableSwitch"
+	AssistantService_AssistantMCPCreate_FullMethodName              = "/assistant_service.AssistantService/AssistantMCPCreate"
+	AssistantService_AssistantMCPDelete_FullMethodName              = "/assistant_service.AssistantService/AssistantMCPDelete"
+	AssistantService_AssistantMCPEnableSwitch_FullMethodName        = "/assistant_service.AssistantService/AssistantMCPEnableSwitch"
+	AssistantService_AssistantMCPGetList_FullMethodName             = "/assistant_service.AssistantService/AssistantMCPGetList"
 	AssistantService_AssistantActionCreate_FullMethodName           = "/assistant_service.AssistantService/AssistantActionCreate"
 	AssistantService_AssistantActionDelete_FullMethodName           = "/assistant_service.AssistantService/AssistantActionDelete"
 	AssistantService_AssistantActionUpdate_FullMethodName           = "/assistant_service.AssistantService/AssistantActionUpdate"
@@ -59,6 +63,11 @@ type AssistantServiceClient interface {
 	AssistantWorkFlowCreate(ctx context.Context, in *AssistantWorkFlowCreateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AssistantWorkFlowDelete(ctx context.Context, in *AssistantWorkFlowDeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AssistantWorkFlowEnableSwitch(ctx context.Context, in *AssistantWorkFlowEnableSwitchReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// --- MCP ---
+	AssistantMCPCreate(ctx context.Context, in *AssistantMCPCreateReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AssistantMCPDelete(ctx context.Context, in *AssistantMCPDeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AssistantMCPEnableSwitch(ctx context.Context, in *AssistantMCPEnableSwitchReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AssistantMCPGetList(ctx context.Context, in *AssistantMCPGetListReq, opts ...grpc.CallOption) (*AssistantMCPList, error)
 	// --- action ---
 	AssistantActionCreate(ctx context.Context, in *AssistantActionCreateReq, opts ...grpc.CallOption) (*AssistantActionCreateResp, error)
 	AssistantActionDelete(ctx context.Context, in *AssistantActionDeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -176,6 +185,46 @@ func (c *assistantServiceClient) AssistantWorkFlowEnableSwitch(ctx context.Conte
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, AssistantService_AssistantWorkFlowEnableSwitch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assistantServiceClient) AssistantMCPCreate(ctx context.Context, in *AssistantMCPCreateReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AssistantService_AssistantMCPCreate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assistantServiceClient) AssistantMCPDelete(ctx context.Context, in *AssistantMCPDeleteReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AssistantService_AssistantMCPDelete_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assistantServiceClient) AssistantMCPEnableSwitch(ctx context.Context, in *AssistantMCPEnableSwitchReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AssistantService_AssistantMCPEnableSwitch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assistantServiceClient) AssistantMCPGetList(ctx context.Context, in *AssistantMCPGetListReq, opts ...grpc.CallOption) (*AssistantMCPList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AssistantMCPList)
+	err := c.cc.Invoke(ctx, AssistantService_AssistantMCPGetList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -317,6 +366,11 @@ type AssistantServiceServer interface {
 	AssistantWorkFlowCreate(context.Context, *AssistantWorkFlowCreateReq) (*emptypb.Empty, error)
 	AssistantWorkFlowDelete(context.Context, *AssistantWorkFlowDeleteReq) (*emptypb.Empty, error)
 	AssistantWorkFlowEnableSwitch(context.Context, *AssistantWorkFlowEnableSwitchReq) (*emptypb.Empty, error)
+	// --- MCP ---
+	AssistantMCPCreate(context.Context, *AssistantMCPCreateReq) (*emptypb.Empty, error)
+	AssistantMCPDelete(context.Context, *AssistantMCPDeleteReq) (*emptypb.Empty, error)
+	AssistantMCPEnableSwitch(context.Context, *AssistantMCPEnableSwitchReq) (*emptypb.Empty, error)
+	AssistantMCPGetList(context.Context, *AssistantMCPGetListReq) (*AssistantMCPList, error)
 	// --- action ---
 	AssistantActionCreate(context.Context, *AssistantActionCreateReq) (*AssistantActionCreateResp, error)
 	AssistantActionDelete(context.Context, *AssistantActionDeleteReq) (*emptypb.Empty, error)
@@ -369,6 +423,18 @@ func (UnimplementedAssistantServiceServer) AssistantWorkFlowDelete(context.Conte
 }
 func (UnimplementedAssistantServiceServer) AssistantWorkFlowEnableSwitch(context.Context, *AssistantWorkFlowEnableSwitchReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssistantWorkFlowEnableSwitch not implemented")
+}
+func (UnimplementedAssistantServiceServer) AssistantMCPCreate(context.Context, *AssistantMCPCreateReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssistantMCPCreate not implemented")
+}
+func (UnimplementedAssistantServiceServer) AssistantMCPDelete(context.Context, *AssistantMCPDeleteReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssistantMCPDelete not implemented")
+}
+func (UnimplementedAssistantServiceServer) AssistantMCPEnableSwitch(context.Context, *AssistantMCPEnableSwitchReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssistantMCPEnableSwitch not implemented")
+}
+func (UnimplementedAssistantServiceServer) AssistantMCPGetList(context.Context, *AssistantMCPGetListReq) (*AssistantMCPList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AssistantMCPGetList not implemented")
 }
 func (UnimplementedAssistantServiceServer) AssistantActionCreate(context.Context, *AssistantActionCreateReq) (*AssistantActionCreateResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssistantActionCreate not implemented")
@@ -600,6 +666,78 @@ func _AssistantService_AssistantWorkFlowEnableSwitch_Handler(srv interface{}, ct
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AssistantServiceServer).AssistantWorkFlowEnableSwitch(ctx, req.(*AssistantWorkFlowEnableSwitchReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssistantService_AssistantMCPCreate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssistantMCPCreateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssistantServiceServer).AssistantMCPCreate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssistantService_AssistantMCPCreate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssistantServiceServer).AssistantMCPCreate(ctx, req.(*AssistantMCPCreateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssistantService_AssistantMCPDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssistantMCPDeleteReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssistantServiceServer).AssistantMCPDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssistantService_AssistantMCPDelete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssistantServiceServer).AssistantMCPDelete(ctx, req.(*AssistantMCPDeleteReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssistantService_AssistantMCPEnableSwitch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssistantMCPEnableSwitchReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssistantServiceServer).AssistantMCPEnableSwitch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssistantService_AssistantMCPEnableSwitch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssistantServiceServer).AssistantMCPEnableSwitch(ctx, req.(*AssistantMCPEnableSwitchReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssistantService_AssistantMCPGetList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AssistantMCPGetListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssistantServiceServer).AssistantMCPGetList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssistantService_AssistantMCPGetList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssistantServiceServer).AssistantMCPGetList(ctx, req.(*AssistantMCPGetListReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -841,6 +979,22 @@ var AssistantService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AssistantWorkFlowEnableSwitch",
 			Handler:    _AssistantService_AssistantWorkFlowEnableSwitch_Handler,
+		},
+		{
+			MethodName: "AssistantMCPCreate",
+			Handler:    _AssistantService_AssistantMCPCreate_Handler,
+		},
+		{
+			MethodName: "AssistantMCPDelete",
+			Handler:    _AssistantService_AssistantMCPDelete_Handler,
+		},
+		{
+			MethodName: "AssistantMCPEnableSwitch",
+			Handler:    _AssistantService_AssistantMCPEnableSwitch_Handler,
+		},
+		{
+			MethodName: "AssistantMCPGetList",
+			Handler:    _AssistantService_AssistantMCPGetList_Handler,
 		},
 		{
 			MethodName: "AssistantActionCreate",

@@ -34,6 +34,7 @@ type Config struct {
 	Assistant ServiceConfig         `json:"assistant" mapstructure:"assistant"`
 	WorkFlow  WorkFlowServiceConfig `json:"workflow" mapstructure:"workflow"`
 	Agent     AgentServiceConfig    `json:"agent" mapstructure:"agent"`
+	Operate   ServiceConfig         `json:"operate" mapstructure:"operate"`
 }
 
 type ServerConfig struct {
@@ -105,6 +106,12 @@ type DocLinkConfig struct {
 }
 
 type CustomInfoConfig struct {
+	DefaultMode string        `json:"default_mode" mapstructure:"default_mode"`
+	Modes       []CustomTheme `json:"modes" mapstructure:"modes"`
+}
+
+type CustomTheme struct {
+	Mode  string      `json:"mode" mapstructure:"mode"`
 	Login CustomLogin `json:"login" mapstructure:"login"`
 	Home  CustomHome  `json:"home" mapstructure:"home"`
 	Tab   CustomTab   `json:"tab" mapstructure:"tab"`
@@ -119,13 +126,14 @@ type CustomLogin struct {
 }
 
 type CustomHome struct {
-	LogoPath string `json:"logo_path" mapstructure:"logo_path"`
-	Title    string `json:"title" mapstructure:"title"`
+	LogoPath        string `json:"logo_path" mapstructure:"logo_path"`
+	Title           string `json:"title" mapstructure:"title"`
+	BackgroundColor string `json:"background_color" mapstructure:"background_color"`
 }
 
 type CustomTab struct {
-	TabTitle    string `json:"tab_title" mapstructure:"tab_title"`
-	TabLogoPath string `json:"tab_logo_path" mapstructure:"tab_logo_path"`
+	TabTitle    string `json:"title" mapstructure:"title"`
+	TabLogoPath string `json:"logo_path" mapstructure:"logo_path"`
 }
 
 type CustomAbout struct {

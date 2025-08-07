@@ -507,9 +507,6 @@ definitions:
       maxHistory:
         description: 最长上下文
         type: integer
-      maxHistoryEnable:
-        description: 最长上下文(开关)
-        type: boolean
       priorityMatch:
         description: 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
         type: integer
@@ -519,15 +516,9 @@ definitions:
       threshold:
         description: 过滤阈值
         type: number
-      thresholdEnable:
-        description: 过滤阈值(开关)
-        type: boolean
       topK:
         description: 知识条数
         type: integer
-      topKEnable:
-        description: 知识条数(开关)
-        type: boolean
     type: object
   request.AppModelConfig:
     properties:
@@ -774,6 +765,16 @@ definitions:
     - embeddingModelInfo
     - name
     type: object
+  request.CreateKnowledgeSplitterReq:
+    properties:
+      splitterName:
+        type: string
+      splitterValue:
+        type: string
+    required:
+    - splitterName
+    - splitterValue
+    type: object
   request.CreateKnowledgeTagReq:
     properties:
       tagName:
@@ -791,6 +792,42 @@ definitions:
         type: string
     required:
     - tableName
+    type: object
+  request.CustomHomeConfig:
+    properties:
+      homeBgColor:
+        description: 平台背景颜色
+        type: string
+      homeLogo:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 平台图标
+      homeName:
+        description: 平台名称
+        type: string
+    type: object
+  request.CustomLoginConfig:
+    properties:
+      loginBg:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 登录页背景图
+      loginButtonColor:
+        description: 登录按钮颜色
+        type: string
+      loginWelcomeText:
+        description: 登录页欢迎语
+        type: string
+    type: object
+  request.CustomTabConfig:
+    properties:
+      tabLogo:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 标签页图标
+      tabTitle:
+        description: 标签页标题
+        type: string
     type: object
   request.DelApiKeyRequest:
     properties:
@@ -843,6 +880,13 @@ definitions:
         type: string
     required:
     - knowledgeId
+    type: object
+  request.DeleteKnowledgeSplitterReq:
+    properties:
+      splitterId:
+        type: string
+    required:
+    - splitterId
     type: object
   request.DeleteKnowledgeTagReq:
     properties:
@@ -956,6 +1000,18 @@ definitions:
     required:
     - knowledgeId
     - pageSize
+    type: object
+  request.DocMetaDataReq:
+    properties:
+      docId:
+        type: string
+      metaDataList:
+        description: 文档元数据
+        items:
+          $ref: '#/definitions/request.MetaData'
+        type: array
+    required:
+    - docId
     type: object
   request.DocSegment:
     properties:
@@ -1110,6 +1166,11 @@ definitions:
           type: string
         type: array
     type: object
+  request.KnowledgeSplitterSelectReq:
+    properties:
+      splitterName:
+        type: string
+    type: object
   request.KnowledgeTagSelectReq:
     properties:
       knowledgeId:
@@ -1147,6 +1208,13 @@ definitions:
     - password
     - username
     type: object
+  request.MCPAddRequest:
+    properties:
+      assistantId:
+        type: string
+      mcpId:
+        type: string
+    type: object
   request.MCPCreate:
     properties:
       desc:
@@ -1177,6 +1245,13 @@ definitions:
     required:
     - mcpId
     type: object
+  request.MCPIdRequest:
+    properties:
+      mcpId:
+        type: string
+    required:
+    - mcpId
+    type: object
   request.MergeFileReq:
     properties:
       chunkName:
@@ -1197,6 +1272,18 @@ definitions:
     required:
     - chunkName
     - fileName
+    type: object
+  request.MetaData:
+    properties:
+      dataId:
+        type: string
+      key:
+        type: string
+      value:
+        type: string
+    required:
+    - key
+    - value
     type: object
   request.ModelStatusRequest:
     properties:
@@ -1480,6 +1567,19 @@ definitions:
     required:
     - knowledgeId
     - name
+    type: object
+  request.UpdateKnowledgeSplitterReq:
+    properties:
+      splitterId:
+        type: string
+      splitterName:
+        type: string
+      splitterValue:
+        type: string
+    required:
+    - splitterId
+    - splitterName
+    - splitterValue
     type: object
   request.UpdateKnowledgeTagReq:
     properties:
@@ -1789,6 +1889,11 @@ definitions:
         allOf:
         - $ref: '#/definitions/request.AppKnowledgebaseConfig'
         description: 知识库
+      mcpInfos:
+        description: MCP信息
+        items:
+          $ref: '#/definitions/response.MCPInfos'
+        type: array
       modelConfig:
         allOf:
         - $ref: '#/definitions/request.AppModelConfig'
@@ -1998,18 +2103,23 @@ definitions:
     type: object
   response.CustomHome:
     properties:
-      logoPath:
-        description: 首页logo路径，例如/v1/static/logo/title_logo.png
+      backgroundColor:
+        description: 平台背景色
         type: string
+      logo:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 首页logo
       title:
-        description: 首页标题
+        description: 平台名称
         type: string
     type: object
   response.CustomLogin:
     properties:
-      backgroundPath:
-        description: 登录页背景图路径
-        type: string
+      background:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 登录页背景图
       loginButtonColor:
         description: 登录按钮颜色
         type: string
@@ -2022,9 +2132,10 @@ definitions:
     type: object
   response.CustomTab:
     properties:
-      logoPath:
-        description: 标签页图标路径
-        type: string
+      logo:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 标签页图标
       title:
         description: 标签页标题
         type: string
@@ -2080,6 +2191,11 @@ definitions:
     type: object
   response.DocSegmentResp:
     properties:
+      MetaDataList:
+        description: 文档元数据
+        items:
+          $ref: '#/definitions/response.MetaData'
+        type: array
       contentList:
         description: 内容
         items:
@@ -2227,6 +2343,25 @@ definitions:
       knowledgeList:
         items:
           $ref: '#/definitions/response.KnowledgeInfo'
+        type: array
+    type: object
+  response.KnowledgeSplitter:
+    properties:
+      splitterId:
+        description: 知识库分隔符id
+        type: string
+      splitterName:
+        description: 知识库分隔符名称
+        type: string
+      splitterValue:
+        description: 知识库分隔符值
+        type: string
+    type: object
+  response.KnowledgeSplitterListResp:
+    properties:
+      knowledgeSplitterList:
+        items:
+          $ref: '#/definitions/response.KnowledgeSplitter'
         type: array
     type: object
   response.KnowledgeTag:
@@ -2424,6 +2559,27 @@ definitions:
         description: SSE URL
         type: string
     type: object
+  response.MCPInfos:
+    properties:
+      enable:
+        type: boolean
+      id:
+        type: string
+      mcpDesc:
+        type: string
+      mcpId:
+        type: string
+      mcpName:
+        type: string
+      mcpServerFrom:
+        type: string
+      mcpServerUrl:
+        type: string
+      mcpSquareId:
+        type: string
+      valid:
+        type: boolean
+    type: object
   response.MCPSelect:
     properties:
       description:
@@ -2567,6 +2723,15 @@ definitions:
         type: string
       filePath:
         description: minio文件的完整路径
+        type: string
+    type: object
+  response.MetaData:
+    properties:
+      dataId:
+        type: string
+      key:
+        type: string
+      value:
         type: string
     type: object
   response.ModelBrief:
@@ -3741,6 +3906,77 @@ paths:
       summary: 智能体对话列表
       tags:
       - agent
+  /assistant/mcp:
+    delete:
+      consumes:
+      - application/json
+      description: 为智能体解绑mcp
+      parameters:
+      - description: mcp id
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.MCPIdRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 删除mcp
+      tags:
+      - agent
+    post:
+      consumes:
+      - application/json
+      description: 为智能体绑定已发布的mcp工具
+      parameters:
+      - description: mcp新增参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.MCPAddRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 添加mcp工具
+      tags:
+      - agent
+  /assistant/mcp/enable:
+    put:
+      consumes:
+      - application/json
+      description: 修改智能体绑定的MCP的启用状态
+      parameters:
+      - description: mcp id
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.MCPIdRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 启用/停用 MCP
+      tags:
+      - agent
   /assistant/stream:
     post:
       consumes:
@@ -4057,7 +4293,79 @@ paths:
       summary: 用户登录
       tags:
       - guest
-  /doc_center/markdown:
+  /custom/home:
+    post:
+      consumes:
+      - application/json
+      description: 配置平台名称、平台图标、平台背景色
+      parameters:
+      - description: 平台配置请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CustomHomeConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 平台自定义配置
+      tags:
+      - setting
+  /custom/login:
+    post:
+      consumes:
+      - application/json
+      description: 上传登录页背景图、登录页欢迎语、登录按钮颜色
+      parameters:
+      - description: 登录页配置请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CustomLoginConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 登录页自定义配置
+      tags:
+      - setting
+  /custom/tab:
+    post:
+      consumes:
+      - application/json
+      description: 上传标签页图标、标签页标题
+      parameters:
+      - description: 标签页配置请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CustomTabConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 标签页自定义配置
+      tags:
+      - setting
+  /doc_center:
     get:
       consumes:
       - application/json
@@ -4566,6 +4874,30 @@ paths:
       summary: 获取文档列表
       tags:
       - knowledge
+  /knowledge/doc/meta:
+    post:
+      consumes:
+      - application/json
+      description: 更新文档元数据
+      parameters:
+      - description: 文档更新元数据请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DocMetaDataReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 更新文档元数据
+      tags:
+      - knowledge
   /knowledge/doc/segment/list:
     get:
       consumes:
@@ -4823,6 +5155,104 @@ paths:
       summary: 查询知识库列表
       tags:
       - knowledge
+  /knowledge/splitter:
+    delete:
+      consumes:
+      - application/json
+      description: 删除知识库分隔符
+      parameters:
+      - description: 删除知识库分隔符请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DeleteKnowledgeSplitterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 删除知识库分隔符
+      tags:
+      - knowledge.splitter
+    get:
+      consumes:
+      - application/json
+      description: 查询知识库分隔符列表
+      parameters:
+      - description: 查询知识库请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.KnowledgeSplitterSelectReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.KnowledgeSplitterListResp'
+              type: object
+      security:
+      - JWT: []
+      summary: 查询知识库分隔符列表
+      tags:
+      - knowledge.splitter
+    post:
+      consumes:
+      - application/json
+      description: 创建知识库分隔符
+      parameters:
+      - description: 创建知识库分隔符请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateKnowledgeSplitterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 创建知识库分隔符
+      tags:
+      - knowledge.splitter
+    put:
+      consumes:
+      - application/json
+      description: 修改知识库分隔符
+      parameters:
+      - description: 修改知识库分隔符请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateKnowledgeSplitterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 修改知识库分隔符
+      tags:
+      - knowledge.splitter
   /knowledge/tag:
     delete:
       consumes:
@@ -5084,6 +5514,11 @@ paths:
       consumes:
       - application/json
       description: 获取自定义MCP列表（用于下拉选择）
+      parameters:
+      - description: mcp名称
+        in: query
+        name: name
+        type: string
       produces:
       - application/json
       responses:

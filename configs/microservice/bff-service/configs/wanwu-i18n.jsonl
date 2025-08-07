@@ -44,16 +44,16 @@
 {"code":110000,"key":"bff_workflow_apps_list_internal","langs":{"en":"get unauthenticated workflow app list err: %v","zh":"获取无鉴权工作流应用列表错误：%v"}}
 {"code":0,"key":"------ assistant ------","langs":{}}
 {"code":0,"key":"bff_assistant_template_name","langs":{"en":"%v_copy%v","zh":"%v_副本%v"}}
-{"code":110005,"key":"bff_sensitive_check_req","langs":{"en":"question sensitive words detected: %v","zh":"您的提问中检测到敏感词: %v"}}
-{"code":110005,"key":"bff_sensitive_chek_resp","langs":{"en":"sensitive words detected in the answer: %v","zh":"回答中检测到敏感词: %v"}}
+{"code":0,"key":"------ sensitive ------","langs":{}}
+{"code":110005,"key":"bff_sensitive_check_req","langs":{"en":"%v","zh":"%v"}}
 {"code":110005,"key":"bff_sensitive_check_req_default_reply","langs":{"en":"your current request or history contains sensitive content. In accordance with relevant security requirements, this round of dialogue has been terminated. Please clear your history or start a new dialogue","zh":"您当前请求或者历史信息中包含敏感内容，根据相关安全要求，该轮对话终止，请清除历史信息或者重新开启新的对话"}}
 {"code":110005,"key":"bff_sensitive_check_resp_default_reply","langs":{"en":"the response contains sensitive content. In accordance with relevant security requirements, this round of dialogue has been terminated. Please clear the history or start a new dialogue.","zh":"回答中包含敏感内容，根据相关安全要求，该轮对话终止，请清除历史信息或者重新开启新的对话"}}
 {"code":0,"key":"------ custom ------","langs":{}}
 {"code":0,"key":"bff_custom_home_title","langs":{"en":"Intelligent agent platform","zh":"智能体平台"}}
 {"code":0,"key":"bff_custom_tab_title","langs":{"en":"Intelligent agent platform","zh":"智能体平台"}}
 {"code":0,"key":"bff_custom_login_welcome_text","langs":{"en":"Hi! Welcome to the large model intelligent agent platform","zh":"嗨！欢迎来到大模型智能体平台"}}
-{"code":0,"key":"bff_custom_login_platform_desc","langs":{}}
 {"code":0,"key":"bff_custom_about_copyright","langs":{"zh":"© 大模型开源平台"}}
+{"code":0,"key":"bff_custom_login_platform_desc","langs":{}}
 {"code":120002,"key":"iam_captcha_refresh","langs":{"en":"refresh but key or code empty","zh":"刷新验证码时 key 或 code 为空"}}
 {"code":120002,"key":"iam_captcha_create","langs":{"en":"code not created,  please refresh: %v","zh":"验证码未生成，请刷新: %v"}}
 {"code":120002,"key":"iam_captcha_check","langs":{"en":"check captcha but key or code empty","zh":"检查验证码时 key 或 code 为空"}}
@@ -201,6 +201,12 @@
 {"code":160004,"key":"assistant_conversation_delete","langs":{"zh":"删除对话错误"}}
 {"code":160004,"key":"assistant_conversation_get","langs":{"zh":"获取对话错误"}}
 {"code":160004,"key":"assistant_conversation_get_list","langs":{"zh":"获取对话列表错误"}}
+{"code":160005,"key":"assistant_mcp_create","langs":{"zh":"创建mcp错误: %v"}}
+{"code":160005,"key":"assistant_mcp_delete","langs":{"zh":"删除mcp错误: %v"}}
+{"code":160005,"key":"assistant_mcp_count","langs":{"zh":"获取mcp错误: %v"}}
+{"code":160005,"key":"assistant_mcp_get","langs":{"zh":"获取mcp错误: %v"}}
+{"code":160005,"key":"assistant_mcp_update","langs":{"zh":"更新mcp错误: %v"}}
+{"code":160005,"key":"assistant_mcp_exist","langs":{"zh":"获取mcp错误: %v"}}
 {"code":300000,"key":"app_config_delete","langs":{"zh":"删除应用配置错误:%v"}}
 {"code":300001,"key":"app_api_keys_get","langs":{"zh":"获取ApiKey列表错误:%v"}}
 {"code":300001,"key":"app_api_key_delete","langs":{"zh":"删除ApiKey错误:%v"}}

@@ -7,6 +7,8 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
+	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
 	"io"
 	"net/http"
 	"strconv"
@@ -306,45 +308,50 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		log.Debugf("Assistant服务添加在线搜索配置到请求参数，assistantId: %s, search_url: %s, search_key: %s, use_search: %v", req.AssistantId, onlineSearchConfig.SearchUrl, onlineSearchConfig.SearchKey, onlineSearchConfig.Enable)
 	}
 
-	knowledgebaseConfig := &AppKnowledgebaseConfig{}
+	knowledgebaseConfig := &RAGKnowledgeBaseConfig{}
 	if assistant.KnowledgebaseConfig != "" {
 		// 将string类型的knowledgebase_config转换为common.AppKnowledgebaseConfig
-		if err := json.Unmarshal([]byte(assistant.KnowledgebaseConfig), knowledgebaseConfig); err != nil {
-			log.Errorf("Assistant服务解析智能体知识库配置失败，assistantId: %s, error: %v, knowledgebaseConfigRaw: %s", req.AssistantId, err, assistant.KnowledgebaseConfig)
+		if errK := json.Unmarshal([]byte(assistant.KnowledgebaseConfig), knowledgebaseConfig); errK != nil {
+			log.Errorf("Assistant服务解析智能体知识库配置失败，assistantId: %s, error: %v, knowledgebaseConfigRaw: %s", req.AssistantId, errK, assistant.KnowledgebaseConfig)
 			SSEError(stream, "智能体知识库配置解析失败")
-			return err
+			return errK
 		}
+		log.Debugf("Assistant服务解析知识库成功，knowledgebaseConfig: %+v", knowledgebaseConfig)
 	}
-	if len(knowledgebaseConfig.Knowledgebases) > 0 {
-		rerankConfig := &common.AppModelConfig{}
-		if assistant.RerankConfig != "" {
-			// 将string类型的assistant.RerankConfig转换为common.AppModelConfig
-			if err := json.Unmarshal([]byte(assistant.RerankConfig), rerankConfig); err != nil {
-				log.Errorf("Assistant服务解析智能体rerank配置失败，assistantId: %s, error: %v, rerankConfigRaw: %s", req.AssistantId, err, assistant.RerankConfig)
-				SSEError(stream, "智能体rerank配置解析失败")
-				return err
-			}
+	// 已选知识库
+	if len(knowledgebaseConfig.KnowledgeBaseIds) > 0 {
+		rerankEndpoint, errR := buildRerank(req, stream, knowledgebaseConfig, assistant)
+		if errR != nil {
+			return errR
 		}
-		if rerankConfig.Model == "" || rerankConfig.ModelId == "" {
-			log.Errorf("Assistant服务缺少rerank配置，assistantId: %s", req.AssistantId)
-			SSEError(stream, "智能体缺少rerank配置")
-			return fmt.Errorf("智能体缺少rerank配置")
+		knowledgeInfoList, errf := Knowledge.SelectKnowledgeDetailByIdList(ctx, &knowledgebase_service.KnowledgeDetailSelectListReq{
+			KnowledgeIds: knowledgebaseConfig.KnowledgeBaseIds,
+		})
+		log.Infof("knowledgeInfoList = %+v", knowledgeInfoList)
+		if errf != nil {
+			return errf
+		}
+		var knowNames []string
+		for _, v := range knowledgeInfoList.List {
+			knowNames = append(knowNames, v.Name)
 		}
 
-		rerankEndpoint := mp.ToModelEndpoint(rerankConfig.ModelId, rerankConfig.Model)
-
-		names := make([]string, 0, len(knowledgebaseConfig.Knowledgebases))
-		for _, kb := range knowledgebaseConfig.Knowledgebases {
-			names = append(names, kb.Name)
-		}
 		requestBody["kn_params"] = map[string]interface{}{
-			"knowledgeBase": names,
-			"rerank_id":     rerankConfig.ModelId,
-			"model":         rerankEndpoint["model"],
-			"model_url":     rerankEndpoint["model_url"],
+			"knowledgeBase":   knowNames,
+			"rerank_id":       rerankEndpoint["model_id"],
+			"model":           rerankEndpoint["model"],
+			"model_url":       rerankEndpoint["model_url"],
+			"rerank_mod":      buildRerankMod(knowledgebaseConfig.PriorityMatch),
+			"retrieve_method": buildRetrieveMethod(knowledgebaseConfig.MatchType),
+			"weights":         buildWeight(knowledgebaseConfig),
+			"max_history":     knowledgebaseConfig.MaxHistory,
+			"threshold":       knowledgebaseConfig.Threshold,
+			"topK":            knowledgebaseConfig.TopK,
+			"rewrite_query":   true,
 		}
 		requestBody["use_know"] = true
 		requestBody["model_id"] = modelConfig.ModelId
+		log.Infof("requestBody = %+v", requestBody)
 	}
 
 	// 如果不是试用模式，查询历史聊天记录并添加到请求参数中
@@ -389,6 +396,36 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		}
 	}
 
+	// 添加 MCP 信息
+	mcpReqData := &model.RequestData{}
+	mcpReqData.McpTools = make(map[string]model.MCPToolInfo)
+	mcpInfos, errMCP := s.cli.GetAssistantMCPList(ctx, map[string]interface{}{"assistant_id": assistant.ID})
+	if errMCP != nil {
+		log.Errorf("Assistant服务获取MCP信息失败，assistantId: %s, error: %v", req.AssistantId, errMCP)
+		SSEError(stream, "获取MCP信息失败")
+		return errStatus(errs.Code_AssistantMCPErr, status)
+	}
+	for _, m := range mcpInfos {
+		mcpCustom, err := MCP.GetCustomMCP(ctx, &mcp_service.GetCustomMCPReq{
+			McpId: m.MCPId,
+		})
+		if err != nil {
+			log.Errorf("Assistant服务获取MCP Custom信息失败，assistantId: %s, error: %v", req.AssistantId, err)
+			SSEError(stream, "获取MCP信息失败")
+			return errStatus(errs.Code_AssistantMCPErr, status)
+		}
+
+		// 仅当MCP Custom开启时，才添加到请求参数中
+		if m.Enable {
+			// 组装MCP Custom信息
+			mcpReqData.McpTools[mcpCustom.Info.Name] = model.MCPToolInfo{
+				URL:       mcpCustom.SseUrl,
+				Transport: "sse",
+			}
+		}
+	}
+	requestBody["mcp_tools"] = mcpReqData.McpTools
+	log.Infof("requestBody = %+v", requestBody)
 	// 向底层智能体能力接口发起请求
 	requestBodyBytes, err := json.Marshal(requestBody)
 	if err != nil {
@@ -510,6 +547,27 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	return nil
 }
 
+func buildRerank(req *assistant_service.AssistantConversionStreamReq, stream assistant_service.AssistantService_AssistantConversionStreamServer, knowledgebaseConfig *RAGKnowledgeBaseConfig, assistant *model.Assistant) (map[string]interface{}, error) {
+	var rerankEndpoint map[string]interface{}
+	if knowledgebaseConfig.PriorityMatch != 1 {
+		rerankConfig := &common.AppModelConfig{}
+		if assistant.RerankConfig != "" {
+			if err := json.Unmarshal([]byte(assistant.RerankConfig), rerankConfig); err != nil {
+				log.Errorf("Assistant服务解析智能体rerank配置失败，assistantId: %s, error: %v, rerankConfigRaw: %s", req.AssistantId, err, assistant.RerankConfig)
+				SSEError(stream, "智能体rerank配置解析失败")
+				return nil, err
+			}
+			if rerankConfig.Model == "" || rerankConfig.ModelId == "" {
+				log.Errorf("Assistant服务缺少rerank配置，assistantId: %s", req.AssistantId)
+				SSEError(stream, "智能体缺少rerank配置")
+				return nil, fmt.Errorf("智能体缺少rerank配置")
+			}
+		}
+		rerankEndpoint = mp.ToModelEndpoint(rerankConfig.ModelId, rerankConfig.Model)
+	}
+	return rerankEndpoint, nil
+}
+
 // 使用独立上下文保存对话的辅助函数
 func saveConversation(originalCtx context.Context, req *assistant_service.AssistantConversionStreamReq, response, searchList string) {
 	// 如果原始上下文已取消，创建一个新的独立上下文
@@ -528,6 +586,38 @@ func saveConversation(originalCtx context.Context, req *assistant_service.Assist
 	if err := saveConversationDetailToES(originalCtx, req, response, searchList); err != nil {
 		log.Errorf("保存聊天记录到ES失败，assistantId: %s, conversationId: %s, error: %v",
 			req.AssistantId, req.ConversationId, err)
+	}
+}
+
+// buildRetrieveMethod 构造检索方式
+func buildRetrieveMethod(matchType string) string {
+	switch matchType {
+	case "vector":
+		return "semantic_search"
+	case "text":
+		return "full_text_search"
+	case "mix":
+		return "hybrid_search"
+	}
+	return ""
+}
+
+// buildRerankMod 构造重排序模式
+func buildRerankMod(priorityType int32) string {
+	if priorityType == 1 {
+		return "weighted_score"
+	}
+	return "rerank_model"
+}
+
+// buildWeight 构造权重信息
+func buildWeight(knowConfig *RAGKnowledgeBaseConfig) *WeightParams {
+	if knowConfig.PriorityMatch != 1 {
+		return nil
+	}
+	return &WeightParams{
+		VectorWeight: knowConfig.SemanticsPriority,
+		TextWeight:   knowConfig.KeywordPriority,
 	}
 }
 
@@ -560,12 +650,26 @@ type AppKnowledgeBase struct {
 }
 
 type AppKnowledgebaseParams struct {
-	MaxHistory       int  `json:"max_history"`
-	MaxHistoryEnable bool `json:"max_history_enable"`
-	Threshold        int  `json:"threshold"`
-	ThresholdEnable  bool `json:"threshold_enable"`
-	TopK             int  `json:"top_k"`
-	TopKEnable       bool `json:"top_k_enable"`
+	MaxHistory int32   `json:"maxHistory"` // 最长上下文
+	Threshold  float32 `json:"threshold"`  // 过滤阈值
+	TopK       int32   `json:"topK"`       // 知识条数
+
+	MatchType         string  `json:"matchType"`         //matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+	PriorityMatch     int32   `json:"priorityMatch"`     // 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+	SemanticsPriority float32 `json:"semanticsPriority"` // 语义权重
+	KeywordPriority   float32 `json:"keywordPriority"`   // 关键词权重
+}
+
+// RAGKnowledgeBaseConfig 知识库配置结构体
+type RAGKnowledgeBaseConfig struct {
+	KnowledgeBaseIds  []string `json:"knowledgeBaseIds"`  // 知识库信息
+	MaxHistory        int32    `json:"maxHistory"`        // 最长上下文
+	Threshold         float32  `json:"threshold"`         // 过滤阈值
+	TopK              int32    `json:"topK"`              // topK
+	MatchType         string   `json:"matchType"`         // 检索类型：vector（向量检索）、text（文本检索）、mix（混合检索）
+	KeywordPriority   float32  `json:"keywordPriority"`   // 关键词权重
+	PriorityMatch     int32    `json:"priorityMatch"`     // 权重匹配，仅混合检索模式下有效，1 表示启用
+	SemanticsPriority float32  `json:"semanticsPriority"` // 语义权重
 }
 
 type AppOnlineSearchConfig struct {
@@ -573,6 +677,11 @@ type AppOnlineSearchConfig struct {
 	SearchKey      string `json:"searchKey"`
 	SearchRerankId string `json:"SearchRerankId"`
 	Enable         bool   `json:"enable"`
+}
+
+type WeightParams struct {
+	VectorWeight float32 `json:"vector_weight"` //语义权重
+	TextWeight   float32 `json:"text_weight"`   //关键字权重
 }
 
 func mergeMaps(map1, map2 map[string]interface{}) map[string]interface{} {

@@ -13,6 +13,7 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/minio"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
+	"github.com/samber/lo"
 )
 
 const (
@@ -97,10 +98,22 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 	return nil
 }
 
+// UpdateDocMetaData 更新文档元数据
+func UpdateDocMetaData(ctx *gin.Context, userId, orgId string, r *request.DocMetaDataReq) error {
+	_, err := knowledgeBaseDoc.UpdateDocMetaData(ctx.Request.Context(), &knowledgebase_doc_service.UpdateDocMetaDataReq{
+		UserId:       userId,
+		OrgId:        orgId,
+		DocId:        r.DocId,
+		MetaDataList: buildMetaDataList(r.MetaDataList),
+	})
+	return err
+}
+
 func UpdateDocStatus(ctx *gin.Context, r *request.CallbackUpdateDocStatusReq) error {
 	_, err := knowledgeBaseDoc.UpdateDocStatus(ctx.Request.Context(), &knowledgebase_doc_service.UpdateDocStatusReq{
-		DocId:  r.DocId,
-		Status: r.Status,
+		DocId:        r.DocId,
+		Status:       r.Status,
+		MetaDataList: buildMetaDataList(r.MetaDataList),
 	})
 	return err
 }
@@ -232,5 +245,32 @@ func buildDocSegmentResp(docSegmentListResp *knowledgebase_doc_service.DocSegmen
 		UploadTime:         docSegmentListResp.CreatedAt,
 		Splitter:           docSegmentListResp.Splitter,
 		SegmentContentList: segmentContentList,
+		MetaDataList:       buildMetaDataResultList(docSegmentListResp.MetaDataList),
 	}
+}
+
+func buildMetaDataList(metaDataList []*request.MetaData) []*knowledgebase_doc_service.MetaData {
+	if len(metaDataList) == 0 {
+		return make([]*knowledgebase_doc_service.MetaData, 0)
+	}
+	return lo.Map(metaDataList, func(item *request.MetaData, index int) *knowledgebase_doc_service.MetaData {
+		return &knowledgebase_doc_service.MetaData{
+			DataId: item.DataId,
+			Key:    item.Key,
+			Value:  item.Value,
+		}
+	})
+}
+
+func buildMetaDataResultList(metaDataList []*knowledgebase_doc_service.MetaData) []*response.MetaData {
+	if len(metaDataList) == 0 {
+		return make([]*response.MetaData, 0)
+	}
+	return lo.Map(metaDataList, func(item *knowledgebase_doc_service.MetaData, index int) *response.MetaData {
+		return &response.MetaData{
+			DataId: item.DataId,
+			Key:    item.Key,
+			Value:  item.Value,
+		}
+	})
 }
