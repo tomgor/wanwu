@@ -68,6 +68,7 @@ func GetLogoCustomInfo(ctx *gin.Context, mode string) (response.LogoCustomInfo, 
 				Version:   mode.About.Version,
 				Copyright: gin_util.I18nKey(ctx, mode.About.Copyright),
 			},
+			LinkList: config.Cfg().DocCenter.GetDocs(),
 		}
 		break
 	}

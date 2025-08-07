@@ -9,6 +9,8 @@ import (
 	"runtime"
 	"syscall"
 
+	"github.com/UnicomAI/wanwu/internal/bff-service/service"
+
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/ahocorasick"
 	assistant_template "github.com/UnicomAI/wanwu/internal/bff-service/pkg/assistant-template"
@@ -68,6 +70,11 @@ func main() {
 	// init aho-corasick
 	if err := ahocorasick.Init(); err != nil {
 		log.Fatalf("init aho-corasick err: %v", err)
+	}
+
+	// doc-center
+	if err := service.InitDocCenter(); err != nil {
+		log.Fatalf("init doc-center err: %v", err)
 	}
 
 	// init minio: custom

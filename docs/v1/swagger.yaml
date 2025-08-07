@@ -2146,9 +2146,47 @@ definitions:
         description: 0:删除失败，1：已完成
         type: integer
     type: object
-  response.DocCenter:
+  response.DocMenu:
     properties:
-      docCenterPath:
+      children:
+        description: 目录
+        items:
+          $ref: '#/definitions/response.DocMenu'
+        type: array
+      index:
+        description: 目录索引
+        type: string
+      name:
+        description: 目录名称
+        type: string
+      path:
+        description: 目录路径（转码后）
+        type: string
+      pathRaw:
+        description: 目录路径
+        type: string
+    type: object
+  response.DocSearchContent:
+    properties:
+      content:
+        description: 内容
+        type: string
+      title:
+        description: 文档中的子标题
+        type: string
+      url:
+        description: 文档链接
+        type: string
+    type: object
+  response.DocSearchResp:
+    properties:
+      list:
+        description: 内容列表
+        items:
+          $ref: '#/definitions/response.DocSearchContent'
+        type: array
+      title:
+        description: 文档名
         type: string
     type: object
   response.DocSegmentResp:
@@ -2436,6 +2474,11 @@ definitions:
         allOf:
         - $ref: '#/definitions/response.CustomHome'
         description: 首页标题信息
+      linkList:
+        additionalProperties:
+          type: string
+        description: 跳转链接列表,key为链接名称,value为URL
+        type: object
       login:
         allOf:
         - $ref: '#/definitions/response.CustomLogin'
@@ -4326,6 +4369,12 @@ paths:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: 目录path
+        in: query
+        name: path
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -4336,11 +4385,63 @@ paths:
             - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/response.DocCenter'
+                  type: string
               type: object
       security:
       - JWT: []
-      summary: 获取文档中心路径
+      summary: 获取文档中心Markdown文件内容
+      tags:
+      - common
+  /doc_center/menu:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.DocMenu'
+                  type: array
+              type: object
+      security:
+      - JWT: []
+      summary: 获取文档中心目录
+      tags:
+      - common
+  /doc_center/search:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 搜索关键字
+        in: query
+        name: content
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.DocSearchResp'
+                  type: array
+              type: object
+      security:
+      - JWT: []
+      summary: 查找文档中心内容
       tags:
       - common
   /exploration/app/favorite:

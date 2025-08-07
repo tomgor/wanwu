@@ -142,7 +142,7 @@ func Rerank(ctx context.Context, provider, apiKey, url string, req map[string]in
 
 	request := resty.New().
 		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}). // 关闭证书校验
-		SetTimeout(0). // 关闭请求超时
+		SetTimeout(0).                                             // 关闭请求超时
 		R().
 		SetContext(ctx).
 		SetHeader("Content-Type", "application/json").

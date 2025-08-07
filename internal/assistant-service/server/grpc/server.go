@@ -45,7 +45,6 @@ func (s *Server) Start() error {
 	}
 	log.Infof("init service success")
 
-
 	// init
 	opts := []grpc_recovery.Option{
 		grpc_recovery.WithRecoveryHandler(func(p interface{}) error {

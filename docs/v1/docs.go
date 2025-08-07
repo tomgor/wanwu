@@ -2003,7 +2003,16 @@ const docTemplate = `{
                 "tags": [
                     "common"
                 ],
-                "summary": "获取文档中心路径",
+                "summary": "获取文档中心Markdown文件内容",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "目录path",
+                        "name": "path",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2016,7 +2025,100 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/response.DocCenter"
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/doc_center/menu": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "common"
+                ],
+                "summary": "获取文档中心目录",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.DocMenu"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/doc_center/search": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "common"
+                ],
+                "summary": "查找文档中心内容",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "搜索关键字",
+                        "name": "content",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.DocSearchResp"
+                                            }
                                         }
                                     }
                                 }
@@ -9529,10 +9631,63 @@ const docTemplate = `{
                 }
             }
         },
-        "response.DocCenter": {
+        "response.DocMenu": {
             "type": "object",
             "properties": {
-                "docCenterPath": {
+                "children": {
+                    "description": "目录",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.DocMenu"
+                    }
+                },
+                "index": {
+                    "description": "目录索引",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "目录名称",
+                    "type": "string"
+                },
+                "path": {
+                    "description": "目录路径（转码后）",
+                    "type": "string"
+                },
+                "pathRaw": {
+                    "description": "目录路径",
+                    "type": "string"
+                }
+            }
+        },
+        "response.DocSearchContent": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "内容",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "文档中的子标题",
+                    "type": "string"
+                },
+                "url": {
+                    "description": "文档链接",
+                    "type": "string"
+                }
+            }
+        },
+        "response.DocSearchResp": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "description": "内容列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.DocSearchContent"
+                    }
+                },
+                "title": {
+                    "description": "文档名",
                     "type": "string"
                 }
             }
@@ -9963,6 +10118,13 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.CustomHome"
                         }
                     ]
+                },
+                "linkList": {
+                    "description": "跳转链接列表,key为链接名称,value为URL",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 },
                 "login": {
                     "description": "登录页标题信息",
