@@ -5593,13 +5593,11 @@
                 "summary": "获取敏感词表",
                 "parameters": [
                     {
-                        "description": "查询敏感词表参数",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.GetSensitiveVocabularyReq"
-                        }
+                        "type": "string",
+                        "description": "敏感词表id",
+                        "name": "tableId",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -8024,18 +8022,6 @@
             "properties": {
                 "id": {
                     "type": "integer"
-                }
-            }
-        },
-        "request.GetSensitiveVocabularyReq": {
-            "type": "object",
-            "required": [
-                "tableId"
-            ],
-            "properties": {
-                "tableId": {
-                    "description": "敏感词表id",
-                    "type": "string"
                 }
             }
         },
