@@ -40,8 +40,7 @@ var (
 	docSearchMu  sync.RWMutex                    // 搜索引擎读写锁
 	docMu        sync.Mutex                      // doc_center全局互斥锁
 
-	docVerCheckRegex = regexp.MustCompile(`^v[\d\.]+$`)
-	docVerRegex      = regexp.MustCompile(`v[\d\.]+`)
+	docVerRegex = regexp.MustCompile(`v[\d\.]+`)
 
 	docCenter *DocCenter
 )
@@ -272,7 +271,7 @@ func getMarkdownSnippet(content, keyword string, snippetLen int) string {
 // 递归查找第一个非空的 filePath
 func findDocCenterFirstFilePath(nodes []*DocMenu) (string, bool) {
 	for _, node := range nodes {
-		if node.RelativePath != "" {
+		if node.FilePath != "" {
 			return node.FilePath, true
 		}
 		// 如果当前节点有子节点，递归查找
