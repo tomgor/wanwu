@@ -310,8 +310,11 @@ export default {
     },
     mixTypeClick(item, n) {
       item.mixTypeValue = n.value;
-      this.formInline.knowledgeMatchParams.priorityMatch =
-        n.value === "weight" ? 1 : 0;
+      const { knowledgeMatchParams } = this.formInline;
+      knowledgeMatchParams.priorityMatch = n.value === "weight" ? 1 : 0;
+      if(n.value === 'weight'){
+        knowledgeMatchParams.rerankModelId = '';
+      }
     },
     showRerank(n) {
       return (

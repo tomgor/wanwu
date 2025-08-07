@@ -34,8 +34,13 @@
         <el-descriptions-item :label="$t('knowledgeManage.markSplit')">{{
           res.splitter
         }}</el-descriptions-item>
-        <el-descriptions-item label="">
-          {{123}}
+        <el-descriptions-item label="元数据">
+          <template v-if="res.MetaDataList.length">
+            <span>{{filterData(res.MetaDataList.slice(0,3))}}</span>
+            <span>+{{res.MetaDataList.length -3}}</span>
+          </template>
+          <span v-else>无数据</span>
+          <span class="el-icon-edit-outline editIcon" @click="showDatabase(res.MetaDataList || [])" v-if="res.MetaDataList.length"></span>
         </el-descriptions-item>
       </el-descriptions>
 
@@ -147,14 +152,16 @@
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
     </el-dialog>
+    <dataBaseDialog ref="dataBaseDialog" @updateData="updateData"/>
   </div>
 </template>
 <script>
 import { getSectionList,setSectionStatus } from "@/api/knowledge";
+import dataBaseDialog from './dataBaseDialog.vue'
 export default {
+  components:{dataBaseDialog},
   data() {
     return {
-      tableData: [],
       dialogVisible: false,
       obj: {}, // 路由参数对象
       cardObj: [
@@ -189,6 +196,16 @@ export default {
     this.getList();
   },
   methods: {
+    updateData(){
+      this.getList();
+    },
+    showDatabase(data){
+      this.$refs.dataBaseDialog.showDiglog(data,this.obj.id)
+    },
+    filterData(data){
+      const formattedString = data.map(item => `${item.key}:${item.value}`).join(", ");
+      return formattedString
+    },
     getList() {
       this.loading.itemStatus = true;
       getSectionList({
@@ -309,6 +326,13 @@ export default {
 };
 </script>
 <style lang="scss">
+.editIcon{
+  cursor: pointer;
+  color:#384BF7;
+  font-size:16px;
+  display: inline-block;
+  margin-left:5px;
+}
 .section {
   width: 100%;
   height: 100%;
