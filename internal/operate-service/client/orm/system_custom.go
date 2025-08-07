@@ -77,7 +77,7 @@ func mergeCustomFields(key SystemCustomKey, custom model.SystemCustom, newCustom
 	case SystemCustomTabKey:
 		var ret TabConfig
 		if err := json.Unmarshal([]byte(custom.Value), &ret); err != nil {
-			log.Errorf("failed to unmarshal TabConfig key %s: %v", key, err)
+			log.Errorf("failed to unmarshal key %s: %v", key, err)
 		}
 		if newCustom.Tab.LogoPath != "" {
 			ret.LogoPath = newCustom.Tab.LogoPath
@@ -91,7 +91,7 @@ func mergeCustomFields(key SystemCustomKey, custom model.SystemCustom, newCustom
 	case SystemCustomLoginKey:
 		var ret LoginConfig
 		if err := json.Unmarshal([]byte(custom.Value), &ret); err != nil {
-			log.Errorf("failed to unmarshal LoginConfig key %s: %v", key, err)
+			log.Errorf("failed to unmarshal key %s: %v", key, err)
 		}
 		if newCustom.Login.LoginBgPath != "" {
 			ret.LoginBgPath = newCustom.Login.LoginBgPath
@@ -108,7 +108,7 @@ func mergeCustomFields(key SystemCustomKey, custom model.SystemCustom, newCustom
 	case SystemCustomHomeKey:
 		var ret HomeConfig
 		if err := json.Unmarshal([]byte(custom.Value), &ret); err != nil {
-			log.Errorf("failed to unmarshal HomeConfig key %s: %v", key, err)
+			log.Errorf("failed to unmarshal key %s: %v", key, err)
 		}
 		if newCustom.Home.Name != "" {
 			ret.Name = newCustom.Home.Name
@@ -123,7 +123,7 @@ func mergeCustomFields(key SystemCustomKey, custom model.SystemCustom, newCustom
 		return string(value)
 
 	default:
-		log.Errorf("unsupported key")
+		log.Errorf("unsupported key %s", key)
 	}
 	return ""
 }
