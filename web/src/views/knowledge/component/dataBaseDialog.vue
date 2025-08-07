@@ -17,7 +17,7 @@
             prop="value"
             label="value">
             <template slot-scope="scope">
-                <span v-if="!item.showInput">{{scope.row.value}}</span>
+                <span v-if="!scope.row.showInput">{{scope.row.value}}</span>
                 <el-input v-model="scope.row.value" v-else @blur="handleBlur(scope.row)"></el-input>
             </template>
         </el-table-column>
@@ -55,7 +55,7 @@ export default {
     submitDialog() {
       this.tableData.forEach(i => delete i.showInput);
       const data = {
-        ...this.tableData,
+        MetaDataList:this.tableData,
         docId:this.docId
       }
       updateDocMeta(data).then(res =>{
@@ -76,13 +76,13 @@ export default {
     delItem(index){
         this.tableData.splice(index,1);
     },
-    showDiaglog(data,id) {
+    showDiglog(data,id) {
       this.dialogVisible = true;
       this.docId = id;
-      this.tableData = data.map(item =>({
-        ...item,
-        showInput:false,
-      }))
+      this.tableData = data.map(item => ({
+          ...item,
+          showInput: false
+        }));
     },
     handleClose() {
       this.dialogVisible = false;

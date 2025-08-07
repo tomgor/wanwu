@@ -108,7 +108,7 @@ export default {
         },
         async doCreateWorkFlow(n,workFlowId, schema){
             let params = {
-                assistantId: this.editForm.assistantId,
+                assistantId: this.assistantId,
                 schema: Base64.decode(schema),
                 workFlowId,
                 apiAuth: {
