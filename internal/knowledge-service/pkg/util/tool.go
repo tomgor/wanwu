@@ -1,9 +1,10 @@
 package util
 
 import (
-	"github.com/satori/go.uuid"
 	"math"
 	"strings"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 func UUID() string {

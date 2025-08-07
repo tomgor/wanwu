@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"

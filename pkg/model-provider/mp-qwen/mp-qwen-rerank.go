@@ -3,11 +3,11 @@ package mp_qwen
 import (
 	"context"
 	"encoding/json"
-	"github.com/UnicomAI/wanwu/pkg/util"
 	"net/url"
 
 	"github.com/UnicomAI/wanwu/pkg/log"
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
+	"github.com/UnicomAI/wanwu/pkg/util"
 )
 
 type Rerank struct {

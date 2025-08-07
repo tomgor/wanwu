@@ -2,10 +2,10 @@ package service
 
 import (
 	"encoding/json"
-	knowledgeBase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	"sort"
 
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
+	knowledgeBase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
