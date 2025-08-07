@@ -140,7 +140,7 @@ export default {
     commonInfo:{
       handler(val) {
         const { home = {} } = val.data || {}
-        this.homeLogoPath = home.logo ? (home.logo.path || '') : (home.logoPath || '')
+        this.homeLogoPath = home.logo ? home.logo.path : ''
         this.homeTitle = home.title || ''
       },
       deep: true

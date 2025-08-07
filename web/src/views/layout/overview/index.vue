@@ -18,14 +18,14 @@ export default {
     'login': {
       handler(val) {
         if (val) {
-          this.setLoginBg(val.background ? val.background.path : val.backgroundPath)
+          this.setLoginBg(val.background ? val.background.path : '')
         }
       },
       deep: true
     }
   },
   mounted() {
-    this.setLoginBg(this.login.background ? this.login.background.path : this.login.backgroundPath)
+    this.setLoginBg(this.login.background ? this.login.background.path : '')
   },
   methods:{
     setDefaultImage() {
