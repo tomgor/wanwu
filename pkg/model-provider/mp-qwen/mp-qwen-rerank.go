@@ -3,6 +3,7 @@ package mp_qwen
 import (
 	"context"
 	"encoding/json"
+	"github.com/UnicomAI/wanwu/pkg/util"
 	"net/url"
 
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -51,15 +52,14 @@ func (cfg *Rerank) rerankUrl() string {
 // --- rerankResp ---
 
 type rerankResp struct {
-	raw string
-
-	Output    rerankRespOutput `json:"output"`
-	Usage     mp_common.Usage  `json:"usage"`
-	RequestId string           `json:"request_id"`
+	raw       string
+	Output    rerankRespOutput `json:"output" validate:"required"`
+	Usage     mp_common.Usage  `json:"usage" validate:"required"`
+	RequestId string           `json:"request_id" validate:"required"`
 }
 
 type rerankRespOutput struct {
-	Results []mp_common.Result `json:"results"`
+	Results []mp_common.Result `json:"results" validate:"required,dive"`
 }
 
 func (resp *rerankResp) String() string {
@@ -78,6 +78,11 @@ func (resp *rerankResp) Data() (interface{}, bool) {
 func (resp *rerankResp) ConvertResp() (*mp_common.RerankResp, bool) {
 	if err := json.Unmarshal([]byte(resp.raw), resp); err != nil {
 		log.Errorf("qwen rerank resp (%v) convert to data err: %v", resp.raw, err)
+		return nil, false
+	}
+
+	if err := util.Validate(resp); err != nil {
+		log.Errorf("qwen rerank resp validate err: %v", err)
 		return nil, false
 	}
 	res := &mp_common.RerankResp{
