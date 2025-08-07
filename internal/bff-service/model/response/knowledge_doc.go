@@ -1,15 +1,14 @@
 package response
 
 type ListDocResp struct {
-	DocId       string   `json:"docId"`
-	DocName     string   `json:"docName"`     //文档名称
-	DocType     string   `json:"docType"`     //文档类型
-	KnowledgeId string   `json:"knowledgeId"` //知识库id
-	UploadTime  string   `json:"uploadTime"`  //上传时间
-	Status      int      `json:"status"`      //处理状态
-	ErrorMsg    string   `json:"errorMsg"`    //解析错误信息，预留
-	FileSize    string   `json:"fileSize"`    //文件大小，预留
-	TagList     []string `json:"tagList"`     //标签列表
+	DocId       string `json:"docId"`
+	DocName     string `json:"docName"`     //文档名称
+	DocType     string `json:"docType"`     //文档类型
+	KnowledgeId string `json:"knowledgeId"` //知识库id
+	UploadTime  string `json:"uploadTime"`  //上传时间
+	Status      int    `json:"status"`      //处理状态
+	ErrorMsg    string `json:"errorMsg"`    //解析错误信息，预留
+	FileSize    string `json:"fileSize"`    //文件大小，预留
 }
 
 type DocImportTipResp struct {
@@ -27,7 +26,14 @@ type DocSegmentResp struct {
 	SegmentType        string            `json:"segmentType"`     //分段方式 0自动分段 1自定义分段
 	UploadTime         string            `json:"uploadTime"`      //上传时间
 	Splitter           string            `json:"splitter"`        // 分隔符（只有自定义分段必填）
+	MetaDataList       []*MetaData       `json:"MetaDataList"`    //文档元数据
 	SegmentContentList []*SegmentContent `json:"contentList"`     //内容
+}
+
+type MetaData struct {
+	Key    string `json:"key"`
+	DataId string `json:"dataId"`
+	Value  string `json:"value"`
 }
 
 type SegmentContent struct {

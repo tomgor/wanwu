@@ -3,7 +3,6 @@ package request
 type DocListReq struct {
 	KnowledgeId string `json:"knowledgeId" form:"knowledgeId" validate:"required"`
 	DocName     string `json:"docName" form:"docName"`
-	DocTag      string `json:"docTag" form:"docTag"`
 	Status      int    `json:"status" form:"status"` // 当前状态  -1-全部， 0-待处理， 1- 处理完成， 2-正在审核中，3-正在解析中，4-审核未通过，5-解析失败
 	PageSearch
 	CommonCheck
@@ -19,9 +18,9 @@ type DocImportReq struct {
 	CommonCheck
 }
 
-type DocTagReq struct {
-	DocId      string   `json:"docId" validate:"required"`
-	DocTagList []string `json:"docTagList"` //文档标签列表
+type DocMetaDataReq struct {
+	DocId        string      `json:"docId" validate:"required"`
+	MetaDataList []*MetaData `json:"MetaDataList"` //文档元数据
 	CommonCheck
 }
 

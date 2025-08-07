@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/samber/lo"
 	"strings"
 	"time"
 
@@ -52,7 +53,14 @@ func (s *Service) ImportDoc(ctx context.Context, req *knowledgebase_doc_service.
 }
 
 func (s *Service) UpdateDocStatus(ctx context.Context, req *knowledgebase_doc_service.UpdateDocStatusReq) (*emptypb.Empty, error) {
-	err := orm.UpdateDocStatusDocId(ctx, req.DocId, int(req.Status), buildTagStr(req.TagList))
+	//1.查询文档详情
+	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, "", "")
+	if err != nil {
+		log.Errorf(fmt.Sprintf("没有操作该知识库文档的权限 参数(%v)", req))
+		return nil, err
+	}
+	doc := docList[0]
+	err = orm.UpdateDocStatusDocId(ctx, req.DocId, int(req.Status), buildMetaParamsList(removeDuplicateMeta(req.MetaDataList), doc.OrgId, doc.UserId, req.DocId))
 	if err != nil {
 		log.Errorf(fmt.Sprintf("update doc fail %v", err), req.DocId)
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateStatusFailed)
@@ -60,7 +68,7 @@ func (s *Service) UpdateDocStatus(ctx context.Context, req *knowledgebase_doc_se
 	return &emptypb.Empty{}, nil
 }
 
-func (s *Service) UpdateDocTag(ctx context.Context, req *knowledgebase_doc_service.UpdateDocTagReq) (*emptypb.Empty, error) {
+func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_service.UpdateDocMetaDataReq) (*emptypb.Empty, error) {
 	//1.查询文档详情
 	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
 	if err != nil {
@@ -80,12 +88,14 @@ func (s *Service) UpdateDocTag(ctx context.Context, req *knowledgebase_doc_servi
 		return nil, err
 	}
 	//4.更新标签
-	err = orm.UpdateDocStatusDocTag(ctx, req.DocId, buildTagStr(req.TagList), &service.RagDocTagParams{
-		FileName:      doc.Name,
-		KnowledgeBase: knowledge.Name,
-		TagList:       req.TagList,
-		UserId:        req.UserId,
-	})
+	metaDataList := removeDuplicateMeta(req.MetaDataList)
+	err = orm.UpdateDocStatusDocTag(ctx, req.DocId, buildMetaParamsList(metaDataList, doc.OrgId, doc.UserId, req.DocId),
+		&service.RagDocMetaParams{
+			FileName:      doc.Name,
+			KnowledgeBase: knowledge.Name,
+			UserId:        req.UserId,
+			MetaList:      buildMetaRagParams(metaDataList),
+		})
 	if err != nil {
 		log.Errorf(fmt.Sprintf("update doc tag fail %v", err), req.DocId)
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateTagStatusFailed)
@@ -190,7 +200,7 @@ func (s *Service) GetDocSegmentList(ctx context.Context, req *knowledgebase_doc_
 		log.Errorf(fmt.Sprintf("查询知识库导入详情失败 参数(%v)", req))
 		return nil, err
 	}
-	//3.查询分片信息
+	//4.查询分片信息
 	segmentListResp, err := service.RagGetDocSegmentList(ctx, &service.RagGetDocSegmentParams{
 		UserId:            req.UserId,
 		KnowledgeBaseName: knowledge.Name,
@@ -201,7 +211,9 @@ func (s *Service) GetDocSegmentList(ctx context.Context, req *knowledgebase_doc_
 	if err != nil {
 		return nil, util.ErrCode(errs.Code_KnowledgeDocSplitFailed)
 	}
-	return buildSegmentListResp(importTask, docInfo, segmentListResp, req.PageNo, req.PageSize)
+	//5.查询文档元数据,忽略错误
+	metaDataList, _ := orm.SelectDocMetaList(ctx, req.UserId, req.OrgId, req.DocId)
+	return buildSegmentListResp(importTask, docInfo, segmentListResp, req.PageNo, req.PageSize, metaDataList)
 }
 
 func (s *Service) UpdateDocSegmentStatus(ctx context.Context, req *knowledgebase_doc_service.UpdateDocSegmentReq) (*emptypb.Empty, error) {
@@ -271,7 +283,6 @@ func buildDocListResp(list []*model.KnowledgeDoc, total int64, pageSize int32, p
 				UploadTime:  util2.Time2Str(item.CreatedAt),
 				Status:      int32(util.BuildDocRespStatus(item.Status)),
 				ErrorMsg:    item.ErrorMsg,
-				TagList:     buildTagArray(item.Tag),
 			})
 		}
 	}
@@ -281,6 +292,15 @@ func buildDocListResp(list []*model.KnowledgeDoc, total int64, pageSize int32, p
 		PageSize: pageSize,
 		PageNum:  pageNum,
 	}
+}
+
+func removeDuplicateMeta(metaDataList []*knowledgebase_doc_service.MetaData) []*knowledgebase_doc_service.MetaData {
+	if len(metaDataList) == 0 {
+		return metaDataList
+	}
+	return lo.UniqBy(metaDataList, func(item *knowledgebase_doc_service.MetaData) string {
+		return item.Key
+	})
 }
 
 // buildImportTask 构造导入任务
@@ -331,7 +351,8 @@ func buildImportTask(req *knowledgebase_doc_service.ImportDocReq) (*model.Knowle
 }
 
 // buildSegmentListResp 构造文档分段列表
-func buildSegmentListResp(importTask *model.KnowledgeImportTask, doc *model.KnowledgeDoc, segmentListResp *service.ContentListResp, pageNo, pageSize int32) (*knowledgebase_doc_service.DocSegmentListResp, error) {
+func buildSegmentListResp(importTask *model.KnowledgeImportTask, doc *model.KnowledgeDoc,
+	segmentListResp *service.ContentListResp, pageNo, pageSize int32, metaDataList []*model.KnowledgeDocMeta) (*knowledgebase_doc_service.DocSegmentListResp, error) {
 	var config = &model.SegmentConfig{}
 	err := json.Unmarshal([]byte(importTask.SegmentConfig), config)
 	if err != nil {
@@ -349,22 +370,53 @@ func buildSegmentListResp(importTask *model.KnowledgeImportTask, doc *model.Know
 		PageTotal:       buildPageTotal(int32(content.MetaData.ChunkTotalNum), pageSize),
 		SegmentTotalNum: int32(content.MetaData.ChunkTotalNum),
 		ContentList:     buildContentList(segmentListResp.List, pageNo, pageSize),
+		MetaDataList:    buildMetaList(metaDataList),
 	}
 	return resp, nil
 }
 
-func buildTagStr(tagList []string) string {
-	if len(tagList) == 0 {
-		return ""
+func buildMetaList(metaDataList []*model.KnowledgeDocMeta) []*knowledgebase_doc_service.MetaData {
+	if len(metaDataList) == 0 {
+		return make([]*knowledgebase_doc_service.MetaData, 0)
 	}
-	return strings.Join(tagList, ",")
+	return lo.Map(metaDataList, func(item *model.KnowledgeDocMeta, index int) *knowledgebase_doc_service.MetaData {
+		return &knowledgebase_doc_service.MetaData{
+			DataId: item.MetaId,
+			Key:    item.Key,
+			Value:  item.Value,
+		}
+	})
 }
 
-func buildTagArray(tag string) []string {
-	if len(tag) == 0 {
-		return make([]string, 0)
+func buildMetaParamsList(metaDataList []*knowledgebase_doc_service.MetaData, orgId, userId, docId string) []*model.KnowledgeDocMeta {
+	if len(metaDataList) == 0 {
+		return make([]*model.KnowledgeDocMeta, 0)
 	}
-	return strings.Split(tag, ",")
+	return lo.Map(metaDataList, func(item *knowledgebase_doc_service.MetaData, index int) *model.KnowledgeDocMeta {
+		return &model.KnowledgeDocMeta{
+			MetaId:    generator.GetGenerator().NewID(),
+			DocId:     docId,
+			Key:       item.Key,
+			Value:     item.Value,
+			ValueType: model.ModelTypeString,
+			Rule:      "",
+			OrgId:     orgId,
+			UserId:    userId,
+			CreatedAt: time.Now().UnixMilli(),
+			UpdatedAt: time.Now().UnixMilli(),
+		}
+	})
+}
+
+func buildMetaRagParams(metaDataList []*knowledgebase_doc_service.MetaData) map[string]interface{} {
+	if len(metaDataList) == 0 {
+		return make(map[string]interface{})
+	}
+	var retMap = make(map[string]interface{})
+	for _, data := range metaDataList {
+		retMap[data.Key] = data.Value
+	}
+	return retMap
 }
 
 func buildSplitter(splitterList []string) string {

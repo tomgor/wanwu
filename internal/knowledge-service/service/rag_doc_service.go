@@ -69,11 +69,11 @@ type RagDeleteDocParams struct {
 	FileName      string `json:"fileName"`
 }
 
-type RagDocTagParams struct {
-	UserId        string   `json:"userId"`
-	KnowledgeBase string   `json:"knowledgeBase"`
-	FileName      string   `json:"fileName"`
-	TagList       []string `json:"tagList"`
+type RagDocMetaParams struct {
+	UserId        string                 `json:"userId"`
+	KnowledgeBase string                 `json:"knowledgeBase"`
+	FileName      string                 `json:"file_name"`
+	MetaList      map[string]interface{} `json:"tags"`
 }
 
 type RagGetDocSegmentResp struct {
@@ -228,7 +228,7 @@ func RagDeleteDoc(ctx context.Context, ragDeleteDocParams *RagDeleteDocParams) e
 }
 
 // RagDocTag 给文档打标签
-func RagDocTag(ctx context.Context, ragDocTagParams *RagDocTagParams) error {
+func RagDocTag(ctx context.Context, ragDocTagParams *RagDocMetaParams) error {
 	//ragServer := config.GetConfig().RagServer
 	//url := ragServer.Endpoint + ragServer.DocDeleteUri
 	//paramsByte, err := json.Marshal(ragDocTagParams)

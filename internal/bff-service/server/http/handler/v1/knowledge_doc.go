@@ -70,24 +70,24 @@ func DeleteDoc(ctx *gin.Context) {
 	gin_util.Response(ctx, nil, err)
 }
 
-// UpdateDocTag
+// UpdateDocMetaData
 //
 //	@Tags			knowledge
-//	@Summary		更新文档tag
-//	@Description	更新文档tag
+//	@Summary		更新文档元数据
+//	@Description	更新文档元数据
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.DocTagReq	true	"文档更新tag请求参数"
+//	@Param			data	body		request.DocMetaDataReq	true	"文档更新元数据请求参数"
 //	@Success		200		{object}	response.Response
-//	@Router			/knowledge/doc/tag [post]
-func UpdateDocTag(ctx *gin.Context) {
+//	@Router			/knowledge/doc/meta [post]
+func UpdateDocMetaData(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)
-	var req request.DocTagReq
+	var req request.DocMetaDataReq
 	if !gin_util.Bind(ctx, &req) {
 		return
 	}
-	err := service.UpdateDocTag(ctx, userId, orgId, &req)
+	err := service.UpdateDocMetaData(ctx, userId, orgId, &req)
 	gin_util.Response(ctx, nil, err)
 }
 

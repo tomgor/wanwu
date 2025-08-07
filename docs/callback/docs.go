@@ -1272,14 +1272,32 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "status": {
-                    "type": "integer"
-                },
-                "tagList": {
+                "metaDataList": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/request.MetaData"
                     }
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.MetaData": {
+            "type": "object",
+            "required": [
+                "key",
+                "value"
+            ],
+            "properties": {
+                "dataId": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         },

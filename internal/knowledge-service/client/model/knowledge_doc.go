@@ -16,7 +16,6 @@ type KnowledgeDoc struct {
 	FilePathMd5  string `gorm:"column:file_path_md5;type:varchar(64);not null;default:'';comment:'文件的md5值'" json:"filePathMd5"`
 	FilePath     string `gorm:"column:file_path;type:text;not null" json:"filePath"`
 	Name         string `gorm:"column:name;index:idx_user_id_knowledge_id_name,priority:3;type:varchar(256);not null;default:''" json:"name"`
-	Tag          string `gorm:"column:tag;type:varchar(512);index:idx_user_id_knowledge_id_tag,priority:3;not null;default:''" json:"tag"`
 	FileType     string `gorm:"column:file_type;type:varchar(20);not null;default:''" json:"fileType"`
 	FileSize     int64  `gorm:"column:file_size;type:bigint(20);COMMENT:'文件大小，单位byte'" json:"fileSize"`
 	Status       int    `gorm:"column:status;type:tinyint(1);not null;comment:'0-待处理， 1- 处理完成， 2-正在审核中(目前没有)，3-正在解析中，4-审核未通过（目前没有），5-解析失败';" json:"status"`
