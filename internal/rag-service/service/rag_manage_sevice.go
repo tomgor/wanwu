@@ -24,7 +24,7 @@ const (
 )
 
 type RagChatParams struct {
-	KnowledgeBase   string           `json:"knowledgeBase"`
+	KnowledgeBase   []string         `json:"knowledgeBase"`
 	Question        string           `json:"question"`
 	Threshold       float32          `json:"threshold"`
 	TopK            int32            `json:"topK"`
@@ -33,7 +33,7 @@ type RagChatParams struct {
 	RerankModelId   string           `json:"rerank_model_id"`
 	CustomModelInfo *CustomModelInfo `json:"custom_model_info"`
 	History         []*HistoryItem   `json:"history"`
-	MaxHistory      int32            `json:"maxHistory"`
+	MaxHistory      int32            `json:"max_history"`
 	RewriteQuery    bool             `json:"rewrite_query"`   // 是否query改写
 	RerankMod       string           `json:"rerank_mod"`      // rerank_model:重排序模式，weighted_score：权重搜索
 	RetrieveMethod  string           `json:"retrieve_method"` // hybrid_search:混合搜索， semantic_search:向量搜索， full_text_search：文本搜索
@@ -126,8 +126,7 @@ func buildHttpParams(userId string, req *RagChatParams) (*http_client.HttpReques
 }
 
 // BuildChatConsultParams 构造rag 会话参数
-func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, knowledge *knowledgeBase_service.KnowledgeInfo) *RagChatParams {
-	// 判断enable状态
+func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, knowledgeInfoList *knowledgeBase_service.KnowledgeDetailSelectListResp) *RagChatParams {
 	ragChatParams := &RagChatParams{}
 	knowledgeConfig := rag.KnowledgeBaseConfig
 	ragChatParams.MaxHistory = int32(knowledgeConfig.MaxHistory)
@@ -137,8 +136,12 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	ragChatParams.RerankMod = buildRerankMod(knowledgeConfig.PriorityMatch)
 	ragChatParams.Weight = buildWeight(knowledgeConfig)
 
+	var kbNameList []string
+	for _, v := range knowledgeInfoList.List {
+		kbNameList = append(kbNameList, v.Name)
+	}
 	ragChatParams.CustomModelInfo = &CustomModelInfo{LlmModelID: rag.ModelConfig.ModelId}
-	ragChatParams.KnowledgeBase = knowledge.Name
+	ragChatParams.KnowledgeBase = kbNameList
 	ragChatParams.Question = req.Question
 	ragChatParams.Stream = true
 	ragChatParams.Chichat = true

@@ -16,13 +16,14 @@ type ILLMParams interface {
 	GetParams() map[string]interface{}
 }
 
-// ToModelEndpoint 返回model、model_url的kv
+// ToModelEndpoint 返回model、model_url、model_id的kv
 func ToModelEndpoint(modelId, model string) map[string]interface{} {
 	ret := make(map[string]interface{})
 	if modelId != "" && model != "" {
 		modelUrl, _ := url.JoinPath(_callbackUrl, "/callback/v1/model", modelId)
 		ret["model"] = model
 		ret["model_url"] = modelUrl
+		ret["model_id"] = modelId
 	}
 	return ret
 }

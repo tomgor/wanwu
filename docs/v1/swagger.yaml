@@ -507,9 +507,6 @@ definitions:
       maxHistory:
         description: 最长上下文
         type: integer
-      maxHistoryEnable:
-        description: 最长上下文(开关)
-        type: boolean
       priorityMatch:
         description: 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
         type: integer
@@ -519,15 +516,9 @@ definitions:
       threshold:
         description: 过滤阈值
         type: number
-      thresholdEnable:
-        description: 过滤阈值(开关)
-        type: boolean
       topK:
         description: 知识条数
         type: integer
-      topKEnable:
-        description: 知识条数(开关)
-        type: boolean
     type: object
   request.AppModelConfig:
     properties:
@@ -1217,6 +1208,13 @@ definitions:
     - password
     - username
     type: object
+  request.MCPAddRequest:
+    properties:
+      assistantId:
+        type: string
+      mcpId:
+        type: string
+    type: object
   request.MCPCreate:
     properties:
       desc:
@@ -1241,6 +1239,13 @@ definitions:
     - sseUrl
     type: object
   request.MCPIDReq:
+    properties:
+      mcpId:
+        type: string
+    required:
+    - mcpId
+    type: object
+  request.MCPIdRequest:
     properties:
       mcpId:
         type: string
@@ -1884,6 +1889,11 @@ definitions:
         allOf:
         - $ref: '#/definitions/request.AppKnowledgebaseConfig'
         description: 知识库
+      mcpInfos:
+        description: MCP信息
+        items:
+          $ref: '#/definitions/response.MCPInfos'
+        type: array
       modelConfig:
         allOf:
         - $ref: '#/definitions/request.AppModelConfig'
@@ -2505,6 +2515,27 @@ definitions:
       sseUrl:
         description: SSE URL
         type: string
+    type: object
+  response.MCPInfos:
+    properties:
+      enable:
+        type: boolean
+      id:
+        type: string
+      mcpDesc:
+        type: string
+      mcpId:
+        type: string
+      mcpName:
+        type: string
+      mcpServerFrom:
+        type: string
+      mcpServerUrl:
+        type: string
+      mcpSquareId:
+        type: string
+      valid:
+        type: boolean
     type: object
   response.MCPSelect:
     properties:
@@ -3830,6 +3861,77 @@ paths:
       security:
       - JWT: []
       summary: 智能体对话列表
+      tags:
+      - agent
+  /assistant/mcp:
+    delete:
+      consumes:
+      - application/json
+      description: 为智能体解绑mcp
+      parameters:
+      - description: mcp id
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.MCPIdRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 删除mcp
+      tags:
+      - agent
+    post:
+      consumes:
+      - application/json
+      description: 为智能体绑定已发布的mcp工具
+      parameters:
+      - description: mcp新增参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.MCPAddRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 添加mcp工具
+      tags:
+      - agent
+  /assistant/mcp/enable:
+    put:
+      consumes:
+      - application/json
+      description: 修改智能体绑定的MCP的启用状态
+      parameters:
+      - description: mcp id
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.MCPIdRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 启用/停用 MCP
       tags:
       - agent
   /assistant/stream:

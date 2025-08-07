@@ -31,6 +31,13 @@ type IClient interface {
 	GetAssistantWorkflow(ctx context.Context, workflowID uint32) (*model.AssistantWorkflow, *err_code.Status)
 	GetAssistantWorkflowsByAssistantID(ctx context.Context, assistantID string) ([]*model.AssistantWorkflow, *err_code.Status)
 
+	//================AssistantMCP================
+	CreateAssistantMCP(ctx context.Context, mcp *model.AssistantMCP) *err_code.Status
+	DeleteAssistantMCP(ctx context.Context, id uint32) *err_code.Status
+	GetAssistantMCP(ctx context.Context, query map[string]interface{}) (*model.AssistantMCP, *err_code.Status)
+	GetAssistantMCPList(ctx context.Context, query map[string]interface{}) ([]*model.AssistantMCP, *err_code.Status)
+	UpdateAssistantMCP(ctx context.Context, mcp *model.AssistantMCP) *err_code.Status
+
 	//================Conversation================
 	CreateConversation(ctx context.Context, conversation *model.Conversation) *err_code.Status
 	UpdateConversation(ctx context.Context, conversation *model.Conversation) *err_code.Status

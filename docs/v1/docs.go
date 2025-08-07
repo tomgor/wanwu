@@ -1214,6 +1214,121 @@ const docTemplate = `{
                 }
             }
         },
+        "/assistant/mcp": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "为智能体绑定已发布的mcp工具",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "添加mcp工具",
+                "parameters": [
+                    {
+                        "description": "mcp新增参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MCPAddRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "为智能体解绑mcp",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "删除mcp",
+                "parameters": [
+                    {
+                        "description": "mcp id",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MCPIdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assistant/mcp/enable": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "修改智能体绑定的MCP的启用状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "启用/停用 MCP",
+                "parameters": [
+                    {
+                        "description": "mcp id",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MCPIdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/assistant/stream": {
             "post": {
                 "security": [
@@ -6973,10 +7088,6 @@ const docTemplate = `{
                     "description": "最长上下文",
                     "type": "integer"
                 },
-                "maxHistoryEnable": {
-                    "description": "最长上下文(开关)",
-                    "type": "boolean"
-                },
                 "priorityMatch": {
                     "description": "权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1",
                     "type": "integer"
@@ -6989,17 +7100,9 @@ const docTemplate = `{
                     "description": "过滤阈值",
                     "type": "number"
                 },
-                "thresholdEnable": {
-                    "description": "过滤阈值(开关)",
-                    "type": "boolean"
-                },
                 "topK": {
                     "description": "知识条数",
                     "type": "integer"
-                },
-                "topKEnable": {
-                    "description": "知识条数(开关)",
-                    "type": "boolean"
                 }
             }
         },
@@ -8033,6 +8136,17 @@ const docTemplate = `{
                 }
             }
         },
+        "request.MCPAddRequest": {
+            "type": "object",
+            "properties": {
+                "assistantId": {
+                    "type": "string"
+                },
+                "mcpId": {
+                    "type": "string"
+                }
+            }
+        },
         "request.MCPCreate": {
             "type": "object",
             "required": [
@@ -8065,6 +8179,17 @@ const docTemplate = `{
             }
         },
         "request.MCPIDReq": {
+            "type": "object",
+            "required": [
+                "mcpId"
+            ],
+            "properties": {
+                "mcpId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.MCPIdRequest": {
             "type": "object",
             "required": [
                 "mcpId"
@@ -9015,6 +9140,13 @@ const docTemplate = `{
                         }
                     ]
                 },
+                "mcpInfos": {
+                    "description": "MCP信息",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MCPInfos"
+                    }
+                },
                 "modelConfig": {
                     "description": "模型",
                     "allOf": [
@@ -9949,6 +10081,38 @@ const docTemplate = `{
                 "sseUrl": {
                     "description": "SSE URL",
                     "type": "string"
+                }
+            }
+        },
+        "response.MCPInfos": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "mcpDesc": {
+                    "type": "string"
+                },
+                "mcpId": {
+                    "type": "string"
+                },
+                "mcpName": {
+                    "type": "string"
+                },
+                "mcpServerFrom": {
+                    "type": "string"
+                },
+                "mcpServerUrl": {
+                    "type": "string"
+                },
+                "mcpSquareId": {
+                    "type": "string"
+                },
+                "valid": {
+                    "type": "boolean"
                 }
             }
         },

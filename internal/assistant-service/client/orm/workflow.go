@@ -10,6 +10,36 @@ import (
 	"gorm.io/gorm"
 )
 
+func (c *Client) CreateAssistantWorkflow(ctx context.Context, workflow *model.AssistantWorkflow) *err_code.Status {
+	if workflow.ID != 0 {
+		return toErrStatus("assistant_workflow_create", "create assistant workflow but id not 0")
+	}
+	return c.transaction(ctx, func(tx *gorm.DB) *err_code.Status {
+		// 创建Workflow
+		if err := tx.Create(workflow).Error; err != nil {
+			return toErrStatus("assistant_workflow_create", err.Error())
+		}
+
+		// 获取Assistant
+		assistant := &model.Assistant{}
+		if err := sqlopt.WithID(workflow.AssistantId).Apply(tx).First(assistant).Error; err != nil {
+			return toErrStatus("assistant_get", err.Error())
+		}
+
+		// 更新HasWorkflow字段
+		if !assistant.HasWorkflow {
+			assistant.HasWorkflow = true
+			if err := tx.Model(assistant).Updates(map[string]interface{}{
+				"has_workflow": assistant.HasWorkflow,
+			}).Error; err != nil {
+				return toErrStatus("assistant_update", err.Error())
+			}
+		}
+
+		return nil
+	})
+}
+
 func (c *Client) UpdateAssistantWorkflow(ctx context.Context, workflow *model.AssistantWorkflow) *err_code.Status {
 	if workflow.ID == 0 {
 		return toErrStatus("assistant_workflow_update", "update assistant workflow but id 0")
@@ -42,36 +72,6 @@ func (c *Client) GetAssistantWorkflowsByAssistantID(ctx context.Context, assista
 		if err := tx.Where("assistant_id = ?", assistantID).Find(&workflows).Error; err != nil {
 			return toErrStatus("assistant_workflows_get_by_assistant_id", err.Error())
 		}
-		return nil
-	})
-}
-
-func (c *Client) CreateAssistantWorkflow(ctx context.Context, workflow *model.AssistantWorkflow) *err_code.Status {
-	if workflow.ID != 0 {
-		return toErrStatus("assistant_workflow_create", "create assistant workflow but id not 0")
-	}
-	return c.transaction(ctx, func(tx *gorm.DB) *err_code.Status {
-		// 创建Workflow
-		if err := tx.Create(workflow).Error; err != nil {
-			return toErrStatus("assistant_workflow_create", err.Error())
-		}
-
-		// 获取Assistant
-		assistant := &model.Assistant{}
-		if err := sqlopt.WithID(workflow.AssistantId).Apply(tx).First(assistant).Error; err != nil {
-			return toErrStatus("assistant_get", err.Error())
-		}
-
-		// 更新HasWorkflow字段
-		if !assistant.HasWorkflow {
-			assistant.HasWorkflow = true
-			if err := tx.Model(assistant).Updates(map[string]interface{}{
-				"has_workflow": assistant.HasWorkflow,
-			}).Error; err != nil {
-				return toErrStatus("assistant_update", err.Error())
-			}
-		}
-
 		return nil
 	})
 }

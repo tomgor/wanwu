@@ -93,6 +93,7 @@ enum Code {
   AssistantActionErr = 160002; // 智能体action相关错误
   AssistantWorkflowErr = 160003; // 智能体workflow相关错误
   AssistantConversationErr = 160004; // 智能体对话相关错误
+  AssistantMCPErr = 160005; // 智能体MCP相关错误
 
   // --- workflow-service ---
   // [210000, 219999]
