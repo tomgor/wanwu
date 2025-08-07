@@ -1,8 +1,8 @@
 package model
 
 const (
-	ModelTypeString = "string"
-	ModelTypeNumber = "number"
+	MetaTypeString = "string"
+	MetaTypeNumber = "number"
 )
 
 type KnowledgeDocMeta struct {

@@ -79,7 +79,7 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 	//2.状态校验
 	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
 		log.Errorf(fmt.Sprintf("非处理完成文档无法增加标签 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req))
-		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateTagFailed)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaFailed)
 	}
 	//3.查询知识库信息
 	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
@@ -89,7 +89,7 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 	}
 	//4.更新标签
 	metaDataList := removeDuplicateMeta(req.MetaDataList)
-	err = orm.UpdateDocStatusDocTag(ctx, req.DocId, buildMetaParamsList(metaDataList, doc.OrgId, doc.UserId, req.DocId),
+	err = orm.UpdateDocStatusDocMeta(ctx, req.DocId, buildMetaParamsList(metaDataList, doc.OrgId, doc.UserId, req.DocId),
 		&service.RagDocMetaParams{
 			FileName:      doc.Name,
 			KnowledgeBase: knowledge.Name,
@@ -98,7 +98,7 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 		})
 	if err != nil {
 		log.Errorf(fmt.Sprintf("update doc tag fail %v", err), req.DocId)
-		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateTagStatusFailed)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaStatusFailed)
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -398,7 +398,7 @@ func buildMetaParamsList(metaDataList []*knowledgebase_doc_service.MetaData, org
 			DocId:     docId,
 			Key:       item.Key,
 			Value:     item.Value,
-			ValueType: model.ModelTypeString,
+			ValueType: model.MetaTypeString,
 			Rule:      "",
 			OrgId:     orgId,
 			UserId:    userId,

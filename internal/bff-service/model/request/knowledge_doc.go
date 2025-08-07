@@ -20,7 +20,7 @@ type DocImportReq struct {
 
 type DocMetaDataReq struct {
 	DocId        string      `json:"docId" validate:"required"`
-	MetaDataList []*MetaData `json:"MetaDataList"` //文档元数据
+	MetaDataList []*MetaData `json:"metaDataList"` //文档元数据
 	CommonCheck
 }
 

@@ -1012,13 +1012,13 @@ definitions:
     type: object
   request.DocMetaDataReq:
     properties:
-      MetaDataList:
+      docId:
+        type: string
+      metaDataList:
         description: 文档元数据
         items:
           $ref: '#/definitions/request.MetaData'
         type: array
-      docId:
-        type: string
     required:
     - docId
     type: object
