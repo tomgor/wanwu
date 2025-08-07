@@ -72,7 +72,7 @@ type RagDeleteDocParams struct {
 type RagDocMetaParams struct {
 	UserId        string                 `json:"userId"`
 	KnowledgeBase string                 `json:"knowledgeBase"`
-	FileName      string                 `json:"file_name"`
+	FileName      string                 `json:"fileName"`
 	MetaList      map[string]interface{} `json:"tags"`
 }
 
