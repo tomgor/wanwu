@@ -100,8 +100,7 @@ func SearchDocCenter(ctx *gin.Context) {
 //	@Success	200	{object}	response.Response{data=[]response.DocMenu}
 //	@Router		/doc_center/menu [get]
 func GetDocCenterMenu(ctx *gin.Context) {
-	resp, err := service.GetDocCenterMenu(ctx)
-	gin_util.Response(ctx, resp, err)
+	gin_util.Response(ctx, service.GetDocCenterMenu(ctx), nil)
 }
 
 // GetDocCenterMarkdown
