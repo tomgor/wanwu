@@ -35,12 +35,12 @@
           res.splitter
         }}</el-descriptions-item>
         <el-descriptions-item label="元数据">
-          <template v-if="res.MetaDataList.length">
-            <span>{{filterData(res.MetaDataList.slice(0,3))}}</span>
-            <span>+{{res.MetaDataList.length -3}}</span>
+          <template v-if="res.MetaDataList && res.MetaDataList.length > 0">
+            <span>{{ res.MetaDataList.length > 3 ? filterData(res.MetaDataList.slice(0,3)) : filterData(res.MetaDataList)}}</span>
+            <span v-if="res.MetaDataList.length > 3" class="showMore">+{{res.MetaDataList.length -3}}</span>
           </template>
           <span v-else>无数据</span>
-          <span class="el-icon-edit-outline editIcon" @click="showDatabase(res.MetaDataList || [])" v-if="res.MetaDataList.length"></span>
+          <span class="el-icon-edit-outline editIcon" @click="showDatabase(res.MetaDataList || [])" v-if="res.MetaDataList && res.MetaDataList.length > 0"></span>
         </el-descriptions-item>
       </el-descriptions>
 
@@ -152,12 +152,12 @@
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
     </el-dialog>
-    <dataBaseDialog ref="dataBaseDialog" @updateData="updateData"/>
+    <dataBaseDialog ref="dataBase" @updateData="updateData"/>
   </div>
 </template>
 <script>
 import { getSectionList,setSectionStatus } from "@/api/knowledge";
-import dataBaseDialog from './dataBaseDialog.vue'
+import dataBaseDialog from './dataBaseDialog'
 export default {
   components:{dataBaseDialog},
   data() {
@@ -200,7 +200,7 @@ export default {
       this.getList();
     },
     showDatabase(data){
-      this.$refs.dataBaseDialog.showDiglog(data,this.obj.id)
+      this.$refs.dataBase.showDiglog(data,this.obj.id)
     },
     filterData(data){
       const formattedString = data.map(item => `${item.key}:${item.value}`).join(", ");
@@ -326,6 +326,12 @@ export default {
 };
 </script>
 <style lang="scss">
+.showMore{
+  margin-left:5px;
+  background:#f4f5ff;
+  padding:2px;
+  border-radius:4px;
+}
 .editIcon{
   cursor: pointer;
   color:#384BF7;
