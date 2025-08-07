@@ -45,10 +45,43 @@ func (c *Client) GetRag(ctx context.Context, req *rag_service.RagDetailReq) (*ra
 	if info.SensitiveConfig.TableIds != "" {
 		err = json.Unmarshal([]byte(info.SensitiveConfig.TableIds), &sensitiveIds)
 		if err != nil {
-			return nil, toErrStatus("rag_get_err", err.Error())
+			return nil, toErrStatus("rag_get_err", "sensitive "+err.Error())
 		}
 	}
 	knowledgeConfig := info.KnowledgeBaseConfig
+	var knowledgeIds []string
+	// 反序列化知识库id列表
+	if knowledgeConfig.KnowId != "" {
+		knowIdStr := knowledgeConfig.KnowId
+		// 判断是否为JSON数组格式（以[开头且以]结尾）
+		isJsonArray := len(knowIdStr) >= 2 && knowIdStr[0] == '[' && knowIdStr[len(knowIdStr)-1] == ']'
+
+		if isJsonArray {
+			err = json.Unmarshal([]byte(knowIdStr), &knowledgeIds)
+			if err != nil {
+				return nil, toErrStatus("rag_get_err", "invalid json array: "+err.Error())
+			}
+		} else {
+			// 非数组格式，视为单个字符串
+			knowledgeIds = []string{knowIdStr}
+
+			// 序列化存入数据库
+			knowIdByte, errf := json.Marshal(knowledgeIds)
+			if errf != nil {
+				return nil, toErrStatus("rag_get_err", "invalid json array: "+errf.Error())
+			}
+
+			knowledgeConfig.KnowId = string(knowIdByte)
+			erru := c.UpdateRagKnowId(ctx, &model.RagInfo{
+				RagID:               info.RagID,
+				KnowledgeBaseConfig: knowledgeConfig,
+			})
+			if erru != nil {
+				return nil, toErrStatus("rag_get_err", "update knowId: "+errf.Error())
+			}
+		}
+	}
+
 	// 填充 rag 的信息
 	resp := &rag_service.RagInfo{
 		RagId: info.RagID,
@@ -72,7 +105,7 @@ func (c *Client) GetRag(ctx context.Context, req *rag_service.RagDetailReq) (*ra
 			Config:    info.RerankConfig.Config,
 		},
 		KnowledgeBaseConfig: &rag_service.RagKnowledgeBaseConfig{
-			KnowledgeBaseId:   knowledgeConfig.KnowId,
+			KnowledgeBaseIds:  knowledgeIds,
 			MaxHistory:        int32(knowledgeConfig.MaxHistory),
 			Threshold:         float32(knowledgeConfig.Threshold),
 			TopK:              int32(knowledgeConfig.TopK),
@@ -250,6 +283,33 @@ func (c *Client) UpdateRagConfig(ctx context.Context, rag *model.RagInfo) *err_c
 
 				"sensitive_enable":    rag.SensitiveConfig.Enable,
 				"sensitive_table_ids": rag.SensitiveConfig.TableIds,
+			}
+
+			// 只更新指定 ragID 的记录
+			if err := sqlopt.WithRagID(rag.RagID).Apply(tx).Model(&model.RagInfo{}).Updates(updateMap).Error; err != nil {
+				return toErrStatus("rag_update_err", "failed to update basic rag config: "+err.Error())
+			}
+		}
+		return nil
+	})
+}
+
+func (c *Client) UpdateRagKnowId(ctx context.Context, rag *model.RagInfo) *err_code.Status {
+	if rag.RagID == "" {
+		return toErrStatus("rag_update_err", "update rag but ragID is empty")
+	}
+	return c.transaction(ctx, func(tx *gorm.DB) *err_code.Status {
+		// 检查ragID是否存在
+		if err := sqlopt.WithRagID(rag.RagID).Apply(tx).First(&model.RagInfo{}).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return toErrStatus("rag_update_err", "rag not found: "+rag.RagID)
+			} else {
+				return toErrStatus("rag_update_err", "failed to check rag: "+err.Error())
+			}
+		} else {
+			// update rag
+			updateMap := map[string]interface{}{
+				"kb_know_id": rag.KnowledgeBaseConfig.KnowId,
 			}
 
 			// 只更新指定 ragID 的记录

@@ -3,6 +3,7 @@ package assistant
 import (
 	"context"
 	"encoding/json"
+	"github.com/UnicomAI/wanwu/pkg/log"
 	"strconv"
 	"strings"
 
@@ -175,6 +176,7 @@ func (s *Service) AssistantConfigUpdate(ctx context.Context, req *assistant_serv
 			})
 		}
 		existingAssistant.KnowledgebaseConfig = string(knowledgeBaseConfigBytes)
+		log.Debugf("knowConfig = %s", existingAssistant.KnowledgebaseConfig)
 	}
 
 	// 处理onlineSearchConfig，转换成json字符串之后再更新

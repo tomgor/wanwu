@@ -22,6 +22,12 @@ service AssistantService {
   rpc AssistantWorkFlowDelete(AssistantWorkFlowDeleteReq) returns (google.protobuf.Empty) {}
   rpc AssistantWorkFlowEnableSwitch(AssistantWorkFlowEnableSwitchReq) returns (google.protobuf.Empty) {}
 
+  // --- MCP ---
+  rpc AssistantMCPCreate(AssistantMCPCreateReq) returns (google.protobuf.Empty) {}
+  rpc AssistantMCPDelete(AssistantMCPDeleteReq) returns (google.protobuf.Empty) {}
+  rpc AssistantMCPEnableSwitch(AssistantMCPEnableSwitchReq) returns (google.protobuf.Empty) {}
+  rpc AssistantMCPGetList(AssistantMCPGetListReq) returns (AssistantMCPList) {}
+
   // --- action ---
   rpc AssistantActionCreate(AssistantActionCreateReq) returns (AssistantActionCreateResp) {}
   rpc AssistantActionDelete(AssistantActionDeleteReq) returns (google.protobuf.Empty) {}
@@ -100,17 +106,14 @@ message AssistantDeleteReq {
 }
 
 message AssistantKnowledgeBaseConfig {
-  repeated AssistantKnowledgeBase knowledgeBases = 1;   // 知识库信息
+  repeated string knowledgeBaseIds = 1;   // 知识库信息
   int32 maxHistory = 2;                           // 最长上下文
-  bool maxHistoryEnable = 3;                      // 是否启用最长上下文
-  float threshold = 4;                            // 过滤阈值
-  bool thresholdEnable = 5;                       // 是否启用过滤阈值
-  int32 topK = 6;                                 // topK
-  bool topKEnable = 7;                            // 是否启用topK
-}
-message AssistantKnowledgeBase {
-  string id = 1;
-  string name = 2;
+  float threshold = 3;                            // 过滤阈值
+  int32 topK = 4;                                 // topK
+  string matchType = 5; //matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+  float keywordPriority = 6;// 关键词权重
+  int32 priorityMatch = 7;// 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+  float semanticsPriority = 8;// 语义权重
 }
 
 message AssistantOnlineSearchConfig {
@@ -177,6 +180,42 @@ message AssistantWorkFlowDeleteReq {
 message AssistantWorkFlowEnableSwitchReq {
   string workFlowId = 1;
   Identity identity = 2;
+}
+
+message AssistantMCPCreateReq {
+  string assistantId = 1;
+  string mcpId = 2;
+  Identity identity = 3;
+}
+
+message AssistantMCPDeleteReq {
+  string mcpId = 1;
+  Identity identity = 2;
+}
+
+message AssistantMCPEnableSwitchReq {
+  string mcpId = 1;
+  Identity identity = 2;
+}
+
+message AssistantMCPGetListReq {
+  string assistantId = 1;
+  Identity identity = 2;
+}
+
+message AssistantMCPInfo {
+  uint32 id = 1;
+  uint32 assistantMcpId = 2;
+  string mcpId = 3;
+  bool enable = 4;
+  string userId = 5;
+  string orgId = 6;
+  int64 createdAt = 7;
+  int64 updatedAt = 8;
+}
+
+message AssistantMCPList {
+  repeated AssistantMCPInfo assistantMCPInfos = 1;
 }
 
 message AssistantActionCreateReq {

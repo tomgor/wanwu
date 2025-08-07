@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	knowledgeBase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	"sort"
 
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
@@ -55,20 +56,13 @@ func AssistantConfigUpdate(ctx *gin.Context, userId, orgId string, req request.A
 		return nil, err
 	}
 	_, err = assistant.AssistantConfigUpdate(ctx, &assistant_service.AssistantConfigUpdateReq{
-		AssistantId:       req.AssistantId,
-		Prologue:          req.Prologue,
-		Instructions:      req.Instructions,
-		RecommendQuestion: req.RecommendQuestion,
-		ModelConfig:       modelConfig,
-		KnowledgeBaseConfig: &assistant_service.AssistantKnowledgeBaseConfig{
-			KnowledgeBases:   transKnowledgebases2Proto(req.KnowledgeBaseConfig.Knowledgebases),
-			MaxHistoryEnable: req.KnowledgeBaseConfig.Config.MaxHistoryEnable,
-			Threshold:        req.KnowledgeBaseConfig.Config.Threshold,
-			ThresholdEnable:  req.KnowledgeBaseConfig.Config.ThresholdEnable,
-			TopK:             req.KnowledgeBaseConfig.Config.TopK,
-			TopKEnable:       req.KnowledgeBaseConfig.Config.TopKEnable,
-		},
-		RerankConfig: rerankConfig,
+		AssistantId:         req.AssistantId,
+		Prologue:            req.Prologue,
+		Instructions:        req.Instructions,
+		RecommendQuestion:   req.RecommendQuestion,
+		ModelConfig:         modelConfig,
+		KnowledgeBaseConfig: transKnowledgebases2Proto(req.KnowledgeBaseConfig),
+		RerankConfig:        rerankConfig,
 		OnlineSearchConfig: &assistant_service.AssistantOnlineSearchConfig{
 			SearchUrl:      req.OnlineSearchConfig.SearchUrl,
 			SearchKey:      req.OnlineSearchConfig.SearchKey,
@@ -110,7 +104,12 @@ func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.Assist
 	if err != nil {
 		return response.Assistant{}, err
 	}
-	assistant, err := transAssistantResp2Model(ctx, resp, accessedWorkFlowList)
+	// 查询该用户所有权限的所有 MCP
+	accessedMCPList, err := GetUserMCPList(ctx, req.AssistantId, userId, orgId)
+	if err != nil {
+		return response.Assistant{}, err
+	}
+	assistant, err := transAssistantResp2Model(ctx, resp, accessedWorkFlowList, accessedMCPList)
 	if err != nil {
 		return response.Assistant{}, err
 	}
@@ -150,6 +149,49 @@ func AssistantWorkFlowDelete(ctx *gin.Context, userId, orgId string, req request
 func AssistantWorkFlowEnableSwitch(ctx *gin.Context, userId, orgId string, req request.WorkFlowIdRequest) (interface{}, error) {
 	_, err := assistant.AssistantWorkFlowEnableSwitch(ctx, &assistant_service.AssistantWorkFlowEnableSwitchReq{
 		WorkFlowId: req.WorkFlowId,
+		Identity: &assistant_service.Identity{
+			UserId: userId,
+			OrgId:  orgId,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
+}
+
+func AssistantMCPCreate(ctx *gin.Context, userId, orgId string, req request.MCPAddRequest) (interface{}, error) {
+	_, err := assistant.AssistantMCPCreate(ctx, &assistant_service.AssistantMCPCreateReq{
+		AssistantId: req.AssistantId,
+		McpId:       req.MCPId,
+		Identity: &assistant_service.Identity{
+			UserId: userId,
+			OrgId:  orgId,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
+}
+
+func AssistantMCPDelete(ctx *gin.Context, userId, orgId string, req request.MCPIdRequest) (interface{}, error) {
+	_, err := assistant.AssistantMCPDelete(ctx, &assistant_service.AssistantMCPDeleteReq{
+		McpId: req.MCPId,
+		Identity: &assistant_service.Identity{
+			UserId: userId,
+			OrgId:  orgId,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
+}
+
+func AssistantMCPEnableSwitch(ctx *gin.Context, userId, orgId string, req request.MCPIdRequest) (interface{}, error) {
+	_, err := assistant.AssistantMCPEnableSwitch(ctx, &assistant_service.AssistantMCPEnableSwitchReq{
+		McpId: req.MCPId,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
@@ -364,18 +406,23 @@ func GetConversationDetailList(ctx *gin.Context, userId, orgId string, req reque
 	return response.PageResult{Total: resp.Total, List: convertedList, PageNo: req.PageNo, PageSize: req.PageSize}, nil
 }
 
-func transKnowledgebases2Proto(kbs []request.AppKnowledgeBase) []*assistant_service.AssistantKnowledgeBase {
-	if kbs == nil {
-		return nil
+func transKnowledgebases2Proto(kbConfig request.AppKnowledgebaseConfig) *assistant_service.AssistantKnowledgeBaseConfig {
+	var knowIds []string
+	if len(kbConfig.Knowledgebases) > 0 {
+		for _, v := range kbConfig.Knowledgebases {
+			knowIds = append(knowIds, v.ID)
+		}
 	}
-	result := make([]*assistant_service.AssistantKnowledgeBase, 0, len(kbs))
-	for _, kb := range kbs {
-		result = append(result, &assistant_service.AssistantKnowledgeBase{
-			Id:   kb.ID,
-			Name: kb.Name,
-		})
+	return &assistant_service.AssistantKnowledgeBaseConfig{
+		KnowledgeBaseIds:  knowIds,
+		MaxHistory:        kbConfig.Config.MaxHistory,
+		Threshold:         kbConfig.Config.Threshold,
+		TopK:              kbConfig.Config.TopK,
+		MatchType:         kbConfig.Config.MatchType,
+		KeywordPriority:   kbConfig.Config.KeywordPriority,
+		PriorityMatch:     kbConfig.Config.PriorityMatch,
+		SemanticsPriority: kbConfig.Config.SemanticsPriority,
 	}
-	return result
 }
 
 func transSafetyConfig2Proto(tables []request.SensitiveTable) []*assistant_service.SensitiveTable {
@@ -392,7 +439,7 @@ func transSafetyConfig2Proto(tables []request.SensitiveTable) []*assistant_servi
 	return result
 }
 
-func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.AssistantInfo, accessedWorkFlowList *response.ListResult) (response.Assistant, error) {
+func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.AssistantInfo, accessedWorkFlowList *response.ListResult, mcpInfos []*response.MCPInfos) (response.Assistant, error) {
 	log.Debugf("开始转换Assistant响应到模型，响应内容: %+v", resp)
 	if resp == nil {
 		log.Debugf("Assistant响应为空，返回空Assistant模型")
@@ -494,6 +541,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	} else {
 		log.Debugf("工作流信息为空")
 	}
+
 	var onlineSearchConfig request.OnlineSearchConfig
 	if resp.OnlineSearchConfig != nil {
 		onlineSearchConfig = request.OnlineSearchConfig{
@@ -511,39 +559,27 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		}
 		sensitiveWordTable, _ = safety.GetSensitiveWordTableListByIDs(ctx, &safety_service.GetSensitiveWordTableListByIDsReq{TableIds: tableIds})
 	}
+	knowledgeBaseConfig, err := transKnowledgeBases2Model(ctx, resp.KnowledgeBaseConfig)
+	if err != nil {
+		return response.Assistant{}, err
+	}
 	assistantModel := response.Assistant{
-		AssistantId:       resp.AssistantId,
-		AppBriefConfig:    appBriefConfigProto2Model(ctx, resp.AssistantBrief),
-		Prologue:          resp.Prologue,
-		Instructions:      resp.Instructions,
-		RecommendQuestion: resp.RecommendQuestion,
-		KnowledgeBaseConfig: func() request.AppKnowledgebaseConfig {
-			if resp.KnowledgeBaseConfig != nil {
-				log.Debugf("检测到知识库配置")
-				return request.AppKnowledgebaseConfig{
-					Knowledgebases: transKnowledgebases2Model(resp.KnowledgeBaseConfig.KnowledgeBases),
-					Config: request.AppKnowledgebaseParams{
-						MaxHistory:       resp.KnowledgeBaseConfig.MaxHistory,
-						MaxHistoryEnable: resp.KnowledgeBaseConfig.MaxHistoryEnable,
-						Threshold:        resp.KnowledgeBaseConfig.Threshold,
-						ThresholdEnable:  resp.KnowledgeBaseConfig.ThresholdEnable,
-						TopK:             resp.KnowledgeBaseConfig.TopK,
-						TopKEnable:       resp.KnowledgeBaseConfig.TopKEnable,
-					},
-				}
-			}
-			log.Debugf("知识库配置为空")
-			return request.AppKnowledgebaseConfig{}
-		}(),
-		ModelConfig:        modelConfig,
-		RerankConfig:       rerankConfig,
-		OnlineSearchConfig: onlineSearchConfig,
-		SafetyConfig:       request.AppSafetyConfig{Enable: resp.SafetyConfig.GetEnable()},
-		Scope:              resp.Scope,
-		ActionInfos:        actionInfos,
-		WorkFlowInfos:      workFlowInfos,
-		CreatedAt:          util.Time2Str(resp.CreatTime),
-		UpdatedAt:          util.Time2Str(resp.UpdateTime),
+		AssistantId:         resp.AssistantId,
+		AppBriefConfig:      appBriefConfigProto2Model(ctx, resp.AssistantBrief),
+		Prologue:            resp.Prologue,
+		Instructions:        resp.Instructions,
+		RecommendQuestion:   resp.RecommendQuestion,
+		KnowledgeBaseConfig: knowledgeBaseConfig,
+		ModelConfig:         modelConfig,
+		RerankConfig:        rerankConfig,
+		OnlineSearchConfig:  onlineSearchConfig,
+		SafetyConfig:        request.AppSafetyConfig{Enable: resp.SafetyConfig.GetEnable()},
+		Scope:               resp.Scope,
+		ActionInfos:         actionInfos,
+		WorkFlowInfos:       workFlowInfos,
+		MCPInfos:            mcpInfos,
+		CreatedAt:           util.Time2Str(resp.CreatTime),
+		UpdatedAt:           util.Time2Str(resp.UpdateTime),
 	}
 	if sensitiveWordTable != nil {
 		var sensitiveTableList []request.SensitiveTable
@@ -559,18 +595,44 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	return assistantModel, nil
 }
 
-func transKnowledgebases2Model(kbs []*assistant_service.AssistantKnowledgeBase) []request.AppKnowledgeBase {
-	if kbs == nil {
-		return nil
+func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.AssistantKnowledgeBaseConfig) (request.AppKnowledgebaseConfig, error) {
+	if kbConfig == nil {
+		log.Debugf("知识库配置为空")
+		return request.AppKnowledgebaseConfig{}, nil
 	}
-	result := make([]request.AppKnowledgeBase, 0, len(kbs))
-	for _, kb := range kbs {
-		result = append(result, request.AppKnowledgeBase{
-			ID:   kb.Id,
-			Name: kb.Name,
+	if len(kbConfig.KnowledgeBaseIds) == 0 {
+		log.Debugf("知识库配置为空")
+		return request.AppKnowledgebaseConfig{}, nil
+	}
+
+	// 获取知识库详情列表
+	kbInfoList, err := knowledgeBase.SelectKnowledgeDetailByIdList(ctx, &knowledgeBase_service.KnowledgeDetailSelectListReq{
+		KnowledgeIds: kbConfig.KnowledgeBaseIds,
+	})
+	if err != nil {
+		return request.AppKnowledgebaseConfig{}, err
+	}
+
+	var knowledgeBases []request.AppKnowledgeBase
+	for _, kbInfo := range kbInfoList.List {
+		knowledgeBases = append(knowledgeBases, request.AppKnowledgeBase{
+			ID:   kbInfo.KnowledgeId,
+			Name: kbInfo.Name,
 		})
 	}
-	return result
+	return request.AppKnowledgebaseConfig{
+		Knowledgebases: knowledgeBases,
+		Config: request.AppKnowledgebaseParams{
+			MaxHistory:        kbConfig.MaxHistory,
+			Threshold:         kbConfig.Threshold,
+			TopK:              kbConfig.TopK,
+			MatchType:         kbConfig.MatchType,
+			PriorityMatch:     kbConfig.PriorityMatch,
+			SemanticsPriority: kbConfig.SemanticsPriority,
+			KeywordPriority:   kbConfig.KeywordPriority,
+		},
+	}, nil
+
 }
 
 func transActionResp2Model(resp *assistant_service.GetAssistantActionInfoResp) response.Action {

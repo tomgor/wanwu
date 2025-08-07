@@ -56,6 +56,19 @@ type WorkFlowIdRequest struct {
 
 func (w *WorkFlowIdRequest) Check() error { return nil }
 
+type MCPAddRequest struct {
+	AssistantId string `json:"assistantId" form:"assistantId"`
+	MCPId       string `json:"mcpId" form:"mcpId"`
+}
+
+func (m *MCPAddRequest) Check() error { return nil }
+
+type MCPIdRequest struct {
+	MCPId string `json:"mcpId" form:"mcpId" validate:"required"`
+}
+
+func (w *MCPIdRequest) Check() error { return nil }
+
 type ActionAddRequest struct {
 	AssistantId string            `json:"assistantId"  validate:"required"`
 	Schema      string            `json:"schema"  validate:"required"`
