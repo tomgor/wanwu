@@ -22,13 +22,14 @@
                     class="toolContent_item"
                     >
                     <span>{{ item.apiName || item.name }}</span>
-                    <el-checkbox v-model="item.checked" @change="openTool($event,item,type)" :disabled="item.checked"></el-checkbox>
+                    <el-button type="text" @click="openTool($event,item,type)" v-if="!item.checked">添加</el-button>
+                    <el-button type="text" v-else style="color:#ccc;">已添加</el-button>
                     </div>
                 </template>
             </div>
-            <span slot="footer" class="dialog-footer">
+            <!-- <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="submit">确 定</el-button>
-            </span>
+            </span> -->
         </el-dialog>
     </div>
 </template>
@@ -48,6 +49,8 @@ export default {
             actionInfos:[],
             workFlowInfos:[],
             mcpInfos:[],
+            mcpList:[],
+            workFlowList:[],
             toolList:[
                 // {
                 //     value:'auto',
@@ -134,9 +137,10 @@ export default {
         getMcpSelect(name){
             getList({name}).then(res => {
                 if(res.code === 0){
-                     this.mcpInfos = (res.data.list || []).map(item => 
-                        Object.assign({}, item, { checked: false })
-                    );
+                    this.mcpInfos = (res.data.list || []).map(m => ({
+                        ...m,
+                        checked: this.mcpList.some(item => item.mcpId === m.mcpId)
+                    }));
                 }
                
             }).catch(err => {
@@ -146,9 +150,10 @@ export default {
             getWorkflowList(name) {
                 getExplorationFlowList({name,appType:'workflow',searchType:'all'}).then(res =>{
                     if (res.code === 0) {
-                        this.workFlowInfos = (res.data.list || []).map(item => 
-                            Object.assign({}, item, { checked: false })
-                        );
+                        this.workFlowInfos = (res.data.list || []).map(m => ({
+                            ...m,
+                            checked: this.workFlowList.some(item => item.workFlowId === m.appId)
+                        }));
                     }
                 })
         },
@@ -156,17 +161,19 @@ export default {
             this.dialogVisible = true;
             this.setMcp(row.mcpInfos);
             this.setWorkflow(row.workFlowInfos);
+            this.mcpList = row.mcpInfos;
+            this.workFlowList = row.workFlowInfos;
         },
         setMcp(data){
            this.mcpInfos = this.mcpInfos.map(m => ({
             ...m,
-            checked: data.includes(m.mcpId)
+            checked: data.some(item => item.mcpId === m.mcpId)
             }));
         },
         setWorkflow(data){
             this.workFlowInfos = this.workFlowInfos.map(m => ({
             ...m,
-            checked: data.includes(m.appId)
+            checked: data.some(item => item.workFlowId === m.appId)
             }));
         },
         handleClose(){

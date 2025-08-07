@@ -211,30 +211,6 @@
               </el-select>
             </div>
           </div>
-          <!-- <div class="block prompt-box">
-            <p class="block-title">Rerank模型</p>
-            <div class="rl">
-              <el-select
-                v-model="editForm.rerankParams"
-                placeholder="请选择模型"
-                @visible-change="rerankVisible"
-                loading-text="模型加载中..."
-                class="cover-input-icon"
-                style="width:100%;"
-                :disabled="isPublish"
-                :loading="modelLoading"
-                clearable
-              >
-                <el-option
-                  v-for="(item,index) in rerankOptions"
-                  :key="item.modelId"
-                  :label="item.displayName"
-                  :value="item.modelId"
-                >
-                </el-option>
-              </el-select>
-            </div>
-          </div> -->
         </div>
         <div class="block prompt-box link-box">
           <p class="block-title">联网检索</p>
@@ -272,24 +248,6 @@
             </span>
           </p>
           <div class="rl tool-conent">
-            <!-- <div class="tool-left tool" v-show="editForm.actionInfos.length">
-              <div class="action-list">
-              <div
-                class="action-item"
-                v-for="(n,i) in editForm.actionInfos"
-                :key="`${i}ac`"
-              >
-                <div
-                  class="name"
-                  @click="preUpdateAction(n.actionId)"
-                >{{n.apiName}}</div>
-                <div class="bt">
-                  <el-switch v-model="n.enable" class="bt-switch" @change="actionSwitch(n.actionId)"></el-switch>
-                  <span @click="preDelAction(n.actionId)" class="el-icon-delete del"></span>
-                </div>
-              </div>
-              </div>
-            </div> -->
             <div
               class="tool-right tool"
               v-show="allTools.length"
@@ -367,49 +325,7 @@
         />
       </div>
     </div>
-    <!-- 添加自定义插件 -->
-    <!-- <el-dialog
-      top="10vh"
-      :title="$t('agent.addComponent')"
-      :close-on-click-modal="false"
-      :visible.sync="wfDialogVisible"
-      width="50%"
-      class="workflow-modal"
-    >
-      <div class="workflow-dialog">
-        <p style="margin-bottom: 30px">
-          <el-tag type="warning"
-            ><i class="el-icon-warning"></i
-            >{{$t('agent.addComponentTips')}}</el-tag
-          >
-        </p>
-        <div class="workflow-list">
-          <div
-            class="workflow-item"
-            v-for="(n, i) in workflowList"
-            :key="`${i}`"
-          >
-            <img class="workflow-item-icon" :src="require('@/assets/imgs/workflowIcon.png')" />
-            <div class="workflow-item-info">
-              <p class="info-name">{{ n.name }}</p>
-              <p class="info-desc">{{ n.desc }}</p>
-            </div>
-            <div class="workflow-item-bt">
-              <el-button v-if="n.checked" disabled size="mini"
-                >{{$t('agent.added')}}</el-button
-              >
-              <el-button
-                v-else
-                type="primary"
-                size="mini"
-                @click="getWorkFlowDetail(n, i)"
-                >{{$t('agent.add')}}</el-button
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-    </el-dialog> -->
+
     <!-- 编辑智能体 -->
     <CreateIntelligent
       ref="createIntelligentDialog"
@@ -465,7 +381,6 @@ import ApiKeyDialog from "./ApiKeyDialog";
 import { selectModelList, getRerankList } from "@/api/modelAccess";
 import {
   getAgentInfo,
-  addWorkFlowInfo,
   delWorkFlowInfo,
   delActionInfo,
   putAgentInfo,
@@ -477,11 +392,8 @@ import ToolDiaglog from "./toolDialog";
 import LinkDialog from "./linkDialog";
 import knowledgeSetDialog from "./knowledgeSetDialog";
 import {
-  getWorkFlowList,
   readWorkFlow,
-  getExplorationFlowList,
 } from "@/api/workflow";
-import { Base64 } from "js-base64";
 import Chat from "./chat";
 import LinkIcon from "@/components/linkIcon.vue";
 export default {
@@ -499,7 +411,7 @@ export default {
   },
   watch: {
     editForm: {
-      handler(newVal) {
+      handler(newVal,oldVal) {
         // 如果是从详情设置的数据，不触发更新逻辑
         if (this.isSettingFromDetail) {
           return;
@@ -515,10 +427,10 @@ export default {
             "prologue",
             "knowledgeBaseIds",
             "instructions",
-            "recommendQuestion",
             "onlineSearchConfig",
             "safetyConfig",
-          ];
+            // "recommendQuestion"
+          ]
           const changed = props.some((prop) => {
             return (
               JSON.stringify(newVal[prop]) !==
@@ -533,7 +445,7 @@ export default {
         }, 500);
       },
       deep: true,
-    },
+    }
   },
   computed: {
     ...mapGetters("app", ["cacheData"]),
@@ -662,8 +574,6 @@ export default {
       : "";
     this.hasPluginPermission = permission.indexOf("plugin") !== -1;
 
-    //自定义插件列表
-    // this.getWorkflowList([]);
   },
   beforeDestroy() {
     store.dispatch("app/initState");
@@ -1010,7 +920,7 @@ export default {
           ...this.mcpInfos.map((item) => ({ ...item, type: "mcp" })),
           ...this.actionInfos.map((item) => ({ ...item, type: "action" })),
         ];
-        // this.getWorkflowList(data.workFlowInfos || []);
+       
         this.$nextTick(() => {
           this.isSettingFromDetail = false;
         });
@@ -1018,41 +928,6 @@ export default {
         this.isSettingFromDetail = false;
       }
     },
-    // async getWorkflowList(workFlowInfos) {
-    //   let res = await getExplorationFlowList({name:'',appType:'workflow',searchType:'all'});
-    //   if (res.code === 0) {
-    //      this.workflowList = res.data.list || []
-    //     //对比数据回显已选插件
-    //     workFlowInfos.forEach((n) => {
-    //       this.workflowList.forEach((m, j) => {
-    //         if (n.workFlowId === m.appId) {
-    //           const updatedItem = {
-    //                 ...m,
-    //                 enable:n.enable,
-    //                 workFlowId: n.id,
-    //                 checked: true
-    //               };
-    //           this.$set(this.workflowList, j, updatedItem);
-    //         }
-    //       });
-    //     });
-    //   }
-    // },
-    // async doCreateWorkFlow(workFlowId, schema, index) {
-    //   let params = {
-    //     assistantId: this.editForm.assistantId,
-    //     schema: Base64.decode(schema),
-    //     workFlowId,
-    //     apiAuth: {
-    //       type: "none",
-    //     },
-    //   };
-    //   let res = await addWorkFlowInfo(params);
-    //   if (res.code === 0) {
-    //     this.$message.success(this.$t('agent.addPluginTips'));
-    //     this.getAppDetail();
-    //   }
-    // },
     async doDeleteWorkflow(workFlowId) {
       if (this.editForm.assistantId) {
         let res = await delWorkFlowInfo({
