@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	docCenterLocalDir        = "configs/microservice/bff-service/static/manual"
+	docCenterLocalDir        = "configs/microservice/bff-service/static/manual/"
 	docCenterStaticAPIPrefix = "../../../user/api/v1/static/manual" // ../../..用于抵消前端固定前缀 aibase/docCenter/pages
 	docCenterSnippetLen      = 200                                  // 截取文本长度
 
@@ -51,7 +51,6 @@ type docCenter struct {
 }
 
 type mdInfo struct {
-	filePath    string
 	relFilePath string
 	content     string
 }
@@ -80,7 +79,6 @@ func InitDocCenter() error {
 			mdInfos = append(mdInfos, mdInfo{
 				content:     convertByte,
 				relFilePath: relFilePath,
-				filePath:    filePath,
 			})
 		}
 		return nil
@@ -89,7 +87,7 @@ func InitDocCenter() error {
 	}
 
 	// 1. 构建搜索引擎
-	searcher, err := newDocMenuSearcher(docCenterLocalDir)
+	searcher, err := newDocMenuSearcher(mdInfos)
 	if err != nil {
 		return fmt.Errorf("init search engin err: %v", err)
 	}
@@ -132,7 +130,7 @@ func SearchDocCenter(ctx *gin.Context, content string) ([]response.DocSearchResp
 			log.Errorf("doc center %v md2html error", doc.DocId)
 			continue // 跳过当前doc不做处理
 		}
-		searchUrl, err := url.JoinPath(config.Cfg().Server.WebBaseUrl, config.Cfg().DocCenter.FrontendPrefix, url.PathEscape(strings.TrimPrefix(strings.Replace(doc.DocId, docCenterLocalDir, "", 1), "/")))
+		searchUrl, err := url.JoinPath(config.Cfg().Server.WebBaseUrl, config.Cfg().DocCenter.FrontendPrefix, url.PathEscape(doc.DocId))
 		if err != nil {
 			log.Errorf("doc center %v to search url err: %v", doc.DocId, err)
 			continue
@@ -200,32 +198,14 @@ func convertMarkdown(apiPrefix, refFilePath, mdContent string) string {
 
 // --- doc-center search engine ---
 
-func newDocMenuSearcher(docCenterLocalDir string) (*riot.Engine, error) {
+func newDocMenuSearcher(mdInfos []mdInfo) (*riot.Engine, error) {
 	engine := &riot.Engine{}
-	engine.Init(types.EngineOpts{
-		Using:   3,    // 使用内存索引
-		GseDict: "zh", // 指定中文分词字典
-	})
-	// 批量加载文件索引
-	if err := filepath.Walk(docCenterLocalDir, func(filePath string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		// 检查不为目录并且是否为markdown文件
-		if !info.IsDir() && strings.HasSuffix(info.Name(), ".md") {
-			// 读取文件内容
-			content, err := os.ReadFile(filePath)
-			if err != nil {
-				return fmt.Errorf("读取文件%v错误", filePath)
-			}
-			// 创建索引
-			engine.Index(filePath, types.DocData{
-				Content: string(content),
-			})
-		}
-		return nil
-	}); err != nil {
-		return nil, err
+	engine.Init(types.EngineOpts{})
+	// 创建索引
+	for _, mdInfo := range mdInfos {
+		engine.Index(mdInfo.relFilePath, types.DocData{
+			Content: string(mdInfo.content),
+		})
 	}
 	// 刷新索引
 	engine.Flush()
