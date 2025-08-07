@@ -231,14 +231,23 @@ func UpdateDocStatusDocId(ctx context.Context, docId string, status int, metaLis
 		}
 		//创建文档元数据
 		if len(metaList) > 0 {
-			return tx.Model(&model.KnowledgeDocMeta{}).CreateInBatches(metaList, len(metaList)).Error
+			//删除所有知识库标签
+			err = tx.Unscoped().Model(&model.KnowledgeDocMeta{}).Where("doc_id = ?", docId).Delete(&model.KnowledgeDocMeta{}).Error
+			if err != nil {
+				return err
+			}
+			//插入数据
+			err = tx.Model(&model.KnowledgeDocMeta{}).CreateInBatches(metaList, len(metaList)).Error
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	})
 }
 
-// UpdateDocStatusDocTag 更新文档tag
-func UpdateDocStatusDocTag(ctx context.Context, docId string, metaDataList []*model.KnowledgeDocMeta, ragDocMetaParams *service.RagDocMetaParams) error {
+// UpdateDocStatusDocMeta 更新文档tag
+func UpdateDocStatusDocMeta(ctx context.Context, docId string, metaDataList []*model.KnowledgeDocMeta, ragDocMetaParams *service.RagDocMetaParams) error {
 	return db.GetHandle(ctx).Transaction(func(tx *gorm.DB) error {
 		//todo 文档元数据应该不会特别多，所以先这么做，如果比较多，后续优化
 		//删除所有知识库标签

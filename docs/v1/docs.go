@@ -7736,15 +7736,15 @@ const docTemplate = `{
                 "docId"
             ],
             "properties": {
-                "MetaDataList": {
+                "docId": {
+                    "type": "string"
+                },
+                "metaDataList": {
                     "description": "文档元数据",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/request.MetaData"
                     }
-                },
-                "docId": {
-                    "type": "string"
                 }
             }
         },

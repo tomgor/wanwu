@@ -111,8 +111,9 @@ func UpdateDocMetaData(ctx *gin.Context, userId, orgId string, r *request.DocMet
 
 func UpdateDocStatus(ctx *gin.Context, r *request.CallbackUpdateDocStatusReq) error {
 	_, err := knowledgeBaseDoc.UpdateDocStatus(ctx.Request.Context(), &knowledgebase_doc_service.UpdateDocStatusReq{
-		DocId:  r.DocId,
-		Status: r.Status,
+		DocId:        r.DocId,
+		Status:       r.Status,
+		MetaDataList: buildMetaDataList(r.MetaDataList),
 	})
 	return err
 }
