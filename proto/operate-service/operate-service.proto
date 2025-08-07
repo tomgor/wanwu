@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package operate_service;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/UnicomAI/wanwu/api/proto/operate-service";
+
+service OperateService {
+
+}

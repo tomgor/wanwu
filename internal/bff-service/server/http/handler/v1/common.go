@@ -75,18 +75,42 @@ func UploadAvatar(ctx *gin.Context) {
 	gin_util.Response(ctx, avatar, nil)
 }
 
-// GetDocCenter
+// SearchDocCenter
 //
 //	@Tags		common
-//	@Summary	获取文档中心路径
+//	@Summary	查找文档中心内容
 //	@Security	JWT
 //	@Accept		json
 //	@Produce	json
-//	@Success	200	{object}	response.Response{data=response.DocCenter}
-//	@Router		/doc_center [get]
-func GetDocCenter(ctx *gin.Context) {
-	resp := service.GetDocCenter()
-	gin_util.Response(ctx, resp, nil)
+//	@Param		content	query		string	true	"搜索关键字"
+//	@Success	200		{object}	response.Response{data=[]response.DocSearchResp}
+//	@Router		/doc_center/search [get]
+func SearchDocCenter(ctx *gin.Context) {
+}
+
+// GetDocCenterMenu
+//
+//	@Tags		common
+//	@Summary	获取文档中心目录
+//	@Security	JWT
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	response.Response{data=[]response.DocMenu}
+//	@Router		/doc_center/menu [get]
+func GetDocCenterMenu(ctx *gin.Context) {
+}
+
+// GetDocCenterMarkdown
+//
+//	@Tags		common
+//	@Summary	获取文档中心Markdown文件内容
+//	@Security	JWT
+//	@Accept		json
+//	@Produce	json
+//	@Param		path	query		string	true	"目录path"
+//	@Success	200		{object}	response.Response{data=string}
+//	@Router		/doc_center/markdown [get]
+func GetDocCenterMarkdown(ctx *gin.Context) {
 }
 
 // --- internal ---

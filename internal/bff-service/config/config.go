@@ -1,6 +1,8 @@
 package config
 
 import (
+	"net/url"
+
 	"github.com/UnicomAI/wanwu/pkg/i18n"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/minio"
@@ -92,7 +94,14 @@ type AssistantTemplateConfig struct {
 }
 
 type DocCenterConfig struct {
-	DocPath string `json:"doc_path" mapstructure:"doc_path"`
+	FrontendPrefix string          `json:"frontend_prefix" mapstructure:"frontend_prefix"`
+	Links          []DocLinkConfig `json:"links" mapstructure:"links"`
+	docs           map[string]string
+}
+
+type DocLinkConfig struct {
+	Key string `json:"key"`
+	Val string `json:"val"`
 }
 
 type CustomInfoConfig struct {
@@ -127,7 +136,15 @@ type CustomAbout struct {
 
 func LoadConfig(in string) error {
 	_c = &Config{}
-	return util.LoadConfig(in, _c)
+	if err := util.LoadConfig(in, _c); err != nil {
+		return err
+	}
+	_c.DocCenter.docs = make(map[string]string)
+	for _, link := range _c.DocCenter.Links {
+		url, _ := url.JoinPath(_c.Server.WebBaseUrl, _c.DocCenter.FrontendPrefix, url.PathEscape(link.Val))
+		_c.DocCenter.docs[link.Key] = url
+	}
+	return nil
 }
 
 func Cfg() *Config {
@@ -135,4 +152,17 @@ func Cfg() *Config {
 		log.Panicf("cfg nil")
 	}
 	return _c
+}
+
+// GetDocs 返回 docs 的深拷贝
+func (d *DocCenterConfig) GetDocs() map[string]string {
+	if d.docs == nil {
+		return nil
+	}
+	// 深拷贝
+	result := make(map[string]string, len(d.docs))
+	for k, v := range d.docs {
+		result[k] = v
+	}
+	return result
 }

@@ -19,10 +19,11 @@ type Captcha struct {
 }
 
 type LogoCustomInfo struct {
-	Login CustomLogin `json:"login"` // 登录页标题信息
-	Home  CustomHome  `json:"home"`  // 首页标题信息
-	Tab   CustomTab   `json:"tab"`   // 标签页信息
-	About CustomAbout `json:"about"` // 关于信息
+	Login    CustomLogin       `json:"login"`    // 登录页标题信息
+	Home     CustomHome        `json:"home"`     // 首页标题信息
+	Tab      CustomTab         `json:"tab"`      // 标签页信息
+	About    CustomAbout       `json:"about"`    // 关于信息
+	LinkList map[string]string `json:"linkList"` // 跳转链接列表,key为链接名称,value为URL
 }
 
 type CustomLogin struct {

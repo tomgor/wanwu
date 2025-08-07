@@ -47,6 +47,7 @@ func GetLogoCustomInfo(ctx *gin.Context) (response.LogoCustomInfo, error) {
 			Version:   config.Cfg().CustomInfo.About.Version,
 			Copyright: gin_util.I18nKey(ctx, config.Cfg().CustomInfo.About.Copyright),
 		},
+		LinkList: config.Cfg().DocCenter.GetDocs(),
 	}
 	return ret, nil
 }
