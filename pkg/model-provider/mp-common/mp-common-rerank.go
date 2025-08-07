@@ -45,7 +45,7 @@ func (req *RerankReq) Data() (map[string]interface{}, error) {
 
 type RerankResp struct {
 	Results   []Result `json:"results" validate:"required,dive"`
-	Model     string   `json:"model" validate:"required"`
+	Model     string   `json:"model"`
 	Object    *string  `json:"object,omitempty"`
 	Usage     Usage    `json:"usage"`
 	RequestId *string  `json:"request_id,omitempty"`
