@@ -3,15 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
-	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
-	"github.com/UnicomAI/wanwu/internal/bff-service/config"
-	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
-	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
-	"github.com/UnicomAI/wanwu/pkg/log"
-	"github.com/UnicomAI/wanwu/pkg/util"
-	"github.com/gin-gonic/gin"
-	"github.com/go-ego/riot"
-	"github.com/go-ego/riot/types"
+	"io"
 	"net/url"
 	"os"
 	"path"
@@ -22,12 +14,22 @@ import (
 	"strings"
 	"sync"
 	"unicode"
+
+	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
+	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
+	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
+	"github.com/UnicomAI/wanwu/pkg/log"
+	"github.com/UnicomAI/wanwu/pkg/util"
+	"github.com/gin-gonic/gin"
+	"github.com/go-ego/riot"
+	"github.com/go-ego/riot/types"
 )
 
 const (
-	docCenterLocalDir     = "configs/microservice/bff-service/static/docs" // bff-service本地缓存目录
-	docCenterStaticPrefix = "../../../service/api/v1"                      // ../../..用于抵消前端固定前缀 aibase/docCenter/pages
-	docCenterSnippetLen   = 200                                            // 截取文本长度
+	docCenterLocalDir     = "cache/manual" // bff-service本地缓存目录
+	loadDocCenterLocalDir = "configs/microservice/bff-service/configs/manual"
+	docCenterStaticPrefix = "../../../service/api/v1" // ../../..用于抵消前端固定前缀 aibase/docCenter/pages
+	docCenterSnippetLen   = 200                       // 截取文本长度
 )
 
 var (
@@ -36,9 +38,9 @@ var (
 	mdLinkRegex           = regexp.MustCompile(`[^!]\[.*?\]\((.*?\.md)\)`) // 从markdown匹配出跳转链接[](xxxxx)
 	mdBracketRegex        = regexp.MustCompile(`\[(.*?)\]`)                // 从markdown匹配[]中的文本
 
-	docSearchers = make(map[string]*riot.Engine) // 初始化搜索引擎
-	docSearchMu  sync.RWMutex                    // 搜索引擎读写锁
-	docMu        sync.Mutex                      // doc_center全局互斥锁
+	docSearchers *riot.Engine // 初始化搜索引擎
+	docSearchMu  sync.RWMutex // 搜索引擎读写锁
+	docMu        sync.Mutex   // doc_center全局互斥锁
 
 	docVerRegex = regexp.MustCompile(`v[\d\.]+`)
 
@@ -67,9 +69,19 @@ type MdInfo struct {
 func InitDocCenter(ctx context.Context) error {
 	var err error
 	var mdInfos []MdInfo
-	version := config.Cfg().CustomInfo.About.Version
-	docDir := path.Join(docCenterLocalDir, version)
-	if err := filepath.Walk(docDir, func(filePath string, info os.FileInfo, err error) error {
+	// 存储文件
+	if _, err := os.Stat(docCenterLocalDir); err != nil {
+		if os.IsNotExist(err) {
+			// 目录不存在，创建目录
+			if err := os.MkdirAll(docCenterLocalDir, 0755); err != nil {
+				return fmt.Errorf("failed to create directory %v: %w", docCenterLocalDir, err)
+			}
+		} else {
+			// 其他类型的错误（如权限问题）
+			return fmt.Errorf("failed to access directory %v: %w", docCenterLocalDir, err)
+		}
+	}
+	if err := filepath.Walk(loadDocCenterLocalDir, func(filePath string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -82,30 +94,27 @@ func InitDocCenter(ctx context.Context) error {
 			}
 			fileName := info.Name()
 			// 将markdown文本中图片引用 ![](xxxxx )与链接引用[](xxxxx )里的 xxxxx 处理为前端可访问的地址
-			convertByte := convertMarkdown(path.Join(docDir, fileName), fileName, string(content))
-
-			// 存储文件
-			if err = os.WriteFile(path.Join(docDir, fileName), []byte(convertByte), os.ModePerm); err != nil {
-				return grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_download_save", filePath, err.Error())
+			convertByte := convertMarkdown(path.Join(docCenterLocalDir, fileName), fileName, string(content))
+			if err = os.WriteFile(path.Join(docCenterLocalDir, fileName), []byte(convertByte), os.ModePerm); err != nil {
+				return fmt.Errorf("save doc center %v err: %v", filePath, err.Error())
 			}
 			mdInfos = append(mdInfos, MdInfo{
 				relPath:  fileName,
-				filePath: path.Join(docDir, fileName),
+				filePath: path.Join(docCenterLocalDir, fileName),
 			})
-
 		}
 		return nil
 	}); err != nil {
 		return err
 	}
-	// 初始化搜索引擎
-	se, err := newDocSearcher(docCenterLocalDir, version)
-	if err != nil {
-		return grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_search_init_err", err.Error())
+	if err := CopyDir(path.Join(loadDocCenterLocalDir, "assets"), path.Join(docCenterLocalDir, "assets")); err != nil {
+		return fmt.Errorf("copy assets err: %v", err.Error())
 	}
-	// 以版本为key添加搜索引擎
-	addDocSearcher(version, se)
-
+	// 初始化搜索引擎
+	docSearchers, err = newDocSearcher(docCenterLocalDir)
+	if err != nil {
+		return fmt.Errorf("init search engin err: %v", err.Error())
+	}
 	// 存储当前版本文档目录结构
 	var menus []*DocMenu
 	for _, mdInfo := range mdInfos {
@@ -129,21 +138,9 @@ func GetDocCenterMenu(ctx *gin.Context) ([]response.DocMenu, error) {
 
 func SearchDocCenter(ctx *gin.Context, content string) ([]response.DocSearchResp, error) {
 	if isDocSearchersEmpty() {
-		return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_search_init_no")
+		return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_search_empty")
 	}
-	// 从文档中心docDir
-	var docDir string
-	if path, ok := findDocCenterFirstFilePath(docCenter.Children); ok {
-		docDir = docVerRegex.FindString(path)
-	} else {
-		return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_file_version", strconv.Itoa(int(docCenter.DocId)), docCenter.Version)
-	}
-	// 找到对应searcher
-	se, exists := getDocSearcher(docDir)
-	if !exists {
-		return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_file_search", docDir)
-	}
-	results := se.SearchDoc(types.SearchReq{Text: content})
+	results := docSearchers.SearchDoc(types.SearchReq{Text: content})
 	var searchResps []response.DocSearchResp
 	for _, doc := range results.Docs {
 		title := strings.TrimSuffix(filepath.Base(doc.DocId), filepath.Ext(filepath.Base(doc.DocId)))
@@ -175,15 +172,6 @@ func GetDocCenterMarkdown(ctx *gin.Context, pathName string) (string, error) {
 	// check fileName
 	if !strings.HasSuffix(pathName, ".md") {
 		return "", grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_file_md", pathName)
-	}
-	parts := strings.SplitN(pathName, "/", 2)
-	if len(parts) == 0 {
-		return "", grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_path_err", pathName)
-	}
-	docDir := parts[0]
-	// 加锁方法
-	if err := checkAndInitDocCenter(ctx, docCenterLocalDir, docDir); err != nil {
-		return "", err
 	}
 	// read file
 	filePath := path.Join(docCenterLocalDir, pathName)
@@ -268,47 +256,6 @@ func getMarkdownSnippet(content, keyword string, snippetLen int) string {
 	return string(runes[start:end])
 }
 
-// 递归查找第一个非空的 filePath
-func findDocCenterFirstFilePath(nodes []*DocMenu) (string, bool) {
-	for _, node := range nodes {
-		if node.FilePath != "" {
-			return node.FilePath, true
-		}
-		// 如果当前节点有子节点，递归查找
-		if len(node.Children) > 0 {
-			if path, found := findDocCenterFirstFilePath(node.Children); found {
-				return path, true
-			}
-		}
-	}
-	return "", false
-}
-
-func checkAndInitDocCenter(ctx *gin.Context, docCenterLocalDir, docDir string) (retErr error) {
-	docMu.Lock()
-	defer docMu.Unlock()
-	defer func() {
-		if retErr != nil {
-			if err := os.RemoveAll(path.Join(docCenterLocalDir, docDir)); err != nil {
-				log.Errorf("clean doc center %v err: %v", docDir, err)
-			}
-		}
-	}()
-	if _, err := os.Stat(path.Join(docCenterLocalDir, docDir)); err != nil {
-		if !os.IsNotExist(err) {
-			return err
-		}
-		// 初始化搜索引擎
-		se, err := newDocSearcher(docCenterLocalDir, docDir)
-		if err != nil {
-			return grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_search_init_err", err.Error())
-		}
-		// 以版本为key添加搜索引擎
-		addDocSearcher(docDir, se)
-	}
-	return nil
-}
-
 // 将markdown文本中图片引用 ![](xxxxx )与链接引用[](xxxxx )里的 xxxxx 处理为前端可访问的地址
 //
 //nolint:staticcheck
@@ -343,9 +290,9 @@ func convertMarkdown(mdFilePath, objectName, mdContent string) string {
 
 // --- doc-center search engine ---
 
-func newDocSearcher(docCenterLocalDir, docDir string) (*riot.Engine, error) {
-	if se, ok := getDocSearcher(docDir); ok {
-		return se, nil
+func newDocSearcher(docCenterLocalDir string) (*riot.Engine, error) {
+	if !isDocSearchersEmpty() {
+		return docSearchers, nil
 	}
 	engine := &riot.Engine{}
 	engine.Init(types.EngineOpts{
@@ -353,7 +300,7 @@ func newDocSearcher(docCenterLocalDir, docDir string) (*riot.Engine, error) {
 		GseDict: "zh", // 指定中文分词字典
 	})
 	// 批量加载文件索引
-	if err := filepath.Walk(path.Join(docCenterLocalDir, docDir), func(filePath string, info os.FileInfo, err error) error {
+	if err := filepath.Walk(docCenterLocalDir, func(filePath string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -378,26 +325,11 @@ func newDocSearcher(docCenterLocalDir, docDir string) (*riot.Engine, error) {
 	return engine, nil
 }
 
-// 获取 searchers 中的指定版本引擎
-func getDocSearcher(docDir string) (*riot.Engine, bool) {
-	docSearchMu.RLock()
-	defer docSearchMu.RUnlock()
-	engine, exists := docSearchers[docDir]
-	return engine, exists
-}
-
-// 添加新的搜索引擎到 searchers
-func addDocSearcher(docDir string, engine *riot.Engine) {
-	docSearchMu.Lock()
-	defer docSearchMu.Unlock()
-	docSearchers[docDir] = engine
-}
-
 // 检查 searchers 是否已初始化
 func isDocSearchersEmpty() bool {
 	docSearchMu.RLock()
 	defer docSearchMu.RUnlock()
-	return len(docSearchers) == 0
+	return docSearchers == nil
 }
 
 func generateDocCenterUrl(suffix string) string {
@@ -445,4 +377,43 @@ func extractDocNum(s string) (int, bool) {
 		return 0, false
 	}
 	return num, true
+}
+
+func CopyDir(src, dst string) error {
+	// 检查目标目录是否存在
+	if _, err := os.Stat(dst); !os.IsNotExist(err) {
+		return nil
+	}
+	// 创建目标目录
+	if err := os.MkdirAll(dst, 0755); err != nil {
+		return err
+	}
+	// 遍历源目录并复制所有内容
+	return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		relPath, _ := filepath.Rel(src, path)
+		dstPath := filepath.Join(dst, relPath)
+		if info.IsDir() {
+			return os.MkdirAll(dstPath, info.Mode())
+		} else {
+			return copyFile(path, dstPath)
+		}
+	})
+}
+
+func copyFile(src, dst string) error {
+	srcFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+	dstFile, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+	_, err = io.Copy(dstFile, srcFile)
+	return err
 }

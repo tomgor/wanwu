@@ -76,43 +76,43 @@ doc-center:
   frontend_prefix: /aibase/docCenter/pages
   links:
     - key: model
-      val: static/manual/模型导入方式-详细版.md
+      val: cache/manual/模型导入方式-详细版.md
     - key: knowledge
-      val: static/manual/2.知识库.md
+      val: cache/manual/2.知识库.md
     - key: knowledge-hit
-      val: static/manual/2.知识库.md
+      val: cache/manual/2.知识库.md
     - key: knowledge-keywords
-      val: static/manual/2.知识库.md
+      val: cache/manual/2.知识库.md
     - key: mcp
-      val: static/manual/3.MCP广场.md
+      val: cache/manual/3.MCP广场.md
     - key: rag
-      val: static/manual/5.文本问答.md
+      val: cache/manual/5.文本问答.md
     - key: agent
-      val: static/manual/7.智能体.md
+      val: cache/manual/7.智能体.md
     - key: workflow-MCPClientNode
-      val: static/manual/6.工作流.md
+      val: cache/manual/6.工作流.md
     - key: workflow-IntentionNode
-      val: static/manual/6.工作流.md
+      val: cache/manual/6.工作流.md
     - key: workflow-ApiNode
-      val: static/manual/6.工作流.md
+      val: cache/manual/6.工作流.md
     - key: workflow-PythonNode
-      val: static/manual/6.工作流.md
+      val: cache/manual/6.工作流.md
     - key: workflow-LLMNode
-      val: static/manual/6.工作流.md
+      val: cache/manual/6.工作流.md
     - key: workflow-SwitchNode
-      val: static/manual/6.工作流.md
+      val: cache/manual/6.工作流.md
     - key: workflow-RagNode
-      val: static/manual/6.工作流.md
+      val: cache/manual/6.工作流.md
     - key: workflow-FileGenerateNode
-      val: static/manual/6.工作流.md
+      val: cache/manual/6.工作流.md
     - key: workflow-FileParseNode
-      val: static/manual/6.工作流.md
+      val: cache/manual/6.工作流.md
     - key: workflow-TemplateTransformNode
-      val: static/manual/6.工作流.md
+      val: cache/manual/6.工作流.md
     - key: workflow-EndNode
-      val: static/manual/6.工作流.md
+      val: cache/manual/6.工作流.md
     - key: workflow-StartNode
-      val: static/manual/6.工作流.md
+      val: cache/manual/6.工作流.md
 
 
 
