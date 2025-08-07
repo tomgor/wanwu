@@ -802,6 +802,42 @@ definitions:
     required:
     - tableName
     type: object
+  request.CustomHomeConfig:
+    properties:
+      homeBgColor:
+        description: 平台背景颜色
+        type: string
+      homeLogo:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 平台图标
+      homeName:
+        description: 平台名称
+        type: string
+    type: object
+  request.CustomLoginConfig:
+    properties:
+      loginBg:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 登录页背景图
+      loginButtonColor:
+        description: 登录按钮颜色
+        type: string
+      loginWelcomeText:
+        description: 登录页欢迎语
+        type: string
+    type: object
+  request.CustomTabConfig:
+    properties:
+      tabLogo:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 标签页图标
+      tabTitle:
+        description: 标签页标题
+        type: string
+    type: object
   request.DelApiKeyRequest:
     properties:
       apiId:
@@ -961,8 +997,6 @@ definitions:
     properties:
       docName:
         type: string
-      docTag:
-        type: string
       knowledgeId:
         type: string
       pageNo:
@@ -975,6 +1009,18 @@ definitions:
     required:
     - knowledgeId
     - pageSize
+    type: object
+  request.DocMetaDataReq:
+    properties:
+      MetaDataList:
+        description: 文档元数据
+        items:
+          $ref: '#/definitions/request.MetaData'
+        type: array
+      docId:
+        type: string
+    required:
+    - docId
     type: object
   request.DocSegment:
     properties:
@@ -1006,18 +1052,6 @@ definitions:
     required:
     - docId
     - pageSize
-    type: object
-  request.DocTagReq:
-    properties:
-      docId:
-        type: string
-      docTagList:
-        description: 文档标签列表
-        items:
-          type: string
-        type: array
-    required:
-    - docId
     type: object
   request.EmbeddingModel:
     properties:
@@ -1233,6 +1267,18 @@ definitions:
     required:
     - chunkName
     - fileName
+    type: object
+  request.MetaData:
+    properties:
+      dataId:
+        type: string
+      key:
+        type: string
+      value:
+        type: string
+    required:
+    - key
+    - value
     type: object
   request.ModelStatusRequest:
     properties:
@@ -2047,18 +2093,23 @@ definitions:
     type: object
   response.CustomHome:
     properties:
-      logoPath:
-        description: 首页logo路径，例如/v1/static/logo/title_logo.png
+      backgroundColor:
+        description: 平台背景色
         type: string
+      logo:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 首页logo
       title:
-        description: 首页标题
+        description: 平台名称
         type: string
     type: object
   response.CustomLogin:
     properties:
-      backgroundPath:
-        description: 登录页背景图路径
-        type: string
+      background:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 登录页背景图
       loginButtonColor:
         description: 登录按钮颜色
         type: string
@@ -2071,9 +2122,10 @@ definitions:
     type: object
   response.CustomTab:
     properties:
-      logoPath:
-        description: 标签页图标路径
-        type: string
+      logo:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 标签页图标
       title:
         description: 标签页标题
         type: string
@@ -2091,6 +2143,11 @@ definitions:
     type: object
   response.DocSegmentResp:
     properties:
+      MetaDataList:
+        description: 文档元数据
+        items:
+          $ref: '#/definitions/response.MetaData'
+        type: array
       contentList:
         description: 内容
         items:
@@ -2318,11 +2375,6 @@ definitions:
       status:
         description: 处理状态
         type: integer
-      tagList:
-        description: 标签列表
-        items:
-          type: string
-        type: array
       uploadTime:
         description: 上传时间
         type: string
@@ -2597,6 +2649,15 @@ definitions:
         type: string
       filePath:
         description: minio文件的完整路径
+        type: string
+    type: object
+  response.MetaData:
+    properties:
+      dataId:
+        type: string
+      key:
+        type: string
+      value:
         type: string
     type: object
   response.ModelBrief:
@@ -4087,6 +4148,78 @@ paths:
       summary: 用户登录
       tags:
       - guest
+  /custom/home:
+    post:
+      consumes:
+      - application/json
+      description: 配置平台名称、平台图标、平台背景色
+      parameters:
+      - description: 平台配置请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CustomHomeConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 平台自定义配置
+      tags:
+      - setting
+  /custom/login:
+    post:
+      consumes:
+      - application/json
+      description: 上传登录页背景图、登录页欢迎语、登录按钮颜色
+      parameters:
+      - description: 登录页配置请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CustomLoginConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 登录页自定义配置
+      tags:
+      - setting
+  /custom/tab:
+    post:
+      consumes:
+      - application/json
+      description: 上传标签页图标、标签页标题
+      parameters:
+      - description: 标签页配置请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CustomTabConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 标签页自定义配置
+      tags:
+      - setting
   /doc_center:
     get:
       consumes:
@@ -4538,6 +4671,30 @@ paths:
       summary: 获取文档列表
       tags:
       - knowledge
+  /knowledge/doc/meta:
+    post:
+      consumes:
+      - application/json
+      description: 更新文档元数据
+      parameters:
+      - description: 文档更新元数据请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DocMetaDataReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 更新文档元数据
+      tags:
+      - knowledge
   /knowledge/doc/segment/list:
     get:
       consumes:
@@ -4589,30 +4746,6 @@ paths:
       security:
       - JWT: []
       summary: 更新文档切片启用状态
-      tags:
-      - knowledge
-  /knowledge/doc/tag:
-    post:
-      consumes:
-      - application/json
-      description: 更新文档tag
-      parameters:
-      - description: 文档更新tag请求参数
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/request.DocTagReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - JWT: []
-      summary: 更新文档tag
       tags:
       - knowledge
   /knowledge/doc/url/analysis:

@@ -75,6 +75,12 @@ func WithDocIDs(ids []string) SQLOption {
 	})
 }
 
+func WithDocID(id string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("doc_id = ?", id)
+	})
+}
+
 func WithIDs(ids []uint32) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		return db.Where("id IN ?", ids)

@@ -626,15 +626,27 @@ definitions:
     properties:
       id:
         type: string
+      metaDataList:
+        items:
+          $ref: '#/definitions/request.MetaData'
+        type: array
       status:
         type: integer
-      tagList:
-        items:
-          type: string
-        type: array
     required:
     - id
     - status
+    type: object
+  request.MetaData:
+    properties:
+      dataId:
+        type: string
+      key:
+        type: string
+      value:
+        type: string
+    required:
+    - key
+    - value
     type: object
   request.SearchKnowledgeInfoReq:
     properties:
