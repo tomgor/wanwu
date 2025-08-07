@@ -25,14 +25,14 @@ import (
 )
 
 const (
-	docCenterLocalDir     = "static/manual"
-	docCenterStaticPrefix = "../../../user/api/v1" // ../../..用于抵消前端固定前缀 aibase/docCenter/pages
-	docCenterSnippetLen   = 200                    // 截取文本长度
+	docCenterLocalDir        = "configs/microservice/bff-service/static/manual"
+	docCenterStaticAPIPrefix = "../../../user/api/v1/static/manual" // ../../..用于抵消前端固定前缀 aibase/docCenter/pages
+	docCenterSnippetLen      = 200                                  // 截取文本长度
 
 	// 文档通用命名：
 	// fileName:    e.g. StartNode.md
-	// filePath:    static/manual + relFilePath e.g. static/manual/workflow/StartNode.md
-	// relFilePath: static/manual中文件的相对路径 e.g. workflow/StartNode.md
+	// filePath:    configs/microservice/bff-service/static/manual + relFilePath e.g. configs/microservice/bff-service/static/manual/workflow/StartNode.md
+	// relFilePath: configs/microservice/bff-service/static/manual中文件的相对路径 e.g. workflow/StartNode.md
 )
 
 var (
@@ -74,13 +74,9 @@ func InitDocCenter() error {
 			if err != nil {
 				return fmt.Errorf("read %v err: %v", filePath, err)
 			}
-			fileName := fileInfo.Name()
 			// 将markdown文本中图片引用 ![](xxxxx )与链接引用[](xxxxx )里的 xxxxx 处理为前端可访问的地址
 			relFilePath := strings.TrimPrefix(filePath, docCenterLocalDir)
-			convertByte := convertMarkdown(filePath, relFilePath, string(content))
-			if err = os.WriteFile(path.Join(docCenterLocalDir, fileName), []byte(convertByte), os.ModePerm); err != nil {
-				return fmt.Errorf("save %v err: %v", filePath, err.Error())
-			}
+			convertByte := convertMarkdown(docCenterStaticAPIPrefix, relFilePath, string(content))
 			mdInfos = append(mdInfos, mdInfo{
 				content:     convertByte,
 				relFilePath: relFilePath,
@@ -173,7 +169,7 @@ func GetDocCenterMarkdown(ctx *gin.Context, relFilePath string) (string, error) 
 // 将markdown文本中图片引用 ![](xxxxx )与链接引用[](xxxxx )里的 xxxxx 处理为前端可访问的地址
 //
 //nolint:staticcheck
-func convertMarkdown(mdFilePath, refFilePath, mdContent string) string {
+func convertMarkdown(apiPrefix, refFilePath, mdContent string) string {
 	convertHttp := mdLinkRegex.ReplaceAllStringFunc(mdContent, func(mdLabel string) string {
 		for _, httpRelPaths := range mdParenthesisRefRegex.FindAllStringSubmatch(mdLabel, -1) {
 			if len(httpRelPaths) <= 1 {
@@ -191,12 +187,12 @@ func convertMarkdown(mdFilePath, refFilePath, mdContent string) string {
 			if len(imageRelPaths) <= 1 {
 				return imageLabel
 			}
-			// 重新生成图片引用，将 ../assets/append.png 处理为 user/api/v1/doc-center/assets/append.png
-			// 例如mdFilePath是static/manual/workflow/StartNode.md
-			// 1. "static/manual/workflow/StartNode.md" + "../" + "../assets/append.png" => static/manual/assets/append.png
-			// 2. "../../../service/api/v1" + "static/manual/assets/append.png" => ../../../service/api/v1/static/manual/assets/append.png
+			// 重新生成图片引用，将 ../assets/append.png 处理为 user/api/v1/static/manual/assets/append.png
+			// 例如refFilePath是workflow/StartNode.md
+			// 1. "workflow/StartNode.md" + "../" + "../assets/append.png" => assets/append.png
+			// 2. "../../../user/api/v1/static/manual" + "assets/append.png" => ../../../user/api/v1/static/manual/assets/append.png
 			// 3. 对路径中的非数字字母等做转义，再将 %2F 转回 /
-			return "![](" + strings.ReplaceAll(url.PathEscape(path.Join(docCenterStaticPrefix, path.Join(mdFilePath, "../", imageRelPaths[1]))), "%2F", "/") + ")"
+			return "![](" + strings.ReplaceAll(url.PathEscape(path.Join(apiPrefix, path.Join(refFilePath, "../", imageRelPaths[1]))), "%2F", "/") + ")"
 		}
 		return imageLabel
 	})
