@@ -30,7 +30,6 @@
                   />
                 </el-select>
                 <search-input class="cover-input-icon" :placeholder="$t('knowledgeManage.docPlaceholder')" ref="searchInput" @handleSearch="handleSearch" />
-                <search-input class="cover-input-icon" placeholder="按照文件标签搜索" ref="searchInput" @handleSearch="handleTagSearch" />
               </div>
 
               <div class="content_title">
@@ -63,7 +62,7 @@
                 <el-table-column
                   prop="docName"
                   :label="$t('knowledgeManage.fileName')"
-                  min-width="200"
+                  min-width="180"
                 >
                   <template slot-scope="scope">
                     <el-popover
@@ -77,43 +76,21 @@
                   </template>
                 </el-table-column>
                 <el-table-column
-                  prop="tagList"
-                  label="文件标签"
-                >
-                <template slot-scope="scope">
-                    <template v-if="scope.row.tagList && scope.row.tagList.length > 0">
-                      <template v-for="(tag, index) in scope.row.tagList.slice(0, 3)">
-                        <el-tooltip 
-                          :key="tag+'TAG'"
-                          :content="tag" 
-                          placement="top"
-                        >
-                          <el-tag class="doc_tag" type="info">{{tag.length > 8 ?tag.slice(0, 8) + '...':tag}}</el-tag>
-                        </el-tooltip>
-                      </template>
-                      <template v-if="scope.row.tagList.length > 3" >
-                        <el-tag class="doc_tag" type="info">+{{scope.row.tagList.length - 3}}</el-tag>
-                      </template>
-                    </template>
-                    <span v-else>-</span>
-                    <span class="el-icon-edit-outline edit-icon" @click="showTag(scope.row)"></span>
-                  </template>
-                </el-table-column>
-                <el-table-column
                   prop="docType"
                   :label="$t('knowledgeManage.fileStyle')"
-                  width="80"
+                  width="200"
                 >
                 </el-table-column>
                 <el-table-column
                   prop="uploadTime"
                   :label="$t('knowledgeManage.importTime')"
-                  width="180"
+                  width="200"
                 >
                 </el-table-column>
                 <el-table-column
                   prop="status"
                   :label="$t('knowledgeManage.currentStatus')"
+                  width="150"
                 >
                   <template slot-scope="scope">
                     <span :class="[[4,5].includes(scope.row.status)?'error':'']">{{filterStatus(scope.row.status)}}</span>
@@ -167,17 +144,15 @@
         </el-main>
       </el-container>
     </div>
-    <tagDialog ref="tagDialog" @relodaData="relodaData" type="doc" :docTagList="tagList"/>
   </div>
 </template>
 
 <script>
-import tagDialog from './tagDialog.vue';
 import Pagination from "@/components/pagination.vue";
 import SearchInput from "@/components/searchInput.vue";
 import {getDocList,delDocItem,uploadFileTips} from "@/api/knowledge";
 export default {
-  components: { Pagination,SearchInput,tagDialog},
+  components: { Pagination,SearchInput},
   data() {
     return {
       knowledgeName:this.$route.query.name || '',
@@ -185,7 +160,6 @@ export default {
       tableLoading:false,
       docQuery: {
         docName:'',
-        docTag:'',
         knowledgeId:this.$route.params.id,
         status: -1
       },
@@ -219,14 +193,6 @@ export default {
     this.clearTimer()
   },
   methods: {
-    relodaData(){
-      this.getTableData(this.docQuery)
-    },
-    showTag(row){
-      if(row.status !== 1) return;
-      this.tagList = row.tagList;
-      this.$refs.tagDialog.showDiaglog(row.docId);
-    },
     startTimer(){
       this.clearTimer();
       if (this.refreshCount >= 2) {
@@ -253,10 +219,6 @@ export default {
     },
     handleSearch(val){
       this.docQuery.docName = val;
-      this.getTableData(this.docQuery)
-    },
-    handleTagSearch(val){
-      this.docQuery.docTag = val;
       this.getTableData(this.docQuery)
     },
     getKnowOptions(){

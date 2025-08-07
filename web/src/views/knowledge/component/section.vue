@@ -34,6 +34,9 @@
         <el-descriptions-item :label="$t('knowledgeManage.markSplit')">{{
           res.splitter
         }}</el-descriptions-item>
+        <el-descriptions-item label="">
+          {{123}}
+        </el-descriptions-item>
       </el-descriptions>
 
       <div class="btn">
