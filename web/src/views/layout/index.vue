@@ -1,5 +1,5 @@
 <template>
-  <div class="layout full-menu">
+  <div class="layout full-menu" :style="`background: ${bgColor}`">
     <el-container class="outer-container">
       <div class="left-nav" v-if="isShowNav">
         <!--不展示平台的图标-->
@@ -231,6 +231,7 @@ export default {
     return{
       basePath: this.$basePath,
       homeLogoPath: '',
+      bgColor: '',
       version: '',
       defaultOpeneds: [],
       orgList: [],
@@ -289,9 +290,10 @@ export default {
     commonInfo:{
       handler(val) {
         const { home = {}, tab = {}, about = {} } = val.data || {}
-        this.homeLogoPath = home.logo ? (home.logo.path || '') : (home.logoPath || '')
+        this.homeLogoPath = home.logo ? home.logo.path : ''
+        this.bgColor = home.backgroundColor || 'linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%)'
         this.version = about.version || '1.0'
-        replaceIcon(tab.logo ? (tab.logo.path || '') : (tab.logoPath || ''))
+        replaceIcon(tab.logo ? tab.logo.path : '')
         replaceTitle(tab.title)
       },
       deep: true
@@ -475,7 +477,7 @@ export default {
 }
 .full-menu.layout {
   height:100%;
-  background: linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%);
+  /*background: linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%);*/
   min-height: 660px;
   .outer-container{
     height: 100%;

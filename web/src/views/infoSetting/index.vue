@@ -271,7 +271,7 @@ export default {
         this[`${type}Loading`] = true
         const res = await setPlatformInfo(type, data)
         if (res.code === 0) this.$message.success(this.$t('common.message.success'))
-        if (type !== 'login') window.location.reload()
+        if (type !== 'login') this.getCommonInfo()
       } finally {
         this[`${type}Loading`] = false
       }

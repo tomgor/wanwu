@@ -140,7 +140,7 @@ export default {
     commonInfo:{
       handler(val) {
         const { home = {} } = val.data || {}
-        this.homeLogoPath = home.logo ? (home.logo.path || '') : (home.logoPath || '')
+        this.homeLogoPath = home.logo ? home.logo.path : ''
         this.homeTitle = home.title || ''
       },
       deep: true
@@ -823,6 +823,7 @@ export default {
         overflow: auto;
         padding-top: 30px;
         background: rgba(255, 255, 255, 0);
+        border-radius: 8px;
       }
       /deep/ .el-submenu__title,
       /deep/ .el-menu-item span,

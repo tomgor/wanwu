@@ -136,7 +136,7 @@ export default {
         this.home = home || {}
         this.loginButtonColor = this.login.loginButtonColor || '#384BF7'
         replaceTitle(tab.title)
-        replaceIcon(tab.logo ? (tab.logo.path || '') : (tab.logoPath || ''))
+        replaceIcon(tab.logo ? tab.logo.path : '')
       })
     },
     // 获取图片验证码
