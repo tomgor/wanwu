@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"io"
 	"net/url"
 	"os"
 	"path"
@@ -12,10 +12,10 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 	"unicode"
 
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
+	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -26,10 +26,14 @@ import (
 )
 
 const (
-	docCenterLocalDir     = "cache/manual" // bff-service本地缓存目录
-	loadDocCenterLocalDir = "configs/microservice/bff-service/configs/manual"
-	docCenterStaticPrefix = "../../../service/api/v1" // ../../..用于抵消前端固定前缀 aibase/docCenter/pages
-	docCenterSnippetLen   = 200                       // 截取文本长度
+	docCenterLocalDir     = "static/manual"
+	docCenterStaticPrefix = "../../../user/api/v1" // ../../..用于抵消前端固定前缀 aibase/docCenter/pages
+	docCenterSnippetLen   = 200                    // 截取文本长度
+
+	// 文档通用命名：
+	// fileName:    e.g. StartNode.md
+	// filePath:    static/manual + relFilePath e.g. static/manual/workflow/StartNode.md
+	// relFilePath: static/manual中文件的相对路径 e.g. workflow/StartNode.md
 )
 
 var (
@@ -38,109 +42,93 @@ var (
 	mdLinkRegex           = regexp.MustCompile(`[^!]\[.*?\]\((.*?\.md)\)`) // 从markdown匹配出跳转链接[](xxxxx)
 	mdBracketRegex        = regexp.MustCompile(`\[(.*?)\]`)                // 从markdown匹配[]中的文本
 
-	docSearchers *riot.Engine // 初始化搜索引擎
-	docSearchMu  sync.RWMutex // 搜索引擎读写锁
-	docMu        sync.Mutex   // doc_center全局互斥锁
-
-	docVerRegex = regexp.MustCompile(`v[\d\.]+`)
-
-	docCenter *DocCenter
+	_docCenter *docCenter
 )
 
-type DocCenter struct {
-	DocId    uint32     `json:"docId,omitempty"`    // 文档ID，表主键
-	Version  string     `json:"version,omitempty"`  // 版本号
-	Desc     string     `json:"desc,omitempty"`     // 描述
-	Children []*DocMenu `json:"children,omitempty"` // 菜单 对children 直接mashal json 存到menu里 用的时候unmashal
+type docCenter struct {
+	menus    []*response.DocMenu
+	contents map[string]string // refFilePath -> content
+	searcher *riot.Engine
 }
 
-type DocMenu struct {
-	Name         string     `json:"name,omitempty"`         // 目录/文档名，如“选模型”、“改模型”、“数据管理”等
-	RelativePath string     `json:"relativePath,omitempty"` // 相对路径，md zip包中路径
-	FilePath     string     `json:"filePath,omitempty"`     // 文件路径
-	Children     []*DocMenu `json:"children,omitempty"`     // 子菜单
-}
-
-type MdInfo struct {
-	relPath  string
-	filePath string
+type mdInfo struct {
+	filePath    string
+	relFilePath string
+	content     string
 }
 
 func InitDocCenter(ctx context.Context) error {
-	var err error
-	var mdInfos []MdInfo
-	// 存储文件
-	if _, err := os.Stat(docCenterLocalDir); err != nil {
-		if os.IsNotExist(err) {
-			// 目录不存在，创建目录
-			if err := os.MkdirAll(docCenterLocalDir, 0755); err != nil {
-				return fmt.Errorf("failed to create directory %v: %w", docCenterLocalDir, err)
-			}
-		} else {
-			// 其他类型的错误（如权限问题）
-			return fmt.Errorf("failed to access directory %v: %w", docCenterLocalDir, err)
-		}
+	if _docCenter != nil {
+		return errors.New("already init")
 	}
-	if err := filepath.Walk(loadDocCenterLocalDir, func(filePath string, info os.FileInfo, err error) error {
+
+	// 0. 读取docCenterLocalDir所有md文件
+	var mdInfos []mdInfo
+	if err := filepath.Walk(docCenterLocalDir, func(filePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		// 检查不为目录并且是否为markdown文件
-		if !info.IsDir() && strings.HasSuffix(info.Name(), ".md") {
+		if !fileInfo.IsDir() && strings.HasSuffix(fileInfo.Name(), ".md") {
 			// 读取文件内容
 			content, err := os.ReadFile(filePath)
 			if err != nil {
-				return fmt.Errorf("读取文件%v错误", filePath)
+				return fmt.Errorf("read %v err: %v", filePath)
 			}
-			fileName := info.Name()
+			fileName := fileInfo.Name()
 			// 将markdown文本中图片引用 ![](xxxxx )与链接引用[](xxxxx )里的 xxxxx 处理为前端可访问的地址
-			convertByte := convertMarkdown(path.Join(docCenterLocalDir, fileName), fileName, string(content))
+			relFilePath := strings.TrimPrefix(filePath, docCenterLocalDir)
+			convertByte := convertMarkdown(filePath, relFilePath, string(content))
 			if err = os.WriteFile(path.Join(docCenterLocalDir, fileName), []byte(convertByte), os.ModePerm); err != nil {
-				return fmt.Errorf("save doc center %v err: %v", filePath, err.Error())
+				return fmt.Errorf("save %v err: %v", filePath, err.Error())
 			}
-			mdInfos = append(mdInfos, MdInfo{
-				relPath:  fileName,
-				filePath: path.Join(docCenterLocalDir, fileName),
+			mdInfos = append(mdInfos, mdInfo{
+				content:     convertByte,
+				relFilePath: relFilePath,
+				filePath:    filePath,
 			})
 		}
 		return nil
 	}); err != nil {
 		return err
 	}
-	if err := CopyDir(path.Join(loadDocCenterLocalDir, "assets"), path.Join(docCenterLocalDir, "assets")); err != nil {
-		return fmt.Errorf("copy assets err: %v", err.Error())
-	}
-	// 初始化搜索引擎
-	docSearchers, err = newDocSearcher(docCenterLocalDir)
+
+	// 1. 构建搜索引擎
+	searcher, err := newDocMenuSearcher(docCenterLocalDir)
 	if err != nil {
-		return fmt.Errorf("init search engin err: %v", err.Error())
+		return fmt.Errorf("init search engin err: %v", err)
 	}
-	// 存储当前版本文档目录结构
-	var menus []*DocMenu
+
+	// 2. 构造menus、contents
+	var menus []*response.DocMenu
+	contents := make(map[string]string)
 	for _, mdInfo := range mdInfos {
-		addMdFileToDocMenu(&menus, mdInfo.relPath, mdInfo)
+		contents[mdInfo.relFilePath] = mdInfo.content
+		addDocMenusMdFile(&menus, mdInfo.relFilePath, mdInfo)
 	}
-	// 文档name排序
+
+	// 3. 刷新索引
+	// 3.1 menus排序
 	sortDocMenus(&menus)
-	docCenter = &DocCenter{
-		Children: menus,
+	// 3.2 重新生成menus index
+	for i, menu := range menus {
+		refreshDocMenuIndex(menu, fmt.Sprintf("doc%d", i+1))
 	}
-	return err
+
+	_docCenter = &docCenter{
+		menus:    menus,
+		contents: contents,
+		searcher: searcher,
+	}
+	return nil
 }
 
-func GetDocCenterMenu(ctx *gin.Context) ([]response.DocMenu, error) {
-	var ret []response.DocMenu
-	for i, menu := range docCenter.Children {
-		ret = append(ret, convertDocMenuToResponse(menu, fmt.Sprintf("doc%d", i+1)))
-	}
-	return ret, nil
+func GetDocCenterMenu(ctx *gin.Context) []*response.DocMenu {
+	return _docCenter.menus
 }
 
 func SearchDocCenter(ctx *gin.Context, content string) ([]response.DocSearchResp, error) {
-	if isDocSearchersEmpty() {
-		return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_search_empty")
-	}
-	results := docSearchers.SearchDoc(types.SearchReq{Text: content})
+	results := _docCenter.searcher.SearchDoc(types.SearchReq{Text: content})
 	var searchResps []response.DocSearchResp
 	for _, doc := range results.Docs {
 		title := strings.TrimSuffix(filepath.Base(doc.DocId), filepath.Ext(filepath.Base(doc.DocId)))
@@ -149,13 +137,18 @@ func SearchDocCenter(ctx *gin.Context, content string) ([]response.DocSearchResp
 			log.Errorf("doc center %v md2html error", doc.DocId)
 			continue // 跳过当前doc不做处理
 		}
+		searchUrl, err := url.JoinPath(config.Cfg().Server.WebBaseUrl, config.Cfg().DocCenter.FrontendPrefix, url.PathEscape(strings.TrimPrefix(strings.Replace(doc.DocId, docCenterLocalDir, "", 1), "/")))
+		if err != nil {
+			log.Errorf("doc center %v to search url err: %v", doc.DocId, err)
+			continue
+		}
 		searchResp := response.DocSearchResp{
 			Title: title,
 			ContentList: []response.DocSearchContent{
 				{
 					Title:   title,
 					Content: snippet,
-					Url:     generateDocCenterUrl(url.PathEscape(strings.TrimPrefix(strings.Replace(doc.DocId, docCenterLocalDir, "", 1), "/"))),
+					Url:     searchUrl,
 				},
 			},
 		}
@@ -164,109 +157,31 @@ func SearchDocCenter(ctx *gin.Context, content string) ([]response.DocSearchResp
 	return searchResps, nil
 }
 
-func GetDocCenterMarkdown(ctx *gin.Context, pathName string) (string, error) {
-	pathName, err := url.QueryUnescape(pathName)
+func GetDocCenterMarkdown(ctx *gin.Context, relFilePath string) (string, error) {
+	relFilePath, err := url.QueryUnescape(relFilePath)
 	if err != nil {
 		return "", grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_file_unescape", err.Error())
 	}
 	// check fileName
-	if !strings.HasSuffix(pathName, ".md") {
-		return "", grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_file_md", pathName)
+	if !strings.HasSuffix(relFilePath, ".md") {
+		return "", grpc_util.ErrorStatusWithKey(err_code.Code_BFFGeneral, "bff_doc_center_file_md", relFilePath)
 	}
-	// read file
-	filePath := path.Join(docCenterLocalDir, pathName)
-	b, err := os.ReadFile(filePath)
-	if err != nil {
-		return "", fmt.Errorf("read %v err: %v", pathName, err)
-	}
-	return string(b), nil
+	return _docCenter.contents[relFilePath], nil
 }
 
-func addMdFileToDocMenu(menus *[]*DocMenu, rest string, mdInfo MdInfo) {
-	parts := strings.SplitN(rest, "/", 2)
-	if len(parts) == 0 {
-		return
-	}
-	var menu *DocMenu
-	for _, curr := range *menus {
-		if curr.Name == parts[0] {
-			menu = curr
-			break
-		}
-	}
-	if menu == nil {
-		menu = &DocMenu{
-			Name: parts[0],
-		}
-		if len(parts) == 1 { // 非目录，是md文件
-			menu.Name = strings.TrimSuffix(menu.Name, ".md")
-			menu.RelativePath = mdInfo.relPath
-			menu.FilePath = mdInfo.filePath
-		}
-		*menus = append(*menus, menu)
-	}
-	if len(parts) > 1 {
-		addMdFileToDocMenu(&menu.Children, parts[1], mdInfo)
-	}
-}
-
-func convertDocMenuToResponse(menu *DocMenu, index string) response.DocMenu {
-	var fileName string
-	if menu.FilePath != "" {
-		parts := strings.SplitN(menu.FilePath, "/", 2)
-		if len(parts) > 1 {
-			fileName = parts[1]
-		}
-	}
-	ret := response.DocMenu{
-		Name:    menu.Name,
-		Index:   index,
-		Path:    url.PathEscape(fileName), // 前端要求做path转义
-		PathRaw: fileName,
-	}
-	for i, child := range menu.Children {
-		ret.Children = append(ret.Children, convertDocMenuToResponse(child, fmt.Sprintf("%s-%d", index, i+1)))
-	}
-	return ret
-}
-
-func getMarkdownSnippet(content, keyword string, snippetLen int) string {
-	//string就是只读的采用utf8编码的字节切片(slice) 因此用len函数获取到的长度并不是字符个数，而是字节个数。
-	//rune是int32的别名，代表字符的Unicode编码，采用4个字节存储，将string转成rune就意味着任何一个字符都用4个字节来存储其unicode值，
-	//这样每次遍历的时候返回的就是unicode值，而不再是字节。
-	runes := []rune(content)
-	keyRunes := []rune(keyword)
-	index := strings.Index(content, keyword)
-	if index == -1 {
-		if len(runes) < snippetLen {
-			return string(runes)
-		} else {
-			return string(runes[0:snippetLen])
-		}
-	}
-	runeIndex := len([]rune(content[:index]))
-	start := runeIndex - snippetLen
-	if start < 0 {
-		start = 0
-	}
-	end := runeIndex + len(keyRunes) + snippetLen
-	if end > len(runes) {
-		end = len(runes)
-	}
-	return string(runes[start:end])
-}
+// --- doc-center convert raw markdown ---
 
 // 将markdown文本中图片引用 ![](xxxxx )与链接引用[](xxxxx )里的 xxxxx 处理为前端可访问的地址
 //
 //nolint:staticcheck
-func convertMarkdown(mdFilePath, objectName, mdContent string) string {
+func convertMarkdown(mdFilePath, refFilePath, mdContent string) string {
 	convertHttp := mdLinkRegex.ReplaceAllStringFunc(mdContent, func(mdLabel string) string {
 		for _, httpRelPaths := range mdParenthesisRefRegex.FindAllStringSubmatch(mdLabel, -1) {
 			if len(httpRelPaths) <= 1 {
 				return mdLabel
 			}
 			txt := mdBracketRegex.FindString(mdLabel)
-			return txt + "(" + url.PathEscape(path.Join(objectName, "../", httpRelPaths[1])) + ")"
+			return txt + "(" + url.PathEscape(path.Join(refFilePath, "../", httpRelPaths[1])) + ")"
 		}
 		return mdLabel
 	})
@@ -277,10 +192,10 @@ func convertMarkdown(mdFilePath, objectName, mdContent string) string {
 			if len(imageRelPaths) <= 1 {
 				return imageLabel
 			}
-			// 重新生成图片引用，将 ../assets/append.png 处理为 service/api/v1/doc-center/assets/append.png
-			// 例如mdFilePath是doc-center/v2.1.0/tips/go-append.md
-			// 1. "doc-center/v2.1.0/tips/go-append.md" + "../" + "../assets/append.png" => doc-center/v2.1.0/assets/append.png
-			// 2. "../../../service/api/v1" + "doc-center/v2.1.0/assets/append.png" => ../../../service/api/v1/doc-center/v2.1.0/assets/append.png
+			// 重新生成图片引用，将 ../assets/append.png 处理为 user/api/v1/doc-center/assets/append.png
+			// 例如mdFilePath是static/manual/workflow/StartNode.md
+			// 1. "static/manual/workflow/StartNode.md" + "../" + "../assets/append.png" => static/manual/assets/append.png
+			// 2. "../../../service/api/v1" + "static/manual/assets/append.png" => ../../../service/api/v1/static/manual/assets/append.png
 			// 3. 对路径中的非数字字母等做转义，再将 %2F 转回 /
 			return "![](" + strings.ReplaceAll(url.PathEscape(path.Join(docCenterStaticPrefix, path.Join(mdFilePath, "../", imageRelPaths[1]))), "%2F", "/") + ")"
 		}
@@ -290,10 +205,7 @@ func convertMarkdown(mdFilePath, objectName, mdContent string) string {
 
 // --- doc-center search engine ---
 
-func newDocSearcher(docCenterLocalDir string) (*riot.Engine, error) {
-	if !isDocSearchersEmpty() {
-		return docSearchers, nil
-	}
+func newDocMenuSearcher(docCenterLocalDir string) (*riot.Engine, error) {
 	engine := &riot.Engine{}
 	engine.Init(types.EngineOpts{
 		Using:   3,    // 使用内存索引
@@ -325,18 +237,66 @@ func newDocSearcher(docCenterLocalDir string) (*riot.Engine, error) {
 	return engine, nil
 }
 
-// 检查 searchers 是否已初始化
-func isDocSearchersEmpty() bool {
-	docSearchMu.RLock()
-	defer docSearchMu.RUnlock()
-	return docSearchers == nil
+func getMarkdownSnippet(content, keyword string, snippetLen int) string {
+	//string就是只读的采用utf8编码的字节切片(slice) 因此用len函数获取到的长度并不是字符个数，而是字节个数。
+	//rune是int32的别名，代表字符的Unicode编码，采用4个字节存储，将string转成rune就意味着任何一个字符都用4个字节来存储其unicode值，
+	//这样每次遍历的时候返回的就是unicode值，而不再是字节。
+	runes := []rune(content)
+	keyRunes := []rune(keyword)
+	index := strings.Index(content, keyword)
+	if index == -1 {
+		if len(runes) < snippetLen {
+			return string(runes)
+		} else {
+			return string(runes[0:snippetLen])
+		}
+	}
+	runeIndex := len([]rune(content[:index]))
+	start := runeIndex - snippetLen
+	if start < 0 {
+		start = 0
+	}
+	end := runeIndex + len(keyRunes) + snippetLen
+	if end > len(runes) {
+		end = len(runes)
+	}
+	return string(runes[start:end])
 }
 
-func generateDocCenterUrl(suffix string) string {
-	return "https://" + os.Getenv("SERVER_EXTERNAL_IP") + ":" + os.Getenv("SERVER_EXTERNAL_PORT") + path.Join("/docCenter/pages", suffix)
+// --- doc-center add markdown file info to menus ---
+
+func addDocMenusMdFile(menus *[]*response.DocMenu, rest string, mdInfo mdInfo) {
+	parts := strings.SplitN(rest, "/", 2)
+	if len(parts) == 0 {
+		return
+	}
+	var menu *response.DocMenu
+	for _, curr := range *menus {
+		if curr.Name == parts[0] {
+			menu = curr
+			break
+		}
+	}
+	if menu == nil {
+		menu = &response.DocMenu{
+			Name: parts[0],
+		}
+		if len(parts) == 1 { // 非目录，是md文件
+			menu.Name = strings.TrimSuffix(menu.Name, ".md")
+			menu.PathRaw = mdInfo.relFilePath
+			menu.Path = url.PathEscape(mdInfo.relFilePath) // 前端要求做path转义
+			menu.SetContent(mdInfo.content)
+		}
+		*menus = append(*menus, menu)
+	}
+	if len(parts) > 1 {
+		addDocMenusMdFile(&(menu.Children), parts[1], mdInfo)
+	}
 }
 
-func sortDocMenus(menus *[]*DocMenu) {
+// --- doc-center sort menus ---
+
+func sortDocMenus(menus *[]*response.DocMenu) {
 	sort.Slice(*menus, func(i, j int) bool {
 		return orderDocNum((*menus)[i].Name, (*menus)[j].Name)
 	})
@@ -379,41 +339,11 @@ func extractDocNum(s string) (int, bool) {
 	return num, true
 }
 
-func CopyDir(src, dst string) error {
-	// 检查目标目录是否存在
-	if _, err := os.Stat(dst); !os.IsNotExist(err) {
-		return nil
-	}
-	// 创建目标目录
-	if err := os.MkdirAll(dst, 0755); err != nil {
-		return err
-	}
-	// 遍历源目录并复制所有内容
-	return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		relPath, _ := filepath.Rel(src, path)
-		dstPath := filepath.Join(dst, relPath)
-		if info.IsDir() {
-			return os.MkdirAll(dstPath, info.Mode())
-		} else {
-			return copyFile(path, dstPath)
-		}
-	})
-}
+// --- doc-center refresh index ---
 
-func copyFile(src, dst string) error {
-	srcFile, err := os.Open(src)
-	if err != nil {
-		return err
+func refreshDocMenuIndex(menu *response.DocMenu, index string) {
+	menu.Index = index
+	for i, child := range menu.Children {
+		refreshDocMenuIndex(child, fmt.Sprintf("%s-%d", index, i+1))
 	}
-	defer srcFile.Close()
-	dstFile, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer dstFile.Close()
-	_, err = io.Copy(dstFile, srcFile)
-	return err
 }
