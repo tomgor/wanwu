@@ -16,9 +16,9 @@ import (
 )
 
 const (
-	AppSafetySensitiveUploadSingle       = "single"
-	AppSafetySensitiveUploadFile         = "file"
-	MaxSensitiveUploadSize         int64 = 100
+	AppSafetySensitiveUploadSingle     = "single"
+	AppSafetySensitiveUploadFile       = "file"
+	MaxSensitiveUploadSize         int = 100
 )
 
 func (c *Client) CreateSensitiveWordTable(ctx context.Context, userId, orgId, tableName, remark string) (string, *errs.Status) {
@@ -130,11 +130,10 @@ func (c *Client) GetSensitiveVocabularyList(ctx context.Context, tableId string,
 
 func (c *Client) UploadSensitiveVocabulary(ctx context.Context, userId, orgId, tableId, importType, word, sensitiveType, filePath string) *errs.Status {
 	var words []*model.SensitiveWordVocabulary
-	var count int64
-	if err := sqlopt.WithTableID(tableId).Apply(c.db.WithContext(ctx)).Find(&words).Count(&count).Error; err != nil {
+	if err := sqlopt.WithTableID(tableId).Apply(c.db.WithContext(ctx)).Find(&words).Error; err != nil {
 		return toErrStatus("app_safety_sensitive_vocabulary_list_get", tableId, err.Error())
 	}
-	if count >= MaxSensitiveUploadSize {
+	if len(words) >= MaxSensitiveUploadSize {
 		return toErrStatus("app_safety_sensitive_table_full", util.Int2Str(MaxSensitiveUploadSize))
 	}
 	// single上传
@@ -182,54 +181,38 @@ func (c *Client) UploadSensitiveVocabulary(ctx context.Context, userId, orgId, t
 	if parseErr != nil {
 		return toErrStatus("app_safety_sensitive_download_fail", parseErr.Error())
 	}
-	// 3. 构造完整敏感词数据表
-	allWords := make([]*model.SensitiveWordVocabulary, len(sensitiveWords))
-	for i, raw := range sensitiveWords {
-		allWords[i] = &model.SensitiveWordVocabulary{
+	// 2. 构建已存在词条的快速查找映射
+	existingMap := make(map[string]bool, len(words))
+	for _, word := range words {
+		existingMap[word.Content] = true
+	}
+	// 3. 构造并直接过滤敏感词数据
+	filteredWords := make([]*model.SensitiveWordVocabulary, 0, len(sensitiveWords))
+	for _, raw := range sensitiveWords {
+		// 跳过重复词条
+		if existingMap[raw.Content] {
+			continue
+		}
+		filteredWords = append(filteredWords, &model.SensitiveWordVocabulary{
 			TableID:       tableId,
 			SensitiveType: raw.SensitiveType,
 			Content:       raw.Content,
 			UserID:        userId,
 			OrgID:         orgId,
-		}
+		})
 	}
-	wordContents := make([]string, 0, len(allWords))
-	for _, word := range allWords {
-		wordContents = append(wordContents, word.Content)
-	}
-	// 4. 查询已存在的词条
-	var existingWords []*model.SensitiveWordVocabulary
-	query := sqlopt.SQLOptions(
-		sqlopt.WithTableID(tableId),
-		sqlopt.WithContents(wordContents),
-	)
-	if err := query.Apply(c.db.WithContext(ctx)).Find(&existingWords).Error; err != nil {
-		return toErrStatus("app_safety_sensitive_vocabulary_list_get", tableId, err.Error())
-	}
-	// 5. 构建重复词条映射
-	existingMap := make(map[string]bool)
-	for _, word := range existingWords {
-		existingMap[word.Content] = true
-	}
-	// 6. 过滤掉重复词条
-	filteredList := make([]*model.SensitiveWordVocabulary, 0, len(allWords))
-	for _, word := range allWords {
-		if !existingMap[word.Content] {
-			filteredList = append(filteredList, word)
-		}
-	}
-	if len(filteredList) == 0 {
+	if len(filteredWords) == 0 {
 		return nil
 	}
-	// 7. 计算有效数据量
-	remaining := int(MaxSensitiveUploadSize - count)
-	if remaining < len(filteredList) {
+	// 4. 计算有效数据量
+	remaining := MaxSensitiveUploadSize - len(words)
+	if remaining < len(filteredWords) {
 		return toErrStatus("app_safety_sensitive_table_full", util.Int2Str(MaxSensitiveUploadSize))
 	}
-	// 8. 批量插入数据
+	// 5. 批量插入数据
 	err = c.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(&model.SensitiveWordVocabulary{}).
-			Create(filteredList).Error; err != nil {
+			Create(filteredWords).Error; err != nil {
 			return fmt.Errorf("batch create failed: %w", err)
 		}
 		if err := sqlopt.WithID(tableId).Apply(tx).Model(&model.SensitiveWordTable{}).
