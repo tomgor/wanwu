@@ -42,12 +42,16 @@
 {"code":110000,"key":"bff_workflow_app_delete","langs":{"en":"delete workflow app err: %v","zh":"删除工作流应用错误：%v"}}
 {"code":110000,"key":"bff_workflow_apps_unpublish","langs":{"en":"unpublish workflow err: %v","zh":"取消发布工作流错误: %v"}}
 {"code":110000,"key":"bff_workflow_apps_list_internal","langs":{"en":"get unauthenticated workflow app list err: %v","zh":"获取无鉴权工作流应用列表错误：%v"}}
+{"code":0,"key":"------ doc ------","langs":{}}
+{"code":110000,"key":"bff_doc_center_file_unescape","langs":{"en":"path unescape error: %v","zh":"路径去除转义错误: %v"}}
+{"code":110000,"key":"bff_doc_center_file_md","langs":{"en":"no markdown files found: %v","zh":"未含有md文件: %v"}}
 {"code":0,"key":"------ assistant ------","langs":{}}
 {"code":0,"key":"bff_assistant_template_name","langs":{"en":"%v_copy%v","zh":"%v_副本%v"}}
 {"code":0,"key":"------ sensitive ------","langs":{}}
 {"code":110005,"key":"bff_sensitive_check_req","langs":{"en":"%v","zh":"%v"}}
 {"code":110005,"key":"bff_sensitive_check_req_default_reply","langs":{"en":"your current request or history contains sensitive content. In accordance with relevant security requirements, this round of dialogue has been terminated. Please clear your history or start a new dialogue","zh":"您当前请求或者历史信息中包含敏感内容，根据相关安全要求，该轮对话终止，请清除历史信息或者重新开启新的对话"}}
 {"code":110005,"key":"bff_sensitive_check_resp_default_reply","langs":{"en":"the response contains sensitive content. In accordance with relevant security requirements, this round of dialogue has been terminated. Please clear the history or start a new dialogue.","zh":"回答中包含敏感内容，根据相关安全要求，该轮对话终止，请清除历史信息或者重新开启新的对话"}}
+{"code":0,"key":"","langs":{}}
 {"code":0,"key":"------ custom ------","langs":{}}
 {"code":0,"key":"bff_custom_home_title","langs":{"en":"Intelligent agent platform","zh":"智能体平台"}}
 {"code":0,"key":"bff_custom_tab_title","langs":{"en":"Intelligent agent platform","zh":"智能体平台"}}
@@ -144,6 +148,10 @@
 {"code":142003,"key":"","langs":{"zh":"修改文档分段状态失败，请稍后重试"}}
 {"code":142004,"key":"","langs":{"zh":"文档导入失败，请稍后重试"}}
 {"code":142005,"key":"","langs":{"zh":"文档分片查询失败，请稍后重试"}}
+{"code":142006,"key":"","langs":{"zh":"更新文档状态失败，请稍后重试"}}
+{"code":142007,"key":"","langs":{"zh":"获取上传文档失败，请稍后重试"}}
+{"code":142008,"key":"","langs":{"zh":"更新文档元数据失败，请稍后重试"}}
+{"code":142009,"key":"","langs":{"zh":"非处理完成文档无法更新元数据，请稍后重试"}}
 {"code":143001,"key":"","langs":{"zh":"新建知识库标签失败，请稍后重试"}}
 {"code":143002,"key":"","langs":{"zh":"删除知识库标签失败，请稍后重试"}}
 {"code":143003,"key":"","langs":{"zh":"修改知识库标签失败，请稍后重试"}}
