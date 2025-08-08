@@ -246,9 +246,16 @@ export default {
                 },
                 onmessage: (e) => {
                     if (e && e.data) {
-                        let data = JSON.parse(e.data)
-                        console.log('===>',new Date().getTime(),'12345', JSON.parse(e.data))
-                        this.sseResponse = data
+                        let data;
+                        try {
+                            data = JSON.parse(e.data);
+                            console.log('===>',new Date().getTime(),'12345', data);
+                        } catch (error) {
+                            return; // 如果解析失败，直接返回，不处理这条消息
+                        }
+                        
+                        this.sseResponse = data;
+                        
                         //待替换的数据，需要前端组装
                         let commonData = {
                             ...data,
@@ -259,11 +266,12 @@ export default {
                             "response": '',
                             "filepath": '',
                             "requestFileUrls":'',
-                            "searchList": data.data.searchList || [],
+                            "searchList": data.data && data.data.searchList ? data.data.searchList: [],
                             "gen_file_url_list": [],
                             "thinkText":'思考中',
                             "isOpen":true
                         }
+
                         if(data.code === 0 || data.code === 1){
                             //finish 0：进行中  1：关闭   2:敏感词关闭
                             let _sentence = data.data.output;
@@ -295,11 +303,11 @@ export default {
                             // this.$nextTick(()=>{
                             //     this.$refs['session-com'].scrollBottom()
                             // })
-                        }else if(data.code === 7 || data.code === -1){
+                        }else if(data.code === 7){
                             this.setStoreSessionStatus(-1)
                             let fillData = {
                                 ...commonData,
-                                "response": data.message                                
+                                "response": data.message                              
                             }
                             this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                         }

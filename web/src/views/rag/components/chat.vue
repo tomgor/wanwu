@@ -250,7 +250,7 @@
             async preSend(val,fileId,fileInfo) {
                 this.inputVal = val || this.$refs['editable'].getPrompt()
                 if (!this.inputVal) {
-                    this.$message.warning(this.$t('yuanjing.inputTips'));
+                    this.$message.warning('请输入内容');
                     return
                 }
                 if (!this.verifiyFormParams()) {
