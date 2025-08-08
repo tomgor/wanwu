@@ -213,7 +213,7 @@ export default {
     },
     mounted(){
       this.setupScrollListener();
-      this.listenerImg();
+      // this.listenerImg();
     },
     beforeDestroy(){
       const container = document.getElementById('timeScroll');
