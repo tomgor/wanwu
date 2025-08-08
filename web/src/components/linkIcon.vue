@@ -19,21 +19,16 @@ export default {
       linkList: {}
     }
   },
-  watch: {
-    commonInfo:{
-      handler(val) {
-        const { linkList } = val.data || {}
-        this.linkList = linkList || {}
-      },
-      deep: true
-    }
+  mounted() {
+    const { linkList } = this.commonInfo.data || {}
+    this.linkList = linkList || {}
   },
   computed: {
     ...mapGetters('user', ['commonInfo']),
   },
   methods: {
     handleClick() {
-      console.log(this.type, '-----------------------------type')
+      console.log(this.type, this.linkList, this.linkList[this.type], '-----------------------------type')
       const docUrl = this.linkList[this.type]
       if (docUrl) window.open(docUrl)
     }
