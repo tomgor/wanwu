@@ -59,7 +59,7 @@
                 <i v-bind:class="{'el-icon-arrow-down': !n.isOpen,'el-icon-arrow-up': n.isOpen}"></i>
               </div>
               <!--内容-->
-              <div class="answer-content" v-bind:class="{'ds-res':showDSBtn(n.response)}" v-html="showDSBtn(n.response)?replaceHTML(n.response,n):n.response"></div>
+              <div class="answer-content"  v-bind:class="{'ds-res':showDSBtn(n.response)}" v-html="showDSBtn(n.response)?replaceHTML(n.response,n):n.response"></div>
               <!--出处-->
               <div v-if="n.searchList && n.searchList.length" class="search-list">
                 <div v-for="(m,j) in n.searchList" :key="`${j}sdsl`" class="search-list-item">
@@ -496,7 +496,9 @@ img.failed::after {
   }
   .answer-content{
     img{
-        width: 80% !important;
+        // height:100px;
+        width:100%;
+        display: block;
       }
     section li{
       list-style-position: inside; /* 将标记符号放在内容框内 */

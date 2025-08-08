@@ -325,7 +325,7 @@ export default {
     },
     showHistory(n){
       return (
-        this.setType === 'rag' &&
+        (this.setType === 'rag'||this.setType === 'agent') &&
         (n.value === "vector" ||
          n.value === "text" ||
          (n.value === "mix" && n.mixTypeValue === "rerank")
