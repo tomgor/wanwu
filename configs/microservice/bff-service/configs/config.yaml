@@ -83,41 +83,43 @@ doc-center:
     - key: model
       val: 模型导入方式-详细版.md
     - key: knowledge
-      val: 2.知识库.md
+      val: 2.知识库/创建知识库.md
     - key: knowledge-hit
-      val: 2.知识库.md
+      val: 2.知识库/命中测试.md
     - key: knowledge-keywords
-      val: 2.知识库.md
+      val: 2.知识库/关键词管理.md
     - key: mcp
       val: 3.MCP广场.md
+    - key: safety
+      val: 4.安全护栏.md
     - key: rag
       val: 5.文本问答.md
     - key: agent
       val: 7.智能体.md
     - key: workflow-MCPClientNode
-      val: 6.工作流.md
+      val: 6.工作流/MCP.md
     - key: workflow-IntentionNode
-      val: 6.工作流.md
+      val: 6.工作流/意图识别.md
     - key: workflow-ApiNode
-      val: 6.工作流.md
+      val: 6.工作流/API.md
     - key: workflow-PythonNode
-      val: 6.工作流.md
+      val: 6.工作流/代码.md
     - key: workflow-LLMNode
-      val: 6.工作流.md
+      val: 6.工作流/大模型.md
     - key: workflow-SwitchNode
-      val: 6.工作流.md
+      val: 6.工作流/分支器.md
     - key: workflow-RagNode
-      val: 6.工作流.md
+      val: 6.工作流/知识库.md
     - key: workflow-FileGenerateNode
-      val: 6.工作流.md
+      val: 6.工作流/文档生成.md
     - key: workflow-FileParseNode
-      val: 6.工作流.md
+      val: 6.工作流/文档解析.md
     - key: workflow-TemplateTransformNode
-      val: 6.工作流.md
+      val: 6.工作流/模板转换.md
     - key: workflow-EndNode
-      val: 6.工作流.md
+      val: 6.工作流/结束.md
     - key: workflow-StartNode
-      val: 6.工作流.md
+      val: 6.工作流/开始.md
 
 
 
