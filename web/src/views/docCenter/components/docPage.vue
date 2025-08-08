@@ -51,6 +51,10 @@ export default {
     this.getMarkdown(this.$route.params.id)
   },
   methods: {
+    docContentScrollTop() {
+      const docPageMain = document.querySelector('.doc-page-main')
+      if (docPageMain) docPageMain.scrollTop = 0
+    },
     getMarkdown(path) {
       if (path === DOC_FIRST_KEY) return
 
@@ -61,6 +65,7 @@ export default {
         const mdContent = marked(res.data || this.$t('common.noData'))
         this.mdContent =  mdContent
         loadingInstance.close()
+        this.docContentScrollTop()
       }).catch(() => {
         this.mdContent = this.$t('common.noData')
         loadingInstance.close()
