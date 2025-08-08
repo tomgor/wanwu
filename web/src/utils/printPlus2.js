@@ -89,6 +89,15 @@ Looper.prototype = {
         const codeBlockRegex = /\n\n```(?:\w+)?[\s\S]*?```\n\n/s;
         const match = this.sentence.match(codeBlockRegex);
         if (match) {
+            // 检查是否包含代码块，如果包含则只处理代码块部分
+            const codeBlockStart = this.sentence.indexOf('\n\n```');
+            if (codeBlockStart > 0) {
+                // 如果代码块前面有内容，则不按代码块处理，让前面的内容正常逐字打印
+                this.isCodeBlock = false;
+                return;
+            }
+            
+            // 只有纯代码块内容才按代码块处理
             this.isCodeBlock = true;
             this.codeBlockContent = match[0]; // 整个代码块内容
             this.sentence = match[0]; // 代码块内部内容（去掉```）

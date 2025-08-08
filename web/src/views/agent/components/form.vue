@@ -411,11 +411,9 @@ export default {
   },
   watch: {
     editForm: {
-      handler(newVal,oldVal) {
+      handler(newVal) {
         // 如果是从详情设置的数据，不触发更新逻辑
-        if (this.isSettingFromDetail) {
-          return;
-        }
+        if (this.isSettingFromDetail) return;
 
         if (this.debounceTimer) {
           clearTimeout(this.debounceTimer);
@@ -445,7 +443,22 @@ export default {
         }, 500);
       },
       deep: true,
-    }
+    },
+  'editForm.recommendQuestion': {
+    handler(newValue, oldValue) {
+      if (this.isSettingFromDetail) return;
+      const valueChanged = newVal.some(function(item, idx) {
+          return item.value !== (oldVal[idx] || {}).value;
+      });
+      // 防抖处理
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = setTimeout(() => {
+        if (valueChanged && this.editForm.modelParams && this.editForm.prologue) {
+          this.updateInfo();
+        }
+      }, 500);
+    },
+  }
   },
   computed: {
     ...mapGetters("app", ["cacheData"]),
