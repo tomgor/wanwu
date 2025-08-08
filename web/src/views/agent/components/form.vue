@@ -163,19 +163,19 @@
             <div
               class="recommend-item"
               v-for="(n,i) in editForm.recommendQuestion"
-              @mouseenter="mouseEnter(n)"
-              @mouseleave="mouseLeave(n)"
+              @mouseenter="activeIndex = i"
+              @mouseleave="activeIndex = -1"
             >
               <el-input
                 class="recommend--input"
-                v-model="n.value"
+                v-model.lazy="n.value"
                 maxlength="50"
                 :key="`${i}rml`"
               ></el-input>
               <span
                 class="el-icon-delete recommend-del"
                 @click="clearRecommend(n,i)"
-                v-if="n.hover && n.hover === true"
+                v-if="activeIndex === i"
               ></span>
             </div>
           </div>
@@ -411,10 +411,10 @@ export default {
   },
   watch: {
     editForm: {
-      handler(newVal) {
+      handler(newVal, oldVal) {
         // 如果是从详情设置的数据，不触发更新逻辑
         if (this.isSettingFromDetail) return;
-
+        
         if (this.debounceTimer) {
           clearTimeout(this.debounceTimer);
         }
@@ -427,14 +427,16 @@ export default {
             "instructions",
             "onlineSearchConfig",
             "safetyConfig",
-            // "recommendQuestion"
+            "recommendQuestion"
           ]
+          
           const changed = props.some((prop) => {
             return (
               JSON.stringify(newVal[prop]) !==
               JSON.stringify((this.initialEditForm || {})[prop])
             );
-          });
+          })
+          
           if (changed) {
             if (newVal["modelParams"] !== "" && newVal["prologue"] !== "") {
               this.updateInfo();
@@ -443,22 +445,7 @@ export default {
         }, 500);
       },
       deep: true,
-    },
-  'editForm.recommendQuestion': {
-    handler(newValue, oldValue) {
-      if (this.isSettingFromDetail) return;
-      const valueChanged = newVal.some(function(item, idx) {
-          return item.value !== (oldVal[idx] || {}).value;
-      });
-      // 防抖处理
-      clearTimeout(this.debounceTimer);
-      this.debounceTimer = setTimeout(() => {
-        if (valueChanged && this.editForm.modelParams && this.editForm.prologue) {
-          this.updateInfo();
-        }
-      }, 500);
-    },
-  }
+    }
   },
   computed: {
     ...mapGetters("app", ["cacheData"]),
@@ -466,6 +453,7 @@ export default {
   },
   data() {
     return {
+      activeIndex:-1,
       showOperation: false,
       appId: "",
       scope: "public",
@@ -492,7 +480,7 @@ export default {
           threshold: 0.4, //过滤分数阈值
           maxHistory: 0, //最长上下文
         },
-        recommendQuestion: [{ value: "", hover: false }],
+        recommendQuestion: [{ value: ""}],
         modelConfig: {
           temperature: 0.7,
           topP: 1,
@@ -913,7 +901,6 @@ export default {
               ? data.recommendQuestion.map((n, index) => {
                   return {
                     value: n,
-                    hover: false,
                   };
                 })
               : [],
@@ -955,26 +942,17 @@ export default {
         this.$message.error(this.$t("agent.otherTips"));
       }
     },
-    mouseEnter(n) {
-      if (n.hover !== undefined) {
-        n.hover = true;
-      }
-    },
-    mouseLeave(n) {
-      if (n.hover !== undefined) {
-        n.hover = false;
-      }
-    },
     //推荐问题
     addRecommend() {
       if (this.editForm.recommendQuestion.length > 3) {
         return;
       }
-      this.editForm.recommendQuestion.push({ value: "", hover: false });
+      this.editForm.recommendQuestion.push({ value: "" });
     },
     clearRecommend(n, index) {
       if (this.editForm.recommendQuestion.length === 1) return;
       this.editForm.recommendQuestion.splice(index, 1);
+      this.activeIndex = -1; 
     },
     closeAction() {
       this.showActionConfig = false;

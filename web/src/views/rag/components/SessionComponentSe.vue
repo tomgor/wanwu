@@ -161,14 +161,23 @@ export default {
     methods:{
         listenerImg(){
           //捕获图片加载错误
-          document.body.addEventListener('error', e => {
+          this.imageErrorHandler = (e) => {
               if (e.target.tagName === 'IMG') {
                 this.handleImageError(e.target);
               }
-          }, true); 
+          };
+          document.body.addEventListener('error', this.imageErrorHandler, true); 
         },
         handleImageError(img){
-          img.classList.add('failed')
+          // 防止重复处理
+          if (img.classList.contains('failed')) {
+            return;
+          }
+          img.classList.add('failed');
+          
+          // 设置图片为不可见，避免闪烁
+          img.style.visibility = 'hidden';
+          img.style.display = 'none';
         },
          setupScrollListener() {
             const container = document.getElementById('timeScroll');
@@ -458,10 +467,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
+/* 图片加载失败时的样式 */
 img.failed {
   position: relative;
   border: 2px dashed #ff6b6b;
   background-color: #fff5f5;
+  opacity: 0.5;
 }
 
 img.failed::after {
@@ -472,6 +483,10 @@ img.failed::after {
   transform: translate(-50%, -50%);
   color: #ff6b6b;
   font-size: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 
 /deep/{
