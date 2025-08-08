@@ -108,7 +108,7 @@ doc-center:
       val: 6.工作流/大模型.md
     - key: workflow-SwitchNode
       val: 6.工作流/分支器.md
-    - key: workflow-RagNode
+    - key: workflow-RAGNode
       val: 6.工作流/知识库.md
     - key: workflow-FileGenerateNode
       val: 6.工作流/文档生成.md
