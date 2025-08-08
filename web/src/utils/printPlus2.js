@@ -85,19 +85,17 @@ const Looper = function (sIndex, sentence, timer, printCB, endCB,sIndexMap) {
 
 Looper.prototype = {
     detectCodeBlock() {
+        // 检查是否包含 MCP 工具名，如果是则不按代码块处理
+        const mcpToolPattern = /<tool>mcp-工具名：/;
+        if (mcpToolPattern.test(this.sentence)) {
+            this.isCodeBlock = false;
+            return;
+        }
+        
         // 更宽松的代码块匹配正则
         const codeBlockRegex = /\n\n```(?:\w+)?[\s\S]*?```\n\n/s;
         const match = this.sentence.match(codeBlockRegex);
         if (match) {
-            // 检查是否包含代码块，如果包含则只处理代码块部分
-            const codeBlockStart = this.sentence.indexOf('\n\n```');
-            if (codeBlockStart > 0) {
-                // 如果代码块前面有内容，则不按代码块处理，让前面的内容正常逐字打印
-                this.isCodeBlock = false;
-                return;
-            }
-            
-            // 只有纯代码块内容才按代码块处理
             this.isCodeBlock = true;
             this.codeBlockContent = match[0]; // 整个代码块内容
             this.sentence = match[0]; // 代码块内部内容（去掉```）
@@ -153,17 +151,11 @@ Looper.prototype = {
         }
 
         this.index = 0;
-        const buffer = [];
-        // let lastTimestamp = performance.now(); // 移除局部变量，改用实例属性
         const baseSpeed = 40; // 基础速度
         const maxSpeed = 120; // 最大速度
-        const bufferThreshold = 8; // 缓冲阈值
 
         const printNextChunk = (timestamp) => {
             if (this.index >= this.sentence.length) {
-                if (buffer.length > 0) {
-                    this.printCB(buffer.join(''));
-                }
                 this.stop();
                 return;
             }
@@ -174,21 +166,22 @@ Looper.prototype = {
             const currentSpeed = baseSpeed + (maxSpeed - baseSpeed) * Math.min(progress / 0.3, 1);
             const targetChars = Math.ceil(elapsed * currentSpeed / 1000);
 
-            // 填充缓冲区
+            // 计算本次要打印的字符
             const endIdx = Math.min(this.index + targetChars, this.sentence.length);
-            for (; this.index < endIdx; this.index++) {
-                buffer.push(this.sentence[this.index]);
-                // 达到缓冲阈值时更新DOM
-                if (buffer.length >= bufferThreshold) {
-                    this.printCB(buffer.join(''));
-                    buffer.length = 0;
-                    this.lastTimestamp = performance.now(); // 只在实际打印时重置
-                    break; // 跳出循环，等待下一帧
-                }
-            }
+            const currentChunk = this.sentence.slice(this.index, endIdx);
+            
+            this.index = endIdx;
 
-            // 如果循环结束但缓冲区未满，继续下一帧
-            this.animationFrame = requestAnimationFrame(printNextChunk);
+            // 传递当前这次要打印的文本片段
+            this.printCB(currentChunk);
+            this.lastTimestamp = timestamp;
+
+            // 继续下一帧或结束
+            if (this.index < this.sentence.length) {
+                this.animationFrame = requestAnimationFrame(printNextChunk);
+            } else {
+                this.stop();
+            }
         };
 
         this.animationFrame = requestAnimationFrame(printNextChunk);
