@@ -1,5 +1,5 @@
 <template>
-  <div class="layout full-menu">
+  <div class="layout full-menu" :style="`background: ${bgColor}`">
     <el-container class="outer-container">
       <div class="left-nav" v-if="isShowNav">
         <!--不展示平台的图标-->
@@ -97,7 +97,7 @@
           </div>
         </div>
       </div>
-      <!-- 导航 -->
+      <!-- 容器 -->
       <el-container :class="['inner-container']">
         <!--取消整体的菜单展示 isShowMenu 一直为 false-->
         <el-aside v-if="isShowMenu && menuList && menuList.length" class="full-menu-aside">
@@ -221,6 +221,8 @@ import ChangeLang from "@/components/changeLang.vue"
 import DocDownloadDialog from "@/components/docDownloadDialog.vue"
 import CreateTotalDialog from "@/components/createTotalDialog.vue"
 import AboutDialog from "@/components/aboutDialog.vue";
+import { DOC_FIRST_KEY } from "@/views/docCenter/constants"
+
 export default {
   name: 'Layout',
   components: { ChangeLang, DocDownloadDialog, CreateTotalDialog, AboutDialog },
@@ -229,6 +231,7 @@ export default {
     return{
       basePath: this.$basePath,
       homeLogoPath: '',
+      bgColor: '',
       version: '',
       defaultOpeneds: [],
       orgList: [],
@@ -248,7 +251,8 @@ export default {
         ],
         [
           {name: this.$t('menu.helpDoc'), img: require('@/assets/imgs/helpDoc_icon.svg'), icon: require('@/assets/imgs/link_icon.png'), redirect: () => {
-            window.open('https://github.com/UnicomAI/wanwu/tree/main/docs/manual')
+            // window.open('https://github.com/UnicomAI/wanwu/tree/main/docs/manual')
+            window.open( window.location.origin + `${this.$basePath}/aibase/docCenter/pages/${DOC_FIRST_KEY}`)
           }},
           {name: 'Github', img: require('@/assets/imgs/github_icon.svg'), icon: require('@/assets/imgs/link_icon.png'), redirect: () => {
             window.open('https://github.com/UnicomAI/wanwu')
@@ -286,9 +290,10 @@ export default {
     commonInfo:{
       handler(val) {
         const { home = {}, tab = {}, about = {} } = val.data || {}
-        this.homeLogoPath = home.logoPath || ''
+        this.homeLogoPath = home.logo ? home.logo.path : ''
+        this.bgColor = home.backgroundColor || 'linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%)'
         this.version = about.version || '1.0'
-        replaceIcon(tab.logoPath)
+        replaceIcon(tab.logo ? tab.logo.path : '')
         replaceTitle(tab.title)
       },
       deep: true
@@ -305,9 +310,6 @@ export default {
     ...mapGetters('user', ['orgInfo', 'userInfo', 'commonInfo', 'permission']),
   },
   async created() {
-    // // 如果没修改过密码，重新向到修改密码
-    // this.redirectUserInfo()
-
     // 判断是否展示左侧菜单
     this.justifyIsShowNav(this.$route.path)
     // this.justifyIsShowMenu(this.$route.path)
@@ -349,13 +351,21 @@ export default {
         return null
       }
     },
+    justifyDocPages(val) {
+      const path = `${this.$basePath}/aibase` + val
+      return val && path.includes(`${this.$basePath}/aibase/docCenter/pages`)
+    },
     justifyIsShowNav(path) {
       const notShowArr = ['/userInfo', '/permission', '/workflow', '/explore/workflow']
       let isShowNav = true
-      for (let item of notShowArr) {
-        if (item === path) {
-          isShowNav = false
-          break
+      if (this.justifyDocPages(path)) {
+        isShowNav = false
+      } else {
+        for (let item of notShowArr) {
+          if (item === path) {
+            isShowNav = false
+            break
+          }
         }
       }
       this.isShowNav = isShowNav
@@ -467,7 +477,7 @@ export default {
 }
 .full-menu.layout {
   height:100%;
-  background: linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%);
+  /*background: linear-gradient(1deg, #FFFFFF 42%, #FFFFFF 42%, #EBEDFE 98%, #EEF0FF 98%);*/
   min-height: 660px;
   .outer-container{
     height: 100%;

@@ -62,7 +62,7 @@
                 <el-table-column
                   prop="docName"
                   :label="$t('knowledgeManage.fileName')"
-                  min-width="350"
+                  min-width="180"
                 >
                   <template slot-scope="scope">
                     <el-popover
@@ -75,25 +75,22 @@
                     </el-popover>
                   </template>
                 </el-table-column>
-                <!-- <el-table-column
-                  prop="fileSize"
-                  :label="$t('knowledgeManage.fileSize')"
-                ></el-table-column> -->
                 <el-table-column
                   prop="docType"
                   :label="$t('knowledgeManage.fileStyle')"
-                  width="80"
+                  width="200"
                 >
                 </el-table-column>
                 <el-table-column
                   prop="uploadTime"
                   :label="$t('knowledgeManage.importTime')"
-                  width="180"
+                  width="200"
                 >
                 </el-table-column>
                 <el-table-column
                   prop="status"
                   :label="$t('knowledgeManage.currentStatus')"
+                  width="150"
                 >
                   <template slot-scope="scope">
                     <span :class="[[4,5].includes(scope.row.status)?'error':'']">{{filterStatus(scope.row.status)}}</span>
@@ -175,7 +172,8 @@ export default {
       knowledgeData: [],
       currentKnowValue:null,
       timer:null,
-      refreshCount:0
+      refreshCount:0,
+      tagList:[]
     };
   },
   watch:{
@@ -388,6 +386,15 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.edit-icon{
+  color: #384BF7;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 5px;
+}
+.doc_tag{
+  margin:0 2px;
+}
 /deep/ {
   .el-button.is-disabled,
   .el-button--info.is-disabled {

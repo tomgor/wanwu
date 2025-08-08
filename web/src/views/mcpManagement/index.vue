@@ -9,16 +9,19 @@
       <div class="mcp-tabs">
         <div :class="['mcp-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">精选推荐</div>
         <div :class="['mcp-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">导入MCP服务</div>
+        <!-- <div :class="['mcp-tab',{ 'active': tabActive === 3 }]" @click="tabClick(3)">自定义工具</div> -->
       </div>
 
       <square ref="square" v-if="tabActive === 0"/>
       <customize ref="customize" v-if="tabActive === 1"/>
+      <autoTools ref="autoTools" v-if="tabActive === 3"/>
     </div>
   </div>
 </template>
 <script>
 import square from '../mcpManagementPublic/square'
 import customize from './customize'
+import autoTools from './autoTools'
 export default {
   data() {
     return {
@@ -43,7 +46,8 @@ export default {
   },
   components: {
       square,
-      customize
+      customize,
+      autoTools
   },
 };
 </script>

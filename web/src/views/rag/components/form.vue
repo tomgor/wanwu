@@ -4,6 +4,7 @@
       <div class="header-left">
         <span class="el-icon-arrow-left btn" @click="goBack"></span>
         <span class="header-left-title">文本问答编辑</span>
+        <LinkIcon type="rag" />
       </div>
       <div class="header-right">
         <div class="header-api">
@@ -72,33 +73,6 @@
               </el-select>
             </div>
           </div>
-          <!-- <div class="block prompt-box">
-            <p class="block-title">
-              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
-              Rerank模型
-            </p>
-            <div class="rl">
-              <el-select
-                v-model="editForm.rerankParams"
-                placeholder="请选择模型"
-                @visible-change="rerankVisible"
-                loading-text="模型加载中..."
-                class="cover-input-icon"
-                style="width:100%;"
-                :disabled="isPublish"
-                :loading="modelLoading"
-                clearable
-              >
-                <el-option
-                  v-for="(item,index) in rerankOptions"
-                  :key="item.modelId"
-                  :label="item.displayName"
-                  :value="item.modelId"
-                >
-                </el-option>
-              </el-select>
-            </div>
-          </div> -->
           <div class="block recommend-box">
             <p class="block-title common-set">
               <span class="common-set-label">
@@ -113,6 +87,7 @@
               placeholder="请选择关联知识库" 
               class="model-select" 
               clearable 
+              filterable
               multiple>
                 <el-option
                   v-for="item in knowledgeData"
@@ -179,8 +154,10 @@ import { getRerankList,selectModelList } from "@/api/modelAccess";
 import { getRagInfo,updateRagConfig } from "@/api/rag";
 import Chat from "./chat";
 import searchConfig from '@/components/searchConfig.vue';
+import LinkIcon from "@/components/linkIcon.vue";
 export default {
   components: {
+    LinkIcon,
     Chat,
     CreateTxtQues,
     ModelSet,
@@ -212,12 +189,6 @@ export default {
         rerankParams:'',
         knowledgeBaseIds:[],
         knowledgeConfig:{
-          // maxHistory:0,
-          // threshold:0.4,
-          // topK:5,
-          // maxHistoryEnable:true,
-          // thresholdEnable:true,
-          // topKEnable:true
           keywordPriority: 0.8, //关键词权重
           matchType: "", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
           priorityMatch: 1, //权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
@@ -302,7 +273,7 @@ export default {
   },
   methods: {
     sendConfigInfo(data){
-      this.editForm.knowledgeConfig = { ...data.knowledgeMatchParams };;
+      this.editForm.knowledgeConfig = { ...data.knowledgeMatchParams };
     },
     sendSafety(data){
       const tablesData = data.map(({ tableId, tableName }) => ({ tableId, tableName }));

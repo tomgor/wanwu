@@ -28,17 +28,18 @@
             v-model="item.selected"
             v-if="!item.showIpt"
           >{{item.tagName}}</el-checkbox>
-          <!-- @blur="inputBlur(item)" -->
           <el-input
             v-model="item.tagName"
             v-if="item.showIpt"
+            maxlength="50"
             @keydown.backspace.native="handleDelete(item,index)" 
             @keyup.enter.native="inputBlur(item)"
+            @blur="inputBlur(item)"
           ></el-input>
           <span
             class="el-icon-close del-icon"
             v-if="item.showDel && !item.showIpt"
-            @click="delTag(item)"
+            @click="delTag(item,index)"
           ></span>
         </div>
       </div>
@@ -55,8 +56,9 @@
   </el-dialog>
 </template>
 <script>
-import { delTag, tagList, createTag, editTag, bindTag,bindTagCount} from "@/api/knowledge";
+import { delTag, tagList, createTag, editTag, bindTag,bindTagCount,updateDocTag} from "@/api/knowledge";
 export default {
+  props:['type'],
   data() {
     return {
       dialogVisible: false,
@@ -67,9 +69,10 @@ export default {
   },
   methods: {
     submitDialog() {
-      const ids = this.tagList
-        .filter((item) => item.selected)
-        .map((item) => item.tagId);
+      this.bindTag()
+    },
+    bindTag(){
+      const ids = this.tagList.filter((item) => item.selected).map((item) => item.tagId);
       bindTag({ knowledgeId: this.knowledgeId, tagIdList: ids }).then((res) => {
         if (res.code === 0) {
           this.$emit("relodaData");
@@ -116,16 +119,16 @@ export default {
         .then(async() => {
           const res = await delTag({ tagId: item.tagId })
             if (res.code === 0) {
-              this.getList();
+                this.getList();
             }
         })
         .catch((error) => {
-          this.getList();
+            this.getList();
         });
     },
     showDiaglog(id) {
-      this.knowledgeId = id;
       this.dialogVisible = true;
+      this.knowledgeId = id;
       this.getList();
     },
     handleClose() {
@@ -141,9 +144,7 @@ export default {
       n.showIpt = true;
     },
     inputBlur(n) {
-      if(!n.tagName){
-        return
-      }
+      if(!n.tagName) return;
       if (n.tagId) {
         this.edit_tag(n);
       } else {

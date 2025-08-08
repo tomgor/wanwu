@@ -134,10 +134,10 @@
           <el-form-item label="知识条数">
             <el-row class="slider-box">
               <el-col :span="11" class="slider">
-                <el-slider v-model="n.value.content" :min="0" :max="10" :step="1"></el-slider>
+                <el-slider v-model="n.value.content" :min="0" :max="20" :step="1"></el-slider>
               </el-col>
               <el-col :span="8" class="input">
-                <el-input-number size="mini" controls-position="right" v-model="n.value.content" :min="0" :max="10" :step="1"></el-input-number>
+                <el-input-number size="mini" controls-position="right" v-model="n.value.content" :min="0" :max="20" :step="1"></el-input-number>
               </el-col>
             </el-row>
           </el-form-item>

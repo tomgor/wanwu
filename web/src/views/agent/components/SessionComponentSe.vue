@@ -124,6 +124,7 @@
             </div>
           </div>
         </div>
+
         <!-- 回答 仅图片-->
         <div v-if="!n.response && n.gen_file_url_list && n.gen_file_url_list.length" class="session-answer">
           <div :class="['session-item','rl']">
@@ -212,6 +213,7 @@ export default {
     },
     mounted(){
       this.setupScrollListener();
+      // this.listenerImg();
     },
     beforeDestroy(){
       const container = document.getElementById('timeScroll');
@@ -219,6 +221,11 @@ export default {
         container.removeEventListener('scroll', this.handleScroll);
       }
       clearTimeout(this.scrollTimeout);
+      
+      // 移除图片错误事件监听器
+      if (this.imageErrorHandler) {
+        document.body.removeEventListener('error', this.imageErrorHandler, true);
+      }
     },
     methods:{
           setupScrollListener() {
@@ -356,6 +363,9 @@ export default {
             this.scrollBottom()
         },
         replaceLastData(index,data){
+          if(!data.response){
+            data.response = '无响应数据'
+          }
           this.$set(this.session_data.history,index,data)
           this.scrollBottom()
           this.codeScrollBottom();//code内容置底
@@ -519,6 +529,26 @@ export default {
             this.$nextTick(() => {
                 this.cv && this.cv.resizeCurrImg(currImg)
             })
+        },
+        listenerImg(){
+          //捕获图片加载错误
+          this.imageErrorHandler = (e) => {
+              if (e.target.tagName === 'IMG') {
+                this.handleImageError(e.target);
+              }
+          };
+          document.body.addEventListener('error', this.imageErrorHandler, true); 
+        },
+        handleImageError(img){
+          // 防止重复处理
+          if (img.classList.contains('failed')) {
+            return;
+          }
+          img.classList.add('failed');
+          
+          // 设置图片为不可见，避免闪烁
+          img.style.visibility = 'hidden';
+          img.style.display = 'none';
         },
     }
 }
@@ -839,6 +869,28 @@ export default {
   cursor:pointer;
 }
 
+}
+
+/* 图片加载失败时的样式 */
+img.failed {
+  position: relative;
+  border: 2px dashed #ff6b6b;
+  background-color: #fff5f5;
+  opacity: 0.5;
+}
+
+img.failed::after {
+  content: '图片加载失败';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ff6b6b;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 
 .text-loading,

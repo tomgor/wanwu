@@ -141,3 +141,28 @@ export const getAgentList = (params)=>{
         params
     })
 }
+
+//删除mcp
+export const deleteMcp = (data)=>{
+    return service({
+        url: `${BASE_URL}/assistant/mcp`,
+        method: 'delete',
+        data
+    })
+}
+//添加mcp
+export const addMcp = (data)=>{
+    return service({
+        url: `${BASE_URL}/assistant/mcp`,
+        method: 'post',
+        data
+    })
+}
+//启停mcp
+export const enableMcp = (data)=>{
+    return service({
+        url: `${BASE_URL}/assistant/mcp/enable`,
+        method: 'put',
+        data
+    })
+}

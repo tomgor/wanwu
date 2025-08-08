@@ -3,6 +3,7 @@
     <div class="page-title">
       <span class="el-icon-arrow-left back" @click="goBack"></span>
       新增文件
+      <LinkIcon type="knowledge" />
     </div>
     <div class="table-box">
       <div class="fileUpload">
@@ -226,8 +227,9 @@ import uploadChunk from "@/mixins/uploadChunk";
 import {docImport,ocrSelectList} from '@/api/knowledge'
 import { delfile } from "@/api/chunkFile";
 import { FlagManager } from '@antv/x6/lib/view/flag';
+import LinkIcon from "@/components/linkIcon.vue";
 export default {
-  components:{urlAnalysis},
+  components:{LinkIcon, urlAnalysis},
   mixins: [uploadChunk],
   data() {
     return {

@@ -8,6 +8,7 @@
       >
       </i>
       {{$t('knowledgeManage.keyWordManage')}}
+      <LinkIcon type="knowledge-keywords" />
       <div class="keyWordTip">{{$t('knowledgeManage.keyWordTip')}}</div>
     </div>
     <div class="block table-wrap list-common wrap-fullheight">
@@ -102,8 +103,9 @@ import SearchInput from "@/components/searchInput.vue";
 import {delDocItem} from "@/api/knowledge";
 import {getKeyWord,delKeyWord} from "@/api/keyword";
 import createKeyWords from './create.vue';
+import LinkIcon from "@/components/linkIcon.vue";
 export default {
-  components: { Pagination,SearchInput,createKeyWords},
+  components: {LinkIcon, Pagination,SearchInput,createKeyWords},
   data() {
     return {
       tableLoading:false,

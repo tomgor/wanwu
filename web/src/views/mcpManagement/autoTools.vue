@@ -3,21 +3,12 @@
     <div class="mcp-content">
       <div class="card-search card-search-cust">
         <div>
-          <p class="card-search-des" style="display: flex; align-items: center">
-            <span>集合各MCP server，即选即用。可支持在插件编排工具中使用。如使用自定义MCP，请在自定义TAB中进行添加和查看</span>
-            <LinkIcon type="mcp" />
+          <p class="card-search-des">
+           创建自定义工具
           </p>
-          <!--<div class="radio-box" >
-            <el-radio-group v-model="source" @input="radioChange" size="mini">
-              <el-radio label="">全部</el-radio>
-              <el-radio label="1">来自我添加</el-radio>
-              <el-radio label="2">来自广场发送</el-radio>
-            </el-radio-group>
-          </div>-->
         </div>
         <div>
-          <search-input placeholder="请输入MCP名称进行搜索" ref="searchInput" @handleSearch="handleSearch" />
-          <el-button size="mini" type="primary" @click="handleAddMCP">导入</el-button>
+          <search-input placeholder="请输入名称搜索" ref="searchInput" @handleSearch="handleSearch" />
         </div>
       </div>
 
@@ -25,11 +16,11 @@
         <div class="card card-item-create">
           <div class="app-card-create" @click="handleAddMCP">
             <div class="create-img-wrap">
-              <img class="create-type" src="@/assets/imgs/create_mcp.svg" alt="" />
+              <img class="create-type" src="@/assets/imgs/create_tools.svg" alt="" />
               <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
               <div class="create-filter"></div>
             </div>
-            <span>导入MCP</span>
+            <span>创建自定义工具</span>
           </div>
         </div>
         <div
@@ -40,7 +31,7 @@
           @click.stop="handleClick(item)"
         >
           <div class="card-title">
-            <img class="card-logo" v-if="item.avatar && item.avatar.path" :src="basePath + '/user/api/' + item.avatar.path" />
+            <img class="card-logo" src="@/assets/imgs/toolImg.svg" />
             <div class="mcp_detailBox">
               <span class="mcp_name">{{ item.name }}</span>
               <span class="mcp_from">
@@ -57,30 +48,21 @@
           <div class="card-des">{{ item.desc }}</div>
         </div>
       </div>
-
-      <!--<div class="no-list" v-if="list.length === 0 && is">
-        <div>
-          <i class="el-icon-circle-plus-outline" @click="handleAddMCP"></i>
-          <span>添加你的第一个MCP Server</span>
-        </div>
-      </div>-->
       <el-empty class="noData" v-if="!(list && list.length)" :description="$t('common.noData')"></el-empty>
     </div>
-    <addDialog :dialogVisible="addOpen" @handleClose="handleClose"></addDialog>
+    <addDialog  ref="addDialog"></addDialog>
   </div>
 </template>
 <script>
-import addDialog from "./addDialog.vue";
+import addDialog from "./addToolDialog.vue";
 import SearchInput from "@/components/searchInput.vue"
 import { getList, setDelete } from "@/api/mcp";
-import LinkIcon from "@/components/linkIcon.vue"
 export default {
-  components: { LinkIcon, SearchInput, addDialog },
+  components: { SearchInput, addDialog },
   data() {
     return {
       basePath: this.$basePath,
       is: true, // 是否第一次进来
-      addOpen: false, // 自定义添加mcp开关
       list: [],
     };
   },
@@ -128,16 +110,12 @@ export default {
         }
       })
     },
-    handleClose(val) {
-      this.addOpen = val;
-      this.init();
-    },
     handleClick(val) {
       // smcpSquareId 有值 mcp广场, 否则自定义
       this.$router.push({path: `/mcp/detail/custom?mcpId=${val.mcpId}&mcpSquareId=${val.mcpSquareId}`})
     },
     handleAddMCP() {
-      this.addOpen = true;
+      this.$refs.addDialog.showDialog();
     },
     handleDelete(item) {
       this.$confirm(
@@ -175,8 +153,8 @@ export default {
   }
 }
 .card-logo{
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
 }
 .mcp-content-box .noData {
