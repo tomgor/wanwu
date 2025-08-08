@@ -24,20 +24,21 @@ func SelectDocMetaList(ctx context.Context, userId, orgId, docId string) ([]*mod
 	return docMetaList, nil
 }
 
-// UpdateDocMetaData 更新文档元数据
-func UpdateDocMetaData(ctx context.Context, name, description string, knowledgeBase *model.KnowledgeBase) error {
+// UpdateDocStatusDocMeta 更新文档tag
+func UpdateDocStatusDocMeta(ctx context.Context, docId string, metaDataList []*model.KnowledgeDocMeta, ragDocMetaParams *service.RagDocMetaParams) error {
 	return db.GetHandle(ctx).Transaction(func(tx *gorm.DB) error {
-		//1.更新数据
-		err := updateKnowledge(tx, knowledgeBase.Id, name, description)
+		//todo 文档元数据应该不会特别多，所以先这么做，如果比较多，后续优化
+		//删除所有知识库标签
+		err := tx.Unscoped().Model(&model.KnowledgeDocMeta{}).Where("doc_id = ?", docId).Delete(&model.KnowledgeDocMeta{}).Error
 		if err != nil {
 			return err
 		}
-		//2.通知rag更新知识库
-		return service.RagKnowledgeUpdate(ctx, &service.RagUpdateParams{
-			UserId:          knowledgeBase.UserId,
-			KnowledgeBaseId: knowledgeBase.KnowledgeId,
-			OldKbName:       knowledgeBase.Name,
-			NewKbName:       name,
-		})
+		//插入数据
+		err = tx.Model(&model.KnowledgeDocMeta{}).CreateInBatches(metaDataList, len(metaDataList)).Error
+		if err != nil {
+			return err
+		}
+		//调用rag
+		return service.RagDocMeta(ctx, ragDocMetaParams)
 	})
 }
