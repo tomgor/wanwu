@@ -89,9 +89,10 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 	}
 	//4.更新标签
 	metaDataList := removeDuplicateMeta(req.MetaDataList)
+	var fileName = service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
 	err = orm.UpdateDocStatusDocMeta(ctx, req.DocId, buildMetaParamsList(metaDataList, doc.OrgId, doc.UserId, req.DocId),
 		&service.RagDocMetaParams{
-			FileName:      doc.Name,
+			FileName:      fileName,
 			KnowledgeBase: knowledge.Name,
 			UserId:        req.UserId,
 			MetaList:      buildMetaRagParams(metaDataList),

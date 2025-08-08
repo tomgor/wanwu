@@ -168,10 +168,11 @@ func BatchDeleteAllDoc(ctx context.Context, tx *gorm.DB, knowledge *model.Knowle
 // batchRagDelete 批量rag删除
 func batchRagDelete(ctx context.Context, knowledge *model.KnowledgeBase, docList []*model.KnowledgeDoc) error {
 	for _, doc := range docList {
+		var fileName = service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
 		err := service.RagDeleteDoc(ctx, &service.RagDeleteDocParams{
 			UserId:        doc.UserId,
 			KnowledgeBase: knowledge.Name,
-			FileName:      doc.Name,
+			FileName:      fileName,
 		})
 		if err != nil {
 			return err
