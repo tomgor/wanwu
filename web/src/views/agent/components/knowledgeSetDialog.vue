@@ -24,13 +24,12 @@ export default {
     data(){
         return{
             dialogVisible:false,
-            configInfo:{},
             knowledgeConfig:{}
         }
     },
     methods:{
         sendConfigInfo(data){
-            this.configInfo = { ...data.knowledgeMatchParams };
+            this.knowledgeConfig = { ...data.knowledgeMatchParams };
         },
         showDialog(row){
             this.dialogVisible = true;
@@ -41,7 +40,7 @@ export default {
         },
         submit(){
             // 验证模型选择
-            const { matchType, priorityMatch, rerankModelId } = this.configInfo;
+            const { matchType, priorityMatch, rerankModelId } = this.knowledgeConfig;
             const needRerankModel = matchType === 'vector' || 
                                    matchType === 'text' || 
                                    (matchType === 'mix' && priorityMatch === 0);
@@ -52,7 +51,7 @@ export default {
             }
 
             this.dialogVisible = false;
-            this.$emit('setKnowledgeSet',this.configInfo)
+            this.$emit('setKnowledgeSet',this.knowledgeConfig)
         }
     }
 }

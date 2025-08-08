@@ -325,9 +325,9 @@ export const ocrSelectList = ()=>{
         method: 'get',
     })
 };
-export const updateDocTag = (data)=>{
+export const updateDocMeta = (data)=>{
     return service({
-        url: `${BASE_URL}/knowledge/doc/tag`,
+        url: `${BASE_URL}/knowledge/doc/meta`,
         method: 'post',
         data
     })
