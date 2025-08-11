@@ -124,6 +124,7 @@
             </div>
           </div>
         </div>
+
         <!-- 回答 仅图片-->
         <div v-if="!n.response && n.gen_file_url_list && n.gen_file_url_list.length" class="session-answer">
           <div :class="['session-item','rl']">
@@ -212,7 +213,7 @@ export default {
     },
     mounted(){
       this.setupScrollListener();
-      this.listenerImg();
+      // this.listenerImg();
     },
     beforeDestroy(){
       const container = document.getElementById('timeScroll');
@@ -362,6 +363,9 @@ export default {
             this.scrollBottom()
         },
         replaceLastData(index,data){
+          if(!data.response){
+            data.response = '无响应数据'
+          }
           this.$set(this.session_data.history,index,data)
           this.scrollBottom()
           this.codeScrollBottom();//code内容置底

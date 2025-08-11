@@ -59,7 +59,7 @@
                 <i v-bind:class="{'el-icon-arrow-down': !n.isOpen,'el-icon-arrow-up': n.isOpen}"></i>
               </div>
               <!--内容-->
-              <div class="answer-content" v-bind:class="{'ds-res':showDSBtn(n.response)}" v-html="showDSBtn(n.response)?replaceHTML(n.response,n):n.response"></div>
+              <div class="answer-content"  v-bind:class="{'ds-res':showDSBtn(n.response)}" v-html="showDSBtn(n.response)?replaceHTML(n.response,n):n.response"></div>
               <!--出处-->
               <div v-if="n.searchList && n.searchList.length" class="search-list">
                 <div v-for="(m,j) in n.searchList" :key="`${j}sdsl`" class="search-list-item">
@@ -149,7 +149,7 @@ export default {
     },
     mounted(){
       this.setupScrollListener();
-      this.listenerImg();
+      // this.listenerImg();
     },
     beforeDestroy(){
       const container = document.getElementById('timeScroll');
@@ -161,14 +161,24 @@ export default {
     methods:{
         listenerImg(){
           //捕获图片加载错误
-          document.body.addEventListener('error', e => {
+          this.imageErrorHandler = (e) => {
               if (e.target.tagName === 'IMG') {
                 this.handleImageError(e.target);
               }
-          }, true); 
+          };
+          document.body.addEventListener('error', this.imageErrorHandler, true); 
         },
         handleImageError(img){
-          img.classList.add('failed')
+          console.log(img)
+          // 防止重复处理
+          if (img.classList.contains('failed')) {
+            return;
+          }
+          img.classList.add('failed');
+          
+          // // 设置图片为不可见，避免闪烁
+          img.style.visibility = 'hidden';
+          img.style.display = 'none';
         },
          setupScrollListener() {
             const container = document.getElementById('timeScroll');
@@ -458,10 +468,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
+/* 图片加载失败时的样式 */
 img.failed {
   position: relative;
   border: 2px dashed #ff6b6b;
   background-color: #fff5f5;
+  opacity: 0.5;
 }
 
 img.failed::after {
@@ -472,6 +484,10 @@ img.failed::after {
   transform: translate(-50%, -50%);
   color: #ff6b6b;
   font-size: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 
 /deep/{
@@ -480,7 +496,9 @@ img.failed::after {
   }
   .answer-content{
     img{
-        width: 80% !important;
+        // height:100px;
+        width:100%;
+        display: block;
       }
     section li{
       list-style-position: inside; /* 将标记符号放在内容框内 */
