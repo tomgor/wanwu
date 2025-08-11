@@ -79,7 +79,7 @@
             </el-form-item>
             <el-form-item
               v-if="ruleForm.docSegment.segmentType == '1'"
-              :label="$t('knowledgeManage.punctuationMark')+'：'"
+              label="分段标识:"
               prop="docSegment.splitter"
               :rules="ruleForm.docSegment.segmentType === '1' 
               ? [{ required: true, message: $t('knowledgeManage.markTips'), trigger: 'blur' }] 
@@ -93,11 +93,17 @@
                 clearable
                 collapse-tags
               >
+               <div class="addSplitter" @click="addSplitter">
+                  <span class="el-icon-plus"></span>
+                  <span>创建分隔符</span>
+               </div>
+               <el-input v-model="newValue" v-if="showInput" class="optionInput"></el-input>
                 <el-option
                   v-for="item in splitOptions"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
+                  class="splitterOption"
                 >
                 </el-option>
               </el-select>
@@ -144,6 +150,15 @@
               </div>
             </el-form-item>
             <el-form-item
+              label="文本预处理规则："
+              prop="docAnalyzer"
+            >
+            <el-checkbox-group v-model="ruleForm.docAnalyzer">
+                <el-checkbox label="text">替换掉连续的空格、换行符和制表符</el-checkbox>
+                <el-checkbox label="ocr">删除所有URL和电子邮件地址</el-checkbox>
+            </el-checkbox-group>
+            </el-form-item>
+            <el-form-item
               label="解析方式："
               prop="docAnalyzer"
             >
@@ -168,6 +183,39 @@
                 :value="item.modelId">
               </el-option>
             </el-select>
+            </el-form-item>
+            <el-form-item
+              label="元数据管理："
+              prop="docAnalyzer"
+            >
+            <el-button icon="el-icon-plus" type="primary">创建</el-button>
+            <el-table
+            :data="tableData"
+            style="width: 70%">
+            <el-table-column
+                prop="key"
+                label="key">
+            </el-table-column>
+            <el-table-column
+                prop="type"
+                label="类型">
+            </el-table-column>
+            <el-table-column
+                prop="value"
+                label="value">
+                <template slot-scope="scope">
+                    <span v-if="!scope.row.showInput">{{scope.row.value}}</span>
+                    <el-input v-model="scope.row.value" v-else @blur="handleBlur(scope.row)"></el-input>
+                </template>
+            </el-table-column>
+            <el-table-column
+                label="操作">
+                <template slot-scope="scope">
+                    <el-button type="text" size="small" @click="editItem(scope.row)">编辑</el-button>
+                    <el-button type="text" size="small" @click="delItem(scope.$index)">删除</el-button>
+                </template>
+            </el-table-column>
+            </el-table> 
             </el-form-item>
           </el-form>
         </div>
@@ -226,13 +274,14 @@ import urlAnalysis from './urlAnalysis.vue';
 import uploadChunk from "@/mixins/uploadChunk";
 import {docImport,ocrSelectList} from '@/api/knowledge'
 import { delfile } from "@/api/chunkFile";
-import { FlagManager } from '@antv/x6/lib/view/flag';
 import LinkIcon from "@/components/linkIcon.vue";
 export default {
   components:{LinkIcon, urlAnalysis},
   mixins: [uploadChunk],
   data() {
     return {
+      tableData:[],
+      showInput:false,
       ocrOptions:[],
       urlValidate: false,
       active: 1,
@@ -292,6 +341,9 @@ export default {
     this.getOcrList()
   },
   methods:{
+  addSplitter(){
+    this.showInput = true;
+  },
   goBack(){
     this.$router.go(-1);
   },
@@ -617,6 +669,21 @@ export default {
 </script>
 <style lang="scss" scoped>
 .red{color:red;}
+.addSplitter{
+  padding:10px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor: pointer;
+  border-bottom:1px solid #ededed;
+}
+.optionInput{
+  width:90%;
+  margin:10px;
+}
+.splitterOption{
+  margin-top:5px;
+}
 .el-input-number {
     line-height: 28px !important;
 }
