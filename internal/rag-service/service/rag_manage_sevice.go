@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/UnicomAI/wanwu/internal/rag-service/config"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,32 +13,34 @@ import (
 	knowledgeBase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	rag_service "github.com/UnicomAI/wanwu/api/proto/rag-service"
 	"github.com/UnicomAI/wanwu/internal/rag-service/client/model"
-	"github.com/UnicomAI/wanwu/internal/rag-service/config"
 	http_client "github.com/UnicomAI/wanwu/internal/rag-service/pkg/http-client"
 	"github.com/UnicomAI/wanwu/pkg/log"
 )
 
 const (
-	DefaultThreshold  = 0.4
-	DefaultTopK       = 5
-	DefaultMaxHistory = 0
+	DefaultTemperature      = 0.14
+	DefaultTopP             = 0.85
+	DefaultFrequencyPenalty = 1.1
 )
 
 type RagChatParams struct {
-	KnowledgeBase   []string         `json:"knowledgeBase"`
-	Question        string           `json:"question"`
-	Threshold       float32          `json:"threshold"`
-	TopK            int32            `json:"topK"`
-	Stream          bool             `json:"stream"`
-	Chichat         bool             `json:"chichat"` // 当知识库召回结果为空时是否使用默认话术（兜底），默认为true
-	RerankModelId   string           `json:"rerank_model_id"`
-	CustomModelInfo *CustomModelInfo `json:"custom_model_info"`
-	History         []*HistoryItem   `json:"history"`
-	MaxHistory      int32            `json:"max_history"`
-	RewriteQuery    bool             `json:"rewrite_query"`   // 是否query改写
-	RerankMod       string           `json:"rerank_mod"`      // rerank_model:重排序模式，weighted_score：权重搜索
-	RetrieveMethod  string           `json:"retrieve_method"` // hybrid_search:混合搜索， semantic_search:向量搜索， full_text_search：文本搜索
-	Weight          *WeightParams    `json:"weights"`         // 权重搜索下的权重配置
+	KnowledgeBase     []string         `json:"knowledgeBase"`
+	Question          string           `json:"question"`
+	Threshold         float32          `json:"threshold"`
+	TopK              int32            `json:"topK"`
+	Stream            bool             `json:"stream"`
+	Chichat           bool             `json:"chichat"` // 当知识库召回结果为空时是否使用默认话术（兜底），默认为true
+	RerankModelId     string           `json:"rerank_model_id"`
+	CustomModelInfo   *CustomModelInfo `json:"custom_model_info"`
+	History           []*HistoryItem   `json:"history"`
+	MaxHistory        int32            `json:"max_history"`
+	RewriteQuery      bool             `json:"rewrite_query"`   // 是否query改写
+	RerankMod         string           `json:"rerank_mod"`      // rerank_model:重排序模式，weighted_score：权重搜索
+	RetrieveMethod    string           `json:"retrieve_method"` // hybrid_search:混合搜索， semantic_search:向量搜索， full_text_search：文本搜索
+	Weight            *WeightParams    `json:"weights"`         // 权重搜索下的权重配置
+	Temperature       float32          `json:"temperature"`
+	TopP              float32          `json:"top_p"`              // 多样性
+	RepetitionPenalty float32          `json:"repetition_penalty"` // 重复惩罚/频率惩罚
 }
 
 type WeightParams struct {
@@ -53,6 +56,17 @@ type HistoryItem struct {
 	Query       string `json:"query"`
 	Response    string `json:"response"`
 	NeedHistory bool   `json:"needHistory"`
+}
+
+type ModelConfig struct {
+	Temperature            float32 `json:"temperature"`
+	TemperatureEnable      bool    `json:"temperatureEnable"`
+	TopP                   float32 `json:"topP"`
+	TopPEnable             bool    `json:"topPEnable"`
+	FrequencyPenalty       float32 `json:"frequencyPenalty"`
+	FrequencyPenaltyEnable bool    `json:"frequencyPenaltyEnable"`
+	PresencePenalty        float32 `json:"presencePenalty"`
+	PresencePenaltyEnable  bool    `json:"presencePenaltyEnable"`
 }
 
 func RagStreamChat(ctx context.Context, userId string, req *RagChatParams) (<-chan string, error) {
@@ -127,6 +141,7 @@ func buildHttpParams(userId string, req *RagChatParams) (*http_client.HttpReques
 
 // BuildChatConsultParams 构造rag 会话参数
 func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, knowledgeInfoList *knowledgeBase_service.KnowledgeDetailSelectListResp) *RagChatParams {
+	// 知识库参数
 	ragChatParams := &RagChatParams{}
 	knowledgeConfig := rag.KnowledgeBaseConfig
 	ragChatParams.MaxHistory = int32(knowledgeConfig.MaxHistory)
@@ -135,19 +150,47 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	ragChatParams.RetrieveMethod = buildRetrieveMethod(knowledgeConfig.MatchType)
 	ragChatParams.RerankMod = buildRerankMod(knowledgeConfig.PriorityMatch)
 	ragChatParams.Weight = buildWeight(knowledgeConfig)
-
 	var kbNameList []string
 	for _, v := range knowledgeInfoList.List {
 		kbNameList = append(kbNameList, v.Name)
 	}
-	ragChatParams.CustomModelInfo = &CustomModelInfo{LlmModelID: rag.ModelConfig.ModelId}
 	ragChatParams.KnowledgeBase = kbNameList
+	ragChatParams.RerankModelId = buildRerankId(knowledgeConfig.PriorityMatch, rag.RerankConfig.ModelId)
+
+	// RAG属性参数
 	ragChatParams.Question = req.Question
 	ragChatParams.Stream = true
 	ragChatParams.Chichat = true
-	ragChatParams.RerankModelId = buildRerankId(knowledgeConfig.PriorityMatch, rag.RerankConfig.ModelId)
 	ragChatParams.History = []*HistoryItem{}
 	ragChatParams.RewriteQuery = true
+
+	// 模型参数
+	ragChatParams.CustomModelInfo = &CustomModelInfo{LlmModelID: rag.ModelConfig.ModelId}
+	modelConfigStr := rag.ModelConfig.Config
+	modelConfig := ModelConfig{}
+	err := json.Unmarshal([]byte(modelConfigStr), &modelConfig)
+	if err != nil {
+		log.Errorf("model config unmarshal fail: %s", modelConfigStr)
+		ragChatParams.Temperature = DefaultTemperature
+		ragChatParams.TopP = DefaultTopP
+		ragChatParams.RepetitionPenalty = DefaultFrequencyPenalty
+		return ragChatParams
+	}
+	if modelConfig.TemperatureEnable {
+		ragChatParams.Temperature = modelConfig.Temperature
+	} else {
+		ragChatParams.Temperature = DefaultTemperature
+	}
+	if modelConfig.TopPEnable {
+		ragChatParams.TopP = modelConfig.TopP
+	} else {
+		ragChatParams.TopP = DefaultTopP
+	}
+	if modelConfig.FrequencyPenaltyEnable {
+		ragChatParams.RepetitionPenalty = modelConfig.FrequencyPenalty
+	} else {
+		ragChatParams.RepetitionPenalty = DefaultFrequencyPenalty
+	}
 
 	log.Infof("ragparams = %+v", ragChatParams)
 	return ragChatParams
