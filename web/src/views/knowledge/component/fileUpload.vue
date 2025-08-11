@@ -33,7 +33,7 @@
                 :auto-upload="false"
                 :limit="5"
                 multiple
-                accept=".pdf,.docx,.doc,.txt,.xlsx,.xls,.zip,.tar.gz,.csv,.pptx,.html"
+                accept=".pdf,.docx,.doc,.txt,.xlsx,.xls,.zip,.tar.gz,.csv,.pptx,.html,.md,.ofd,.wps"
                 :file-list="fileList"
                 :on-change="uploadOnChange"
               >
@@ -43,7 +43,7 @@
                     <p class="click-text">将文件拖到此处，或<span class="clickUpload">点击上传</span></p>
                 </div>
                 <div class="tips">
-                  <p v-if="fileType === 'file'"><span class="red">*</span>您可单独或者批量上传以下格式的文档：pdf/docx/pptx 文件最大为200MB，xlsx/csv/txt/html文件最大为20MB。zip格式内的文档需符合各自文件格式上传大小限制</p>
+                  <p v-if="fileType === 'file'"><span class="red">*</span>您可单独或者批量上传以下格式的文档：pdf/docx/pptx/doc文件最大为200MB，xlsx/xls/csv/txt/html/md/ofd/wps文件最大为20MB。zip/tar.gz格式内的文档需符合各自文件格式上传大小限制</p>
                   <p v-if="fileType === 'file'"><span class="red">*</span>非压缩包文件，一次可传5个文件，如文件页数多，文档解析时间较长，平均3秒/页，请您耐心等待</p>
                   <p v-if="fileType === 'fileUrl'"><span class="red">*</span>批量上传支持.xlsx格式，仅可上传1个。文档最多可添加100条url，文件不超过15mb <a class="template_downLoad" href="#" @click.prevent.stop="downloadTemplate">模版下载</a></p>
                   <p v-if="fileType === 'fileUrl'"><span class="red">*</span>当前内容不自动更新</p>
@@ -523,7 +523,7 @@ export default {
     },
     //  验证文件格式
     verifyFormat(file) {
-      const nameType = ['pdf','docx','pptx','zip','tar.gz','xlsx','csv','txt','html']
+      const nameType = ['pdf','docx','doc','pptx','zip','tar.gz','xlsx','xls','csv','txt','html','md','ofd','wps']
       const fileName = file.name
       const isSupportedFormat = nameType.some(ext => fileName.endsWith(`.${ext}`));
       if (!isSupportedFormat) {
