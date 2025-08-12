@@ -235,6 +235,32 @@ services:
     working_dir: /app
     command: ./bin/assistant-service
   
+  workflow-service:
+    restart: always
+    image: ${WANWU_GO_IMAGE}
+    container_name: workflow-service
+    networks:
+      - ${WANWU_DOCKER_NETWORK}
+    ports:
+      - 8999:8999
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ../wanwu-workflow/wanwu-backend/bin/${WANWU_ARCH}/workflow-service:/app/bin/workflow-service
+      - ../wanwu-workflow/wanwu-backend/configs:/app/configs
+      - ${WANWU_PROJECT_DIR}/workflow-service/log:/app/log
+    environment:
+      DB_NAME: ${WANWU_DB_NAME}
+      DB_MYSQL_ADDRESS: ${WANWU_MYSQL_ADDRESS}
+      DB_MYSQL_PASSWORD: ${WANWU_MYSQL_PASSWORD}
+      REDIS_HOST: ${WANWU_REDIS_HOST}
+      REDIS_PORT: ${WANWU_REDIS_PORT}
+      REDIS_PASSWORD: ${WANWU_REDIS_PASSWORD}
+      MINIO_ENDPOINT: ${WANWU_MINIO_ENDPOINT}
+      MINIO_USER: ${WANWU_MINIO_USER}
+      MINIO_PASSWORD: ${WANWU_MINIO_PASSWORD}
+    working_dir: /app
+    command: ./bin/workflow-service
+
   agentscope:
     restart: always
     image: ${WANWU_AGENTSCOPE_BASE_IMAGE}
