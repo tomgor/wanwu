@@ -109,7 +109,7 @@ type WebSearch struct {
 
 type OpenAIMsg struct {
 	Role             MsgRole       `json:"role" validate:"required"` // "system" | "user" | "assistant" | "function(已弃用)"
-	Content          string        `json:"content" validate:"required"`
+	Content          string        `json:"content"`
 	ToolCallId       *string       `json:"tool_call_id,omitempty"`
 	ReasoningContent *string       `json:"reasoning_content,omitempty"`
 	Name             *string       `json:"name,omitempty"`
