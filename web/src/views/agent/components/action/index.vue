@@ -19,15 +19,6 @@
                     <div class="block prompt-box">
                         <p class="block-title required-label rl">Schema</p>
                         <div class="rl">
-                            <!--<div class="flex" style="margin-bottom: 10px">
-                                <el-input class="name-input" v-model="basicForm.name" @blur="listenerUpdate" maxlength="10" placeholder="应用名称" ></el-input>
-                                <el-button style="margin-left: 10px" type="primary" size="small">导入</el-button>
-                                <el-select style="margin-left: 100px;width: 200px">
-                                    <el-option label="模板样例导入" value="json"></el-option>
-                                    <el-option label="JSON样例导入" value="json"></el-option>
-                                    <el-option label="YAML样例导入" value="json"></el-option>
-                                </el-select>
-                            </div>-->
                             <div class="flex" style="margin-bottom: 10px">
                                 <el-select v-model="basicForm.example" placeholder="选择样例" style="width:100%;" @change="exampleChange">
                                     <!--<el-option label="模板样例导入" value="json"></el-option>-->
@@ -65,49 +56,10 @@
                             </el-table>
                         </div>
                     </div>
-
-
                     <div class="block prompt-box">
                         <p class="block-title  rl">隐私政策</p>
                         <el-input class="name-input" v-model="basicForm.privacy" placeholder="填写API对应的隐私政策url链接" ></el-input>
                     </div>
-                    <!--<div class="block prompt-box">
-                        <p class="block-title ">actions获取结果</p>
-                        <div class="rl">
-                            <el-table
-                                    :data="tableData"
-                                    border
-                                    style="width: 100%">
-                                <el-table-column
-                                        prop="name"
-                                        label="名称"
-                                        width="180">
-                                </el-table-column>
-                                <el-table-column
-                                        prop="type"
-                                        label="方法"
-                                        width="180">
-                                </el-table-column>
-                                <el-table-column
-                                        prop="url"
-                                        label="路径">
-                                </el-table-column>
-                                <el-table-column
-                                        fixed="right"
-                                        label="操作"
-                                        width="100">
-                                    <template slot-scope="scope">
-                                        <el-button type="text" size="small">测试</el-button>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                        </div>
-                    </div>
-
-                    <div class="block recommend-box">
-                        <p class="block-title">隐私条款</p>
-                        <el-input class="desc-input " v-model="basicForm.description" placeholder="填写URL"></el-input>
-                    </div>-->
                 </div>
             </el-col>
 
@@ -147,31 +99,6 @@
                             <el-input class="desc-input " v-model="authForm.customHeaderName" placeholder="Custom Header Name" clearable></el-input>
                         </el-form-item>
                     </div>
-                    <!--OAuth-->
-                    <!--<div v-if="authForm.type === '3'">
-                        <el-form-item label="Client ID">
-                            <el-input class="desc-input " v-model="basicForm.description" placeholder="Client ID"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Client Secret">
-                            <el-input class="desc-input " v-model="basicForm.description" placeholder="Client Secret"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Authentication URL">
-                            <el-input class="desc-input " v-model="basicForm.description" placeholder="Authentication URL"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Token URL">
-                            <el-input class="desc-input " v-model="basicForm.description" placeholder="Token URL"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Scope">
-                            <el-input class="desc-input " v-model="basicForm.description" placeholder="Scope"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Token Exchange Method">
-                            <el-radio-group v-model="authForm.authType">
-                                <el-radio label="1">Default（POST request）</el-radio>
-                                <el-radio label="2">Bearer</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                    </div>-->
-
                 </el-form>
 
             </div>

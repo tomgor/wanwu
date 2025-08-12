@@ -469,6 +469,29 @@ services:
       retries: 99
       start_period: 10s
   
+  operate-service:
+    restart: always
+    image: ${WANWU_BACKEND_IMAGE}
+    container_name: operate-service
+    networks:
+      - ${WANWU_DOCKER_NETWORK}
+    # ports:
+    #   - 9797:9797
+    volumes:
+      - ${WANWU_PROJECT_DIR}/operate-service/log:/app/log
+    environment:
+      DB_NAME: ${WANWU_DB_NAME}
+      DB_MYSQL_ADDRESS: ${WANWU_MYSQL_ADDRESS}
+      DB_MYSQL_PASSWORD: ${WANWU_MYSQL_PASSWORD}
+    working_dir: /app
+    command: ./bin/operate-service
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9797"]
+      interval: 15s
+      timeout: 5s
+      retries: 99
+      start_period: 10s
+  
   app-service:
     depends_on:
       mysql:
@@ -491,6 +514,9 @@ services:
       REDIS_HOST: ${WANWU_REDIS_HOST}
       REDIS_PORT: ${WANWU_REDIS_PORT}
       REDIS_PASSWORD: ${WANWU_REDIS_PASSWORD}
+      MINIO_ENDPOINT: ${WANWU_MINIO_ENDPOINT}
+      MINIO_USER: ${WANWU_MINIO_USER}
+      MINIO_PASSWORD: ${WANWU_MINIO_PASSWORD}
     working_dir: /app
     command: ./bin/app-service
     healthcheck:
@@ -499,7 +525,7 @@ services:
       timeout: 5s
       retries: 99
       start_period: 10s
-  
+
   agentscope:
     depends_on:
       mysql:
@@ -562,6 +588,10 @@ services:
       ES_HOSTS: https://${WANWU_ELASTIC_ADDRESS}
       ES_USER: ${WANWU_ELASTIC_USER}
       ES_PASSWORD: ${WANWU_ELASTIC_PASSWORD}
+      REDIS_HOST: ${WANWU_REDIS_HOST}
+      REDIS_PORT: ${WANWU_REDIS_PORT}
+      REDIS_PASSWD: ${WANWU_REDIS_PASSWORD}
+
   
   agent:
     depends_on:

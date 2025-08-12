@@ -10,6 +10,7 @@ import (
 	"github.com/UnicomAI/wanwu/api/proto/common"
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/client/model"
+	"github.com/UnicomAI/wanwu/pkg/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -62,7 +63,7 @@ func (s *Service) AssistantCreate(ctx context.Context, req *assistant_service.As
 		OrgId:      req.Identity.OrgId,
 	}
 	// 查找否存在相同名称智能体
-	if err := s.cli.CheckSameAssistantName(ctx, req.Identity.UserId, req.Identity.OrgId, req.AssistantBrief.Name); err != nil {
+	if err := s.cli.CheckSameAssistantName(ctx, req.Identity.UserId, req.Identity.OrgId, req.AssistantBrief.Name, ""); err != nil {
 		return nil, errStatus(errs.Code_AssistantErr, err)
 	}
 	// 调用client方法创建智能体
@@ -82,15 +83,16 @@ func (s *Service) AssistantUpdate(ctx context.Context, req *assistant_service.As
 	if err != nil {
 		return nil, err
 	}
-	// 查找否存在相同名称智能体
-	if err := s.cli.CheckSameAssistantName(ctx, req.Identity.UserId, req.Identity.OrgId, req.AssistantBrief.Name); err != nil {
-		return nil, errStatus(errs.Code_AssistantErr, err)
-	}
 
 	// 获取现有智能体信息
 	existingAssistant, status := s.cli.GetAssistant(ctx, uint32(assistantID))
 	if status != nil {
 		return nil, errStatus(errs.Code_AssistantErr, status)
+	}
+
+	// 查找否存在相同名称智能体
+	if err := s.cli.CheckSameAssistantName(ctx, req.Identity.UserId, req.Identity.OrgId, req.AssistantBrief.Name, req.AssistantId); err != nil {
+		return nil, errStatus(errs.Code_AssistantErr, err)
 	}
 
 	existingAssistant.AvatarPath = req.AssistantBrief.AvatarPath
@@ -174,6 +176,7 @@ func (s *Service) AssistantConfigUpdate(ctx context.Context, req *assistant_serv
 			})
 		}
 		existingAssistant.KnowledgebaseConfig = string(knowledgeBaseConfigBytes)
+		log.Debugf("knowConfig = %s", existingAssistant.KnowledgebaseConfig)
 	}
 
 	// 处理onlineSearchConfig，转换成json字符串之后再更新
@@ -186,6 +189,18 @@ func (s *Service) AssistantConfigUpdate(ctx context.Context, req *assistant_serv
 			})
 		}
 		existingAssistant.OnlineSearchConfig = string(onlineSearchConfigBytes)
+	}
+
+	// 处理safetyConfig，转换成json字符串之后再更新
+	if req.SafetyConfig != nil {
+		safetyConfigBytes, err := json.Marshal(req.SafetyConfig)
+		if err != nil {
+			return nil, errStatus(errs.Code_AssistantErr, &errs.Status{
+				TextKey: "assistant_safetyConfig_marshal",
+				Args:    []string{err.Error()},
+			})
+		}
+		existingAssistant.SafetyConfig = string(safetyConfigBytes)
 	}
 
 	// 调用client方法更新智能体
@@ -312,6 +327,18 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 		}
 	}
 
+	// 处理assistant.SafetyConfig，转换成AssistantSafetyConfig
+	var safetyConfig *assistant_service.AssistantSafetyConfig
+	if assistant.SafetyConfig != "" {
+		safetyConfig = &assistant_service.AssistantSafetyConfig{}
+		if err := json.Unmarshal([]byte(assistant.SafetyConfig), safetyConfig); err != nil {
+			return nil, errStatus(errs.Code_AssistantErr, &errs.Status{
+				TextKey: "assistant_safetyConfig_unmarshal",
+				Args:    []string{err.Error()},
+			})
+		}
+	}
+
 	return &assistant_service.AssistantInfo{
 		AssistantId: strconv.FormatUint(uint64(assistant.ID), 10),
 		AssistantBrief: &common.AppBriefConfig{
@@ -326,6 +353,7 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 		KnowledgeBaseConfig: knowledgeBaseConfig,
 		RerankConfig:        rerankConfig,
 		OnlineSearchConfig:  onlineSearchConfig,
+		SafetyConfig:        safetyConfig,
 		Scope:               int32(assistant.Scope),
 		WorkFlowInfos:       workFlowInfos,
 		ActionInfos:         actionInfos,

@@ -23,6 +23,9 @@ func Register(apiV1 *gin.RouterGroup) {
 	// mcp
 	registerMCP(apiV1)
 
+	// safety
+	registerSafety(apiV1)
+
 	// rag
 	registerRag(apiV1)
 
@@ -34,4 +37,7 @@ func Register(apiV1 *gin.RouterGroup) {
 
 	// permission
 	registerPermission(apiV1)
+
+	// setting
+	registerSetting(apiV1)
 }

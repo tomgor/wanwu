@@ -319,3 +319,16 @@ export const hitTest = (data)=>{
         data
     })
 };
+export const ocrSelectList = ()=>{
+    return service({
+        url: `${BASE_URL}/model/select/ocr`,
+        method: 'get',
+    })
+};
+export const updateDocMeta = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/doc/meta`,
+        method: 'post',
+        data
+    })
+};

@@ -2,13 +2,9 @@ package mp_yuanjing
 
 import (
 	"context"
-	"crypto/tls"
-	"fmt"
-	"io"
 	"net/url"
 
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
-	"github.com/go-resty/resty/v2"
 )
 
 type Embedding struct {
@@ -17,47 +13,17 @@ type Embedding struct {
 }
 
 func (cfg *Embedding) NewReq(req *mp_common.EmbeddingReq) (mp_common.IEmbeddingReq, error) {
-	m := map[string]interface{}{
-		"model": req.Model,
-		"input": req.Input,
+	m, err := req.Data()
+	if err != nil {
+		return nil, err
 	}
-	if req.EncodingFormat != "" {
-		m["encoding_format"] = req.EncodingFormat
-	}
-	return mp_common.NewRerankReq(m), nil
+	return mp_common.NewEmbeddingReq(m), nil
 }
 
 func (cfg *Embedding) Embeddings(ctx context.Context, req mp_common.IEmbeddingReq, headers ...mp_common.Header) (mp_common.IEmbeddingResp, error) {
-	if cfg.ApiKey != "" {
-		headers = append(headers, mp_common.Header{
-			Key:   "Authorization",
-			Value: "Bearer " + cfg.ApiKey,
-		})
-	}
-
-	request := resty.New().
-		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}). // 关闭证书校验
-		SetTimeout(0).                                             // 关闭请求超时
-		R().
-		SetContext(ctx).
-		SetHeader("Content-Type", "application/json").
-		SetHeader("Accept", "application/json").
-		SetBody(req.Data()).
-		SetDoNotParseResponse(true)
-	for _, header := range headers {
-		request.SetHeader(header.Key, header.Value)
-	}
-
-	url := cfg.embeddingsUrl()
-	resp, err := request.Post(url)
+	b, err := mp_common.Embeddings(ctx, "yuanjing", cfg.ApiKey, cfg.embeddingsUrl(), req.Data(), headers...)
 	if err != nil {
-		return nil, fmt.Errorf("request %v yuanjing embeddings err: %v", url, err)
-	} else if resp.StatusCode() >= 300 {
-		return nil, fmt.Errorf("request %v yuanjing embeddings http status %v msg: %v", url, resp.StatusCode(), resp.String())
-	}
-	b, err := io.ReadAll(resp.RawResponse.Body)
-	if err != nil {
-		return nil, fmt.Errorf("request %v yuanjing embeddings read response body err: %v", url, err)
+		return nil, err
 	}
 	return mp_common.NewEmbeddingResp(string(b)), nil
 }

@@ -14,9 +14,11 @@ type Assistant struct {
 	KnowledgeBaseConfig    request.AppKnowledgebaseConfig `json:"knowledgeBaseConfig"` // 知识库
 	RerankConfig           request.AppModelConfig         `json:"rerankConfig"`        // Rerank模型
 	OnlineSearchConfig     request.OnlineSearchConfig     `json:"onlineSearchConfig"`  // 在线搜索配置
+	SafetyConfig           request.AppSafetyConfig        `json:"safetyConfig"`        // 敏感词表配置
 	Scope                  int32                          `json:"scope"`               // 作用域
 	ActionInfos            []*ActionInfos                 `json:"actionInfos"`         // action信息
 	WorkFlowInfos          []*WorkFlowInfos               `json:"workFlowInfos"`       // 工作流信息
+	MCPInfos               []*MCPInfos                    `json:"mcpInfos"`            // MCP信息
 	CreatedAt              string                         `json:"createdAt"`           // 创建时间
 	UpdatedAt              string                         `json:"updatedAt"`           // 更新时间
 }
@@ -35,6 +37,18 @@ type WorkFlowInfos struct {
 	WorkFlowName string `json:"workFlowName"`
 	WorkFlowDesc string `json:"workFlowDesc"`
 	Valid        bool   `json:"valid"`
+}
+
+type MCPInfos struct {
+	Id            string `json:"id"`
+	MCPId         string `json:"mcpId"`
+	MCPSquareId   string `json:"mcpSquareId"`
+	Enable        bool   `json:"enable"`
+	MCPName       string `json:"mcpName"`
+	MCPDesc       string `json:"mcpDesc"`
+	MCPServerFrom string `json:"mcpServerFrom"`
+	MCPServerUrl  string `json:"mcpServerUrl"`
+	Valid         bool   `json:"valid"`
 }
 
 type Action struct {

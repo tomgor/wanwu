@@ -95,6 +95,55 @@ export const pythonNode_initData = {
 
 }
 
+export const templateTransformNode_initData = {
+    "id": "templatetransformnode",
+    "name": '模板转换',
+    "type": "TemplateTransformNode",
+    "shape": "dag-node",
+    "x": 40,
+    "y": 40,
+    "icon": require('../components/img/transform.png'),
+    ports:[{
+        id: 'templatetransformnode-left',
+        group: 'left',
+    },
+    {
+        id: 'templatetransformnode-right',
+        group: 'right',
+    }],
+    "data":{
+        "id": "templatetransformnode",
+        "name": '模板转换',
+        "type": "TemplateTransformNode",
+        "shape": "dag-node",
+        "x": 40,
+        "y": 40,
+        "icon": require('../components/img/transform.png'),
+        "data": {
+            "inputs": [
+
+            ],
+            "outputs": [
+                {
+                    "name": "output",
+                    "desc": "转换后内容",
+                    "type": "string",
+                    "list_schema": null,
+                    "object_schema": null,
+                    "value": {
+                        "content": "",
+                        "type": "generated"
+                    }
+                }
+            ],
+            "settings": {
+                "code": "",
+                "language": ""
+            }
+        }
+    }
+}
+
 export const LLMNode_initData =  {
     "id": "llmnode",
     "type": "LLMNode",
@@ -277,7 +326,6 @@ export const SwitchNode_initData = {
         }
     }
 }
-
 
 export const ragNode_initData = {
     "id": "ragnode",
@@ -921,13 +969,13 @@ export const intention_initData = {
     }
 }
 
-
 export const nodeDescConfig = {
     'StartNode':'工作流运行的起点。定义此工作流所需的输入参数。自定义的参数，会在工作流被应用调用时，由思考模型根据参数描述从用户输入的原始内容中抽取并传入。',
     'EndNode':'工作流的最终节点，输出工作流运行后的最终结果。',
     'EndStreamingNode': '工作流的最终节点，输出工作流运行后的最终结果。',
-    'APINode':'配置外部 API 服务，并调用该服务。',
+    'ApiNode':'配置外部 API 服务，并调用该服务。',
     'PythonNode':'编写代码，处理输入输出变量来生成返回值。',
+    'TemplateTransformNode': '使用 Jinja2 模版语法将数据转换为字符串',
     'LLMNode':'调用大语言模型，根据输入参数和提示词生成回复。',
     'SwitchNode':'连接多个下游分支节点，若设定条件成立则运行对应的条件分支，若均不成立则运行“否则”分支。',
     'RAGNode':'根据输入的参数，在选定的知识库中检索相关片段并召回，返回切片列表。',

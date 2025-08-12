@@ -3,6 +3,7 @@
     <div class="page-title">
       <span class="el-icon-arrow-left back" @click="goBack"></span>
       新增文件
+      <LinkIcon type="knowledge" />
     </div>
     <div class="table-box">
       <div class="fileUpload">
@@ -148,8 +149,25 @@
             >
             <el-checkbox-group v-model="ruleForm.docAnalyzer">
                 <el-checkbox label="text" disabled>文本提取</el-checkbox>
-                <!-- <el-checkbox label="ocr">启用ocr解析</el-checkbox> -->
+                <el-checkbox label="ocr">启用ocr解析</el-checkbox>
             </el-checkbox-group>
+            </el-form-item>
+            <el-form-item
+              label="OCR模型："
+              prop="ocrModelId"
+              v-if="ruleForm.docAnalyzer.includes('ocr')"
+              :rules="[
+                  { required: true, message:'请选择ocr模型',trigger:'blur'}
+              ]"
+            >
+            <el-select v-model="ruleForm.ocrModelId" placeholder="请选择" >
+               <el-option
+                v-for="item in ocrOptions"
+                :key="item.modelId"
+                :label="item.displayName"
+                :value="item.modelId">
+              </el-option>
+            </el-select>
             </el-form-item>
           </el-form>
         </div>
@@ -206,14 +224,16 @@
 <script>
 import urlAnalysis from './urlAnalysis.vue';
 import uploadChunk from "@/mixins/uploadChunk";
-import {docImport} from '@/api/knowledge'
+import {docImport,ocrSelectList} from '@/api/knowledge'
 import { delfile } from "@/api/chunkFile";
 import { FlagManager } from '@antv/x6/lib/view/flag';
+import LinkIcon from "@/components/linkIcon.vue";
 export default {
-  components:{urlAnalysis},
+  components:{LinkIcon, urlAnalysis},
   mixins: [uploadChunk],
   data() {
     return {
+      ocrOptions:[],
       urlValidate: false,
       active: 1,
       fileType:'file',
@@ -223,7 +243,7 @@ export default {
       fileUrl:'',
       docInfoList:[],
       ruleForm:{
-        docAnalyzer:['text'],
+        docAnalyzer:['text','ocr'],
         docSegment:{
           segmentType:'0',
           splitter:["！","。","？","?","!",".","......"],
@@ -232,7 +252,8 @@ export default {
         },
         docInfoList:[],
         docImportType:0,
-        knowledgeId:this.$route.query.id
+        knowledgeId:this.$route.query.id,
+        ocrModelId:''
       },
       splitOptions: [
         {
@@ -267,9 +288,19 @@ export default {
       urlLoading:false
     };
   },
+  created(){
+    this.getOcrList()
+  },
   methods:{
   goBack(){
     this.$router.go(-1);
+  },
+  getOcrList(){
+    ocrSelectList().then(res =>{
+      if(res.code === 0){
+        this.ocrOptions = res.data.list || [];
+      }
+    })
   },
   handleSetData(data){
     this.docInfoList = [];

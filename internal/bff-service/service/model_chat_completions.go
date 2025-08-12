@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -14,7 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ModelChatCompletions(ctx *gin.Context, modelID string, req map[string]interface{}) {
+func ModelChatCompletions(ctx *gin.Context, modelID string, req *mp_common.LLMReq) {
 	// modelInfo by modelID
 	modelInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: modelID})
 	if err != nil {
@@ -23,11 +24,9 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req map[string]inter
 	}
 	// 校验model字段
 	if req != nil {
-		if _, exists := req["model"]; exists {
-			if req["model"] != modelInfo.Model {
-				gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v chat completions err: model mismatch!", modelInfo.ModelId)))
-				return
-			}
+		if req.Model != modelInfo.Model {
+			gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v chat completions err: model mismatch!", modelInfo.ModelId)))
+			return
 		}
 	}
 
@@ -43,7 +42,11 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req map[string]inter
 		return
 	}
 	// chat completions
-	llmReq := mp_common.NewLLMReq(req)
+	llmReq, err := iLLM.NewReq(req)
+	if err != nil {
+		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v chat completions NewReq err: %v", modelInfo.ModelId, err)))
+		return
+	}
 	resp, sseCh, err := iLLM.ChatCompletions(ctx.Request.Context(), llmReq)
 	if err != nil {
 		gin_util.Response(ctx, nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v chat completions err: %v", modelInfo.ModelId, err)))
@@ -51,7 +54,7 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req map[string]inter
 	}
 	// unary
 	if !llmReq.Stream() {
-		if data, ok := resp.Data(); ok {
+		if data, ok := resp.ConvertResp(); ok {
 			status := http.StatusOK
 			ctx.Set(gin_util.STATUS, status)
 			ctx.Set(gin_util.RESULT, resp.String())
@@ -66,13 +69,21 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req map[string]inter
 	ctx.Header("Cache-Control", "no-cache")
 	ctx.Header("Connection", "keep-alive")
 	ctx.Header("Content-Type", "text/event-stream; charset=utf-8")
+	var data *mp_common.LLMResp
 	for sseResp := range sseCh {
-		if data, ok := sseResp.OpenAIResp(); ok {
+		data, ok = sseResp.ConvertResp()
+		dataStr := ""
+		if ok && data != nil {
 			if len(data.Choices) > 0 && data.Choices[0].Delta != nil {
 				answer = answer + data.Choices[0].Delta.Content
 			}
+			dataByte, _ := json.Marshal(data)
+			dataStr = fmt.Sprintf("data: %v\n", string(dataByte))
+		} else {
+			dataStr = fmt.Sprintf("%v\n", sseResp.String())
 		}
-		if _, err = ctx.Writer.Write([]byte(fmt.Sprintf("%v\n", sseResp.String()))); err != nil {
+
+		if _, err = ctx.Writer.Write([]byte(dataStr)); err != nil {
 			log.Errorf("model %v chat completions sse err: %v", modelInfo.ModelId, err)
 		}
 		ctx.Writer.Flush()

@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -36,7 +37,7 @@ func UpdateModel(ctx *gin.Context, userId, orgId string, req *request.ImportOrUp
 		return err
 	}
 	if err = ValidateModel(ctx, clientReq); err != nil {
-		return grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("An error occurred during model import validation: Invalid model: %v, err : %v", clientReq.Model, err))
+		return grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("An error occurred during model update validation: Invalid model: %v, err : %v", clientReq.Model, err))
 	}
 	_, err = model.UpdateModel(ctx, clientReq)
 	if err != nil {

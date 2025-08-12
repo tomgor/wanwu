@@ -23,8 +23,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const docCenterLocalDir = "static/docs"
-
 var (
 	avatarCacheMu       sync.Mutex
 	avatarCacheLocalDir = "cache"
@@ -47,8 +45,9 @@ func GetUserPermission(ctx *gin.Context, userID, orgID string) (*response.UserPe
 		return nil, err
 	}
 	return &response.UserPermission{
-		OrgPermission: toOrgPermission(ctx, resp),
-		Language:      getLanguageByCode(user.Language),
+		OrgPermission:    toOrgPermission(ctx, resp),
+		Language:         getLanguageByCode(user.Language),
+		IsUpdatePassword: resp.LastUpdatePasswordAt != 0,
 	}, nil
 }
 
@@ -146,10 +145,4 @@ func CacheAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
 	}
 	avatar.Path = filepath.Join("/v1", filePath)
 	return avatar
-}
-
-func GetDocCenter() *response.DocCenter {
-	return &response.DocCenter{
-		DocCenterPath: path.Join("/v1", docCenterLocalDir, path.Base(config.Cfg().DocCenter.DocPath)),
-	}
 }

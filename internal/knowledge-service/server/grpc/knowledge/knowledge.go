@@ -61,6 +61,15 @@ func (s *Service) SelectKnowledgeDetailByName(ctx context.Context, req *knowledg
 	return buildKnowledgeInfo(knowledgeInfo), nil
 }
 
+func (s *Service) SelectKnowledgeDetailByIdList(ctx context.Context, req *knowledgebase_service.KnowledgeDetailSelectListReq) (*knowledgebase_service.KnowledgeDetailSelectListResp, error) {
+	knowledgeInfoList, err := orm.SelectKnowledgeByIdList(ctx, req.KnowledgeIds, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf(fmt.Sprintf("根据id列表获取知识库详情列表失败(%v)  参数(%v)", err, req))
+		return nil, err
+	}
+	return buildKnowledgeInfoList(knowledgeInfoList), nil
+}
+
 func (s *Service) CreateKnowledge(ctx context.Context, req *knowledgebase_service.CreateKnowledgeReq) (*knowledgebase_service.CreateKnowledgeResp, error) {
 	//1.重名校验
 	err := orm.CheckSameKnowledgeName(ctx, req.UserId, req.OrgId, req.Name)
@@ -133,13 +142,18 @@ func (s *Service) KnowledgeHit(ctx context.Context, req *knowledgebase_service.K
 	if err != nil {
 		return nil, err
 	}
+	matchParams := req.KnowledgeMatchParams
+	priorityMatch := matchParams.PriorityMatch
 	hitResp, err := rag_service.RagKnowledgeHit(ctx, &rag_service.KnowledgeHitParams{
-		UserId:        req.UserId,
-		Question:      req.Question,
-		KnowledgeBase: buildKnowledgeNameList(list),
-		TopK:          HitTopK,
-		Threshold:     HitThreshold,
-		RerankModelId: req.RerankModelId,
+		UserId:         req.UserId,
+		Question:       req.Question,
+		KnowledgeBase:  buildKnowledgeNameList(list),
+		TopK:           matchParams.TopK,
+		Threshold:      float64(matchParams.Score),
+		RerankModelId:  buildRerankId(priorityMatch, matchParams.RerankModelId),
+		RetrieveMethod: buildRetrieveMethod(matchParams.MatchType),
+		RerankMod:      buildRerankMod(priorityMatch),
+		Weight:         buildWeight(priorityMatch, matchParams.SemanticsPriority, matchParams.KeywordPriority),
 	})
 	if err != nil {
 		log.Errorf("RagKnowledgeHit error %s", err)
@@ -218,6 +232,19 @@ func buildKnowledgeInfo(knowledge *model.KnowledgeBase) *knowledgebase_service.K
 	}
 }
 
+// buildKnowledgeInfoList 构造知识库信息列表
+func buildKnowledgeInfoList(knowledgeList []*model.KnowledgeBase) *knowledgebase_service.KnowledgeDetailSelectListResp {
+	var retList []*knowledgebase_service.KnowledgeInfo
+	for _, v := range knowledgeList {
+		info := buildKnowledgeInfo(v)
+		retList = append(retList, info)
+	}
+	return &knowledgebase_service.KnowledgeDetailSelectListResp{
+		List:  retList,
+		Total: int32(len(retList)),
+	}
+}
+
 // buildKnowledgeBaseModel 构造知识库模型
 func buildKnowledgeBaseModel(req *knowledgebase_service.CreateKnowledgeReq) (*model.KnowledgeBase, error) {
 	embeddingModelInfo, err := json.Marshal(req.EmbeddingModelInfo)
@@ -266,5 +293,45 @@ func buildKnowledgeBaseHitResp(ragKnowledgeHitResp *rag_service.RagKnowledgeHitR
 		Prompt:     knowledgeHitData.Prompt,
 		Score:      knowledgeHitData.Score,
 		SearchList: searchList,
+	}
+}
+
+// buildRerankId 构造重排序模型id
+func buildRerankId(priorityType int32, rerankId string) string {
+	if priorityType == 1 {
+		return ""
+	}
+	return rerankId
+}
+
+// buildRetrieveMethod 构造检索方式
+func buildRetrieveMethod(matchType string) string {
+	switch matchType {
+	case "vector":
+		return "semantic_search"
+	case "text":
+		return "full_text_search"
+	case "mix":
+		return "hybrid_search"
+	}
+	return ""
+}
+
+// buildRerankMod 构造重排序模式
+func buildRerankMod(priorityType int32) string {
+	if priorityType == 1 {
+		return "weighted_score"
+	}
+	return "rerank_model"
+}
+
+// buildWeight 构造权重信息
+func buildWeight(priorityType int32, semanticsPriority float32, keywordPriority float32) *rag_service.WeightParams {
+	if priorityType != 1 {
+		return nil
+	}
+	return &rag_service.WeightParams{
+		VectorWeight: semanticsPriority,
+		TextWeight:   keywordPriority,
 	}
 }

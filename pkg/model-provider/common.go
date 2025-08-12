@@ -5,12 +5,16 @@ const (
 	ModelTypeLLM       = "llm"
 	ModelTypeEmbedding = "embedding"
 	ModelTypeRerank    = "rerank"
+	ModelTypeOcr       = "ocr"
 )
 
 // model provider
 const (
 	ProviderOpenAICompatible = "OpenAI-API-compatible"
 	ProviderYuanJing         = "YuanJing"
+	ProviderHuoshan          = "Huoshan"
+	ProviderOllama           = "Ollama"
+	ProviderQwen             = "Qwen"
 )
 
 var (

@@ -220,14 +220,42 @@ export default {
                 signal: this.ctrlAbort.signal,
                 body: JSON.stringify(this.sseParams),
                 openWhenHidden: true, //页面退至后台保持连接
-                onopen: (e) => {
+                onopen: async(e) => {
                     console.log("已建立SSE连接~",new Date().getTime());
+                    if (e.status !== 200) {
+                        try {
+                            const errorData = await e.json();
+                            let commonData = {
+                                ...this.sseParams,
+                                "query": prompt,
+                            }
+                            let fillData = {
+                                ...commonData,
+                                "response": errorData.msg                                
+                            }
+                            this.$refs['session-com'].replaceLastData(lastIndex, fillData)
+                        } catch (e) {
+                            const text = await e.text();
+                            this.$message.error(text || '未知错误');
+                        }
+
+                        this.stopEventSource();
+                        this.setStoreSessionStatus(-1);
+                        return;
+                    }
                 },
                 onmessage: (e) => {
                     if (e && e.data) {
-                        let data = JSON.parse(e.data)
-                        console.log('===>',new Date().getTime(),'12345', JSON.parse(e.data))
-                        this.sseResponse = data
+                        let data;
+                        try {
+                            data = JSON.parse(e.data);
+                            console.log('===>',new Date().getTime(),'12345', data);
+                        } catch (error) {
+                            return; // 如果解析失败，直接返回，不处理这条消息
+                        }
+                        
+                        this.sseResponse = data;
+                        
                         //待替换的数据，需要前端组装
                         let commonData = {
                             ...data,
@@ -238,11 +266,12 @@ export default {
                             "response": '',
                             "filepath": '',
                             "requestFileUrls":'',
-                            "searchList": data.data.searchList || [],
+                            "searchList": data.data && data.data.searchList ? data.data.searchList: [],
                             "gen_file_url_list": [],
                             "thinkText":'思考中',
                             "isOpen":true
                         }
+
                         if(data.code === 0 || data.code === 1){
                             //finish 0：进行中  1：关闭   2:敏感词关闭
                             let _sentence = data.data.output;
@@ -278,7 +307,7 @@ export default {
                             this.setStoreSessionStatus(-1)
                             let fillData = {
                                 ...commonData,
-                                "response": data.message                                
+                                "response": data.message                              
                             }
                             this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                         }
@@ -356,8 +385,29 @@ export default {
                 signal: this.ctrlAbort.signal,
                 body: JSON.stringify(data),
                 openWhenHidden: true, //页面退至后台保持连接
-                onopen: (e) => {
+                onopen: async(e) => {
                     console.log("已建立SSE连接~",new Date().getTime());
+                    if (e.status !== 200) {
+                        try {
+                            const errorData = await e.json();
+                            let commonData = {
+                                ...this.sseParams,
+                                "query": prompt,
+                            }
+                            let fillData = {
+                                ...commonData,
+                                "response": errorData.msg                                
+                            }
+                            this.$refs['session-com'].replaceLastData(lastIndex, fillData)
+                        } catch (e) {
+                            const text = await e.text();
+                            this.$message.error(text || '未知错误');
+                        }
+
+                        this.stopEventSource();
+                        this.setStoreSessionStatus(-1);
+                        return;
+                    }
                 },
                 onmessage: (e) => {
                     if (e && e.data) {

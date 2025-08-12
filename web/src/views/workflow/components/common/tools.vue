@@ -1,6 +1,6 @@
 <template>
   <div class="my_tools">
-    <i class="el-icon-delete" @click="handleClick"></i>
+    <i class="el-icon-delete"></i><!--@click="handleClick"-->
   </div>
 </template>
 <script>

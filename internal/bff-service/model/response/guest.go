@@ -1,15 +1,18 @@
 package response
 
+import "github.com/UnicomAI/wanwu/internal/bff-service/model/request"
+
 type Login struct {
-	UID           string            `json:"uid"`
-	Username      string            `json:"username"`
-	Token         string            `json:"token"`
-	ExpiresAt     int64             `json:"expiresAt"`
-	ExpireIn      string            `json:"expireIn"`
-	Nickname      string            `json:"nickname"`
-	OrgPermission UserOrgPermission `json:"orgPermission"` // 用户所在组织权限
-	Orgs          []IDName          `json:"orgs"`          // 用户所在组织列表
-	Language      Language          `json:"language"`      // 语言
+	UID              string            `json:"uid"`
+	Username         string            `json:"username"`
+	Token            string            `json:"token"`
+	ExpiresAt        int64             `json:"expiresAt"`
+	ExpireIn         string            `json:"expireIn"`
+	Nickname         string            `json:"nickname"`
+	OrgPermission    UserOrgPermission `json:"orgPermission"`    // 用户所在组织权限
+	Orgs             []IDName          `json:"orgs"`             // 用户所在组织列表
+	Language         Language          `json:"language"`         // 语言
+	IsUpdatePassword bool              `json:"isUpdatePassword"` // 是否已更新密码
 }
 
 type Captcha struct {
@@ -18,27 +21,29 @@ type Captcha struct {
 }
 
 type LogoCustomInfo struct {
-	Login CustomLogin `json:"login"` // 登录页标题信息
-	Home  CustomHome  `json:"home"`  // 首页标题信息
-	Tab   CustomTab   `json:"tab"`   // 标签页信息
-	About CustomAbout `json:"about"` // 关于信息
+	Login    CustomLogin       `json:"login"`    // 登录页标题信息
+	Home     CustomHome        `json:"home"`     // 首页标题信息
+	Tab      CustomTab         `json:"tab"`      // 标签页信息
+	About    CustomAbout       `json:"about"`    // 关于信息
+	LinkList map[string]string `json:"linkList"` // 跳转链接列表,key为链接名称,value为URL
 }
 
 type CustomLogin struct {
-	BackgroundPath   string `json:"backgroundPath"`   // 登录页背景图路径
-	LoginButtonColor string `json:"loginButtonColor"` // 登录按钮颜色
-	WelcomeText      string `json:"welcomeText"`      // 登录页欢迎标词
-	PlatformDesc     string `json:"platformDesc"`     // 平台描述词
+	Background       request.Avatar `json:"background"`       // 登录页背景图
+	LoginButtonColor string         `json:"loginButtonColor"` // 登录按钮颜色
+	WelcomeText      string         `json:"welcomeText"`      // 登录页欢迎标词
+	PlatformDesc     string         `json:"platformDesc"`     // 平台描述词
 }
 
 type CustomHome struct {
-	LogoPath string `json:"logoPath"` // 首页logo路径，例如/v1/static/logo/title_logo.png
-	Title    string `json:"title"`    // 首页标题
+	Logo            request.Avatar `json:"logo"`            // 首页logo
+	Title           string         `json:"title"`           // 平台名称
+	BackgroundColor string         `json:"backgroundColor"` // 平台背景色
 }
 
 type CustomTab struct {
-	LogoPath string `json:"logoPath"` // 标签页图标路径
-	Title    string `json:"title"`    // 标签页标题
+	Logo  request.Avatar `json:"logo"`  // 标签页图标
+	Title string         `json:"title"` // 标签页标题
 }
 
 type CustomAbout struct {

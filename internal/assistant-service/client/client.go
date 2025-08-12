@@ -15,7 +15,7 @@ type IClient interface {
 	GetAssistant(ctx context.Context, assistantID uint32) (*model.Assistant, *err_code.Status)
 	GetAssistantsByIDs(ctx context.Context, assistantIDs []uint32) ([]*model.Assistant, *err_code.Status)
 	GetAssistantList(ctx context.Context, userID, orgID string, name string) ([]*model.Assistant, int64, *err_code.Status)
-	CheckSameAssistantName(ctx context.Context, userID, orgID, name string) *err_code.Status
+	CheckSameAssistantName(ctx context.Context, userID, orgID, name, assistantID string) *err_code.Status
 
 	//================AssistantAction================
 	CreateAssistantAction(ctx context.Context, action *model.AssistantAction) *err_code.Status
@@ -30,6 +30,13 @@ type IClient interface {
 	UpdateAssistantWorkflow(ctx context.Context, workflow *model.AssistantWorkflow) *err_code.Status
 	GetAssistantWorkflow(ctx context.Context, workflowID uint32) (*model.AssistantWorkflow, *err_code.Status)
 	GetAssistantWorkflowsByAssistantID(ctx context.Context, assistantID string) ([]*model.AssistantWorkflow, *err_code.Status)
+
+	//================AssistantMCP================
+	CreateAssistantMCP(ctx context.Context, mcp *model.AssistantMCP) *err_code.Status
+	DeleteAssistantMCP(ctx context.Context, id uint32) *err_code.Status
+	GetAssistantMCP(ctx context.Context, query map[string]interface{}) (*model.AssistantMCP, *err_code.Status)
+	GetAssistantMCPList(ctx context.Context, query map[string]interface{}) ([]*model.AssistantMCP, *err_code.Status)
+	UpdateAssistantMCP(ctx context.Context, mcp *model.AssistantMCP) *err_code.Status
 
 	//================Conversation================
 	CreateConversation(ctx context.Context, conversation *model.Conversation) *err_code.Status

@@ -2,7 +2,6 @@
 export default {
     login: {
         title: '登 录',
-        welcomeText: '嗨！欢迎来到元景万悟智能体平台',
         form: {
             username: '用户名',
             password: '密码',
@@ -17,7 +16,6 @@ export default {
     },
     about: {
         version: '版本',
-        company: '◎ 联通数据智能有限公司'
     },
     menu: {
         explore: '应用广场',
@@ -36,16 +34,18 @@ export default {
         userInfo: '个人信息',
         org: '组织管理',
         modelAccess: '模型管理',
-        about: '关于'
+        about: '关于',
+        helpDoc: '帮助文档'
     },
     header: {
-        title: '元景万悟',
+        title: '智能体平台',
         doc: '文档中心',
         logout: '登出',
         login: '登录',
         org: {
             placeholder: '选择组织'
         },
+        noData: '暂无匹配内容'
     },
     common: {
         datePicker: {
@@ -108,7 +108,8 @@ export default {
             modelNameLimit: '2-50个字符',
             modelId: '支持英文、数字、下划线(_)、中划线(-)、(.)，2-50个字符，不能以下划线为开头',
             version: '支持英文、数字、(.)',
-            inferUrl: '请输入',
+            inferUrl: 'Base Url，例如：',
+            apiKey: '输入APIKey, 例如：'
         },
         select: {
             placeholder: '请选择'
@@ -290,6 +291,39 @@ export default {
             startHint: '该组织状态已停用，是否确定开启？',
             stopHint: '该组织状态开启中，是否确定停用？'
         },
+    },
+    infoSetting: {
+        title: '平台配置',
+        form: {
+            labelTitle: '标签页标题',
+            platformTitle: '平台标题',
+            logo: '平台LOGO',
+            loginBg: '登录页背景图',
+            uploadHint: '请上传',
+            upload: '点击上传',
+            save: '保存配置',
+            labelIcon: '标签页图标',
+            bgColor: '平台背景色',
+            loginButtonColor: '"登录"按钮颜色',
+            logoWelcome: '登录页欢迎语',
+        },
+        tabSet: '标签页配置',
+        platformSet: '平台配置',
+        loginBgSet: '登录页配置',
+        hint: {
+            labelTitle: '显示在浏览器标签页上的标题',
+            color: '颜色',
+            platformTitle: '显示“帮助文档”页面上方',
+            imgUpload: '点击图标上传，可上传 .png、.jpg、.jpeg文件',
+            labelIcon: '显示在浏览器标签页上的图标',
+            logo: '显示在平台左上方的LOGO',
+            oneColor: '单色',
+            linearColor: '渐变',
+            bgColor: '显示在平台主界面的填充色',
+            loginBg: '显示在登录页面的背景图',
+            loginButtonColor: '显示在登录框中登录按钮的颜色',
+            logoWelcome: '显示在登录页的欢迎语',
+        }
     },
     modelAccess: {
         title: '模型管理',

@@ -1,13 +1,18 @@
 <template>
   <div class="createDialog">
     <el-dialog
-      :title="$t('modelAccess.dialog.title')"
       :visible.sync="dialogVisible"
       width="700px"
       append-to-body
       :close-on-click-modal="false"
       :before-close="handleClose"
     >
+      <template slot="title">
+        <div class="dialog-title-wrapper">
+          <span class="dialog-title">{{$t('modelAccess.dialog.title')}}</span>
+          <LinkIcon type="model" />
+        </div>
+      </template>
       <div>
         <div
           :class="['provider-card-item', {'is-active': item.key === currentObj.key}]"
@@ -15,7 +20,7 @@
           :key="item.key"
           @click="showCreate(item)"
         >
-          <img class="provider-card-img" :src="item.key === yuanjing ? require('@/assets/imgs/yuanjing.png') : require('@/assets/imgs/openAI.png')" alt="" />
+          <img class="provider-card-img" :src="providerImgObj[item.key]" alt="" />
           <div>
             <div class="provider-card-name">{{item.name}}</div>
             <div>
@@ -32,12 +37,15 @@
   </div>
 </template>
 <script>
-import { PROVIDER_TYPE, YUAN_JING } from "../constants"
+import { PROVIDER_TYPE, YUAN_JING, PROVIDER_IMG_OBJ } from "../constants"
+import LinkIcon from "@/components/linkIcon.vue"
 
 export default {
+  components: { LinkIcon },
   data() {
     return {
       dialogVisible: false,
+      providerImgObj: PROVIDER_IMG_OBJ,
       providerType: PROVIDER_TYPE,
       currentObj: PROVIDER_TYPE[0],
       yuanjing: YUAN_JING
@@ -104,6 +112,15 @@ export default {
   border: 1px solid $color;
   .provider-card-name {
     color: $color;
+  }
+}
+.dialog-title-wrapper {
+  display: flex;
+  align-items: center;
+  .dialog-title {
+    color: $color_title;
+    font-size: 18px;
+    font-weight: bold;
   }
 }
 </style>

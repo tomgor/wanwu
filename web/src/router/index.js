@@ -37,6 +37,11 @@ const constantRoutes = [
                 meta:{perm: [PERMS.PERMISSION]},
             },
             {
+                path: '/docCenter/pages/:id(.*)*',
+                component:resolve => require(['@/views/docCenter'], resolve),
+                // meta:{perm: [PERMS.DOC_CENTER]}
+            },
+            {
                 path: '/modelAccess',
                 component:resolve =>require(['@/views/modelAccess'],resolve),
                 meta:{perm: [PERMS.MODEL]},
@@ -126,6 +131,16 @@ const constantRoutes = [
                 path: '/knowledge/hitTest',
                 component:resolve =>require(['@/views/knowledge/component/hitTest'],resolve),
                 meta:{perm: [PERMS.KNOWLEDGE]},
+            },
+            {
+                path:'/safety',
+                component:resolve =>require(['@/views/safety'],resolve),
+                meta:{perm: [PERMS.SAFRTY]},
+            },
+            {
+                path:'/safety/wordList/:id',
+                component:resolve =>require(['@/views/safety/component/wordList'],resolve),
+                meta:{perm: [PERMS.SAFRTY]},
             },
             {
                 path: '/userCenter/*',

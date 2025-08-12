@@ -5,7 +5,7 @@
       <div class="header__left">
         <!--<img
           style="height: 26px; margin: 0 15px 0 22px"
-          :src="home.logoPath ? (basePath + '/user/api' + home.logoPath) : require('@/assets/imgs/wanwu.svg')"
+          :src="home.logo.path ? (basePath + '/user/api' + home.logo.path) : require('@/assets/imgs/wanwu.svg')"
         />
          <span style="font-size: 16px;">{{home.title || ''}}</span>-->
         <!--<div style="margin-left: 10px">
@@ -16,7 +16,7 @@
         <p class="login-header">
           <span style="font-weight: bold">{{$t('login.title')}}</span>
           <span style="margin-left: 20px; font-size: 16px; padding-bottom: 2px">
-            {{login.welcomeText || $t('login.welcomeText')}}
+            {{login.welcomeText}}
           </span>
         </p>
         <div class="login-form">
@@ -136,7 +136,7 @@ export default {
         this.home = home || {}
         this.loginButtonColor = this.login.loginButtonColor || '#384BF7'
         replaceTitle(tab.title)
-        replaceIcon(tab.logoPath)
+        replaceIcon(tab.logo ? tab.logo.path : '')
       })
     },
     // 获取图片验证码

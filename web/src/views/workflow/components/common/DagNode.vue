@@ -75,6 +75,7 @@
         [
           'ApiNode',
           'PythonNode',
+          'TemplateTransformNode',
           'LLMNode',
           'LLMStreamingNode',
           'RAGNode',
@@ -362,6 +363,7 @@
         [
           'ApiNode',
           'PythonNode',
+          'TemplateTransformNode',
           'LLMNode',
           'LLMStreamingNode',
           'RAGNode',

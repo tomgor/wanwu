@@ -1,5 +1,19 @@
 basePath: /callback/v1
 definitions:
+  mp.ProviderModelByHuoshan:
+    properties:
+      embedding:
+        $ref: '#/definitions/mp_huoshan.Embedding'
+      llm:
+        $ref: '#/definitions/mp_huoshan.LLM'
+    type: object
+  mp.ProviderModelByOllama:
+    properties:
+      embedding:
+        $ref: '#/definitions/mp_ollama.Embedding'
+      llm:
+        $ref: '#/definitions/mp_ollama.LLM'
+    type: object
   mp.ProviderModelByOpenAICompatible:
     properties:
       embedding:
@@ -8,6 +22,15 @@ definitions:
         $ref: '#/definitions/mp_openai_compatible.LLM'
       rerank:
         $ref: '#/definitions/mp_openai_compatible.Rerank'
+    type: object
+  mp.ProviderModelByQwen:
+    properties:
+      embedding:
+        $ref: '#/definitions/mp_qwen.Embedding'
+      llm:
+        $ref: '#/definitions/mp_qwen.LLM'
+      rerank:
+        $ref: '#/definitions/mp_qwen.Rerank'
     type: object
   mp.ProviderModelByYuanjing:
     properties:
@@ -20,8 +43,14 @@ definitions:
     type: object
   mp.ProviderModelConfig:
     properties:
+      providerHuoshan:
+        $ref: '#/definitions/mp.ProviderModelByHuoshan'
+      providerOllama:
+        $ref: '#/definitions/mp.ProviderModelByOllama'
       providerOpenAICompatible:
         $ref: '#/definitions/mp.ProviderModelByOpenAICompatible'
+      providerQwen:
+        $ref: '#/definitions/mp.ProviderModelByQwen'
       providerYuanJing:
         $ref: '#/definitions/mp.ProviderModelByYuanjing'
     type: object
@@ -57,16 +86,287 @@ definitions:
     type: object
   mp_common.EmbeddingResp:
     properties:
+      created:
+        type: integer
       data:
         items:
           $ref: '#/definitions/mp_common.EmbeddingData'
         type: array
+      id:
+        type: string
       model:
         type: string
       object:
         type: string
       usage:
         $ref: '#/definitions/mp_common.Usage'
+    type: object
+  mp_common.FunctionCall:
+    properties:
+      arguments:
+        type: string
+      name:
+        type: string
+    type: object
+  mp_common.LLMReq:
+    properties:
+      do_sample:
+        description: Yuanjing
+        type: boolean
+      enable_thinking:
+        type: boolean
+      frequency_penalty:
+        description: 频率惩罚系数
+        type: number
+      logit_bias:
+        additionalProperties:
+          type: integer
+        description: 调整指定 token 在模型输出内容中出现的概率
+        type: object
+      logprobs:
+        description: 是否返回输出 Token 的对数概率
+        type: boolean
+      max_completion_tokens:
+        description: 控制模型输出的最大长度[0,64k]
+        type: integer
+      max_tokens:
+        type: integer
+      messages:
+        items:
+          $ref: '#/definitions/mp_common.OpenAIMsg'
+        type: array
+      min_p:
+        type: number
+      model:
+        description: general
+        type: string
+      "n":
+        type: integer
+      parallel_tool_calls:
+        description: 是否开启并行工具调用
+        type: boolean
+      presence_penalty:
+        description: 控制模型生成文本时的内容重复度
+        type: number
+      repetition_penalty:
+        type: number
+      response_format:
+        $ref: '#/definitions/mp_common.OpenAIResponseFormat'
+      seed:
+        type: integer
+      stop:
+        type: string
+      stream:
+        type: boolean
+      stream_options:
+        allOf:
+        - $ref: '#/definitions/mp_common.StreamOptions'
+        description: '当启用流式输出时，可通过将本参数设置为{"include_usage": true}，在输出的最后一行显示所使用的Token数。'
+      temperature:
+        type: number
+      thinking:
+        allOf:
+        - $ref: '#/definitions/mp_common.Thinking'
+        description: custom
+      thinking_budget:
+        description: 思考过程的最大长度，只在enable_thinking为true时生效
+        type: integer
+      tool_choice:
+        description: 强制指定工具调用的策略
+      tools:
+        items:
+          $ref: '#/definitions/mp_common.OpenAITool'
+        type: array
+      top_k:
+        type: integer
+      top_logprobs:
+        description: 指定在每一步生成时，返回模型最大概率的候选 Token 个数
+        type: integer
+      top_p:
+        type: number
+      user:
+        type: string
+      web_search:
+        allOf:
+        - $ref: '#/definitions/mp_common.WebSearch'
+        description: 搜索增强
+    required:
+    - messages
+    - model
+    type: object
+  mp_common.LLMResp:
+    properties:
+      choices:
+        description: 生成结果列表
+        items:
+          $ref: '#/definitions/mp_common.OpenAIRespChoice'
+        type: array
+      created:
+        description: 时间戳（秒）
+        type: integer
+      id:
+        description: 唯一标识
+        type: string
+      model:
+        description: 使用的模型
+        type: string
+      object:
+        description: 固定为 "chat.completion"
+        type: string
+      service_tier:
+        description: （火山）指定是否使用TPM保障包。生效对象为购买了保障包推理接入点
+        type: string
+      system_fingerprint:
+        type: string
+      usage:
+        allOf:
+        - $ref: '#/definitions/mp_common.OpenAIRespUsage'
+        description: token 使用统计
+    type: object
+  mp_common.MsgRole:
+    enum:
+    - system
+    - user
+    - assistant
+    - tool
+    type: string
+    x-enum-varnames:
+    - MsgRoleSystem
+    - MsgRoleUser
+    - MsgRoleAssistant
+    - MsgRoleFunction
+  mp_common.OcrData:
+    properties:
+      length:
+        type: integer
+      page_num:
+        items:
+          type: integer
+        type: array
+      text:
+        type: string
+      type:
+        type: string
+    type: object
+  mp_common.OcrResp:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/mp_common.OcrData'
+        type: array
+      id:
+        type: string
+      message:
+        type: string
+      time_cost:
+        type: number
+      timestamp:
+        type: string
+      version:
+        type: string
+    type: object
+  mp_common.OpenAIFunction:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      parameters:
+        $ref: '#/definitions/mp_common.OpenAIFunctionParameters'
+    required:
+    - name
+    type: object
+  mp_common.OpenAIFunctionParameters:
+    properties:
+      properties:
+        additionalProperties:
+          $ref: '#/definitions/mp_common.OpenAIFunctionParametersProperty'
+        type: object
+      required:
+        items:
+          type: string
+        type: array
+      type:
+        type: string
+    type: object
+  mp_common.OpenAIFunctionParametersProperty:
+    properties:
+      description:
+        type: string
+      type:
+        type: string
+    type: object
+  mp_common.OpenAIMsg:
+    properties:
+      content:
+        type: string
+      function_call:
+        $ref: '#/definitions/mp_common.FunctionCall'
+      name:
+        type: string
+      reasoning_content:
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/mp_common.MsgRole'
+        description: '"system" | "user" | "assistant" | "function(已弃用)"'
+      tool_call_id:
+        type: string
+      tool_calls:
+        items:
+          $ref: '#/definitions/mp_common.ToolCall'
+        type: array
+    required:
+    - content
+    - role
+    type: object
+  mp_common.OpenAIRespChoice:
+    properties:
+      delta:
+        allOf:
+        - $ref: '#/definitions/mp_common.OpenAIMsg'
+        description: 流式生成的消息
+      finish_reason:
+        description: 停止原因
+        type: string
+      index:
+        description: 选项索引
+        type: integer
+      logprobs: {}
+      message:
+        allOf:
+        - $ref: '#/definitions/mp_common.OpenAIMsg'
+        description: 非流式生成的消息
+    type: object
+  mp_common.OpenAIRespUsage:
+    properties:
+      completion_tokens:
+        description: 输出 token 数
+        type: integer
+      prompt_tokens:
+        description: 输入 token 数
+        type: integer
+      total_tokens:
+        description: 总 token 数
+        type: integer
+    type: object
+  mp_common.OpenAIResponseFormat:
+    properties:
+      type:
+        description: '"text" | "json"'
+        type: string
+    type: object
+  mp_common.OpenAITool:
+    properties:
+      function:
+        $ref: '#/definitions/mp_common.OpenAIFunction'
+      type:
+        $ref: '#/definitions/mp_common.ToolType'
+    required:
+    - function
+    - type
     type: object
   mp_common.RerankReq:
     properties:
@@ -81,7 +381,6 @@ definitions:
       return_documents:
         type: boolean
       top_n:
-        minimum: 0
         type: integer
     required:
     - documents
@@ -93,6 +392,8 @@ definitions:
       model:
         type: string
       object:
+        type: string
+      request_id:
         type: string
       results:
         items:
@@ -110,6 +411,36 @@ definitions:
       relevance_score:
         type: number
     type: object
+  mp_common.StreamOptions:
+    properties:
+      chunk_include_usage:
+        type: boolean
+      include_usage:
+        type: boolean
+    type: object
+  mp_common.Thinking:
+    properties:
+      type:
+        default: enabled
+        type: string
+    type: object
+  mp_common.ToolCall:
+    properties:
+      function:
+        $ref: '#/definitions/mp_common.FunctionCall'
+      id:
+        type: string
+      index:
+        type: integer
+      type:
+        $ref: '#/definitions/mp_common.ToolType'
+    type: object
+  mp_common.ToolType:
+    enum:
+    - function
+    type: string
+    x-enum-varnames:
+    - ToolTypeFunction
   mp_common.Usage:
     properties:
       completion_tokens:
@@ -118,6 +449,67 @@ definitions:
         type: integer
       total_tokens:
         type: integer
+    type: object
+  mp_common.WebSearch:
+    properties:
+      enable:
+        type: boolean
+      enable_citation:
+        type: boolean
+      enable_status:
+        type: boolean
+      enable_trace:
+        type: boolean
+    type: object
+  mp_huoshan.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_huoshan.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        - functionCall
+        type: string
+    type: object
+  mp_ollama.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_ollama.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        - functionCall
+        type: string
     type: object
   mp_openai_compatible.Embedding:
     properties:
@@ -145,6 +537,40 @@ definitions:
         type: string
     type: object
   mp_openai_compatible.Rerank:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_qwen.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_qwen.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        - functionCall
+        type: string
+    type: object
+  mp_qwen.Rerank:
     properties:
       apiKey:
         description: ApiKey
@@ -200,11 +626,27 @@ definitions:
     properties:
       id:
         type: string
+      metaDataList:
+        items:
+          $ref: '#/definitions/request.MetaData'
+        type: array
       status:
         type: integer
     required:
     - id
     - status
+    type: object
+  request.MetaData:
+    properties:
+      dataId:
+        type: string
+      key:
+        type: string
+      value:
+        type: string
+    required:
+    - key
+    - value
     type: object
   request.SearchKnowledgeInfoReq:
     properties:
@@ -395,15 +837,14 @@ paths:
         name: data
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/mp_common.LLMReq'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/mp_common.LLMResp'
       summary: Model Chat Completions
       tags:
       - callback
@@ -431,6 +872,31 @@ paths:
           schema:
             $ref: '#/definitions/mp_common.EmbeddingResp'
       summary: Model Embeddings
+      tags:
+      - callback
+  /model/{modelId}/ocr:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 模型ID
+        in: path
+        name: modelId
+        required: true
+        type: string
+      - description: 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mp_common.OcrResp'
+      summary: Model Ocr
       tags:
       - callback
   /model/{modelId}/rerank:

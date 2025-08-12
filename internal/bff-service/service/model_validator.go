@@ -1,11 +1,20 @@
 package service
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"os"
 	"strings"
 	"sync"
 
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
+	"github.com/UnicomAI/wanwu/internal/bff-service/config"
+	"github.com/UnicomAI/wanwu/pkg/log"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	"github.com/gin-gonic/gin"
@@ -20,6 +29,7 @@ var validators = sync.OnceValue(func() map[string]ModelValidator {
 		mp.ModelTypeLLM:       ValidateLLMModel,
 		mp.ModelTypeRerank:    ValidateRerankModel,
 		mp.ModelTypeEmbedding: ValidateEmbeddingModel,
+		mp.ModelTypeOcr:       ValidateOcrModel,
 	}
 })
 
@@ -42,20 +52,70 @@ func ValidateLLMModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) erro
 		return fmt.Errorf("invalid provider")
 	}
 	// mock  request
-	req := map[string]interface{}{
-		"model": modelInfo.Model,
-		"messages": []map[string]interface{}{
+	var stream bool = false
+	req := &mp_common.LLMReq{
+		Model: modelInfo.Model,
+		Messages: []mp_common.OpenAIMsg{
 			{
-				"role":    "user",
-				"content": "hello",
+				Role:    mp_common.MsgRoleUser,
+				Content: "几点了",
 			},
 		},
-		"stream": false,
+		Stream: &stream,
 	}
-	llmReq := mp_common.NewLLMReq(req)
-	_, _, err = iLLM.ChatCompletions(ctx.Request.Context(), llmReq)
+	// ToolCall 校验
+	var result map[string]interface{}
+	err = json.Unmarshal([]byte(modelInfo.ProviderConfig), &result)
 	if err != nil {
-		return fmt.Errorf("invalid resp: %v", err)
+		return err
+	}
+	fc, ok := result["functionCalling"].(mp_common.FCType)
+	if ok && fc == mp_common.FCTypeToolCall {
+		tools := []mp_common.OpenAITool{
+			{
+				Type: mp_common.ToolTypeFunction,
+				Function: &mp_common.OpenAIFunction{
+					Name:        "get_current_time",
+					Description: "当你想知道现在的时间时非常有用。",
+					Parameters: &mp_common.OpenAIFunctionParameters{
+						Type:       "object",
+						Properties: map[string]mp_common.OpenAIFunctionParametersProperty{},
+					},
+				},
+			},
+		}
+		req.Tools = tools
+		llmReq, err := iLLM.NewReq(req)
+		if err != nil {
+			return err
+		}
+		resp, _, err := iLLM.ChatCompletions(context.Background(), llmReq)
+		if err != nil {
+			return err
+		}
+		openAIResp, ok := resp.ConvertResp()
+		if !ok {
+			return fmt.Errorf("invalid resp: %v", err)
+		}
+		if len(openAIResp.Choices) == 0 || openAIResp.Choices[0].Message.ToolCalls == nil {
+			return fmt.Errorf("model does not support toolcall functionality")
+		} else {
+			data, _ := json.MarshalIndent(openAIResp.Choices[0].Message.ToolCalls, "", "  ")
+			log.Debugf("tool call: %v", string(data))
+		}
+		return nil
+	}
+	llmReq, err := iLLM.NewReq(req)
+	if err != nil {
+		return err
+	}
+	resp, _, err := iLLM.ChatCompletions(ctx.Request.Context(), llmReq)
+	if err != nil {
+		return fmt.Errorf("model API call failed: %v", err)
+	}
+	_, ok = resp.ConvertResp()
+	if !ok {
+		return fmt.Errorf("invalid response format")
 	}
 	return nil
 }
@@ -78,11 +138,15 @@ func ValidateEmbeddingModel(ctx *gin.Context, modelInfo *model_service.ModelInfo
 	if err != nil {
 		return err
 	}
-	_, err = iEmbedding.Embeddings(ctx.Request.Context(), embeddingReq)
+	resp, err := iEmbedding.Embeddings(ctx.Request.Context(), embeddingReq)
 	if err != nil {
 		{
-			return fmt.Errorf("invalid resp: %v", err)
+			return fmt.Errorf("model API call failed: %v", err)
 		}
+	}
+	_, ok = resp.ConvertResp()
+	if !ok {
+		return fmt.Errorf("invalid response format")
 	}
 	return nil
 }
@@ -109,9 +173,73 @@ func ValidateRerankModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) e
 	if err != nil {
 		return err
 	}
-	_, err = iRerank.Rerank(ctx.Request.Context(), rerankReq)
+	resp, err := iRerank.Rerank(ctx.Request.Context(), rerankReq)
 	if err != nil {
-		return fmt.Errorf("invalid resp: %v", err)
+		return fmt.Errorf("model API call failed: %v", err)
+	}
+	_, ok = resp.ConvertResp()
+	if !ok {
+		return fmt.Errorf("invalid response format")
+	}
+	return nil
+}
+
+func ValidateOcrModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) error {
+	rerank, err := mp.ToModelConfig(modelInfo.Provider, modelInfo.ModelType, modelInfo.ProviderConfig)
+	if err != nil {
+		return err
+	}
+	iOcr, ok := rerank.(mp.IOcr)
+	if !ok {
+		return fmt.Errorf("invalid provider")
+	}
+	// mock  request
+
+	file, err := os.Open(config.Cfg().Model.OcrFilePath)
+	if err != nil {
+		return fmt.Errorf("open file failed: %v", err)
+	}
+	defer file.Close()
+
+	// 创建内存缓冲区
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	// 创建表单文件字段
+	part, err := writer.CreateFormFile("file", file.Name())
+	if err != nil {
+		return fmt.Errorf("create form file failed: %v", err)
+	}
+
+	// 复制文件内容
+	if _, err := io.Copy(part, file); err != nil {
+		return fmt.Errorf("copy file content failed: %v", err)
+	}
+	writer.Close()
+
+	// 模拟HTTP请求
+	mockReq, _ := http.NewRequest("POST", "", body)
+	mockReq.Header.Set("Content-Type", writer.FormDataContentType())
+	ctx.Request = mockReq
+	// 获取FileHeader对象
+	_, fileH, err := ctx.Request.FormFile("file")
+	if err != nil {
+		return fmt.Errorf("get file header failed: %v", err)
+	}
+	req := &mp_common.OcrReq{
+		Files: fileH,
+	}
+	ocrReq, err := iOcr.NewReq(req)
+	if err != nil {
+		return err
+	}
+	resp, err := iOcr.Ocr(ctx, ocrReq)
+	if err != nil {
+		return fmt.Errorf("model API call failed: %v", err)
+	}
+	_, ok = resp.ConvertResp()
+	if !ok {
+		return fmt.Errorf("invalid response format")
 	}
 	return nil
 }

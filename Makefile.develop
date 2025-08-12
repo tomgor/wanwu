@@ -107,6 +107,19 @@ stop-app:
 		--env-file .env \
 		down app-service
 
+# --- operate-service ---
+run-operate:
+	docker-compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		up -d operate-service
+
+stop-operate:
+	docker-compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		down operate-service
+
 # --- rag-service ---
 run-rag:
 	docker-compose -f docker-compose-develop.yaml \
@@ -145,3 +158,17 @@ stop-assistant:
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		down assistant-service
+
+# --- agentscope ---
+run-agentscope: # 启动agentscope后自动重启下nginx
+	docker-compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		up -d agentscope
+	docker restart ${WANWU_NGINX_HOST}
+
+stop-agentscope:
+	docker-compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		down agentscope

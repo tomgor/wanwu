@@ -190,8 +190,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/mp_common.LLMReq"
                         }
                     }
                 ],
@@ -199,7 +198,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/mp_common.LLMResp"
                         }
                     }
                 }
@@ -240,6 +239,44 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/mp_common.EmbeddingResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/model/{modelId}/ocr": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callback"
+                ],
+                "summary": "Model Ocr",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "模型ID",
+                        "name": "modelId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "文件",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mp_common.OcrResp"
                         }
                     }
                 }
@@ -287,6 +324,28 @@
         }
     },
     "definitions": {
+        "mp.ProviderModelByHuoshan": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_huoshan.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_huoshan.LLM"
+                }
+            }
+        },
+        "mp.ProviderModelByOllama": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_ollama.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_ollama.LLM"
+                }
+            }
+        },
         "mp.ProviderModelByOpenAICompatible": {
             "type": "object",
             "properties": {
@@ -298,6 +357,20 @@
                 },
                 "rerank": {
                     "$ref": "#/definitions/mp_openai_compatible.Rerank"
+                }
+            }
+        },
+        "mp.ProviderModelByQwen": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_qwen.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_qwen.LLM"
+                },
+                "rerank": {
+                    "$ref": "#/definitions/mp_qwen.Rerank"
                 }
             }
         },
@@ -318,8 +391,17 @@
         "mp.ProviderModelConfig": {
             "type": "object",
             "properties": {
+                "providerHuoshan": {
+                    "$ref": "#/definitions/mp.ProviderModelByHuoshan"
+                },
+                "providerOllama": {
+                    "$ref": "#/definitions/mp.ProviderModelByOllama"
+                },
                 "providerOpenAICompatible": {
                     "$ref": "#/definitions/mp.ProviderModelByOpenAICompatible"
+                },
+                "providerQwen": {
+                    "$ref": "#/definitions/mp.ProviderModelByQwen"
                 },
                 "providerYuanJing": {
                     "$ref": "#/definitions/mp.ProviderModelByYuanjing"
@@ -375,11 +457,17 @@
         "mp_common.EmbeddingResp": {
             "type": "object",
             "properties": {
+                "created": {
+                    "type": "integer"
+                },
                 "data": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/mp_common.EmbeddingData"
                     }
+                },
+                "id": {
+                    "type": "string"
                 },
                 "model": {
                     "type": "string"
@@ -389,6 +477,411 @@
                 },
                 "usage": {
                     "$ref": "#/definitions/mp_common.Usage"
+                }
+            }
+        },
+        "mp_common.FunctionCall": {
+            "type": "object",
+            "properties": {
+                "arguments": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "mp_common.LLMReq": {
+            "type": "object",
+            "required": [
+                "messages",
+                "model"
+            ],
+            "properties": {
+                "do_sample": {
+                    "description": "Yuanjing",
+                    "type": "boolean"
+                },
+                "enable_thinking": {
+                    "type": "boolean"
+                },
+                "frequency_penalty": {
+                    "description": "频率惩罚系数",
+                    "type": "number"
+                },
+                "logit_bias": {
+                    "description": "调整指定 token 在模型输出内容中出现的概率",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "logprobs": {
+                    "description": "是否返回输出 Token 的对数概率",
+                    "type": "boolean"
+                },
+                "max_completion_tokens": {
+                    "description": "控制模型输出的最大长度[0,64k]",
+                    "type": "integer"
+                },
+                "max_tokens": {
+                    "type": "integer"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mp_common.OpenAIMsg"
+                    }
+                },
+                "min_p": {
+                    "type": "number"
+                },
+                "model": {
+                    "description": "general",
+                    "type": "string"
+                },
+                "n": {
+                    "type": "integer"
+                },
+                "parallel_tool_calls": {
+                    "description": "是否开启并行工具调用",
+                    "type": "boolean"
+                },
+                "presence_penalty": {
+                    "description": "控制模型生成文本时的内容重复度",
+                    "type": "number"
+                },
+                "repetition_penalty": {
+                    "type": "number"
+                },
+                "response_format": {
+                    "$ref": "#/definitions/mp_common.OpenAIResponseFormat"
+                },
+                "seed": {
+                    "type": "integer"
+                },
+                "stop": {
+                    "type": "string"
+                },
+                "stream": {
+                    "type": "boolean"
+                },
+                "stream_options": {
+                    "description": "当启用流式输出时，可通过将本参数设置为{\"include_usage\": true}，在输出的最后一行显示所使用的Token数。",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_common.StreamOptions"
+                        }
+                    ]
+                },
+                "temperature": {
+                    "type": "number"
+                },
+                "thinking": {
+                    "description": "custom",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_common.Thinking"
+                        }
+                    ]
+                },
+                "thinking_budget": {
+                    "description": "思考过程的最大长度，只在enable_thinking为true时生效",
+                    "type": "integer"
+                },
+                "tool_choice": {
+                    "description": "强制指定工具调用的策略"
+                },
+                "tools": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mp_common.OpenAITool"
+                    }
+                },
+                "top_k": {
+                    "type": "integer"
+                },
+                "top_logprobs": {
+                    "description": "指定在每一步生成时，返回模型最大概率的候选 Token 个数",
+                    "type": "integer"
+                },
+                "top_p": {
+                    "type": "number"
+                },
+                "user": {
+                    "type": "string"
+                },
+                "web_search": {
+                    "description": "搜索增强",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_common.WebSearch"
+                        }
+                    ]
+                }
+            }
+        },
+        "mp_common.LLMResp": {
+            "type": "object",
+            "properties": {
+                "choices": {
+                    "description": "生成结果列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mp_common.OpenAIRespChoice"
+                    }
+                },
+                "created": {
+                    "description": "时间戳（秒）",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "唯一标识",
+                    "type": "string"
+                },
+                "model": {
+                    "description": "使用的模型",
+                    "type": "string"
+                },
+                "object": {
+                    "description": "固定为 \"chat.completion\"",
+                    "type": "string"
+                },
+                "service_tier": {
+                    "description": "（火山）指定是否使用TPM保障包。生效对象为购买了保障包推理接入点",
+                    "type": "string"
+                },
+                "system_fingerprint": {
+                    "type": "string"
+                },
+                "usage": {
+                    "description": "token 使用统计",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_common.OpenAIRespUsage"
+                        }
+                    ]
+                }
+            }
+        },
+        "mp_common.MsgRole": {
+            "type": "string",
+            "enum": [
+                "system",
+                "user",
+                "assistant",
+                "tool"
+            ],
+            "x-enum-varnames": [
+                "MsgRoleSystem",
+                "MsgRoleUser",
+                "MsgRoleAssistant",
+                "MsgRoleFunction"
+            ]
+        },
+        "mp_common.OcrData": {
+            "type": "object",
+            "properties": {
+                "length": {
+                    "type": "integer"
+                },
+                "page_num": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "text": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "mp_common.OcrResp": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mp_common.OcrData"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "time_cost": {
+                    "type": "number"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "mp_common.OpenAIFunction": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "$ref": "#/definitions/mp_common.OpenAIFunctionParameters"
+                }
+            }
+        },
+        "mp_common.OpenAIFunctionParameters": {
+            "type": "object",
+            "properties": {
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/mp_common.OpenAIFunctionParametersProperty"
+                    }
+                },
+                "required": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "mp_common.OpenAIFunctionParametersProperty": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "mp_common.OpenAIMsg": {
+            "type": "object",
+            "required": [
+                "content",
+                "role"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "function_call": {
+                    "$ref": "#/definitions/mp_common.FunctionCall"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reasoning_content": {
+                    "type": "string"
+                },
+                "role": {
+                    "description": "\"system\" | \"user\" | \"assistant\" | \"function(已弃用)\"",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_common.MsgRole"
+                        }
+                    ]
+                },
+                "tool_call_id": {
+                    "type": "string"
+                },
+                "tool_calls": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mp_common.ToolCall"
+                    }
+                }
+            }
+        },
+        "mp_common.OpenAIRespChoice": {
+            "type": "object",
+            "properties": {
+                "delta": {
+                    "description": "流式生成的消息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_common.OpenAIMsg"
+                        }
+                    ]
+                },
+                "finish_reason": {
+                    "description": "停止原因",
+                    "type": "string"
+                },
+                "index": {
+                    "description": "选项索引",
+                    "type": "integer"
+                },
+                "logprobs": {},
+                "message": {
+                    "description": "非流式生成的消息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_common.OpenAIMsg"
+                        }
+                    ]
+                }
+            }
+        },
+        "mp_common.OpenAIRespUsage": {
+            "type": "object",
+            "properties": {
+                "completion_tokens": {
+                    "description": "输出 token 数",
+                    "type": "integer"
+                },
+                "prompt_tokens": {
+                    "description": "输入 token 数",
+                    "type": "integer"
+                },
+                "total_tokens": {
+                    "description": "总 token 数",
+                    "type": "integer"
+                }
+            }
+        },
+        "mp_common.OpenAIResponseFormat": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "\"text\" | \"json\"",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_common.OpenAITool": {
+            "type": "object",
+            "required": [
+                "function",
+                "type"
+            ],
+            "properties": {
+                "function": {
+                    "$ref": "#/definitions/mp_common.OpenAIFunction"
+                },
+                "type": {
+                    "$ref": "#/definitions/mp_common.ToolType"
                 }
             }
         },
@@ -416,8 +909,7 @@
                     "type": "boolean"
                 },
                 "top_n": {
-                    "type": "integer",
-                    "minimum": 0
+                    "type": "integer"
                 }
             }
         },
@@ -428,6 +920,9 @@
                     "type": "string"
                 },
                 "object": {
+                    "type": "string"
+                },
+                "request_id": {
                     "type": "string"
                 },
                 "results": {
@@ -455,6 +950,52 @@
                 }
             }
         },
+        "mp_common.StreamOptions": {
+            "type": "object",
+            "properties": {
+                "chunk_include_usage": {
+                    "type": "boolean"
+                },
+                "include_usage": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "mp_common.Thinking": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "default": "enabled"
+                }
+            }
+        },
+        "mp_common.ToolCall": {
+            "type": "object",
+            "properties": {
+                "function": {
+                    "$ref": "#/definitions/mp_common.FunctionCall"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "integer"
+                },
+                "type": {
+                    "$ref": "#/definitions/mp_common.ToolType"
+                }
+            }
+        },
+        "mp_common.ToolType": {
+            "type": "string",
+            "enum": [
+                "function"
+            ],
+            "x-enum-varnames": [
+                "ToolTypeFunction"
+            ]
+        },
         "mp_common.Usage": {
             "type": "object",
             "properties": {
@@ -466,6 +1007,93 @@
                 },
                 "total_tokens": {
                     "type": "integer"
+                }
+            }
+        },
+        "mp_common.WebSearch": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean"
+                },
+                "enable_citation": {
+                    "type": "boolean"
+                },
+                "enable_status": {
+                    "type": "boolean"
+                },
+                "enable_trace": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "mp_huoshan.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_huoshan.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
+                }
+            }
+        },
+        "mp_ollama.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_ollama.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
                 }
             }
         },
@@ -505,6 +1133,54 @@
             }
         },
         "mp_openai_compatible.Rerank": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_qwen.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_qwen.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
+                }
+            }
+        },
+        "mp_qwen.Rerank": {
             "type": "object",
             "properties": {
                 "apiKey": {
@@ -588,8 +1264,32 @@
                 "id": {
                     "type": "string"
                 },
+                "metaDataList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.MetaData"
+                    }
+                },
                 "status": {
                     "type": "integer"
+                }
+            }
+        },
+        "request.MetaData": {
+            "type": "object",
+            "required": [
+                "key",
+                "value"
+            ],
+            "properties": {
+                "dataId": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         },

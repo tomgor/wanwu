@@ -4,6 +4,7 @@
       <div class="header-left">
         <span class="el-icon-arrow-left btn" @click="goBack"></span>
         <span class="header-left-title">文本问答编辑</span>
+        <LinkIcon type="rag" />
       </div>
       <div class="header-right">
         <div class="header-api">
@@ -72,40 +73,13 @@
               </el-select>
             </div>
           </div>
-          <div class="block prompt-box">
-            <p class="block-title">
-              <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
-              Rerank模型
-            </p>
-            <div class="rl">
-              <el-select
-                v-model="editForm.rerankParams"
-                placeholder="请选择模型"
-                @visible-change="rerankVisible"
-                loading-text="模型加载中..."
-                class="cover-input-icon"
-                style="width:100%;"
-                :disabled="isPublish"
-                :loading="modelLoading"
-                clearable
-              >
-                <el-option
-                  v-for="(item,index) in rerankOptions"
-                  :key="item.modelId"
-                  :label="item.displayName"
-                  :value="item.modelId"
-                >
-                </el-option>
-              </el-select>
-            </div>
-          </div>
           <div class="block recommend-box">
             <p class="block-title common-set">
               <span class="common-set-label">
                 <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
                 关联知识库
               </span>
-              <span class="el-icon-s-operation operation" @click="showKnowledgeSet"></span>
+              <!-- <span class="el-icon-s-operation operation" @click="showKnowledgeSet"></span> -->
             </p>
             <div class="rl">
               <el-select 
@@ -113,6 +87,7 @@
               placeholder="请选择关联知识库" 
               class="model-select" 
               clearable 
+              filterable
               multiple>
                 <el-option
                   v-for="item in knowledgeData"
@@ -123,6 +98,32 @@
               </el-select>
             </div>
           </div>
+        </div>
+        <div class="block safety-box">
+            <p class="block-title common-set">
+              <span class="common-set-label">
+                <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
+                检索方式配置
+              </span>
+            </p>
+          <div class="rl">
+            <searchConfig ref="searchConfig" @sendConfigInfo="sendConfigInfo" :setType="'rag'" :config="editForm.knowledgeConfig"/>
+          </div>
+        </div>
+        <div class="block prompt-box safety-box">
+            <p class="block-title tool-title">
+            <span>
+              安全护栏配置
+              <el-tooltip class="item" effect="dark" content="实时拦截高风险内容的输入和输出，保障内容安全合规。" placement="top">
+                  <span class="el-icon-question question-tips"></span>
+              </el-tooltip>
+            </span>
+            <span class="common-add">
+              <span class="el-icon-s-operation"></span>
+              <span class="handleBtn" style="margin-right:10px;" @click="showSafety">配置</span>
+              <el-switch v-model="editForm.safetyConfig.enable" :disabled="!(editForm.safetyConfig.tables || []).length"></el-switch>
+            </span>
+          </p>
         </div>
       </div>
       <div class="drawer-test">
@@ -137,6 +138,7 @@
     <knowledgeSet @setKnowledgeSet="setKnowledgeSet" ref="knowledgeSetDialog" :knowledgeConfig="editForm.knowledgeConfig" />
     <!-- apikey -->
     <ApiKeyDialog ref="apiKeyDialog" :appId="editForm.appId" :appType="'rag'" />
+    <setSafety ref="setSafety" @sendSafety="sendSafety" />
   </div>
 </template>
 
@@ -147,22 +149,29 @@ import CreateTxtQues from "@/components/createApp/createRag.vue"
 import ModelSet from "./modelSetDialog.vue";
 import knowledgeSet from "./knowledgeSetDialog.vue"
 import ApiKeyDialog from "./ApiKeyDialog";
+import setSafety from "@/components/setSafety";
 import { getRerankList,selectModelList } from "@/api/modelAccess";
 import { getRagInfo,updateRagConfig } from "@/api/rag";
 import Chat from "./chat";
+import searchConfig from '@/components/searchConfig.vue';
+import LinkIcon from "@/components/linkIcon.vue";
 export default {
   components: {
+    LinkIcon,
     Chat,
     CreateTxtQues,
     ModelSet,
     knowledgeSet,
-    ApiKeyDialog
+    ApiKeyDialog,
+    setSafety,
+    searchConfig
   },
   data() {
     return {
       rerankOptions:[],
       showOperation:false,
       scope:'public',
+      localKnowledgeConfig:{},
       editForm:{
         appId:'',
         avatar:{},
@@ -180,12 +189,18 @@ export default {
         rerankParams:'',
         knowledgeBaseIds:[],
         knowledgeConfig:{
-          maxHistory:0,
-          threshold:0.4,
-          topK:5,
-          maxHistoryEnable:true,
-          thresholdEnable:true,
-          topKEnable:true
+          keywordPriority: 0.8, //关键词权重
+          matchType: "", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+          priorityMatch: 1, //权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+          rerankModelId: "", //rerank模型id
+          semanticsPriority: 0.2, //语义权重
+          topK: 5, //topK 获取最高的几行
+          threshold: 0.4, //过滤分数阈值
+          maxHistory:0//最长上下文
+        },
+        safetyConfig:{
+          enable: false,
+          tables:[]
         }
       },
       initialEditForm:null,
@@ -207,24 +222,32 @@ export default {
       loading: false, //按钮
       t: null,
       logoFileList: [],
-      debounceTimer:null //防抖计时器
+      debounceTimer:null, //防抖计时器
+      isUpdating: false, // 防止重复更新标记
+      isSettingFromDetail: false // 防止详情数据触发更新标记
     };
   },
   watch:{
     editForm: {
     handler(newVal) {
+      // 如果是从详情设置的数据，不触发更新逻辑
+      if (this.isSettingFromDetail) {
+        return;
+      }
+      
       if(this.debounceTimer){
         clearTimeout(this.debounceTimer)
       }
       this.debounceTimer = setTimeout(() =>{
-          const props = ['modelParams', 'modelConfig', 'rerankParams', 'knowledgeBaseIds', 'knowledgeConfig'];
+          const props = ['modelParams', 'modelConfig', 'knowledgeBaseIds', 'knowledgeConfig','safetyConfig'];
           const changed = props.some(prop => {
           return JSON.stringify(newVal[prop]) !== JSON.stringify(
               (this.initialEditForm || {})[prop]
             );
           });
-          if (changed) {
-            if(newVal['modelParams']!== '' && newVal['knowledgeBaseIds'].length > 0 && newVal['rerankParams'] !==''){
+          if (changed && !this.isUpdating) {
+            const isMixPriorityMatch = newVal['knowledgeConfig']['matchType'] === 'mix' && newVal['knowledgeConfig']['priorityMatch']
+            if(newVal['modelParams']!== '' && newVal['knowledgeBaseIds'].length > 0 || (!isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
               this.updateInfo();
             }
           }
@@ -249,16 +272,30 @@ export default {
     }
   },
   methods: {
+    sendConfigInfo(data){
+      this.editForm.knowledgeConfig = { ...data.knowledgeMatchParams };
+    },
+    sendSafety(data){
+      const tablesData = data.map(({ tableId, tableName }) => ({ tableId, tableName }));
+      this.editForm.safetyConfig.tables = tablesData;
+    },
+    showSafety(){
+      this.$refs.setSafety.showDialog(this.editForm.safetyConfig.tables);
+    },
     goBack(){
       this.$router.go(-1);
     },
     getDetail(){//获取详情
+      this.isSettingFromDetail = true; // 设置标志位，防止触发更新逻辑
       getRagInfo({ragId:this.editForm.appId}).then(res =>{
         if(res.code === 0){
             this.editForm.avatar = res.data.avatar;
             this.editForm.name = res.data.name;
             this.editForm.desc = res.data.desc;
             this.editForm.modelParams = res.data.modelConfig.modelId;
+            if(res.data.safetyConfig && res.data.safetyConfig !== null){
+              this.editForm.safetyConfig = res.data.safetyConfig;
+            }
             if(res.data.modelConfig.config !== null){
               this.editForm.modelConfig = res.data.modelConfig.config;
             }
@@ -268,8 +305,17 @@ export default {
               this.editForm.knowledgeBaseIds = knowledgeData.map(item => item.id);
             }
             this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;//需要后端修改
+            this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
+            // 使用nextTick确保所有数据设置完成后再重置标志位
+            this.$nextTick(() => {
+              this.isSettingFromDetail = false;
+            });
+        } else {
+          this.isSettingFromDetail = false;
         }
-      })
+      }).catch(() => {
+        this.isSettingFromDetail = false;
+      });
     },
     getRerankData(){
       getRerankList().then(res =>{
@@ -282,11 +328,13 @@ export default {
       this.showOperation = !this.showOperation;
     },
     savePublish(){
+      const { matchType, priorityMatch, rerankModelId } = this.editForm.knowledgeConfig;
+      const isMixPriorityMatch = matchType === 'mix' && priorityMatch;
       if(this.editForm.modelParams === ''){
         this.$message.warning('请选择模型！')
         return false
       }
-      if(this.editForm.rerankParams === ''){
+      if(!isMixPriorityMatch && !rerankModelId){
         this.$message.warning('请选rerank择模型！')
         return false
       }
@@ -356,38 +404,53 @@ export default {
       }
     },
     async updateInfo() {
-      //知识库数据
-      const knowledgeMap = new Map(this.knowledgeData.map(item => [item.knowledgeId, item]));
-      const knowledgeData = this.editForm.knowledgeBaseIds.map(id => {
-        const found = knowledgeMap.get(id);
-        return found ? { id: found.knowledgeId, name: found.name } : null;
-      }).filter(Boolean);
-      //模型数据
-      const modeInfo = this.modleOptions.find(item => item.modelId === this.editForm.modelParams)
-      const rerankInfo = this.rerankOptions.find(item => item.modelId === this.editForm.rerankParams)
-      let fromParams = {
-        ragId:this.editForm.appId,
-        knowledgeBaseConfig:{
-          knowledgebases:knowledgeData,
-          config:this.editForm.knowledgeConfig
-        },
-        modelConfig:{
-          config:this.editForm.modelConfig,
-          displayName: modeInfo.displayName,
-          model: modeInfo.model,
-          modelId: modeInfo.modelId,
-          modelType: modeInfo.modelType,
-          provider: modeInfo.provider,
-        },
-        rerankConfig:{
-          displayName: rerankInfo ? rerankInfo.displayName : '',
-          model: rerankInfo ? rerankInfo.model : '',
-          modelId: rerankInfo ? rerankInfo.modelId : '',
-          modelType: rerankInfo ? rerankInfo.modelType : '',
-          provider: rerankInfo ? rerankInfo.provider : '',
+      if (this.isUpdating) return; // 防止重复调用
+      
+      this.isUpdating = true;
+      try {
+        //知识库数据
+        const knowledgeMap = new Map(this.knowledgeData.map(item => [item.knowledgeId, item]));
+        const knowledgeData = this.editForm.knowledgeBaseIds.map(id => {
+          const found = knowledgeMap.get(id);
+          return found ? { id: found.knowledgeId, name: found.name } : null;
+        }).filter(Boolean);
+        //模型数据
+        const modeInfo = this.modleOptions.find(item => item.modelId === this.editForm.modelParams)
+        const rerankInfo = this.rerankOptions.find(item => item.modelId === this.editForm.knowledgeConfig.rerankModelId)
+        let fromParams = {
+          ragId:this.editForm.appId,
+          knowledgeBaseConfig:{
+            knowledgebases:knowledgeData,
+            config:this.editForm.knowledgeConfig
+          },
+          modelConfig:{
+            config:this.editForm.modelConfig,
+            displayName: modeInfo.displayName,
+            model: modeInfo.model,
+            modelId: modeInfo.modelId,
+            modelType: modeInfo.modelType,
+            provider: modeInfo.provider,
+          },
+          rerankConfig:{
+            displayName: rerankInfo ? rerankInfo.displayName : '',
+            model: rerankInfo ? rerankInfo.model : '',
+            modelId: rerankInfo ? rerankInfo.modelId : '',
+            modelType: rerankInfo ? rerankInfo.modelType : '',
+            provider: rerankInfo ? rerankInfo.provider : '',
+          },
+          safetyConfig:this.editForm.safetyConfig,
         }
+        const res = await updateRagConfig(fromParams)
+        
+        // 更新成功后，更新 initialEditForm 避免重复触发
+        if (res.code === 0) {
+          this.initialEditForm = JSON.parse(JSON.stringify(this.editForm));
+        }
+      } catch (error) {
+        console.error('更新配置失败:', error);
+      } finally {
+        this.isUpdating = false;
       }
-      const res = await updateRagConfig(fromParams)
     }
   }
 };
@@ -519,6 +582,26 @@ export default {
     margin-bottom:10px;
     .block{
       margin-bottom:10px;
+    }
+  }
+  .safety-box{
+    background:#F7F8FA;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+    border-radius:8px;
+    padding:10px 15px;
+    margin-top:14px;
+    .block-title{
+      line-height: 30px;
+      font-size: 15px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      .handleBtn{
+        cursor: pointer;
+      }
+    }
+    .tool-title{
+      justify-content: space-between;
     }
   }
   .common-set{

@@ -60,11 +60,20 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('modelAccess.table.apiKey')" prop="apiKey">
-          <el-input v-model="createForm.apiKey" :placeholder="$t('common.input.placeholder')"></el-input>
+        <el-form-item v-if="provider.key !== ollama" :label="$t('modelAccess.table.apiKey')" prop="apiKey">
+          <el-input
+            type="password"
+            v-model="createForm.apiKey"
+            :placeholder="$t('common.hint.apiKey') + typeObj.apiKey[provider.key]"
+          >
+          </el-input>
         </el-form-item>
         <el-form-item :label="$t('modelAccess.table.inferUrl')" prop="endpointUrl">
-          <el-input v-model="createForm.endpointUrl" :placeholder="$t('common.hint.inferUrl')"></el-input>
+          <el-input
+            v-model="createForm.endpointUrl"
+            :placeholder="$t('common.hint.inferUrl') + typeObj.inferUrl[provider.key]"
+          >
+          </el-input>
         </el-form-item>
         <el-form-item :label="$t('modelAccess.table.publishTime')" prop="publishDate">
           <el-date-picker
@@ -78,7 +87,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose">{{$t('common.button.cancel')}}</el-button>
-        <el-button type="primary" @click="handleSubmit">{{$t('common.button.confirm')}}</el-button>
+        <el-button :loading="loading" type="primary" @click="handleSubmit">{{$t('common.button.confirm')}}</el-button>
       </span>
     </el-dialog>
   </div>
@@ -86,7 +95,15 @@
 <script>
 import { addModel, editModel } from "@/api/modelAccess"
 import { uploadAvatar } from "@/api/user"
-import { MODEL_TYPE, PROVIDER_OBJ, FUNC_CALLING, LLM, DEFAULT_CALLING } from "../constants"
+import {
+  PROVIDER_TYPE,
+  PROVIDER_OBJ,
+  FUNC_CALLING,
+  LLM,
+  DEFAULT_CALLING,
+  TYPE_OBJ,
+  OLLAMA,
+} from "../constants"
 
 export default {
   data() {
@@ -103,9 +120,11 @@ export default {
       basePath: this.$basePath,
       defaultLogo: require("@/assets/imgs/bg-logo.png"),
       dialogVisible: false,
-      modelType: MODEL_TYPE,
+      modelType: [],
       functionCalling: FUNC_CALLING,
+      typeObj: TYPE_OBJ,
       llm: LLM,
+      ollama: OLLAMA,
       createForm: {
         model: '',
         displayName: '',
@@ -138,6 +157,7 @@ export default {
       row: {},
       provider: {},
       isEdit: false,
+      loading: false
     }
   },
   methods: {
@@ -165,10 +185,11 @@ export default {
     },
     openDialog(title, row){
       this.provider = {key: title, name: PROVIDER_OBJ[title]}
+      const currentProvider = PROVIDER_TYPE.find(item => item.key === title) || {}
+      this.modelType = currentProvider.children || []
       this.dialogVisible = true
 
       this.isEdit = Boolean(row)
-      console.log(row, title, '-----------------row')
       if (this.isEdit) {
         this.row = row || {}
         this.formatValue(row)
@@ -198,13 +219,18 @@ export default {
           delete form.endpointUrl
           delete form.functionCalling
 
-          const res = this.isEdit
-            ? await editModel({...form, modelId: this.row.modelId})
-            : await addModel(form)
-          if (res.code === 0) {
-            this.$message.success(this.$t('common.message.success'))
-            this.handleClose()
-            this.$emit('reloadData')
+          try {
+            this.loading = true
+            const res = this.isEdit
+              ? await editModel({...form, modelId: this.row.modelId})
+              : await addModel(form)
+            if (res.code === 0) {
+              this.$message.success(this.$t('common.message.success'))
+              this.handleClose()
+              this.$emit('reloadData', !this.isEdit)
+            }
+          } finally {
+            this.loading = false
           }
         }
       })

@@ -250,7 +250,7 @@
             async preSend(val,fileId,fileInfo) {
                 this.inputVal = val || this.$refs['editable'].getPrompt()
                 if (!this.inputVal) {
-                    this.$message.warning(this.$t('yuanjing.inputTips'));
+                    this.$message.warning('请输入内容');
                     return
                 }
                 if (!this.verifiyFormParams()) {
@@ -263,9 +263,11 @@
             },
             verifiyFormParams(){
                 if (this.chatType === 'chat') return true;
+                const { matchType, priorityMatch, rerankModelId } = this.editForm.knowledgeConfig;
+                const isMixPriorityMatch = matchType === 'mix' && priorityMatch;
                 const conditions = [
                     { check: !this.editForm.modelParams, message: '请选择模型' },
-                    { check: !this.editForm.rerankParams, message: '请选择rerank模型' },
+                    { check: !isMixPriorityMatch && !rerankModelId, message: '请选择rerank模型' },
                     { check: this.editForm.knowledgeBaseIds.length === 0, message: '请选择知识库' }
                 ];
                 for (const condition of conditions) {

@@ -1214,6 +1214,121 @@ const docTemplate = `{
                 }
             }
         },
+        "/assistant/mcp": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "为智能体绑定已发布的mcp工具",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "添加mcp工具",
+                "parameters": [
+                    {
+                        "description": "mcp新增参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MCPAddRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "为智能体解绑mcp",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "删除mcp",
+                "parameters": [
+                    {
+                        "description": "mcp id",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MCPIdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assistant/mcp/enable": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "修改智能体绑定的MCP的启用状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "启用/停用 MCP",
+                "parameters": [
+                    {
+                        "description": "mcp id",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.MCPIdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/assistant/stream": {
             "post": {
                 "security": [
@@ -1755,6 +1870,123 @@ const docTemplate = `{
                 }
             }
         },
+        "/custom/home": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "配置平台名称、平台图标、平台背景色",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "setting"
+                ],
+                "summary": "平台自定义配置",
+                "parameters": [
+                    {
+                        "description": "平台配置请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CustomHomeConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/custom/login": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "上传登录页背景图、登录页欢迎语、登录按钮颜色",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "setting"
+                ],
+                "summary": "登录页自定义配置",
+                "parameters": [
+                    {
+                        "description": "登录页配置请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CustomLoginConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/custom/tab": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "上传标签页图标、标签页标题",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "setting"
+                ],
+                "summary": "标签页自定义配置",
+                "parameters": [
+                    {
+                        "description": "标签页配置请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CustomTabConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/doc_center": {
             "get": {
                 "security": [
@@ -1771,7 +2003,16 @@ const docTemplate = `{
                 "tags": [
                     "common"
                 ],
-                "summary": "获取文档中心路径",
+                "summary": "获取文档中心Markdown文件内容",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "目录path",
+                        "name": "path",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1784,7 +2025,100 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/response.DocCenter"
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/doc_center/menu": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "common"
+                ],
+                "summary": "获取文档中心目录",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.DocMenu"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/doc_center/search": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "common"
+                ],
+                "summary": "查找文档中心内容",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "搜索关键字",
+                        "name": "content",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/response.DocSearchResp"
+                                            }
                                         }
                                     }
                                 }
@@ -2522,6 +2856,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/knowledge/doc/meta": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "更新文档元数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge"
+                ],
+                "summary": "更新文档元数据",
+                "parameters": [
+                    {
+                        "description": "文档更新元数据请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DocMetaDataReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/knowledge/doc/segment/list": {
             "get": {
                 "security": [
@@ -2714,6 +3087,195 @@ const docTemplate = `{
                 }
             }
         },
+        "/knowledge/keywords": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "查询知识库关键词列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.keywords"
+                ],
+                "summary": "查询知识库关键词列表",
+                "parameters": [
+                    {
+                        "description": "关键词列表查询请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.ListKeywordsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.GetKnowledgeKeywordListResp"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "编辑知识库关键词",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.keywords"
+                ],
+                "summary": "编辑知识库关键词",
+                "parameters": [
+                    {
+                        "description": "修改关键词请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateKeywordsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "新增知识库关键词",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.keywords"
+                ],
+                "summary": "新增知识库关键词",
+                "parameters": [
+                    {
+                        "description": "创建关键词请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateKeywordsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "删除知识库关键词",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.keywords"
+                ],
+                "summary": "删除知识库关键词",
+                "parameters": [
+                    {
+                        "description": "删除知识库关键词请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DeleteKeywordsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/knowledge/keywords/detail": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "查询知识库关键词详情",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.keywords"
+                ],
+                "summary": "查询知识库关键词详情",
+                "parameters": [
+                    {
+                        "description": "关键词列表查询请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GetKeywordsDetailReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.KeywordsInfo"
+                        }
+                    }
+                }
+            }
+        },
         "/knowledge/select": {
             "post": {
                 "security": [
@@ -2760,6 +3322,168 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    }
+                }
+            }
+        },
+        "/knowledge/splitter": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "查询知识库分隔符列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.splitter"
+                ],
+                "summary": "查询知识库分隔符列表",
+                "parameters": [
+                    {
+                        "description": "查询知识库请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.KnowledgeSplitterSelectReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.KnowledgeSplitterListResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "修改知识库分隔符",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.splitter"
+                ],
+                "summary": "修改知识库分隔符",
+                "parameters": [
+                    {
+                        "description": "修改知识库分隔符请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateKnowledgeSplitterReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "创建知识库分隔符",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.splitter"
+                ],
+                "summary": "创建知识库分隔符",
+                "parameters": [
+                    {
+                        "description": "创建知识库分隔符请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateKnowledgeSplitterReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "删除知识库分隔符",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge.splitter"
+                ],
+                "summary": "删除知识库分隔符",
+                "parameters": [
+                    {
+                        "description": "删除知识库分隔符请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DeleteKnowledgeSplitterReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -3208,6 +3932,14 @@ const docTemplate = `{
                     "mcp"
                 ],
                 "summary": "获取自定义MCP列表（用于下拉选择）",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "mcp名称",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -3798,6 +4530,57 @@ const docTemplate = `{
                     "model"
                 ],
                 "summary": "llm模型列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "$ref": "#/definitions/response.ModelBrief"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/model/select/ocr": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "model"
+                ],
+                "summary": "ocr模型列表",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -4797,6 +5580,481 @@ const docTemplate = `{
                 }
             }
         },
+        "/safe/sensitive/table": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "获取敏感词表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "获取敏感词表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "敏感词表id",
+                        "name": "tableId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.SensitiveWordTableDetail"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "编辑敏感词表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "编辑敏感词表",
+                "parameters": [
+                    {
+                        "description": "编辑敏感词表请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateSensitiveWordTableReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "创建敏感词表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "创建敏感词表",
+                "parameters": [
+                    {
+                        "description": "创建敏感词表请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateSensitiveWordTableReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CreateSensitiveWordTableResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "删除敏感词表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "删除敏感词表",
+                "parameters": [
+                    {
+                        "description": "删除敏感词表请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DeleteSensitiveWordTableReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/safe/sensitive/table/list": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "获取敏感词表列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "获取敏感词表列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.SensitiveWordTableDetail"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/safe/sensitive/table/reply": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "编辑回复设置",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "编辑回复设置",
+                "parameters": [
+                    {
+                        "description": "编辑回复设置请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateSensitiveWordTableReplyReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/safe/sensitive/table/select": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "获取敏感词表列表（用于下拉选择）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "获取敏感词表列表（用于下拉选择）",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.SensitiveWordTableDetail"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/safe/sensitive/word": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "上传敏感词",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "上传敏感词",
+                "parameters": [
+                    {
+                        "description": "上传敏感词参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UploadSensitiveVocabularyReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "删除敏感词",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "删除敏感词",
+                "parameters": [
+                    {
+                        "description": "删除敏感词参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DeleteSensitiveVocabularyReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/safe/sensitive/word/list": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "获取词表数据列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "safety"
+                ],
+                "summary": "获取词表数据列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "敏感词表id",
+                        "name": "tableId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页面编号，从1开始",
+                        "name": "pageNo",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "单页数量，从1开始",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.SensitiveWordVocabularyDetail"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "put": {
                 "security": [
@@ -5240,6 +6498,28 @@ const docTemplate = `{
                 }
             }
         },
+        "mp.ProviderModelByHuoshan": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_huoshan.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_huoshan.LLM"
+                }
+            }
+        },
+        "mp.ProviderModelByOllama": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_ollama.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_ollama.LLM"
+                }
+            }
+        },
         "mp.ProviderModelByOpenAICompatible": {
             "type": "object",
             "properties": {
@@ -5251,6 +6531,20 @@ const docTemplate = `{
                 },
                 "rerank": {
                     "$ref": "#/definitions/mp_openai_compatible.Rerank"
+                }
+            }
+        },
+        "mp.ProviderModelByQwen": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_qwen.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_qwen.LLM"
+                },
+                "rerank": {
+                    "$ref": "#/definitions/mp_qwen.Rerank"
                 }
             }
         },
@@ -5271,11 +6565,90 @@ const docTemplate = `{
         "mp.ProviderModelConfig": {
             "type": "object",
             "properties": {
+                "providerHuoshan": {
+                    "$ref": "#/definitions/mp.ProviderModelByHuoshan"
+                },
+                "providerOllama": {
+                    "$ref": "#/definitions/mp.ProviderModelByOllama"
+                },
                 "providerOpenAICompatible": {
                     "$ref": "#/definitions/mp.ProviderModelByOpenAICompatible"
                 },
+                "providerQwen": {
+                    "$ref": "#/definitions/mp.ProviderModelByQwen"
+                },
                 "providerYuanJing": {
                     "$ref": "#/definitions/mp.ProviderModelByYuanjing"
+                }
+            }
+        },
+        "mp_huoshan.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_huoshan.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
+                }
+            }
+        },
+        "mp_ollama.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_ollama.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
                 }
             }
         },
@@ -5360,6 +6733,54 @@ const docTemplate = `{
             }
         },
         "mp_openai_compatible.Rerank": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_qwen.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_qwen.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
+                }
+            }
+        },
+        "mp_qwen.Rerank": {
             "type": "object",
             "properties": {
                 "apiKey": {
@@ -5755,29 +7176,33 @@ const docTemplate = `{
         "request.AppKnowledgebaseParams": {
             "type": "object",
             "properties": {
+                "keywordPriority": {
+                    "description": "关键词权重",
+                    "type": "number"
+                },
+                "matchType": {
+                    "description": "matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）",
+                    "type": "string"
+                },
                 "maxHistory": {
                     "description": "最长上下文",
                     "type": "integer"
                 },
-                "maxHistoryEnable": {
-                    "description": "最长上下文(开关)",
-                    "type": "boolean"
+                "priorityMatch": {
+                    "description": "权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1",
+                    "type": "integer"
+                },
+                "semanticsPriority": {
+                    "description": "语义权重",
+                    "type": "number"
                 },
                 "threshold": {
                     "description": "过滤阈值",
                     "type": "number"
                 },
-                "thresholdEnable": {
-                    "description": "过滤阈值(开关)",
-                    "type": "boolean"
-                },
                 "topK": {
                     "description": "知识条数",
                     "type": "integer"
-                },
-                "topKEnable": {
-                    "description": "知识条数(开关)",
-                    "type": "boolean"
                 }
             }
         },
@@ -5814,6 +7239,21 @@ const docTemplate = `{
                 "provider": {
                     "description": "模型供应商",
                     "type": "string"
+                }
+            }
+        },
+        "request.AppSafetyConfig": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "description": "安全护栏(开关)",
+                    "type": "boolean"
+                },
+                "tables": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.SensitiveTable"
+                    }
                 }
             }
         },
@@ -5898,6 +7338,14 @@ const docTemplate = `{
                     "allOf": [
                         {
                             "$ref": "#/definitions/request.AppModelConfig"
+                        }
+                    ]
+                },
+                "safetyConfig": {
+                    "description": "敏感词表配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.AppSafetyConfig"
                         }
                     ]
                 }
@@ -6093,6 +7541,28 @@ const docTemplate = `{
                 }
             }
         },
+        "request.CreateKeywordsReq": {
+            "type": "object",
+            "required": [
+                "alias",
+                "knowledgeBaseIds",
+                "name"
+            ],
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "knowledgeBaseIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "request.CreateKnowledgeReq": {
             "type": "object",
             "required": [
@@ -6111,6 +7581,21 @@ const docTemplate = `{
                 }
             }
         },
+        "request.CreateKnowledgeSplitterReq": {
+            "type": "object",
+            "required": [
+                "splitterName",
+                "splitterValue"
+            ],
+            "properties": {
+                "splitterName": {
+                    "type": "string"
+                },
+                "splitterValue": {
+                    "type": "string"
+                }
+            }
+        },
         "request.CreateKnowledgeTagReq": {
             "type": "object",
             "required": [
@@ -6118,6 +7603,81 @@ const docTemplate = `{
             ],
             "properties": {
                 "tagName": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.CreateSensitiveWordTableReq": {
+            "type": "object",
+            "required": [
+                "tableName"
+            ],
+            "properties": {
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "tableName": {
+                    "description": "敏感词表名",
+                    "type": "string"
+                }
+            }
+        },
+        "request.CustomHomeConfig": {
+            "type": "object",
+            "properties": {
+                "homeBgColor": {
+                    "description": "平台背景颜色",
+                    "type": "string"
+                },
+                "homeLogo": {
+                    "description": "平台图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "homeName": {
+                    "description": "平台名称",
+                    "type": "string"
+                }
+            }
+        },
+        "request.CustomLoginConfig": {
+            "type": "object",
+            "properties": {
+                "loginBg": {
+                    "description": "登录页背景图",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "loginButtonColor": {
+                    "description": "登录按钮颜色",
+                    "type": "string"
+                },
+                "loginWelcomeText": {
+                    "description": "登录页欢迎语",
+                    "type": "string"
+                }
+            }
+        },
+        "request.CustomTabConfig": {
+            "type": "object",
+            "properties": {
+                "tabLogo": {
+                    "description": "标签页图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "tabTitle": {
+                    "description": "标签页标题",
                     "type": "string"
                 }
             }
@@ -6181,6 +7741,14 @@ const docTemplate = `{
                 }
             }
         },
+        "request.DeleteKeywordsReq": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "request.DeleteKnowledge": {
             "type": "object",
             "required": [
@@ -6188,6 +7756,17 @@ const docTemplate = `{
             ],
             "properties": {
                 "knowledgeId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.DeleteKnowledgeSplitterReq": {
+            "type": "object",
+            "required": [
+                "splitterId"
+            ],
+            "properties": {
+                "splitterId": {
                     "type": "string"
                 }
             }
@@ -6230,6 +7809,35 @@ const docTemplate = `{
                 }
             }
         },
+        "request.DeleteSensitiveVocabularyReq": {
+            "type": "object",
+            "required": [
+                "tableId",
+                "wordId"
+            ],
+            "properties": {
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                },
+                "wordId": {
+                    "description": "敏感词id",
+                    "type": "string"
+                }
+            }
+        },
+        "request.DeleteSensitiveWordTableReq": {
+            "type": "object",
+            "required": [
+                "tableId"
+            ],
+            "properties": {
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                }
+            }
+        },
         "request.DocImportReq": {
             "type": "object",
             "required": [
@@ -6267,6 +7875,10 @@ const docTemplate = `{
                 },
                 "knowledgeId": {
                     "description": "知识库id",
+                    "type": "string"
+                },
+                "ocrModelId": {
+                    "description": "ocr模型id",
                     "type": "string"
                 }
             }
@@ -6318,6 +7930,24 @@ const docTemplate = `{
                 "status": {
                     "description": "当前状态  -1-全部， 0-待处理， 1- 处理完成， 2-正在审核中，3-正在解析中，4-审核未通过，5-解析失败",
                     "type": "integer"
+                }
+            }
+        },
+        "request.DocMetaDataReq": {
+            "type": "object",
+            "required": [
+                "docId"
+            ],
+            "properties": {
+                "docId": {
+                    "type": "string"
+                },
+                "metaDataList": {
+                    "description": "文档元数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.MetaData"
+                    }
                 }
             }
         },
@@ -6394,6 +8024,14 @@ const docTemplate = `{
                 }
             }
         },
+        "request.GetKeywordsDetailReq": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "request.ImportOrUpdateModelRequest": {
             "type": "object",
             "required": [
@@ -6457,8 +8095,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "knowledgeIdList",
-                "question",
-                "rerankModelId"
+                "knowledgeMatchParams",
+                "question"
             ],
             "properties": {
                 "knowledgeIdList": {
@@ -6467,11 +8105,47 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "knowledgeMatchParams": {
+                    "$ref": "#/definitions/request.KnowledgeMatchParams"
+                },
                 "question": {
                     "type": "string"
+                }
+            }
+        },
+        "request.KnowledgeMatchParams": {
+            "type": "object",
+            "required": [
+                "matchType"
+            ],
+            "properties": {
+                "keywordPriority": {
+                    "description": "关键词权重",
+                    "type": "number"
+                },
+                "matchType": {
+                    "description": "matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）",
+                    "type": "string"
+                },
+                "priorityMatch": {
+                    "description": "权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1",
+                    "type": "integer"
                 },
                 "rerankModelId": {
+                    "description": "rerank模型id",
                     "type": "string"
+                },
+                "semanticsPriority": {
+                    "description": "语义权重",
+                    "type": "number"
+                },
+                "threshold": {
+                    "description": "threshold 过滤分数阈值",
+                    "type": "number"
+                },
+                "topK": {
+                    "description": "topK 获取最高的几行",
+                    "type": "integer"
                 }
             }
         },
@@ -6489,6 +8163,14 @@ const docTemplate = `{
                 }
             }
         },
+        "request.KnowledgeSplitterSelectReq": {
+            "type": "object",
+            "properties": {
+                "splitterName": {
+                    "type": "string"
+                }
+            }
+        },
         "request.KnowledgeTagSelectReq": {
             "type": "object",
             "properties": {
@@ -6497,6 +8179,21 @@ const docTemplate = `{
                 },
                 "tagName": {
                     "type": "string"
+                }
+            }
+        },
+        "request.ListKeywordsReq": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "用于搜索【问题中的关键词】/【文档中的词语】",
+                    "type": "string"
+                },
+                "pageNo": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
                 }
             }
         },
@@ -6523,6 +8220,17 @@ const docTemplate = `{
                 },
                 "username": {
                     "description": "用户名",
+                    "type": "string"
+                }
+            }
+        },
+        "request.MCPAddRequest": {
+            "type": "object",
+            "properties": {
+                "assistantId": {
+                    "type": "string"
+                },
+                "mcpId": {
                     "type": "string"
                 }
             }
@@ -6569,6 +8277,17 @@ const docTemplate = `{
                 }
             }
         },
+        "request.MCPIdRequest": {
+            "type": "object",
+            "required": [
+                "mcpId"
+            ],
+            "properties": {
+                "mcpId": {
+                    "type": "string"
+                }
+            }
+        },
         "request.MergeFileReq": {
             "type": "object",
             "required": [
@@ -6595,6 +8314,24 @@ const docTemplate = `{
                 "isExpired": {
                     "description": "minio存储文件是否过期 0:过期，1:不过期",
                     "type": "boolean"
+                }
+            }
+        },
+        "request.MetaData": {
+            "type": "object",
+            "required": [
+                "key",
+                "value"
+            ],
+            "properties": {
+                "dataId": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         },
@@ -6816,6 +8553,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/request.AppModelConfig"
                         }
                     ]
+                },
+                "safetyConfig": {
+                    "description": "敏感词表配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.AppSafetyConfig"
+                        }
+                    ]
                 }
             }
         },
@@ -6907,6 +8652,22 @@ const docTemplate = `{
                 }
             }
         },
+        "request.SensitiveTable": {
+            "type": "object",
+            "required": [
+                "tableId"
+            ],
+            "properties": {
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                },
+                "tableName": {
+                    "description": "敏感词表名称(请求非必填)",
+                    "type": "string"
+                }
+            }
+        },
         "request.TagBindCountReq": {
             "type": "object",
             "required": [
@@ -6953,6 +8714,32 @@ const docTemplate = `{
                 }
             }
         },
+        "request.UpdateKeywordsReq": {
+            "type": "object",
+            "required": [
+                "alias",
+                "id",
+                "knowledgeBaseIds",
+                "name"
+            ],
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "knowledgeBaseIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "request.UpdateKnowledgeReq": {
             "type": "object",
             "required": [
@@ -6971,6 +8758,25 @@ const docTemplate = `{
                 }
             }
         },
+        "request.UpdateKnowledgeSplitterReq": {
+            "type": "object",
+            "required": [
+                "splitterId",
+                "splitterName",
+                "splitterValue"
+            ],
+            "properties": {
+                "splitterId": {
+                    "type": "string"
+                },
+                "splitterName": {
+                    "type": "string"
+                },
+                "splitterValue": {
+                    "type": "string"
+                }
+            }
+        },
         "request.UpdateKnowledgeTagReq": {
             "type": "object",
             "required": [
@@ -6982,6 +8788,72 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tagName": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.UpdateSensitiveWordTableReplyReq": {
+            "type": "object",
+            "required": [
+                "tableId"
+            ],
+            "properties": {
+                "reply": {
+                    "description": "回复设置",
+                    "type": "string"
+                },
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                }
+            }
+        },
+        "request.UpdateSensitiveWordTableReq": {
+            "type": "object",
+            "required": [
+                "tableId",
+                "tableName"
+            ],
+            "properties": {
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                },
+                "tableName": {
+                    "description": "敏感词表名",
+                    "type": "string"
+                }
+            }
+        },
+        "request.UploadSensitiveVocabularyReq": {
+            "type": "object",
+            "required": [
+                "importType",
+                "tableId"
+            ],
+            "properties": {
+                "fileName": {
+                    "description": "文件名",
+                    "type": "string"
+                },
+                "importType": {
+                    "description": "上传敏感词方式，single：单条添加，file：批量上传",
+                    "type": "string"
+                },
+                "sensitiveType": {
+                    "description": "敏感词类型 (涉政:Political, 辱骂:Revile, 涉黄:Pornography, 暴恐:ViolentTerror, 违禁:Illegal, 信息安全:InformationSecurity, 其他:Other)",
+                    "type": "string"
+                },
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                },
+                "word": {
+                    "description": "敏感词",
                     "type": "string"
                 }
             }
@@ -7356,6 +9228,13 @@ const docTemplate = `{
                         }
                     ]
                 },
+                "mcpInfos": {
+                    "description": "MCP信息",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MCPInfos"
+                    }
+                },
                 "modelConfig": {
                     "description": "模型",
                     "allOf": [
@@ -7392,6 +9271,14 @@ const docTemplate = `{
                     "allOf": [
                         {
                             "$ref": "#/definitions/request.AppModelConfig"
+                        }
+                    ]
+                },
+                "safetyConfig": {
+                    "description": "敏感词表配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.AppSafetyConfig"
                         }
                     ]
                 },
@@ -7633,6 +9520,15 @@ const docTemplate = `{
                 }
             }
         },
+        "response.CreateSensitiveWordTableResp": {
+            "type": "object",
+            "properties": {
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                }
+            }
+        },
         "response.CustomAbout": {
             "type": "object",
             "properties": {
@@ -7652,12 +9548,20 @@ const docTemplate = `{
         "response.CustomHome": {
             "type": "object",
             "properties": {
-                "logoPath": {
-                    "description": "首页logo路径，例如/v1/static/logo/title_logo.png",
+                "backgroundColor": {
+                    "description": "平台背景色",
                     "type": "string"
                 },
+                "logo": {
+                    "description": "首页logo",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
                 "title": {
-                    "description": "首页标题",
+                    "description": "平台名称",
                     "type": "string"
                 }
             }
@@ -7665,9 +9569,13 @@ const docTemplate = `{
         "response.CustomLogin": {
             "type": "object",
             "properties": {
-                "backgroundPath": {
-                    "description": "登录页背景图路径",
-                    "type": "string"
+                "background": {
+                    "description": "登录页背景图",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
                 },
                 "loginButtonColor": {
                     "description": "登录按钮颜色",
@@ -7686,9 +9594,13 @@ const docTemplate = `{
         "response.CustomTab": {
             "type": "object",
             "properties": {
-                "logoPath": {
-                    "description": "标签页图标路径",
-                    "type": "string"
+                "logo": {
+                    "description": "标签页图标",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
                 },
                 "title": {
                     "description": "标签页标题",
@@ -7705,10 +9617,63 @@ const docTemplate = `{
                 }
             }
         },
-        "response.DocCenter": {
+        "response.DocMenu": {
             "type": "object",
             "properties": {
-                "docCenterPath": {
+                "children": {
+                    "description": "目录",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.DocMenu"
+                    }
+                },
+                "index": {
+                    "description": "目录索引",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "目录名称",
+                    "type": "string"
+                },
+                "path": {
+                    "description": "目录路径（转码后）",
+                    "type": "string"
+                },
+                "pathRaw": {
+                    "description": "目录路径",
+                    "type": "string"
+                }
+            }
+        },
+        "response.DocSearchContent": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "内容",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "文档中的子标题",
+                    "type": "string"
+                },
+                "url": {
+                    "description": "文档链接",
+                    "type": "string"
+                }
+            }
+        },
+        "response.DocSearchResp": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "description": "内容列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.DocSearchContent"
+                    }
+                },
+                "title": {
+                    "description": "文档名",
                     "type": "string"
                 }
             }
@@ -7716,6 +9681,13 @@ const docTemplate = `{
         "response.DocSegmentResp": {
             "type": "object",
             "properties": {
+                "MetaDataList": {
+                    "description": "文档元数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MetaData"
+                    }
+                },
                 "contentList": {
                     "description": "内容",
                     "type": "array",
@@ -7806,6 +9778,26 @@ const docTemplate = `{
                 }
             }
         },
+        "response.GetKnowledgeKeywordListResp": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.KeywordsInfo"
+                    }
+                },
+                "pageNo": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "response.IDName": {
             "type": "object",
             "properties": {
@@ -7813,6 +9805,35 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.KeywordsInfo": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "knowledgeBaseIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "knowledgeBaseNames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updatedAt": {
                     "type": "string"
                 }
             }
@@ -7883,6 +9904,34 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.KnowledgeInfo"
+                    }
+                }
+            }
+        },
+        "response.KnowledgeSplitter": {
+            "type": "object",
+            "properties": {
+                "splitterId": {
+                    "description": "知识库分隔符id",
+                    "type": "string"
+                },
+                "splitterName": {
+                    "description": "知识库分隔符名称",
+                    "type": "string"
+                },
+                "splitterValue": {
+                    "description": "知识库分隔符值",
+                    "type": "string"
+                }
+            }
+        },
+        "response.KnowledgeSplitterListResp": {
+            "type": "object",
+            "properties": {
+                "knowledgeSplitterList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.KnowledgeSplitter"
                     }
                 }
             }
@@ -7996,6 +10045,10 @@ const docTemplate = `{
                 "expiresAt": {
                     "type": "integer"
                 },
+                "isUpdatePassword": {
+                    "description": "是否已更新密码",
+                    "type": "boolean"
+                },
                 "language": {
                     "description": "语言",
                     "allOf": [
@@ -8051,6 +10104,13 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.CustomHome"
                         }
                     ]
+                },
+                "linkList": {
+                    "description": "跳转链接列表,key为链接名称,value为URL",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 },
                 "login": {
                     "description": "登录页标题信息",
@@ -8169,6 +10229,38 @@ const docTemplate = `{
                 "sseUrl": {
                     "description": "SSE URL",
                     "type": "string"
+                }
+            }
+        },
+        "response.MCPInfos": {
+            "type": "object",
+            "properties": {
+                "enable": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "mcpDesc": {
+                    "type": "string"
+                },
+                "mcpId": {
+                    "type": "string"
+                },
+                "mcpName": {
+                    "type": "string"
+                },
+                "mcpServerFrom": {
+                    "type": "string"
+                },
+                "mcpServerUrl": {
+                    "type": "string"
+                },
+                "mcpSquareId": {
+                    "type": "string"
+                },
+                "valid": {
+                    "type": "boolean"
                 }
             }
         },
@@ -8379,6 +10471,20 @@ const docTemplate = `{
                 },
                 "filePath": {
                     "description": "minio文件的完整路径",
+                    "type": "string"
+                }
+            }
+        },
+        "response.MetaData": {
+            "type": "object",
+            "properties": {
+                "dataId": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "value": {
                     "type": "string"
                 }
             }
@@ -8662,6 +10768,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/request.AppModelConfig"
                         }
                     ]
+                },
+                "safetyConfig": {
+                    "description": "敏感词表配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.AppSafetyConfig"
+                        }
+                    ]
                 }
             }
         },
@@ -8789,6 +10903,48 @@ const docTemplate = `{
                 }
             }
         },
+        "response.SensitiveWordTableDetail": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "敏感词表创建时间",
+                    "type": "string"
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "reply": {
+                    "description": "回复设置",
+                    "type": "string"
+                },
+                "tableId": {
+                    "description": "敏感词表id",
+                    "type": "string"
+                },
+                "tableName": {
+                    "description": "敏感词表名",
+                    "type": "string"
+                }
+            }
+        },
+        "response.SensitiveWordVocabularyDetail": {
+            "type": "object",
+            "properties": {
+                "sensitiveType": {
+                    "description": "敏感词类型",
+                    "type": "string"
+                },
+                "word": {
+                    "description": "敏感词",
+                    "type": "string"
+                },
+                "wordId": {
+                    "description": "敏感词id",
+                    "type": "string"
+                }
+            }
+        },
         "response.UploadFileResp": {
             "type": "object",
             "properties": {
@@ -8911,6 +11067,10 @@ const docTemplate = `{
         "response.UserPermission": {
             "type": "object",
             "properties": {
+                "isUpdatePassword": {
+                    "description": "是否已更新密码",
+                    "type": "boolean"
+                },
                 "language": {
                     "description": "语言",
                     "allOf": [
@@ -8941,7 +11101,16 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "valid": {
+                    "type": "boolean"
+                },
+                "workFlowDesc": {
+                    "type": "string"
+                },
                 "workFlowId": {
+                    "type": "string"
+                },
+                "workFlowName": {
                     "type": "string"
                 }
             }

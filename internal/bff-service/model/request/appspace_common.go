@@ -68,10 +68,22 @@ type AppKnowledgeBase struct {
 }
 
 type AppKnowledgebaseParams struct {
-	MaxHistory       int32   `json:"maxHistory"`       // 最长上下文
-	MaxHistoryEnable bool    `json:"maxHistoryEnable"` // 最长上下文(开关)
-	Threshold        float32 `json:"threshold"`        // 过滤阈值
-	ThresholdEnable  bool    `json:"thresholdEnable"`  // 过滤阈值(开关)
-	TopK             int32   `json:"topK"`             // 知识条数
-	TopKEnable       bool    `json:"topKEnable"`       // 知识条数(开关)
+	MaxHistory int32   `json:"maxHistory"` // 最长上下文
+	Threshold  float32 `json:"threshold"`  // 过滤阈值
+	TopK       int32   `json:"topK"`       // 知识条数
+
+	MatchType         string  `json:"matchType"`         //matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+	PriorityMatch     int32   `json:"priorityMatch"`     // 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+	SemanticsPriority float32 `json:"semanticsPriority"` // 语义权重
+	KeywordPriority   float32 `json:"keywordPriority"`   // 关键词权重
+}
+
+type AppSafetyConfig struct {
+	Enable bool             `json:"enable"` // 安全护栏(开关)
+	Tables []SensitiveTable `json:"tables"`
+}
+
+type SensitiveTable struct {
+	TableId   string `json:"tableId" validate:"required"` // 敏感词表id
+	TableName string `json:"tableName"`                   // 敏感词表名称(请求非必填)
 }

@@ -101,6 +101,14 @@
               </el-collapse-transition>
             </div>
           </div>
+          <!--loading-->
+          <div v-if="n.finish === 0 && sessionStatus == 0 && i === session_data.history.length - 1"
+            class="text-loading"
+          >
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
           <!--停止生成 重新生成 点赞   session code 是0时不可操作-->
           <div class="answer-operation">
             <div class="opera-left">
@@ -116,6 +124,7 @@
             </div>
           </div>
         </div>
+
         <!-- 回答 仅图片-->
         <div v-if="!n.response && n.gen_file_url_list && n.gen_file_url_list.length" class="session-answer">
           <div :class="['session-item','rl']">
@@ -204,6 +213,7 @@ export default {
     },
     mounted(){
       this.setupScrollListener();
+      // this.listenerImg();
     },
     beforeDestroy(){
       const container = document.getElementById('timeScroll');
@@ -211,6 +221,11 @@ export default {
         container.removeEventListener('scroll', this.handleScroll);
       }
       clearTimeout(this.scrollTimeout);
+      
+      // 移除图片错误事件监听器
+      if (this.imageErrorHandler) {
+        document.body.removeEventListener('error', this.imageErrorHandler, true);
+      }
     },
     methods:{
           setupScrollListener() {
@@ -348,6 +363,9 @@ export default {
             this.scrollBottom()
         },
         replaceLastData(index,data){
+          if(!data.response){
+            data.response = '无响应数据'
+          }
           this.$set(this.session_data.history,index,data)
           this.scrollBottom()
           this.codeScrollBottom();//code内容置底
@@ -512,6 +530,26 @@ export default {
                 this.cv && this.cv.resizeCurrImg(currImg)
             })
         },
+        listenerImg(){
+          //捕获图片加载错误
+          this.imageErrorHandler = (e) => {
+              if (e.target.tagName === 'IMG') {
+                this.handleImageError(e.target);
+              }
+          };
+          document.body.addEventListener('error', this.imageErrorHandler, true); 
+        },
+        handleImageError(img){
+          // 防止重复处理
+          if (img.classList.contains('failed')) {
+            return;
+          }
+          img.classList.add('failed');
+          
+          // 设置图片为不可见，避免闪烁
+          img.style.visibility = 'hidden';
+          img.style.display = 'none';
+        },
     }
 }
 </script>
@@ -578,7 +616,7 @@ export default {
       }
       .answer-content{
         // width: calc(100% - 30px);
-        padding:10px 15px;
+        padding:0 15px 10px 15px;
         position: relative;
         color: #333;
         .answer-content-query{
@@ -831,6 +869,81 @@ export default {
   cursor:pointer;
 }
 
+}
+
+/* 图片加载失败时的样式 */
+img.failed {
+  position: relative;
+  border: 2px dashed #ff6b6b;
+  background-color: #fff5f5;
+  opacity: 0.5;
+}
+
+img.failed::after {
+  content: '图片加载失败';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ff6b6b;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.text-loading,
+.text-loading > div {
+  position: relative;
+  box-sizing: border-box;
+}
+
+.text-loading {
+  display: block;
+  font-size: 0;
+  color: #c8c8c8;
+}
+
+.text-loading.la-dark {
+  color: #e8e8e8;
+}
+
+.text-loading > div {
+  display: inline-block;
+  float: none;
+  background-color: currentColor;
+  border: 0 solid currentColor;
+}
+
+.text-loading {
+  width: 54px;
+  height: 18px;
+  margin: 0 0 0 55px;
+}
+
+.text-loading > div {
+  width: 8px;
+  height: 8px;
+  margin: 4px;
+  border-radius: 100%;
+  animation: ball-beat 0.7s -0.15s infinite linear;
+}
+
+.text-loading > div:nth-child(2n-1) {
+  animation-delay: -0.5s;
+}
+
+@keyframes ball-beat {
+  50% {
+    opacity: 0.2;
+    transform: scale(0.75);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 </style>

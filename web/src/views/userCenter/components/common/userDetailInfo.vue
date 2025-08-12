@@ -41,7 +41,24 @@ export default {
       pwdVisible: false
     }
   },
+  watch: {
+    $route: {
+      handler () {
+        this.justifyShowPwd()
+      },
+      deep: true
+    },
+  },
+  mounted() {
+    this.justifyShowPwd()
+  },
   methods:{
+    justifyShowPwd() {
+      const {showPwd} = this.$route.query || {}
+      if (showPwd === '1') {
+        this.showPwd()
+      }
+    },
     setData(data){
       const {userId, username, company, phone, email, remark} = data || {}
       this.form = {userId, username, company, phone, email, remark, password: '***'}

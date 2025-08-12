@@ -34,6 +34,14 @@
         <el-descriptions-item :label="$t('knowledgeManage.markSplit')">{{
           res.splitter
         }}</el-descriptions-item>
+        <el-descriptions-item label="元数据">
+          <template v-if="res.MetaDataList && res.MetaDataList.length > 0">
+            <span>{{ res.MetaDataList.length > 3 ? filterData(res.MetaDataList.slice(0,3)) : filterData(res.MetaDataList)}}</span>
+            <span v-if="res.MetaDataList.length > 3" class="showMore">+{{res.MetaDataList.length -3}}</span>
+          </template>
+          <span v-else>无数据</span>
+          <span class="el-icon-edit-outline editIcon" @click="showDatabase(res.MetaDataList || [])" v-if="res.MetaDataList && res.MetaDataList.length > 0"></span>
+        </el-descriptions-item>
       </el-descriptions>
 
       <div class="btn">
@@ -144,14 +152,16 @@
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
     </el-dialog>
+    <dataBaseDialog ref="dataBase" @updateData="updateData"/>
   </div>
 </template>
 <script>
 import { getSectionList,setSectionStatus } from "@/api/knowledge";
+import dataBaseDialog from './dataBaseDialog'
 export default {
+  components:{dataBaseDialog},
   data() {
     return {
-      tableData: [],
       dialogVisible: false,
       obj: {}, // 路由参数对象
       cardObj: [
@@ -186,6 +196,16 @@ export default {
     this.getList();
   },
   methods: {
+    updateData(){
+      this.getList();
+    },
+    showDatabase(data){
+      this.$refs.dataBase.showDiglog(data,this.obj.id)
+    },
+    filterData(data){
+      const formattedString = data.map(item => `${item.key}:${item.value}`).join(", ");
+      return formattedString
+    },
     getList() {
       this.loading.itemStatus = true;
       getSectionList({
@@ -306,6 +326,19 @@ export default {
 };
 </script>
 <style lang="scss">
+.showMore{
+  margin-left:5px;
+  background:#f4f5ff;
+  padding:2px;
+  border-radius:4px;
+}
+.editIcon{
+  cursor: pointer;
+  color:#384BF7;
+  font-size:16px;
+  display: inline-block;
+  margin-left:5px;
+}
 .section {
   width: 100%;
   height: 100%;
