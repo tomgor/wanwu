@@ -51,6 +51,7 @@ func GetLogoCustomInfo(ctx *gin.Context, mode string) (response.LogoCustomInfo, 
 		ret = response.LogoCustomInfo{
 			Login: response.CustomLogin{
 				Background:       request.Avatar{Path: mode.Login.BackgroundPath},
+				Logo:             request.Avatar{Path: mode.Login.LogoPath},
 				LoginButtonColor: mode.Login.LoginButtonColor,
 				WelcomeText:      gin_util.I18nKey(ctx, mode.Login.WelcomeText),
 			},
@@ -84,6 +85,9 @@ func GetLogoCustomInfo(ctx *gin.Context, mode string) (response.LogoCustomInfo, 
 	}
 	if custom.Login.LoginBgPath != "" {
 		ret.Login.Background = CacheAvatar(ctx, custom.Login.LoginBgPath)
+	}
+	if custom.Login.LoginLogo != "" {
+		ret.Login.Logo = CacheAvatar(ctx, custom.Login.LoginLogo)
 	}
 	if custom.Login.LoginButtonColor != "" {
 		ret.Login.LoginButtonColor = custom.Login.LoginButtonColor
