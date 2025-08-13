@@ -1987,7 +1987,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/doc_center": {
+        "/doc_center/markdown": {
             "get": {
                 "security": [
                     {
@@ -6557,6 +6557,9 @@ const docTemplate = `{
                 "llm": {
                     "$ref": "#/definitions/mp_yuanjing.LLM"
                 },
+                "ocr": {
+                    "$ref": "#/definitions/mp_yuanjing.Ocr"
+                },
                 "rerank": {
                     "$ref": "#/definitions/mp_yuanjing.Rerank"
                 }
@@ -6870,6 +6873,19 @@ const docTemplate = `{
                 "topPEnable": {
                     "description": "Top P(开关)",
                     "type": "boolean"
+                }
+            }
+        },
+        "mp_yuanjing.Ocr": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
                 }
             }
         },
@@ -8320,14 +8336,23 @@ const docTemplate = `{
         "request.MetaData": {
             "type": "object",
             "required": [
+                "dataType",
                 "key",
+                "option",
                 "value"
             ],
             "properties": {
                 "dataId": {
                     "type": "string"
                 },
+                "dataType": {
+                    "description": "String，Number，Date",
+                    "type": "string"
+                },
                 "key": {
+                    "type": "string"
+                },
+                "option": {
                     "type": "string"
                 },
                 "value": {
@@ -10479,6 +10504,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "dataId": {
+                    "type": "string"
+                },
+                "dataType": {
                     "type": "string"
                 },
                 "key": {

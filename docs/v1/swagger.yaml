@@ -63,6 +63,8 @@ definitions:
         $ref: '#/definitions/mp_yuanjing.Embedding'
       llm:
         $ref: '#/definitions/mp_yuanjing.LLM'
+      ocr:
+        $ref: '#/definitions/mp_yuanjing.Ocr'
       rerank:
         $ref: '#/definitions/mp_yuanjing.Rerank'
     type: object
@@ -287,6 +289,15 @@ definitions:
       topPEnable:
         description: Top P(开关)
         type: boolean
+    type: object
+  mp_yuanjing.Ocr:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
     type: object
   mp_yuanjing.Rerank:
     properties:
@@ -1269,12 +1280,19 @@ definitions:
     properties:
       dataId:
         type: string
+      dataType:
+        description: String，Number，Date
+        type: string
       key:
+        type: string
+      option:
         type: string
       value:
         type: string
     required:
+    - dataType
     - key
+    - option
     - value
     type: object
   request.ModelStatusRequest:
@@ -2720,6 +2738,8 @@ definitions:
   response.MetaData:
     properties:
       dataId:
+        type: string
+      dataType:
         type: string
       key:
         type: string
@@ -4357,7 +4377,7 @@ paths:
       summary: 标签页自定义配置
       tags:
       - setting
-  /doc_center:
+  /doc_center/markdown:
     get:
       consumes:
       - application/json

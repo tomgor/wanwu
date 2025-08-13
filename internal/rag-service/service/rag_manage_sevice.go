@@ -41,6 +41,7 @@ type RagChatParams struct {
 	Temperature       float32          `json:"temperature"`
 	TopP              float32          `json:"top_p"`              // 多样性
 	RepetitionPenalty float32          `json:"repetition_penalty"` // 重复惩罚/频率惩罚
+	ReturnMeta        bool             `json:"return_meta"`        // 是否返回元数据
 }
 
 type WeightParams struct {
@@ -163,6 +164,7 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	ragChatParams.Chichat = true
 	ragChatParams.History = []*HistoryItem{}
 	ragChatParams.RewriteQuery = true
+	ragChatParams.ReturnMeta = true
 
 	// 模型参数
 	ragChatParams.CustomModelInfo = &CustomModelInfo{LlmModelID: rag.ModelConfig.ModelId}

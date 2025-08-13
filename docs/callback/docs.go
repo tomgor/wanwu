@@ -391,6 +391,9 @@ const docTemplate = `{
                 "llm": {
                     "$ref": "#/definitions/mp_yuanjing.LLM"
                 },
+                "ocr": {
+                    "$ref": "#/definitions/mp_yuanjing.Ocr"
+                },
                 "rerank": {
                     "$ref": "#/definitions/mp_yuanjing.Rerank"
                 }
@@ -426,9 +429,13 @@ const docTemplate = `{
         },
         "mp_common.EmbeddingData": {
             "type": "object",
+            "required": [
+                "embedding"
+            ],
             "properties": {
                 "embedding": {
                     "type": "array",
+                    "minItems": 1,
                     "items": {
                         "type": "number"
                     }
@@ -464,6 +471,10 @@ const docTemplate = `{
         },
         "mp_common.EmbeddingResp": {
             "type": "object",
+            "required": [
+                "data",
+                "model"
+            ],
             "properties": {
                 "created": {
                     "type": "integer"
@@ -631,6 +642,10 @@ const docTemplate = `{
         },
         "mp_common.LLMResp": {
             "type": "object",
+            "required": [
+                "choices",
+                "model"
+            ],
             "properties": {
                 "choices": {
                     "description": "生成结果列表",
@@ -689,12 +704,18 @@ const docTemplate = `{
         },
         "mp_common.OcrData": {
             "type": "object",
+            "required": [
+                "page_num",
+                "text",
+                "type"
+            ],
             "properties": {
                 "length": {
                     "type": "integer"
                 },
                 "page_num": {
                     "type": "array",
+                    "minItems": 1,
                     "items": {
                         "type": "integer"
                     }
@@ -709,6 +730,10 @@ const docTemplate = `{
         },
         "mp_common.OcrResp": {
             "type": "object",
+            "required": [
+                "data",
+                "message"
+            ],
             "properties": {
                 "code": {
                     "type": "integer"
@@ -787,7 +812,6 @@ const docTemplate = `{
         "mp_common.OpenAIMsg": {
             "type": "object",
             "required": [
-                "content",
                 "role"
             ],
             "properties": {
@@ -923,6 +947,9 @@ const docTemplate = `{
         },
         "mp_common.RerankResp": {
             "type": "object",
+            "required": [
+                "results"
+            ],
             "properties": {
                 "model": {
                     "type": "string"
@@ -946,6 +973,9 @@ const docTemplate = `{
         },
         "mp_common.Result": {
             "type": "object",
+            "required": [
+                "relevance_score"
+            ],
             "properties": {
                 "document": {
                     "$ref": "#/definitions/mp_common.Document"
@@ -1236,6 +1266,19 @@ const docTemplate = `{
                 }
             }
         },
+        "mp_yuanjing.Ocr": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
         "mp_yuanjing.Rerank": {
             "type": "object",
             "properties": {
@@ -1286,14 +1329,23 @@ const docTemplate = `{
         "request.MetaData": {
             "type": "object",
             "required": [
+                "dataType",
                 "key",
+                "option",
                 "value"
             ],
             "properties": {
                 "dataId": {
                     "type": "string"
                 },
+                "dataType": {
+                    "description": "String，Number，Date",
+                    "type": "string"
+                },
                 "key": {
+                    "type": "string"
+                },
+                "option": {
                     "type": "string"
                 },
                 "value": {
