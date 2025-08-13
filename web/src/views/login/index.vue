@@ -5,7 +5,7 @@
       <div class="header__left">
         <img
           v-if="login.logo && login.logo.path"
-          style="height: 35px; margin: 0 15px 0 22px"
+          style="height: 60px; margin: 0 15px 0 22px"
           :src="basePath + '/user/api' + login.logo.path"
         />
         <!--<span style="font-size: 16px;">{{home.title || ''}}</span>-->
@@ -188,17 +188,17 @@ export default {
     align-items: center;
     margin-top: 16px;
     margin-left: 10px;
-    height: 35px;
+    height: 60px;
   }
   .container__left {
     display: flex;
     align-items: center;
-    height: calc(80% - 36px);
+    height: calc(80% - 60px);
     font-size: 35px;
     width: calc(100% - 13% - 400px);
     justify-content: center;
     color: #fff;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
   }
   .login-box{
     position: absolute;
