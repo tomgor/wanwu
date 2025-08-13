@@ -38,6 +38,8 @@ definitions:
         $ref: '#/definitions/mp_yuanjing.Embedding'
       llm:
         $ref: '#/definitions/mp_yuanjing.LLM'
+      ocr:
+        $ref: '#/definitions/mp_yuanjing.Ocr'
       rerank:
         $ref: '#/definitions/mp_yuanjing.Rerank'
     type: object
@@ -64,11 +66,14 @@ definitions:
       embedding:
         items:
           type: number
+        minItems: 1
         type: array
       index:
         type: integer
       object:
         type: string
+    required:
+    - embedding
     type: object
   mp_common.EmbeddingReq:
     properties:
@@ -100,6 +105,9 @@ definitions:
         type: string
       usage:
         $ref: '#/definitions/mp_common.Usage'
+    required:
+    - data
+    - model
     type: object
   mp_common.FunctionCall:
     properties:
@@ -222,6 +230,9 @@ definitions:
         allOf:
         - $ref: '#/definitions/mp_common.OpenAIRespUsage'
         description: token 使用统计
+    required:
+    - choices
+    - model
     type: object
   mp_common.MsgRole:
     enum:
@@ -242,11 +253,16 @@ definitions:
       page_num:
         items:
           type: integer
+        minItems: 1
         type: array
       text:
         type: string
       type:
         type: string
+    required:
+    - page_num
+    - text
+    - type
     type: object
   mp_common.OcrResp:
     properties:
@@ -266,6 +282,9 @@ definitions:
         type: string
       version:
         type: string
+    required:
+    - data
+    - message
     type: object
   mp_common.OpenAIFunction:
     properties:
@@ -319,7 +338,6 @@ definitions:
           $ref: '#/definitions/mp_common.ToolCall'
         type: array
     required:
-    - content
     - role
     type: object
   mp_common.OpenAIRespChoice:
@@ -401,6 +419,8 @@ definitions:
         type: array
       usage:
         $ref: '#/definitions/mp_common.Usage'
+    required:
+    - results
     type: object
   mp_common.Result:
     properties:
@@ -410,6 +430,8 @@ definitions:
         type: integer
       relevance_score:
         type: number
+    required:
+    - relevance_score
     type: object
   mp_common.StreamOptions:
     properties:
@@ -604,6 +626,15 @@ definitions:
         - functionCall
         type: string
     type: object
+  mp_yuanjing.Ocr:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
   mp_yuanjing.Rerank:
     properties:
       apiKey:
@@ -640,12 +671,19 @@ definitions:
     properties:
       dataId:
         type: string
+      dataType:
+        description: String，Number，Date
+        type: string
       key:
+        type: string
+      option:
         type: string
       value:
         type: string
     required:
+    - dataType
     - key
+    - option
     - value
     type: object
   request.SearchKnowledgeInfoReq:
