@@ -27,9 +27,20 @@ type UpdateKnowledgeReq struct {
 }
 
 type KnowledgeHitReq struct {
-	KnowledgeIdList []string `json:"knowledgeIdList"   validate:"required"`
-	Question        string   `json:"question"   validate:"required"`
-	RerankModelId   string   `json:"rerankModelId"   validate:"required"`
+	KnowledgeIdList      []string              `json:"knowledgeIdList"   validate:"required"`
+	Question             string                `json:"question"   validate:"required"`
+	KnowledgeMatchParams *KnowledgeMatchParams `json:"knowledgeMatchParams"   validate:"required"`
+	CommonCheck
+}
+
+type KnowledgeMatchParams struct {
+	MatchType         string  `json:"matchType"  validate:"required"` //matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+	RerankModelId     string  `json:"rerankModelId"`                  //rerank模型id
+	PriorityMatch     int32   `json:"priorityMatch"`                  // 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+	SemanticsPriority float32 `json:"semanticsPriority"`              // 语义权重
+	KeywordPriority   float32 `json:"keywordPriority"`                // 关键词权重
+	TopK              int32   `json:"topK"`                           //topK 获取最高的几行
+	Threshold         float32 `json:"threshold"`                      //threshold 过滤分数阈值
 	CommonCheck
 }
 
@@ -43,9 +54,18 @@ type DeleteKnowledge struct {
 }
 
 type CallbackUpdateDocStatusReq struct {
-	DocId  string `json:"id" validate:"required"`
-	Status int32  `json:"status" validate:"required"`
+	DocId        string      `json:"id" validate:"required"`
+	Status       int32       `json:"status" validate:"required"`
+	MetaDataList []*MetaData `json:"metaDataList"`
 	CommonCheck
+}
+
+type MetaData struct {
+	Key      string `json:"key" validate:"required"`
+	DataId   string `json:"dataId"`
+	Value    string `json:"value" validate:"required"`
+	Option   string `json:"option" validate:"required"`   //option:add(新增)、update(更新)、delete(删除),update 和delete 的时候dataId 不能为空
+	DataType string `json:"dataType" validate:"required"` //String，Number，Date
 }
 
 type SearchKnowledgeInfoReq struct {

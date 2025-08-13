@@ -1,5 +1,19 @@
 basePath: /callback/v1
 definitions:
+  mp.ProviderModelByHuoshan:
+    properties:
+      embedding:
+        $ref: '#/definitions/mp_huoshan.Embedding'
+      llm:
+        $ref: '#/definitions/mp_huoshan.LLM'
+    type: object
+  mp.ProviderModelByOllama:
+    properties:
+      embedding:
+        $ref: '#/definitions/mp_ollama.Embedding'
+      llm:
+        $ref: '#/definitions/mp_ollama.LLM'
+    type: object
   mp.ProviderModelByOpenAICompatible:
     properties:
       embedding:
@@ -9,19 +23,36 @@ definitions:
       rerank:
         $ref: '#/definitions/mp_openai_compatible.Rerank'
     type: object
+  mp.ProviderModelByQwen:
+    properties:
+      embedding:
+        $ref: '#/definitions/mp_qwen.Embedding'
+      llm:
+        $ref: '#/definitions/mp_qwen.LLM'
+      rerank:
+        $ref: '#/definitions/mp_qwen.Rerank'
+    type: object
   mp.ProviderModelByYuanjing:
     properties:
       embedding:
         $ref: '#/definitions/mp_yuanjing.Embedding'
       llm:
         $ref: '#/definitions/mp_yuanjing.LLM'
+      ocr:
+        $ref: '#/definitions/mp_yuanjing.Ocr'
       rerank:
         $ref: '#/definitions/mp_yuanjing.Rerank'
     type: object
   mp.ProviderModelConfig:
     properties:
+      providerHuoshan:
+        $ref: '#/definitions/mp.ProviderModelByHuoshan'
+      providerOllama:
+        $ref: '#/definitions/mp.ProviderModelByOllama'
       providerOpenAICompatible:
         $ref: '#/definitions/mp.ProviderModelByOpenAICompatible'
+      providerQwen:
+        $ref: '#/definitions/mp.ProviderModelByQwen'
       providerYuanJing:
         $ref: '#/definitions/mp.ProviderModelByYuanjing'
     type: object
@@ -35,11 +66,14 @@ definitions:
       embedding:
         items:
           type: number
+        minItems: 1
         type: array
       index:
         type: integer
       object:
         type: string
+    required:
+    - embedding
     type: object
   mp_common.EmbeddingReq:
     properties:
@@ -57,16 +91,23 @@ definitions:
     type: object
   mp_common.EmbeddingResp:
     properties:
+      created:
+        type: integer
       data:
         items:
           $ref: '#/definitions/mp_common.EmbeddingData'
         type: array
+      id:
+        type: string
       model:
         type: string
       object:
         type: string
       usage:
         $ref: '#/definitions/mp_common.Usage'
+    required:
+    - data
+    - model
     type: object
   mp_common.FunctionCall:
     properties:
@@ -180,10 +221,18 @@ definitions:
       object:
         description: 固定为 "chat.completion"
         type: string
+      service_tier:
+        description: （火山）指定是否使用TPM保障包。生效对象为购买了保障包推理接入点
+        type: string
+      system_fingerprint:
+        type: string
       usage:
         allOf:
         - $ref: '#/definitions/mp_common.OpenAIRespUsage'
         description: token 使用统计
+    required:
+    - choices
+    - model
     type: object
   mp_common.MsgRole:
     enum:
@@ -197,6 +246,46 @@ definitions:
     - MsgRoleUser
     - MsgRoleAssistant
     - MsgRoleFunction
+  mp_common.OcrData:
+    properties:
+      length:
+        type: integer
+      page_num:
+        items:
+          type: integer
+        minItems: 1
+        type: array
+      text:
+        type: string
+      type:
+        type: string
+    required:
+    - page_num
+    - text
+    - type
+    type: object
+  mp_common.OcrResp:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/mp_common.OcrData'
+        type: array
+      id:
+        type: string
+      message:
+        type: string
+      time_cost:
+        type: number
+      timestamp:
+        type: string
+      version:
+        type: string
+    required:
+    - data
+    - message
+    type: object
   mp_common.OpenAIFunction:
     properties:
       description:
@@ -249,7 +338,6 @@ definitions:
           $ref: '#/definitions/mp_common.ToolCall'
         type: array
     required:
-    - content
     - role
     type: object
   mp_common.OpenAIRespChoice:
@@ -264,6 +352,7 @@ definitions:
       index:
         description: 选项索引
         type: integer
+      logprobs: {}
       message:
         allOf:
         - $ref: '#/definitions/mp_common.OpenAIMsg'
@@ -310,7 +399,6 @@ definitions:
       return_documents:
         type: boolean
       top_n:
-        minimum: 0
         type: integer
     required:
     - documents
@@ -323,12 +411,16 @@ definitions:
         type: string
       object:
         type: string
+      request_id:
+        type: string
       results:
         items:
           $ref: '#/definitions/mp_common.Result'
         type: array
       usage:
         $ref: '#/definitions/mp_common.Usage'
+    required:
+    - results
     type: object
   mp_common.Result:
     properties:
@@ -338,6 +430,8 @@ definitions:
         type: integer
       relevance_score:
         type: number
+    required:
+    - relevance_score
     type: object
   mp_common.StreamOptions:
     properties:
@@ -389,6 +483,56 @@ definitions:
       enable_trace:
         type: boolean
     type: object
+  mp_huoshan.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_huoshan.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        - functionCall
+        type: string
+    type: object
+  mp_ollama.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_ollama.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        - functionCall
+        type: string
+    type: object
   mp_openai_compatible.Embedding:
     properties:
       apiKey:
@@ -423,6 +567,40 @@ definitions:
         description: 推理url
         type: string
     type: object
+  mp_qwen.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_qwen.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        - functionCall
+        type: string
+    type: object
+  mp_qwen.Rerank:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
   mp_yuanjing.Embedding:
     properties:
       apiKey:
@@ -448,6 +626,15 @@ definitions:
         - functionCall
         type: string
     type: object
+  mp_yuanjing.Ocr:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
   mp_yuanjing.Rerank:
     properties:
       apiKey:
@@ -470,11 +657,34 @@ definitions:
     properties:
       id:
         type: string
+      metaDataList:
+        items:
+          $ref: '#/definitions/request.MetaData'
+        type: array
       status:
         type: integer
     required:
     - id
     - status
+    type: object
+  request.MetaData:
+    properties:
+      dataId:
+        type: string
+      dataType:
+        description: String，Number，Date
+        type: string
+      key:
+        type: string
+      option:
+        type: string
+      value:
+        type: string
+    required:
+    - dataType
+    - key
+    - option
+    - value
     type: object
   request.SearchKnowledgeInfoReq:
     properties:
@@ -700,6 +910,31 @@ paths:
           schema:
             $ref: '#/definitions/mp_common.EmbeddingResp'
       summary: Model Embeddings
+      tags:
+      - callback
+  /model/{modelId}/ocr:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 模型ID
+        in: path
+        name: modelId
+        required: true
+        type: string
+      - description: 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mp_common.OcrResp'
+      summary: Model Ocr
       tags:
       - callback
   /model/{modelId}/rerank:

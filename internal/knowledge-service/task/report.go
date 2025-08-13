@@ -2,8 +2,9 @@ package task
 
 import (
 	"context"
-	"github.com/gromitlee/go-async/pkg/async/async_task"
 	"sync"
+
+	"github.com/gromitlee/go-async/pkg/async/async_task"
 )
 
 // report impl IReport

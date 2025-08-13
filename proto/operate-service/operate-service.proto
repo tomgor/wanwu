@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package operate_service;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/UnicomAI/wanwu/api/proto/operate-service";
+
+service OperateService {
+    rpc CreateSystemCustomTab(CreateSystemCustomTabReq) returns (google.protobuf.Empty) {}
+    rpc CreateSystemCustomLogin(CreateSystemCustomLoginReq) returns (google.protobuf.Empty) {}
+    rpc CreateSystemCustomHome(CreateSystemCustomHomeReq) returns (google.protobuf.Empty) {}
+    rpc GetSystemCustom(GetSystemCustomReq) returns (SystemCustom) {}
+}
+
+message CreateSystemCustomTabReq {
+    string orgId = 1; // 租户ID
+    string userId = 2; // 用户ID
+    string mode = 3; // 模式
+    Tab tab = 4; // 标签页信息
+}
+
+message CreateSystemCustomLoginReq {
+    string orgId = 1; // 租户ID
+    string userId = 2; // 用户ID
+    string mode = 3;
+    Login login = 4; // 登录页
+}
+
+message CreateSystemCustomHomeReq {
+    string orgId = 1; // 租户ID
+    string userId = 2; // 用户ID
+    string mode = 3;
+    Home home = 4; // 标题
+}
+
+message GetSystemCustomReq {
+    string mode = 1; // 模式
+}
+
+message SystemCustom {
+    Login login = 1; // 登录页
+    Tab tab = 2; // logo
+    Home home = 3; // 标题
+}
+
+message Tab {
+    string tabLogoPath = 1; // 标签页logo路径
+    string tabTitle = 2; // 标签页标题
+}
+
+message Login {
+    string loginBgPath = 1; // 登录页背景图
+    string loginWelcomeText = 2; // 登录页欢迎词
+    string loginButtonColor = 3; // 登录按钮颜色
+}
+
+message Home {
+    string homeLogoPath = 1; // 平台logo路径
+    string homeName = 2; // 平台名称
+    string homeBgColor = 3; // 平台背景颜色
+}

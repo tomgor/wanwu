@@ -127,10 +127,11 @@ func GetMCPList(ctx *gin.Context) {
 //	@Description	获取自定义MCP列表（用于下拉选择）
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{object}	response.Response{data=response.ListResult{list=[]response.MCPSelect}}
+//	@Param			name	query		string	false	"mcp名称"
+//	@Success		200		{object}	response.Response{data=response.ListResult{list=[]response.MCPSelect}}
 //	@Router			/mcp/select [get]
 func GetMCPSelect(ctx *gin.Context) {
-	resp, err := service.GetMCPSelect(ctx, getUserID(ctx), getOrgID(ctx))
+	resp, err := service.GetMCPSelect(ctx, getUserID(ctx), getOrgID(ctx), ctx.Query("name"))
 	gin_util.Response(ctx, resp, err)
 }
 

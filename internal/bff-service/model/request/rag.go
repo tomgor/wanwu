@@ -10,6 +10,7 @@ type RagConfig struct {
 	ModelConfig         AppModelConfig         `json:"modelConfig" validate:"required"`         // 模型
 	RerankConfig        AppModelConfig         `json:"rerankConfig" validate:"required"`        // Rerank模型
 	KnowledgeBaseConfig AppKnowledgebaseConfig `json:"knowledgeBaseConfig" validate:"required"` // 知识库
+	SafetyConfig        AppSafetyConfig        `json:"safetyConfig"`                            // 敏感词表配置
 }
 
 type ChatRagRequest struct {

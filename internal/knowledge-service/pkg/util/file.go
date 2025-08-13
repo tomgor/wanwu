@@ -2,9 +2,10 @@ package util
 
 import (
 	"errors"
-	uuid "github.com/satori/go.uuid"
 	"io"
 	"strings"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 func FileEOF(err error) bool {

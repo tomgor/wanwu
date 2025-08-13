@@ -17,6 +17,8 @@ func NewClient(db *gorm.DB) (*Client, error) {
 		model.AppHistory{},
 		model.App{},
 		model.AppFavorite{},
+		model.SensitiveWordTable{},
+		model.SensitiveWordVocabulary{},
 	); err != nil {
 		return nil, err
 	}
@@ -45,4 +47,9 @@ type ExplorationAppInfo struct {
 	UpdatedAt   int64
 	IsFavorite  bool
 	PublishType string
+}
+
+type SensitiveWordTableWithWord struct {
+	model.SensitiveWordTable
+	SensitiveWords []string
 }

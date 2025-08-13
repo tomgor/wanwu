@@ -112,6 +112,24 @@ func ModelRerank(ctx *gin.Context) {
 	service.ModelRerank(ctx, ctx.Param("modelId"), &data)
 }
 
+// ModelOcr
+//
+//	@Tags		callback
+//	@Summary	Model Ocr
+//	@Accept		multipart/form-data
+//	@Produce	json
+//	@Param		modelId	path		string	true	"模型ID"
+//	@Param		file	formData	file	true	"文件"
+//	@Success	200		{object}	mp_common.OcrResp{}
+//	@Router		/model/{modelId}/ocr [post]
+func ModelOcr(ctx *gin.Context) {
+	var data mp_common.OcrReq
+	if !gin_util.BindForm(ctx, &data) {
+		return
+	}
+	service.ModelOcr(ctx, ctx.Param("modelId"), &data)
+}
+
 // UpdateDocStatus
 //
 //	@Tags			callback

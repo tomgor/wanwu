@@ -95,10 +95,11 @@ func GetMCPList(ctx *gin.Context, userID, orgID, name string) (*response.ListRes
 	}, nil
 }
 
-func GetMCPSelect(ctx *gin.Context, userID, orgID string) (*response.ListResult, error) {
+func GetMCPSelect(ctx *gin.Context, userID, orgID string, name string) (*response.ListResult, error) {
 	resp, err := mcp.GetCustomMCPList(ctx.Request.Context(), &mcp_service.GetCustomMCPListReq{
 		OrgId:  orgID,
 		UserId: userID,
+		Name:   name,
 	})
 	if err != nil {
 		return nil, err

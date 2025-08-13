@@ -24,6 +24,10 @@ func registerAssistant(apiV1 *gin.RouterGroup) {
 	mid.Sub("agent").Reg(apiV1, "/assistant/workflow", http.MethodDelete, v1.AssistantWorkFlowDelete, "删除工作流")
 	mid.Sub("agent").Reg(apiV1, "/assistant/workflow/enable", http.MethodPut, v1.AssistantWorkFlowEnableSwitch, "启用/停用工作流")
 
+	mid.Sub("agent").Reg(apiV1, "/assistant/mcp", http.MethodPost, v1.AssistantMCPCreate, "添加mcp工具")
+	mid.Sub("agent").Reg(apiV1, "/assistant/mcp", http.MethodDelete, v1.AssistantMCPDelete, "删除mcp工具")
+	mid.Sub("agent").Reg(apiV1, "/assistant/mcp/enable", http.MethodPut, v1.AssistantMCPEnableSwitch, "启用/停用mcp")
+
 	mid.Sub("agent").Reg(apiV1, "/assistant/action", http.MethodPost, v1.AssistantActionCreate, "添加action")
 	mid.Sub("agent").Reg(apiV1, "/assistant/action", http.MethodDelete, v1.AssistantActionDelete, "删除action")
 	mid.Sub("agent").Reg(apiV1, "/assistant/action", http.MethodPut, v1.AssistantActionUpdate, "编辑action")

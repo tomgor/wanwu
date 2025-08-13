@@ -1,6 +1,8 @@
 package config
 
 import (
+	"net/url"
+
 	"github.com/UnicomAI/wanwu/pkg/i18n"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/minio"
@@ -24,7 +26,7 @@ type Config struct {
 	Minio minio.Config `json:"minio" mapstructure:"minio"`
 	// microservice
 	Iam       ServiceConfig         `json:"iam" mapstructure:"iam"`
-	Model     ServiceConfig         `json:"model" mapstructure:"model"`
+	Model     ModelConfig           `json:"model" mapstructure:"model"`
 	MCP       ServiceConfig         `json:"mcp" mapstructure:"mcp"`
 	App       ServiceConfig         `json:"app" mapstructure:"app"`
 	Knowledge ServiceConfig         `json:"knowledge" mapstructure:"knowledge"`
@@ -32,6 +34,7 @@ type Config struct {
 	Assistant ServiceConfig         `json:"assistant" mapstructure:"assistant"`
 	WorkFlow  WorkFlowServiceConfig `json:"workflow" mapstructure:"workflow"`
 	Agent     AgentServiceConfig    `json:"agent" mapstructure:"agent"`
+	Operate   ServiceConfig         `json:"operate" mapstructure:"operate"`
 }
 
 type ServerConfig struct {
@@ -42,6 +45,11 @@ type ServerConfig struct {
 	WebBaseUrl   string `json:"web_base_url" mapstructure:"web_base_url"`
 	ApiBaseUrl   string `json:"api_base_url" mapstructure:"api_base_url"`
 	CallbackUrl  string `json:"callback_url" mapstructure:"callback_url"`
+}
+
+type ModelConfig struct {
+	Host        string `json:"host" mapstructure:"host"`
+	OcrFilePath string `json:"ocr_test_file_path" mapstructure:"ocr_test_file_path"`
 }
 
 type LogConfig struct {
@@ -87,10 +95,23 @@ type AssistantTemplateConfig struct {
 }
 
 type DocCenterConfig struct {
-	DocPath string `json:"doc_path" mapstructure:"doc_path"`
+	FrontendPrefix string          `json:"frontend_prefix" mapstructure:"frontend_prefix"`
+	Links          []DocLinkConfig `json:"links" mapstructure:"links"`
+	docs           map[string]string
+}
+
+type DocLinkConfig struct {
+	Key string `json:"key"`
+	Val string `json:"val"`
 }
 
 type CustomInfoConfig struct {
+	DefaultMode string        `json:"default_mode" mapstructure:"default_mode"`
+	Modes       []CustomTheme `json:"modes" mapstructure:"modes"`
+}
+
+type CustomTheme struct {
+	Mode  string      `json:"mode" mapstructure:"mode"`
 	Login CustomLogin `json:"login" mapstructure:"login"`
 	Home  CustomHome  `json:"home" mapstructure:"home"`
 	Tab   CustomTab   `json:"tab" mapstructure:"tab"`
@@ -105,13 +126,14 @@ type CustomLogin struct {
 }
 
 type CustomHome struct {
-	LogoPath string `json:"logo_path" mapstructure:"logo_path"`
-	Title    string `json:"title" mapstructure:"title"`
+	LogoPath        string `json:"logo_path" mapstructure:"logo_path"`
+	Title           string `json:"title" mapstructure:"title"`
+	BackgroundColor string `json:"background_color" mapstructure:"background_color"`
 }
 
 type CustomTab struct {
-	TabTitle    string `json:"tab_title" mapstructure:"tab_title"`
-	TabLogoPath string `json:"tab_logo_path" mapstructure:"tab_logo_path"`
+	TabTitle    string `json:"title" mapstructure:"title"`
+	TabLogoPath string `json:"logo_path" mapstructure:"logo_path"`
 }
 
 type CustomAbout struct {
@@ -122,7 +144,15 @@ type CustomAbout struct {
 
 func LoadConfig(in string) error {
 	_c = &Config{}
-	return util.LoadConfig(in, _c)
+	if err := util.LoadConfig(in, _c); err != nil {
+		return err
+	}
+	_c.DocCenter.docs = make(map[string]string)
+	for _, link := range _c.DocCenter.Links {
+		url, _ := url.JoinPath(_c.Server.WebBaseUrl, _c.DocCenter.FrontendPrefix, url.PathEscape(link.Val))
+		_c.DocCenter.docs[link.Key] = url
+	}
+	return nil
 }
 
 func Cfg() *Config {
@@ -130,4 +160,17 @@ func Cfg() *Config {
 		log.Panicf("cfg nil")
 	}
 	return _c
+}
+
+// GetDocs 返回 docs 的深拷贝
+func (d *DocCenterConfig) GetDocs() map[string]string {
+	if d.docs == nil {
+		return nil
+	}
+	// 深拷贝
+	result := make(map[string]string, len(d.docs))
+	for k, v := range d.docs {
+		result[k] = v
+	}
+	return result
 }
