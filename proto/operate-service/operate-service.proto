@@ -51,8 +51,9 @@ message Tab {
 
 message Login {
     string loginBgPath = 1; // 登录页背景图
-    string loginWelcomeText = 2; // 登录页欢迎词
-    string loginButtonColor = 3; // 登录按钮颜色
+    string loginLogo = 2; // 登录页logo路径
+    string loginWelcomeText = 3; // 登录页欢迎词
+    string loginButtonColor = 4; // 登录按钮颜色
 }
 
 message Home {
