@@ -262,5 +262,6 @@
 ------
 
 ### &#x1F4E9; 联系我们
-
-<img src="https://github.com/user-attachments/assets/b793e5bd-2285-484a-b210-0b53bc742ca6" style="width:30%; height:auto;" />
+| QQ群 |
+| ---  |
+| <img width="183" height="258" alt="image" src="https://github.com/user-attachments/assets/010f1d68-78e9-446d-baf1-0a7339efb48e" /> |
