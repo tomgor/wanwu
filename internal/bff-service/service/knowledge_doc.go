@@ -255,9 +255,11 @@ func buildMetaDataList(metaDataList []*request.MetaData) []*knowledgebase_doc_se
 	}
 	return lo.Map(metaDataList, func(item *request.MetaData, index int) *knowledgebase_doc_service.MetaData {
 		return &knowledgebase_doc_service.MetaData{
-			DataId: item.DataId,
-			Key:    item.Key,
-			Value:  item.Value,
+			DataId:    item.DataId,
+			Key:       item.Key,
+			Value:     item.Value,
+			Option:    item.Option,
+			ValueType: item.DataType,
 		}
 	})
 }
@@ -268,9 +270,10 @@ func buildMetaDataResultList(metaDataList []*knowledgebase_doc_service.MetaData)
 	}
 	return lo.Map(metaDataList, func(item *knowledgebase_doc_service.MetaData, index int) *response.MetaData {
 		return &response.MetaData{
-			DataId: item.DataId,
-			Key:    item.Key,
-			Value:  item.Value,
+			DataId:   item.DataId,
+			Key:      item.Key,
+			Value:    item.Value,
+			DataType: item.ValueType,
 		}
 	})
 }

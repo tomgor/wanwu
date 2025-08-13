@@ -61,9 +61,11 @@ type CallbackUpdateDocStatusReq struct {
 }
 
 type MetaData struct {
-	Key    string `json:"key" validate:"required"`
-	DataId string `json:"dataId"`
-	Value  string `json:"value" validate:"required"`
+	Key      string `json:"key" validate:"required"`
+	DataId   string `json:"dataId"`
+	Value    string `json:"value" validate:"required"`
+	Option   string `json:"option" validate:"required"`   //option:add(新增)、update(更新)、delete(删除),update 和delete 的时候dataId 不能为空
+	DataType string `json:"dataType" validate:"required"` //String，Number，Date
 }
 
 type SearchKnowledgeInfoReq struct {

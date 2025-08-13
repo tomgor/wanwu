@@ -90,7 +90,8 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 	//4.更新标签
 	metaDataList := removeDuplicateMeta(req.MetaDataList)
 	var fileName = service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
-	err = orm.UpdateDocStatusDocMeta(ctx, req.DocId, buildMetaParamsList(metaDataList, doc.OrgId, doc.UserId, req.DocId),
+	addList, updateList, deleteList := buildMetaModelList(metaDataList, doc.OrgId, doc.UserId, req.DocId)
+	err = orm.UpdateDocStatusDocMeta(ctx, req.DocId, addList, updateList, deleteList,
 		&service.RagDocMetaParams{
 			FileName:      fileName,
 			KnowledgeBase: knowledge.Name,
@@ -381,10 +382,15 @@ func buildMetaList(metaDataList []*model.KnowledgeDocMeta) []*knowledgebase_doc_
 		return make([]*knowledgebase_doc_service.MetaData, 0)
 	}
 	return lo.Map(metaDataList, func(item *model.KnowledgeDocMeta, index int) *knowledgebase_doc_service.MetaData {
+		var valueType = item.ValueType
+		if valueType == "" || valueType == "string" {
+			valueType = model.MetaTypeString
+		}
 		return &knowledgebase_doc_service.MetaData{
-			DataId: item.MetaId,
-			Key:    item.Key,
-			Value:  item.Value,
+			DataId:    item.MetaId,
+			Key:       item.Key,
+			Value:     item.Value,
+			ValueType: valueType,
 		}
 	})
 }
@@ -399,7 +405,7 @@ func buildMetaParamsList(metaDataList []*knowledgebase_doc_service.MetaData, org
 			DocId:     docId,
 			Key:       item.Key,
 			Value:     item.Value,
-			ValueType: model.MetaTypeString,
+			ValueType: item.ValueType,
 			Rule:      "",
 			OrgId:     orgId,
 			UserId:    userId,
@@ -409,12 +415,50 @@ func buildMetaParamsList(metaDataList []*knowledgebase_doc_service.MetaData, org
 	})
 }
 
+func buildMetaModelList(metaDataList []*knowledgebase_doc_service.MetaData, orgId, userId, docId string) (addList []*model.KnowledgeDocMeta,
+	updateList []*model.KnowledgeDocMeta, deleteDataIdList []string) {
+	if len(metaDataList) == 0 {
+		return
+	}
+	for _, data := range metaDataList {
+		if data.Option == "delete" {
+			deleteDataIdList = append(deleteDataIdList, data.DataId)
+			continue
+		}
+		if data.Option == "update" {
+			updateList = append(updateList, &model.KnowledgeDocMeta{
+				MetaId: data.DataId,
+				DocId:  docId,
+				Key:    data.Key,
+				Value:  data.Value,
+			})
+			continue
+		}
+		addList = append(addList, &model.KnowledgeDocMeta{
+			MetaId:    generator.GetGenerator().NewID(),
+			DocId:     docId,
+			Key:       data.Key,
+			Value:     data.Value,
+			ValueType: data.ValueType,
+			Rule:      "",
+			OrgId:     orgId,
+			UserId:    userId,
+			CreatedAt: time.Now().UnixMilli(),
+			UpdatedAt: time.Now().UnixMilli(),
+		})
+	}
+	return
+}
+
 func buildMetaRagParams(metaDataList []*knowledgebase_doc_service.MetaData) map[string]interface{} {
 	if len(metaDataList) == 0 {
 		return make(map[string]interface{})
 	}
 	var retMap = make(map[string]interface{})
 	for _, data := range metaDataList {
+		if data.Option == "delete" {
+			continue
+		}
 		retMap[data.Key] = data.Value
 	}
 	return retMap

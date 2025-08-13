@@ -30,6 +30,7 @@ type LogoCustomInfo struct {
 
 type CustomLogin struct {
 	Background       request.Avatar `json:"background"`       // 登录页背景图
+	Logo             request.Avatar `json:"logo"`             // 登录页图标
 	LoginButtonColor string         `json:"loginButtonColor"` // 登录按钮颜色
 	WelcomeText      string         `json:"welcomeText"`      // 登录页欢迎标词
 	PlatformDesc     string         `json:"platformDesc"`     // 平台描述词

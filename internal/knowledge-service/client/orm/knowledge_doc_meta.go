@@ -25,18 +25,34 @@ func SelectDocMetaList(ctx context.Context, userId, orgId, docId string) ([]*mod
 }
 
 // UpdateDocStatusDocMeta 更新文档tag
-func UpdateDocStatusDocMeta(ctx context.Context, docId string, metaDataList []*model.KnowledgeDocMeta, ragDocMetaParams *service.RagDocMetaParams) error {
+func UpdateDocStatusDocMeta(ctx context.Context, docId string, addList []*model.KnowledgeDocMeta,
+	updateList []*model.KnowledgeDocMeta, deleteDataIdList []string, ragDocMetaParams *service.RagDocMetaParams) error {
 	return db.GetHandle(ctx).Transaction(func(tx *gorm.DB) error {
 		//todo 文档元数据应该不会特别多，所以先这么做，如果比较多，后续优化
-		//删除所有知识库标签
-		err := tx.Unscoped().Model(&model.KnowledgeDocMeta{}).Where("doc_id = ?", docId).Delete(&model.KnowledgeDocMeta{}).Error
-		if err != nil {
-			return err
+		if len(deleteDataIdList) > 0 {
+			err := tx.Unscoped().Model(&model.KnowledgeDocMeta{}).Where("meta_id IN ?", deleteDataIdList).Delete(&model.KnowledgeDocMeta{}).Error
+			if err != nil {
+				return err
+			}
 		}
-		//插入数据
-		err = tx.Model(&model.KnowledgeDocMeta{}).CreateInBatches(metaDataList, len(metaDataList)).Error
-		if err != nil {
-			return err
+		if len(addList) > 0 {
+			//插入数据
+			err := tx.Model(&model.KnowledgeDocMeta{}).CreateInBatches(addList, len(addList)).Error
+			if err != nil {
+				return err
+			}
+		}
+		if len(updateList) > 0 {
+			for _, meta := range updateList {
+				//更新数据
+				updateMap := map[string]interface{}{
+					"value": meta.Value,
+				}
+				err := tx.Model(&model.KnowledgeDocMeta{}).Where("meta_id = ?", meta.MetaId).Updates(updateMap).Error
+				if err != nil {
+					return err
+				}
+			}
 		}
 		//调用rag
 		return service.RagDocMeta(ctx, ragDocMetaParams)

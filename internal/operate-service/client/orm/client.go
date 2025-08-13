@@ -50,6 +50,7 @@ type SystemCustom struct {
 
 type LoginConfig struct {
 	LoginBgPath string `json:"loginBgPath"` // 登录页背景图路径
+	LogoPath    string `json:"logoPath"`    // 登录页logo路径
 	WelcomeText string `json:"welcomeText"` // 登录页欢迎词
 	ButtonColor string `json:"buttonColor"` // 登录按钮颜色
 }
