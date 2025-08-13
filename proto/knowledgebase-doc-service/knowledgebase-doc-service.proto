@@ -76,6 +76,8 @@ message MetaData {
   string dataId = 1;
   string key = 2;
   string value = 3;
+  string valueType = 4; //String, Number,Date
+  string option = 5; //option:add(新增)、update(更新)、delete(删除),update 和delete 的时候dataId 不能为空
 }
 
 message InitDocStatusReq {

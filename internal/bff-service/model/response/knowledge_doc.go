@@ -31,9 +31,10 @@ type DocSegmentResp struct {
 }
 
 type MetaData struct {
-	Key    string `json:"key"`
-	DataId string `json:"dataId"`
-	Value  string `json:"value"`
+	Key      string `json:"key"`
+	DataId   string `json:"dataId"`
+	Value    string `json:"value"`
+	DataType string `json:"dataType"`
 }
 
 type SegmentContent struct {
