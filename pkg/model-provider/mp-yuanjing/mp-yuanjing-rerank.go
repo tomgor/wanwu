@@ -2,15 +2,12 @@ package mp_yuanjing
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
-	"fmt"
-	"io"
 	"net/url"
 
 	"github.com/UnicomAI/wanwu/pkg/log"
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
-	"github.com/go-resty/resty/v2"
+	"github.com/UnicomAI/wanwu/pkg/util"
 )
 
 type Rerank struct {
@@ -27,36 +24,9 @@ func (cfg *Rerank) NewReq(req *mp_common.RerankReq) (mp_common.IRerankReq, error
 }
 
 func (cfg *Rerank) Rerank(ctx context.Context, req mp_common.IRerankReq, headers ...mp_common.Header) (mp_common.IRerankResp, error) {
-	if cfg.ApiKey != "" {
-		headers = append(headers, mp_common.Header{
-			Key:   "Authorization",
-			Value: "Bearer " + cfg.ApiKey,
-		})
-	}
-
-	request := resty.New().
-		SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}). // 关闭证书校验
-		SetTimeout(0).                                             // 关闭请求超时
-		R().
-		SetContext(ctx).
-		SetHeader("Content-Type", "application/json").
-		SetHeader("Accept", "application/json").
-		SetBody(req.Data()).
-		SetDoNotParseResponse(true)
-	for _, header := range headers {
-		request.SetHeader(header.Key, header.Value)
-	}
-
-	url := cfg.rerankUrl()
-	resp, err := request.Post(url)
+	b, err := mp_common.Rerank(ctx, "yuanjing", cfg.ApiKey, cfg.rerankUrl(), req.Data(), headers...)
 	if err != nil {
-		return nil, fmt.Errorf("request %v yuanjing rerank err: %v", url, err)
-	} else if resp.StatusCode() >= 300 {
-		return nil, fmt.Errorf("request %v yuanjing rerank http status %v msg: %v", url, resp.StatusCode(), resp.String())
-	}
-	b, err := io.ReadAll(resp.RawResponse.Body)
-	if err != nil {
-		return nil, fmt.Errorf("request %v yuanjing rerank read response body err: %v", url, err)
+		return nil, err
 	}
 	return &rerankResp{raw: string(b)}, nil
 }
@@ -72,8 +42,8 @@ type rerankResp struct {
 	raw string
 
 	Index    int     `json:"index"`
-	Score    float64 `json:"score"`
-	Document string  `json:"document"`
+	Score    float64 `json:"score" validate:"required" `
+	Document string  `json:"document" validate:"required"`
 }
 
 func (resp *rerankResp) String() string {
@@ -88,6 +58,7 @@ func (resp *rerankResp) Data() (interface{}, bool) {
 	}
 	return ret, true
 }
+
 func (resp *rerankResp) ConvertResp() (*mp_common.RerankResp, bool) {
 	var data []map[string]interface{}
 	if err := json.Unmarshal([]byte(resp.raw), &data); err != nil {
@@ -106,6 +77,12 @@ func (resp *rerankResp) ConvertResp() (*mp_common.RerankResp, bool) {
 			log.Errorf("yuanjing rerank resp (%v) item (%v) unmarshal err: %v", resp.raw, item, err)
 			return nil, false
 		}
+
+		if err := util.Validate(resp); err != nil {
+			log.Errorf("yuanjing rerank resp validate err: %v", err)
+			return nil, false
+		}
+
 		results = append(results, mp_common.Result{
 			Index:          resp.Index,
 			RelevanceScore: resp.Score,

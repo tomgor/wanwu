@@ -52,6 +52,9 @@ func ModelEmbeddings(ctx *gin.Context, modelID string, req *mp_common.EmbeddingR
 		return
 	}
 	if data, ok := resp.ConvertResp(); ok {
+		if data.Model == "" {
+			data.Model = modelInfo.Model
+		}
 		status := http.StatusOK
 		ctx.Set(gin_util.STATUS, status)
 		//ctx.Set(config.RESULT, resp.String())

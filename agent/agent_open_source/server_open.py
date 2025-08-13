@@ -22,6 +22,7 @@ from logging_config import setup_logging
 from bing_plus import *
 import configparser
 from langchain.requests import RequestsWrapper
+from mcp_client import *
 
 
 import logging
@@ -68,6 +69,9 @@ def agent_start():
             userId = request.headers.get('X-Uid')
             function_call = data.get("function_call",False)
             logger.info('user_id是:'+userId)
+
+
+            mcp_tools = data.get("mcp_tools", {})
             
 
 
@@ -198,9 +202,137 @@ def agent_start():
             if kn_params:
                 knowledgebase_name = kn_params.get('knowledgeBase')
                 threshold = kn_params.get('threshold',0.4)
-                topk = kn_params.get('topk',5)
+                topk = kn_params.get('topK',5)
                 rerank_id = kn_params.get('rerank_id')
-            
+                rerank_mod = kn_params.get('rerank_mod','rerank_model')
+                retrieve_method = kn_params.get('retrieve_method','hybrid_search') 
+                weights = kn_params.get('weights',None)
+                max_history = kn_params.get('max_history')
+                rewrite_query = kn_params.get('rewrite_query')
+
+
+
+
+            if mcp_tools:
+                mcp_server_response = mcp_server_client(question, mcp_tools, temperature=temperature,model_name=model,model_url=model_url,
+                                                        stream=True,
+                                                        history=history)
+                if mcp_server_response:
+                    for item in mcp_server_response:
+                        logger.info('result: %s',item)
+                        answer = {
+                            "code": 0,
+                            "message": "success",
+                            "response": "",
+                            "gen_file_url_list": [],
+                            "history": [],
+                            "finish": 0,
+                            "usage": {
+                                "prompt_tokens": 0,
+                                "completion_tokens": 0,
+                                "total_tokens": 0
+                            },
+                            "search_list": [],
+                            "qa_type": 20
+                        }
+                            # 处理 AIMessage 内容
+                        if isinstance(item, AIMessage) and item.content:
+                            token_usage = getattr(item, "response_metadata", {}).get("token_usage", {})
+
+                            answer["response"] = item.content
+                            answer["usage"] = {
+                                "prompt_tokens": token_usage.get("prompt_tokens", 0),
+                                "completion_tokens": token_usage.get("completion_tokens", 0),
+                                "total_tokens": token_usage.get("total_tokens", 0)
+                            }
+                            #yield f"data:{json.dumps(answer, ensure_ascii=False)}\n\n"
+
+
+                            tool_calls = getattr(item, "tool_calls", [])
+                            if tool_calls:
+                                logger.info('tool_calls is: %s', tool_calls)
+                                tool_name = tool_calls[0]['name']
+                                args = tool_calls[0]['args']
+                                logger.info('tool_name is: %s',tool_name)
+                                logger.info('args_str is: %s',args)
+                                text = f"<tool>mcp-工具名：{tool_name}\n\n\n```请求参数：\n{args}\n```\n\n"
+                                answer["response"] = text
+                            yield f"data:{json.dumps(answer, ensure_ascii=False)}\n\n"
+
+
+                        # 是 ToolMessage
+                        elif isinstance(item, ToolMessage) and item.content:
+                            text1 = f"```请求结果：\n{item.content}\n```\n\n</tool>"
+                            answer["response"] = text1
+                            yield f"data:{json.dumps(answer, ensure_ascii=False)}\n\n"
+
+
+                    # 最后一条，标记完成
+                    answer["finish"] = 1
+                    answer["usage"] = {
+                        "prompt_tokens": 0,
+                        "completion_tokens": 0,
+                        "total_tokens": 0
+                    }
+                    yield f"data:{json.dumps(answer, ensure_ascii=False)}\n"
+                    return
+                else:
+                    logger.info('mcp无法回答 大模型兜底回答')
+                    llm = ChatOpenAI(
+                        model_name=model,
+                        streaming=True,
+                        top_p=top_p,
+                        temperature=temperature,
+                        frequency_penalty=frequency_penalty,
+                        presence_penalty=presence_penalty,
+                        base_url=model_url,
+                        openai_api_key=os.environ["ARK_API_KEY"],
+                    )
+                    answer = {
+                        "code": 0,
+                        "message": "success",
+                        "response": "",
+                        "gen_file_url_list": [],
+                        "history": [],
+                        "finish": 0,
+                        "usage": {
+                            "prompt_tokens": 0,
+                            "completion_tokens": 0,
+                            "total_tokens": 0
+                        },
+                        "search_list": [],
+                        "qa_type": 0
+                    }
+
+                    assistant_reply = ""
+                    messages.append({"role": "user", "content": question})
+                    messages.append({"role": "system", "content": system_role})
+                    for chunk in llm.stream(messages):
+                        if hasattr(chunk, "content"):
+                            print('大模型输出是:', chunk)
+                            assistant_reply += chunk.content
+                            answer['response'] = chunk.content
+
+                            if hasattr(chunk, "response_metadata"):
+                                if 'finish_reason' in chunk.response_metadata and chunk.response_metadata[
+                                    'finish_reason'] == 'stop':
+                                    updated_history = history[-4:] if len(history) > 4 else history
+                                    updated_history.append({
+                                        "query": question,
+                                        "response": assistant_reply
+                                    })
+                                    answer['finish'] = 1
+                                    answer["history"] = updated_history
+                            if hasattr(chunk, "usage_metadata") and chunk.usage_metadata is not None:
+                                answer['usage']['prompt_tokens'] = chunk.usage_metadata[
+                                    'input_tokens'] if 'input_tokens' in chunk.usage_metadata else 0
+                                answer['usage']['completion_tokens'] = chunk.usage_metadata[
+                                    'output_tokens'] if 'output_tokens' in chunk.usage_metadata else 0
+                                answer['usage']['total_tokens'] = chunk.usage_metadata[
+                                    'total_tokens'] if 'total_tokens' in chunk.usage_metadata else 0
+                            yield f"data:{json.dumps(answer, ensure_ascii=False)}\n"
+                    return
+
 
 
             used_rag = False
@@ -219,7 +351,12 @@ def agent_start():
                     "history": history,
                     "auto_citation":auto_citation,
                     "rerank_model_id":rerank_id,
-                    "custom_model_info":{"llm_model_id":model_id}
+                    "custom_model_info":{"llm_model_id":model_id},
+                    "rerank_mod":rerank_mod,
+                    "retrieve_method":retrieve_method,
+                    "weights":weights,
+                    "max_history":max_history,
+                    "rewrite_query":rewrite_query
                 }
 
 
@@ -497,7 +634,6 @@ def agent_start():
                             model_name=model,
                             streaming=True,
                             top_p = top_p,
-                            max_tokens = max_tokens,
                             temperature = temperature,
                             frequency_penalty = frequency_penalty,
                             presence_penalty = presence_penalty,
@@ -551,7 +687,6 @@ def agent_start():
                         model_name=model,
                         streaming=True,
                         top_p = top_p,
-                        max_tokens = max_tokens,
                         temperature = temperature,
                         frequency_penalty = frequency_penalty,
                         presence_penalty = presence_penalty,

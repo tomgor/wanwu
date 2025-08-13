@@ -39,6 +39,11 @@ func (s *Server) Start() error {
 	if s.serv != nil {
 		return nil
 	}
+	// 初始化微服务
+	if err := assistant.StartService(); err != nil {
+		log.Fatalf("init service err: %v", err)
+	}
+	log.Infof("init service success")
 
 	// init
 	opts := []grpc_recovery.Option{

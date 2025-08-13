@@ -3,21 +3,22 @@
     <overview :login="login" />
     <div class="login-modal">
       <div class="header__left">
-        <!--<img
-          style="height: 26px; margin: 0 15px 0 22px"
-          :src="home.logo.path ? (basePath + '/user/api' + home.logo.path) : require('@/assets/imgs/wanwu.svg')"
+        <img
+          v-if="login.logo && login.logo.path"
+          style="height: 35px; margin: 0 15px 0 22px"
+          :src="basePath + '/user/api' + login.logo.path"
         />
-         <span style="font-size: 16px;">{{home.title || ''}}</span>-->
+        <!--<span style="font-size: 16px;">{{home.title || ''}}</span>-->
         <!--<div style="margin-left: 10px">
           <ChangeLang :isLogin="true" />
         </div>-->
       </div>
+      <div class="container__left">
+        {{login.welcomeText}}
+      </div>
       <div class="login-box">
         <p class="login-header">
           <span style="font-weight: bold">{{$t('login.title')}}</span>
-          <span style="margin-left: 20px; font-size: 16px; padding-bottom: 2px">
-            {{login.welcomeText}}
-          </span>
         </p>
         <div class="login-form">
           <el-form ref="form" class="form" :model="form" label-position="top">
@@ -187,6 +188,17 @@ export default {
     align-items: center;
     margin-top: 16px;
     margin-left: 10px;
+    height: 35px;
+  }
+  .container__left {
+    display: flex;
+    align-items: center;
+    height: calc(80% - 36px);
+    font-size: 35px;
+    width: calc(100% - 13% - 400px);
+    justify-content: center;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   }
   .login-box{
     position: absolute;

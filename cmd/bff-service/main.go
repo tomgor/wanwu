@@ -9,7 +9,10 @@ import (
 	"runtime"
 	"syscall"
 
+	"github.com/UnicomAI/wanwu/internal/bff-service/service"
+
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
+	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/ahocorasick"
 	assistant_template "github.com/UnicomAI/wanwu/internal/bff-service/pkg/assistant-template"
 	"github.com/UnicomAI/wanwu/internal/bff-service/server/http/handler"
 	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
@@ -62,6 +65,16 @@ func main() {
 	// init i18n
 	if err := i18n.Init(config.Cfg().I18n); err != nil {
 		log.Fatalf("init i18n err: %v", err)
+	}
+
+	// init aho-corasick
+	if err := ahocorasick.Init(); err != nil {
+		log.Fatalf("init aho-corasick err: %v", err)
+	}
+
+	// doc-center
+	if err := service.InitDocCenter(); err != nil {
+		log.Fatalf("init doc-center err: %v", err)
 	}
 
 	// init minio: custom

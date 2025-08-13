@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -321,7 +322,44 @@ func logRequest(ctx context.Context, httpRequestParams *HttpRequestParams, reque
 	var paramsMap = make(map[string]interface{})
 	paramsMap["url"] = httpRequestParams.Url
 	paramsMap["requestBody"] = requestBody
-	log.Infof("HTTP-"+requestType, httpRequestParams.MonitorKey, paramsMap, responseBody, err, start.UnixMilli())
+	LogRpcJson(ctx, "HTTP-"+requestType, httpRequestParams.MonitorKey, paramsMap, responseBody, err, start.UnixMilli())
+}
+
+func LogRpcJson(ctx context.Context, business string, method string, params interface{}, result interface{}, err error, starTimestamp int64) {
+	defer func() {
+		if err1 := recover(); err1 != nil {
+			fmt.Println(err1)
+		}
+	}()
+	var success = 1
+	if err != nil {
+		success = 0
+	}
+	var paramsStr = Convert2LogString(params)
+	var resultStr = Convert2LogString(result)
+	var errMsg = "-"
+	if err != nil {
+		errMsg = err.Error()
+	}
+	log.Log().Infof("%s|%s|%d|%d|%+v|%+v|%s", business, method, success, time.Now().UnixMilli()-starTimestamp, paramsStr, resultStr, errMsg)
+}
+
+func Convert2LogString(object interface{}) string {
+	if object == nil {
+		return "-"
+	}
+	switch obj := object.(type) {
+	case string:
+		return obj
+	case []byte:
+		return string(obj)
+	default:
+		bytesData, err := json.Marshal(object)
+		if err != nil {
+			return "-"
+		}
+		return string(bytesData)
+	}
 }
 
 func Get(ctx context.Context, params *HttpRequestParams) ([]byte, error) {

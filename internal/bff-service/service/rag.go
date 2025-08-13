@@ -4,6 +4,7 @@ import (
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	rag_service "github.com/UnicomAI/wanwu/api/proto/rag-service"
+	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	"github.com/gin-gonic/gin"
@@ -43,20 +44,44 @@ func UpdateRagConfig(ctx *gin.Context, req request.RagConfig) error {
 		return err
 	}
 	_, err = rag.UpdateRagConfig(ctx.Request.Context(), &rag_service.UpdateRagConfigReq{
-		RagId:        req.RagID,
-		ModelConfig:  modelConfig,
-		RerankConfig: rerankConfig,
-		KnowledgeBaseConfig: &rag_service.RagKnowledgeBaseConfig{
-			KnowledgeBaseId:  req.KnowledgeBaseConfig.Knowledgebases[0].ID,
-			MaxHistory:       req.KnowledgeBaseConfig.Config.MaxHistory,
-			MaxHistoryEnable: req.KnowledgeBaseConfig.Config.MaxHistoryEnable,
-			Threshold:        req.KnowledgeBaseConfig.Config.Threshold,
-			ThresholdEnable:  req.KnowledgeBaseConfig.Config.ThresholdEnable,
-			TopK:             req.KnowledgeBaseConfig.Config.TopK,
-			TopKEnable:       req.KnowledgeBaseConfig.Config.TopKEnable,
-		},
+		RagId:               req.RagID,
+		ModelConfig:         modelConfig,
+		RerankConfig:        rerankConfig,
+		KnowledgeBaseConfig: ragKBConfigToProto(req.KnowledgeBaseConfig),
+		SensitiveConfig:     ragSensitiveConfigToProto(req.SafetyConfig),
 	})
 	return err
+}
+
+func ragSensitiveConfigToProto(req request.AppSafetyConfig) *rag_service.RagSensitiveConfig {
+	var sensitiveTableIds []string
+	for _, v := range req.Tables {
+		sensitiveTableIds = append(sensitiveTableIds, v.TableId)
+	}
+	sensitiveConfig := &rag_service.RagSensitiveConfig{
+		Enable:   req.Enable,
+		TableIds: sensitiveTableIds,
+	}
+	return sensitiveConfig
+}
+
+func ragKBConfigToProto(knowledgeConfig request.AppKnowledgebaseConfig) *rag_service.RagKnowledgeBaseConfig {
+	var knowledgeBaseIds []string
+	for _, v := range knowledgeConfig.Knowledgebases {
+		knowledgeBaseIds = append(knowledgeBaseIds, v.ID)
+	}
+	configParams := knowledgeConfig.Config
+	knowledgeBaseConfig := &rag_service.RagKnowledgeBaseConfig{
+		KnowledgeBaseIds:  knowledgeBaseIds,
+		MaxHistory:        configParams.MaxHistory,
+		Threshold:         configParams.Threshold,
+		TopK:              configParams.TopK,
+		MatchType:         configParams.MatchType,
+		PriorityMatch:     configParams.PriorityMatch,
+		SemanticsPriority: configParams.SemanticsPriority,
+		KeywordPriority:   configParams.KeywordPriority,
+	}
+	return knowledgeBaseConfig
 }
 
 func DeleteRag(ctx *gin.Context, req request.RagReq) error {
@@ -71,58 +96,94 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	var modelInfo, rerankInfo *model_service.ModelInfo
+	modelConfig, rerankConfig, err := appModelRerankProto2Model(ctx, resp)
+	if err != nil {
+		return &response.RagInfo{}, err
+	}
+	ragInfo := &response.RagInfo{
+		RagID:               resp.RagId,
+		AppBriefConfig:      appBriefConfigProto2Model(ctx, resp.BriefConfig),
+		ModelConfig:         modelConfig,
+		RerankConfig:        rerankConfig,
+		KnowledgeBaseConfig: ragKBConfigProto2Model(ctx, resp.KnowledgeBaseConfig),
+		SafetyConfig:        ragSafetyConfigProto2Model(ctx, resp.SensitiveConfig),
+	}
+
+	return ragInfo, nil
+}
+
+func appModelRerankProto2Model(ctx *gin.Context, resp *rag_service.RagInfo) (request.AppModelConfig, request.AppModelConfig, error) {
 	var modelConfig, rerankConfig request.AppModelConfig
-	var knowledgeInfo *knowledgebase_service.KnowledgeInfo
-	var ragInfo = &response.RagInfo{}
 	if resp.ModelConfig.ModelId != "" {
-		modelInfo, err = model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: resp.ModelConfig.ModelId})
+		modelInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: resp.ModelConfig.ModelId})
 		if err != nil {
-			return nil, err
+			return request.AppModelConfig{}, request.AppModelConfig{}, err
 		}
 		modelConfig, err = appModelConfigProto2Model(resp.ModelConfig, modelInfo.DisplayName)
 		if err != nil {
-			return nil, err
+			return request.AppModelConfig{}, request.AppModelConfig{}, err
 		}
 	}
 	if resp.RerankConfig.ModelId != "" {
-		rerankInfo, err = model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: resp.RerankConfig.ModelId})
+		rerankInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: resp.RerankConfig.ModelId})
 		if err != nil {
-			return nil, err
+			return request.AppModelConfig{}, request.AppModelConfig{}, err
 		}
 		rerankConfig, err = appModelConfigProto2Model(resp.RerankConfig, rerankInfo.DisplayName)
 		if err != nil {
-			return nil, err
+			return request.AppModelConfig{}, request.AppModelConfig{}, err
 		}
 	}
-	if resp.KnowledgeBaseConfig.KnowledgeBaseId != "" {
-		knowledgeInfo, _ = knowledgeBase.SelectKnowledgeDetailById(ctx, &knowledgebase_service.KnowledgeDetailSelectReq{
-			KnowledgeId: resp.KnowledgeBaseConfig.KnowledgeBaseId,
-		})
+	return modelConfig, rerankConfig, nil
+}
+
+func ragSafetyConfigProto2Model(ctx *gin.Context, sensitiveCfg *rag_service.RagSensitiveConfig) request.AppSafetyConfig {
+	var sensitiveTableList []request.SensitiveTable
+	if len(sensitiveCfg.GetTableIds()) != 0 {
+		sensitiveWordTable, _ := safety.GetSensitiveWordTableListByIDs(ctx, &safety_service.GetSensitiveWordTableListByIDsReq{TableIds: sensitiveCfg.GetTableIds()})
+		if sensitiveWordTable != nil {
+			for _, table := range sensitiveWordTable.List {
+				sensitiveTableList = append(sensitiveTableList, request.SensitiveTable{
+					TableId:   table.TableId,
+					TableName: table.TableName,
+				})
+			}
+		}
 	}
-	ragInfo = &response.RagInfo{
-		RagID:          resp.RagId,
-		AppBriefConfig: appBriefConfigProto2Model(ctx, resp.BriefConfig),
-		ModelConfig:    modelConfig,
-		RerankConfig:   rerankConfig,
-		KnowledgeBaseConfig: request.AppKnowledgebaseConfig{
-			Config: request.AppKnowledgebaseParams{
-				MaxHistory:       resp.KnowledgeBaseConfig.MaxHistory,
-				MaxHistoryEnable: resp.KnowledgeBaseConfig.MaxHistoryEnable,
-				Threshold:        resp.KnowledgeBaseConfig.Threshold,
-				ThresholdEnable:  resp.KnowledgeBaseConfig.ThresholdEnable,
-				TopK:             resp.KnowledgeBaseConfig.TopK,
-				TopKEnable:       resp.KnowledgeBaseConfig.TopKEnable,
-			},
+	safetyConfig := request.AppSafetyConfig{
+		Enable: sensitiveCfg.Enable,
+		Tables: sensitiveTableList,
+	}
+	return safetyConfig
+}
+
+func ragKBConfigProto2Model(ctx *gin.Context, kbConfig *rag_service.RagKnowledgeBaseConfig) request.AppKnowledgebaseConfig {
+	var knowledgeBases []request.AppKnowledgeBase
+	if len(kbConfig.KnowledgeBaseIds) > 0 {
+		knowledgeInfoList, _ := knowledgeBase.SelectKnowledgeDetailByIdList(ctx, &knowledgebase_service.KnowledgeDetailSelectListReq{
+			KnowledgeIds: kbConfig.KnowledgeBaseIds,
+		})
+		if knowledgeInfoList != nil {
+			for _, v := range knowledgeInfoList.List {
+				kb := request.AppKnowledgeBase{
+					ID:   v.KnowledgeId,
+					Name: v.Name,
+				}
+				knowledgeBases = append(knowledgeBases, kb)
+			}
+		}
+	}
+	knowledgeBaseConfig := request.AppKnowledgebaseConfig{
+		Knowledgebases: knowledgeBases,
+		Config: request.AppKnowledgebaseParams{
+			MaxHistory:        kbConfig.MaxHistory,
+			Threshold:         kbConfig.Threshold,
+			TopK:              kbConfig.TopK,
+			MatchType:         kbConfig.MatchType,
+			KeywordPriority:   kbConfig.KeywordPriority,
+			PriorityMatch:     kbConfig.PriorityMatch,
+			SemanticsPriority: kbConfig.SemanticsPriority,
 		},
 	}
-	if knowledgeInfo != nil {
-		ragInfo.KnowledgeBaseConfig.Knowledgebases = []request.AppKnowledgeBase{
-			{
-				ID:   resp.KnowledgeBaseConfig.KnowledgeBaseId,
-				Name: knowledgeInfo.Name,
-			},
-		}
-	}
-	return ragInfo, nil
+	return knowledgeBaseConfig
 }

@@ -154,6 +154,69 @@ func AssistantWorkFlowEnableSwitch(ctx *gin.Context) {
 	gin_util.Response(ctx, resp, err)
 }
 
+// AssistantMCPCreate
+//
+//	@Tags			agent
+//	@Summary		添加mcp工具
+//	@Description	为智能体绑定已发布的mcp工具
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.MCPAddRequest	true	"mcp新增参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/assistant/mcp [post]
+func AssistantMCPCreate(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.MCPAddRequest
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	resp, err := service.AssistantMCPCreate(ctx, userId, orgId, req)
+	gin_util.Response(ctx, resp, err)
+}
+
+// AssistantMCPDelete
+//
+//	@Tags			agent
+//	@Summary		删除mcp
+//	@Description	为智能体解绑mcp
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.MCPIdRequest	true	"mcp id"
+//	@Success		200		{object}	response.Response
+//	@Router			/assistant/mcp [delete]
+func AssistantMCPDelete(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.MCPIdRequest
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	resp, err := service.AssistantMCPDelete(ctx, userId, orgId, req)
+	gin_util.Response(ctx, resp, err)
+}
+
+// AssistantMCPEnableSwitch
+//
+//	@Tags			agent
+//	@Summary		启用/停用 MCP
+//	@Description	修改智能体绑定的MCP的启用状态
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.MCPIdRequest	true	"mcp id"
+//	@Success		200		{object}	response.Response
+//	@Router			/assistant/mcp/enable [put]
+func AssistantMCPEnableSwitch(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.MCPIdRequest
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	resp, err := service.AssistantMCPEnableSwitch(ctx, userId, orgId, req)
+	gin_util.Response(ctx, resp, err)
+}
+
 // AssistantActionCreate
 //
 //	@Tags			agent

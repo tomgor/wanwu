@@ -2,6 +2,8 @@ package orm
 
 import (
 	"context"
+	"sync"
+
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm/sqlopt"
@@ -10,7 +12,6 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/log"
 	pkg_util "github.com/UnicomAI/wanwu/pkg/util"
 	"gorm.io/gorm"
-	"sync"
 )
 
 type TagRelation struct {

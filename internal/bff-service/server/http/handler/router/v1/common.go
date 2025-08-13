@@ -25,12 +25,15 @@ func registerCommon(apiV1 *gin.RouterGroup) {
 	mid.Sub("common").Reg(apiV1, "/proxy/file/upload", http.MethodPost, v1.ProxyUploadFile, "代理上传文件")
 
 	// 文档中心
-	mid.Sub("common").Reg(apiV1, "/doc_center", http.MethodGet, v1.GetDocCenter, "获取文档中心路径")
+	mid.Sub("common").Reg(apiV1, "/doc_center/search", http.MethodGet, v1.SearchDocCenter, "查找文档中心内容")
+	mid.Sub("common").Reg(apiV1, "/doc_center/menu", http.MethodGet, v1.GetDocCenterMenu, "获取文档中心目录")
+	mid.Sub("common").Reg(apiV1, "/doc_center/markdown", http.MethodGet, v1.GetDocCenterMarkdown, "获取文档中心Markdown文件内容")
 
 	// 模型通用
 	mid.Sub("common").Reg(apiV1, "/model/select/llm", http.MethodGet, v1.ListLlmModels, "llm模型列表展示")
 	mid.Sub("common").Reg(apiV1, "/model/select/rerank", http.MethodGet, v1.ListRerankModels, "rerank模型列表展示")
 	mid.Sub("common").Reg(apiV1, "/model/select/embedding", http.MethodGet, v1.ListEmbeddingModels, "embedding模型列表展示")
+	mid.Sub("common").Reg(apiV1, "/model/select/ocr", http.MethodGet, v1.ListOcrModels, "ocr模型列表展示")
 
 	// 知识库通用
 	mid.Sub("common").Reg(apiV1, "/knowledge/select", http.MethodPost, v1.GetKnowledgeSelect, "查询用户知识库列表")
@@ -47,4 +50,7 @@ func registerCommon(apiV1 *gin.RouterGroup) {
 
 	// MCP通用
 	mid.Sub("common").Reg(apiV1, "/mcp/select", http.MethodGet, v1.GetMCPSelect, "获取MCP自定义列表")
+
+	// Safety通用
+	mid.Sub("common").Reg(apiV1, "/safe/sensitive/table/select", http.MethodGet, v1.GetSensitiveWordTableSelect, "获取敏感词表下拉列表")
 }

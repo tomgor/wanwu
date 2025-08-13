@@ -53,3 +53,9 @@ db:
     max_open_conns: 16
     max_idle_conns: 16
     log_mode: true
+
+minio:
+  endpoint: localhost:9000
+  user: root
+  password: Wanwu123456
+  bucket: safety
