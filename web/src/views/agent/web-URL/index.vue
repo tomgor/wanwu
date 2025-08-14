@@ -23,9 +23,11 @@
     </div>
 </template>
 <script>
-import CommonLayout from '@/components/exploreContainer.vue'
+import CommonLayout from '@/components/exploreContainer.vue';
+import CreateApi from './createApi.vue';
+import CreateUrl from './createUrl.vue';
 export default {
-    components: {CommonLayout},
+    components: {CommonLayout,CreateApi,CreateUrl},
     data(){
         return{
             asideWidth:'320',

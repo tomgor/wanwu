@@ -213,7 +213,7 @@
                   </el-select>
                   <el-input v-model="item.metaValue" v-if="item.metadataType ==='value' && item.metaValueType === 'string'" @blur="metaValueBlur(item)" placeholder="string"></el-input>
                   <el-input v-model="item.metaValue" v-if="item.metadataType ==='value'  && item.metaValueType === 'number'" @blur="metaValueBlur(item)" type="number" placeholder="number"></el-input>
-                  <el-input v-model="item.metaRule" v-if="item.metadataType ==='regExp' && item.metaValueType !== 'time'" @blur="metaRuleBlur(item)" placeholder="regExp"></el-input>
+                  <el-input v-model="item.metaRule" v-if="item.metadataType ==='regExp'" @blur="metaRuleBlur(item)" placeholder="regExp"></el-input>
                   <el-date-picker
                     v-if="item.metaValueType === 'time' && item.metadataType==='value'"
                     v-model="item.metaValue"
