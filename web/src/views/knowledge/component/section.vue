@@ -35,12 +35,27 @@
           res.splitter
         }}</el-descriptions-item>
         <el-descriptions-item label="元数据">
-          <template v-if="res.MetaDataList && res.MetaDataList.length > 0">
-            <span>{{ res.MetaDataList.length > 3 ? filterData(res.MetaDataList.slice(0,3)) : filterData(res.MetaDataList)}}</span>
-            <span v-if="res.MetaDataList.length > 3" class="showMore">+{{res.MetaDataList.length -3}}</span>
+          <template v-if="metaDataList && metaDataList.length > 0">
+            <span v-for="(item, index) in metaDataList.slice(0, 3)" :key="index" class="metaItem">
+              {{ item.key }}: {{ item.value }}<span v-if="index < metaDataList.slice(0, 3).length - 1"> </span>
+            </span>
+            <el-tooltip v-if="metaDataList.length > 3" :content="filterData(metaDataList.slice(3))" placement="bottom">
+              <span class="metaItem">...</span>
+            </el-tooltip>
           </template>
           <span v-else>无数据</span>
-          <span class="el-icon-edit-outline editIcon" @click="showDatabase(res.MetaDataList || [])" v-if="res.MetaDataList && res.MetaDataList.length > 0"></span>
+          <span class="el-icon-edit-outline editIcon" @click="showDatabase(metaDataList || [])" v-if="metaDataList"></span>
+        </el-descriptions-item>
+        <el-descriptions-item label="元数据规则">
+          <template v-if="metaRuleList && metaRuleList.length > 0">
+            <span v-for="(item, index) in metaRuleList.slice(0, 3)" :key="index" class="metaItem">
+              {{ item.key }}: {{ item.rule }}<span v-if="index < metaRuleList.slice(0, 3).length - 1"> </span>
+            </span>
+            <el-tooltip v-if="metaRuleList.length > 3" :content="filterRule(metaRuleList.slice(3))" placement="bottom">
+              <span class="metaItem">...</span>
+            </el-tooltip>
+          </template>
+          <span v-else>无数据</span>
         </el-descriptions-item>
       </el-descriptions>
 
@@ -189,6 +204,8 @@ export default {
       res: {
         contentList: [],
       },
+      metaDataList: [],
+      metaRuleList: []
     };
   },
   created() {
@@ -206,6 +223,10 @@ export default {
       const formattedString = data.map(item => `${item.key}:${item.value}`).join(", ");
       return formattedString
     },
+    filterRule(rule){
+      const formattedString = rule.map(item => `${item.key}:${item.rule}`).join(", ");
+      return formattedString
+    },
     getList() {
       this.loading.itemStatus = true;
       getSectionList({
@@ -217,6 +238,8 @@ export default {
           this.loading.itemStatus = false;
           this.res = res.data;
           this.page.total = this.res.segmentTotalNum;
+          this.metaRuleList = res.data.MetaDataList.filter(item => item.rule);
+          this.metaDataList = res.data.MetaDataList.filter(item => !item.rule);
         })
         .catch(() => {
           this.loading.itemStatus = false;
@@ -327,6 +350,12 @@ export default {
 </script>
 <style lang="scss">
 .showMore{
+  margin-left:5px;
+  background:#f4f5ff;
+  padding:2px;
+  border-radius:4px;
+}
+.metaItem{
   margin-left:5px;
   background:#f4f5ff;
   padding:2px;
