@@ -159,18 +159,18 @@ stop-assistant:
 		--env-file .env \
 		down assistant-service
 
-# --- workflow-service ---
+# --- workflow ---
 run-workflow:
 	docker-compose -f docker-compose-develop.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
-		up -d workflow-service
+		up -d workflow
 
 stop-workflow:
 	docker-compose -f docker-compose-develop.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
-		down workflow-service
+		down workflow
 
 # --- agentscope ---
 run-agentscope: # 启动agentscope后自动重启下nginx
