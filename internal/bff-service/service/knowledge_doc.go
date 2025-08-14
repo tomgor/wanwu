@@ -1,6 +1,7 @@
 package service
 
 import (
+	"regexp"
 	"strings"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
@@ -76,6 +77,26 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 			}
 		}
 	}
+	var metaList []*knowledgebase_doc_service.DocMetaData
+	for _, meta := range req.DocMetaData {
+		if meta.MetaRule != "" {
+			// 检查rule和key传参
+			if meta.MetaKey != "" {
+				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "常量和正则表达式重复")
+			}
+			// 检查正则合法性
+			_, err := regexp.Compile(meta.MetaRule)
+			if err != nil {
+				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "非法正则表达式", err.Error())
+			}
+		}
+		metaList = append(metaList, &knowledgebase_doc_service.DocMetaData{
+			Key:       meta.MetaKey,
+			Value:     meta.MetaValue,
+			ValueType: meta.MetaValueType,
+			Rule:      meta.MetaRule,
+		})
+	}
 	_, err := knowledgeBaseDoc.ImportDoc(ctx.Request.Context(), &knowledgebase_doc_service.ImportDocReq{
 		UserId:        userId,
 		OrgId:         orgId,
@@ -87,9 +108,11 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 			MaxSplitter: int32(segment.MaxSplitter),
 			Overlap:     segment.Overlap,
 		},
-		DocAnalyzer: req.DocAnalyzer,
-		DocInfoList: docInfoList,
-		OcrModelId:  req.OcrModelId,
+		DocAnalyzer:     req.DocAnalyzer,
+		DocInfoList:     docInfoList,
+		OcrModelId:      req.OcrModelId,
+		DocPreprocess:   req.DocPreprocess,
+		DocMetaDataList: metaList,
 	})
 	if err != nil {
 		log.Errorf("上传失败(保存上传任务 失败(%v) ", err)
@@ -113,7 +136,7 @@ func UpdateDocStatus(ctx *gin.Context, r *request.CallbackUpdateDocStatusReq) er
 	_, err := knowledgeBaseDoc.UpdateDocStatus(ctx.Request.Context(), &knowledgebase_doc_service.UpdateDocStatusReq{
 		DocId:        r.DocId,
 		Status:       r.Status,
-		MetaDataList: buildMetaDataList(r.MetaDataList),
+		MetaDataList: buildCallbackMetaDataList(r.MetaDataList),
 	})
 	return err
 }
@@ -260,6 +283,19 @@ func buildMetaDataList(metaDataList []*request.MetaData) []*knowledgebase_doc_se
 			Value:     item.Value,
 			Option:    item.Option,
 			ValueType: item.DataType,
+		}
+	})
+}
+
+func buildCallbackMetaDataList(metaDataList []*request.CallbackMetaData) []*knowledgebase_doc_service.MetaData {
+	if len(metaDataList) == 0 {
+		return make([]*knowledgebase_doc_service.MetaData, 0)
+	}
+	return lo.Map(metaDataList, func(item *request.CallbackMetaData, index int) *knowledgebase_doc_service.MetaData {
+		return &knowledgebase_doc_service.MetaData{
+			DataId: item.MetaId,
+			Key:    item.Key,
+			Value:  item.Value,
 		}
 	})
 }

@@ -54,10 +54,16 @@ type DeleteKnowledge struct {
 }
 
 type CallbackUpdateDocStatusReq struct {
-	DocId        string      `json:"id" validate:"required"`
-	Status       int32       `json:"status" validate:"required"`
-	MetaDataList []*MetaData `json:"metaDataList"`
+	DocId        string              `json:"id" validate:"required"`
+	Status       int32               `json:"status" validate:"required"`
+	MetaDataList []*CallbackMetaData `json:"metaDataList"`
 	CommonCheck
+}
+
+type CallbackMetaData struct {
+	Key    string `json:"key"`
+	MetaId string `json:"metaId" validate:"required"`
+	Value  string `json:"value" validate:"required"`
 }
 
 type MetaData struct {

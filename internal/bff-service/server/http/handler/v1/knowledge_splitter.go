@@ -14,17 +14,12 @@ import (
 //	@Description	查询知识库分隔符列表
 //	@Security		JWT
 //	@Accept			json
-//	@Param			data	body	request.KnowledgeSplitterSelectReq	true	"查询知识库请求参数"
 //	@Produce		json
 //	@Success		200	{object}	response.Response{data=response.KnowledgeSplitterListResp}
 //	@Router			/knowledge/splitter [get]
 func GetKnowledgeSplitterSelect(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)
-	var req request.KnowledgeSplitterSelectReq
-	if !gin_util.BindQuery(ctx, &req) {
-		return
-	}
-	resp, err := service.SelectKnowledgeSplitterList(ctx, userId, orgId, &req)
+	resp, err := service.SelectKnowledgeSplitterList(ctx, userId, orgId)
 	gin_util.Response(ctx, resp, err)
 }
 

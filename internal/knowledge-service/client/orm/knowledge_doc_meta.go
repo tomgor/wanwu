@@ -2,7 +2,6 @@ package orm
 
 import (
 	"context"
-
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm/sqlopt"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/db"
@@ -58,4 +57,29 @@ func UpdateDocStatusDocMeta(ctx context.Context, docId string, addList []*model.
 		//return service.RagDocMeta(ctx, ragDocMetaParams)
 		return nil
 	})
+}
+
+// UpdateDocStatusMetaData 根据metaId更新元数据
+func UpdateDocStatusMetaData(ctx context.Context, metaDataList []*model.KnowledgeDocMeta) error {
+	return db.GetHandle(ctx).Transaction(func(tx *gorm.DB) error {
+		// 遍历传入的元数据列表
+		for _, meta := range metaDataList {
+			err := tx.Model(&model.KnowledgeDocMeta{}).
+				Where("meta_id = ?", meta.MetaId). // 匹配metaId
+				Update("value", meta.Value).Error  // 仅更新value
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+// createBatchKnowledgeDocMeta 插入数据
+func createBatchKnowledgeDocMeta(tx *gorm.DB, knowledgeDocMetaList []*model.KnowledgeDocMeta) error {
+	err := tx.Model(&model.KnowledgeDocMeta{}).CreateInBatches(knowledgeDocMetaList, len(knowledgeDocMetaList)).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
