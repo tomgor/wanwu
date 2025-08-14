@@ -65,6 +65,12 @@ type Config struct {
 	UsageLimit         *UsageLimitConfig   `mapstructure:"usage-limit" json:"usageLimit"`
 	RagServer          *RagServerConfig    `mapstructure:"rag-server" json:"ragServer"`
 	KnowledgeDocConfig *KnowledgeDocConfig `json:"knowledge-doc-config" mapstructure:"knowledge-doc-config"`
+	SplitterList       []*Splitter         `mapstructure:"splitters" json:"splitters" yaml:"splitters"`
+}
+
+type Splitter struct {
+	Name  string `mapstructure:"name" json:"name" yaml:"name"`
+	Value string `mapstructure:"value" json:"value" yaml:"value"`
 }
 
 type Server struct {

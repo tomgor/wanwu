@@ -53,14 +53,7 @@ func (s *Service) ImportDoc(ctx context.Context, req *knowledgebase_doc_service.
 }
 
 func (s *Service) UpdateDocStatus(ctx context.Context, req *knowledgebase_doc_service.UpdateDocStatusReq) (*emptypb.Empty, error) {
-	//1.查询文档详情
-	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, "", "")
-	if err != nil {
-		log.Errorf(fmt.Sprintf("没有操作该知识库文档的权限 参数(%v)", req))
-		return nil, err
-	}
-	doc := docList[0]
-	err = orm.UpdateDocStatusDocId(ctx, req.DocId, int(req.Status), buildMetaParamsList(removeDuplicateMeta(req.MetaDataList), doc.OrgId, doc.UserId, req.DocId))
+	err := orm.UpdateDocStatusDocId(ctx, req.DocId, int(req.Status), buildMetaParamsList(removeDuplicateMeta(req.MetaDataList)))
 	if err != nil {
 		log.Errorf(fmt.Sprintf("update doc fail %v", err), req.DocId)
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateStatusFailed)
@@ -340,6 +333,32 @@ func buildImportTask(req *knowledgebase_doc_service.ImportDocReq) (*model.Knowle
 	if err != nil {
 		return nil, err
 	}
+
+	preprocess, err := json.Marshal(&model.DocPreProcess{
+		PreProcessList: req.DocPreprocess,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var docImportMetaData string
+	if len(req.DocMetaDataList) > 0 {
+		metaList := make([]*model.KnowledgeDocMeta, 0)
+		for _, metaData := range req.DocMetaDataList {
+			metaList = append(metaList, &model.KnowledgeDocMeta{
+				Key:       metaData.Key,
+				Value:     metaData.Value,
+				ValueType: metaData.ValueType,
+				Rule:      metaData.Rule,
+			})
+		}
+		importMetaDataByte, err := json.Marshal(&model.DocImportMetaData{
+			DocMetaDataList: metaList,
+		})
+		if err != nil {
+			return nil, err
+		}
+		docImportMetaData = string(importMetaDataByte)
+	}
 	return &model.KnowledgeImportTask{
 		ImportId:      generator.GetGenerator().NewID(),
 		KnowledgeId:   req.KnowledgeId,
@@ -350,6 +369,8 @@ func buildImportTask(req *knowledgebase_doc_service.ImportDocReq) (*model.Knowle
 		UpdatedAt:     time.Now().UnixMilli(),
 		DocInfo:       string(docImportInfo),
 		OcrModelId:    req.OcrModelId,
+		DocPreProcess: string(preprocess),
+		MetaData:      docImportMetaData,
 		UserId:        req.UserId,
 		OrgId:         req.OrgId,
 	}, nil
@@ -399,22 +420,14 @@ func buildMetaList(metaDataList []*model.KnowledgeDocMeta) []*knowledgebase_doc_
 	})
 }
 
-func buildMetaParamsList(metaDataList []*knowledgebase_doc_service.MetaData, orgId, userId, docId string) []*model.KnowledgeDocMeta {
+func buildMetaParamsList(metaDataList []*knowledgebase_doc_service.MetaData) []*model.KnowledgeDocMeta {
 	if len(metaDataList) == 0 {
 		return make([]*model.KnowledgeDocMeta, 0)
 	}
 	return lo.Map(metaDataList, func(item *knowledgebase_doc_service.MetaData, index int) *model.KnowledgeDocMeta {
 		return &model.KnowledgeDocMeta{
-			MetaId:    generator.GetGenerator().NewID(),
-			DocId:     docId,
-			Key:       item.Key,
-			Value:     item.Value,
-			ValueType: item.ValueType,
-			Rule:      "",
-			OrgId:     orgId,
-			UserId:    userId,
-			CreatedAt: time.Now().UnixMilli(),
-			UpdatedAt: time.Now().UnixMilli(),
+			MetaId: item.DataId,
+			Value:  item.Value,
 		}
 	})
 }

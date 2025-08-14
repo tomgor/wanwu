@@ -57,6 +57,15 @@ message ImportDocReq {
   DocSegment docSegment = 6; //分段信息配置
   repeated string docAnalyzer = 7;//文档解析类型
   string ocrModelId = 8; //ocr模型id
+  repeated string docPreprocess = 9;//文本预处理规则
+  repeated DocMetaData docMetaDataList = 10; // 元数据列表
+}
+
+message DocMetaData{
+  string key = 1; //key
+  string value = 2; //常量
+  string valueType = 3; //常量类型
+  string rule = 4; //正则表达式
 }
 
 message UpdateDocStatusReq {

@@ -1305,6 +1305,24 @@ const docTemplate = `{
                 }
             }
         },
+        "request.CallbackMetaData": {
+            "type": "object",
+            "required": [
+                "metaId",
+                "value"
+            ],
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "metaId": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
         "request.CallbackUpdateDocStatusReq": {
             "type": "object",
             "required": [
@@ -1318,38 +1336,11 @@ const docTemplate = `{
                 "metaDataList": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/request.MetaData"
+                        "$ref": "#/definitions/request.CallbackMetaData"
                     }
                 },
                 "status": {
                     "type": "integer"
-                }
-            }
-        },
-        "request.MetaData": {
-            "type": "object",
-            "required": [
-                "dataType",
-                "key",
-                "option",
-                "value"
-            ],
-            "properties": {
-                "dataId": {
-                    "type": "string"
-                },
-                "dataType": {
-                    "description": "String，Number，Date",
-                    "type": "string"
-                },
-                "key": {
-                    "type": "string"
-                },
-                "option": {
-                    "type": "string"
-                },
-                "value": {
-                    "type": "string"
                 }
             }
         },
