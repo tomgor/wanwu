@@ -122,8 +122,6 @@ doc-center:
     - key: workflow-StartNode
       val: 6.工作流/开始.md
 
-
-
 # --- middleware ---
 
 minio:
