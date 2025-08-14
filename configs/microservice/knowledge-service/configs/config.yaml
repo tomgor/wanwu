@@ -110,7 +110,7 @@ usage-limit:
   category-depth: 3
   doc-total: -1
   punc-types: "？@#@！@#@。@#@?@#@......@#@!@#@."
-  file-types: ".docx;.txt;.pdf;.xlsx;.csv;.pptx;.html;.doc;.xls"
+  file-types: ".docx;.txt;.pdf;.xlsx;.csv;.pptx;.html;.doc;.xls;.ofd;.wps"
   compressed-file-type: ".zip;.tar.gz"
   max-number-of-files-in-compressed: -1
   max-file-size: 209715200
