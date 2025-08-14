@@ -22,7 +22,7 @@ const (
 )
 
 func (s *Service) SelectKnowledgeSplitterList(ctx context.Context, req *knowledgebase_splitter_service.KnowledgeSplitterSelectReq) (*knowledgebase_splitter_service.KnowledgeSplitterSelectListResp, error) {
-	customSplitterList, err := orm.SelectKnowledgeSplitterList(ctx, req.UserId, req.OrgId)
+	customSplitterList, err := orm.SelectKnowledgeSplitterList(ctx, req.UserId, req.OrgId, req.SplitterName)
 	if err != nil {
 		log.Errorf(fmt.Sprintf("获取知识库分隔符列表失败(%v)  参数(%v)", err, req))
 		return nil, util.ErrCode(errs.Code_KnowledgeSplitterSelectFailed)
