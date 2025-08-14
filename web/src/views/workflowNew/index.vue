@@ -10,7 +10,7 @@ export default {
   data(){
     return{
       workflowUrl: process.env.NODE_ENV === 'development'
-        ? 'http://localhost:8081/work_flow?workflow_id=7535747020951126016&space_id=7535746948309975040'
+        ? 'http://192.168.35.247:8081/work_flow?workflow_id=7537585355608817664&space_id=7535746948309975040'
         : window.location.origin + this.$basePath + '/work_flow?workflow_id=7535747020951126016&space_id=7535746948309975040'
     }
   },
