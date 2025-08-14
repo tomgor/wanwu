@@ -19,6 +19,7 @@
       <div class="tag-box">
         <div
           v-for="(item,index) in tagList"
+          :key="index"
           class="tag_item"
           @mouseenter="mouseEnter(item)"
           @mouseleave="mouseLeave(item)"

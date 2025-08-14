@@ -25,7 +25,7 @@
           <img :src="require('@/assets/imgs/apikey.png')" />
           API秘钥
         </el-button>
-        <el-button
+        <!-- <el-button
           size="small"
           type="primary"
           style="padding:13px 12px;"
@@ -33,7 +33,7 @@
         >
          <span class="el-icon-setting"></span>
           发布配置
-        </el-button>
+        </el-button> -->
         <el-button
           size="small"
           type="primary"
