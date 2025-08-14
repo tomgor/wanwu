@@ -11,7 +11,7 @@ import (
 type IClient interface {
 	// --- api key ---
 	GetApiKeyList(ctx context.Context, userId, orgId, appId, appType string) ([]*model.ApiKey, *err_code.Status)
-	DelApiKey(ctx context.Context, apiId string) *err_code.Status
+	DelApiKey(ctx context.Context, apiId uint32) *err_code.Status
 	GenApiKey(ctx context.Context, userId, orgId, appId, appType, apiKey string) (*model.ApiKey, *err_code.Status)
 	GetApiKeyByKey(ctx context.Context, apiKey string) (*model.ApiKey, *err_code.Status)
 
@@ -29,14 +29,22 @@ type IClient interface {
 
 	// --- safety ---
 	CreateSensitiveWordTable(ctx context.Context, userId, orgId, tableName, remark string) (string, *err_code.Status)
-	UpdateSensitiveWordTable(ctx context.Context, tableId, tableName, remark string) *err_code.Status
-	UpdateSensitiveWordTableReply(ctx context.Context, tableId, reply string) *err_code.Status
-	DeleteSensitiveWordTable(ctx context.Context, tableId string) *err_code.Status
+	UpdateSensitiveWordTable(ctx context.Context, tableId uint32, tableName, remark string) *err_code.Status
+	UpdateSensitiveWordTableReply(ctx context.Context, tableId uint32, reply string) *err_code.Status
+	DeleteSensitiveWordTable(ctx context.Context, tableId uint32) *err_code.Status
 	GetSensitiveWordTableList(ctx context.Context, userId, orgId string) ([]*model.SensitiveWordTable, *err_code.Status)
-	GetSensitiveVocabularyList(ctx context.Context, tableId string, offset, limit int32) ([]*model.SensitiveWordVocabulary, int64, *err_code.Status)
-	UploadSensitiveVocabulary(ctx context.Context, userId, orgId, tableId, importType, word, sensitiveType, filePath string) *err_code.Status
-	DeleteSensitiveVocabulary(ctx context.Context, tableId, wordId string) *err_code.Status
+	GetSensitiveVocabularyList(ctx context.Context, tableId uint32, offset, limit int32) ([]*model.SensitiveWordVocabulary, int64, *err_code.Status)
+	UploadSensitiveVocabulary(ctx context.Context, userId, orgId, importType, word, sensitiveType, filePath string, tableId uint32) *err_code.Status
+	DeleteSensitiveVocabulary(ctx context.Context, tableId, wordId uint32) *err_code.Status
 	GetSensitiveWordTableListWithWordsByIDs(ctx context.Context, tableIds []string) ([]*orm.SensitiveWordTableWithWord, *err_code.Status)
 	GetSensitiveWordTableListByIDs(ctx context.Context, tableIds []string) ([]*model.SensitiveWordTable, *err_code.Status)
-	GetSensitiveWordTableByID(ctx context.Context, tableId string) (*model.SensitiveWordTable, *err_code.Status)
+	GetSensitiveWordTableByID(ctx context.Context, tableId uint32) (*model.SensitiveWordTable, *err_code.Status)
+
+	// --- web_url ---
+	CreateAppUrl(ctx context.Context, appUrl *model.AppUrl) *err_code.Status
+	DeleteAppUrl(ctx context.Context, urlID uint32) *err_code.Status
+	UpdateAppUrl(ctx context.Context, appUrl *model.AppUrl) *err_code.Status
+	GetAppUrlList(ctx context.Context, appID, appType string) ([]*model.AppUrl, *err_code.Status)
+	GetAppUrlInfoBySuffix(ctx context.Context, suffix string) (*model.AppUrl, *err_code.Status)
+	AppUrlStatusSwitch(ctx context.Context, urlID uint32, status bool) *err_code.Status
 }

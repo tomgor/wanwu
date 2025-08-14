@@ -16,7 +16,7 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Param			data	body		request.GetKnowledgeSplitterReq	false	"查询知识库分隔符列表参数"
-//	@Success		200	{object}	response.Response{data=response.KnowledgeSplitterListResp}
+//	@Success		200		{object}	response.Response{data=response.KnowledgeSplitterListResp}
 //	@Router			/knowledge/splitter [get]
 func GetKnowledgeSplitterSelect(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)

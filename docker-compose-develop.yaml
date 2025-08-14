@@ -35,6 +35,7 @@ services:
       SERVER_EXTERNAL_PORT: ${WANWU_EXTERNAL_PORT}
       SERVER_WEB_BASE_URL: ${WANWU_WEB_BASE_URL}
       SERVER_API_BASE_URL: ${WANWU_API_BASE_URL}
+      SERVER_APP_OPEN_BASE_URL: ${WANWU_APP_OPEN_BASE_URL}
       MINIO_ENDPOINT: ${WANWU_MINIO_ENDPOINT}
       MINIO_USER: ${WANWU_MINIO_USER}
       MINIO_PASSWORD: ${WANWU_MINIO_PASSWORD}
@@ -112,7 +113,7 @@ services:
       REDIS_PASSWORD: ${WANWU_REDIS_PASSWORD}
     working_dir: /app
     command: ./bin/model-service
-  
+
   mcp-service:
     restart: always
     image: ${WANWU_GO_IMAGE}

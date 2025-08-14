@@ -260,6 +260,229 @@ const docTemplate = `{
                 }
             }
         },
+        "/appspace/app/openurl": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "编辑应用Url",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "编辑应用Url",
+                "parameters": [
+                    {
+                        "description": "应用Url基本信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppUrlUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "创建应用Url",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "创建应用Url",
+                "parameters": [
+                    {
+                        "description": "应用Url基本信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppUrlCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "删除应用Url",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "删除应用Url",
+                "parameters": [
+                    {
+                        "description": "应用UrlId",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppUrlIdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/appspace/app/openurl/list": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "获取应用Url列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "获取应用Url列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "应用id",
+                        "name": "appId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "应用类型",
+                        "name": "appType",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.AppUrlInfo"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/appspace/app/openurl/status": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "启用/停用应用Url",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "启用/停用应用Url",
+                "parameters": [
+                    {
+                        "description": "应用UrlId",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppUrlStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/appspace/app/publish": {
             "post": {
                 "security": [
@@ -3345,6 +3568,16 @@ const docTemplate = `{
                     "knowledge.splitter"
                 ],
                 "summary": "查询知识库分隔符列表",
+                "parameters": [
+                    {
+                        "description": "查询知识库分隔符列表参数",
+                        "name": "data",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/request.GetKnowledgeSplitterReq"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -7262,6 +7495,129 @@ const docTemplate = `{
                 }
             }
         },
+        "request.AppUrlCreateRequest": {
+            "type": "object",
+            "required": [
+                "appId",
+                "appType",
+                "name"
+            ],
+            "properties": {
+                "appId": {
+                    "description": "应用id",
+                    "type": "string"
+                },
+                "appType": {
+                    "description": "应用类型",
+                    "type": "string"
+                },
+                "copyright": {
+                    "description": "版权",
+                    "type": "string"
+                },
+                "copyrightEnable": {
+                    "description": "版权开关",
+                    "type": "boolean"
+                },
+                "disclaimer": {
+                    "description": "免责声明",
+                    "type": "string"
+                },
+                "disclaimerEnable": {
+                    "description": "免责声明开关",
+                    "type": "boolean"
+                },
+                "expiredAt": {
+                    "description": "过期时间",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "privacyPolicy": {
+                    "description": "隐私协议",
+                    "type": "string"
+                },
+                "privacyPolicyEnable": {
+                    "description": "隐私协议开关",
+                    "type": "boolean"
+                }
+            }
+        },
+        "request.AppUrlIdRequest": {
+            "type": "object",
+            "required": [
+                "urlId"
+            ],
+            "properties": {
+                "urlId": {
+                    "description": "UrlID",
+                    "type": "string"
+                }
+            }
+        },
+        "request.AppUrlStatusRequest": {
+            "type": "object",
+            "required": [
+                "urlId"
+            ],
+            "properties": {
+                "status": {
+                    "description": "启停状态",
+                    "type": "boolean"
+                },
+                "urlId": {
+                    "description": "UrlID",
+                    "type": "string"
+                }
+            }
+        },
+        "request.AppUrlUpdateRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "urlId"
+            ],
+            "properties": {
+                "copyright": {
+                    "description": "版权",
+                    "type": "string"
+                },
+                "copyrightEnable": {
+                    "description": "版权开关",
+                    "type": "boolean"
+                },
+                "disclaimer": {
+                    "description": "免责声明",
+                    "type": "string"
+                },
+                "disclaimerEnable": {
+                    "description": "免责声明开关",
+                    "type": "boolean"
+                },
+                "expiredAt": {
+                    "description": "过期时间",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "privacyPolicy": {
+                    "description": "隐私协议",
+                    "type": "string"
+                },
+                "privacyPolicyEnable": {
+                    "description": "隐私协议开关",
+                    "type": "boolean"
+                },
+                "urlId": {
+                    "description": "UrlID",
+                    "type": "string"
+                }
+            }
+        },
         "request.AssistantBrief": {
             "type": "object",
             "required": [
@@ -8073,6 +8429,14 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "request.GetKnowledgeSplitterReq": {
+            "type": "object",
+            "properties": {
+                "splitterName": {
+                    "type": "string"
                 }
             }
         },
@@ -9224,6 +9588,75 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "description": "应用更新时间(用于历史记录排序)",
+                    "type": "string"
+                }
+            }
+        },
+        "response.AppUrlInfo": {
+            "type": "object",
+            "properties": {
+                "appId": {
+                    "description": "应用ID",
+                    "type": "string"
+                },
+                "appType": {
+                    "description": "应用类型",
+                    "type": "string"
+                },
+                "copyright": {
+                    "description": "知识产权",
+                    "type": "string"
+                },
+                "copyrightEnable": {
+                    "description": "知识产权开关",
+                    "type": "boolean"
+                },
+                "createdAt": {
+                    "description": "创建时间",
+                    "type": "integer"
+                },
+                "disclaimer": {
+                    "description": "免责声明",
+                    "type": "string"
+                },
+                "disclaimerEnable": {
+                    "description": "免责声明开关",
+                    "type": "boolean"
+                },
+                "expiredAt": {
+                    "description": "过期时间",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Url名称",
+                    "type": "string"
+                },
+                "orgId": {
+                    "description": "组织ID",
+                    "type": "string"
+                },
+                "privacyPolicy": {
+                    "description": "隐私政策",
+                    "type": "string"
+                },
+                "privacyPolicyEnable": {
+                    "description": "隐私政策开关",
+                    "type": "boolean"
+                },
+                "status": {
+                    "description": "应用Url开关",
+                    "type": "boolean"
+                },
+                "suffix": {
+                    "description": "生成Url后缀",
+                    "type": "string"
+                },
+                "urlId": {
+                    "description": "UrlID",
+                    "type": "string"
+                },
+                "userId": {
+                    "description": "用户ID",
                     "type": "string"
                 }
             }
@@ -10542,6 +10975,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "key": {
+                    "type": "string"
+                },
+                "rule": {
                     "type": "string"
                 },
                 "value": {
