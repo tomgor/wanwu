@@ -35,6 +35,7 @@ type MetaData struct {
 	DataId   string `json:"dataId"`
 	Value    string `json:"value"`
 	DataType string `json:"dataType"`
+	Rule     string `json:"rule"`
 }
 
 type SegmentContent struct {

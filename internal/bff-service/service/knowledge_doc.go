@@ -274,6 +274,7 @@ func buildMetaDataResultList(metaDataList []*knowledgebase_doc_service.MetaData)
 			Key:      item.Key,
 			Value:    item.Value,
 			DataType: item.ValueType,
+			Rule:     item.Rule,
 		}
 	})
 }

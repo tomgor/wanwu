@@ -55,6 +55,7 @@ func UpdateDocStatusDocMeta(ctx context.Context, docId string, addList []*model.
 			}
 		}
 		//调用rag
-		return service.RagDocMeta(ctx, ragDocMetaParams)
+		//return service.RagDocMeta(ctx, ragDocMetaParams)
+		return nil
 	})
 }
