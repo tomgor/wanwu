@@ -19,14 +19,29 @@ stop-all-middleware:
 	make stop-mysql-worker
 	make stop-mysql
 
+# --- frontend ---
+
 unzip-frontend:
-	@find frontend -maxdepth 1 -type f -name "*.tar.gz" | while read gzfile; do \
-		tar -zxvf $$gzfile -C frontend; \
-	done
+	make -f Makefile.develop unzip-frontend-aibase
+	make -f Makefile.develop unzip-frontend-workflow
+
+unzip-frontend-aibase:
+	tar -zxvf frontend/aibase.tar.gz -C frontend
+
+unzip-frontend-workflow:
+	tar -zxvf frontend/workflow.tar.gz -C frontend
 
 update-frontend:
-	rm -rf $(WANWU_PROJECT_DIR)/nginx/html/*
-	cp -r frontend/* $(WANWU_PROJECT_DIR)/nginx/html
+	make -f Makefile.develop update-frontend-aibase
+	make -f Makefile.develop update-frontend-workflow
+
+update-frontend-aibase:
+	rm -r $(WANWU_PROJECT_DIR)/nginx/html/aibase
+	cp -r frontend/aibase $(WANWU_PROJECT_DIR)/nginx/html
+
+update-frontend-workflow:
+	rm -r $(WANWU_PROJECT_DIR)/nginx/html/workflow
+	cp -r frontend/workflow $(WANWU_PROJECT_DIR)/nginx/html
 
 # --- nginx ---
 run-nginx:
