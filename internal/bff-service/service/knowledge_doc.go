@@ -81,13 +81,13 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 	for _, meta := range req.DocMetaData {
 		if meta.MetaRule != "" {
 			// 检查rule和key传参
-			if meta.MetaKey != "" {
+			if meta.MetaValue != "" {
 				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "常量和正则表达式重复")
 			}
 			// 检查正则合法性
 			_, err := regexp.Compile(meta.MetaRule)
 			if err != nil {
-				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "非法正则表达式", err.Error())
+				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "非法正则表达式")
 			}
 		}
 		metaList = append(metaList, &knowledgebase_doc_service.DocMetaData{

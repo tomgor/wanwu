@@ -8,10 +8,11 @@ import (
 )
 
 // SelectKnowledgeSplitterList 查询知识库分隔符列表
-func SelectKnowledgeSplitterList(ctx *gin.Context, userId, orgId string) (*response.KnowledgeSplitterListResp, error) {
+func SelectKnowledgeSplitterList(ctx *gin.Context, userId, orgId string, req *request.GetKnowledgeSplitterReq) (*response.KnowledgeSplitterListResp, error) {
 	resp, err := knowledgeBaseSplitter.SelectKnowledgeSplitterList(ctx.Request.Context(), &knowledgebase_splitter_service.KnowledgeSplitterSelectReq{
-		UserId: userId,
-		OrgId:  orgId,
+		UserId:       userId,
+		OrgId:        orgId,
+		SplitterName: req.SplitterName,
 	})
 	if err != nil {
 		return nil, err

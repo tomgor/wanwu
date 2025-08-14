@@ -20,6 +20,7 @@ service KnowledgeBaseSplitterService {
 message KnowledgeSplitterSelectReq {
   string userId = 1;
   string orgId = 2;
+  string splitterName = 3;
 }
 
 message KnowledgeSplitterSelectListResp {

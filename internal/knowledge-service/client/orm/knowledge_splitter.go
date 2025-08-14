@@ -12,9 +12,9 @@ import (
 )
 
 // SelectKnowledgeSplitterList 查询知识库分隔符列表
-func SelectKnowledgeSplitterList(ctx context.Context, userId, orgId string) ([]*model.KnowledgeSplitter, error) {
+func SelectKnowledgeSplitterList(ctx context.Context, userId, orgId, name string) ([]*model.KnowledgeSplitter, error) {
 	var knowledgeSplitterList []*model.KnowledgeSplitter
-	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId)).
+	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.WithName(name)).
 		Apply(db.GetHandle(ctx), &model.KnowledgeSplitter{}).
 		Order("create_at desc").
 		Find(&knowledgeSplitterList).
