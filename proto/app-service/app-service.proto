@@ -22,6 +22,14 @@ service AppService {
   rpc GetAppList(GetAppListReq) returns (AppList){}
   rpc GetAppListByIds(GetAppListByIdsReq) returns (AppList){}
   rpc DeleteApp(DeleteAppReq) returns (google.protobuf.Empty) {}
+
+  // --- url ---
+  rpc AppUrlCreate(AppUrlCreateReq) returns (google.protobuf.Empty) {}
+  rpc AppUrlDelete(AppUrlDeleteReq) returns (google.protobuf.Empty) {}
+  rpc AppUrlUpdate(AppUrlUpdateReq) returns (google.protobuf.Empty) {}
+  rpc GetAppUrlList(GetAppUrlListReq) returns (GetAppUrlListResp) {}
+  rpc GetAppUrlInfoBySuffix(GetAppUrlInfoBySuffixReq) returns (AppUrlInfo) {}
+  rpc AppUrlStatusSwitch(AppUrlStatusSwitchReq) returns (google.protobuf.Empty) {}
 }
 
 message GenApiKeyReq {
@@ -137,4 +145,53 @@ message DeleteAppReq {
   string appType = 2;
 }
 
+message AppUrlInfo {
+  string urlId = 1;
+  string appId = 2;
+  string appType = 3;
+  string name = 4;
+  int64 createdAt = 5;
+  int64 expiredAt = 6;
+  string copyright = 7;
+  bool copyrightEnable = 8;
+  string privacyPolicy = 9;
+  bool privacyPolicyEnable = 10;
+  string disclaimer = 11;
+  bool disclaimerEnable = 12;
+  string suffix = 13;
+  bool status = 14;
+  string userId = 15;
+  string orgId = 16;
+}
+
+message AppUrlCreateReq {
+  AppUrlInfo appUrlInfo = 1;
+}
+
+message AppUrlUpdateReq {
+  AppUrlInfo appUrlInfo = 1;
+}
+
+message AppUrlDeleteReq {
+  string urlId = 1;
+}
+
+message GetAppUrlListReq {
+  string appId = 1;
+  string appType = 2;
+}
+
+message GetAppUrlListResp {
+  repeated AppUrlInfo appUrlInfos = 1;
+  int64 total = 2;
+}
+
+message GetAppUrlInfoBySuffixReq {
+  string suffix = 1;
+}
+
+message AppUrlStatusSwitchReq {
+  string urlId = 1;
+  bool status = 2;
+}
 

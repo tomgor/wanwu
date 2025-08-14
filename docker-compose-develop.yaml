@@ -35,6 +35,7 @@ services:
       SERVER_EXTERNAL_PORT: ${WANWU_EXTERNAL_PORT}
       SERVER_WEB_BASE_URL: ${WANWU_WEB_BASE_URL}
       SERVER_API_BASE_URL: ${WANWU_API_BASE_URL}
+      SERVER_APP_OPEN_BASE_URL: ${WANWU_APP_OPEN_BASE_URL}
       MINIO_ENDPOINT: ${WANWU_MINIO_ENDPOINT}
       MINIO_USER: ${WANWU_MINIO_USER}
       MINIO_PASSWORD: ${WANWU_MINIO_PASSWORD}
@@ -112,7 +113,7 @@ services:
       REDIS_PASSWORD: ${WANWU_REDIS_PASSWORD}
     working_dir: /app
     command: ./bin/model-service
-  
+
   mcp-service:
     restart: always
     image: ${WANWU_GO_IMAGE}
@@ -235,19 +236,19 @@ services:
     working_dir: /app
     command: ./bin/assistant-service
   
-  workflow-service:
+  workflow:
     restart: always
     image: ${WANWU_GO_IMAGE}
-    container_name: workflow-service
+    container_name: workflow-wanwu
     networks:
       - ${WANWU_DOCKER_NETWORK}
     ports:
       - 8999:8999
     volumes:
       - /etc/localtime:/etc/localtime
-      - ../wanwu-workflow/wanwu-backend/bin/${WANWU_ARCH}/workflow-service:/app/bin/workflow-service
+      - ../wanwu-workflow/wanwu-backend/bin/${WANWU_ARCH}/workflow-wanwu:/app/bin/workflow-wanwu
       - ../wanwu-workflow/wanwu-backend/configs:/app/configs
-      - ${WANWU_PROJECT_DIR}/workflow-service/log:/app/log
+      - ${WANWU_PROJECT_DIR}/workflow-wanwu/log:/app/log
     environment:
       DB_NAME: ${WANWU_DB_NAME}
       DB_MYSQL_ADDRESS: ${WANWU_MYSQL_ADDRESS}
@@ -259,7 +260,7 @@ services:
       MINIO_USER: ${WANWU_MINIO_USER}
       MINIO_PASSWORD: ${WANWU_MINIO_PASSWORD}
     working_dir: /app
-    command: ./bin/workflow-service
+    command: ./bin/workflow-wanwu
 
   agentscope:
     restart: always

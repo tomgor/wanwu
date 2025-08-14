@@ -43,3 +43,27 @@ type DeleteWorkFlowResp struct {
 	Code    int    `json:"code"`
 	Message string `json:"msg"`
 }
+
+type AppUrlInfo struct {
+	UrlId               string `json:"urlId"`               // UrlID
+	AppId               string `json:"appId"`               // 应用ID
+	AppType             string `json:"appType"`             // 应用类型
+	Name                string `json:"name"`                // Url名称
+	CreatedAt           int64  `json:"createdAt"`           // 创建时间
+	ExpiredAt           string `json:"expiredAt"`           // 过期时间
+	Copyright           string `json:"copyright"`           // 知识产权
+	CopyrightEnable     bool   `json:"copyrightEnable"`     // 知识产权开关
+	PrivacyPolicy       string `json:"privacyPolicy"`       // 隐私政策
+	PrivacyPolicyEnable bool   `json:"privacyPolicyEnable"` // 隐私政策开关
+	Disclaimer          string `json:"disclaimer"`          // 免责声明
+	DisclaimerEnable    bool   `json:"disclaimerEnable"`    // 免责声明开关
+	Suffix              string `json:"suffix"`              // 生成Url后缀
+	Status              bool   `json:"status"`              // 应用Url开关
+	UserId              string `json:"userId"`              // 用户ID
+	OrgId               string `json:"orgId"`               // 组织ID
+}
+
+type AppUrlConfig struct {
+	Assistant  Assistant   `json:"assistant"`  // 基本信息
+	AppUrlInfo *AppUrlInfo `json:"appUrlInfo"` // 应用Url信息
+}

@@ -53,4 +53,11 @@ func registerCommon(apiV1 *gin.RouterGroup) {
 
 	// Safety通用
 	mid.Sub("common").Reg(apiV1, "/safe/sensitive/table/select", http.MethodGet, v1.GetSensitiveWordTableSelect, "获取敏感词表下拉列表")
+
+	// 应用Url
+	mid.Sub("common").Reg(apiV1, "/appspace/app/openurl", http.MethodPost, v1.AppUrlCreate, "创建应用Url")
+	mid.Sub("common").Reg(apiV1, "/appspace/app/openurl", http.MethodDelete, v1.AppUrlDelete, "删除应用Url")
+	mid.Sub("common").Reg(apiV1, "/appspace/app/openurl", http.MethodPut, v1.AppUrlUpdate, "编辑应用Url")
+	mid.Sub("common").Reg(apiV1, "/appspace/app/openurl/list", http.MethodGet, v1.GetAppUrlList, "获取应用Url列表")
+	mid.Sub("common").Reg(apiV1, "/appspace/app/openurl/status", http.MethodPut, v1.AppUrlStatusSwitch, "启用/停用应用Url")
 }

@@ -166,6 +166,12 @@
 {"code":144004,"key":"","langs":{"zh":"查询关键词列表失败，请稍后重试"}}
 {"code":144005,"key":"","langs":{"zh":"查询关键词详情失败，请稍后重试"}}
 {"code":144006,"key":"","langs":{"zh":"关键词在知识库中已存在，请勿重复添加"}}
+{"code":145001,"key":"","langs":{"zh":"新建知识库分隔符失败，请稍后重试"}}
+{"code":145002,"key":"","langs":{"zh":"删除知识库分隔符失败，请稍后重试"}}
+{"code":145003,"key":"","langs":{"zh":"修改知识库分隔符失败，请稍后重试"}}
+{"code":145004,"key":"","langs":{"zh":"已存在同名知识库分隔符"}}
+{"code":145005,"key":"","langs":{"zh":"查询知识库标分隔符表失败，请稍后重试"}}
+{"code":145008,"key":"","langs":{"zh":"没有操作该知识库分隔符的权限"}}
 {"code":310001,"key":"mcp_get_square_err","langs":{"zh":"广场MCP不存在"}}
 {"code":310001,"key":"mcp_check_exist_err","langs":{"zh":"检查MCP是否存在来自广场异常: %v"}}
 {"code":310002,"key":"mcp_create_duplicate_square","langs":{"zh":"创建MCP异常: 已存在来自广场"}}
@@ -215,6 +221,12 @@
 {"code":160005,"key":"assistant_mcp_get","langs":{"zh":"获取mcp错误: %v"}}
 {"code":160005,"key":"assistant_mcp_update","langs":{"zh":"更新mcp错误: %v"}}
 {"code":160005,"key":"assistant_mcp_exist","langs":{"zh":"获取mcp错误: %v"}}
+{"code":160006,"key":"assistant_custom_create","langs":{"zh":"创建custom错误: %v"}}
+{"code":160006,"key":"assistant_custom_count","langs":{"zh":"获取custom错误: %v"}}
+{"code":160006,"key":"assistant_custom_exist","langs":{"zh":"获取custom错误: %v"}}
+{"code":160006,"key":"assistant_custom_delete","langs":{"zh":"删除custom错误: %v"}}
+{"code":160006,"key":"assistant_custom_update","langs":{"zh":"更新custom错误: %v"}}
+{"code":160006,"key":"assistant_custom_get","langs":{"zh":"获取custom错误: %v"}}
 {"code":300000,"key":"app_config_delete","langs":{"zh":"删除应用配置错误:%v"}}
 {"code":300001,"key":"app_api_keys_get","langs":{"zh":"获取ApiKey列表错误:%v"}}
 {"code":300001,"key":"app_api_key_delete","langs":{"zh":"删除ApiKey错误:%v"}}
@@ -253,3 +265,13 @@
 {"code":300003,"key":"app_safety_sensitive_download_fail","langs":{"zh":"文件下载失败: %v"}}
 {"code":300003,"key":"app_safety_sensitive_vocabulary_list_get_by_ids","langs":{"zh":"批量获取敏感词失败: %v"}}
 {"code":300003,"key":"app_safety_sensitive_table_not_found","langs":{"zh":"敏感词表(%v)不存在"}}
+{"code":300009,"key":"app_url_get_by_name","langs":{"zh":"获取应用(%v)错误: %v"}}
+{"code":0,"key":"app_url_same_name","langs":{"zh":"存在同名应用(%v)，请修改后重试"}}
+{"code":0,"key":"app_url_create","langs":{"zh":"创建URL(%v)失败: %v"}}
+{"code":0,"key":"app_url_delete","langs":{"zh":"删除URL(%v)错误: %v"}}
+{"code":0,"key":"app_url_update","langs":{"zh":"更新URL(%v)失败: %v"}}
+{"code":0,"key":"app_url_get","langs":{"zh":"获取URL失败"}}
+{"code":0,"key":"app_url_get_list","langs":{"zh":"获取应用(%v)类型(%v)列表失败: %v"}}
+{"code":0,"key":"app_url_update_switch","langs":{"zh":"URL(%v)状态修改失败: %v"}}
+{"code":300010,"key":"","langs":{"zh":"URL已被禁用"}}
+{"code":300011,"key":"","langs":{"zh":"URL已过期"}}

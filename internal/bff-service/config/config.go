@@ -45,6 +45,7 @@ type ServerConfig struct {
 	WebBaseUrl   string `json:"web_base_url" mapstructure:"web_base_url"`
 	ApiBaseUrl   string `json:"api_base_url" mapstructure:"api_base_url"`
 	CallbackUrl  string `json:"callback_url" mapstructure:"callback_url"`
+	AppOpenUrl   string `json:"app_open_base_url" mapstructure:"app_open_base_url"`
 }
 
 type ModelConfig struct {

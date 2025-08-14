@@ -19,6 +19,7 @@ func NewClient(db *gorm.DB) (*Client, error) {
 		model.AppFavorite{},
 		model.SensitiveWordTable{},
 		model.SensitiveWordVocabulary{},
+		model.AppUrl{},
 	); err != nil {
 		return nil, err
 	}

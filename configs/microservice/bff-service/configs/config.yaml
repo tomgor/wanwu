@@ -6,6 +6,7 @@ server:
   web_base_url: http://localhost:8081
   api_base_url: http://localhost:6668
   callback_url: http://172.17.0.1:6668
+  app_open_base_url: http://172.17.0.1:6668
 
 log:
   std: true
@@ -122,6 +123,8 @@ doc-center:
     - key: workflow-StartNode
       val: 6.工作流/开始.md
 
+
+
 # --- middleware ---
 
 minio:
@@ -164,8 +167,8 @@ workflow:
 agent:
   host: agent-wanwu
   upload_minio:
-      port: 15001
-      uri: /upload
+    port: 15001
+    uri: /upload
 
 operate:
   host: operate-service:9797
