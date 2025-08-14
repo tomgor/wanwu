@@ -472,7 +472,7 @@ export default {
   },
   async delSplitterItem(item){
     this.$confirm(
-        `删除标签${item.splitterName}`,
+        `删除分隔符${item.splitterName}`,
          "确认要删除当前分隔符？",
         {
           confirmButtonText: "确定",
