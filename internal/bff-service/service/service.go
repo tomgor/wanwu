@@ -2,7 +2,12 @@ package service
 
 import (
 	"fmt"
+
+	knowledgebase_keywords_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-keywords-service"
+	knowledgebase_splitter_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-splitter-service"
 	knowledgebase_tag_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-tag-service"
+	operate_service "github.com/UnicomAI/wanwu/api/proto/operate-service"
+	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 
 	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
@@ -25,16 +30,20 @@ const (
 )
 
 var (
-	iam              iam_service.IAMServiceClient
-	perm             perm_service.PermServiceClient
-	model            model_service.ModelServiceClient
-	mcp              mcp_service.MCPServiceClient
-	knowledgeBase    knowledgebase_service.KnowledgeBaseServiceClient
-	knowledgeBaseDoc knowledgebase_doc_service.KnowledgeBaseDocServiceClient
-	knowledgeBaseTag knowledgebase_tag_service.KnowledgeBaseTagServiceClient
-	app              app_service.AppServiceClient
-	rag              rag_service.RagServiceClient
-	assistant        assistant_service.AssistantServiceClient
+	iam                   iam_service.IAMServiceClient
+	perm                  perm_service.PermServiceClient
+	model                 model_service.ModelServiceClient
+	mcp                   mcp_service.MCPServiceClient
+	knowledgeBase         knowledgebase_service.KnowledgeBaseServiceClient
+	knowledgeBaseDoc      knowledgebase_doc_service.KnowledgeBaseDocServiceClient
+	knowledgeBaseTag      knowledgebase_tag_service.KnowledgeBaseTagServiceClient
+	knowledgeBaseSplitter knowledgebase_splitter_service.KnowledgeBaseSplitterServiceClient
+	knowledgeBaseKeywords knowledgebase_keywords_service.KnowledgeBaseKeywordsServiceClient
+	app                   app_service.AppServiceClient
+	rag                   rag_service.RagServiceClient
+	assistant             assistant_service.AssistantServiceClient
+	safety                safety_service.SafetyServiceClient
+	operate               operate_service.OperateServiceClient
 )
 
 // --- API ---
@@ -69,6 +78,10 @@ func Init() error {
 	if err != nil {
 		return fmt.Errorf("init assistant-service connection err: %v", err)
 	}
+	operateConn, err := newConn(config.Cfg().Operate.Host)
+	if err != nil {
+		return fmt.Errorf("init operate-service connection err: %v", err)
+	}
 	// grpc clients
 	iam = iam_service.NewIAMServiceClient(iamConn)
 	perm = perm_service.NewPermServiceClient(iamConn)
@@ -78,8 +91,12 @@ func Init() error {
 	knowledgeBase = knowledgebase_service.NewKnowledgeBaseServiceClient(knowledgeBaseConn)
 	knowledgeBaseDoc = knowledgebase_doc_service.NewKnowledgeBaseDocServiceClient(knowledgeBaseConn)
 	knowledgeBaseTag = knowledgebase_tag_service.NewKnowledgeBaseTagServiceClient(knowledgeBaseConn)
+	knowledgeBaseKeywords = knowledgebase_keywords_service.NewKnowledgeBaseKeywordsServiceClient(knowledgeBaseConn)
+	knowledgeBaseSplitter = knowledgebase_splitter_service.NewKnowledgeBaseSplitterServiceClient(knowledgeBaseConn)
 	rag = rag_service.NewRagServiceClient(ragConn)
 	assistant = assistant_service.NewAssistantServiceClient(assistantConn)
+	safety = safety_service.NewSafetyServiceClient(appConn)
+	operate = operate_service.NewOperateServiceClient(operateConn)
 	return nil
 }
 

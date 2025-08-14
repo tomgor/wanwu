@@ -16,6 +16,7 @@ type AssistantConfig struct {
 	RecommendQuestion   []string               `json:"recommendQuestion"`   // 推荐问题
 	ModelConfig         AppModelConfig         `json:"modelConfig"`         // 模型
 	KnowledgeBaseConfig AppKnowledgebaseConfig `json:"knowledgeBaseConfig"` // 知识库
+	SafetyConfig        AppSafetyConfig        `json:"safetyConfig"`        // 敏感词表配置
 	RerankConfig        AppModelConfig         `json:"rerankConfig"`        // Rerank模型
 	OnlineSearchConfig  OnlineSearchConfig     `json:"onlineSearchConfig"`  // 在线搜索
 }
@@ -54,6 +55,19 @@ type WorkFlowIdRequest struct {
 }
 
 func (w *WorkFlowIdRequest) Check() error { return nil }
+
+type MCPAddRequest struct {
+	AssistantId string `json:"assistantId" form:"assistantId"`
+	MCPId       string `json:"mcpId" form:"mcpId"`
+}
+
+func (m *MCPAddRequest) Check() error { return nil }
+
+type MCPIdRequest struct {
+	MCPId string `json:"mcpId" form:"mcpId" validate:"required"`
+}
+
+func (w *MCPIdRequest) Check() error { return nil }
 
 type ActionAddRequest struct {
 	AssistantId string            `json:"assistantId"  validate:"required"`

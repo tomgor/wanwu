@@ -42,12 +42,20 @@ type RagDeleteParams struct {
 }
 
 type KnowledgeHitParams struct {
-	UserId        string   `json:"userId"`
-	Question      string   `json:"question" validate:"required"`
-	KnowledgeBase []string `json:"knowledgeBase" validate:"required"`
-	Threshold     float64  `json:"threshold"`
-	TopK          int      `json:"topK"`
-	RerankModelId string   `json:"rerank_model_id"`
+	UserId         string        `json:"userId"`
+	Question       string        `json:"question" validate:"required"`
+	KnowledgeBase  []string      `json:"knowledgeBase" validate:"required"`
+	Threshold      float64       `json:"threshold"`
+	TopK           int32         `json:"topK"`
+	RerankModelId  string        `json:"rerank_model_id"` // rerankId
+	RerankMod      string        `json:"rerank_mod"`      // rerank_model:重排序模式，weighted_score：权重搜索
+	RetrieveMethod string        `json:"retrieve_method"` // hybrid_search:混合搜索， semantic_search:向量搜索， full_text_search：文本搜索
+	Weight         *WeightParams `json:"weights"`         // 权重搜索下的权重配置
+}
+
+type WeightParams struct {
+	VectorWeight float32 `json:"vector_weight"` //语义权重
+	TextWeight   float32 `json:"text_weight"`   //关键字权重
 }
 
 type RagKnowledgeHitResp struct {

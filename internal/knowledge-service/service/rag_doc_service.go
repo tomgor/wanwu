@@ -47,6 +47,7 @@ type RagImportDocParams struct {
 	SegmentType   string   `json:"chunk_type"`
 	Separators    []string `json:"separators"`
 	ParserChoices []string `json:"parser_choices"`
+	OcrModelId    string   `json:"ocr_model_id"`
 }
 
 type RagImportUrlDocParams struct {
@@ -66,6 +67,13 @@ type RagDeleteDocParams struct {
 	UserId        string `json:"userId"`
 	KnowledgeBase string `json:"knowledgeBase"`
 	FileName      string `json:"fileName"`
+}
+
+type RagDocMetaParams struct {
+	UserId        string                 `json:"userId"`
+	KnowledgeBase string                 `json:"knowledgeBase"`
+	FileName      string                 `json:"fileName"`
+	MetaList      map[string]interface{} `json:"tags"`
 }
 
 type RagGetDocSegmentResp struct {
@@ -214,6 +222,35 @@ func RagDeleteDoc(ctx context.Context, ragDeleteDocParams *RagDeleteDocParams) e
 		if strings.Contains(resp.Message, "文档不存在") {
 			return nil
 		}
+		return errors.New(resp.Message)
+	}
+	return nil
+}
+
+// RagDocMeta 给文档打标签
+func RagDocMeta(ctx context.Context, ragDocTagParams *RagDocMetaParams) error {
+	ragServer := config.GetConfig().RagServer
+	url := ragServer.Endpoint + ragServer.DocTagUri
+	paramsByte, err := json.Marshal(ragDocTagParams)
+	if err != nil {
+		return err
+	}
+	result, err := http.GetClient().PostJson(ctx, &http_client.HttpRequestParams{
+		Url:        url,
+		Body:       paramsByte,
+		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
+		MonitorKey: "rag_doc_tag",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return err
+	}
+	var resp RagCommonResp
+	if err := json.Unmarshal(result, &resp); err != nil {
+		log.Errorf(err.Error())
+		return err
+	}
+	if resp.Code != successCode {
 		return errors.New(resp.Message)
 	}
 	return nil

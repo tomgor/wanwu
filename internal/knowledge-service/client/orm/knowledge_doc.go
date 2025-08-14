@@ -18,10 +18,12 @@ import (
 )
 
 // GetDocList 查询知识库文件列表
-func GetDocList(ctx context.Context, userId, orgId, knowledgeId, name string, statusList []int, pageSize int32, pageNum int32) ([]*model.KnowledgeDoc, int64, error) {
+func GetDocList(ctx context.Context, userId, orgId, knowledgeId, name, tag string,
+	statusList []int, pageSize int32, pageNum int32) ([]*model.KnowledgeDoc, int64, error) {
 	tx := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId),
 		sqlopt.WithKnowledgeID(knowledgeId),
 		sqlopt.LikeName(name),
+		sqlopt.LikeTag(tag),
 		sqlopt.WithStatusList(statusList),
 		sqlopt.WithDelete(0)).
 		Apply(db.GetHandle(ctx), &model.KnowledgeDoc{})
@@ -147,6 +149,7 @@ func CreateKnowledgeDoc(ctx context.Context, doc *model.KnowledgeDoc, importTask
 			ObjectName:    objectName,
 			OriginalName:  doc.Name,
 			IsEnhanced:    "false",
+			OcrModelId:    importTask.OcrModelId,
 		})
 	})
 }
@@ -215,12 +218,32 @@ func CreateKnowledgeUrlDoc(ctx context.Context, doc *model.KnowledgeDoc, importT
 }
 
 // UpdateDocStatusDocId 更新文档状态
-func UpdateDocStatusDocId(ctx context.Context, docId string, status int) error {
-	var updateParams = map[string]interface{}{
-		"status":    status,
-		"error_msg": util.BuildDocErrMessage(status),
-	}
-	return db.GetHandle(ctx).Model(&model.KnowledgeDoc{}).Where("doc_id = ?", docId).Updates(updateParams).Error
+func UpdateDocStatusDocId(ctx context.Context, docId string, status int, metaList []*model.KnowledgeDocMeta) error {
+	return db.GetHandle(ctx).Transaction(func(tx *gorm.DB) error {
+		//更新文档状态
+		var updateParams = map[string]interface{}{
+			"status":    status,
+			"error_msg": util.BuildDocErrMessage(status),
+		}
+		err := tx.Model(&model.KnowledgeDoc{}).Where("doc_id = ?", docId).Updates(updateParams).Error
+		if err != nil {
+			return err
+		}
+		//创建文档元数据
+		if len(metaList) > 0 {
+			//删除所有知识库标签
+			err = tx.Unscoped().Model(&model.KnowledgeDocMeta{}).Where("doc_id = ?", docId).Delete(&model.KnowledgeDocMeta{}).Error
+			if err != nil {
+				return err
+			}
+			//插入数据
+			err = tx.Model(&model.KnowledgeDocMeta{}).CreateInBatches(metaList, len(metaList)).Error
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 // InitDocStatus 初始化文档状态

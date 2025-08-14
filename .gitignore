@@ -23,6 +23,7 @@ go.work
 .DS_store
 .idea
 .vscode
+.history
 .log
 .env
 bin/amd64/*

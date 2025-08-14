@@ -30,11 +30,11 @@ func Init() {
 	// --- knowledge ---
 	mid.NewSub("knowledge", "知识库", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
 
-	// permission.user
-	mid.Sub("knowledge").NewSub("tag", "知识库标签", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
-
 	// --- mcp ---
 	mid.NewSub("mcp", "MCP广场", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
+
+	// --- safety ---
+	mid.NewSub("safety", "安全护栏", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
 
 	// --- rag ---
 	mid.NewSub("rag", "文本问答", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
@@ -59,4 +59,7 @@ func Init() {
 
 	// permission.role
 	mid.Sub("permission").NewSub("role", "角色", route.PermNeedCheck, true, true)
+
+	// --- setting ---
+	mid.NewSub("setting", "平台配置", route.PermNeedCheck, true, true, JWTUser, CheckUserPerm)
 }

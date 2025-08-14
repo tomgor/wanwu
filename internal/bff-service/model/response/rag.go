@@ -8,4 +8,5 @@ type RagInfo struct {
 	ModelConfig         request.AppModelConfig         `json:"modelConfig" validate:"required"`         // 模型
 	RerankConfig        request.AppModelConfig         `json:"rerankConfig" validate:"required"`        // Rerank模型
 	KnowledgeBaseConfig request.AppKnowledgebaseConfig `json:"knowledgeBaseConfig" validate:"required"` // 知识库
+	SafetyConfig        request.AppSafetyConfig        `json:"safetyConfig"`                            // 敏感词表配置
 }

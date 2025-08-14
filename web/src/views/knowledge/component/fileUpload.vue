@@ -33,7 +33,7 @@
                 :auto-upload="false"
                 :limit="5"
                 multiple
-                accept=".pdf,.docx,.doc,.txt,.xlsx,.xls,.zip,.tar.gz,.csv,.pptx,.html"
+                accept=".pdf,.docx,.doc,.txt,.xlsx,.xls,.zip,.tar.gz,.csv,.pptx,.html,.md,.ofd,.wps"
                 :file-list="fileList"
                 :on-change="uploadOnChange"
               >
@@ -43,7 +43,7 @@
                     <p class="click-text">将文件拖到此处，或<span class="clickUpload">点击上传</span></p>
                 </div>
                 <div class="tips">
-                  <p v-if="fileType === 'file'"><span class="red">*</span>您可单独或者批量上传以下格式的文档：pdf/docx/pptx 文件最大为200MB，xlsx/csv/txt/html文件最大为20MB。zip格式内的文档需符合各自文件格式上传大小限制</p>
+                  <p v-if="fileType === 'file'"><span class="red">*</span>您可单独或者批量上传以下格式的文档：pdf/docx/pptx/doc/wps/ofd文件最大为200MB，xlsx/xls/csv/txt/html/md/文件最大为20MB。zip/tar.gz格式内的文档需符合各自文件格式上传大小限制</p>
                   <p v-if="fileType === 'file'"><span class="red">*</span>非压缩包文件，一次可传5个文件，如文件页数多，文档解析时间较长，平均3秒/页，请您耐心等待</p>
                   <p v-if="fileType === 'fileUrl'"><span class="red">*</span>批量上传支持.xlsx格式，仅可上传1个。文档最多可添加100条url，文件不超过15mb <a class="template_downLoad" href="#" @click.prevent.stop="downloadTemplate">模版下载</a></p>
                   <p v-if="fileType === 'fileUrl'"><span class="red">*</span>当前内容不自动更新</p>
@@ -79,31 +79,24 @@
             </el-form-item>
             <el-form-item
               v-if="ruleForm.docSegment.segmentType == '1'"
-              :label="$t('knowledgeManage.punctuationMark')+'：'"
+              label="分段标识:"
               prop="docSegment.splitter"
               :rules="ruleForm.docSegment.segmentType === '1' 
               ? [{ required: true, message: $t('knowledgeManage.markTips'), trigger: 'blur' }] 
               : []"
             >
-              <el-select
-                v-model="ruleForm.docSegment.splitter"
-                :placeholder="$t('knowledgeManage.please')"
-                class="setItem"
-                multiple
-                clearable
-                collapse-tags
+            <el-tag
+              :key="tag.splitterId"
+              v-for="tag in checkSplitter"
+              :disable-transitions="false"
+              class="splitterTag"
               >
-                <el-option
-                  v-for="item in splitOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </el-option>
-              </el-select>
-              <div style="color: #384BF7;">
-                {{$t('knowledgeManage.splitOptionsTips')}}
-              </div>
+              {{tag.splitterName}}
+            </el-tag>
+            <el-button class="button-new-tag" size="small" @click="showSplitterSet"> + 分段标识设置</el-button>
+            <div style="color: #384BF7;">
+              {{$t('knowledgeManage.splitOptionsTips')}}
+            </div>
             </el-form-item>
             <el-form-item
               v-if="ruleForm.docSegment.segmentType == '1'"
@@ -144,6 +137,16 @@
               </div>
             </el-form-item>
             <el-form-item
+              label="文本预处理规则："
+              prop="docPreprocess"
+              v-if="ruleForm.docSegment.segmentType == '1'"
+            >
+            <el-checkbox-group v-model="ruleForm.docPreprocess">
+                <el-checkbox label="replaceSymbols">替换掉连续的空格、换行符和制表符</el-checkbox>
+                <el-checkbox label="deleteLinks">删除所有URL和电子邮件地址</el-checkbox>
+            </el-checkbox-group>
+            </el-form-item>
+            <el-form-item
               label="解析方式："
               prop="docAnalyzer"
             >
@@ -168,6 +171,76 @@
                 :value="item.modelId">
               </el-option>
             </el-select>
+            </el-form-item>
+            <el-form-item
+              label="元数据管理："
+              prop="docAnalyzer"
+            >
+            <el-button icon="el-icon-plus" type="primary" size="mini" @click="createMetaData">创建</el-button>
+            <div>
+              <div v-for="item in ruleForm.docMetaData">
+                <div>
+                  <span>Key:</span>
+                  <el-input v-model="item.metaKey"></el-input>
+                </div>
+                <div>
+                  <span>类型:</span>
+                  <el-select v-model="item.metaValueType" placeholder="请选择">
+                    <el-option
+                      v-for="item in typeOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                </div>
+                <div>
+                  <span>value:</span>
+                  <el-select v-model="item.metadataType" placeholder="请选择">
+                    <el-option
+                      v-for="item in valueOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                  <el-input v-model="item.metaValue" v-if="item.metadataType==='value'"></el-input>
+                  <el-input v-model="item.metaRule" v-else></el-input>
+                </div>
+                <div>
+                  <span class="el-icon-edit-outline"></span>
+                  <span class="el-icon-delete"></span>
+                </div>
+              </div>
+            </div>
+            <!-- <el-table
+            :data="ruleForm.docMetaData"
+            border="true"
+            style="width: 70%">
+            <el-table-column
+                prop="key"
+                label="key">
+            </el-table-column>
+            <el-table-column
+                prop="type"
+                label="类型">
+            </el-table-column>
+            <el-table-column
+                prop="value"
+                label="value">
+                <template slot-scope="scope">
+                    <span v-if="!scope.row.showInput">{{scope.row.value}}</span>
+                    <el-input v-model="scope.row.value" v-else @blur="handleBlur(scope.row)"></el-input>
+                </template>
+            </el-table-column>
+            <el-table-column
+                label="操作">
+                <template slot-scope="scope">
+                    <el-button type="text" size="small" @click="editItem(scope.row)">编辑</el-button>
+                    <el-button type="text" size="small" @click="delItem(scope.$index)">删除</el-button>
+                </template>
+            </el-table-column>
+            </el-table>  -->
             </el-form-item>
           </el-form>
         </div>
@@ -219,20 +292,49 @@
         </div>
       </div>
     </div>
+    <splitterDialog ref="splitterDialog" :title="titleText" :placeholderText="placeholderText" :dataList="splitOptions" @editItem="editItem" @createItem="createItem" @delItem="delSplitterItem" @relodData="relodData" @checkData="checkData" />
   </div>
 </template>
 <script>
 import urlAnalysis from './urlAnalysis.vue';
 import uploadChunk from "@/mixins/uploadChunk";
-import {docImport,ocrSelectList} from '@/api/knowledge'
+import {docImport,ocrSelectList,delSplitter,getSplitter,createSplitter,editSplitter} from '@/api/knowledge'
 import { delfile } from "@/api/chunkFile";
-import { FlagManager } from '@antv/x6/lib/view/flag';
 import LinkIcon from "@/components/linkIcon.vue";
+import splitterDialog from './splitterDialog.vue';
 export default {
-  components:{LinkIcon, urlAnalysis},
+  components:{LinkIcon, urlAnalysis,splitterDialog},
   mixins: [uploadChunk],
   data() {
     return {
+      typeOptions:[
+        {
+          label:'String',
+          value:"string"
+        },
+        {
+          label:'Number',
+          value:"number"
+        },
+        {
+          label:'Time',
+          value:"time"
+        },
+      ],
+      valueOptions:[
+        {
+          value:'value',
+          name:'确认值'
+        },
+        {
+          value:'reg',
+          name:'正则表达式'
+        }
+      ],
+      placeholderText:'搜索分隔符',
+      titleText:'创建分隔符',
+      splitterValue:'',
+      tableData:[],
       ocrOptions:[],
       urlValidate: false,
       active: 1,
@@ -243,55 +345,96 @@ export default {
       fileUrl:'',
       docInfoList:[],
       ruleForm:{
-        docAnalyzer:['text','ocr'],
+        docAnalyzer:['text'],
+        docMetaData:[],//元数据管理数据
+        docPreprocess:[],//'deleteLinks','replaceSymbols'
         docSegment:{
           segmentType:'0',
-          splitter:["！","。","？","?","!",".","......"],
+          splitter:[],//"！","。","？","?","!",".","......"
           maxSplitter:200,
-          overlap:0.2
+          overlap:0.2,
         },
         docInfoList:[],
         docImportType:0,
         knowledgeId:this.$route.query.id,
-        ocrModelId:''
+        ocrModelId:'',
+        metadata:[]
       },
-      splitOptions: [
-        {
-          label: this.$t('knowledgeManage.zh_exclamationMark'),
-          value: "！",
-        },
-        {
-          label: this.$t('knowledgeManage.zh_period'),
-          value: "。",
-        },
-        {
-          label: this.$t('knowledgeManage.zh_questionMark'),
-          value: "？",
-        },
-        {
-          label: this.$t('knowledgeManage.en_questionMark'),
-          value: "?",
-        },
-        {
-          label: this.$t('knowledgeManage.en_exclamationMark'),
-          value: "!",
-        },
-        {
-          label: this.$t('knowledgeManage.eh_period'),
-          value: ".",
-        },
-        {
-          label: this.$t('knowledgeManage.ellipsis'),
-          value: "......",
-        }
-      ],
+      checkSplitter:[],
+      splitOptions: [],
       urlLoading:false
     };
   },
   created(){
     this.getOcrList()
+    this.getSplitterList()
   },
   methods:{
+  createMetaData(){
+    this.ruleForm.docMetaData.push({
+       metakey:'',
+       metaRule:'',
+       metaValue:'',
+       metaValueType:'string',
+       metadataType:'value'
+    })
+  },
+  checkData(data){
+    this.checkSplitter = data
+  },
+  relodData(){
+    this.getSplitterList()
+  },
+  getSplitterList(){
+    getSplitter().then(res =>{
+      if(res.code === 0){
+        this.splitOptions = (res.data.knowledgeSplitterList || []).map((item) => ({
+          ...item,
+          showDel: false,
+          showIpt: false
+        }))
+      }
+    })
+  },
+  editItem(item){
+    editSplitter({splitterId:item.splitterId,splitterName:item.splitterName,splitterValue:item.splitterName}).then(res =>{
+      if(res.code === 0){
+        item.showIpt = false;
+        this.getSplitterList();
+      }
+    })
+  },
+  createItem(item){
+    createSplitter({splitterName:item.splitterName,splitterValue:item.splitterName}).then(res =>{
+      if(res.code === 0){
+        item.showIpt = false;
+        this.getSplitterList();
+      }
+    })
+  },
+  async delSplitterItem(item){
+    this.$confirm(
+        `删除标签${item.splitterName}`,
+         "确认要删除当前分隔符？",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(async() => {
+          const res = await delSplitter({ splitterId: item.splitterId })
+            if (res.code === 0) {
+                this.getSplitterList();
+            }
+        })
+        .catch((error) => {
+            this.getSplitterList();
+    });
+  },
+  showSplitterSet(){
+    this.$refs.splitterDialog.showDiaglog()
+  },
   goBack(){
     this.$router.go(-1);
   },
@@ -313,6 +456,20 @@ export default {
       })
     })
   },
+    handleAddMetadata(){
+      this.ruleForm.metadata.push({
+        key: '',
+        type: '',
+        value: {},
+        editable: true
+      });
+    },
+    handleEditMetadata(row) {
+      row.editable = !row.editable;
+    },
+    handleDeleteMetadata(row) {
+      this.ruleForm.metadata.splice(this.ruleForm.metadata.indexOf(row), 1);
+    },
   async downloadTemplate(){
     const url = '/user/api/v1/static/docs/url_import_template.xlsx';
     const fileName = 'url_import_template.xlsx';
@@ -523,7 +680,7 @@ export default {
     },
     //  验证文件格式
     verifyFormat(file) {
-      const nameType = ['pdf','docx','pptx','zip','tar.gz','xlsx','csv','txt','html']
+      const nameType = ['pdf','docx','doc','pptx','zip','tar.gz','xlsx','xls','csv','txt','html','md','ofd','wps']
       const fileName = file.name
       const isSupportedFormat = nameType.some(ext => fileName.endsWith(`.${ext}`));
       if (!isSupportedFormat) {
@@ -536,8 +693,8 @@ export default {
         return false
       }else{
         const fileType = file.name.split(".").pop()
-        const limit200 = ['pdf','docx','pptx','zip','tar.gz']
-        const limit20 = ['xlsx','csv','txt','html']
+        const limit200 = ['pdf','docx','doc','pptx','zip','tar.gz','ofd','wps']
+        const limit20 = ['xlsx','xls','csv','txt','html','md']
         let isLimit200 = file.size / 1024 / 1024 < 200;
         let isLimit20 = file.size / 1024 / 1024 < 20;
         let num = 0;
@@ -617,6 +774,20 @@ export default {
 </script>
 <style lang="scss" scoped>
 .red{color:red;}
+.splitterTag{
+  margin-right:10px;
+  border:none;
+  background: #f4f5ff;
+  color:#384BF7;
+  border-radius:3px;
+}
+.optionInput{
+  width:90%;
+  margin:10px;
+}
+.splitterOption{
+  margin-top:5px;
+}
 .el-input-number {
     line-height: 28px !important;
 }
@@ -799,5 +970,8 @@ export default {
   .document_lise_item:hover{
     background: #ECEEFE;
   }
+}
+.table-opera-icon{
+  font-size: 18px;
 }
 </style>

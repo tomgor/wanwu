@@ -3,17 +3,16 @@ package grpc
 import (
 	"context"
 	"fmt"
-	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
-	"github.com/UnicomAI/wanwu/internal/mcp-service/server/grpc/mcp"
 	"net"
 	"runtime/debug"
 	"time"
 
+	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
 	"github.com/UnicomAI/wanwu/internal/mcp-service/client"
 	"github.com/UnicomAI/wanwu/internal/mcp-service/config"
-	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-
+	"github.com/UnicomAI/wanwu/internal/mcp-service/server/grpc/mcp"
 	"github.com/UnicomAI/wanwu/pkg/log"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/health"

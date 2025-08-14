@@ -2,6 +2,7 @@ package rag
 
 import (
 	"context"
+	"encoding/json"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
@@ -41,22 +42,28 @@ func (s *Service) ChatRag(req *rag_service.ChatRagReq, stream grpc.ServerStreami
 	log.Infof("get rag: %v", rag)
 	// 校验知识库是否存在
 	log.Infof("check know: userid = %s, orgId = %s, knowid = %s", rag.UserID, rag.UserID, rag.KnowledgeBaseConfig.KnowId)
-	knowledge, errk := Knowledge.SelectKnowledgeDetailById(ctx, &knowledgebase_service.KnowledgeDetailSelectReq{
-		UserId:      rag.UserID,
-		OrgId:       rag.OrgID,
-		KnowledgeId: rag.KnowledgeBaseConfig.KnowId,
+	// 反序列化字符串
+	var knowledgeIds []string
+	errU := json.Unmarshal([]byte(rag.KnowledgeBaseConfig.KnowId), &knowledgeIds)
+	if errU != nil {
+		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", "unmarshal knowIds err:", errU.Error())
+	}
+	knowledgeInfoList, errk := Knowledge.SelectKnowledgeDetailByIdList(ctx, &knowledgebase_service.KnowledgeDetailSelectListReq{
+		UserId:       rag.UserID,
+		OrgId:        rag.OrgID,
+		KnowledgeIds: knowledgeIds,
 	})
 	if errk != nil {
 		log.Errorf("errk = %s", errk.Error())
-		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", "check knowledge err:", errk.Error())
+		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", "check knowledgeInfoList err:", errk.Error())
 	}
-	if knowledge == nil {
-		log.Errorf("knowledge = nil")
-		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", "check knowledge err: knowledge is nil")
+	if knowledgeInfoList == nil {
+		log.Errorf("knowledgeInfoList = nil")
+		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", "check knowledgeInfoList err: knowledgeInfoList is nil")
 	}
 
 	//  请求rag
-	buildParams := service.BuildChatConsultParams(req, rag, knowledge)
+	buildParams := service.BuildChatConsultParams(req, rag, knowledgeInfoList)
 	chatChan, errg := service.RagStreamChat(ctx, rag.UserID, buildParams)
 	if errg != nil {
 		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", errg.Error())
@@ -107,6 +114,22 @@ func (s *Service) UpdateRag(ctx context.Context, in *rag_service.UpdateRagReq) (
 }
 
 func (s *Service) UpdateRagConfig(ctx context.Context, in *rag_service.UpdateRagConfigReq) (*emptypb.Empty, error) {
+	var sensitiveIds string
+	var knowledgeIds string
+	if in.SensitiveConfig.TableIds != nil {
+		sensitiveIdBytes, err := json.Marshal(in.SensitiveConfig.TableIds)
+		if err != nil {
+			return nil, grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_update_err", "marshal err:", err.Error())
+		}
+		sensitiveIds = string(sensitiveIdBytes)
+	}
+	if len(in.KnowledgeBaseConfig.KnowledgeBaseIds) > 0 {
+		knowledgeIdBytes, err := json.Marshal(in.KnowledgeBaseConfig.KnowledgeBaseIds)
+		if err != nil {
+			return nil, grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_update_err", "marshal err:", err.Error())
+		}
+		knowledgeIds = string(knowledgeIdBytes)
+	}
 	if err := s.cli.UpdateRagConfig(ctx, &model.RagInfo{
 		RagID: in.RagId,
 		ModelConfig: model.AppModelConfig{
@@ -124,13 +147,18 @@ func (s *Service) UpdateRagConfig(ctx context.Context, in *rag_service.UpdateRag
 			Config:    in.RerankConfig.Config,
 		},
 		KnowledgeBaseConfig: model.KnowledgeBaseConfig{
-			KnowId:           in.KnowledgeBaseConfig.KnowledgeBaseId,
-			MaxHistory:       int64(in.KnowledgeBaseConfig.MaxHistory),
-			MaxHistoryEnable: in.KnowledgeBaseConfig.MaxHistoryEnable,
-			Threshold:        float64(in.KnowledgeBaseConfig.Threshold),
-			ThresholdEnable:  in.KnowledgeBaseConfig.ThresholdEnable,
-			TopK:             int64(in.KnowledgeBaseConfig.TopK),
-			TopKEnable:       in.KnowledgeBaseConfig.TopKEnable,
+			KnowId:            knowledgeIds,
+			MaxHistory:        int64(in.KnowledgeBaseConfig.MaxHistory),
+			Threshold:         float64(in.KnowledgeBaseConfig.Threshold),
+			TopK:              int64(in.KnowledgeBaseConfig.TopK),
+			MatchType:         in.KnowledgeBaseConfig.MatchType,
+			PriorityMatch:     in.KnowledgeBaseConfig.PriorityMatch,
+			SemanticsPriority: float64(in.KnowledgeBaseConfig.SemanticsPriority),
+			KeywordPriority:   float64(in.KnowledgeBaseConfig.KeywordPriority),
+		},
+		SensitiveConfig: model.SensitiveConfig{
+			Enable:   in.SensitiveConfig.Enable,
+			TableIds: sensitiveIds,
 		},
 	}); err != nil {
 		return nil, errStatus(errs.Code_RagUpdateErr, err)

@@ -306,6 +306,7 @@ export default {
             bgColor: '平台背景色',
             loginButtonColor: '"登录"按钮颜色',
             logoWelcome: '登录页欢迎语',
+            loginLogo: '登录页Logo'
         },
         tabSet: '标签页配置',
         platformSet: '平台配置',
@@ -323,6 +324,7 @@ export default {
             loginBg: '显示在登录页面的背景图',
             loginButtonColor: '显示在登录框中登录按钮的颜色',
             logoWelcome: '显示在登录页的欢迎语',
+            loginLogo: '显示在登录页左上方的Logo'
         }
     },
     modelAccess: {

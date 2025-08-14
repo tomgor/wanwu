@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"net/url"
 
+	mp_huoshan "github.com/UnicomAI/wanwu/pkg/model-provider/mp-huoshan"
+	mp_ollama "github.com/UnicomAI/wanwu/pkg/model-provider/mp-ollama"
 	mp_openai_compatible "github.com/UnicomAI/wanwu/pkg/model-provider/mp-openai-compatible"
+	mp_qwen "github.com/UnicomAI/wanwu/pkg/model-provider/mp-qwen"
 	mp_yuanjing "github.com/UnicomAI/wanwu/pkg/model-provider/mp-yuanjing"
 )
 
@@ -13,13 +16,14 @@ type ILLMParams interface {
 	GetParams() map[string]interface{}
 }
 
-// ToModelEndpoint 返回model、model_url的kv
+// ToModelEndpoint 返回model、model_url、model_id的kv
 func ToModelEndpoint(modelId, model string) map[string]interface{} {
 	ret := make(map[string]interface{})
 	if modelId != "" && model != "" {
 		modelUrl, _ := url.JoinPath(_callbackUrl, "/callback/v1/model", modelId)
 		ret["model"] = model
 		ret["model_url"] = modelUrl
+		ret["model_id"] = modelId
 	}
 	return ret
 }
@@ -50,6 +54,45 @@ func ToModelParams(provider, modelType, cfg string) (interface{}, map[string]int
 		switch modelType {
 		case ModelTypeLLM:
 			llm := &mp_yuanjing.LLMParams{}
+			if err = json.Unmarshal([]byte(cfg), llm); err == nil {
+				ret = llm
+				params = llm.GetParams()
+			}
+		case ModelTypeRerank:
+		case ModelTypeEmbedding:
+		default:
+			return nil, nil, fmt.Errorf("invalid model type: %v", modelType)
+		}
+	case ProviderHuoshan:
+		switch modelType {
+		case ModelTypeLLM:
+			llm := &mp_huoshan.LLMParams{}
+			if err = json.Unmarshal([]byte(cfg), llm); err == nil {
+				ret = llm
+				params = llm.GetParams()
+			}
+		case ModelTypeRerank:
+		case ModelTypeEmbedding:
+		default:
+			return nil, nil, fmt.Errorf("invalid model type: %v", modelType)
+		}
+	case ProviderOllama:
+		switch modelType {
+		case ModelTypeLLM:
+			llm := &mp_ollama.LLMParams{}
+			if err = json.Unmarshal([]byte(cfg), llm); err == nil {
+				ret = llm
+				params = llm.GetParams()
+			}
+		case ModelTypeRerank:
+		case ModelTypeEmbedding:
+		default:
+			return nil, nil, fmt.Errorf("invalid model type: %v", modelType)
+		}
+	case ProviderQwen:
+		switch modelType {
+		case ModelTypeLLM:
+			llm := &mp_qwen.LLMParams{}
 			if err = json.Unmarshal([]byte(cfg), llm); err == nil {
 				ret = llm
 				params = llm.GetParams()

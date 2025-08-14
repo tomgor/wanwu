@@ -23,8 +23,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const docCenterLocalDir = "static/docs"
-
 var (
 	avatarCacheMu       sync.Mutex
 	avatarCacheLocalDir = "cache"
@@ -147,10 +145,4 @@ func CacheAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
 	}
 	avatar.Path = filepath.Join("/v1", filePath)
 	return avatar
-}
-
-func GetDocCenter() *response.DocCenter {
-	return &response.DocCenter{
-		DocCenterPath: path.Join("/v1", docCenterLocalDir, path.Base(config.Cfg().DocCenter.DocPath)),
-	}
 }

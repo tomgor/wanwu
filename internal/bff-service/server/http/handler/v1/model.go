@@ -183,3 +183,20 @@ func ListEmbeddingModels(ctx *gin.Context) {
 	})
 	gin_util.Response(ctx, resp, err)
 }
+
+// ListOcrModels
+//
+//	@Tags		model
+//	@Summary	ocr模型列表
+//	@Description
+//	@Security	JWT
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelBrief}}
+//	@Router		/model/select/ocr [get]
+func ListOcrModels(ctx *gin.Context) {
+	resp, err := service.ListTypeModels(ctx, getUserID(ctx), getOrgID(ctx), &request.ListTypeModelsRequest{
+		ModelType: mp.ModelTypeOcr,
+	})
+	gin_util.Response(ctx, resp, err)
+}

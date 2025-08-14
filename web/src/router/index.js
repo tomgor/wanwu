@@ -19,6 +19,26 @@ const constantRoutes = [
         path: '/',
     },
     {
+        path: '/doc',
+        component:resolve =>require(['@/components/filePreview/DocPeview'],resolve),
+    },
+    {
+        path: '/pdf',
+        component:resolve =>require(['@/components/filePreview/PdfPreview'],resolve),
+    },
+    {
+        path: '/pdfView',
+        component:resolve =>require(['@/components/filePreview/pdfView'],resolve),
+    },
+    {
+        path: '/txtView',
+        component:resolve =>require(['@/components/filePreview/textView'],resolve),
+    },
+    {
+        path: '/jsExcel',
+        component:resolve =>require(['@/components/filePreview/JsPreviewExcel'],resolve),
+    },
+    {
         path: '/portal',
         name: 'portal',
         component:resolve =>require(['@/views/layout'],resolve),
@@ -141,6 +161,11 @@ const constantRoutes = [
                 path:'/safety/wordList/:id',
                 component:resolve =>require(['@/views/safety/component/wordList'],resolve),
                 meta:{perm: [PERMS.SAFRTY]},
+            },
+            {
+                path:'/agent/publishSet/:id',
+                component:resolve =>require(['@/views/agent/web-URL'],resolve),
+                meta:{perm: [PERMS.AGENT]},
             },
             {
                 path: '/userCenter/*',

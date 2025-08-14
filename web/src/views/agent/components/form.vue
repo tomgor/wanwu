@@ -28,6 +28,15 @@
         <el-button
           size="small"
           type="primary"
+          style="padding:13px 12px;"
+          @click="handlePublishSet"
+        >
+         <span class="el-icon-setting"></span>
+          发布配置
+        </el-button>
+        <el-button
+          size="small"
+          type="primary"
           @click="handlePublish"
           style="padding:13px 12px;"
         >发布<span
@@ -580,6 +589,9 @@ export default {
     store.dispatch("app/initState");
   },
   methods: {
+    handlePublishSet(){
+      this.$router.push({path:`/agent/publishSet/id=${this.editForm.assistantId}`})
+    },
     setKnowledgeSet(data){
       this.editForm.knowledgeConfig = data;
     },
