@@ -278,6 +278,7 @@
           <el-button type="primary" size="mini" @click="preStep" v-if="active === 2">上一步</el-button>
           <el-button type="primary" size="mini" @click="nextStep" v-if="active === 1" :loading="urlLoading">下一步</el-button>
           <el-button type="primary" size="mini" @click="submitInfo" v-if="active === 2">确 定</el-button>
+          <el-button size="mini" @click="formReset" v-if="active === 2">重 置</el-button>
         </div>
       </div>
     </div>
@@ -363,7 +364,7 @@ export default {
   },
   created(){
     this.getOcrList()
-    this.getSplitterList()
+    this.getSplitterList('')
   },
   methods:{
   typeChange(item){
@@ -439,11 +440,11 @@ export default {
     this.checkSplitter = data;
     this.ruleForm.docSegment.splitter = data.map(item => item.splitterValue)
   },
-  relodData(){
-    this.getSplitterList()
+  relodData(name){
+    this.getSplitterList(name)
   },
-  getSplitterList(){
-    getSplitter().then(res =>{
+  getSplitterList(splitterName){
+    getSplitter({splitterName}).then(res =>{
       if(res.code === 0){
         this.splitOptions = (res.data.knowledgeSplitterList || []).map((item) => ({
           ...item,
@@ -457,7 +458,7 @@ export default {
     editSplitter({splitterId:item.splitterId,splitterName:item.splitterName,splitterValue:item.splitterName}).then(res =>{
       if(res.code === 0){
         item.showIpt = false;
-        this.getSplitterList();
+        this.getSplitterList('');
       }
     })
   },
@@ -465,7 +466,7 @@ export default {
     createSplitter({splitterName:item.splitterName,splitterValue:item.splitterName}).then(res =>{
       if(res.code === 0){
         item.showIpt = false;
-        this.getSplitterList();
+        this.getSplitterList('');
       }
     })
   },
@@ -482,11 +483,11 @@ export default {
         .then(async() => {
           const res = await delSplitter({ splitterId: item.splitterId })
             if (res.code === 0) {
-                this.getSplitterList();
+                this.getSplitterList('');
             }
         })
         .catch((error) => {
-            this.getSplitterList();
+            this.getSplitterList('');
     });
   },
   showSplitterSet(){
@@ -608,7 +609,6 @@ export default {
       this.fileList = []
     },
     submitInfo(){
-      console.log(this.ruleForm)
       const { segmentType, splitter } = this.ruleForm.docSegment;
       if (segmentType === '1' && splitter.length === 0) {
           this.$refs.ruleForm.validate();
@@ -642,6 +642,28 @@ export default {
             this.$router.push({path:`/knowledge/doclist/${this.knowledgeId}`,query:{name:this.knowledgeName,done:'fileUpload'}})
           }
         })
+    },
+    formReset(){
+      this.ruleForm = {
+        docAnalyzer:['text'],
+        docMetaData:[],//元数据管理数据
+        docPreprocess:[],//'deleteLinks','replaceSymbols'
+        docSegment:{
+          segmentType:this.ruleForm.docSegment.segmentType,
+          splitter:[],//"！","。","？","?","!",".","......"
+          maxSplitter:200,
+          overlap:0.2,
+        },
+        docInfoList:[],
+        docImportType:0,
+        knowledgeId:this.$route.query.id,
+        ocrModelId:''
+      }
+      this.checkSplitter = []
+      this.splitOptions = this.splitOptions.map(item => ({
+        ...item,
+        checked: false
+      }))
     },
     uploadOnChange(file, fileList){
       if (!fileList.length) return;

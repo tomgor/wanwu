@@ -654,7 +654,7 @@ export default {
         noStatus:'无状态信息',
         categoryNameRules:'命名只能包含小写英文、中文、数字、特殊符号-_',
         chunkTypeConfigTips:'*当前自定义分段对.xlsx文件切分不生效，如您上传.xlsx，将按系统默认形式切分',
-        markTips:'请输入选择标点符号',
+        markTips:'请输入选择分段标识',
         splitOptionsTips:'按照所选的标识符切分文本。切分后，按设置的切片最大长度对切分后的文本组合成单一切片内容',
         splitMax:'可分割最大值',
         splitMaxTips:'可填写范围最小为200 tokens，最大为4000 tokens',
