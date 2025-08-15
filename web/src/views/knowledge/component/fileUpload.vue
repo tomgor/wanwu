@@ -82,7 +82,7 @@
               label="分段标识:"
               prop="docSegment.splitter"
               :rules="ruleForm.docSegment.segmentType === '1' 
-              ? [{ validator: validateSplitter, message: $t('knowledgeManage.markTips'), trigger: 'blur' }] 
+              ? [{ required: true,validator: validateSplitter, message: $t('knowledgeManage.markTips'), trigger: 'blur' }] 
               : []"
             >
             <el-tag
@@ -298,7 +298,7 @@ export default {
   data() {
     const validateSplitter = (rule, value, callback) => {
       if (this.checkSplitter.length === 0) {
-        callback(new Error(this.$t('knowledgeManage.splitterRequired'))); // 请至少选择一个分段标识
+        callback(new Error(this.$t('knowledgeManage.splitterRequired')));
       } else {
         callback();
       }
@@ -345,10 +345,10 @@ export default {
       ruleForm:{
         docAnalyzer:['text'],
         docMetaData:[],//元数据管理数据
-        docPreprocess:[],//'deleteLinks','replaceSymbols'
+        docPreprocess:['replaceSymbols'],//'deleteLinks','replaceSymbols'
         docSegment:{
           segmentType:'0',
-          splitter:[],//"！","。","？","?","!",".","......"
+          splitter:["！","。","？","?","!",".","......"],
           maxSplitter:200,
           overlap:0.2,
         },
@@ -362,11 +362,21 @@ export default {
       urlLoading:false
     };
   },
-  created(){
+  async  created(){
     this.getOcrList()
-    this.getSplitterList('')
+    await this.getSplitterList('')
+    await this.custom()
   },
   methods:{
+  custom(){
+    const splitter = this.ruleForm.docSegment.splitter
+    this.checkSplitter = this.splitOptions.filter(item => {
+      return (
+        splitter.includes(item.splitterValue) && 
+        item.type === 'preset'
+      );
+    });
+  },
   typeChange(item){
     item.metaValue = '';
     item.metaRule = '';
@@ -443,16 +453,15 @@ export default {
   relodData(name){
     this.getSplitterList(name)
   },
-  getSplitterList(splitterName){
-    getSplitter({splitterName}).then(res =>{
-      if(res.code === 0){
-        this.splitOptions = (res.data.knowledgeSplitterList || []).map((item) => ({
-          ...item,
-          showDel: false,
-          showIpt: false
-        }))
-      }
-    })
+  async getSplitterList(splitterName){
+    const res = await getSplitter({splitterName});
+    if(res.code === 0){
+      this.splitOptions = (res.data.knowledgeSplitterList || []).map((item) => ({
+        ...item,
+        showDel: false,
+        showIpt: false
+      }))
+    }
   },
   editItem(item){
     editSplitter({splitterId:item.splitterId,splitterName:item.splitterName,splitterValue:item.splitterName}).then(res =>{
