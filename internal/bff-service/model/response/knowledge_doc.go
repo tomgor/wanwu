@@ -26,7 +26,7 @@ type DocSegmentResp struct {
 	SegmentType        string            `json:"segmentType"`     //分段方式 0自动分段 1自定义分段
 	UploadTime         string            `json:"uploadTime"`      //上传时间
 	Splitter           string            `json:"splitter"`        // 分隔符（只有自定义分段必填）
-	MetaDataList       []*MetaData       `json:"MetaDataList"`    //文档元数据
+	MetaDataList       []*MetaData       `json:"metaDataList"`    //文档元数据
 	SegmentContentList []*SegmentContent `json:"contentList"`     //内容
 }
 
