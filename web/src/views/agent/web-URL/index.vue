@@ -17,7 +17,7 @@
             </div>
         </template>
         <template #main-content>
-            <CreateApi ref="CreateApi" v-if="active === 'url'"/>
+            <CreateApi ref="CreateApi" v-if="active === 'api'"/>
             <CreateUrl ref="CreateUrl" v-else/>
         </template>
         </CommonLayout>
