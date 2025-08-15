@@ -8320,15 +8320,18 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "metaKey": {
+                    "description": "key 的校验",
                     "type": "string"
                 },
                 "metaRule": {
                     "type": "string"
                 },
                 "metaValue": {
+                    "description": "传入字符串",
                     "type": "string"
                 },
                 "metaValueType": {
+                    "description": "number:\"1\" , date:\"1755226779000\" 毫秒 , string, \"\"",
                     "type": "string"
                 }
             }
@@ -9613,7 +9616,7 @@ const docTemplate = `{
                 },
                 "createdAt": {
                     "description": "创建时间",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "disclaimer": {
                     "description": "免责声明",
@@ -10972,6 +10975,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "dataType": {
+                    "type": "string"
+                },
+                "formatValue": {
                     "type": "string"
                 },
                 "key": {

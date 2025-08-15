@@ -3,7 +3,7 @@ package model
 const (
 	MetaTypeString = "string"
 	MetaTypeNumber = "number"
-	MetaTypeDate   = "date"
+	MetaTypeTime   = "time"
 )
 
 type KnowledgeDocMeta struct {

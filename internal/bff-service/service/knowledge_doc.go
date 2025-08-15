@@ -1,8 +1,11 @@
 package service
 
 import (
+	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_doc_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-doc-service"
@@ -306,11 +309,44 @@ func buildMetaDataResultList(metaDataList []*knowledgebase_doc_service.MetaData)
 	}
 	return lo.Map(metaDataList, func(item *knowledgebase_doc_service.MetaData, index int) *response.MetaData {
 		return &response.MetaData{
-			DataId:   item.DataId,
-			Key:      item.Key,
-			Value:    item.Value,
-			DataType: item.ValueType,
-			Rule:     item.Rule,
+			DataId:      item.DataId,
+			Key:         item.Key,
+			Value:       item.Value,
+			FormatValue: buildFormatValue(item.ValueType, item.Value),
+			DataType:    item.ValueType,
+			Rule:        item.Rule,
 		}
 	})
+}
+
+func buildFormatValue(valueType, value string) string {
+	if valueType == "time" {
+		timestamp, err := formatTimestamp(value)
+		if err != nil {
+			return timestamp
+		}
+	}
+	return value
+}
+
+func formatTimestamp(timestampStr string) (string, error) {
+	// 将字符串转换为整数
+	timestamp, err := strconv.ParseInt(timestampStr, 10, 64)
+	if err != nil {
+		return "", fmt.Errorf("invalid timestamp: %v", err)
+	}
+
+	// 根据时间戳长度进行处理
+	var t time.Time
+	switch len(timestampStr) {
+	case 10: // 秒级时间戳
+		t = time.Unix(timestamp, 0)
+	case 13: // 毫秒级时间戳
+		t = time.Unix(timestamp/1000, (timestamp%1000)*1e6)
+	default:
+		return "", fmt.Errorf("unsupported timestamp length: %d (expected 10 or 13 digits)", len(timestampStr))
+	}
+
+	// 格式化为标准日期时间字符串
+	return t.Format("2006-01-02 15:04"), nil
 }
