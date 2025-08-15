@@ -53,7 +53,7 @@ func (s *Service) SelectKnowledgeSplitterList(ctx context.Context, req *knowledg
 
 func (s *Service) CreateKnowledgeSplitter(ctx context.Context, req *knowledgebase_splitter_service.CreateKnowledgeSplitterReq) (*emptypb.Empty, error) {
 	//1.重名校验
-	err := orm.CheckSameKnowledgeSplitterName(ctx, req.UserId, req.OrgId, req.SplitterName)
+	err := orm.CheckSameKnowledgeSplitterNameOrValue(ctx, req.UserId, req.OrgId, req.SplitterName, req.SplitterValue)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (s *Service) UpdateKnowledgeSplitter(ctx context.Context, req *knowledgebas
 		//如何修改得名称和原名称一样无需修改
 		return &emptypb.Empty{}, nil
 	}
-	err = orm.CheckSameKnowledgeSplitterName(ctx, req.UserId, req.OrgId, req.SplitterName)
+	err = orm.CheckSameKnowledgeSplitterNameOrValue(ctx, req.UserId, req.OrgId, req.SplitterName, req.SplitterValue)
 	if err != nil {
 		return nil, err
 	}

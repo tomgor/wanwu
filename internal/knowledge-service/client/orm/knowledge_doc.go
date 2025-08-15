@@ -4,23 +4,23 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/generator"
-	"net/url"
-	"strconv"
-
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm/sqlopt"
 	async_task "github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/async-task"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/db"
+	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/generator"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/util"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/service"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"gorm.io/gorm"
+	"net/url"
+	"strconv"
 )
 
 const (
 	MetaValueTypeNumber = "number"
+	MetaValueTypeTime   = "time"
 	PreprocessSymbol    = "replace_symbols"
 	PreprocessLink      = "delete_links"
 )
@@ -249,9 +249,18 @@ func convertMetaValue(meta *model.KnowledgeDocMeta) (interface{}, error) {
 	if meta.ValueType == MetaValueTypeNumber {
 		ragValue, err := strconv.Atoi(meta.Value)
 		if err != nil {
+			log.Errorf("convertMetaValue fail %v", err)
 			return nil, err
 		}
 		return ragValue, nil
+	}
+	if meta.ValueType == MetaValueTypeTime {
+		parseInt, err := strconv.ParseInt(meta.Value, 10, 64)
+		if err != nil {
+			log.Errorf("convertMetaValue fail %v", err)
+			return nil, err
+		}
+		return parseInt, nil
 	}
 	return meta.Value, nil
 }

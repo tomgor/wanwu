@@ -2,6 +2,7 @@ package orm
 
 import (
 	"context"
+	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/config"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
@@ -37,9 +38,9 @@ func SelectKnowledgeSplitterDetail(ctx context.Context, userId, orgId, splitterI
 	return &knowledgeSplitter, nil
 }
 
-func CheckSameKnowledgeSplitterName(ctx context.Context, userId, orgId, name string) error {
+func CheckSameKnowledgeSplitterNameOrValue(ctx context.Context, userId, orgId, name, value string) error {
 	var count int64
-	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.WithName(name)).
+	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.WithNameOrValue(name, value)).
 		Apply(db.GetHandle(ctx), &model.KnowledgeSplitter{}).
 		Count(&count).Error
 	if err != nil {
@@ -49,6 +50,16 @@ func CheckSameKnowledgeSplitterName(ctx context.Context, userId, orgId, name str
 	if count > 0 {
 		log.Errorf("KnowledgeSplitterNameExist userId %s name %s count: %v", userId, name, count)
 		return util.ErrCode(errs.Code_KnowledgeSplitterDuplicateName)
+	}
+	configSplitterList := config.GetConfig().SplitterList
+	for _, configSplitter := range configSplitterList {
+		if configSplitter.Name == name {
+			log.Errorf("KnowledgeSplitterNameExist userId %s name %s count: %v", userId, name, count)
+			return util.ErrCode(errs.Code_KnowledgeSplitterDuplicateName)
+		}
+		if configSplitter.Value == value {
+			return util.ErrCode(errs.Code_KnowledgeSplitterDuplicateName)
+		}
 	}
 	return nil
 }
