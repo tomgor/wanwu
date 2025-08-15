@@ -42,7 +42,6 @@
                 class="metaItem"
             >
               {{ item.key }}: {{ item.dataType === 'time' ? formatTimestamp(item.value) : item.value }}
-              <span v-if="index < metaDataList.slice(0, 3).length - 1">, </span>
             </span>
             <el-tooltip v-if="metaDataList.length > 3" :content="filterData(metaDataList.slice(3))" placement="bottom">
               <span class="metaItem">...</span>
