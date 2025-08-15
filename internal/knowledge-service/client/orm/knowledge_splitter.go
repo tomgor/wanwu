@@ -14,7 +14,7 @@ import (
 // SelectKnowledgeSplitterList 查询知识库分隔符列表
 func SelectKnowledgeSplitterList(ctx context.Context, userId, orgId, name string) ([]*model.KnowledgeSplitter, error) {
 	var knowledgeSplitterList []*model.KnowledgeSplitter
-	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.WithName(name)).
+	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.LikeName(name)).
 		Apply(db.GetHandle(ctx), &model.KnowledgeSplitter{}).
 		Order("create_at desc").
 		Find(&knowledgeSplitterList).
@@ -47,6 +47,7 @@ func CheckSameKnowledgeSplitterName(ctx context.Context, userId, orgId, name str
 		return util.ErrCode(errs.Code_KnowledgeSplitterDuplicateName)
 	}
 	if count > 0 {
+		log.Errorf("KnowledgeSplitterNameExist userId %s name %s count: %v", userId, name, count)
 		return util.ErrCode(errs.Code_KnowledgeSplitterDuplicateName)
 	}
 	return nil

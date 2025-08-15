@@ -118,7 +118,7 @@ func buildKnowledgeDocMeta(doc *model.KnowledgeDoc, importTask *model.KnowledgeI
 		MetaId:    generator.GetGenerator().NewID(),
 		DocId:     doc.DocId,
 		Key:       meta.Key,
-		Value:     meta.Key,
+		Value:     meta.Value,
 		ValueType: meta.ValueType,
 		Rule:      meta.Rule,
 		UserId:    importTask.UserId,

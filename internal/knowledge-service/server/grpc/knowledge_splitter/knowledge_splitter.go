@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/config"
+	"strings"
 	"time"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
@@ -27,13 +28,25 @@ func (s *Service) SelectKnowledgeSplitterList(ctx context.Context, req *knowledg
 		log.Errorf(fmt.Sprintf("获取知识库分隔符列表失败(%v)  参数(%v)", err, req))
 		return nil, util.ErrCode(errs.Code_KnowledgeSplitterSelectFailed)
 	}
+
 	configSplitterList := config.GetConfig().SplitterList
 	var presetSplitterList []*model.KnowledgeSplitter
 	for _, v := range configSplitterList {
-		presetSplitterList = append(presetSplitterList, &model.KnowledgeSplitter{
-			Name:  v.Name,
-			Value: v.Value,
-		})
+		// 搜索条件
+		if req.SplitterName != "" {
+			if strings.Contains(v.Name, req.SplitterName) {
+				presetSplitterList = append(presetSplitterList, &model.KnowledgeSplitter{
+					Name:  v.Name,
+					Value: v.Value,
+				})
+			}
+		} else {
+			presetSplitterList = append(presetSplitterList, &model.KnowledgeSplitter{
+				Name:  v.Name,
+				Value: v.Value,
+			})
+		}
+
 	}
 	return buildKnowledgeSplitterListResp(customSplitterList, presetSplitterList), nil
 }
