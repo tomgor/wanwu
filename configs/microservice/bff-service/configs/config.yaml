@@ -75,9 +75,9 @@ custom-info:
         logo_path: "/v1/static/logo/tab_logo.png"
       about:
         logo_path: "/v1/static/logo/about_logo.png"
-        version: v0.1.0
         copyright: bff_custom_about_copyright
     - mode: dark
+  version: v0.1.0
 
 doc-center:
   frontend_prefix: /aibase/docCenter/pages
