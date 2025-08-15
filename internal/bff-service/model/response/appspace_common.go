@@ -49,7 +49,7 @@ type AppUrlInfo struct {
 	AppId               string `json:"appId"`               // 应用ID
 	AppType             string `json:"appType"`             // 应用类型
 	Name                string `json:"name"`                // Url名称
-	CreatedAt           int64  `json:"createdAt"`           // 创建时间
+	CreatedAt           string `json:"createdAt"`           // 创建时间
 	ExpiredAt           string `json:"expiredAt"`           // 过期时间
 	Copyright           string `json:"copyright"`           // 知识产权
 	CopyrightEnable     bool   `json:"copyrightEnable"`     // 知识产权开关

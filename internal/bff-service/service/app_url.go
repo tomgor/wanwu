@@ -19,8 +19,15 @@ func AppUrlCreate(ctx *gin.Context, userId, orgId string, req request.AppUrlCrea
 	if req.AppType != constant.AppTypeAgent {
 		return grpc_util.ErrorStatus(err_code.Code_BFFGeneral, "app url create app type mismatch")
 	}
-	expiredAt, _ := util.Str2Time(req.ExpiredAt)
-	_, err := app.AppUrlCreate(ctx, &app_service.AppUrlCreateReq{
+	var expiredAt int64
+	var err error
+	if req.ExpiredAt != "" {
+		expiredAt, err = util.Str2Time(req.ExpiredAt)
+		if err != nil {
+			return grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, err.Error())
+		}
+	}
+	_, err = app.AppUrlCreate(ctx, &app_service.AppUrlCreateReq{
 		AppUrlInfo: &app_service.AppUrlInfo{
 			AppId:               req.AppId,
 			AppType:             req.AppType,
@@ -36,7 +43,6 @@ func AppUrlCreate(ctx *gin.Context, userId, orgId string, req request.AppUrlCrea
 			OrgId:               orgId,
 		},
 	})
-
 	return err
 }
 
@@ -48,8 +54,15 @@ func AppUrlDelete(ctx *gin.Context, req request.AppUrlIdRequest) error {
 }
 
 func AppUrlUpdate(ctx *gin.Context, req request.AppUrlUpdateRequest) error {
-	expiredAt, _ := util.Str2Time(req.ExpiredAt)
-	_, err := app.AppUrlUpdate(ctx, &app_service.AppUrlUpdateReq{
+	var expiredAt int64
+	var err error
+	if req.ExpiredAt != "" {
+		expiredAt, err = util.Str2Time(req.ExpiredAt)
+		if err != nil {
+			return grpc_util.ErrorStatus(err_code.Code_BFFInvalidArg, err.Error())
+		}
+	}
+	_, err = app.AppUrlUpdate(ctx, &app_service.AppUrlUpdateReq{
 		AppUrlInfo: &app_service.AppUrlInfo{
 			UrlId:               req.UrlId,
 			Name:                req.Name,
@@ -99,13 +112,13 @@ func transAppUrlListResp2Model(resp *app_service.GetAppUrlListResp) []*response.
 }
 
 func transAppUrlInfo(resp *app_service.AppUrlInfo) *response.AppUrlInfo {
-	return &response.AppUrlInfo{
+	ret := &response.AppUrlInfo{
 		UrlId:               resp.UrlId,
 		AppId:               resp.AppId,
 		AppType:             resp.AppType,
 		Name:                resp.Name,
-		CreatedAt:           resp.CreatedAt,
-		ExpiredAt:           util.Time2MsStr(resp.ExpiredAt),
+		CreatedAt:           util.Time2Str(resp.CreatedAt),
+		ExpiredAt:           "",
 		Copyright:           resp.Copyright,
 		CopyrightEnable:     resp.CopyrightEnable,
 		PrivacyPolicy:       resp.PrivacyPolicy,
@@ -117,4 +130,8 @@ func transAppUrlInfo(resp *app_service.AppUrlInfo) *response.AppUrlInfo {
 		UserId:              resp.UserId,
 		OrgId:               resp.OrgId,
 	}
+	if resp.ExpiredAt != 0 {
+		ret.ExpiredAt = util.Time2Str(resp.ExpiredAt)
+	}
+	return ret
 }
