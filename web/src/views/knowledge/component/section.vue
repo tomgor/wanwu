@@ -260,7 +260,7 @@ export default {
           this.res = res.data;
           this.page.total = this.res.segmentTotalNum;
           this.metaRuleList = res.data.metaDataList.filter(item => item.rule);
-          this.metaDataList = res.data.metaDataList.filter(item => !item.rule);
+          this.metaDataList = res.data.metaDataList;
         })
         .catch(() => {
           this.loading.itemStatus = false;
