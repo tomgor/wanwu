@@ -322,7 +322,7 @@ func buildMetaDataResultList(metaDataList []*knowledgebase_doc_service.MetaData)
 func buildFormatValue(valueType, value string) string {
 	if valueType == "time" {
 		timestamp, err := formatTimestamp(value)
-		if err != nil {
+		if err == nil {
 			return timestamp
 		}
 	}
