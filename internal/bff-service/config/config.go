@@ -109,6 +109,7 @@ type DocLinkConfig struct {
 type CustomInfoConfig struct {
 	DefaultMode string        `json:"default_mode" mapstructure:"default_mode"`
 	Modes       []CustomTheme `json:"modes" mapstructure:"modes"`
+	Version     string        `json:"version" mapstructure:"version"`
 }
 
 type CustomTheme struct {
@@ -140,7 +141,6 @@ type CustomTab struct {
 
 type CustomAbout struct {
 	LogoPath  string `json:"logo_path" mapstructure:"logo_path"`
-	Version   string `json:"version" mapstructure:"version"`
 	Copyright string `json:"copyright" mapstructure:"copyright"`
 }
 

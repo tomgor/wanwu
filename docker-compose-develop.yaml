@@ -30,7 +30,7 @@ services:
       - ${WANWU_PROJECT_DIR}/bff-service/log:/app/log
       - ${WANWU_PROJECT_DIR}/bff-service/tmp:/app/tmp
     environment:
-      CUSTOM_INFO_ABOUT_VERSION: ${WANWU_VERSION}
+      CUSTOM_INFO_VERSION: ${WANWU_VERSION}
       SERVER_EXTERNAL_IP: ${WANWU_EXTERNAL_IP}
       SERVER_EXTERNAL_PORT: ${WANWU_EXTERNAL_PORT}
       SERVER_WEB_BASE_URL: ${WANWU_WEB_BASE_URL}
