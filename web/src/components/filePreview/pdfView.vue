@@ -8,7 +8,7 @@ export default {
   name: 'pdf-view',
   data () {
     return {
-      pdfUrl:'/pdfjs/web/viewer.html',
+      pdfUrl:window.location.origin + this.$basePath + '/pdfjs/web/viewer.html',
       pdfOps: {
         downLink: "",
         page: 1,
