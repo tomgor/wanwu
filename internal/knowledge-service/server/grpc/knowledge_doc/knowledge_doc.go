@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -87,12 +88,17 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 	metaDataList := removeDuplicateMeta(req.MetaDataList)
 	var fileName = service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
 	addList, updateList, deleteList := buildMetaModelList(metaDataList, doc.OrgId, doc.UserId, req.DocId)
+	params, err := buildMetaRagParams(metaDataList)
+	if err != nil {
+		log.Errorf(fmt.Sprintf("update buildMetaRagParams fail %v", err), req.DocId)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaFailed)
+	}
 	err = orm.UpdateDocStatusDocMeta(ctx, req.DocId, addList, updateList, deleteList,
 		&service.RagDocMetaParams{
 			FileName:      fileName,
 			KnowledgeBase: knowledge.Name,
 			UserId:        req.UserId,
-			MetaList:      buildMetaRagParams(metaDataList),
+			MetaList:      params,
 		})
 	if err != nil {
 		log.Errorf(fmt.Sprintf("update doc tag fail %v", err), req.DocId)
@@ -407,7 +413,7 @@ func buildMetaList(metaDataList []*model.KnowledgeDocMeta) []*knowledgebase_doc_
 	}
 	return lo.Map(metaDataList, func(item *model.KnowledgeDocMeta, index int) *knowledgebase_doc_service.MetaData {
 		var valueType = item.ValueType
-		if valueType == "" || valueType == "string" {
+		if valueType == "" {
 			valueType = model.MetaTypeString
 		}
 		return &knowledgebase_doc_service.MetaData{
@@ -467,18 +473,36 @@ func buildMetaModelList(metaDataList []*knowledgebase_doc_service.MetaData, orgI
 	return
 }
 
-func buildMetaRagParams(metaDataList []*knowledgebase_doc_service.MetaData) map[string]interface{} {
+func buildMetaRagParams(metaDataList []*knowledgebase_doc_service.MetaData) ([]*service.MetaData, error) {
 	if len(metaDataList) == 0 {
-		return make(map[string]interface{})
+		return make([]*service.MetaData, 0), nil
 	}
-	var retMap = make(map[string]interface{})
+	var retList []*service.MetaData
 	for _, data := range metaDataList {
 		if data.Option == "delete" {
 			continue
 		}
-		retMap[data.Key] = data.Value
+		valueData, err := buildValueData(data.ValueType, data.Value)
+		if err != nil {
+			log.Errorf("buildValueData error %s", err.Error())
+			return nil, err
+		}
+		retList = append(retList, &service.MetaData{
+			Key:       data.Key,
+			Value:     valueData,
+			ValueType: data.ValueType,
+		})
 	}
-	return retMap
+	return retList, nil
+}
+
+func buildValueData(valueType string, value string) (interface{}, error) {
+	switch valueType {
+	case model.MetaTypeNumber:
+	case model.MetaTypeDate:
+		return strconv.ParseInt(value, 10, 64)
+	}
+	return value, nil
 }
 
 func buildSplitter(splitterList []string) string {

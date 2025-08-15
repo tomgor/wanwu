@@ -83,10 +83,16 @@ type RagDeleteDocParams struct {
 }
 
 type RagDocMetaParams struct {
-	UserId        string                 `json:"userId"`
-	KnowledgeBase string                 `json:"knowledgeBase"`
-	FileName      string                 `json:"fileName"`
-	MetaList      map[string]interface{} `json:"tags"`
+	UserId        string      `json:"userId"`
+	KnowledgeBase string      `json:"knowledgeBase"`
+	FileName      string      `json:"fileName"`
+	MetaList      []*MetaData `json:"tags"`
+}
+
+type MetaData struct {
+	Key       string      `json:"key"`
+	Value     interface{} `json:"value"`
+	ValueType string      `json:"value_type"`
 }
 
 type RagGetDocSegmentResp struct {
