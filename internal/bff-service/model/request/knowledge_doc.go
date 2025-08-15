@@ -21,9 +21,9 @@ type DocImportReq struct {
 }
 
 type DocMetaData struct {
-	MetaKey       string `json:"metaKey"`
-	MetaValue     string `json:"metaValue"`
-	MetaValueType string `json:"metaValueType"`
+	MetaKey       string `json:"metaKey"`       //key 的校验
+	MetaValue     string `json:"metaValue"`     //传入字符串
+	MetaValueType string `json:"metaValueType"` // number:"1" , date:"1755226779000" 毫秒 , string, ""
 	MetaRule      string `json:"metaRule"`
 }
 
