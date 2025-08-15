@@ -786,7 +786,7 @@ const docTemplate = `{
                 },
                 "createdAt": {
                     "description": "创建时间",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "disclaimer": {
                     "description": "免责声明",

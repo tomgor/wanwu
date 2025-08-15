@@ -74,6 +74,11 @@ func UpdateDocStatusMetaData(ctx context.Context, metaDataList []*model.Knowledg
 	})
 }
 
+// DeleteMetaDataByDocIdList 根据docIdList删除元数据
+func DeleteMetaDataByDocIdList(tx *gorm.DB, docIdList []string) error {
+	return tx.Unscoped().Model(&model.KnowledgeDocMeta{}).Where("doc_id IN ?", docIdList).Delete(&model.KnowledgeDocMeta{}).Error
+}
+
 // createBatchKnowledgeDocMeta 插入数据
 func createBatchKnowledgeDocMeta(tx *gorm.DB, knowledgeDocMetaList []*model.KnowledgeDocMeta) error {
 	err := tx.Model(&model.KnowledgeDocMeta{}).CreateInBatches(knowledgeDocMetaList, len(knowledgeDocMetaList)).Error

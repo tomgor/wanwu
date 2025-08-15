@@ -477,7 +477,7 @@ func buildMetaRagParams(metaDataList []*knowledgebase_doc_service.MetaData) ([]*
 	if len(metaDataList) == 0 {
 		return make([]*service.MetaData, 0), nil
 	}
-	var retList []*service.MetaData
+	var retList = make([]*service.MetaData, 0)
 	for _, data := range metaDataList {
 		if data.Option == "delete" {
 			continue
@@ -499,7 +499,7 @@ func buildMetaRagParams(metaDataList []*knowledgebase_doc_service.MetaData) ([]*
 func buildValueData(valueType string, value string) (interface{}, error) {
 	switch valueType {
 	case model.MetaTypeNumber:
-	case model.MetaTypeDate:
+	case model.MetaTypeTime:
 		return strconv.ParseInt(value, 10, 64)
 	}
 	return value, nil
