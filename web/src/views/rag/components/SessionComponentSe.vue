@@ -170,18 +170,18 @@ export default {
           if(fileType.includes(ext)){
               switch(ext){
                 case 'docx'||'doc':
-                  openUrl = `${window.location.origin}/doc?fileUrl=` + fileUrl;
+                  openUrl = `${window.location.origin}/aibase/doc?fileUrl=` + fileUrl;
                   break;
                 case 'txt':
-                  openUrl = `${window.location.origin}/txtView?fileUrl=` + fileUrl;
+                  openUrl = `${window.location.origin}/aibase/txtView?fileUrl=` + fileUrl;
                   break;
                 case 'pdf':
                   if(page_num.length > 0){
-                    openUrl = `${window.location.origin}/pdfView?fileUrl=` + fileUrl + "&page=" + page_num[0]
+                    openUrl = `${window.location.origin}/aibase/pdfView?fileUrl=` + fileUrl + "&page=" + page_num[0]
                   }
                   break;
                 case 'xlsx':
-                  openUrl = `${window.location.origin}/jsExcel?url=` + fileUrl + "&rownum=" + row_num + "&sheetName=" + sheet_name
+                  openUrl = `${window.location.origin}/aibase/jsExcel?url=` + fileUrl + "&rownum=" + row_num + "&sheetName=" + sheet_name
                   break;
                 default:
                   this.$message.warning('暂不支持此格式查看')
