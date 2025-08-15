@@ -81,7 +81,16 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 		}
 	}
 	var metaList []*knowledgebase_doc_service.DocMetaData
+	seenKeys := make(map[string]bool)
 	for _, meta := range req.DocMetaData {
+		if meta.MetaKey == "" {
+			return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "key为空")
+		}
+		// 检查Key是否重复
+		if seenKeys[meta.MetaKey] {
+			return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "key重复")
+		}
+		seenKeys[meta.MetaKey] = true
 		if meta.MetaRule != "" {
 			// 检查rule和key传参
 			if meta.MetaValue != "" {
