@@ -138,6 +138,24 @@ func WithName(name string) SQLOption {
 	})
 }
 
+func WithValue(value string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if len(value) > 0 {
+			return db.Where("value = ?", value)
+		}
+		return db
+	})
+}
+
+func WithNameOrValue(name, value string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if len(name) > 0 || len(value) > 0 {
+			return db.Where("name = ? OR value = ?", name, value)
+		}
+		return db
+	})
+}
+
 func WithNameOrAliasLike(name string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		if len(name) > 0 {

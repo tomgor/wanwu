@@ -92,6 +92,10 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 			if err != nil {
 				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "非法正则表达式")
 			}
+			// 检查key合法性
+			if !isValidKey(meta.MetaKey) {
+				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "非法key")
+			}
 		}
 		metaList = append(metaList, &knowledgebase_doc_service.DocMetaData{
 			Key:       meta.MetaKey,
@@ -122,6 +126,11 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 		return err
 	}
 	return nil
+}
+
+func isValidKey(s string) bool {
+	re := regexp.MustCompile(`^[a-z][a-z0-9_]*$`) //只包含小写字母，数字和下划线，并且以小写字母开头
+	return re.MatchString(s)
 }
 
 // UpdateDocMetaData 更新文档元数据
