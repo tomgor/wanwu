@@ -229,24 +229,25 @@ export default {
         item.metaRule = "";
         return;
       }
-      if(!/^\/.*\/$/.test(item.metaRule)){
-        this.showWarning("正则表达式格式应为 /pattern/ 或 /pattern/flags",item);
-        item.metaRule = "";
-        return;
-      }
     },
     showWarning(message,item){
         this.$message.warning(message);
         item.metaRule = "";
     },
     isValidRegex(str) {
-      try {
-        const [_, pattern, flags] = str.match(/^\/(.*)\/([a-z]*)$/);
-        new RegExp(pattern, flags);
-        return true;
-      } catch (e) {
-        return false;
-      }
+        try {
+            if (str.startsWith('/')) {
+            if (!str.endsWith('/') && !str.match(/\/[a-z]*$/)) return false;
+            const parts = str.slice(1).split('/');
+            if (parts.length < 1) return false;
+            new RegExp(parts[0], parts[1]);
+            } else {
+            new RegExp(str);
+            }
+            return true;
+        } catch {
+            return false;
+        }
     },
   },
 };
