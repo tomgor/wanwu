@@ -245,6 +245,9 @@ func buildAndCreateMetaData(tx *gorm.DB, importTask *model.KnowledgeImportTask, 
 }
 
 func convertMetaValue(meta *model.KnowledgeDocMeta) (interface{}, error) {
+	if len(meta.Value) == 0 {
+		return nil, nil
+	}
 	// 根据类型转换value
 	if meta.ValueType == MetaValueTypeNumber {
 		ragValue, err := strconv.Atoi(meta.Value)

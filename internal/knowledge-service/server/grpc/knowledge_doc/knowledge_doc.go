@@ -433,6 +433,7 @@ func buildMetaParamsList(metaDataList []*knowledgebase_doc_service.MetaData) []*
 	return lo.Map(metaDataList, func(item *knowledgebase_doc_service.MetaData, index int) *model.KnowledgeDocMeta {
 		return &model.KnowledgeDocMeta{
 			MetaId: item.DataId,
+			Key:    item.Key,
 			Value:  item.Value,
 		}
 	})
