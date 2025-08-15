@@ -36,8 +36,13 @@
         }}</el-descriptions-item>
         <el-descriptions-item label="元数据">
           <template v-if="metaDataList && metaDataList.length > 0">
-            <span v-for="(item, index) in metaDataList.slice(0, 3)" :key="index" class="metaItem">
-              {{ item.key }}: {{ item.value }}<span v-if="index < metaDataList.slice(0, 3).length - 1"> </span>
+            <span
+                v-for="(item, index) in metaDataList.slice(0, 3)"
+                :key="index"
+                class="metaItem"
+            >
+              {{ item.key }}: {{ item.dataType === 'time' ? formatTimestamp(item.value) : item.value }}
+              <span v-if="index < metaDataList.slice(0, 3).length - 1">, </span>
             </span>
             <el-tooltip v-if="metaDataList.length > 3" :content="filterData(metaDataList.slice(3))" placement="bottom">
               <span class="metaItem">...</span>
@@ -220,8 +225,25 @@ export default {
       this.$refs.dataBase.showDiglog(data,this.obj.id)
     },
     filterData(data){
-      const formattedString = data.map(item => `${item.key}:${item.value}`).join(", ");
-      return formattedString
+      const formattedString = data.map(item => {
+        let value = item.value;
+        // 如果是时间类型且值为时间戳，转换为日期字符串
+        if (item.dataType === 'time' && typeof value === 'number') {
+          value = this.formatTimestamp(value);
+        }
+        return `${item.key}:${value}`;
+      }).join(", ");
+      return formattedString;
+    },
+    formatTimestamp(timestamp) {
+      const date = new Date(Number(timestamp));
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     },
     filterRule(rule){
       const formattedString = rule.map(item => `${item.key}:${item.rule}`).join(", ");
@@ -238,8 +260,8 @@ export default {
           this.loading.itemStatus = false;
           this.res = res.data;
           this.page.total = this.res.segmentTotalNum;
-          this.metaRuleList = res.data.MetaDataList.filter(item => item.rule);
-          this.metaDataList = res.data.MetaDataList.filter(item => !item.rule);
+          this.metaRuleList = res.data.metaDataList.filter(item => item.rule);
+          this.metaDataList = res.data.metaDataList.filter(item => !item.rule);
         })
         .catch(() => {
           this.loading.itemStatus = false;

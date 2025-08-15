@@ -22,6 +22,7 @@
               <el-input
                   v-model="row.key"
                   placeholder="只能包含小写字母、数字和下划线，并且必须以小写字母开头"
+                  @input="row.key = row.key.replace(/[^a-z0-9_]/g, '').replace(/^[^a-z]*/, '')"
                   clearable
                   :disabled="!row.editable || !row.created"
               />
@@ -73,7 +74,8 @@
                   clearable
                   :disabled="!row.editable"
                   align="right"
-                  format="yyyy-MM-dd HH:mm"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="timestamp"
                   type="datetime"
                   placeholder="请选择日期时间"
               />
@@ -129,9 +131,10 @@ export default {
       this.tableData.forEach(i => {
         delete i.editable
         delete i.created
+        i.value = i.value.toString()
       });
       const data = {
-        MetaDataList:this.tableData,
+        metaDataList:this.tableData,
         docId:this.docId
       }
       updateDocMeta(data).then(res =>{
