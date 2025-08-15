@@ -72,6 +72,10 @@ export default {
         type:String,
         required:true,
         default:''
+    },
+    selectData:{
+      typeof:Array,
+      default:[]
     }
   },
   watch:{
@@ -83,6 +87,16 @@ export default {
         },
         deep: true,
         immediate:true
+    },
+    selectData:{
+      handler(val){
+        if(val){
+          this.tagList = this.tagList.map(tag => ({
+            ...tag,
+            checked: val.some(item => item.splitterId === tag.splitterId)
+          }));
+        }
+      }
     }
   },
   data() {

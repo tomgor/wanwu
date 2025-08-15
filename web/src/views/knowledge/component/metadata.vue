@@ -105,13 +105,27 @@
 </template>
 <script>
 export default {
+  props:['metaData'],
   watch: {
+    metaData:{
+        handler(val) {
+            if(val){
+                this.docMetaData = val;
+            }
+        },
+        deep: true,
+        immediate: true,
+    },
     docMetaData: {
       handler(val) {
         if (this.debounceTimer) {
           clearTimeout(this.debounceTimer);
         }
         this.debounceTimer = setTimeout(() => {
+          val = val.map(item => ({
+            ...item,
+            metaValue:String(item.metaValue)
+          }))
           this.$emit("updateMeata", val);
         }, 500);
       },

@@ -229,7 +229,7 @@
         </div>
       </div>
     </div>
-    <splitterDialog ref="splitterDialog" :title="titleText" :placeholderText="placeholderText" :dataList="splitOptions" @editItem="editItem" @createItem="createItem" @delItem="delSplitterItem" @relodData="relodData" @checkData="checkData" />
+    <splitterDialog ref="splitterDialog" :title="titleText" :placeholderText="placeholderText" :dataList="splitOptions" @editItem="editItem" @createItem="createItem" @delItem="delSplitterItem" @relodData="relodData" @checkData="checkData" :selectData="checkSplitter"/>
   </div>
 </template>
 <script>
