@@ -325,6 +325,7 @@ export default {
             bgColor: '平台背景色',
             loginButtonColor: '"登录"按钮颜色',
             logoWelcome: '登录页欢迎语',
+            loginLogo: '登录页Logo'
         },
         tabSet: '标签页配置',
         platformSet: '平台配置',
@@ -342,6 +343,7 @@ export default {
             loginBg: '显示在登录页面的背景图',
             loginButtonColor: '显示在登录框中登录按钮的颜色',
             logoWelcome: '显示在登录页的欢迎语',
+            loginLogo: '显示在登录页左上方的Logo'
         }
     },
     modelAccess: {
@@ -652,10 +654,10 @@ export default {
         noStatus:'无状态信息',
         categoryNameRules:'命名只能包含小写英文、中文、数字、特殊符号-_',
         chunkTypeConfigTips:'*当前自定义分段对.xlsx文件切分不生效，如您上传.xlsx，将按系统默认形式切分',
-        markTips:'请输入选择标点符号',
+        markTips:'请输入选择分段标识',
         splitOptionsTips:'按照所选的标识符切分文本。切分后，按设置的切片最大长度对切分后的文本组合成单一切片内容',
         splitMax:'可分割最大值',
-        splitMaxTips:'可填写范围最小为200，最大为500',
+        splitMaxTips:'可填写范围最小为200 tokens，最大为4000 tokens',
         overLapNum:'可重叠值',
         overLapNumTips:'请输入可重叠值',
         inputErrorTips:'知识库名称格式错误,只能包含小写英文、中文、数字、特殊符号-_',

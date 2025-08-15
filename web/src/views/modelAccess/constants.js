@@ -23,7 +23,7 @@ export const PROVIDER_OBJ = {
     [YUAN_JING]: '联通元景',
     [OLLAMA]: 'Ollama',
     [QWEN]: '通义千问',
-    // [HUOSHAN]: '火山引擎',
+    [HUOSHAN]: '火山引擎',
 }
 
 export const PROVIDER_IMG_OBJ = {
@@ -44,7 +44,7 @@ export const PROVIDER_TYPE = Object.keys(PROVIDER_OBJ)
                 : key === OLLAMA
                     ? MODEL_TYPE.filter(item => ![OCR, RERANK].includes(item.key))
                     : key === HUOSHAN
-                        ? MODEL_TYPE.filter(item => item.key === LLM)
+                        ? MODEL_TYPE.filter(item => [LLM, EMBEDDING].includes(item.key))
                         : MODEL_TYPE.filter(item => item.key !== OCR)
         })
     })

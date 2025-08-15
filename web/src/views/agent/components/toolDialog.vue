@@ -14,6 +14,7 @@
                 <el-input v-model="toolName" placeholder="搜索工具" class="tool-input" suffix-icon="el-icon-search" @keyup.enter.native="searchTool" clearable></el-input>
             </div>
             <div class="toolContent">
+                <div @click="goCreate" class="createTool"><span class="el-icon-plus add"></span>{{createText()}}</div>
                 <template v-for="(items, type) in contentMap">
                     <div 
                     v-if="activeValue === type"
@@ -81,6 +82,24 @@ export default {
         this.getWorkflowList('');
     },
     methods:{
+        goCreate(){
+            if(this.activeValue === 'auto'){
+                this.$router.push({path:'/mcp'})
+            }else if(this.activeValue === 'mcp'){
+                this.$router.push({path:'/mcp'})
+            }else{
+               this.$router.push({path:'/appSpace/workflow'})
+            }
+        },
+        createText(){
+            if(this.activeValue === 'auto'){
+                return '创建自定义工具'
+            }else if(this.activeValue === 'mcp'){
+                return '创建MCP'
+            }else{
+                return '创建工作流'
+            }
+        },
         openTool(e,item,type){
             if(!e) return;
             item.checked = !item.checked
@@ -197,6 +216,16 @@ export default {
     .el-dialog__body{
         padding:10px 20px;
     }
+}
+.createTool{
+    padding:10px;
+    cursor: pointer;
+    .add{
+        padding-right:5px;
+    }
+}
+.createTool:hover{
+    color: #384BF7;
 }
 .tool-typ{
     display:flex;

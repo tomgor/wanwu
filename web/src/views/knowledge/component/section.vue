@@ -35,12 +35,31 @@
           res.splitter
         }}</el-descriptions-item>
         <el-descriptions-item label="元数据">
-          <template v-if="res.MetaDataList && res.MetaDataList.length > 0">
-            <span>{{ res.MetaDataList.length > 3 ? filterData(res.MetaDataList.slice(0,3)) : filterData(res.MetaDataList)}}</span>
-            <span v-if="res.MetaDataList.length > 3" class="showMore">+{{res.MetaDataList.length -3}}</span>
+          <template v-if="metaDataList && metaDataList.length > 0">
+            <span
+                v-for="(item, index) in metaDataList.slice(0, 3)"
+                :key="index"
+                class="metaItem"
+            >
+              {{ item.key }}: {{ item.dataType === 'time' ? formatTimestamp(item.value) : item.value }}
+            </span>
+            <el-tooltip v-if="metaDataList.length > 3" :content="filterData(metaDataList.slice(3))" placement="bottom">
+              <span class="metaItem">...</span>
+            </el-tooltip>
           </template>
           <span v-else>无数据</span>
-          <span class="el-icon-edit-outline editIcon" @click="showDatabase(res.MetaDataList || [])" v-if="res.MetaDataList && res.MetaDataList.length > 0"></span>
+          <span class="el-icon-edit-outline editIcon" @click="showDatabase(metaDataList || [])" v-if="metaDataList"></span>
+        </el-descriptions-item>
+        <el-descriptions-item label="元数据规则">
+          <template v-if="metaRuleList && metaRuleList.length > 0">
+            <span v-for="(item, index) in metaRuleList.slice(0, 3)" :key="index" class="metaItem">
+              {{ item.key }}: {{ item.rule }}<span v-if="index < metaRuleList.slice(0, 3).length - 1"> </span>
+            </span>
+            <el-tooltip v-if="metaRuleList.length > 3" :content="filterRule(metaRuleList.slice(3))" placement="bottom">
+              <span class="metaItem">...</span>
+            </el-tooltip>
+          </template>
+          <span v-else>无数据</span>
         </el-descriptions-item>
       </el-descriptions>
 
@@ -189,6 +208,8 @@ export default {
       res: {
         contentList: [],
       },
+      metaDataList: [],
+      metaRuleList: []
     };
   },
   created() {
@@ -203,7 +224,29 @@ export default {
       this.$refs.dataBase.showDiglog(data,this.obj.id)
     },
     filterData(data){
-      const formattedString = data.map(item => `${item.key}:${item.value}`).join(", ");
+      const formattedString = data.map(item => {
+        let value = item.value;
+        // 如果是时间类型且值为时间戳，转换为日期字符串
+        if (item.dataType === 'time' && typeof value === 'number') {
+          value = this.formatTimestamp(value);
+        }
+        return `${item.key}:${value}`;
+      }).join(", ");
+      return formattedString;
+    },
+    formatTimestamp(timestamp) {
+      if (timestamp === '') return '';
+      const date = new Date(Number(timestamp));
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    },
+    filterRule(rule){
+      const formattedString = rule.map(item => `${item.key}:${item.rule}`).join(", ");
       return formattedString
     },
     getList() {
@@ -217,6 +260,8 @@ export default {
           this.loading.itemStatus = false;
           this.res = res.data;
           this.page.total = this.res.segmentTotalNum;
+          this.metaRuleList = res.data.metaDataList.filter(item => item.rule);
+          this.metaDataList = res.data.metaDataList;
         })
         .catch(() => {
           this.loading.itemStatus = false;
@@ -327,6 +372,12 @@ export default {
 </script>
 <style lang="scss">
 .showMore{
+  margin-left:5px;
+  background:#f4f5ff;
+  padding:2px;
+  border-radius:4px;
+}
+.metaItem{
   margin-left:5px;
   background:#f4f5ff;
   padding:2px;

@@ -1,8 +1,8 @@
 <template>
   <el-container class="explore-container">
-    <el-aside width="220px"v-if="showAside">
+    <el-aside :width="asideWidth" v-if="showAside">
         <slot name="aside">
-            <div class="aside-title">
+            <div class="aside-title" v-if="showTitle">
                 <span class="title" v-if="!isButton">{{ asideTitle }}</span>
                 <div v-else class="title">
                   <el-button type="primary" @click="handleClick" size="mini" ><span class="el-icon-circle-plus-outline addIcon"></span>{{asideTitle}}</el-button>
@@ -25,6 +25,10 @@
 export default {
   name:'commonLayout',
   props:{
+    asideWidth:{
+      type: String,
+      default: '220'
+    },
     asideTitle: {
       type: String,
       default: ''
@@ -34,6 +38,10 @@ export default {
       default:false
     },
     showAside:{
+      type:Boolean,
+      default:true
+    },
+    showTitle:{
       type:Boolean,
       default:true
     }

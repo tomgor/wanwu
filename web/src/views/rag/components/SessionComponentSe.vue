@@ -63,10 +63,11 @@
               <!--出处-->
               <div v-if="n.searchList && n.searchList.length" class="search-list">
                 <div v-for="(m,j) in n.searchList" :key="`${j}sdsl`" class="search-list-item">
-                  <div>
+                  <div class="serach-list-item">
                     <span @click="collapseClick(n,m,j)"><i :class="['',m.collapse?'el-icon-caret-bottom':'el-icon-caret-right']"></i>出处：</span>
                     <a v-if="m.link" :href="m.link" target="_blank">{{m.link}}</a>
                     <span v-if="m.title" style="margin-left: 10px" v-html="m.title"></span>
+                    <!-- <span @click="goPreview($event,m)" class="search-doc">查看全文</span> -->
                   </div>
                   <el-collapse-transition>
                     <div v-show="m.collapse?true:false"  class="snippet">
@@ -84,8 +85,6 @@
 </template>
 
 <script>
-//import CanvasUtil from './utils/canvasUtil.js'
-
 import {marked} from 'marked'
 var highlight = require('highlight.js');
 import 'highlight.js/styles/atom-one-dark.css';
@@ -159,6 +158,41 @@ export default {
       clearTimeout(this.scrollTimeout);
     },
     methods:{
+        goPreview(event,item){
+          event.stopPropagation(); // 阻止事件冒泡
+          let { meta_data } = item;
+          let { file_name,download_link,page_num,row_num,sheet_name } = meta_data;
+          var index = file_name.lastIndexOf('.');
+          var ext = file_name.substr(index + 1);
+          let openUrl = '';
+          let fileUrl = encodeURIComponent(download_link);
+          const fileType = ['docx','doc','txt','pdf','xlsx']
+          if(fileType.includes(ext)){
+              switch(ext){
+                case 'docx'||'doc':
+                  openUrl = `${window.location.origin}/aibase/doc?fileUrl=` + fileUrl;
+                  break;
+                case 'txt':
+                  openUrl = `${window.location.origin}/aibase/txtView?fileUrl=` + fileUrl;
+                  break;
+                case 'pdf':
+                  if(page_num.length > 0){
+                    openUrl = `${window.location.origin}/aibase/pdfView?fileUrl=` + fileUrl + "&page=" + page_num[0]
+                  }
+                  break;
+                case 'xlsx':
+                  openUrl = `${window.location.origin}/aibase/jsExcel?url=` + fileUrl + "&rownum=" + row_num + "&sheetName=" + sheet_name
+                  break;
+                default:
+                  this.$message.warning('暂不支持此格式查看')
+              }
+            }
+          if(openUrl !== ''){
+            window.open(openUrl, '_blank')
+          }else{
+            this.$message.warning('暂不支持此格式查看')
+          }
+        },
         listenerImg(){
           //捕获图片加载错误
           this.imageErrorHandler = (e) => {
@@ -468,6 +502,17 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.serach-list-item{
+  display: flex;
+  align-items: center;
+  .search-doc{
+    margin-left:10px;
+    cursor: pointer;
+    color: #384BF7;
+    
+  }
+}
+
 /* 图片加载失败时的样式 */
 img.failed {
   position: relative;

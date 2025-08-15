@@ -69,7 +69,27 @@
             </div>
           </el-upload>
         </el-form-item>
-        <el-form-item :label="$t('infoSetting.form.logoWelcome')" prop="logoWelcomeText">
+        <el-form-item :label="$t('infoSetting.form.loginLogo')" prop="loginLogo">
+          <el-upload
+            class="avatar-uploader"
+            action=""
+            name="files"
+            :show-file-list="false"
+            :http-request="handleUploadLoginLogo"
+            :on-error="handleUploadError"
+            accept=".png,.jpg,.jpeg"
+          >
+            <img v-if="loginForm.loginLogo.path" :src="getLogoPath(loginForm.loginLogo.path)" class="avatar">
+            <i v-if="!loginForm.loginLogo.path" class="el-icon-plus avatar-uploader-icon"></i>
+            <span style="margin-left: 12px; color: #aaa !important;">
+              {{$t('infoSetting.hint.imgUpload')}}
+            </span>
+            <div style="text-align: left; font-size: 11px; color: #aaa; margin-top: -9px">
+              {{$t('infoSetting.hint.loginLogo')}}
+            </div>
+          </el-upload>
+        </el-form-item>
+        <el-form-item :label="$t('infoSetting.form.logoWelcome')" prop="loginWelcomeText">
           <el-input v-model="loginForm.loginWelcomeText" style="width: 300px" />
           <div style="font-size: 11px; color: #aaa; margin-top: -9px">
             {{$t('infoSetting.hint.logoWelcome')}}
@@ -183,6 +203,7 @@ export default {
       },
       loginForm: {
         loginBg: {},
+        loginLogo: {},
         loginButtonColor: '',
         loginWelcomeText: ''
       },
@@ -198,6 +219,7 @@ export default {
       },
       loginRules: {
         loginBg: [{required: true, validator: (...params) => checkImage(this.loginForm.loginBg.path, ...params), trigger: 'change'}],
+        loginLogo: [{required: true, validator: (...params) => checkImage(this.loginForm.loginLogo.path, ...params), trigger: 'change'}],
         loginButtonColor: [{required: true, message: this.$t('common.select.placeholder'), trigger: 'change'}],
         loginWelcomeText: [{required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'}],
       }
@@ -222,6 +244,7 @@ export default {
         this.form.homeBgColor = color
 
         this.loginForm.loginBg = login.background || {}
+        this.loginForm.loginLogo = login.logo || {}
         this.loginForm.loginWelcomeText = login.welcomeText || ''
         this.loginForm.loginButtonColor = login.loginButtonColor || ''
       },
@@ -253,6 +276,13 @@ export default {
       if (data.file) {
         this.uploadAvatar(data.file).then(res => {
           this.loginForm.loginBg = res.data || {}
+        })
+      }
+    },
+    handleUploadLoginLogo(data) {
+      if (data.file) {
+        this.uploadAvatar(data.file).then(res => {
+          this.loginForm.loginLogo = res.data || {}
         })
       }
     },
