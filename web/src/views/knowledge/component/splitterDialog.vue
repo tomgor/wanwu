@@ -19,6 +19,7 @@
       <div class="tag-box">
         <div
           v-for="(item,index) in tagList"
+          :key="index"
           class="tag_item"
           @mouseenter="mouseEnter(item)"
           @mouseleave="mouseLeave(item)"
@@ -33,12 +34,11 @@
             v-if="item.showIpt"
             maxlength="50"
             @keydown.backspace.native="handleDelete(item,index)" 
-            @keyup.enter.native="inputBlur(item)"
             @blur="inputBlur(item)"
           ></el-input>
           <span
             class="el-icon-close del-icon"
-            v-if="item.showDel && !item.showIpt && item.type !== ' preset'"
+            v-if="item.showDel && !item.showIpt && item.type !== 'preset'"
             @click="delTag(item,index)"
           ></span>
         </div>
@@ -141,7 +141,7 @@ export default {
     },
     addByEnterKey(e) {
       if (e.keyCode === 13) {
-        this.$emit('relodData');
+        this.$emit('relodData',this.tagName);
       }
     },
   },
