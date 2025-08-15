@@ -615,7 +615,11 @@ export default {
           return false;
       }
       this.$refs.ruleForm.clearValidate(['docSegment.splitter']);
-
+      
+      if(!this.validateMetaData()){
+        return;
+      }
+      
       this.ruleForm.docMetaData.forEach(item => {
         delete item.metadataType;
       });
