@@ -36,7 +36,7 @@
                   v-model="row.dataType"
                   placeholder="请选择"
                   clearable
-                  :disabled="!row.editable"
+                  :disabled="!row.editable || !row.created"
               >
                 <el-option value="string" label="String"></el-option>
                 <el-option value="number" label="Number"></el-option>
@@ -50,10 +50,32 @@
               align="center">
             <template #default="{ row }">
               <el-input
+                  v-if="row.dataType === 'string'"
                   v-model="row.value"
                   @blur="handleBlur(row)"
                   clearable
                   :disabled="!row.editable"
+                  placeholder="请输入内容"
+              />
+              <el-input
+                  v-if="row.dataType === 'number'"
+                  v-model="row.value"
+                  @blur="handleBlur(row)"
+                  clearable
+                  :disabled="!row.editable"
+                  type="number"
+                  placeholder="请输入数字"
+              />
+              <el-date-picker
+                  v-if="row.dataType === 'time'"
+                  v-model="row.value"
+                  @blur="handleBlur(row)"
+                  clearable
+                  :disabled="!row.editable"
+                  align="right"
+                  format="yyyy-MM-dd HH:mm"
+                  type="datetime"
+                  placeholder="请选择日期时间"
               />
             </template>
           </el-table-column>
@@ -79,6 +101,7 @@
       <el-button
         type="primary"
         @click="submitDialog"
+        :disabled="rule"
       >确 定</el-button>
     </span>
   </el-dialog>
@@ -89,6 +112,9 @@ export default {
   computed: {
     filteredTableData() {
       return this.tableData.filter(item => item.option !== "delete");
+    },
+    rule() {
+      return this.tableData.some(item => !item.value || !item.key)
     }
   },
   data() {
@@ -120,8 +146,8 @@ export default {
     addItem(){
       this.tableData.push({
         key: '',
-        dataType: '',
-        value: [],
+        dataType: 'string',
+        value: '',
         option: 'add',
         editable: true,
         created: true,
