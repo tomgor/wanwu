@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="hello" style="color:red">
     <iframe :src="`${pdfUrl}?file=${pdfOps.downLink}#page=${pdfOps.page}`" width="100%" height="100%" frameborder="0" id="myIframe"></iframe>
   </div>
 </template>
@@ -8,7 +8,7 @@ export default {
   name: 'pdf-view',
   data () {
     return {
-      pdfUrl:'@/utils/pdfjs/web/viewer.html',
+      pdfUrl:'/pdfjs/web/viewer.html',
       pdfOps: {
         downLink: "",
         page: 1,

@@ -127,10 +127,11 @@
               <div class="elSliderItem">
                 <el-slider
                   :min="0"
-                  :max="0.25"
+                  :max="1"
                   :step="0.01"
                   style="width:70%;margin-left:15px;"
                   v-model="ruleForm.docSegment.overlap"
+                  @change="overlapChange"
                   show-input
                 >
                 </el-slider>
@@ -292,6 +293,12 @@ export default {
     await this.custom()
   },
   methods:{
+  overlapChange(val){
+    if (val > 0.25) {
+      this.ruleForm.docSegment.overlap = 0.25;
+      return;
+    }
+  },
   custom(){
     const splitter = this.ruleForm.docSegment.splitter
     this.checkSplitter = this.splitOptions.filter(item => {
