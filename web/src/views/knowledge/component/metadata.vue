@@ -183,18 +183,6 @@ export default {
     delMataItem(i) {
       this.docMetaData.splice(i, 1);
     },
-    metakeyBlur(item) {
-      const regex = /^[a-z][a-z0-9_]*$/;
-      if (!item.metaKey) {
-        this.$message.warning("请输入key值");
-        return;
-      }
-      if (!regex.test(item.metaKey)) {
-        this.$message.warning("请输入符合标准的key值");
-        item.metaKey = "";
-        return;
-      }
-    },
     typeChange(item) {
       item.metaValue = "";
       item.metaRule = "";
@@ -219,18 +207,28 @@ export default {
     },
     metaRuleBlur(item) {
       if (!item.metaRule) {
-        this.$message.warning("请输入正则值");
+        this.showWarning("请输入正则值",item);
         return;
       }
       if (!this.isValidRegex(item.metaRule)) {
-        this.$message.warning("请输入合法正则值");
+        this.showWarning("请输入合法正则值",item);
+        item.metaRule = "";
+        return;
+      }
+      if(!/^\/.*\/$/.test(item.metaRule)){
+        this.showWarning("正则表达式格式应为 /pattern/ 或 /pattern/flags",item);
         item.metaRule = "";
         return;
       }
     },
+    showWarning(message,item){
+        this.$message.warning(message);
+        item.metaRule = "";
+    },
     isValidRegex(str) {
       try {
-        new RegExp(str);
+        const [_, pattern, flags] = str.match(/^\/(.*)\/([a-z]*)$/);
+        new RegExp(pattern, flags);
         return true;
       } catch (e) {
         return false;
