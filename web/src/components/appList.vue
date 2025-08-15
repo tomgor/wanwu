@@ -359,6 +359,7 @@ export default {
           break;
         case "cancelPublish":
           this.cancelPublish(row);
+          break;
         case "publishSet":
           //发布设置
           this.$router.push({path:`/agent/publishSet/${row.appId}`})
