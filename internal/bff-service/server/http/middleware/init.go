@@ -18,6 +18,9 @@ func Init() {
 	// --- callback ---
 	mid.NewSub("callback", "系统内部调用", route.PermNone, false, false)
 
+	// --- openurl ---
+	mid.NewSub("openurl", "智能体Url", route.PermNone, false, false)
+
 	// --- guest ---
 	mid.NewSub("guest", "", route.PermNone, false, false)
 

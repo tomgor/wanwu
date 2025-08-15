@@ -317,7 +317,7 @@
                 <div class="params-content">
                   <div class="params-content-item">
                     <span>{{ n.name || "未命名" }}</span>
-                    <span>{{ n.type }}</span>
+                    <span>{{ n.value.type === 'ref' ? '引用' : n.type }}</span>
                   </div>
                 </div>
               </el-col>

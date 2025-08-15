@@ -33,7 +33,7 @@
                 :auto-upload="false"
                 :limit="5"
                 multiple
-                accept=".pdf,.docx,.doc,.txt,.xlsx,.xls,.zip,.tar.gz,.csv,.pptx,.html"
+                accept=".pdf,.docx,.doc,.txt,.xlsx,.xls,.zip,.tar.gz,.csv,.pptx,.html,.md,.ofd,.wps"
                 :file-list="fileList"
                 :on-change="uploadOnChange"
               >
@@ -43,7 +43,7 @@
                     <p class="click-text">将文件拖到此处，或<span class="clickUpload">点击上传</span></p>
                 </div>
                 <div class="tips">
-                  <p v-if="fileType === 'file'"><span class="red">*</span>您可单独或者批量上传以下格式的文档：pdf/docx/pptx 文件最大为200MB，xlsx/csv/txt/html文件最大为20MB。zip格式内的文档需符合各自文件格式上传大小限制</p>
+                  <p v-if="fileType === 'file'"><span class="red">*</span>您可单独或者批量上传以下格式的文档：pdf/docx/pptx/doc/wps/ofd文件最大为200MB，xlsx/xls/csv/txt/html/md/文件最大为20MB。zip/tar.gz格式内的文档需符合各自文件格式上传大小限制</p>
                   <p v-if="fileType === 'file'"><span class="red">*</span>非压缩包文件，一次可传5个文件，如文件页数多，文档解析时间较长，平均3秒/页，请您耐心等待</p>
                   <p v-if="fileType === 'fileUrl'"><span class="red">*</span>批量上传支持.xlsx格式，仅可上传1个。文档最多可添加100条url，文件不超过15mb <a class="template_downLoad" href="#" @click.prevent.stop="downloadTemplate">模版下载</a></p>
                   <p v-if="fileType === 'fileUrl'"><span class="red">*</span>当前内容不自动更新</p>
@@ -79,31 +79,24 @@
             </el-form-item>
             <el-form-item
               v-if="ruleForm.docSegment.segmentType == '1'"
-              :label="$t('knowledgeManage.punctuationMark')+'：'"
+              label="分段标识:"
               prop="docSegment.splitter"
               :rules="ruleForm.docSegment.segmentType === '1' 
-              ? [{ required: true, message: $t('knowledgeManage.markTips'), trigger: 'blur' }] 
+              ? [{ required: true,validator: validateSplitter, message: $t('knowledgeManage.markTips'), trigger: 'blur' }] 
               : []"
             >
-              <el-select
-                v-model="ruleForm.docSegment.splitter"
-                :placeholder="$t('knowledgeManage.please')"
-                class="setItem"
-                multiple
-                clearable
-                collapse-tags
+            <el-tag
+              v-for="(tag,index) in checkSplitter"
+              :key="'tag'+index"
+              :disable-transitions="false"
+              class="splitterTag"
               >
-                <el-option
-                  v-for="item in splitOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </el-option>
-              </el-select>
-              <div style="color: #384BF7;">
-                {{$t('knowledgeManage.splitOptionsTips')}}
-              </div>
+              {{tag.splitterName}}
+            </el-tag>
+            <el-button class="button-new-tag" size="small" @click="showSplitterSet"> + 分段标识设置</el-button>
+            <div style="color: #384BF7;">
+              {{$t('knowledgeManage.splitOptionsTips')}}
+            </div>
             </el-form-item>
             <el-form-item
               v-if="ruleForm.docSegment.segmentType == '1'"
@@ -115,7 +108,7 @@
                 <el-input-number
                     v-model="ruleForm.docSegment.maxSplitter"
                     :min="200"
-                    :max="500"
+                    :max="4000"
                     :placeholder="$t('knowledgeManage.splitMax')"
                 ></el-input-number>
                 <p class="tips">
@@ -134,14 +127,25 @@
               <div class="elSliderItem">
                 <el-slider
                   :min="0"
-                  :max="0.25"
+                  :max="1"
                   :step="0.01"
                   style="width:70%;margin-left:15px;"
                   v-model="ruleForm.docSegment.overlap"
+                  @change="overlapChange"
                   show-input
                 >
                 </el-slider>
               </div>
+            </el-form-item>
+            <el-form-item
+              label="文本预处理规则："
+              prop="docPreprocess"
+              v-if="ruleForm.docSegment.segmentType == '1'"
+            >
+            <el-checkbox-group v-model="ruleForm.docPreprocess">
+                <el-checkbox label="replaceSymbols">替换掉连续的空格、换行符和制表符</el-checkbox>
+                <el-checkbox label="deleteLinks">删除所有URL和电子邮件地址</el-checkbox>
+            </el-checkbox-group>
             </el-form-item>
             <el-form-item
               label="解析方式："
@@ -168,6 +172,12 @@
                 :value="item.modelId">
               </el-option>
             </el-select>
+            </el-form-item>
+            <el-form-item
+              label="元数据管理："
+              prop="docAnalyzer"
+            >
+            <mataData ref="mataData" @updateMeata="updateMeata"/>
             </el-form-item>
           </el-form>
         </div>
@@ -216,23 +226,38 @@
           <el-button type="primary" size="mini" @click="preStep" v-if="active === 2">上一步</el-button>
           <el-button type="primary" size="mini" @click="nextStep" v-if="active === 1" :loading="urlLoading">下一步</el-button>
           <el-button type="primary" size="mini" @click="submitInfo" v-if="active === 2">确 定</el-button>
+          <el-button size="mini" @click="formReset" v-if="active === 2">重 置</el-button>
         </div>
       </div>
     </div>
+    <splitterDialog ref="splitterDialog" :title="titleText" :placeholderText="placeholderText" :dataList="splitOptions" @editItem="editItem" @createItem="createItem" @delItem="delSplitterItem" @relodData="relodData" @checkData="checkData" :selectData="checkSplitter"/>
   </div>
 </template>
 <script>
 import urlAnalysis from './urlAnalysis.vue';
 import uploadChunk from "@/mixins/uploadChunk";
-import {docImport,ocrSelectList} from '@/api/knowledge'
+import {docImport,ocrSelectList,delSplitter,getSplitter,createSplitter,editSplitter} from '@/api/knowledge'
 import { delfile } from "@/api/chunkFile";
-import { FlagManager } from '@antv/x6/lib/view/flag';
 import LinkIcon from "@/components/linkIcon.vue";
+import splitterDialog from './splitterDialog.vue';
+import mataData from './metadata.vue'
 export default {
-  components:{LinkIcon, urlAnalysis},
+  components:{LinkIcon, urlAnalysis,splitterDialog,mataData},
   mixins: [uploadChunk],
   data() {
+    const validateSplitter = (rule, value, callback) => {
+      if (this.checkSplitter.length === 0) {
+        callback(new Error(this.$t('knowledgeManage.splitterRequired')));
+      } else {
+        callback();
+      }
+    };
     return {
+      validateSplitter:validateSplitter,
+      placeholderText:'搜索分隔符',
+      titleText:'创建分隔符',
+      splitterValue:'',
+      tableData:[],
       ocrOptions:[],
       urlValidate: false,
       active: 1,
@@ -243,55 +268,118 @@ export default {
       fileUrl:'',
       docInfoList:[],
       ruleForm:{
-        docAnalyzer:['text','ocr'],
+        docAnalyzer:['text'],
+        docMetaData:[],//元数据管理数据
+        docPreprocess:['replaceSymbols'],//'deleteLinks','replaceSymbols'
         docSegment:{
           segmentType:'0',
           splitter:["！","。","？","?","!",".","......"],
           maxSplitter:200,
-          overlap:0.2
+          overlap:0.2,
         },
         docInfoList:[],
         docImportType:0,
         knowledgeId:this.$route.query.id,
         ocrModelId:''
       },
-      splitOptions: [
-        {
-          label: this.$t('knowledgeManage.zh_exclamationMark'),
-          value: "！",
-        },
-        {
-          label: this.$t('knowledgeManage.zh_period'),
-          value: "。",
-        },
-        {
-          label: this.$t('knowledgeManage.zh_questionMark'),
-          value: "？",
-        },
-        {
-          label: this.$t('knowledgeManage.en_questionMark'),
-          value: "?",
-        },
-        {
-          label: this.$t('knowledgeManage.en_exclamationMark'),
-          value: "!",
-        },
-        {
-          label: this.$t('knowledgeManage.eh_period'),
-          value: ".",
-        },
-        {
-          label: this.$t('knowledgeManage.ellipsis'),
-          value: "......",
-        }
-      ],
+      checkSplitter:[],
+      splitOptions: [],
       urlLoading:false
     };
   },
-  created(){
+  async  created(){
     this.getOcrList()
+    await this.getSplitterList('')
+    await this.custom()
   },
   methods:{
+  overlapChange(val){
+    if (val > 0.25) {
+      this.ruleForm.docSegment.overlap = 0.25;
+      return;
+    }
+  },
+  custom(){
+    const splitter = this.ruleForm.docSegment.splitter
+    this.checkSplitter = this.splitOptions.filter(item => {
+      return (
+        splitter.includes(item.splitterValue) && 
+        item.type === 'preset'
+      );
+    });
+  },
+  updateMeata(data){
+    this.ruleForm.docMetaData = data
+  },
+  validateMetaData(){
+    const hasEmptyField = this.ruleForm.docMetaData.some(item => {
+      const isMetaKeyEmpty = !item.metaKey || (typeof item.metaKey === 'string' && item.metaKey.trim() === '');
+      const isMetaRuleRequired = item.metadataType !== 'value';
+      const isMetaRuleEmpty = isMetaRuleRequired && (!item.metaRule || (typeof item.metaRule === 'string' && item.metaRule.trim() === ''));
+      return isMetaKeyEmpty || isMetaRuleEmpty;
+    });
+    if (hasEmptyField) {
+      this.$message.error('元数据管理存在未填写的必填字段');
+      return false;
+    }
+    return true;
+  },
+  checkData(data){
+    this.checkSplitter = data;
+    this.ruleForm.docSegment.splitter = data.map(item => item.splitterValue)
+  },
+  relodData(name){
+    this.getSplitterList(name)
+  },
+  async getSplitterList(splitterName){
+    const res = await getSplitter({splitterName});
+    if(res.code === 0){
+      this.splitOptions = (res.data.knowledgeSplitterList || []).map((item) => ({
+        ...item,
+        showDel: false,
+        showIpt: false
+      }))
+    }
+  },
+  editItem(item){
+    editSplitter({splitterId:item.splitterId,splitterName:item.splitterName,splitterValue:item.splitterName}).then(res =>{
+      if(res.code === 0){
+        item.showIpt = false;
+        this.getSplitterList('');
+      }
+    })
+  },
+  createItem(item){
+    createSplitter({splitterName:item.splitterName,splitterValue:item.splitterName}).then(res =>{
+      if(res.code === 0){
+        item.showIpt = false;
+        this.getSplitterList('');
+      }
+    })
+  },
+  async delSplitterItem(item){
+    this.$confirm(
+        `删除分隔符${item.splitterName}`,
+         "确认要删除当前分隔符？",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(async() => {
+          const res = await delSplitter({ splitterId: item.splitterId })
+            if (res.code === 0) {
+                this.getSplitterList('');
+            }
+        })
+        .catch((error) => {
+            this.getSplitterList('');
+    });
+  },
+  showSplitterSet(){
+    this.$refs.splitterDialog.showDiaglog()
+  },
   goBack(){
     this.$router.go(-1);
   },
@@ -339,14 +427,6 @@ export default {
         this.reset();
       }
     },
-    // handleValidate() {
-    //   this.$refs["uplodForm"].validate((valid) => {
-    //     this.urlValidate = valid; // true/false
-    //   });
-    // },
-    // handleSetDisabled(val) {
-    //   this.urlSave = val;
-    // },
     reset() {
       if (this.source.length > 0) {
         for (let i = 0; i < this.source.length; i++) {
@@ -379,8 +459,6 @@ export default {
       this.fileUuid = '';
       this.$emit("handleSetOpen", {isShow:false,knowValue:null});
       this.uploading = false;
-      // this.$refs.urlUpload &&
-      // this.$refs.urlUpload.resetForm("dynamicValidateForm");
     },
     // 删除已上传文件
     handleRemove(item,index) {
@@ -424,6 +502,14 @@ export default {
           return false;
       }
       this.$refs.ruleForm.clearValidate(['docSegment.splitter']);
+      
+      if(!this.validateMetaData()){
+        return;
+      }
+      
+      this.ruleForm.docMetaData.forEach(item => {
+        delete item.metadataType;
+      });
 
       if(this.fileType ==='file'){
         this.ruleForm.docImportType  = 0;
@@ -447,6 +533,28 @@ export default {
             this.$router.push({path:`/knowledge/doclist/${this.knowledgeId}`,query:{name:this.knowledgeName,done:'fileUpload'}})
           }
         })
+    },
+    formReset(){
+      this.ruleForm = {
+        docAnalyzer:['text'],
+        docMetaData:[],//元数据管理数据
+        docPreprocess:[],//'deleteLinks','replaceSymbols'
+        docSegment:{
+          segmentType:this.ruleForm.docSegment.segmentType,
+          splitter:[],//"！","。","？","?","!",".","......"
+          maxSplitter:200,
+          overlap:0.2,
+        },
+        docInfoList:[],
+        docImportType:0,
+        knowledgeId:this.$route.query.id,
+        ocrModelId:''
+      }
+      this.checkSplitter = []
+      this.splitOptions = this.splitOptions.map(item => ({
+        ...item,
+        checked: false
+      }))
     },
     uploadOnChange(file, fileList){
       if (!fileList.length) return;
@@ -523,7 +631,7 @@ export default {
     },
     //  验证文件格式
     verifyFormat(file) {
-      const nameType = ['pdf','docx','pptx','zip','tar.gz','xlsx','csv','txt','html']
+      const nameType = ['pdf','docx','doc','pptx','zip','tar.gz','xlsx','xls','csv','txt','html','md','ofd','wps']
       const fileName = file.name
       const isSupportedFormat = nameType.some(ext => fileName.endsWith(`.${ext}`));
       if (!isSupportedFormat) {
@@ -536,8 +644,8 @@ export default {
         return false
       }else{
         const fileType = file.name.split(".").pop()
-        const limit200 = ['pdf','docx','pptx','zip','tar.gz']
-        const limit20 = ['xlsx','csv','txt','html']
+        const limit200 = ['pdf','docx','doc','pptx','zip','tar.gz','ofd','wps']
+        const limit20 = ['xlsx','xls','csv','txt','html','md']
         let isLimit200 = file.size / 1024 / 1024 < 200;
         let isLimit20 = file.size / 1024 / 1024 < 20;
         let num = 0;
@@ -617,6 +725,20 @@ export default {
 </script>
 <style lang="scss" scoped>
 .red{color:red;}
+.splitterTag{
+  margin-right:10px;
+  border:none;
+  background: #f4f5ff;
+  color:#384BF7;
+  border-radius:3px;
+}
+.optionInput{
+  width:90%;
+  margin:10px;
+}
+.splitterOption{
+  margin-top:5px;
+}
 .el-input-number {
     line-height: 28px !important;
 }
@@ -752,6 +874,47 @@ export default {
   border-radius:6px;
   .el-form{
     padding:10px;
+    // .docMetaData{
+    //   .docItem{
+    //     display:flex;
+    //     align-items:center;
+    //     border-radius:8px;
+    //     background:#f7f8fa;
+    //     margin-top:10px;
+    //     width: fit-content;
+    //     .docItem_data{
+    //       display:flex;
+    //       align-items:center;
+    //       margin-bottom:5px;
+    //       padding:0 10px;
+    //       .el-input,.el-select,.el-date-picker{
+    //         min-width:160px;
+    //       }
+    //       .docItem_data_label{
+    //         margin-right:5px;
+    //         display:flex;
+    //         align-items:center;
+    //         .question{
+    //           color: #aaadcc;
+    //           margin-left:2px;
+    //           cursor: pointer;
+    //         }
+    //       }
+    //       .setBtn{
+    //         font-size:16px;
+    //         cursor: pointer;
+    //         color: #384BF7;
+    //       }
+    //     }
+    //     .docItem_data_btn{
+    //       display:flex;
+    //       justify-content:center;
+    //       .el-icon-delete{
+    //         margin-left:5px;
+    //       }
+    //     }
+    //   }
+    // }
   }
 }
 .page-title{
@@ -799,5 +962,8 @@ export default {
   .document_lise_item:hover{
     background: #ECEEFE;
   }
+}
+.table-opera-icon{
+  font-size: 18px;
 }
 </style>

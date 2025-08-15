@@ -68,10 +68,9 @@ func main() {
 	}
 
 	// init aho-corasick
-	if err := ahocorasick.Init(); err != nil {
+	if err := ahocorasick.Init(true); err != nil {
 		log.Fatalf("init aho-corasick err: %v", err)
 	}
-
 	// doc-center
 	if err := service.InitDocCenter(); err != nil {
 		log.Fatalf("init doc-center err: %v", err)
@@ -115,6 +114,7 @@ func main() {
 
 	// stop http handler
 	handler.Stop(ctx)
+	ahocorasick.Stop()
 }
 
 func versionPrint() {

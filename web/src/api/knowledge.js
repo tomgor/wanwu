@@ -332,3 +332,31 @@ export const updateDocMeta = (data)=>{
         data
     })
 };
+export const delSplitter = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/splitter`,
+        method: 'delete',
+        data
+    })
+};
+export const getSplitter = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/splitter`,
+        method: 'get',
+        params:data
+    })
+};
+export const createSplitter = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/splitter`,
+        method: 'post',
+        data
+    })
+};
+export const editSplitter = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/splitter`,
+        method: 'put',
+        data
+    })
+};

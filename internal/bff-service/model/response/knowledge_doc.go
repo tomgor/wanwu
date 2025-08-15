@@ -26,15 +26,17 @@ type DocSegmentResp struct {
 	SegmentType        string            `json:"segmentType"`     //分段方式 0自动分段 1自定义分段
 	UploadTime         string            `json:"uploadTime"`      //上传时间
 	Splitter           string            `json:"splitter"`        // 分隔符（只有自定义分段必填）
-	MetaDataList       []*MetaData       `json:"MetaDataList"`    //文档元数据
+	MetaDataList       []*MetaData       `json:"metaDataList"`    //文档元数据
 	SegmentContentList []*SegmentContent `json:"contentList"`     //内容
 }
 
 type MetaData struct {
-	Key      string `json:"key"`
-	DataId   string `json:"dataId"`
-	Value    string `json:"value"`
-	DataType string `json:"dataType"`
+	Key         string `json:"key"`
+	DataId      string `json:"dataId"`
+	Value       string `json:"value"`
+	FormatValue string `json:"formatValue"`
+	DataType    string `json:"dataType"`
+	Rule        string `json:"rule"`
 }
 
 type SegmentContent struct {

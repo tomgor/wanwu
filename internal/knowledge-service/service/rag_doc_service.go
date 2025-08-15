@@ -34,33 +34,46 @@ type RagGetDocSegmentParams struct {
 	SearchAfter       int32  `json:"search_after"`
 }
 
+type RagMetaDataParams struct {
+	MetaId    string      `json:"meta_id"`    // 元数据id
+	Key       string      `json:"key"`        // key
+	Value     interface{} `json:"value"`      // 常量
+	ValueType string      `json:"value_type"` // 常量类型
+	Rule      string      `json:"rule"`       // 正则表达式
+}
+
 type RagImportDocParams struct {
-	DocId         string   `json:"id"`         //文档id
-	KnowledgeName string   `json:"categoryId"` //知识库名称
-	CategoryId    string   `json:"kb_id"`      //知识库id
-	IsEnhanced    string   `json:"is_enhanced"`
-	UserId        string   `json:"userId"`
-	Overlap       float32  `json:"overlap" `
-	ObjectName    string   `json:"objectName"`
-	SegmentSize   int      `json:"chunk_size"`
-	OriginalName  string   `json:"originalName"`
-	SegmentType   string   `json:"chunk_type"`
-	Separators    []string `json:"separators"`
-	ParserChoices []string `json:"parser_choices"`
-	OcrModelId    string   `json:"ocr_model_id"`
+	DocId             string               `json:"id"`         //文档id
+	KnowledgeName     string               `json:"categoryId"` //知识库名称
+	CategoryId        string               `json:"kb_id"`      //知识库id
+	IsEnhanced        string               `json:"is_enhanced"`
+	UserId            string               `json:"userId"`
+	Overlap           float32              `json:"overlap" `
+	ObjectName        string               `json:"objectName"`
+	SegmentSize       int                  `json:"chunk_size"`
+	OriginalName      string               `json:"originalName"`
+	SegmentType       string               `json:"chunk_type"`
+	Separators        []string             `json:"separators"`
+	ParserChoices     []string             `json:"parser_choices"`
+	OcrModelId        string               `json:"ocr_model_id"`
+	PreProcess        []string             `json:"pre_process"`
+	RagMetaDataParams []*RagMetaDataParams `json:"meta_data"`
 }
 
 type RagImportUrlDocParams struct {
-	Url               string   `json:"url"`
-	FileName          string   `json:"file_name"`
-	Overlap           float32  `json:"overlap_size" `
-	SegmentSize       int      `json:"sentence_size"`
-	SegmentType       string   `json:"chunk_type"`
-	UserId            string   `json:"userId"`
-	KnowledgeBaseName string   `json:"knowledgeBase"`
-	IsEnhanced        bool     `json:"is_enhanced"`
-	Separators        []string `json:"separators"`
-	TaskId            string   `json:"task_id"`
+	Url               string               `json:"url"`
+	FileName          string               `json:"file_name"`
+	Overlap           float32              `json:"overlap_size" `
+	SegmentSize       int                  `json:"sentence_size"`
+	SegmentType       string               `json:"chunk_type"`
+	UserId            string               `json:"userId"`
+	KnowledgeBaseName string               `json:"knowledgeBase"`
+	IsEnhanced        bool                 `json:"is_enhanced"`
+	Separators        []string             `json:"separators"`
+	TaskId            string               `json:"task_id"`
+	OcrModelId        string               `json:"ocr_model_id"`
+	PreProcess        []string             `json:"pre_process"`
+	RagMetaDataParams []*RagMetaDataParams `json:"meta_data"`
 }
 
 type RagDeleteDocParams struct {
@@ -70,10 +83,16 @@ type RagDeleteDocParams struct {
 }
 
 type RagDocMetaParams struct {
-	UserId        string                 `json:"userId"`
-	KnowledgeBase string                 `json:"knowledgeBase"`
-	FileName      string                 `json:"fileName"`
-	MetaList      map[string]interface{} `json:"tags"`
+	UserId        string      `json:"userId"`
+	KnowledgeBase string      `json:"knowledgeBase"`
+	FileName      string      `json:"fileName"`
+	MetaList      []*MetaData `json:"tags"`
+}
+
+type MetaData struct {
+	Key       string      `json:"key"`
+	Value     interface{} `json:"value"`
+	ValueType string      `json:"value_type"`
 }
 
 type RagGetDocSegmentResp struct {

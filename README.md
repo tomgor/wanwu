@@ -7,11 +7,12 @@
 
 ### 📢 新闻
 
-- **[2025-08-08]** 
-  - 新增智能体可直接关联MCP工具功能
-  - 新增智能体调试时，知识库可配置检索方式
-  - 新增知识库内文件，自动解析生成元数据
-  - 新增前端可视化平台配置功能，包括平台名称、logo等
+- **[2025-08-15]** 
+  - 新增导入火山引擎Embedding模型
+  - 新增知识库自定义分段添加分段标识和文本预处理规则
+  - 新增知识库文件上传元数据管理
+  - 新增知识库详情内元数据编辑
+  - 新增知识库文档解析类型.doc、.xls、.md、.ofd、.wps
 
 ------
 
@@ -187,11 +188,23 @@
 
 ### &#x1F4D1; 使用万悟
 
-为了帮助您快速上手本项目，我们强烈推荐先查看[ 文档操作手册](https://github.com/UnicomAI/wanwu/blob/main/docs/manual/%E6%A8%A1%E5%9E%8B%E5%AF%BC%E5%85%A5%E6%96%B9%E5%BC%8F-%E8%AF%A6%E7%BB%86%E7%89%88.md)。我们为用户提供了交互式、结构化的操作指南，您可以直接在其中查看操作说明、接口文档等，极大地降低了学习和使用的门槛。
+为了帮助您快速上手本项目，我们强烈推荐先查看[ 文档操作手册](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual)。我们为用户提供了交互式、结构化的操作指南，您可以直接在其中查看操作说明、接口文档等，极大地降低了学习和使用的门槛。详细功能清单如下：
+
+|                             功能                             | 详细描述                                                     |
+| :----------------------------------------------------------: | :----------------------------------------------------------- |
+| [模型管理](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/1.%E6%A8%A1%E5%9E%8B%E7%AE%A1%E7%90%86.md) | 支持用户导入包括联通元景、OpenAI-API-compatible、Ollama、通义千问、火山引擎等模型供应商的LLM、Embedding、Rerank模型。[ 模型导入方式-详细版](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/%E6%A8%A1%E5%9E%8B%E5%AF%BC%E5%85%A5%E6%96%B9%E5%BC%8F-%E8%AF%A6%E7%BB%86%E7%89%88.md) |
+| [知识库](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/2.%E7%9F%A5%E8%AF%86%E5%BA%93) | 文档解析（支持OCR）、命中测试、关键词管理                    |
+| [MCP](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/3.MCP%E5%B9%BF%E5%9C%BA.md) | 内置100+优选行业MCP server，同时支持导入自己的MCP服务，并在工作流和智能体中使用 |
+| [安全护栏](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/4.%E5%AE%89%E5%85%A8%E6%8A%A4%E6%A0%8F.md) | 用户可以创建敏感词表，控制模型反馈结果的安全性               |
+| [文本问答](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/5.%E6%96%87%E6%9C%AC%E9%97%AE%E7%AD%94.md) | 基于私人知识库的专属知识顾问，支持知识库管理、知识问答、知识总结、个性参数配置、安全护栏、检索配置等功能，提高知识管理与学习的效率。支持公开或私密发布文本问答应用 |
+| [工作流](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/6.%E5%B7%A5%E4%BD%9C%E6%B5%81) | 可以扩展智能体能力边界，由节点组成，提供可视化工作流编辑能力，用户可以编排多个不同的工作流节点，实现复杂且稳定的业务流程。支持公开或私密发布工作流应用 |
+| [智能体](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/7.%E6%99%BA%E8%83%BD%E4%BD%93.md) | 基于用户使用场景和业务需求创建智能体，支持选模型、设置提示词、联网检索、知识库选择、MCP、工作流、自定义工具等。支持公开或私密发布智能体应用 |
+| [应用广场](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/8.%E5%BA%94%E7%94%A8%E5%B9%BF%E5%9C%BA.md) | 支持用户体验已发布的应用，包括文本问答、工作流和智能体       |
+| [设置](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/9.%E8%AE%BE%E7%BD%AE.md) | 平台支持多租户，允许用户进行组织、角色、用户管理             |
 
 ------
 
-### &#x1F517; 使用的其他开源项目
+### &#x1F517; 致谢
 
 - [AgentScope](https://github.com/modelscope/agentscope)
 - [LangChain](https://github.com/langchain-ai/langchain)
@@ -201,17 +214,19 @@
 
 ### &#x1F4F0; TODO LIST
 
-- [ ] 智能体公开发布为Web URL
-- [ ] 增加知识库分段方式配置形式
 - [ ] 多模态模型接入
-- [ ] RAG出处支持显示全文
-- [ ] 推理模型支持reasonning-content
 - [ ] 支持自定义MCP Server，即可以把工作流、智能体、或者符合OpenAPI规范的API作为tools添加到MCP Server里进行发布
 - [ ] 工作流发布为API
 - [ ] 增加工作流节点类型
 - [ ] 支持工作流的导入导出
 - [ ] 支持自定义工具
 - [ ] 知识库共享
+- [ ] 智能体和模型测评
+- [ ] 知识库支撑对分段内容打标签
+- [ ] 知识库支持分段内容添加
+- [ ] 智能体监控统计
+- [ ] 模型体验
+- [ ] 提示词工程
 
 ------
 

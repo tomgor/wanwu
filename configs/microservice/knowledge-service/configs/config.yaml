@@ -110,7 +110,7 @@ usage-limit:
   category-depth: 3
   doc-total: -1
   punc-types: "？@#@！@#@。@#@?@#@......@#@!@#@."
-  file-types: ".docx;.txt;.pdf;.xlsx;.csv;.pptx;.html;.doc;.xls"
+  file-types: ".docx;.txt;.pdf;.xlsx;.csv;.pptx;.html;.doc;.xls;.ofd;.wps;.md"
   compressed-file-type: ".zip;.tar.gz"
   max-number-of-files-in-compressed: -1
   max-file-size: 209715200
@@ -129,3 +129,19 @@ usage-limit:
 
 knowledge-doc-config:
   doc-local-file-path: static/temp
+
+splitters:
+  - name: "中文叹号"
+    value: "！"
+  - name: "中文句号"
+    value: "。"
+  - name: "中文问号"
+    value: "？"
+  - name: "英文问号"
+    value: "?"
+  - name: "英文叹号"
+    value: "!"
+  - name: "英文句号"
+    value: "."
+  - name: "省略号"
+    value: "......"

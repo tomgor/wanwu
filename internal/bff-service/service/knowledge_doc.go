@@ -1,7 +1,11 @@
 package service
 
 import (
+	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_doc_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-doc-service"
@@ -76,6 +80,39 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 			}
 		}
 	}
+	var metaList []*knowledgebase_doc_service.DocMetaData
+	seenKeys := make(map[string]bool)
+	for _, meta := range req.DocMetaData {
+		if meta.MetaKey == "" {
+			return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "key为空")
+		}
+		// 检查Key是否重复
+		if seenKeys[meta.MetaKey] {
+			return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "key重复")
+		}
+		seenKeys[meta.MetaKey] = true
+		if meta.MetaRule != "" {
+			// 检查rule和key传参
+			if meta.MetaValue != "" {
+				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "常量和正则表达式重复")
+			}
+			// 检查正则合法性
+			_, err := regexp.Compile(meta.MetaRule)
+			if err != nil {
+				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "非法正则表达式")
+			}
+			// 检查key合法性
+			if !isValidKey(meta.MetaKey) {
+				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "非法key")
+			}
+		}
+		metaList = append(metaList, &knowledgebase_doc_service.DocMetaData{
+			Key:       meta.MetaKey,
+			Value:     meta.MetaValue,
+			ValueType: meta.MetaValueType,
+			Rule:      meta.MetaRule,
+		})
+	}
 	_, err := knowledgeBaseDoc.ImportDoc(ctx.Request.Context(), &knowledgebase_doc_service.ImportDocReq{
 		UserId:        userId,
 		OrgId:         orgId,
@@ -87,15 +124,22 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 			MaxSplitter: int32(segment.MaxSplitter),
 			Overlap:     segment.Overlap,
 		},
-		DocAnalyzer: req.DocAnalyzer,
-		DocInfoList: docInfoList,
-		OcrModelId:  req.OcrModelId,
+		DocAnalyzer:     req.DocAnalyzer,
+		DocInfoList:     docInfoList,
+		OcrModelId:      req.OcrModelId,
+		DocPreprocess:   req.DocPreprocess,
+		DocMetaDataList: metaList,
 	})
 	if err != nil {
 		log.Errorf("上传失败(保存上传任务 失败(%v) ", err)
 		return err
 	}
 	return nil
+}
+
+func isValidKey(s string) bool {
+	re := regexp.MustCompile(`^[a-z][a-z0-9_]*$`) //只包含小写字母，数字和下划线，并且以小写字母开头
+	return re.MatchString(s)
 }
 
 // UpdateDocMetaData 更新文档元数据
@@ -113,7 +157,7 @@ func UpdateDocStatus(ctx *gin.Context, r *request.CallbackUpdateDocStatusReq) er
 	_, err := knowledgeBaseDoc.UpdateDocStatus(ctx.Request.Context(), &knowledgebase_doc_service.UpdateDocStatusReq{
 		DocId:        r.DocId,
 		Status:       r.Status,
-		MetaDataList: buildMetaDataList(r.MetaDataList),
+		MetaDataList: buildCallbackMetaDataList(r.MetaDataList),
 	})
 	return err
 }
@@ -264,16 +308,63 @@ func buildMetaDataList(metaDataList []*request.MetaData) []*knowledgebase_doc_se
 	})
 }
 
+func buildCallbackMetaDataList(metaDataList []*request.CallbackMetaData) []*knowledgebase_doc_service.MetaData {
+	if len(metaDataList) == 0 {
+		return make([]*knowledgebase_doc_service.MetaData, 0)
+	}
+	return lo.Map(metaDataList, func(item *request.CallbackMetaData, index int) *knowledgebase_doc_service.MetaData {
+		return &knowledgebase_doc_service.MetaData{
+			DataId: item.MetaId,
+			Key:    item.Key,
+			Value:  item.Value,
+		}
+	})
+}
+
 func buildMetaDataResultList(metaDataList []*knowledgebase_doc_service.MetaData) []*response.MetaData {
 	if len(metaDataList) == 0 {
 		return make([]*response.MetaData, 0)
 	}
 	return lo.Map(metaDataList, func(item *knowledgebase_doc_service.MetaData, index int) *response.MetaData {
 		return &response.MetaData{
-			DataId:   item.DataId,
-			Key:      item.Key,
-			Value:    item.Value,
-			DataType: item.ValueType,
+			DataId:      item.DataId,
+			Key:         item.Key,
+			Value:       item.Value,
+			FormatValue: buildFormatValue(item.ValueType, item.Value),
+			DataType:    item.ValueType,
+			Rule:        item.Rule,
 		}
 	})
+}
+
+func buildFormatValue(valueType, value string) string {
+	if valueType == "time" {
+		timestamp, err := formatTimestamp(value)
+		if err == nil {
+			return timestamp
+		}
+	}
+	return value
+}
+
+func formatTimestamp(timestampStr string) (string, error) {
+	// 将字符串转换为整数
+	timestamp, err := strconv.ParseInt(timestampStr, 10, 64)
+	if err != nil {
+		return "", fmt.Errorf("invalid timestamp: %v", err)
+	}
+
+	// 根据时间戳长度进行处理
+	var t time.Time
+	switch len(timestampStr) {
+	case 10: // 秒级时间戳
+		t = time.Unix(timestamp, 0)
+	case 13: // 毫秒级时间戳
+		t = time.Unix(timestamp/1000, (timestamp%1000)*1e6)
+	default:
+		return "", fmt.Errorf("unsupported timestamp length: %d (expected 10 or 13 digits)", len(timestampStr))
+	}
+
+	// 格式化为标准日期时间字符串
+	return t.Format("2006-01-02 15:04"), nil
 }

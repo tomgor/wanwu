@@ -653,38 +653,31 @@ definitions:
         description: 前端请求地址，例如：/v1/static/avatar/abc/def.png (请求非必填)
         type: string
     type: object
+  request.CallbackMetaData:
+    properties:
+      key:
+        type: string
+      metaId:
+        type: string
+      value:
+        type: string
+    required:
+    - metaId
+    - value
+    type: object
   request.CallbackUpdateDocStatusReq:
     properties:
       id:
         type: string
       metaDataList:
         items:
-          $ref: '#/definitions/request.MetaData'
+          $ref: '#/definitions/request.CallbackMetaData'
         type: array
       status:
         type: integer
     required:
     - id
     - status
-    type: object
-  request.MetaData:
-    properties:
-      dataId:
-        type: string
-      dataType:
-        description: String，Number，Date
-        type: string
-      key:
-        type: string
-      option:
-        type: string
-      value:
-        type: string
-    required:
-    - dataType
-    - key
-    - option
-    - value
     type: object
   request.SearchKnowledgeInfoReq:
     properties:

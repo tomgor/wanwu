@@ -21,6 +21,10 @@ type DocAnalyzer struct {
 	AnalyzerList []string `json:"analyzerList"` //文档解析方式，ocr等
 }
 
+type DocPreProcess struct {
+	PreProcessList []string `json:"preProcessList"` //文档预处理方式: replace_symbols, delete_links
+}
+
 type DocImportInfo struct {
 	DocInfoList []*DocInfo `json:"docInfoList"`
 }
@@ -31,6 +35,18 @@ type DocInfo struct {
 	DocUrl  string `json:"docUrl"`  //文档url
 	DocType string `json:"docType"` // 文档类型
 	DocSize int64  `json:"docSie"`  // 文档大小
+}
+
+type DocImportMetaData struct {
+	DocMetaDataList []*KnowledgeDocMeta `json:"docMetaDataList"`
+}
+
+type DocMetaData struct {
+	MetaId    string      `json:"metaId"`    // 元数据id
+	Key       string      `json:"key"`       // key
+	Value     interface{} `json:"value"`     // 常量
+	ValueType string      `json:"valueType"` // 常量类型
+	Rule      string      `json:"rule"`      // 正则表达式
 }
 
 type KnowledgeImportTask struct {
@@ -44,6 +60,8 @@ type KnowledgeImportTask struct {
 	SegmentConfig string `gorm:"column:segment_config;type:text;not null;comment:'分段配置信息'" json:"segmentConfig"`
 	DocAnalyzer   string `gorm:"column:doc_analyzer;type:text;not null;comment:'文档解析配置'" json:"docAnalyzer"`
 	OcrModelId    string `gorm:"column:ocr_model_id;type:varchar(64);not null;default:'';comment:'ocr模型id'" json:"ocrModelId"`
+	DocPreProcess string `gorm:"column:doc_pre_process;type:text;not null;comment:'文档预处理规则: replace_symbols,delete_links'" json:"docPreProcess"`
+	MetaData      string `gorm:"column:meta_data;type:text;not null;comment:'元数据列表'" json:"metaData"`
 	CreatedAt     int64  `gorm:"column:create_at;type:bigint(20);not null;" json:"createAt"` // Create Time
 	UpdatedAt     int64  `gorm:"column:update_at;type:bigint(20);not null;" json:"updateAt"` // Update Time
 	UserId        string `gorm:"column:user_id;type:varchar(64);not null;default:'';" json:"userId"`

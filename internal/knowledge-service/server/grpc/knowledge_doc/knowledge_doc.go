@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -53,14 +54,7 @@ func (s *Service) ImportDoc(ctx context.Context, req *knowledgebase_doc_service.
 }
 
 func (s *Service) UpdateDocStatus(ctx context.Context, req *knowledgebase_doc_service.UpdateDocStatusReq) (*emptypb.Empty, error) {
-	//1.查询文档详情
-	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, "", "")
-	if err != nil {
-		log.Errorf(fmt.Sprintf("没有操作该知识库文档的权限 参数(%v)", req))
-		return nil, err
-	}
-	doc := docList[0]
-	err = orm.UpdateDocStatusDocId(ctx, req.DocId, int(req.Status), buildMetaParamsList(removeDuplicateMeta(req.MetaDataList), doc.OrgId, doc.UserId, req.DocId))
+	err := orm.UpdateDocStatusDocId(ctx, req.DocId, int(req.Status), buildMetaParamsList(removeDuplicateMeta(req.MetaDataList)))
 	if err != nil {
 		log.Errorf(fmt.Sprintf("update doc fail %v", err), req.DocId)
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateStatusFailed)
@@ -69,6 +63,9 @@ func (s *Service) UpdateDocStatus(ctx context.Context, req *knowledgebase_doc_se
 }
 
 func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_service.UpdateDocMetaDataReq) (*emptypb.Empty, error) {
+	if len(req.MetaDataList) == 0 {
+		return &emptypb.Empty{}, nil
+	}
 	//1.查询文档详情
 	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
 	if err != nil {
@@ -79,7 +76,7 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 	//2.状态校验
 	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
 		log.Errorf(fmt.Sprintf("非处理完成文档无法增加标签 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req))
-		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaFailed)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaStatusFailed)
 	}
 	//3.查询知识库信息
 	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
@@ -91,16 +88,21 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 	metaDataList := removeDuplicateMeta(req.MetaDataList)
 	var fileName = service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
 	addList, updateList, deleteList := buildMetaModelList(metaDataList, doc.OrgId, doc.UserId, req.DocId)
+	params, err := buildMetaRagParams(metaDataList)
+	if err != nil {
+		log.Errorf(fmt.Sprintf("update buildMetaRagParams fail %v", err), req.DocId)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaFailed)
+	}
 	err = orm.UpdateDocStatusDocMeta(ctx, req.DocId, addList, updateList, deleteList,
 		&service.RagDocMetaParams{
 			FileName:      fileName,
 			KnowledgeBase: knowledge.Name,
 			UserId:        req.UserId,
-			MetaList:      buildMetaRagParams(metaDataList),
+			MetaList:      params,
 		})
 	if err != nil {
 		log.Errorf(fmt.Sprintf("update doc tag fail %v", err), req.DocId)
-		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaStatusFailed)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaFailed)
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -337,6 +339,32 @@ func buildImportTask(req *knowledgebase_doc_service.ImportDocReq) (*model.Knowle
 	if err != nil {
 		return nil, err
 	}
+
+	preprocess, err := json.Marshal(&model.DocPreProcess{
+		PreProcessList: req.DocPreprocess,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var docImportMetaData string
+	if len(req.DocMetaDataList) > 0 {
+		metaList := make([]*model.KnowledgeDocMeta, 0)
+		for _, metaData := range req.DocMetaDataList {
+			metaList = append(metaList, &model.KnowledgeDocMeta{
+				Key:       metaData.Key,
+				Value:     metaData.Value,
+				ValueType: metaData.ValueType,
+				Rule:      metaData.Rule,
+			})
+		}
+		importMetaDataByte, err := json.Marshal(&model.DocImportMetaData{
+			DocMetaDataList: metaList,
+		})
+		if err != nil {
+			return nil, err
+		}
+		docImportMetaData = string(importMetaDataByte)
+	}
 	return &model.KnowledgeImportTask{
 		ImportId:      generator.GetGenerator().NewID(),
 		KnowledgeId:   req.KnowledgeId,
@@ -347,6 +375,8 @@ func buildImportTask(req *knowledgebase_doc_service.ImportDocReq) (*model.Knowle
 		UpdatedAt:     time.Now().UnixMilli(),
 		DocInfo:       string(docImportInfo),
 		OcrModelId:    req.OcrModelId,
+		DocPreProcess: string(preprocess),
+		MetaData:      docImportMetaData,
 		UserId:        req.UserId,
 		OrgId:         req.OrgId,
 	}, nil
@@ -383,7 +413,7 @@ func buildMetaList(metaDataList []*model.KnowledgeDocMeta) []*knowledgebase_doc_
 	}
 	return lo.Map(metaDataList, func(item *model.KnowledgeDocMeta, index int) *knowledgebase_doc_service.MetaData {
 		var valueType = item.ValueType
-		if valueType == "" || valueType == "string" {
+		if valueType == "" {
 			valueType = model.MetaTypeString
 		}
 		return &knowledgebase_doc_service.MetaData{
@@ -391,26 +421,20 @@ func buildMetaList(metaDataList []*model.KnowledgeDocMeta) []*knowledgebase_doc_
 			Key:       item.Key,
 			Value:     item.Value,
 			ValueType: valueType,
+			Rule:      item.Rule,
 		}
 	})
 }
 
-func buildMetaParamsList(metaDataList []*knowledgebase_doc_service.MetaData, orgId, userId, docId string) []*model.KnowledgeDocMeta {
+func buildMetaParamsList(metaDataList []*knowledgebase_doc_service.MetaData) []*model.KnowledgeDocMeta {
 	if len(metaDataList) == 0 {
 		return make([]*model.KnowledgeDocMeta, 0)
 	}
 	return lo.Map(metaDataList, func(item *knowledgebase_doc_service.MetaData, index int) *model.KnowledgeDocMeta {
 		return &model.KnowledgeDocMeta{
-			MetaId:    generator.GetGenerator().NewID(),
-			DocId:     docId,
-			Key:       item.Key,
-			Value:     item.Value,
-			ValueType: item.ValueType,
-			Rule:      "",
-			OrgId:     orgId,
-			UserId:    userId,
-			CreatedAt: time.Now().UnixMilli(),
-			UpdatedAt: time.Now().UnixMilli(),
+			MetaId: item.DataId,
+			Key:    item.Key,
+			Value:  item.Value,
 		}
 	})
 }
@@ -450,18 +474,36 @@ func buildMetaModelList(metaDataList []*knowledgebase_doc_service.MetaData, orgI
 	return
 }
 
-func buildMetaRagParams(metaDataList []*knowledgebase_doc_service.MetaData) map[string]interface{} {
+func buildMetaRagParams(metaDataList []*knowledgebase_doc_service.MetaData) ([]*service.MetaData, error) {
 	if len(metaDataList) == 0 {
-		return make(map[string]interface{})
+		return make([]*service.MetaData, 0), nil
 	}
-	var retMap = make(map[string]interface{})
+	var retList = make([]*service.MetaData, 0)
 	for _, data := range metaDataList {
 		if data.Option == "delete" {
 			continue
 		}
-		retMap[data.Key] = data.Value
+		valueData, err := buildValueData(data.ValueType, data.Value)
+		if err != nil {
+			log.Errorf("buildValueData error %s", err.Error())
+			return nil, err
+		}
+		retList = append(retList, &service.MetaData{
+			Key:       data.Key,
+			Value:     valueData,
+			ValueType: data.ValueType,
+		})
 	}
-	return retMap
+	return retList, nil
+}
+
+func buildValueData(valueType string, value string) (interface{}, error) {
+	switch valueType {
+	case model.MetaTypeNumber:
+	case model.MetaTypeTime:
+		return strconv.ParseInt(value, 10, 64)
+	}
+	return value, nil
 }
 
 func buildSplitter(splitterList []string) string {

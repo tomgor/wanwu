@@ -9,13 +9,22 @@ type DocListReq struct {
 }
 
 type DocImportReq struct {
-	KnowledgeId   string      `json:"knowledgeId" validate:"required"` //知识库id
-	DocImportType int         `json:"docImportType"`                   //文档导入类型，0：文件上传，1：url上传，2.批量url上传
-	DocInfo       []*DocInfo  `json:"docInfoList" validate:"required"` //上传文档列表
-	DocSegment    *DocSegment `json:"docSegment" validate:"required"`  //文档分段配置
-	DocAnalyzer   []string    `json:"docAnalyzer" validate:"required"` //文档解析类型
-	OcrModelId    string      `json:"ocrModelId"`                      //ocr模型id
+	KnowledgeId   string         `json:"knowledgeId" validate:"required"` //知识库id
+	DocImportType int            `json:"docImportType"`                   //文档导入类型，0：文件上传，1：url上传，2.批量url上传
+	DocInfo       []*DocInfo     `json:"docInfoList" validate:"required"` //上传文档列表
+	DocSegment    *DocSegment    `json:"docSegment" validate:"required"`  //文档分段配置
+	DocAnalyzer   []string       `json:"docAnalyzer" validate:"required"` //文档解析类型 text / ocr
+	OcrModelId    string         `json:"ocrModelId"`                      //ocr模型id
+	DocPreprocess []string       `json:"docPreprocess"`                   // 文本预处理规则 replaceSymbols / deleteLinks
+	DocMetaData   []*DocMetaData `json:"docMetaData"`                     // 元数据
 	CommonCheck
+}
+
+type DocMetaData struct {
+	MetaKey       string `json:"metaKey"`       //key 的校验
+	MetaValue     string `json:"metaValue"`     //传入字符串
+	MetaValueType string `json:"metaValueType"` // number:"1" , date:"1755226779000" 毫秒 , string, ""
+	MetaRule      string `json:"metaRule"`
 }
 
 type DocMetaDataReq struct {

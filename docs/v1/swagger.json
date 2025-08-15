@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "## HTTP Header\r\n| Header        | 说明      |\r\n| ------------- | --------- |\r\n| Authorization | JWT token |\r\n| X-Language    | 语言Code  |\r\n| X-Org-Id      | 组织ID    |\r\n\r\n## HTTP Status\r\n| HTTP Status             | 说明                   |\r\n| ----------------------- | ---------------------- |\r\n| 200, StatusOK           | 请求返回成功           |\r\n| 400, StatusBadRequest   | 请求返回失败，用于业务 |\r\n| 401, StatusUnauthorized | JWT认证失败            |\r\n| 403, StatusForbidden    | 没有权限               |\r\n\r\n## 权限-菜单对应表\r\n| 一级权限        | 二级权限  | 三级权限 | 一级菜单 | 二级菜单 | 三级菜单 |\r\n|-------------|-------|------|------|------|------|\r\n| guest       |       |      | 【访客】 |      |      |\r\n| common      |       |      | 【通用】 |      |      |\r\n| permission  |       |      | 权限管理 |      |      |\r\n| permission  | user  |      | 权限管理 | 用户管理 |      |\r\n| permission  | org   |      | 权限管理 | 组织管理 |      |\r\n| permission  | role  |      | 权限管理 | 角色管理 |      |\r\n\r\n## `/v1/user/permission`返回用例\r\n```json\r\n{\r\n  \"code\": 0,\r\n  \"data\": {\r\n    \"orgPermission\": {\r\n      \"org\": {\"id\": \"test-org-id\", \"name\": \"test-org-name\"},\r\n      \"permissions\": [\r\n        {\"perm\": \"permission\"},\r\n        {\"perm\": \"permission.user\"},\r\n        {\"perm\": \"permission.org\"},\r\n        {\"perm\": \"permission.role\"}\r\n      ]\r\n    }\r\n  },\r\n  \"msg\": \"操作成功\"\r\n}\r\n```",
+        "description": "## HTTP Header\n| Header        | 说明      |\n| ------------- | --------- |\n| Authorization | JWT token |\n| X-Language    | 语言Code  |\n| X-Org-Id      | 组织ID    |\n\n## HTTP Status\n| HTTP Status             | 说明                   |\n| ----------------------- | ---------------------- |\n| 200, StatusOK           | 请求返回成功           |\n| 400, StatusBadRequest   | 请求返回失败，用于业务 |\n| 401, StatusUnauthorized | JWT认证失败            |\n| 403, StatusForbidden    | 没有权限               |\n\n## 权限-菜单对应表\n| 一级权限        | 二级权限  | 三级权限 | 一级菜单 | 二级菜单 | 三级菜单 |\n|-------------|-------|------|------|------|------|\n| guest       |       |      | 【访客】 |      |      |\n| common      |       |      | 【通用】 |      |      |\n| permission  |       |      | 权限管理 |      |      |\n| permission  | user  |      | 权限管理 | 用户管理 |      |\n| permission  | org   |      | 权限管理 | 组织管理 |      |\n| permission  | role  |      | 权限管理 | 角色管理 |      |\n\n## `/v1/user/permission`返回用例\n```json\n{\n  \"code\": 0,\n  \"data\": {\n    \"orgPermission\": {\n      \"org\": {\"id\": \"test-org-id\", \"name\": \"test-org-name\"},\n      \"permissions\": [\n        {\"perm\": \"permission\"},\n        {\"perm\": \"permission.user\"},\n        {\"perm\": \"permission.org\"},\n        {\"perm\": \"permission.role\"}\n      ]\n    }\n  },\n  \"msg\": \"操作成功\"\n}\n```",
         "title": "AI Agent Productivity Platform API",
         "contact": {},
         "version": "v0.0.1"
@@ -248,6 +248,229 @@
                                     }
                                 }
                             ]
+                        }
+                    }
+                }
+            }
+        },
+        "/appspace/app/openurl": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "编辑应用Url",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "编辑应用Url",
+                "parameters": [
+                    {
+                        "description": "应用Url基本信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppUrlUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "创建应用Url",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "创建应用Url",
+                "parameters": [
+                    {
+                        "description": "应用Url基本信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppUrlCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "删除应用Url",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "删除应用Url",
+                "parameters": [
+                    {
+                        "description": "应用UrlId",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppUrlIdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/appspace/app/openurl/list": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "获取应用Url列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "获取应用Url列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "应用id",
+                        "name": "appId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "应用类型",
+                        "name": "appType",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.AppUrlInfo"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/appspace/app/openurl/status": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "启用/停用应用Url",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "app"
+                ],
+                "summary": "启用/停用应用Url",
+                "parameters": [
+                    {
+                        "description": "应用UrlId",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppUrlStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -3340,12 +3563,11 @@
                 "summary": "查询知识库分隔符列表",
                 "parameters": [
                     {
-                        "description": "查询知识库请求参数",
+                        "description": "查询知识库分隔符列表参数",
                         "name": "data",
                         "in": "body",
-                        "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.KnowledgeSplitterSelectReq"
+                            "$ref": "#/definitions/request.GetKnowledgeSplitterReq"
                         }
                     }
                 ],
@@ -7266,6 +7488,129 @@
                 }
             }
         },
+        "request.AppUrlCreateRequest": {
+            "type": "object",
+            "required": [
+                "appId",
+                "appType",
+                "name"
+            ],
+            "properties": {
+                "appId": {
+                    "description": "应用id",
+                    "type": "string"
+                },
+                "appType": {
+                    "description": "应用类型",
+                    "type": "string"
+                },
+                "copyright": {
+                    "description": "版权",
+                    "type": "string"
+                },
+                "copyrightEnable": {
+                    "description": "版权开关",
+                    "type": "boolean"
+                },
+                "disclaimer": {
+                    "description": "免责声明",
+                    "type": "string"
+                },
+                "disclaimerEnable": {
+                    "description": "免责声明开关",
+                    "type": "boolean"
+                },
+                "expiredAt": {
+                    "description": "过期时间",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "privacyPolicy": {
+                    "description": "隐私协议",
+                    "type": "string"
+                },
+                "privacyPolicyEnable": {
+                    "description": "隐私协议开关",
+                    "type": "boolean"
+                }
+            }
+        },
+        "request.AppUrlIdRequest": {
+            "type": "object",
+            "required": [
+                "urlId"
+            ],
+            "properties": {
+                "urlId": {
+                    "description": "UrlID",
+                    "type": "string"
+                }
+            }
+        },
+        "request.AppUrlStatusRequest": {
+            "type": "object",
+            "required": [
+                "urlId"
+            ],
+            "properties": {
+                "status": {
+                    "description": "启停状态",
+                    "type": "boolean"
+                },
+                "urlId": {
+                    "description": "UrlID",
+                    "type": "string"
+                }
+            }
+        },
+        "request.AppUrlUpdateRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "urlId"
+            ],
+            "properties": {
+                "copyright": {
+                    "description": "版权",
+                    "type": "string"
+                },
+                "copyrightEnable": {
+                    "description": "版权开关",
+                    "type": "boolean"
+                },
+                "disclaimer": {
+                    "description": "免责声明",
+                    "type": "string"
+                },
+                "disclaimerEnable": {
+                    "description": "免责声明开关",
+                    "type": "boolean"
+                },
+                "expiredAt": {
+                    "description": "过期时间",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "privacyPolicy": {
+                    "description": "隐私协议",
+                    "type": "string"
+                },
+                "privacyPolicyEnable": {
+                    "description": "隐私协议开关",
+                    "type": "boolean"
+                },
+                "urlId": {
+                    "description": "UrlID",
+                    "type": "string"
+                }
+            }
+        },
         "request.AssistantBrief": {
             "type": "object",
             "required": [
@@ -7865,7 +8210,7 @@
             ],
             "properties": {
                 "docAnalyzer": {
-                    "description": "文档解析类型",
+                    "description": "文档解析类型 text / ocr",
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -7880,6 +8225,20 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/request.DocInfo"
+                    }
+                },
+                "docMetaData": {
+                    "description": "元数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.DocMetaData"
+                    }
+                },
+                "docPreprocess": {
+                    "description": "文本预处理规则 replaceSymbols / deleteLinks",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
                     }
                 },
                 "docSegment": {
@@ -7947,6 +8306,26 @@
                 "status": {
                     "description": "当前状态  -1-全部， 0-待处理， 1- 处理完成， 2-正在审核中，3-正在解析中，4-审核未通过，5-解析失败",
                     "type": "integer"
+                }
+            }
+        },
+        "request.DocMetaData": {
+            "type": "object",
+            "properties": {
+                "metaKey": {
+                    "description": "key 的校验",
+                    "type": "string"
+                },
+                "metaRule": {
+                    "type": "string"
+                },
+                "metaValue": {
+                    "description": "传入字符串",
+                    "type": "string"
+                },
+                "metaValueType": {
+                    "description": "number:\"1\" , date:\"1755226779000\" 毫秒 , string, \"\"",
+                    "type": "string"
                 }
             }
         },
@@ -8046,6 +8425,14 @@
             "properties": {
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "request.GetKnowledgeSplitterReq": {
+            "type": "object",
+            "properties": {
+                "splitterName": {
+                    "type": "string"
                 }
             }
         },
@@ -8177,14 +8564,6 @@
                     "items": {
                         "type": "string"
                     }
-                }
-            }
-        },
-        "request.KnowledgeSplitterSelectReq": {
-            "type": "object",
-            "properties": {
-                "splitterName": {
-                    "type": "string"
                 }
             }
         },
@@ -9209,6 +9588,75 @@
                 }
             }
         },
+        "response.AppUrlInfo": {
+            "type": "object",
+            "properties": {
+                "appId": {
+                    "description": "应用ID",
+                    "type": "string"
+                },
+                "appType": {
+                    "description": "应用类型",
+                    "type": "string"
+                },
+                "copyright": {
+                    "description": "知识产权",
+                    "type": "string"
+                },
+                "copyrightEnable": {
+                    "description": "知识产权开关",
+                    "type": "boolean"
+                },
+                "createdAt": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "disclaimer": {
+                    "description": "免责声明",
+                    "type": "string"
+                },
+                "disclaimerEnable": {
+                    "description": "免责声明开关",
+                    "type": "boolean"
+                },
+                "expiredAt": {
+                    "description": "过期时间",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Url名称",
+                    "type": "string"
+                },
+                "orgId": {
+                    "description": "组织ID",
+                    "type": "string"
+                },
+                "privacyPolicy": {
+                    "description": "隐私政策",
+                    "type": "string"
+                },
+                "privacyPolicyEnable": {
+                    "description": "隐私政策开关",
+                    "type": "boolean"
+                },
+                "status": {
+                    "description": "应用Url开关",
+                    "type": "boolean"
+                },
+                "suffix": {
+                    "description": "生成Url后缀",
+                    "type": "string"
+                },
+                "urlId": {
+                    "description": "UrlID",
+                    "type": "string"
+                },
+                "userId": {
+                    "description": "用户ID",
+                    "type": "string"
+                }
+            }
+        },
         "response.Assistant": {
             "type": "object",
             "required": [
@@ -9956,6 +10404,10 @@
                 "splitterValue": {
                     "description": "知识库分隔符值",
                     "type": "string"
+                },
+                "type": {
+                    "description": "分隔符类型： preset / custom",
+                    "type": "string"
                 }
             }
         },
@@ -10518,7 +10970,13 @@
                 "dataType": {
                     "type": "string"
                 },
+                "formatValue": {
+                    "type": "string"
+                },
                 "key": {
+                    "type": "string"
+                },
+                "rule": {
                     "type": "string"
                 },
                 "value": {

@@ -45,6 +45,7 @@ type ServerConfig struct {
 	WebBaseUrl   string `json:"web_base_url" mapstructure:"web_base_url"`
 	ApiBaseUrl   string `json:"api_base_url" mapstructure:"api_base_url"`
 	CallbackUrl  string `json:"callback_url" mapstructure:"callback_url"`
+	AppOpenUrl   string `json:"app_open_base_url" mapstructure:"app_open_base_url"`
 }
 
 type ModelConfig struct {
@@ -108,6 +109,7 @@ type DocLinkConfig struct {
 type CustomInfoConfig struct {
 	DefaultMode string        `json:"default_mode" mapstructure:"default_mode"`
 	Modes       []CustomTheme `json:"modes" mapstructure:"modes"`
+	Version     string        `json:"version" mapstructure:"version"`
 }
 
 type CustomTheme struct {
@@ -139,7 +141,6 @@ type CustomTab struct {
 
 type CustomAbout struct {
 	LogoPath  string `json:"logo_path" mapstructure:"logo_path"`
-	Version   string `json:"version" mapstructure:"version"`
 	Copyright string `json:"copyright" mapstructure:"copyright"`
 }
 

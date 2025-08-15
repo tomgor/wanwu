@@ -4,17 +4,25 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"net/url"
-
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm/sqlopt"
 	async_task "github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/async-task"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/db"
+	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/generator"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/util"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/service"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"gorm.io/gorm"
+	"net/url"
+	"strconv"
+)
+
+const (
+	MetaValueTypeNumber = "number"
+	MetaValueTypeTime   = "time"
+	PreprocessSymbol    = "replace_symbols"
+	PreprocessLink      = "delete_links"
 )
 
 // GetDocList 查询知识库文件列表
@@ -105,6 +113,19 @@ func SelectDocByDocIdList(ctx context.Context, docIdList []string, userId, orgId
 	return docList, nil
 }
 
+func buildKnowledgeDocMeta(doc *model.KnowledgeDoc, importTask *model.KnowledgeImportTask, meta *model.KnowledgeDocMeta) (*model.KnowledgeDocMeta, error) {
+	return &model.KnowledgeDocMeta{
+		MetaId:    generator.GetGenerator().NewID(),
+		DocId:     doc.DocId,
+		Key:       meta.Key,
+		Value:     meta.Value,
+		ValueType: meta.ValueType,
+		Rule:      meta.Rule,
+		UserId:    importTask.UserId,
+		OrgId:     importTask.OrgId,
+	}, nil
+}
+
 // CreateKnowledgeDoc 创建知识库文件
 func CreateKnowledgeDoc(ctx context.Context, doc *model.KnowledgeDoc, importTask *model.KnowledgeImportTask) error {
 	knowledge, err := SelectKnowledgeById(ctx, doc.KnowledgeId, doc.UserId, doc.OrgId)
@@ -124,12 +145,26 @@ func CreateKnowledgeDoc(ctx context.Context, doc *model.KnowledgeDoc, importTask
 
 		return err
 	}
+	var preProcess = &model.DocPreProcess{}
+	if len(importTask.DocPreProcess) > 0 {
+		err = json.Unmarshal([]byte(importTask.DocPreProcess), preProcess)
+		if err != nil {
+			log.Errorf("DocPreprocess process error %s", err.Error())
+			return err
+		}
+		preProcess.PreProcessList = normalizeList(preProcess.PreProcessList)
+	}
+
 	_, objectName, _ := service.SplitFilePath(doc.FilePath)
 	return db.GetHandle(ctx).Transaction(func(tx *gorm.DB) error {
-		//1.逻辑删除数据
-		err := createKnowledgeDoc(tx, doc)
+		//1.插入数据
+		err = createKnowledgeDoc(tx, doc)
 		if err != nil {
 			return err
+		}
+		ragMetaList, err := buildAndCreateMetaData(tx, importTask, doc)
+		if err != nil {
+			log.Errorf("buildAndCreateMetaData error %s", err.Error())
 		}
 		//非初始话状态的不需要rag 导入，因为有可能直接失败了
 		if doc.Status != model.DocInit {
@@ -137,21 +172,100 @@ func CreateKnowledgeDoc(ctx context.Context, doc *model.KnowledgeDoc, importTask
 		}
 		//2.rag文档导入
 		return service.RagImportDoc(ctx, &service.RagImportDocParams{
-			DocId:         doc.DocId,
-			KnowledgeName: knowledge.Name,
-			CategoryId:    knowledge.KnowledgeId,
-			UserId:        doc.UserId,
-			Overlap:       config.Overlap,
-			SegmentSize:   config.MaxSplitter,
-			SegmentType:   service.RebuildSegmentType(config.SegmentType),
-			Separators:    config.Splitter,
-			ParserChoices: analyzer.AnalyzerList,
-			ObjectName:    objectName,
-			OriginalName:  doc.Name,
-			IsEnhanced:    "false",
-			OcrModelId:    importTask.OcrModelId,
+			DocId:             doc.DocId,
+			KnowledgeName:     knowledge.Name,
+			CategoryId:        knowledge.KnowledgeId,
+			UserId:            doc.UserId,
+			Overlap:           config.Overlap,
+			SegmentSize:       config.MaxSplitter,
+			SegmentType:       service.RebuildSegmentType(config.SegmentType),
+			Separators:        config.Splitter,
+			ParserChoices:     analyzer.AnalyzerList,
+			ObjectName:        objectName,
+			OriginalName:      doc.Name,
+			IsEnhanced:        "false",
+			OcrModelId:        importTask.OcrModelId,
+			PreProcess:        preProcess.PreProcessList,
+			RagMetaDataParams: ragMetaList,
 		})
 	})
+}
+
+func normalizeList(list []string) []string {
+	for i, item := range list {
+		switch item {
+		case "deleteLinks":
+			list[i] = PreprocessLink
+		case "replaceSymbols":
+			list[i] = PreprocessSymbol
+		}
+	}
+	return list
+}
+
+func buildAndCreateMetaData(tx *gorm.DB, importTask *model.KnowledgeImportTask, doc *model.KnowledgeDoc) ([]*service.RagMetaDataParams, error) {
+	// 从importTask反序列化meta
+	if len(importTask.MetaData) == 0 {
+		return nil, nil
+	}
+	var importMetaData = model.DocImportMetaData{}
+	err := json.Unmarshal([]byte(importTask.MetaData), &importMetaData)
+	if err != nil {
+		log.Errorf("Unmarshal fail %v", err)
+		return nil, err
+	}
+	var metaList []*model.KnowledgeDocMeta
+	var ragMetaList []*service.RagMetaDataParams
+	for _, importMeta := range importMetaData.DocMetaDataList {
+		// 构造meta数据库结构
+		meta, err := buildKnowledgeDocMeta(doc, importTask, importMeta)
+		if err != nil {
+			return nil, err
+		}
+		metaList = append(metaList, meta)
+		// 构造rag参数
+		ragValue, err := convertMetaValue(meta)
+		if err != nil {
+			return nil, err
+		}
+		ragMetaList = append(ragMetaList, &service.RagMetaDataParams{
+			MetaId:    meta.MetaId,
+			Key:       meta.Key,
+			Value:     ragValue,
+			ValueType: meta.ValueType,
+			Rule:      meta.Rule,
+		})
+	}
+	// 批量插入meta数据库
+	err = createBatchKnowledgeDocMeta(tx, metaList)
+	if err != nil {
+		return nil, err
+	}
+	return ragMetaList, nil
+}
+
+func convertMetaValue(meta *model.KnowledgeDocMeta) (interface{}, error) {
+	if len(meta.Value) == 0 {
+		return nil, nil
+	}
+	// 根据类型转换value
+	if meta.ValueType == MetaValueTypeNumber {
+		ragValue, err := strconv.Atoi(meta.Value)
+		if err != nil {
+			log.Errorf("convertMetaValue fail %v", err)
+			return nil, err
+		}
+		return ragValue, nil
+	}
+	if meta.ValueType == MetaValueTypeTime {
+		parseInt, err := strconv.ParseInt(meta.Value, 10, 64)
+		if err != nil {
+			log.Errorf("convertMetaValue fail %v", err)
+			return nil, err
+		}
+		return parseInt, nil
+	}
+	return meta.Value, nil
 }
 
 // CreateKnowledgeUrlDoc 创建知识库url文件
@@ -170,14 +284,23 @@ func CreateKnowledgeUrlDoc(ctx context.Context, doc *model.KnowledgeDoc, importT
 	err = json.Unmarshal([]byte(importTask.DocAnalyzer), analyzer)
 	if err != nil {
 		log.Errorf("DocAnalyzer process error %s", err.Error())
-
+		return err
+	}
+	var preProcess = &model.DocPreProcess{}
+	err = json.Unmarshal([]byte(importTask.DocPreProcess), preProcess)
+	if err != nil {
+		log.Errorf("DocPreprocess process error %s", err.Error())
 		return err
 	}
 	return db.GetHandle(ctx).Transaction(func(tx *gorm.DB) error {
 		//1.逻辑删除数据
-		err := createKnowledgeDoc(tx, doc)
+		err = createKnowledgeDoc(tx, doc)
 		if err != nil {
 			return err
+		}
+		ragMetaList, err := buildAndCreateMetaData(tx, importTask, doc)
+		if err != nil {
+			log.Errorf("buildAndCreateMetaData error %s", err.Error())
 		}
 		//非初始话状态的不需要rag 导入，因为有可能直接失败了
 		if doc.Status != model.DocInit {
@@ -194,6 +317,9 @@ func CreateKnowledgeUrlDoc(ctx context.Context, doc *model.KnowledgeDoc, importT
 			SegmentType:       service.RebuildSegmentType(config.SegmentType),
 			Separators:        config.Splitter,
 			KnowledgeBaseName: knowledge.Name,
+			OcrModelId:        importTask.OcrModelId,
+			PreProcess:        preProcess.PreProcessList,
+			RagMetaDataParams: ragMetaList,
 		})
 		if err != nil {
 			return err
@@ -201,18 +327,21 @@ func CreateKnowledgeUrlDoc(ctx context.Context, doc *model.KnowledgeDoc, importT
 		//3.rag 文档开始导入操作
 		var fileName = service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
 		return service.RagImportDoc(ctx, &service.RagImportDocParams{
-			DocId:         doc.DocId,
-			KnowledgeName: knowledge.Name,
-			CategoryId:    knowledge.KnowledgeId,
-			UserId:        doc.UserId,
-			Overlap:       config.Overlap,
-			SegmentSize:   config.MaxSplitter,
-			SegmentType:   service.RebuildSegmentType(config.SegmentType),
-			Separators:    config.Splitter,
-			ParserChoices: analyzer.AnalyzerList,
-			ObjectName:    fileName,
-			OriginalName:  fileName,
-			IsEnhanced:    "false",
+			DocId:             doc.DocId,
+			KnowledgeName:     knowledge.Name,
+			CategoryId:        knowledge.KnowledgeId,
+			UserId:            doc.UserId,
+			Overlap:           config.Overlap,
+			SegmentSize:       config.MaxSplitter,
+			SegmentType:       service.RebuildSegmentType(config.SegmentType),
+			Separators:        config.Splitter,
+			ParserChoices:     analyzer.AnalyzerList,
+			ObjectName:        fileName,
+			OriginalName:      fileName,
+			IsEnhanced:        "false",
+			OcrModelId:        importTask.OcrModelId,
+			PreProcess:        preProcess.PreProcessList,
+			RagMetaDataParams: ragMetaList,
 		})
 	})
 }
@@ -229,15 +358,9 @@ func UpdateDocStatusDocId(ctx context.Context, docId string, status int, metaLis
 		if err != nil {
 			return err
 		}
-		//创建文档元数据
+		//更新文档元数据
 		if len(metaList) > 0 {
-			//删除所有知识库标签
-			err = tx.Unscoped().Model(&model.KnowledgeDocMeta{}).Where("doc_id = ?", docId).Delete(&model.KnowledgeDocMeta{}).Error
-			if err != nil {
-				return err
-			}
-			//插入数据
-			err = tx.Model(&model.KnowledgeDocMeta{}).CreateInBatches(metaList, len(metaList)).Error
+			err := UpdateDocStatusMetaData(ctx, metaList)
 			if err != nil {
 				return err
 			}

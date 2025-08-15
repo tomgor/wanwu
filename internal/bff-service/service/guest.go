@@ -66,7 +66,7 @@ func GetLogoCustomInfo(ctx *gin.Context, mode string) (response.LogoCustomInfo, 
 			},
 			About: response.CustomAbout{
 				LogoPath:  mode.About.LogoPath,
-				Version:   mode.About.Version,
+				Version:   cfg.Version,
 				Copyright: gin_util.I18nKey(ctx, mode.About.Copyright),
 			},
 			LinkList: config.Cfg().DocCenter.GetDocs(),

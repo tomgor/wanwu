@@ -121,6 +121,12 @@
               >
                 {{$t('common.button.cancelPublish')}}
               </el-dropdown-item>
+               <!-- <el-dropdown-item
+                command="publishSet"
+                v-if="n.appType === 'agent'"
+              >
+                发布配置
+              </el-dropdown-item> -->
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -353,6 +359,10 @@ export default {
           break;
         case "cancelPublish":
           this.cancelPublish(row);
+          break;
+        case "publishSet":
+          //发布设置
+          this.$router.push({path:`/agent/publishSet/${row.appId}`})
           break;
       }
     },

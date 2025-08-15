@@ -83,6 +83,9 @@ doc-swag:
 	# callback
 	swag fmt  -g callback.go -d internal/bff-service/server/http/handler/callback
 	swag init -g callback.go -d internal/bff-service/server/http/handler/callback -o docs/callback --pd
+	# openurl
+	swag fmt  -g openurl.go -d internal/bff-service/server/http/handler/openurl
+	swag init -g openurl.go -d internal/bff-service/server/http/handler/openurl -o docs/openurl --pd
 
 docker-image-backend:
 	docker build -f Dockerfile.backend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/backend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-${WANWU_ARCH} .

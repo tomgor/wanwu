@@ -55,18 +55,9 @@ func WithExcludeUserID(userID string) SQLOption {
 	})
 }
 
-func WithID(Id string) SQLOption {
+func WithSuffix(suffix string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
-		if Id != "" {
-			return db.Where("id = ?", Id)
-		}
-		return db
-	})
-}
-
-func WithIDs(Ids []string) SQLOption {
-	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
-		return db.Where("id IN (?)", Ids)
+		return db.Where("suffix = ?", suffix)
 	})
 }
 
@@ -85,6 +76,18 @@ func WithAppType(appType string) SQLOption {
 			return db.Where("app_type = ?", appType)
 		}
 		return db
+	})
+}
+
+func WithID(id uint32) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("id = ?", id)
+	})
+}
+
+func WithIDs(Ids []string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("id IN (?)", Ids)
 	})
 }
 
@@ -175,12 +178,9 @@ func WithSearchType(userID, searchType string) SQLOption {
 	})
 }
 
-func WithTableID(tableID string) SQLOption {
+func WithTableID(tableID uint32) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
-		if tableID != "" {
-			return db.Where("table_id = ?", tableID)
-		}
-		return db
+		return db.Where("table_id = ?", tableID)
 	})
 }
 

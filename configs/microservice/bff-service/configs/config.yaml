@@ -6,6 +6,7 @@ server:
   web_base_url: http://localhost:8081
   api_base_url: http://localhost:6668
   callback_url: http://172.17.0.1:6668
+  app_open_base_url: http://172.17.0.1:6668
 
 log:
   std: true
@@ -74,9 +75,9 @@ custom-info:
         logo_path: "/v1/static/logo/tab_logo.png"
       about:
         logo_path: "/v1/static/logo/about_logo.png"
-        version: v0.1.0
         copyright: bff_custom_about_copyright
     - mode: dark
+  version: v0.1.0
 
 doc-center:
   frontend_prefix: /aibase/docCenter/pages
@@ -166,8 +167,8 @@ workflow:
 agent:
   host: agent-wanwu
   upload_minio:
-      port: 15001
-      uri: /upload
+    port: 15001
+    uri: /upload
 
 operate:
   host: operate-service:9797

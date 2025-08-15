@@ -167,5 +167,8 @@ func SplitFilePath(filePath string) (bucketName string, objectName string, fileN
 }
 
 func buildObjectName(dir, fileName string) string {
+	if len(dir) == 0 {
+		return fileName
+	}
 	return dir + "/" + fileName
 }
