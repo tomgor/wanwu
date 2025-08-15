@@ -235,6 +235,7 @@ export default {
       return formattedString;
     },
     formatTimestamp(timestamp) {
+      if (timestamp === '') return '';
       const date = new Date(Number(timestamp));
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
