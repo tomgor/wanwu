@@ -10,13 +10,14 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
+	"github.com/UnicomAI/wanwu/pkg/constant"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
 	"github.com/gin-gonic/gin"
 )
 
-func ListWorkFlow(ctx *gin.Context, userId, orgId, name string) (*response.WorkFlowResultResp, error) {
-	workflowService := config.Cfg().WorkFlow
+func ListAgentScopeWorkFlow(ctx *gin.Context, userId, orgId, name string) (*response.AgentScopeWorkFlowPageResult, error) {
+	workflowService := config.Cfg().AgentScopeWorkFlow
 	url, _ := net_url.JoinPath(workflowService.Endpoint, workflowService.WorkFlowListUri)
 	result, err := http_client.Workflow().Get(ctx.Request.Context(), &http_client.HttpRequestParams{
 		Url: url,
@@ -35,7 +36,7 @@ func ListWorkFlow(ctx *gin.Context, userId, orgId, name string) (*response.WorkF
 	if err != nil {
 		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_apps_list", err.Error())
 	}
-	var resp = &response.WorkFlowListResp{}
+	var resp = &response.AgentScopeWorkFlowListResp{}
 	if err = json.Unmarshal(result, resp); err != nil {
 		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_apps_list", err.Error())
 	}
@@ -45,10 +46,10 @@ func ListWorkFlow(ctx *gin.Context, userId, orgId, name string) (*response.WorkF
 	return resp.Data, nil
 }
 
-func DeleteWorkFlow(ctx *gin.Context, userId, orgId, id string) error {
-	workflowService := config.Cfg().WorkFlow
+func DeleteAgentScopeWorkFlow(ctx *gin.Context, userId, orgId, id string) error {
+	workflowService := config.Cfg().AgentScopeWorkFlow
 	url, _ := net_url.JoinPath(workflowService.Endpoint, workflowService.DeleteWorkFlowUri)
-	params := &request.DeleteWorkFlowRequest{
+	params := &request.DeleteAgentScopeWorkFlowRequest{
 		AppId: id,
 	}
 	body, err := json.Marshal(params)
@@ -71,7 +72,7 @@ func DeleteWorkFlow(ctx *gin.Context, userId, orgId, id string) error {
 	if err != nil {
 		return grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_app_delete", err.Error())
 	}
-	var resp = &response.DeleteWorkFlowResp{}
+	var resp = &response.AgentScopeDeleteWorkFlowResp{}
 	if err = json.Unmarshal(result, resp); err != nil {
 		return grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_app_delete", err.Error())
 	}
@@ -81,10 +82,10 @@ func DeleteWorkFlow(ctx *gin.Context, userId, orgId, id string) error {
 	return nil
 }
 
-func PublishWorkFlow(ctx *gin.Context, userId, orgId, workflowID string) error {
-	workflowService := config.Cfg().WorkFlow
+func PublishAgentScopeWorkFlow(ctx *gin.Context, userId, orgId, workflowID string) error {
+	workflowService := config.Cfg().AgentScopeWorkFlow
 	url, _ := net_url.JoinPath(workflowService.Endpoint, workflowService.PublishWorkFlowUri)
-	params := &request.PublishWorkFlowRequest{
+	params := &request.PublishAgentScopeWorkFlowRequest{
 		AppId: workflowID,
 	}
 	body, err := json.Marshal(params)
@@ -121,8 +122,8 @@ func PublishWorkFlow(ctx *gin.Context, userId, orgId, workflowID string) error {
 	return nil
 }
 
-func ListWorkFlowInternal(ctx *gin.Context) (*response.WorkFlowResultResp, error) {
-	workflowService := config.Cfg().WorkFlow
+func ListAgentScopeWorkFlowInternal(ctx *gin.Context) (*response.AgentScopeWorkFlowPageResult, error) {
+	workflowService := config.Cfg().AgentScopeWorkFlow
 	url, _ := net_url.JoinPath(workflowService.Endpoint, workflowService.WorkFlowListUriInternal)
 	result, err := http_client.Workflow().Get(ctx.Request.Context(), &http_client.HttpRequestParams{
 		Url: url,
@@ -136,7 +137,7 @@ func ListWorkFlowInternal(ctx *gin.Context) (*response.WorkFlowResultResp, error
 	if err != nil {
 		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_apps_list_internal", err.Error())
 	}
-	var resp = &response.WorkFlowListResp{}
+	var resp = &response.AgentScopeWorkFlowListResp{}
 	if err = json.Unmarshal(result, resp); err != nil {
 		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_apps_list_internal", err.Error())
 	}
@@ -146,10 +147,10 @@ func ListWorkFlowInternal(ctx *gin.Context) (*response.WorkFlowResultResp, error
 	return resp.Data, nil
 }
 
-func UnPublishWorkFlow(ctx *gin.Context, userId, orgId, workflowID string) error {
-	workflowService := config.Cfg().WorkFlow
+func UnPublishAgentScopeWorkFlow(ctx *gin.Context, userId, orgId, workflowID string) error {
+	workflowService := config.Cfg().AgentScopeWorkFlow
 	url, _ := net_url.JoinPath(workflowService.Endpoint, workflowService.UnPublishWorkFlowUri)
-	params := &request.UnPublishWorkFlowRequest{
+	params := &request.UnPublishAgentScopeWorkFlowRequest{
 		AppId: workflowID,
 	}
 	body, err := json.Marshal(params)
@@ -185,4 +186,18 @@ func UnPublishWorkFlow(ctx *gin.Context, userId, orgId, workflowID string) error
 		return grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_apps_unpublish", errors.New(resp.Message).Error())
 	}
 	return nil
+}
+
+// --- internal ---
+
+func agentscopeWorkflowInfo2Model(workflowInfo response.AgentScopeWorkFlowInfo) response.AppBriefInfo {
+	return response.AppBriefInfo{
+		AppId:   workflowInfo.Id,
+		AppType: constant.AppTypeWorkflow,
+		//Avatar:    CacheAvatar(ctx, workflowInfo.AvatarPath),
+		Name:      workflowInfo.ConfigName,
+		Desc:      workflowInfo.ConfigDesc,
+		CreatedAt: workflowInfo.UpdatedTime,
+		UpdatedAt: workflowInfo.UpdatedTime,
+	}
 }

@@ -2373,11 +2373,6 @@ definitions:
     type: object
   response.DocSegmentResp:
     properties:
-      MetaDataList:
-        description: 文档元数据
-        items:
-          $ref: '#/definitions/response.MetaData'
-        type: array
       contentList:
         description: 内容
         items:
@@ -2389,6 +2384,11 @@ definitions:
       maxSegmentSize:
         description: 设置最大长度
         type: integer
+      metaDataList:
+        description: 文档元数据
+        items:
+          $ref: '#/definitions/response.MetaData'
+        type: array
       pageTotal:
         description: 总页数
         type: integer

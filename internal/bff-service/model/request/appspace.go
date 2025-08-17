@@ -45,27 +45,3 @@ func (req GetApiBaseUrlRequest) Check() error {
 func (o *GetAppSpaceAppListRequest) Check() error {
 	return nil
 }
-
-type DeleteWorkFlowRequest struct {
-	AppId string `form:"workflowID" json:"workflowID" validate:"required"` // 应用ID
-}
-
-func (o *DeleteWorkFlowRequest) Check() error {
-	return nil
-}
-
-type PublishWorkFlowRequest struct {
-	AppId string `form:"workflowID" json:"workflowID" validate:"required"` // 应用ID
-}
-
-func (p *PublishWorkFlowRequest) Check() error {
-	return nil
-}
-
-type UnPublishWorkFlowRequest struct {
-	AppId string `form:"workflowID" json:"workflowID" validate:"required"` // 应用ID
-}
-
-func (p *UnPublishWorkFlowRequest) Check() error {
-	return nil
-}

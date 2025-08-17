@@ -36,7 +36,7 @@ func DeleteAppSpaceApp(ctx *gin.Context, userId, orgId, appId, appType string) e
 			AssistantId: appId,
 		})
 	case constant.AppTypeWorkflow:
-		err = DeleteWorkFlow(ctx, userId, orgId, appId)
+		err = DeleteAgentScopeWorkFlow(ctx, userId, orgId, appId)
 	}
 	return err
 }
@@ -74,12 +74,12 @@ func GetAppSpaceAppList(ctx *gin.Context, userId, orgId, name, appType string) (
 		}
 	}
 	if appType == "" || appType == constant.AppTypeWorkflow {
-		resp, err := ListWorkFlow(ctx, userId, orgId, name)
+		resp, err := ListAgentScopeWorkFlow(ctx, userId, orgId, name)
 		if err != nil {
 			return nil, err
 		}
 		for _, workflowInfo := range resp.List {
-			ret = append(ret, workflowInfo2Model(workflowInfo))
+			ret = append(ret, agentscopeWorkflowInfo2Model(workflowInfo))
 		}
 	}
 	var appIds []string
@@ -111,9 +111,9 @@ func GetAppSpaceAppList(ctx *gin.Context, userId, orgId, name, appType string) (
 }
 
 func PublishApp(ctx *gin.Context, userId, orgId string, req request.PublishAppRequest) error {
-	// 特殊处理工作流的发布
+	// 特殊处理AgentScope工作流的发布
 	if req.AppType == constant.AppTypeWorkflow {
-		if err := PublishWorkFlow(ctx, userId, orgId, req.AppId); err != nil {
+		if err := PublishAgentScopeWorkFlow(ctx, userId, orgId, req.AppId); err != nil {
 			return err
 		}
 	}
@@ -149,8 +149,9 @@ func UnPublishApp(ctx *gin.Context, userId, orgId string, req request.UnPublishA
 	if err != nil {
 		return err
 	}
+	// 特殊处理AgentScope工作流的取消发布
 	if req.AppType == constant.AppTypeWorkflow {
-		err = UnPublishWorkFlow(ctx, userId, orgId, req.AppId)
+		err = UnPublishAgentScopeWorkFlow(ctx, userId, orgId, req.AppId)
 		if err != nil {
 			return err
 		}
