@@ -301,7 +301,7 @@ func ProxyUploadFile(ctx *gin.Context, r *request.ProxyUploadFileReq) (*response
 		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_file_upload_save", err.Error())
 	}
 	agentConfig := config.Cfg().Agent
-	url := "http://" + agentConfig.Endpoint + ":" + agentConfig.UploadMinioUri.Port + agentConfig.UploadMinioUri.Uri
+	url := "http://" + agentConfig.Host + ":" + agentConfig.UploadMinioUri.Port + agentConfig.UploadMinioUri.Uri
 	result, err := http_client.ProxyMinio().PostFile(ctx, &http_client.HttpRequestParams{
 		Params: map[string]string{"file_name": r.FileName},
 		FileParams: []*http_client.HttpRequestFileParams{&http_client.HttpRequestFileParams{

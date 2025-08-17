@@ -10170,13 +10170,6 @@ const docTemplate = `{
         "response.DocSegmentResp": {
             "type": "object",
             "properties": {
-                "MetaDataList": {
-                    "description": "文档元数据",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.MetaData"
-                    }
-                },
                 "contentList": {
                     "description": "内容",
                     "type": "array",
@@ -10191,6 +10184,13 @@ const docTemplate = `{
                 "maxSegmentSize": {
                     "description": "设置最大长度",
                     "type": "integer"
+                },
+                "metaDataList": {
+                    "description": "文档元数据",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.MetaData"
+                    }
                 },
                 "pageTotal": {
                     "description": "总页数",

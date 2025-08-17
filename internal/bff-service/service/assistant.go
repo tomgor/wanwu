@@ -2,7 +2,9 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
 	"sort"
+	"strconv"
 
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	knowledgeBase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
@@ -10,9 +12,11 @@ import (
 	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
+	"github.com/UnicomAI/wanwu/pkg/constant"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func AssistantCreate(ctx *gin.Context, userId, orgId string, req request.AppBriefConfig) (*response.AssistantCreateResp, error) {
@@ -98,14 +102,14 @@ func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.Assist
 	}
 	//查询该用户有权限的所有工作流
 	accessedWorkFlowList, err := GetExplorationAppList(ctx, userId, request.GetExplorationAppListRequest{
-		AppType:    "workflow",
+		AppType:    constant.AppTypeWorkflow,
 		SearchType: "all",
 	})
 	if err != nil {
 		return response.Assistant{}, err
 	}
 	// 查询该用户所有权限的所有 MCP
-	accessedMCPList, err := GetUserMCPList(ctx, req.AssistantId, userId, orgId)
+	accessedMCPList, err := AssistantMCPList(ctx, req.AssistantId, userId, orgId)
 	if err != nil {
 		return response.Assistant{}, err
 	}
@@ -201,6 +205,49 @@ func AssistantMCPEnableSwitch(ctx *gin.Context, userId, orgId string, req reques
 		return nil, err
 	}
 	return nil, nil
+}
+
+func AssistantMCPList(ctx *gin.Context, assistantId, userId, orgId string) ([]*response.MCPInfos, error) {
+	// 获取该用户的所有 MCP 列表
+	resp, err := assistant.AssistantMCPGetList(ctx.Request.Context(), &assistant_service.AssistantMCPGetListReq{
+		AssistantId: assistantId,
+		Identity: &assistant_service.Identity{
+			UserId: userId,
+			OrgId:  orgId,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// 获取MCP 详情
+	valid := true
+	var retMCPInfos []*response.MCPInfos
+	for _, m := range resp.AssistantMCPInfos {
+		mcpInfo, err := GetMCP(ctx, m.McpId)
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				valid = false
+			} else {
+				return nil, err
+			}
+		}
+
+		// 组装为 MCPInfos
+		retMCPInfos = append(retMCPInfos, &response.MCPInfos{
+			Id:            strconv.Itoa(int(m.Id)),
+			MCPId:         m.McpId,
+			MCPSquareId:   mcpInfo.MCPSquareID,
+			Enable:        m.Enable,
+			MCPName:       mcpInfo.MCPInfo.Name,
+			MCPDesc:       mcpInfo.MCPInfo.Desc,
+			MCPServerFrom: mcpInfo.MCPInfo.From,
+			MCPServerUrl:  mcpInfo.MCPInfo.SSEURL,
+			Valid:         valid,
+		})
+	}
+
+	return retMCPInfos, nil
 }
 
 func AssistantActionCreate(ctx *gin.Context, userId, orgId string, req request.ActionAddRequest) (response.ActionAddResponse, error) {
