@@ -3,8 +3,6 @@ package service
 import (
 	"fmt"
 
-	"github.com/UnicomAI/wanwu/pkg/constant"
-
 	"github.com/UnicomAI/wanwu/api/proto/common"
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -14,8 +12,6 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 )
-
-const PublishedStatus = "published"
 
 // --- app breif ---
 
@@ -79,16 +75,4 @@ func appModelConfigModel2Proto(appModel request.AppModelConfig) (*common.AppMode
 		ModelType: appModel.ModelType,
 		Config:    configStr,
 	}, nil
-}
-
-func workflowInfo2Model(workflowInfo response.WorkFlowInfo) response.AppBriefInfo {
-	return response.AppBriefInfo{
-		AppId:   workflowInfo.Id,
-		AppType: constant.AppTypeWorkflow,
-		//Avatar:    CacheAvatar(ctx, workflowInfo.AvatarPath),
-		Name:      workflowInfo.ConfigName,
-		Desc:      workflowInfo.ConfigDesc,
-		CreatedAt: workflowInfo.UpdatedTime,
-		UpdatedAt: workflowInfo.UpdatedTime,
-	}
 }

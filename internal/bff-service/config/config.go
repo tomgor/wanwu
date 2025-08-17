@@ -25,16 +25,17 @@ type Config struct {
 	// middleware
 	Minio minio.Config `json:"minio" mapstructure:"minio"`
 	// microservice
-	Iam       ServiceConfig         `json:"iam" mapstructure:"iam"`
-	Model     ModelConfig           `json:"model" mapstructure:"model"`
-	MCP       ServiceConfig         `json:"mcp" mapstructure:"mcp"`
-	App       ServiceConfig         `json:"app" mapstructure:"app"`
-	Knowledge ServiceConfig         `json:"knowledge" mapstructure:"knowledge"`
-	Rag       ServiceConfig         `json:"rag" mapstructure:"rag"`
-	Assistant ServiceConfig         `json:"assistant" mapstructure:"assistant"`
-	WorkFlow  WorkFlowServiceConfig `json:"workflow" mapstructure:"workflow"`
-	Agent     AgentServiceConfig    `json:"agent" mapstructure:"agent"`
-	Operate   ServiceConfig         `json:"operate" mapstructure:"operate"`
+	Iam       ServiceConfig      `json:"iam" mapstructure:"iam"`
+	Model     ModelConfig        `json:"model" mapstructure:"model"`
+	MCP       ServiceConfig      `json:"mcp" mapstructure:"mcp"`
+	App       ServiceConfig      `json:"app" mapstructure:"app"`
+	Knowledge ServiceConfig      `json:"knowledge" mapstructure:"knowledge"`
+	Rag       ServiceConfig      `json:"rag" mapstructure:"rag"`
+	Assistant ServiceConfig      `json:"assistant" mapstructure:"assistant"`
+	Operate   ServiceConfig      `json:"operate" mapstructure:"operate"`
+	Agent     AgentServiceConfig `json:"agent" mapstructure:"agent"`
+
+	AgentScopeWorkFlow AgentScopeWorkFlowServiceConfig `json:"agentscope-workflow" mapstructure:"agentscope-workflow"`
 }
 
 type ServerConfig struct {
@@ -72,8 +73,8 @@ type ServiceConfig struct {
 	Host string `json:"host" mapstructure:"host"`
 }
 
-type WorkFlowServiceConfig struct {
-	Endpoint                string `json:"host" mapstructure:"host"`
+type AgentScopeWorkFlowServiceConfig struct {
+	Endpoint                string `json:"endpoint" mapstructure:"endpoint"`
 	WorkFlowListUri         string `json:"workflow_list_uri" mapstructure:"workflow_list_uri"`
 	WorkFlowListUriInternal string `json:"workflow_list_uri_internal" mapstructure:"workflow_list_uri_internal"`
 	DeleteWorkFlowUri       string `json:"delete_workflow_uri" mapstructure:"delete_workflow_uri"`
@@ -82,7 +83,7 @@ type WorkFlowServiceConfig struct {
 }
 
 type AgentServiceConfig struct {
-	Endpoint       string    `json:"host" mapstructure:"host"`
+	Host           string    `json:"host" mapstructure:"host"`
 	UploadMinioUri UriConfig `json:"upload_minio" mapstructure:"upload_minio"`
 }
 
