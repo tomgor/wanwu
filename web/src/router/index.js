@@ -163,7 +163,7 @@ const constantRoutes = [
                 meta:{perm: [PERMS.SAFRTY]},
             },
             {
-                path:'/agent/publishSet/:id',
+                path:'/agent/publishSet',
                 component:resolve =>require(['@/views/agent/web-URL'],resolve),
                 meta:{perm: [PERMS.AGENT]},
             },

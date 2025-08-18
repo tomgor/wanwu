@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>
+    <div class="header">
       <div class="header-api">
         <el-tag
           effect="plain"
@@ -46,11 +46,19 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- apikey -->
+    <ApiKeyDialog
+      ref="apiKeyDialog"
+      :appId="appId"
+      :appType="'agent'"
+    />
   </div>
 </template>
 <script>
+import ApiKeyDialog from "../components/ApiKeyDialog";
 import { createApiKey, delApiKey, getApiKeyList } from "@/api/appspace";
 export default {
+  components:{ApiKeyDialog},
   props: {
     appType: {
       type: String,
@@ -72,7 +80,7 @@ export default {
   },
   methods: {
     openApiDialog(){
-
+      this.$refs.apiKeyDialog.showDialog();
     },
     handleCopy(row) {
       let text = row.apiKey;
@@ -129,3 +137,32 @@ export default {
   },
 };
 </script>
+<style lang="scss" scoped>
+  .header{
+    width:100%;
+    display:flex;
+    justify-content:flex-start;
+    align-items:flex-start;
+    height:60px;
+    .header-api {
+      padding: 6px 10px;
+      box-shadow: 1px 2px 2px #ddd;
+      background-color: #fff;
+      border-radius: 6px;
+      width:20%;
+      .root-url {
+        background-color: #eceefe;
+        color: #384bf7;
+        border: none;
+      }
+    }
+    .apikeyBtn{
+      margin-left:10px;
+      border:1px solid #384bf7;
+      padding:12px;
+      display:flex;
+      align-items:center;
+    }
+  }
+
+</style>
