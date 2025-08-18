@@ -171,12 +171,15 @@ export default {
         }
         return;
       }
-      let res = await createWorkFlow(this.form);
+      let res = await createWorkFlow({
+        name: this.form.configName,
+        desc: this.form.configDesc
+      });
       if (res.code === 0) {
         this.$message.success(this.$t('list.createSuccess'));
         this.dialogVisible = false;
-        let { workflowID } = res.data;
-        let querys = { id:workflowID };
+        let { workflow_id } = res.data;
+        let querys = { id: workflow_id };
         if(this.form.isStream){
           querys.isStream = true
         }

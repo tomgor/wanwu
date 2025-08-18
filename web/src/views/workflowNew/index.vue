@@ -8,13 +8,15 @@
 
 export default {
   data(){
+    const query = `?workflow_id=${this.$route.query.id}&space_id=${this.$store.state.user.userInfo.orgId}`
     return{
       workflowUrl: process.env.NODE_ENV === 'development'
-        ? 'http://192.168.35.247:8081/work_flow?workflow_id=7537585355608817664&space_id=7535746948309975040'
-        : window.location.origin + this.$basePath + '/work_flow?workflow_id=7535747020951126016&space_id=7535746948309975040'
+        ? `http://192.168.35.247:8081/workflow${query}`
+        : window.location.origin + this.$basePath + `/workflow/${query}`
     }
   },
   mounted() {
+    console.log(this.workflowUrl, '------------------------------workflowUrl')
     window.addEventListener("message", (e) => {
       console.log('message=========>',e.data);
     });

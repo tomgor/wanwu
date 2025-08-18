@@ -73,7 +73,7 @@ export const getExplorationFlowList = (params)=>{
 };
 export const createWorkFlow = (data)=>{
     return request({
-        url: '/workflow/api/workflow/create',
+        url: '/user/api/v1/appspace/workflow', //'/workflow/api/workflow/create',
         method: 'post',
         data
     })
