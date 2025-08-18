@@ -860,7 +860,57 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/response.CozeWorkflowCreateData"
+                                            "$ref": "#/definitions/response.CozeWorkflowIDData"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/appspace/workflow/copy": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workflow"
+                ],
+                "summary": "拷贝Workflow",
+                "parameters": [
+                    {
+                        "description": "创建Workflow的请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WorkflowIDReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CozeWorkflowIDData"
                                         }
                                     }
                                 }
@@ -9508,6 +9558,17 @@ const docTemplate = `{
                 }
             }
         },
+        "request.WorkflowIDReq": {
+            "type": "object",
+            "required": [
+                "workflow_id"
+            ],
+            "properties": {
+                "workflow_id": {
+                    "type": "string"
+                }
+            }
+        },
         "response.Action": {
             "type": "object",
             "properties": {
@@ -10035,7 +10096,7 @@ const docTemplate = `{
                 }
             }
         },
-        "response.CozeWorkflowCreateData": {
+        "response.CozeWorkflowIDData": {
             "type": "object",
             "properties": {
                 "workflow_id": {

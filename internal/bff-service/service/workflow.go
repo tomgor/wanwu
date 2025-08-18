@@ -40,9 +40,9 @@ func ListWorkflow(ctx *gin.Context, userID, orgID, name string) (*response.CozeW
 	return ret.Data, nil
 }
 
-func CreateWorkflow(ctx *gin.Context, userID, orgID, name, desc string) (*response.CozeWorkflowCreateData, error) {
+func CreateWorkflow(ctx *gin.Context, userID, orgID, name, desc string) (*response.CozeWorkflowIDData, error) {
 	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.CreateUri)
-	ret := &response.CozeWorkflowCreateResp{}
+	ret := &response.CozeWorkflowIDResp{}
 	if resp, err := resty.New().
 		R().
 		SetContext(ctx).
@@ -62,6 +62,30 @@ func CreateWorkflow(ctx *gin.Context, userID, orgID, name, desc string) (*respon
 		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_app_create", fmt.Sprintf("[%v] %v", resp.StatusCode(), resp.String()))
 	} else if ret.Code != 0 {
 		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_app_create", fmt.Sprintf("code %v msg %v", ret.Code, ret.Msg))
+	}
+	return ret.Data, nil
+}
+
+func CopyWorkflow(ctx *gin.Context, userID, orgID, workflowID string) (*response.CozeWorkflowIDData, error) {
+	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.CopyUri)
+	ret := &response.CozeWorkflowIDResp{}
+	if resp, err := resty.New().
+		R().
+		SetContext(ctx).
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Accept", "application/json").
+		SetHeaders(workflowHttpReqHeader(ctx, userID, orgID)).
+		SetQueryParams(map[string]string{
+			"space_id":    orgID,
+			"workflow_id": workflowID,
+		}).
+		SetResult(ret).
+		Post(url); err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_app_copy", err.Error())
+	} else if resp.StatusCode() >= 300 {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_app_copy", fmt.Sprintf("[%v] %v", resp.StatusCode(), resp.String()))
+	} else if ret.Code != 0 {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_app_copy", fmt.Sprintf("code %v msg %v", ret.Code, ret.Msg))
 	}
 	return ret.Data, nil
 }

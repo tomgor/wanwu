@@ -18,13 +18,13 @@ type CozeWorkflowListDataWorkflow struct {
 	UpdateTime int64  `json:"update_time"`
 }
 
-type CozeWorkflowCreateResp struct {
-	Code int                     `json:"code"`
-	Msg  string                  `json:"msg"`
-	Data *CozeWorkflowCreateData `json:"data,omitempty"`
+type CozeWorkflowIDResp struct {
+	Code int                 `json:"code"`
+	Msg  string              `json:"msg"`
+	Data *CozeWorkflowIDData `json:"data,omitempty"`
 }
 
-type CozeWorkflowCreateData struct {
+type CozeWorkflowIDData struct {
 	WorkflowID string `json:"workflow_id"`
 }
 

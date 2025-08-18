@@ -16,7 +16,7 @@ import (
 //	@Accept		json
 //	@Produce	json
 //	@Param		data	body		request.AppBriefConfig	true	"创建Workflow的请求参数"
-//	@Success	200		{object}	response.Response{data=response.CozeWorkflowCreateData}
+//	@Success	200		{object}	response.Response{data=response.CozeWorkflowIDData}
 //	@Router		/appspace/workflow [post]
 func CreateWorkflow(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)
@@ -25,5 +25,26 @@ func CreateWorkflow(ctx *gin.Context) {
 		return
 	}
 	resp, err := service.CreateWorkflow(ctx, userId, orgId, req.Name, req.Desc)
+	gin_util.Response(ctx, resp, err)
+}
+
+// CopyWorkflow
+//
+//	@Tags		workflow
+//	@Summary	拷贝Workflow
+//	@Description
+//	@Security	JWT
+//	@Accept		json
+//	@Produce	json
+//	@Param		data	body		request.WorkflowIDReq	true	"创建Workflow的请求参数"
+//	@Success	200		{object}	response.Response{data=response.CozeWorkflowIDData}
+//	@Router		/appspace/workflow/copy [post]
+func CopyWorkflow(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.WorkflowIDReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	resp, err := service.CopyWorkflow(ctx, userId, orgId, req.WorkflowID)
 	gin_util.Response(ctx, resp, err)
 }

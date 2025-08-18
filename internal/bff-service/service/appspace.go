@@ -126,11 +126,11 @@ func GetAppSpaceAppList(ctx *gin.Context, userId, orgId, name, appType string) (
 
 func PublishApp(ctx *gin.Context, userId, orgId string, req request.PublishAppRequest) error {
 	// 特殊处理AgentScope工作流的发布
-	if req.AppType == constant.AppTypeWorkflow {
-		if err := PublishAgentScopeWorkFlow(ctx, userId, orgId, req.AppId); err != nil {
-			return err
-		}
-	}
+	// if req.AppType == constant.AppTypeWorkflow {
+	// 	if err := PublishAgentScopeWorkFlow(ctx, userId, orgId, req.AppId); err != nil {
+	// 		return err
+	// 	}
+	// }
 	_, err := app.PublishApp(ctx.Request.Context(), &app_service.PublishAppReq{
 		AppId:       req.AppId,
 		AppType:     req.AppType,
@@ -164,11 +164,11 @@ func UnPublishApp(ctx *gin.Context, userId, orgId string, req request.UnPublishA
 		return err
 	}
 	// 特殊处理AgentScope工作流的取消发布
-	if req.AppType == constant.AppTypeWorkflow {
-		err = UnPublishAgentScopeWorkFlow(ctx, userId, orgId, req.AppId)
-		if err != nil {
-			return err
-		}
-	}
+	// if req.AppType == constant.AppTypeWorkflow {
+	// 	err = UnPublishAgentScopeWorkFlow(ctx, userId, orgId, req.AppId)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
 	return nil
 }
