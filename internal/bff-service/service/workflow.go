@@ -53,6 +53,7 @@ func CreateWorkflow(ctx *gin.Context, userID, orgID, name, desc string) (*respon
 			"space_id": orgID,
 			"name":     name,
 			"desc":     desc,
+			"icon_uri": "default_icon/default_workflow_icon.png",
 		}).
 		SetResult(ret).
 		Post(url); err != nil {
