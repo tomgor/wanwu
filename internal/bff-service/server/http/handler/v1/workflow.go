@@ -1,0 +1,29 @@
+package v1
+
+import (
+	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
+	"github.com/UnicomAI/wanwu/internal/bff-service/service"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
+	"github.com/gin-gonic/gin"
+)
+
+// CreateWorkflow
+//
+//	@Tags		workflow
+//	@Summary	创建Workflow
+//	@Description
+//	@Security	JWT
+//	@Accept		json
+//	@Produce	json
+//	@Param		data	body		request.AppBriefConfig	true	"创建Workflow的请求参数"
+//	@Success	200		{object}	response.Response{data=response.CozeWorkflowCreateData}
+//	@Router		/appspace/workflow [post]
+func CreateWorkflow(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.AppBriefConfig
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	resp, err := service.CreateWorkflow(ctx, userId, orgId, req.Name, req.Desc)
+	gin_util.Response(ctx, resp, err)
+}

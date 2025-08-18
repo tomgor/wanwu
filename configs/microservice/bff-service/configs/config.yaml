@@ -165,6 +165,13 @@ agent:
     port: 15001
     uri: /upload
 
+workflow:
+  endpoint: http://workflow-wanwu:8999
+  list_uri: /api/workflow_api/workflow_list
+  create_uri: /api/workflow_api/create
+  delete_uri: /api/workflow_api/delete
+  copy_uri: /api/workflow_api/copy
+
 agentscope-workflow:
   endpoint: http://agentscope-wanwu:6672
   workflow_list_uri: "/workflow/list"

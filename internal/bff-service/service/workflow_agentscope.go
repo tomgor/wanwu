@@ -10,7 +10,6 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
-	"github.com/UnicomAI/wanwu/pkg/constant"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
 	"github.com/gin-gonic/gin"
@@ -190,14 +189,14 @@ func UnPublishAgentScopeWorkFlow(ctx *gin.Context, userId, orgId, workflowID str
 
 // --- internal ---
 
-func agentscopeWorkflowInfo2Model(workflowInfo response.AgentScopeWorkFlowInfo) response.AppBriefInfo {
-	return response.AppBriefInfo{
-		AppId:   workflowInfo.Id,
-		AppType: constant.AppTypeWorkflow,
-		//Avatar:    CacheAvatar(ctx, workflowInfo.AvatarPath),
-		Name:      workflowInfo.ConfigName,
-		Desc:      workflowInfo.ConfigDesc,
-		CreatedAt: workflowInfo.UpdatedTime,
-		UpdatedAt: workflowInfo.UpdatedTime,
-	}
-}
+// func agentscopeWorkflowInfo2Model(workflowInfo response.AgentScopeWorkFlowInfo) response.AppBriefInfo {
+// 	return response.AppBriefInfo{
+// 		AppId:   workflowInfo.Id,
+// 		AppType: constant.AppTypeWorkflow,
+// 		//Avatar:    CacheAvatar(ctx, workflowInfo.AvatarPath),
+// 		Name:      workflowInfo.ConfigName,
+// 		Desc:      workflowInfo.ConfigDesc,
+// 		CreatedAt: workflowInfo.UpdatedTime,
+// 		UpdatedAt: workflowInfo.UpdatedTime,
+// 	}
+// }
