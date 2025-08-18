@@ -1,10 +1,10 @@
 <template>
     <div>
         <div>
-            <el-button type="primary" icon="el-icon-plus">创建</el-button>
+            <el-button type="primary" icon="el-icon-plus" size="mini">创建</el-button>
             <el-table
                 :data="tableData"
-                style="width: 100%"
+                style="width: 100%;margin-top:15px;"
                 :header-cell-style="{ background: '#F9F9F9', color: '#999999' }"
               >
                 <el-table-column

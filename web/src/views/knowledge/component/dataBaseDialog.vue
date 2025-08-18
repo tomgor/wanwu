@@ -16,12 +16,24 @@
         style="width: 100%;margin-top: 20px">
           <el-table-column
               prop="key"
-              label="Key"
               align="center">
+            <!-- 自定义表头（label + tooltip） -->
+            <template #header>
+              <div style="display: inline-flex; align-items: center;">
+                <span>Key</span>
+                <el-tooltip
+                    effect="dark"
+                    content="只能包含小写字母、数字和下划线，并且必须以小写字母开头"
+                    placement="top-start"
+                >
+                  <i class="el-icon-question" style="margin-left: 5px; cursor: pointer;"></i>
+                </el-tooltip>
+              </div>
+            </template>
             <template #default="{ row }">
               <el-input
                   v-model="row.key"
-                  placeholder="只能包含小写字母、数字和下划线，并且必须以小写字母开头"
+                  @input="row.key = row.key.replace(/[^a-z0-9_]/g, '').replace(/^[^a-z]*/, '')"
                   clearable
                   :disabled="!row.editable || !row.created"
               />
@@ -34,9 +46,8 @@
             <template #default="{ row }">
               <el-select
                   v-model="row.dataType"
-                  placeholder="请选择"
                   clearable
-                  :disabled="!row.editable"
+                  :disabled="!row.editable || !row.created"
               >
                 <el-option value="string" label="String"></el-option>
                 <el-option value="number" label="Number"></el-option>
@@ -47,13 +58,37 @@
           <el-table-column
               prop="value"
               label="Value"
-              align="center">
+              align="center"
+              min-width="90">
             <template #default="{ row }">
               <el-input
+                  v-if="row.dataType === 'string'"
                   v-model="row.value"
                   @blur="handleBlur(row)"
                   clearable
                   :disabled="!row.editable"
+                  placeholder="请输入内容"
+              />
+              <el-input
+                  v-if="row.dataType === 'number'"
+                  v-model="row.value"
+                  @blur="handleBlur(row)"
+                  clearable
+                  :disabled="!row.editable"
+                  type="number"
+                  placeholder="请输入数字"
+              />
+              <el-date-picker
+                  v-if="row.dataType === 'time'"
+                  v-model="row.value"
+                  @blur="handleBlur(row)"
+                  clearable
+                  :disabled="!row.editable"
+                  align="right"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="timestamp"
+                  type="datetime"
+                  placeholder="请选择日期时间"
               />
             </template>
           </el-table-column>
@@ -79,6 +114,7 @@
       <el-button
         type="primary"
         @click="submitDialog"
+        :disabled="rule"
       >确 定</el-button>
     </span>
   </el-dialog>
@@ -89,6 +125,9 @@ export default {
   computed: {
     filteredTableData() {
       return this.tableData.filter(item => item.option !== "delete");
+    },
+    rule() {
+      return this.tableData.some(item => !item.value || !item.key)
     }
   },
   data() {
@@ -103,9 +142,10 @@ export default {
       this.tableData.forEach(i => {
         delete i.editable
         delete i.created
+        i.value = i.value.toString()
       });
       const data = {
-        MetaDataList:this.tableData,
+        metaDataList:this.tableData,
         docId:this.docId
       }
       updateDocMeta(data).then(res =>{
@@ -120,8 +160,8 @@ export default {
     addItem(){
       this.tableData.push({
         key: '',
-        dataType: '',
-        value: [],
+        dataType: 'string',
+        value: '',
         option: 'add',
         editable: true,
         created: true,
@@ -131,7 +171,7 @@ export default {
         n.editable = !n.editable;
     },
     handleBlur(n){
-        n.editable = false;
+      if (n.key && n.dataType && n.value) n.editable = false;
     },
     delItem(index){
       index.option = "delete";

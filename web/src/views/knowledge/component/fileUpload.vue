@@ -82,7 +82,7 @@
               label="分段标识:"
               prop="docSegment.splitter"
               :rules="ruleForm.docSegment.segmentType === '1' 
-              ? [{ validator: validateSplitter, message: $t('knowledgeManage.markTips'), trigger: 'blur' }] 
+              ? [{ required: true,validator: validateSplitter, message: $t('knowledgeManage.markTips'), trigger: 'blur' }] 
               : []"
             >
             <el-tag
@@ -127,10 +127,11 @@
               <div class="elSliderItem">
                 <el-slider
                   :min="0"
-                  :max="0.25"
+                  :max="1"
                   :step="0.01"
                   style="width:70%;margin-left:15px;"
                   v-model="ruleForm.docSegment.overlap"
+                  @change="overlapChange"
                   show-input
                 >
                 </el-slider>
@@ -176,60 +177,7 @@
               label="元数据管理："
               prop="docAnalyzer"
             >
-            <el-button icon="el-icon-plus" type="primary" size="mini" @click="createMetaData">创建</el-button>
-            <div class="docMetaData">
-              <div v-for="(item,index) in ruleForm.docMetaData" class="docItem">
-                <div class="docItem_data">
-                  <span class="docItem_data_label">
-                    <span>Key:</span>
-                    <el-tooltip class="item" effect="dark" content="只能包含小写字母、数字和下划线，并且必须以小写字母开头" placement="top-start">
-                      <span class="el-icon-question question"></span>
-                    </el-tooltip>
-                  </span>
-                  <el-input v-model="item.metaKey" @blur="metakeyBlur(item)"></el-input>
-                </div>
-                <el-divider direction="vertical"></el-divider>
-                <div class="docItem_data">
-                  <span class="docItem_data_label">type:</span>
-                  <el-select v-model="item.metaValueType" placeholder="请选择" @change="typeChange(item)">
-                    <el-option
-                      v-for="item in typeOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>
-                </div>
-                <el-divider direction="vertical"></el-divider>
-                <div class="docItem_data">
-                  <span class="docItem_data_label">value:</span>
-                  <el-select v-model="item.metadataType" placeholder="请选择" style="margin-right:5px;" @change="typeChange(item)">
-                    <el-option
-                      v-for="item in valueOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                    </el-option>
-                  </el-select>
-                  <el-input v-model="item.metaValue" v-if="item.metadataType ==='value' && item.metaValueType === 'string'" @blur="metaValueBlur(item)" placeholder="string"></el-input>
-                  <el-input v-model="item.metaValue" v-if="item.metadataType ==='value'  && item.metaValueType === 'number'" @blur="metaValueBlur(item)" type="number" placeholder="number"></el-input>
-                  <el-input v-model="item.metaRule" v-if="item.metadataType ==='regExp'" @blur="metaRuleBlur(item)" placeholder="regExp"></el-input>
-                  <el-date-picker
-                    v-if="item.metaValueType === 'time' && item.metadataType==='value'"
-                    v-model="item.metaValue"
-                    align="right"
-                    format="yyyy-MM-dd HH:mm"
-                    type="datetime"
-                    placeholder="选择日期时间"
-                  >
-                  </el-date-picker>
-                </div>
-                <el-divider direction="vertical"></el-divider>
-                <div class="docItem_data docItem_data_btn">
-                  <span class="el-icon-delete setBtn"  @click="delMataItem(index)"></span>
-                </div>
-              </div>
-            </div>
+            <mataData ref="mataData" @updateMeata="updateMeata"/>
             </el-form-item>
           </el-form>
         </div>
@@ -282,7 +230,7 @@
         </div>
       </div>
     </div>
-    <splitterDialog ref="splitterDialog" :title="titleText" :placeholderText="placeholderText" :dataList="splitOptions" @editItem="editItem" @createItem="createItem" @delItem="delSplitterItem" @relodData="relodData" @checkData="checkData" />
+    <splitterDialog ref="splitterDialog" :title="titleText" :placeholderText="placeholderText" :dataList="splitOptions" @editItem="editItem" @createItem="createItem" @delItem="delSplitterItem" @relodData="relodData" @checkData="checkData" :selectData="checkSplitter"/>
   </div>
 </template>
 <script>
@@ -292,43 +240,20 @@ import {docImport,ocrSelectList,delSplitter,getSplitter,createSplitter,editSplit
 import { delfile } from "@/api/chunkFile";
 import LinkIcon from "@/components/linkIcon.vue";
 import splitterDialog from './splitterDialog.vue';
+import mataData from './metadata.vue'
 export default {
-  components:{LinkIcon, urlAnalysis,splitterDialog},
+  components:{LinkIcon, urlAnalysis,splitterDialog,mataData},
   mixins: [uploadChunk],
   data() {
     const validateSplitter = (rule, value, callback) => {
       if (this.checkSplitter.length === 0) {
-        callback(new Error(this.$t('knowledgeManage.splitterRequired'))); // 请至少选择一个分段标识
+        callback(new Error(this.$t('knowledgeManage.splitterRequired')));
       } else {
         callback();
       }
     };
     return {
       validateSplitter:validateSplitter,
-      typeOptions:[
-        {
-          label:'String',
-          value:"string"
-        },
-        {
-          label:'Number',
-          value:"number"
-        },
-        {
-          label:'Time',
-          value:"time"
-        },
-      ],
-      valueOptions:[
-        {
-          value:'value',
-          name:'确认值'
-        },
-        {
-          value:'regExp',
-          name:'正则表达式'
-        }
-      ],
       placeholderText:'搜索分隔符',
       titleText:'创建分隔符',
       splitterValue:'',
@@ -345,10 +270,10 @@ export default {
       ruleForm:{
         docAnalyzer:['text'],
         docMetaData:[],//元数据管理数据
-        docPreprocess:[],//'deleteLinks','replaceSymbols'
+        docPreprocess:['replaceSymbols'],//'deleteLinks','replaceSymbols'
         docSegment:{
           segmentType:'0',
-          splitter:[],//"！","。","？","?","!",".","......"
+          splitter:["！","。","？","?","!",".","......"],
           maxSplitter:200,
           overlap:0.2,
         },
@@ -362,66 +287,29 @@ export default {
       urlLoading:false
     };
   },
-  created(){
+  async  created(){
     this.getOcrList()
-    this.getSplitterList('')
+    await this.getSplitterList('')
+    await this.custom()
   },
   methods:{
-  typeChange(item){
-    item.metaValue = '';
-    item.metaRule = '';
-  },
-  metakeyBlur(item){
-    const regex = /^[a-z][a-z0-9_]*$/;
-    if(!item.metaKey){
-      this.$message.warning('请输入key值');
-      return
-    }
-    if(!regex.test(item.metaKey)){
-      this.$message.warning('请输入符合标准的key值');
-      item.metaKey = '';
-      return
-    }
-  },
-  metaValueBlur(item){
-    if(!item.metaValue){
-      this.$message.warning('请输入value值');
-      return
-    }
-  },
-  metaRuleBlur(item){
-    if(!item.metaRule){
-      this.$message.warning('请输入正则值');
-      return
-    }
-    if(!this.isValidRegex(item.metaRule)){
-      this.$message.warning('请输入合法正则值');
-      item.metaRule = '';
-      return
-    }
-  },
-  isValidRegex(str){
-    try {
-      new RegExp(str);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  },
-  delMataItem(i){
-    this.ruleForm.docMetaData.splice(i,1)
-  },
-  createMetaData(){
-    if(this.ruleForm.docMetaData.length > 0 && !this.validateMetaData()){
+  overlapChange(val){
+    if (val > 0.25) {
+      this.ruleForm.docSegment.overlap = 0.25;
       return;
     }
-    this.ruleForm.docMetaData.push({
-       metaKey:'',
-       metaRule:'',
-       metaValue:'',
-       metaValueType:'string',
-       metadataType:'value'
-    })
+  },
+  custom(){
+    const splitter = this.ruleForm.docSegment.splitter
+    this.checkSplitter = this.splitOptions.filter(item => {
+      return (
+        splitter.includes(item.splitterValue) && 
+        item.type === 'preset'
+      );
+    });
+  },
+  updateMeata(data){
+    this.ruleForm.docMetaData = data
   },
   validateMetaData(){
     const hasEmptyField = this.ruleForm.docMetaData.some(item => {
@@ -443,16 +331,15 @@ export default {
   relodData(name){
     this.getSplitterList(name)
   },
-  getSplitterList(splitterName){
-    getSplitter({splitterName}).then(res =>{
-      if(res.code === 0){
-        this.splitOptions = (res.data.knowledgeSplitterList || []).map((item) => ({
-          ...item,
-          showDel: false,
-          showIpt: false
-        }))
-      }
-    })
+  async getSplitterList(splitterName){
+    const res = await getSplitter({splitterName});
+    if(res.code === 0){
+      this.splitOptions = (res.data.knowledgeSplitterList || []).map((item) => ({
+        ...item,
+        showDel: false,
+        showIpt: false
+      }))
+    }
   },
   editItem(item){
     editSplitter({splitterId:item.splitterId,splitterName:item.splitterName,splitterValue:item.splitterName}).then(res =>{
@@ -615,7 +502,11 @@ export default {
           return false;
       }
       this.$refs.ruleForm.clearValidate(['docSegment.splitter']);
-
+      
+      if(!this.validateMetaData()){
+        return;
+      }
+      
       this.ruleForm.docMetaData.forEach(item => {
         delete item.metadataType;
       });
@@ -983,47 +874,47 @@ export default {
   border-radius:6px;
   .el-form{
     padding:10px;
-    .docMetaData{
-      .docItem{
-        display:flex;
-        align-items:center;
-        border-radius:8px;
-        background:#f7f8fa;
-        margin-top:10px;
-        width: fit-content;
-        .docItem_data{
-          display:flex;
-          align-items:center;
-          margin-bottom:5px;
-          padding:0 10px;
-          .el-input,.el-select,.el-date-picker{
-            min-width:160px;
-          }
-          .docItem_data_label{
-            margin-right:5px;
-            display:flex;
-            align-items:center;
-            .question{
-              color: #aaadcc;
-              margin-left:2px;
-              cursor: pointer;
-            }
-          }
-          .setBtn{
-            font-size:16px;
-            cursor: pointer;
-            color: #384BF7;
-          }
-        }
-        .docItem_data_btn{
-          display:flex;
-          justify-content:center;
-          .el-icon-delete{
-            margin-left:5px;
-          }
-        }
-      }
-    }
+    // .docMetaData{
+    //   .docItem{
+    //     display:flex;
+    //     align-items:center;
+    //     border-radius:8px;
+    //     background:#f7f8fa;
+    //     margin-top:10px;
+    //     width: fit-content;
+    //     .docItem_data{
+    //       display:flex;
+    //       align-items:center;
+    //       margin-bottom:5px;
+    //       padding:0 10px;
+    //       .el-input,.el-select,.el-date-picker{
+    //         min-width:160px;
+    //       }
+    //       .docItem_data_label{
+    //         margin-right:5px;
+    //         display:flex;
+    //         align-items:center;
+    //         .question{
+    //           color: #aaadcc;
+    //           margin-left:2px;
+    //           cursor: pointer;
+    //         }
+    //       }
+    //       .setBtn{
+    //         font-size:16px;
+    //         cursor: pointer;
+    //         color: #384BF7;
+    //       }
+    //     }
+    //     .docItem_data_btn{
+    //       display:flex;
+    //       justify-content:center;
+    //       .el-icon-delete{
+    //         margin-left:5px;
+    //       }
+    //     }
+    //   }
+    // }
   }
 }
 .page-title{

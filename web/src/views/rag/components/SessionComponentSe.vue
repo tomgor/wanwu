@@ -67,7 +67,7 @@
                     <span @click="collapseClick(n,m,j)"><i :class="['',m.collapse?'el-icon-caret-bottom':'el-icon-caret-right']"></i>出处：</span>
                     <a v-if="m.link" :href="m.link" target="_blank">{{m.link}}</a>
                     <span v-if="m.title" style="margin-left: 10px" v-html="m.title"></span>
-                    <span @click="goPreview($event,m)" class="search-doc">查看全文</span>
+                    <!-- <span @click="goPreview($event,m)" class="search-doc">查看全文</span> -->
                   </div>
                   <el-collapse-transition>
                     <div v-show="m.collapse?true:false"  class="snippet">
@@ -170,18 +170,18 @@ export default {
           if(fileType.includes(ext)){
               switch(ext){
                 case 'docx'||'doc':
-                  openUrl = `${window.location.origin}/doc?fileUrl=` + fileUrl;
+                  openUrl = `${window.location.origin}/aibase/doc?fileUrl=` + fileUrl;
                   break;
                 case 'txt':
-                  openUrl = `${window.location.origin}/txtView?fileUrl=` + fileUrl;
+                  openUrl = `${window.location.origin}/aibase/txtView?fileUrl=` + fileUrl;
                   break;
                 case 'pdf':
                   if(page_num.length > 0){
-                    openUrl = `${window.location.origin}/pdfView?fileUrl=` + fileUrl + "&page=" + page_num[0]
+                    openUrl = `${window.location.origin}/aibase/pdfView?fileUrl=` + fileUrl + "&page=" + page_num[0]
                   }
                   break;
                 case 'xlsx':
-                  openUrl = `${window.location.origin}/jsExcel?url=` + fileUrl + "&rownum=" + row_num + "&sheetName=" + sheet_name
+                  openUrl = `${window.location.origin}/aibase/jsExcel?url=` + fileUrl + "&rownum=" + row_num + "&sheetName=" + sheet_name
                   break;
                 default:
                   this.$message.warning('暂不支持此格式查看')

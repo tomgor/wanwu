@@ -11,13 +11,14 @@
         class="weburl-content"
         >
         <template #aside>
-            <div v-for="item in toolList" class="toolList">
+            <div v-for="item in toolList" :class="['toolList',item.type === active ? 'activeItem':'' ]" @click="checkTool(item)">
                 <h3>{{item.name}}</h3>
                 <p>{{item.desc}}</p>
             </div>
         </template>
         <template #main-content>
-
+            <CreateApi ref="CreateApi" v-if="active === 'api'"/>
+            <CreateUrl ref="CreateUrl" v-else/>
         </template>
         </CommonLayout>
     </div>
@@ -30,6 +31,7 @@ export default {
     components: {CommonLayout,CreateApi,CreateUrl},
     data(){
         return{
+            active:'url',
             asideWidth:'320',
             toolList:[
                 {
@@ -44,10 +46,18 @@ export default {
                 }
             ]
         }
+    },
+    methods:{
+        checkTool(item){
+            this.active = item.type
+        }
     }
 }
 </script>
 <style lang="scss" scoped>
+    .activeItem{
+        border:1px solid #384BF7!important;
+    }
     .weburl-container{
         width:100%;
         height:100%;
