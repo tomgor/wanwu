@@ -235,6 +235,7 @@ export default {
       return formattedString;
     },
     formatTimestamp(timestamp) {
+      if (timestamp === '') return '';
       const date = new Date(Number(timestamp));
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -260,7 +261,7 @@ export default {
           this.res = res.data;
           this.page.total = this.res.segmentTotalNum;
           this.metaRuleList = res.data.metaDataList.filter(item => item.rule);
-          this.metaDataList = res.data.metaDataList.filter(item => !item.rule);
+          this.metaDataList = res.data.metaDataList;
         })
         .catch(() => {
           this.loading.itemStatus = false;
