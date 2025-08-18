@@ -2252,6 +2252,11 @@ definitions:
       title:
         type: string
     type: object
+  response.CozeWorkflowCreateData:
+    properties:
+      workflow_id:
+        type: string
+    type: object
   response.CreateKnowledgeResp:
     properties:
       knowledgeId:
@@ -3865,6 +3870,34 @@ paths:
       summary: 更新RAG配置信息
       tags:
       - rag
+  /appspace/workflow:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 创建Workflow的请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.AppBriefConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CozeWorkflowCreateData'
+              type: object
+      security:
+      - JWT: []
+      summary: 创建Workflow
+      tags:
+      - workflow
   /assistant:
     get:
       consumes:

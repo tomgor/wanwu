@@ -36,7 +36,11 @@ func DeleteAppSpaceApp(ctx *gin.Context, userId, orgId, appId, appType string) e
 			AssistantId: appId,
 		})
 	case constant.AppTypeWorkflow:
-		err = DeleteAgentScopeWorkFlow(ctx, userId, orgId, appId)
+		// AgentScope Workflow
+		// err = DeleteAgentScopeWorkFlow(ctx, userId, orgId, appId)
+
+		// Coze Workflow
+		err = DeleteWorkflow(ctx, userId, orgId, appId)
 	}
 	return err
 }
@@ -74,12 +78,22 @@ func GetAppSpaceAppList(ctx *gin.Context, userId, orgId, name, appType string) (
 		}
 	}
 	if appType == "" || appType == constant.AppTypeWorkflow {
-		resp, err := ListAgentScopeWorkFlow(ctx, userId, orgId, name)
+		// AgentScope Workflow
+		// resp, err := ListAgentScopeWorkFlow(ctx, userId, orgId, name)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// for _, workflowInfo := range resp.List {
+		// 	ret = append(ret, agentscopeWorkflowInfo2Model(workflowInfo))
+		// }
+
+		// Coze Workflow
+		resp, err := ListWorkflow(ctx, userId, orgId, name)
 		if err != nil {
 			return nil, err
 		}
-		for _, workflowInfo := range resp.List {
-			ret = append(ret, agentscopeWorkflowInfo2Model(workflowInfo))
+		for _, workflowInfo := range resp.Workflows {
+			ret = append(ret, cozeWorkflowInfo2Model(*workflowInfo))
 		}
 	}
 	var appIds []string
