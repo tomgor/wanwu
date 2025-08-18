@@ -39,6 +39,10 @@ const constantRoutes = [
         component:resolve =>require(['@/components/filePreview/JsPreviewExcel'],resolve),
     },
     {
+        path: '/webChat/:id',
+        component:resolve =>require(['@/views/agent'],resolve),
+    },
+    {
         path: '/portal',
         name: 'portal',
         component:resolve =>require(['@/views/layout'],resolve),

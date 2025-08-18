@@ -2,8 +2,10 @@
     <CommonLayout
     :aside-title="asideTitle" 
     :isButton="true"
+    :asideWidth="asideWidth"
     @handleBtnClick="handleBtnClick"
     :isBtnDisabled="sessionStatus === 0"
+    :class="[chatType==='webChat'?'chatBg':'']"
   >
     <template #aside-content>
       <div class="explore-aside-app">
@@ -45,7 +47,7 @@ import CommonLayout from '@/components/exploreContainer.vue'
 import Chat from './components/chat.vue'
  import {mapGetters} from 'vuex'
  import ApiKeyDialog from './components/ApiKeyDialog.vue'
- import { getAgentInfo } from "@/api/agent";
+ import { getAgentInfo,getOpenurlInfo,OpenurlConverList } from "@/api/agent";
  import {getApiKeyRoot} from "@/api/appspace";
 import sseMethod from '@/mixins/sseMethod'
 import { getConversationlist} from "@/api/agent";
@@ -54,6 +56,7 @@ export default {
     mixins: [sseMethod],
     data(){
         return {
+            asideWidth:'260px',
             apiURL:'',
             asideTitle:'新建对话',
             assistantId:'',
@@ -66,12 +69,27 @@ export default {
                 prologue:'',          
                 recommendQuestion:[]
             },
+            chatType:'agentChat',
+            apiStrategies:{
+                'agentChat_info':getAgentInfo,
+                'webChat_info':getOpenurlInfo,
+                'agentChat_converstionList':getConversationlist,
+                'webChat_converstionList':OpenurlConverList
+            },
+            uuid:'',
+            STORAGE_KEY :'chatUUID'
         }
     },
     computed: {
         ...mapGetters('app', ['sessionStatus'])
     },
     created(){
+        if(this.$route.path.includes('/webChat')){
+            this.chatType = 'webChat';
+            this.initUUID();
+        }else{
+            this.chatType = 'agentChat';
+        }
         if(this.$route.query.id){
             this.assistantId = this.$route.query.id
             this.editForm.assistantId = this.$route.query.id;
@@ -80,20 +98,65 @@ export default {
             this.apiKeyRootUrl()
         }
     },
+    mounted() {
+        if (!localStorage.getItem(this.STORAGE_KEY)) {
+            localStorage.setItem(this.STORAGE_KEY, 'active');
+        }
+        window.addEventListener('storage', this.handleStorageEvent);
+    },
+    beforeDestroy(){
+        window.removeEventListener('storage', this.handleStorageEvent);
+    },
     methods:{
+        initUUID(){
+            const storedUUID = localStorage.getItem('chatUUID');
+            this.uuid = storedUUID || this.$guid;
+            if (!storedUUID) {
+                localStorage.setItem('chatUUID', this.uuid);
+            }
+        },
+        handleStorageEvent(event) {
+            if (event.key === this.STORAGE_KEY && !event.newValue) {
+                this.clearUUID();
+            }
+        },
+      clearUUID(){
+        localStorage.removeItem('chatUUID');
+        this.uuid = this.$guid;
+        localStorage.setItem('chatUUID', this.uuid);
+      },
       reloadList(val){
         this.getList(val)
       },
-      getDetail(){
-            getAgentInfo({assistantId:this.editForm.assistantId}).then(res =>{
-                if(res.code === 0){
-                    this.editForm.avatar = res.data.avatar;
-                    this.editForm.name = res.data.name;
-                    this.editForm.desc = res.data.desc;
-                    this.editForm.prologue = res.data.prologue;
-                    this.editForm.recommendQuestion = res.data.recommendQuestion.map(item =>({value:item}));
+      async getDetail(){
+        let res = null;
+        if(this.chatType === 'agentChat'){
+            res = await getAgentInfo({assistantId:this.editForm.assistantId})
+        }else{
+             const config = {
+                Headers:{
+                  'X-Client-ID':this.uuid  
                 }
-            })
+            }
+            res = await getOpenurlInfo(this.assistantId,config)
+        }
+         if(res.code === 0){
+            this.editForm.avatar = res.data.avatar;
+            this.editForm.name = res.data.name;
+            this.editForm.desc = res.data.desc;
+            this.editForm.prologue = res.data.prologue;
+            this.editForm.recommendQuestion = res.data.recommendQuestion.map(item =>({value:item}));
+         }
+
+            // getAgentInfo({assistantId:this.editForm.assistantId}).then(res =>{
+            //     if(res.code === 0){
+            //         this.editForm.avatar = res.data.avatar;
+            //         this.editForm.name = res.data.name;
+            //         this.editForm.desc = res.data.desc;
+            //         this.editForm.prologue = res.data.prologue;
+            //         this.editForm.recommendQuestion = res.data.recommendQuestion.map(item =>({value:item}));
+            //     }
+            // })
         },
         getList(noInit){
             getConversationlist({assistantId:this.assistantId,pageNo:1,pageSize:1000}).then(res =>{
@@ -158,6 +221,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import '@/style/chat.scss';
+.chatBg{
+    background: linear-gradient(1deg, rgb(255, 255, 255) 42%, rgb(255, 255, 255) 42%, rgb(235, 237, 254) 98%, rgb(238, 240, 255) 98%);
+}
 .active{
     background-color: $color_opacity !important;
     .appTag{

@@ -34,7 +34,7 @@ export default {
             appId:'',
             appType:'',
             active:'url',
-            asideWidth:'320',
+            asideWidth:'260px',
             toolList:[
                 {
                     name:'Web URL',

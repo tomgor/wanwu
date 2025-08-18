@@ -225,7 +225,7 @@ export const openurlConversation = (data,suffix,config)=>{
         config
     })
 }
-//s删除智能体openurl创建智能体对话
+//删除智能体openurl创建智能体对话
 export const delOpenurlConversation = (data,suffix,config)=>{
     return service({
         url: `${BASE_URL}/agent/${suffix}/conversation`,

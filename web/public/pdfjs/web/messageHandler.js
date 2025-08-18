@@ -1,6 +1,5 @@
 
 window.addEventListener('message', (message) => {
-      console.log('pppppppppppppppppppppppppppppppp')
       const { data } = message;
       const { type, value } = data;
       switch (type) {

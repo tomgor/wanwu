@@ -740,14 +740,14 @@ export default {
         }
       });
     },
-    apiKeyRootUrl() {
-      const data = { appId: this.editForm.assistantId, appType: "agent" };
-      getApiKeyRoot(data).then((res) => {
-        if (res.code === 0) {
-          this.apiURL = res.data || "";
-        }
-      });
-    },
+    // apiKeyRootUrl() {
+    //   const data = { appId: this.editForm.assistantId, appType: "agent" };
+    //   getApiKeyRoot(data).then((res) => {
+    //     if (res.code === 0) {
+    //       this.apiURL = res.data || "";
+    //     }
+    //   });
+    // },
     // openApiDialog() {
     //   this.$refs.apiKeyDialog.showDialog();
     // },

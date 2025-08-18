@@ -46,19 +46,11 @@
         </template>
       </el-table-column>
     </el-table>
-    <!-- apikey -->
-    <ApiKeyDialog
-      ref="apiKeyDialog"
-      :appId="appId"
-      :appType="'agent'"
-    />
   </div>
 </template>
 <script>
-import ApiKeyDialog from "../components/ApiKeyDialog";
-import { createApiKey, delApiKey, getApiKeyList } from "@/api/appspace";
+import { getApiKeyRoot,createApiKey,delApiKey,getApiKeyList } from "@/api/appspace";
 export default {
-  components:{ApiKeyDialog},
   props: {
     appType: {
       type: String,
@@ -73,14 +65,27 @@ export default {
     return {
       apiURL: "",
       tableData: [],
+      dialogVisible:false
     };
   },
   created() {
     this.getTableData();
+    this.apiKeyRootUrl();
   },
   methods: {
+    handleClose(){
+      this.dialogVisible = false;
+    },
+    apiKeyRootUrl() {
+      const data = { appId: this.appId, appType:this.appType };
+      getApiKeyRoot(data).then((res) => {
+        if (res.code === 0) {
+          this.apiURL = res.data || "";
+        }
+      });
+    },
     openApiDialog(){
-      this.$refs.apiKeyDialog.showDialog();
+      this.handleCreate();
     },
     handleCopy(row) {
       let text = row.apiKey;
@@ -100,7 +105,7 @@ export default {
       const data = { appId: this.appId, appType: this.appType };
       createApiKey(data).then((res) => {
         if (res.code === 0) {
-          this.tableData.push(res.data);
+          this.getTableData()
         }
       });
     },
@@ -149,7 +154,7 @@ export default {
       box-shadow: 1px 2px 2px #ddd;
       background-color: #fff;
       border-radius: 6px;
-      width:20%;
+      width:450px;
       .root-url {
         background-color: #eceefe;
         color: #384bf7;
@@ -160,6 +165,7 @@ export default {
       margin-left:10px;
       border:1px solid #384bf7;
       padding:12px;
+      color: #384bf7;
       display:flex;
       align-items:center;
     }
