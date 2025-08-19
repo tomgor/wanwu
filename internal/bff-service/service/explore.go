@@ -33,7 +33,7 @@ func GetExplorationAppList(ctx *gin.Context, userId string, req request.GetExplo
 	if err != nil {
 		return nil, err
 	}
-	workFlows, err := explorerationFilterWorkFlow(ctx, explorationApp.Infos, req.Name)
+	workFlows, err := explorerationFilterAgentScopeWorkFlow(ctx, explorationApp.Infos, req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func explorerationFilterAgent(ctx *gin.Context, apps []*app_service.ExplorationA
 	return retAppList, nil
 }
 
-func explorerationFilterWorkFlow(ctx *gin.Context, apps []*app_service.ExplorationAppInfo, name string) ([]*response.ExplorationAppInfo, error) {
+func explorerationFilterAgentScopeWorkFlow(ctx *gin.Context, apps []*app_service.ExplorationAppInfo, name string) ([]*response.ExplorationAppInfo, error) {
 	// 获取工作流详情
 	workFlowList, err := ListAgentScopeWorkFlowInternal(ctx)
 	if err != nil {
