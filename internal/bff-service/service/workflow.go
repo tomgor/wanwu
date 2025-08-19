@@ -8,13 +8,15 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	"github.com/UnicomAI/wanwu/pkg/constant"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 )
 
-func ListWorkflow(ctx *gin.Context, userID, orgID, name string) (*response.CozeWorkflowListData, error) {
+// ListWorkflow userID/orgID数据隔离，用于【工作流】
+func ListWorkflow(ctx *gin.Context, orgID, name string) (*response.CozeWorkflowListData, error) {
 	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.ListUri)
 	ret := &response.CozeWorkflowListResp{}
 	if resp, err := resty.New().
@@ -22,7 +24,7 @@ func ListWorkflow(ctx *gin.Context, userID, orgID, name string) (*response.CozeW
 		SetContext(ctx).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").
-		SetHeaders(workflowHttpReqHeader(ctx, userID, orgID)).
+		SetHeaders(workflowHttpReqHeader(ctx)).
 		SetQueryParams(map[string]string{
 			"login_user_create": "true",
 			"space_id":          orgID,
@@ -41,7 +43,33 @@ func ListWorkflow(ctx *gin.Context, userID, orgID, name string) (*response.CozeW
 	return ret.Data, nil
 }
 
-func CreateWorkflow(ctx *gin.Context, userID, orgID, name, desc string) (*response.CozeWorkflowIDData, error) {
+// ListWorkflowByIDs 无userID或orgID隔离，用于【智能体选工作流】【应用广场】业务流程中
+func ListWorkflowByIDs(ctx *gin.Context, name string, workflowIDs []string) (*response.CozeWorkflowListData, error) {
+	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.ListUri)
+	ret := &response.CozeWorkflowListResp{}
+	if resp, err := resty.New().
+		R().
+		SetContext(ctx).
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Accept", "application/json").
+		SetHeaders(workflowHttpReqHeader(ctx)).
+		SetQueryParams(map[string]string{
+			"name": name,
+			"page": "1",
+			"size": "99999",
+		}).
+		SetResult(ret).
+		Post(url); err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_apps_list", err.Error())
+	} else if resp.StatusCode() >= 300 {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_apps_list", fmt.Sprintf("[%v] %v", resp.StatusCode(), resp.String()))
+	} else if ret.Code != 0 {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_apps_list", fmt.Sprintf("code %v msg %v", ret.Code, ret.Msg))
+	}
+	return ret.Data, nil
+}
+
+func CreateWorkflow(ctx *gin.Context, orgID, name, desc string) (*response.CozeWorkflowIDData, error) {
 	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.CreateUri)
 	ret := &response.CozeWorkflowIDResp{}
 	if resp, err := resty.New().
@@ -49,7 +77,7 @@ func CreateWorkflow(ctx *gin.Context, userID, orgID, name, desc string) (*respon
 		SetContext(ctx).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").
-		SetHeaders(workflowHttpReqHeader(ctx, userID, orgID)).
+		SetHeaders(workflowHttpReqHeader(ctx)).
 		SetQueryParams(map[string]string{
 			"space_id": orgID,
 			"name":     name,
@@ -67,7 +95,7 @@ func CreateWorkflow(ctx *gin.Context, userID, orgID, name, desc string) (*respon
 	return ret.Data, nil
 }
 
-func CopyWorkflow(ctx *gin.Context, userID, orgID, workflowID string) (*response.CozeWorkflowIDData, error) {
+func CopyWorkflow(ctx *gin.Context, orgID, workflowID string) (*response.CozeWorkflowIDData, error) {
 	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.CopyUri)
 	ret := &response.CozeWorkflowIDResp{}
 	if resp, err := resty.New().
@@ -75,7 +103,7 @@ func CopyWorkflow(ctx *gin.Context, userID, orgID, workflowID string) (*response
 		SetContext(ctx).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").
-		SetHeaders(workflowHttpReqHeader(ctx, userID, orgID)).
+		SetHeaders(workflowHttpReqHeader(ctx)).
 		SetQueryParams(map[string]string{
 			"space_id":    orgID,
 			"workflow_id": workflowID,
@@ -91,7 +119,7 @@ func CopyWorkflow(ctx *gin.Context, userID, orgID, workflowID string) (*response
 	return ret.Data, nil
 }
 
-func DeleteWorkflow(ctx *gin.Context, userID, orgID, workflowID string) error {
+func DeleteWorkflow(ctx *gin.Context, orgID, workflowID string) error {
 	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.DeleteUri)
 	ret := &response.CozeWorkflowDeleteResp{}
 	if resp, err := resty.New().
@@ -99,7 +127,7 @@ func DeleteWorkflow(ctx *gin.Context, userID, orgID, workflowID string) error {
 		SetContext(ctx).
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").
-		SetHeaders(workflowHttpReqHeader(ctx, userID, orgID)).
+		SetHeaders(workflowHttpReqHeader(ctx)).
 		SetQueryParams(map[string]string{
 			"workflow_id": workflowID,
 			"space_id":    orgID,
@@ -117,16 +145,16 @@ func DeleteWorkflow(ctx *gin.Context, userID, orgID, workflowID string) error {
 
 // --- internal ---
 
-func workflowHttpReqHeader(ctx *gin.Context, userID, orgID string) map[string]string {
+func workflowHttpReqHeader(ctx *gin.Context) map[string]string {
 	return map[string]string{
 		"Authorization": ctx.GetHeader("Authorization"),
+		"X-Org-Id":      ctx.GetHeader(gin_util.X_ORG_ID),
+		"X-User-Id":     ctx.GetString(gin_util.USER_ID),
 		"Content-Type":  "application/json",
-		"X-Org-Id":      orgID,
-		"X-User-Id":     userID,
 	}
 }
 
-func cozeWorkflowInfo2Model(workflowInfo response.CozeWorkflowListDataWorkflow) response.AppBriefInfo {
+func cozeWorkflowInfo2Model(workflowInfo *response.CozeWorkflowListDataWorkflow) response.AppBriefInfo {
 	return response.AppBriefInfo{
 		AppId:     workflowInfo.WorkflowId,
 		AppType:   constant.AppTypeWorkflow,

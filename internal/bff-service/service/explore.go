@@ -33,7 +33,10 @@ func GetExplorationAppList(ctx *gin.Context, userId string, req request.GetExplo
 	if err != nil {
 		return nil, err
 	}
-	workFlows, err := explorerationFilterAgentScopeWorkFlow(ctx, explorationApp.Infos, req.Name)
+	// AgentScope Workflow
+	// workFlows, err := explorerationFilterAgentScopeWorkFlow(ctx, explorationApp.Infos, req.Name)
+	// Coze Workflow
+	workFlows, err := explorerationFilterWorkFlow(ctx, explorationApp.Infos, req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -182,24 +185,38 @@ func explorerationFilterAgent(ctx *gin.Context, apps []*app_service.ExplorationA
 	return retAppList, nil
 }
 
-func explorerationFilterAgentScopeWorkFlow(ctx *gin.Context, apps []*app_service.ExplorationAppInfo, name string) ([]*response.ExplorationAppInfo, error) {
+func explorerationFilterWorkFlow(ctx *gin.Context, apps []*app_service.ExplorationAppInfo, name string) ([]*response.ExplorationAppInfo, error) {
+	// 首先收集所有agent类型的appId
+	var ids []string
+	for _, info := range apps {
+		if info.AppType == constant.AppTypeWorkflow {
+			ids = append(ids, info.AppId)
+		}
+	}
+	if len(ids) == 0 {
+		return nil, nil
+	}
 	// 获取工作流详情
-	workFlowList, err := ListAgentScopeWorkFlowInternal(ctx)
+	workFlowList, err := ListWorkflowByIDs(ctx, name, ids)
 	if err != nil {
 		return nil, err
 	}
 	var retAppList []*response.ExplorationAppInfo
-	for _, expApp := range apps {
-		for _, workFlow := range workFlowList.List {
-			if expApp.AppId == workFlow.Id {
+	for _, id := range ids {
+		var foundWorkflow *response.CozeWorkflowListDataWorkflow
+		for _, workflow := range workFlowList.Workflows {
+			if workflow.WorkflowId == id {
+				foundWorkflow = workflow
+				break
+			}
+		}
+		if foundWorkflow == nil {
+			continue
+		}
+		for _, expApp := range apps {
+			if expApp.AppId == id {
 				appInfo := &response.ExplorationAppInfo{
-					AppBriefInfo: response.AppBriefInfo{
-						AppId:   workFlow.Id,
-						AppType: constant.AppTypeWorkflow,
-						Avatar:  request.Avatar{},
-						Name:    workFlow.ConfigName,
-						Desc:    workFlow.ConfigDesc,
-					},
+					AppBriefInfo: cozeWorkflowInfo2Model(foundWorkflow),
 				}
 				appInfo.CreatedAt = util.Time2Str(expApp.CreatedAt)
 				appInfo.UpdatedAt = util.Time2Str(expApp.UpdatedAt)
@@ -209,17 +226,47 @@ func explorerationFilterAgentScopeWorkFlow(ctx *gin.Context, apps []*app_service
 				break
 			}
 		}
-
-	}
-	// 如果name不为空，过滤结果
-	if name != "" {
-		var filteredList []*response.ExplorationAppInfo
-		for _, ret := range retAppList {
-			if strings.Contains(strings.ToLower(ret.AppBriefInfo.Name), strings.ToLower(name)) {
-				filteredList = append(filteredList, ret)
-			}
-		}
-		return filteredList, nil
 	}
 	return retAppList, nil
 }
+
+// func explorerationFilterAgentScopeWorkFlow(ctx *gin.Context, apps []*app_service.ExplorationAppInfo, name string) ([]*response.ExplorationAppInfo, error) {
+// 	// 获取工作流详情
+// 	workFlowList, err := ListAgentScopeWorkFlowInternal(ctx)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	var retAppList []*response.ExplorationAppInfo
+// 	for _, expApp := range apps {
+// 		for _, workFlow := range workFlowList.List {
+// 			if expApp.AppId == workFlow.Id {
+// 				appInfo := &response.ExplorationAppInfo{
+// 					AppBriefInfo: response.AppBriefInfo{
+// 						AppId:   workFlow.Id,
+// 						AppType: constant.AppTypeWorkflow,
+// 						Avatar:  request.Avatar{},
+// 						Name:    workFlow.ConfigName,
+// 						Desc:    workFlow.ConfigDesc,
+// 					},
+// 				}
+// 				appInfo.CreatedAt = util.Time2Str(expApp.CreatedAt)
+// 				appInfo.UpdatedAt = util.Time2Str(expApp.UpdatedAt)
+// 				appInfo.PublishType = expApp.PublishType
+// 				appInfo.IsFavorite = expApp.IsFavorite
+// 				retAppList = append(retAppList, appInfo)
+// 				break
+// 			}
+// 		}
+// 	}
+// 	// 如果name不为空，过滤结果
+// 	if name != "" {
+// 		var filteredList []*response.ExplorationAppInfo
+// 		for _, ret := range retAppList {
+// 			if strings.Contains(strings.ToLower(ret.AppBriefInfo.Name), strings.ToLower(name)) {
+// 				filteredList = append(filteredList, ret)
+// 			}
+// 		}
+// 		return filteredList, nil
+// 	}
+// 	return retAppList, nil
+// }

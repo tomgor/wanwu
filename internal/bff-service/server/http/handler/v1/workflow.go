@@ -19,12 +19,11 @@ import (
 //	@Success	200		{object}	response.Response{data=response.CozeWorkflowIDData}
 //	@Router		/appspace/workflow [post]
 func CreateWorkflow(ctx *gin.Context) {
-	userId, orgId := getUserID(ctx), getOrgID(ctx)
 	var req request.AppBriefConfig
 	if !gin_util.Bind(ctx, &req) {
 		return
 	}
-	resp, err := service.CreateWorkflow(ctx, userId, orgId, req.Name, req.Desc)
+	resp, err := service.CreateWorkflow(ctx, getOrgID(ctx), req.Name, req.Desc)
 	gin_util.Response(ctx, resp, err)
 }
 
@@ -40,11 +39,10 @@ func CreateWorkflow(ctx *gin.Context) {
 //	@Success	200		{object}	response.Response{data=response.CozeWorkflowIDData}
 //	@Router		/appspace/workflow/copy [post]
 func CopyWorkflow(ctx *gin.Context) {
-	userId, orgId := getUserID(ctx), getOrgID(ctx)
 	var req request.WorkflowIDReq
 	if !gin_util.Bind(ctx, &req) {
 		return
 	}
-	resp, err := service.CopyWorkflow(ctx, userId, orgId, req.WorkflowID)
+	resp, err := service.CopyWorkflow(ctx, getOrgID(ctx), req.WorkflowID)
 	gin_util.Response(ctx, resp, err)
 }
