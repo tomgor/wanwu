@@ -102,7 +102,7 @@ export const publishWorkFlow = (data)=>{
 //复制
 export const copyWorkFlow = (data)=>{
     return request({
-        url: '/workflow/api/workflow/clone',
+        url: '/user/api/v1/appspace/workflow/copy', //'/workflow/api/workflow/clone',
         method: 'post',
         data
     })
