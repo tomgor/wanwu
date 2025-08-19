@@ -10,7 +10,7 @@
         <LinkIcon type="agent" />
       </div>
       <div class="header-right">
-        <div class="header-api">
+        <!-- <div class="header-api">
           <el-tag
             effect="plain"
             class="root-url"
@@ -24,8 +24,8 @@
         >
           <img :src="require('@/assets/imgs/apikey.png')" />
           API秘钥
-        </el-button>
-        <!-- <el-button
+        </el-button> -->
+        <el-button
           size="small"
           type="primary"
           style="padding:13px 12px;"
@@ -33,7 +33,7 @@
         >
          <span class="el-icon-setting"></span>
           发布配置
-        </el-button> -->
+        </el-button>
         <el-button
           size="small"
           type="primary"
@@ -349,11 +349,11 @@
       :modelform="editForm.modelConfig"
     />
     <!-- apikey -->
-    <ApiKeyDialog
+    <!-- <ApiKeyDialog
       ref="apiKeyDialog"
       :appId="editForm.assistantId"
       :appType="'agent'"
-    />
+    /> -->
     <!-- 选择工作类型 -->
     <ToolDiaglog
       ref="toolDiaglog"
@@ -386,7 +386,7 @@ import { getKnowledgeList } from "@/api/knowledge";
 import CreateIntelligent from "@/components/createApp/createIntelligent";
 import setSafety from "@/components/setSafety";
 import ModelSet from "./modelSetDialog";
-import ApiKeyDialog from "./ApiKeyDialog";
+// import ApiKeyDialog from "./ApiKeyDialog";
 import { selectModelList, getRerankList } from "@/api/modelAccess";
 import {
   getAgentInfo,
@@ -412,7 +412,7 @@ export default {
     CreateIntelligent,
     ModelSet,
     ActionConfig,
-    ApiKeyDialog,
+    // ApiKeyDialog,
     ToolDiaglog,
     LinkDialog,
     setSafety,
@@ -590,7 +590,7 @@ export default {
   },
   methods: {
     handlePublishSet(){
-      this.$router.push({path:`/agent/publishSet/id=${this.editForm.assistantId}`})
+      this.$router.push({path:`/agent/publishSet`,query:{appId:this.editForm.assistantId,appType:'agent'}})
     },
     setKnowledgeSet(data){
       this.editForm.knowledgeConfig = data;
@@ -740,17 +740,17 @@ export default {
         }
       });
     },
-    apiKeyRootUrl() {
-      const data = { appId: this.editForm.assistantId, appType: "agent" };
-      getApiKeyRoot(data).then((res) => {
-        if (res.code === 0) {
-          this.apiURL = res.data || "";
-        }
-      });
-    },
-    openApiDialog() {
-      this.$refs.apiKeyDialog.showDialog();
-    },
+    // apiKeyRootUrl() {
+    //   const data = { appId: this.editForm.assistantId, appType: "agent" };
+    //   getApiKeyRoot(data).then((res) => {
+    //     if (res.code === 0) {
+    //       this.apiURL = res.data || "";
+    //     }
+    //   });
+    // },
+    // openApiDialog() {
+    //   this.$refs.apiKeyDialog.showDialog();
+    // },
     setModelSet(data) {
       this.editForm.modelConfig = data;
     },
@@ -1090,18 +1090,18 @@ export default {
   .header-right {
     display: flex;
     align-items: center;
-    .header-api {
-      padding: 6px 10px;
-      box-shadow: 1px 2px 2px #ddd;
-      background-color: #fff;
-      margin: 0 10px;
-      border-radius: 6px;
-      .root-url {
-        background-color: #eceefe;
-        color: #384bf7;
-        border: none;
-      }
-    }
+    // .header-api {
+    //   padding: 6px 10px;
+    //   box-shadow: 1px 2px 2px #ddd;
+    //   background-color: #fff;
+    //   margin: 0 10px;
+    //   border-radius: 6px;
+    //   .root-url {
+    //     background-color: #eceefe;
+    //     color: #384bf7;
+    //     border: none;
+    //   }
+    // }
   }
 }
 .agent-from-content {

@@ -227,7 +227,7 @@ export default {
       const formattedString = data.map(item => {
         let value = item.value;
         // 如果是时间类型且值为时间戳，转换为日期字符串
-        if (item.dataType === 'time' && typeof value === 'number') {
+        if (item.dataType === 'time') {
           value = this.formatTimestamp(value);
         }
         return `${item.key}:${value}`;

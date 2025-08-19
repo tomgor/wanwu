@@ -166,3 +166,97 @@ export const enableMcp = (data)=>{
         data
     })
 }
+
+//编辑url
+export const editOpenurl = (data)=>{
+    return service({
+        url: `${BASE_URL}/appspace/app/openurl`,
+        method: 'put',
+        data
+    })
+}
+//创建url
+export const createOpenurl = (data)=>{
+    return service({
+        url: `${BASE_URL}/appspace/app/openurl`,
+        method: 'post',
+        data
+    })
+}
+//删除应用url
+export const delOpenurl = (data)=>{
+    return service({
+        url: `${BASE_URL}/appspace/app/openurl`,
+        method: 'delete',
+        data
+    })
+}
+//获取应用url列表
+export const getOpenurl = (data)=>{
+    return service({
+        url: `${BASE_URL}/appspace/app/openurl/list`,
+        method: 'get',
+        params:data
+    })
+}
+//启停应用url状态
+export const switchOpenurl = (data)=>{
+    return service({
+        url: `${BASE_URL}/appspace/app/openurl/status`,
+        method: 'put',
+        data
+    })
+}
+
+//获取智能体openurl信息
+export const getOpenurlInfo = (suffix,config)=>{
+    return service({
+        url: `${BASE_URL}/agent/${suffix}`,
+        method: 'get',
+        config
+    })
+}
+//智能体openurl创建智能体对话
+export const openurlConversation = (data,suffix,config)=>{
+    return service({
+        url: `${BASE_URL}/agent/${suffix}/conversation`,
+        method: 'post',
+        data,
+        config
+    })
+}
+//删除智能体openurl创建智能体对话
+export const delOpenurlConversation = (data,suffix,config)=>{
+    return service({
+        url: `${BASE_URL}/agent/${suffix}/conversation`,
+        method: 'delete',
+        data,
+        config
+    })
+}
+//智能体openurl详情历史列表
+export const OpenurlConverHistory = (data,suffix,config)=>{
+    return service({
+        url: `${BASE_URL}/agent/${suffix}/conversation`,
+        method: 'get',
+        data,
+        config
+    })
+}
+//智能体openurl对话列表
+export const OpenurlConverList = (suffix,config)=>{
+    return service({
+        url: `${BASE_URL}/agent/${suffix}/conversation/list`,
+        method: 'get',
+        config
+    })
+}
+//智能体openurl流式对话
+export const OpenurlStream = (data,suffix,config)=>{
+    return service({
+        url: `${BASE_URL}/agent/${suffix}/stream`,
+        method: 'post',
+        data,
+        config
+    })
+}
