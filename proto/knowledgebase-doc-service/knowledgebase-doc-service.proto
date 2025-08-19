@@ -27,6 +27,8 @@ service KnowledgeBaseDocService {
   rpc UpdateDocSegmentStatus(UpdateDocSegmentReq) returns (google.protobuf.Empty) {}
   // url上传功能-解析url
   rpc AnalysisDocUrl(AnalysisUrlDocReq) returns (AnalysisUrlDocResp) {}
+  // 更新文档元数据标签
+  rpc UpdateDocSegmentLabels(DocSegmentLabelsReq) returns (google.protobuf.Empty) {}
 }
 
 
@@ -82,12 +84,12 @@ message UpdateDocMetaDataReq {
 }
 
 message MetaData {
-  string dataId = 1;
-  string key = 2;
-  string value = 3;
-  string valueType = 4; //String, Number,Date
-  string option = 5; //option:add(新增)、update(更新)、delete(删除),update 和delete 的时候dataId 不能为空
-  string rule = 6;//规则
+  string metaId = 1; // 元数据id
+  string key = 2; // key
+  string value = 3; // 确定值
+  string valueType = 4; // string, number, time
+  string option = 5; // option:add(新增)、update(更新)、delete(删除),update 和delete 的时候metaId 不能为空
+  string rule = 6; // 正则表达式
 }
 
 message InitDocStatusReq {
@@ -148,6 +150,7 @@ message SegmentContent{
   bool available = 3;
   string contentId = 4;
   int32 contentNum = 5;
+  repeated string labels = 6;
 }
 
 message DocInfo{
@@ -195,3 +198,11 @@ message UrlInfo{
   double fileSize = 3;
 }
 
+message DocSegmentLabelsReq{
+  string knowledgeId = 1;
+  string contentId = 2;
+  string docId = 3;
+  repeated string labels = 4;
+  string userId = 5;
+  string orgId = 6;
+}

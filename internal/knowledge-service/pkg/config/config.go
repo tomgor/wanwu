@@ -140,5 +140,6 @@ type RagServerConfig struct {
 	DocUrlImportUri           string `mapstructure:"doc-url-import-uri" json:"doc-url-import-uri"`
 	DocUrlAnalysisUri         string `mapstructure:"doc-url-analysis-uri" json:"doc-url-analysis-uri"`
 	KeywordsUri               string `mapstructure:"keywords-uri" json:"keywords-uri"`
+	DocSegmentUpdateLabelsUri string `mapstructure:"doc-segment-update-labels-uri" json:"doc-segment-update-labels-uri"`
 	Timeout                   int64  `mapstructure:"timeout" json:"timeout"`
 }

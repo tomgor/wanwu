@@ -95,6 +95,15 @@ type MetaData struct {
 	ValueType string      `json:"value_type"`
 }
 
+type RagDocSegmentLabelsParams struct {
+	UserId        string   `json:"userId"`        // 发起请求的用户ID
+	KnowledgeBase string   `json:"knowledgeBase"` // 知识库的名称
+	KnowledgeId   string   `json:"kb_id"`         // 知识库的唯一ID
+	FileName      string   `json:"fileName"`      // 与chunk关联的文件名
+	ContentId     string   `json:"chunk_id"`      // 要更新标签的chunk的唯一ID
+	Labels        []string `json:"labels"`        // 需要为该chunk关联的标签列表
+}
+
 type RagGetDocSegmentResp struct {
 	RagCommonResp
 	Data *ContentListResp `json:"data"`
@@ -113,6 +122,7 @@ type FileSplitContent struct {
 	UserId    string          `json:"userId"`
 	KbName    string          `json:"kb_name"`
 	FileName  string          `json:"file_name"`
+	Labels    []string        `json:"labels"`
 }
 
 type ContentMetaData struct {
@@ -246,7 +256,7 @@ func RagDeleteDoc(ctx context.Context, ragDeleteDocParams *RagDeleteDocParams) e
 	return nil
 }
 
-// RagDocMeta 给文档打标签
+// RagDocMeta 更新文档元数据
 func RagDocMeta(ctx context.Context, ragDocTagParams *RagDocMetaParams) error {
 	ragServer := config.GetConfig().RagServer
 	url := ragServer.Endpoint + ragServer.DocTagUri
@@ -391,6 +401,35 @@ func RagDocUrlAnalysis(ctx context.Context, docUrlParams *DocUrlParams) (*DocUrl
 	}
 	resp.Url = docUrlParams.Url
 	return resp, nil
+}
+
+// RagDocSegmentLabels 更新文档切片标签
+func RagDocSegmentLabels(ctx context.Context, ragDocSegLabelsParams *RagDocSegmentLabelsParams) error {
+	ragServer := config.GetConfig().RagServer
+	url := ragServer.Endpoint + ragServer.DocSegmentUpdateLabelsUri
+	paramsByte, err := json.Marshal(ragDocSegLabelsParams)
+	if err != nil {
+		return err
+	}
+	result, err := http.GetClient().PostJson(ctx, &http_client.HttpRequestParams{
+		Url:        url,
+		Body:       paramsByte,
+		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
+		MonitorKey: "rag_doc_tag",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return err
+	}
+	var resp RagCommonResp
+	if err := json.Unmarshal(result, &resp); err != nil {
+		log.Errorf(err.Error())
+		return err
+	}
+	if resp.Code != successCode {
+		return errors.New(resp.Message)
+	}
+	return nil
 }
 
 // RebuildSegmentType 转换分段类型

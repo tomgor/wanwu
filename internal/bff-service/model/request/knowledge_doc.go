@@ -20,16 +20,9 @@ type DocImportReq struct {
 	CommonCheck
 }
 
-type DocMetaData struct {
-	MetaKey       string `json:"metaKey"`       //key 的校验
-	MetaValue     string `json:"metaValue"`     //传入字符串
-	MetaValueType string `json:"metaValueType"` // number:"1" , date:"1755226779000" 毫秒 , string, ""
-	MetaRule      string `json:"metaRule"`
-}
-
 type DocMetaDataReq struct {
-	DocId        string      `json:"docId" validate:"required"`
-	MetaDataList []*MetaData `json:"metaDataList"` //文档元数据
+	DocId        string         `json:"docId" validate:"required"`
+	MetaDataList []*DocMetaData `json:"metaDataList"` //文档元数据
 	CommonCheck
 }
 
@@ -75,5 +68,13 @@ type UpdateDocSegmentStatusReq struct {
 type AnalysisUrlDocReq struct {
 	KnowledgeId string   `json:"knowledgeId"   validate:"required"`
 	UrlList     []string `json:"urlList"   validate:"required"`
+	CommonCheck
+}
+
+type DocSegmentLabelsReq struct {
+	KnowledgeId string   `json:"knowledgeId"  validate:"required"`
+	ContentId   string   `json:"contentId"  validate:"required"`
+	DocId       string   `json:"docId"  validate:"required"`
+	Labels      []string `json:"labels"  validate:"required"`
 	CommonCheck
 }

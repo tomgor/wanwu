@@ -3111,6 +3111,45 @@
                 }
             }
         },
+        "/knowledge/doc/segment/labels": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "更新文档切片标签",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge"
+                ],
+                "summary": "更新文档切片标签",
+                "parameters": [
+                    {
+                        "description": "更新文档切片标签请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DocSegmentLabelsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/knowledge/doc/segment/list": {
             "get": {
                 "security": [
@@ -8312,19 +8351,28 @@
         "request.DocMetaData": {
             "type": "object",
             "properties": {
+                "metaId": {
+                    "description": "元数据id",
+                    "type": "string"
+                },
                 "metaKey": {
-                    "description": "key 的校验",
+                    "description": "key",
                     "type": "string"
                 },
                 "metaRule": {
+                    "description": "正则表达式",
                     "type": "string"
                 },
                 "metaValue": {
-                    "description": "传入字符串",
+                    "description": "确定值",
                     "type": "string"
                 },
                 "metaValueType": {
-                    "description": "number:\"1\" , date:\"1755226779000\" 毫秒 , string, \"\"",
+                    "description": "string，number，time",
+                    "type": "string"
+                },
+                "option": {
+                    "description": "option:add(新增)、update(更新)、delete(删除),update 和delete 的时候metaId 不能为空",
                     "type": "string"
                 }
             }
@@ -8342,7 +8390,7 @@
                     "description": "文档元数据",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/request.MetaData"
+                        "$ref": "#/definitions/request.DocMetaData"
                     }
                 }
             }
@@ -8367,6 +8415,32 @@
                 },
                 "splitter": {
                     "description": "分隔符（只有自定义分段必填）",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "request.DocSegmentLabelsReq": {
+            "type": "object",
+            "required": [
+                "contentId",
+                "docId",
+                "knowledgeId",
+                "labels"
+            ],
+            "properties": {
+                "contentId": {
+                    "type": "string"
+                },
+                "docId": {
+                    "type": "string"
+                },
+                "knowledgeId": {
+                    "type": "string"
+                },
+                "labels": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -8710,33 +8784,6 @@
                 "isExpired": {
                     "description": "minio存储文件是否过期 0:过期，1:不过期",
                     "type": "boolean"
-                }
-            }
-        },
-        "request.MetaData": {
-            "type": "object",
-            "required": [
-                "dataType",
-                "key",
-                "option",
-                "value"
-            ],
-            "properties": {
-                "dataId": {
-                    "type": "string"
-                },
-                "dataType": {
-                    "description": "String，Number，Date",
-                    "type": "string"
-                },
-                "key": {
-                    "type": "string"
-                },
-                "option": {
-                    "type": "string"
-                },
-                "value": {
-                    "type": "string"
                 }
             }
         },
@@ -10127,6 +10174,31 @@
                 }
             }
         },
+        "response.DocMetaData": {
+            "type": "object",
+            "properties": {
+                "metaId": {
+                    "description": "元数据id",
+                    "type": "string"
+                },
+                "metaKey": {
+                    "description": "key",
+                    "type": "string"
+                },
+                "metaRule": {
+                    "description": "正则表达式",
+                    "type": "string"
+                },
+                "metaValue": {
+                    "description": "确定值",
+                    "type": "string"
+                },
+                "metaValueType": {
+                    "description": "number，time, string",
+                    "type": "string"
+                }
+            }
+        },
         "response.DocSearchContent": {
             "type": "object",
             "properties": {
@@ -10182,7 +10254,7 @@
                     "description": "文档元数据",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/response.MetaData"
+                        "$ref": "#/definitions/response.DocMetaData"
                     }
                 },
                 "pageTotal": {
@@ -10961,29 +11033,6 @@
                 }
             }
         },
-        "response.MetaData": {
-            "type": "object",
-            "properties": {
-                "dataId": {
-                    "type": "string"
-                },
-                "dataType": {
-                    "type": "string"
-                },
-                "formatValue": {
-                    "type": "string"
-                },
-                "key": {
-                    "type": "string"
-                },
-                "rule": {
-                    "type": "string"
-                },
-                "value": {
-                    "type": "string"
-                }
-            }
-        },
         "response.ModelBrief": {
             "type": "object",
             "required": [
@@ -11381,6 +11430,12 @@
                 },
                 "contentNum": {
                     "type": "integer"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "len": {
                     "type": "integer"

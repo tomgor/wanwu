@@ -174,3 +174,24 @@ func AnalysisDocUrl(ctx *gin.Context) {
 	resp, err := service.AnalysisDocUrl(ctx, userId, orgId, &req)
 	gin_util.Response(ctx, resp, err)
 }
+
+// UpdateDocSegmentLabels
+//
+//	@Tags			knowledge
+//	@Summary		更新文档切片标签
+//	@Description	更新文档切片标签
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.DocSegmentLabelsReq	true	"更新文档切片标签请求参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/knowledge/doc/segment/labels [post]
+func UpdateDocSegmentLabels(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.DocSegmentLabelsReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.UpdateDocSegmentLabels(ctx, userId, orgId, &req)
+	gin_util.Response(ctx, nil, err)
+}
