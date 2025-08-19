@@ -24,10 +24,11 @@ func ListWorkflow(ctx *gin.Context, userID, orgID, name string) (*response.CozeW
 		SetHeader("Accept", "application/json").
 		SetHeaders(workflowHttpReqHeader(ctx, userID, orgID)).
 		SetQueryParams(map[string]string{
-			"space_id": orgID,
-			"name":     name,
-			"page":     "1",
-			"size":     "100",
+			"login_user_create": "true",
+			"space_id":          orgID,
+			"name":              name,
+			"page":              "1",
+			"size":              "99999",
 		}).
 		SetResult(ret).
 		Post(url); err != nil {

@@ -167,7 +167,7 @@ agent:
 
 workflow:
   endpoint: http://workflow-wanwu:8999
-  list_uri: /api/workflow_api/workflow_list
+  list_uri: /api/workflow_api/workflow_list_by_wanwu
   create_uri: /api/workflow_api/create
   delete_uri: /api/workflow_api/delete
   copy_uri: /api/workflow_api/copy
