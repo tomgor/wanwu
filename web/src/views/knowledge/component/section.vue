@@ -108,6 +108,13 @@
               <div class="text item" @click="handleClick(item, index)">
                 {{ item.content }}
               </div>
+              <!-- <div class="tagList" style="border:1px solid red;">
+                <span :class="['smartDate','tagList']" v-if="formattedTagNames(n.knowledgeTagList).length === 0" @click.stop="addTag(n.knowledgeId)">
+                  <span class="el-icon-price-tag icon-tag"></span>
+                  添加标签
+                </span>
+                <span v-else @click.stop="addTag(n.knowledgeId)">{{formattedTagNames(n.knowledgeTagList) }}</span>
+              </div> -->
             </el-card>
           </el-col>
         </el-row>
