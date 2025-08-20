@@ -80,7 +80,7 @@
               </div>
             </div>
             <div class="block prompt-box" v-show="!dialogDetailVisible">
-              <p class="block-title required-label rl">隐私政策</p>
+              <p class="block-title rl">隐私政策</p>
               <el-form-item prop="privacyPolicy">
                 <el-input class="name-input" v-model="form.privacyPolicy"
                           placeholder="填写API对应的隐私政策url链接"></el-input>
@@ -143,7 +143,7 @@
     <span slot="footer" class="dialog-footer" v-show="dialogDetailVisible">
         <el-button
             type="primary"
-            @click="dialogDetailVisible = false">编辑</el-button>
+            @click="dialogDetailVisible = false; title = '修改自定义工具'">编辑</el-button>
     </span>
   </el-dialog>
 </template>
@@ -185,7 +185,6 @@ export default {
       rules: {
         description: [{required: true, message: '请输入', trigger: 'blur'}],
         name: [{required: true, message: '请输入', trigger: 'blur'}],
-        privacyPolicy: [{required: true, message: '请输入', trigger: 'blur'}],
         schema: [{required: true, message: '请输入', trigger: 'blur'}],
         apiAuth: [{validator: validateApiAuthFields, message: '请完善API身份认证信息', trigger: 'blur'}]
       },
@@ -210,10 +209,10 @@ export default {
             .then((res) => {
               const {list, ...form} = res.data
               this.form = form
-              this.listenerSchema()
               if (dialogDetailVisible) {
                 this.title = form.name
               }
+              this.listenerSchema()
             })
       } else this.title = '新增自定义工具'
     },
@@ -278,6 +277,7 @@ export default {
       this.dialogBasicVisible = false
       this.apiList = []
       this.example = ''
+      this.title = ''
       this.$refs.form.clearValidate()
       this.form = {
         description: '',
