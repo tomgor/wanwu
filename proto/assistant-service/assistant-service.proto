@@ -347,6 +347,7 @@ message AssistantConversionStreamReq {
   string prompt = 5;
   string appPublishType = 6;
   Identity identity = 7;
+  repeated string accessedWorkFlowIds = 8;
 }
 
 message ConversionStreamFile{

@@ -2,15 +2,11 @@ package assistant
 
 import (
 	"context"
-	"fmt"
 	"strconv"
-	"strings"
 
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/client/model"
-	"github.com/UnicomAI/wanwu/internal/assistant-service/pkg/util"
-	"github.com/UnicomAI/wanwu/pkg/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -35,27 +31,10 @@ func parseWorkFlowApiInfo(req *assistant_service.AssistantWorkFlowCreateReq) (*m
 	if err != nil {
 		return nil, err
 	}
-	doc, err := util.ValidateOpenAPISchema(req.Schema)
-	if err != nil {
-		log.Errorf(fmt.Sprintf("ParseWorkFlowApiInfo 报错：Schema 不合法！(%v) 参数(%v)", err, req))
-		return nil, err
-	}
-	var paths, names, methods []string
 	workFlowId := req.WorkFlowId
-	for path, pathItem := range doc.Paths.Map() {
-		paths = append(paths, path)
-		for method, operation := range pathItem.Operations() {
-			names = append(names, operation.OperationID)
-			methods = append(methods, method)
-		}
-	}
 	workFlow := &model.AssistantWorkflow{
 		WorkflowId:  workFlowId,
 		AssistantId: uint32(assistantID),
-		APISchema:   req.Schema,
-		Path:        strings.Join(paths, ","),
-		Name:        strings.Join(names, ","),
-		Method:      strings.Join(methods, ","),
 		Enable:      true,
 		UserId:      userId,
 		OrgId:       orgId,

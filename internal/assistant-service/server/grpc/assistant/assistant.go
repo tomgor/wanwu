@@ -274,7 +274,6 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 		workFlowInfos = append(workFlowInfos, &assistant_service.WorkFlowInfos{
 			Id:         strconv.FormatUint(uint64(workflow.ID), 10),
 			WorkFlowId: workflow.WorkflowId,
-			ApiName:    workflow.Name,
 			Enable:     workflow.Enable,
 		})
 	}
