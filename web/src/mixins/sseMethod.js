@@ -338,6 +338,7 @@ export default {
         },
         sendEventSource(prompt, msgStr, lastIndex) {
             console.log('####  sendEventSource',new Date().getTime())
+            const userInfo = this.$store.state.user.userInfo || {}
             if (this.sessionStatus === 0) {
                 this.$message.warning('上个问题没有回答完！')
                 return
@@ -392,7 +393,6 @@ export default {
             }
 
             this.ctrlAbort = new AbortController();
-            const userInfo = this.$store.state.user.userInfo || {}
             this.eventSource = new fetchEventSource(this.origin + this.sseApi, {
                 method: 'POST',
                 headers,

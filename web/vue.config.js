@@ -85,7 +85,7 @@ module.exports = {
             changeOrigin: true,
             secure: false,
         },
-        "/openurl/v1":{
+        "/service/url/openurl/v1":{
             target: "http://192.168.0.21:8081",
             changeOrigin: true,
             secure: false,

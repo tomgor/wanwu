@@ -242,7 +242,7 @@ export const switchOpenurl = (data)=>{
 //获取智能体openurl信息
 export const getOpenurlInfo = (suffix,config)=>{
     return service({
-        url: `/openurl/v1/agent/${suffix}`,
+        url: `/service/url/openurl/v1/agent/${suffix}`,
         method: 'get',
         config
     })
@@ -250,7 +250,7 @@ export const getOpenurlInfo = (suffix,config)=>{
 //智能体openurl创建智能体对话
 export const openurlConversation = (data,suffix,config)=>{
     return service({
-        url: `/openurl/v1/agent/${suffix}/conversation`,
+        url: `/service/url/openurl/v1/agent/${suffix}/conversation`,
         method: 'post',
         data,
         config
@@ -259,7 +259,7 @@ export const openurlConversation = (data,suffix,config)=>{
 //删除智能体openurl创建智能体对话
 export const delOpenurlConversation = (data,suffix,config)=>{
     return service({
-        url: `/openurl/v1/agent/${suffix}/conversation`,
+        url: `/service/url/openurl/v1/agent/${suffix}/conversation`,
         method: 'delete',
         data,
         config
@@ -268,7 +268,7 @@ export const delOpenurlConversation = (data,suffix,config)=>{
 //智能体openurl详情历史列表
 export const OpenurlConverHistory = (data,suffix,config)=>{
     return service({
-        url: `/openurl/v1/agent/${suffix}/conversation/detail`,
+        url: `/service/url/openurl/v1/agent/${suffix}/conversation/detail`,
         method: 'get',
         data,
         config
@@ -277,7 +277,7 @@ export const OpenurlConverHistory = (data,suffix,config)=>{
 //智能体openurl对话列表
 export const OpenurlConverList = (suffix,config)=>{
     return service({
-        url: `/openurl/v1/agent/${suffix}/conversation/list`,
+        url: `/service/url/openurl/v1/agent/${suffix}/conversation/list`,
         method: 'get',
         config
     })
@@ -285,7 +285,7 @@ export const OpenurlConverList = (suffix,config)=>{
 //智能体openurl流式对话
 export const OpenurlStream = (data,suffix,config)=>{
     return service({
-        url: `/openurl/v1/agent/${suffix}/stream`,
+        url: `/service/url/openurl/v1/agent/${suffix}/stream`,
         method: 'post',
         data,
         config
