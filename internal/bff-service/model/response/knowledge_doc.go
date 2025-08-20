@@ -26,25 +26,25 @@ type DocSegmentResp struct {
 	SegmentType        string            `json:"segmentType"`     //分段方式 0自动分段 1自定义分段
 	UploadTime         string            `json:"uploadTime"`      //上传时间
 	Splitter           string            `json:"splitter"`        // 分隔符（只有自定义分段必填）
-	MetaDataList       []*MetaData       `json:"metaDataList"`    //文档元数据
+	MetaDataList       []*DocMetaData    `json:"metaDataList"`    //文档元数据
 	SegmentContentList []*SegmentContent `json:"contentList"`     //内容
 }
 
-type MetaData struct {
-	Key         string `json:"key"`
-	DataId      string `json:"dataId"`
-	Value       string `json:"value"`
-	FormatValue string `json:"formatValue"`
-	DataType    string `json:"dataType"`
-	Rule        string `json:"rule"`
+type DocMetaData struct {
+	MetaKey       string `json:"metaKey"`       // key
+	MetaValue     string `json:"metaValue"`     // 确定值
+	MetaValueType string `json:"metaValueType"` // number，time, string
+	MetaRule      string `json:"metaRule"`      // 正则表达式
+	MetaId        string `json:"metaId"`        // 元数据id
 }
 
 type SegmentContent struct {
-	Content    string `json:"content"`
-	Len        int    `json:"len"`
-	Available  bool   `json:"available"`
-	ContentId  string `json:"contentId"`
-	ContentNum int    `json:"contentNum"`
+	Content    string   `json:"content"`
+	Len        int      `json:"len"`
+	Available  bool     `json:"available"`
+	ContentId  string   `json:"contentId"`
+	ContentNum int      `json:"contentNum"`
+	Labels     []string `json:"labels"`
 }
 
 type AnalysisDocUrlResp struct {

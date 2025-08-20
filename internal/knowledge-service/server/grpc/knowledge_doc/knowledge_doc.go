@@ -75,7 +75,7 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 	doc := docList[0]
 	//2.状态校验
 	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
-		log.Errorf(fmt.Sprintf("非处理完成文档无法增加标签 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req))
+		log.Errorf(fmt.Sprintf("非处理完成文档无法增加元数据 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req))
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaStatusFailed)
 	}
 	//3.查询知识库信息
@@ -417,7 +417,7 @@ func buildMetaList(metaDataList []*model.KnowledgeDocMeta) []*knowledgebase_doc_
 			valueType = model.MetaTypeString
 		}
 		return &knowledgebase_doc_service.MetaData{
-			DataId:    item.MetaId,
+			MetaId:    item.MetaId,
 			Key:       item.Key,
 			Value:     item.Value,
 			ValueType: valueType,
@@ -432,7 +432,7 @@ func buildMetaParamsList(metaDataList []*knowledgebase_doc_service.MetaData) []*
 	}
 	return lo.Map(metaDataList, func(item *knowledgebase_doc_service.MetaData, index int) *model.KnowledgeDocMeta {
 		return &model.KnowledgeDocMeta{
-			MetaId: item.DataId,
+			MetaId: item.MetaId,
 			Key:    item.Key,
 			Value:  item.Value,
 		}
@@ -446,12 +446,12 @@ func buildMetaModelList(metaDataList []*knowledgebase_doc_service.MetaData, orgI
 	}
 	for _, data := range metaDataList {
 		if data.Option == "delete" {
-			deleteDataIdList = append(deleteDataIdList, data.DataId)
+			deleteDataIdList = append(deleteDataIdList, data.MetaId)
 			continue
 		}
 		if data.Option == "update" {
 			updateList = append(updateList, &model.KnowledgeDocMeta{
-				MetaId: data.DataId,
+				MetaId: data.MetaId,
 				DocId:  docId,
 				Key:    data.Key,
 				Value:  data.Value,
@@ -532,6 +532,7 @@ func buildContentList(contentList []service.FileSplitContent, pageNo int32, page
 			Available:  content.Status,
 			ContentId:  content.ContentId,
 			ContentNum: (pageNo-1)*pageSize + int32(i+1),
+			Labels:     content.Labels,
 		})
 	}
 	return retList
@@ -560,4 +561,40 @@ func buildDocUpdateSegmentStatusParams(req *knowledgebase_doc_service.UpdateDocS
 			Status:        status,
 		}
 	}
+}
+
+func (s *Service) UpdateDocSegmentLabels(ctx context.Context, req *knowledgebase_doc_service.DocSegmentLabelsReq) (*emptypb.Empty, error) {
+	//1.查询文档详情
+	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf(fmt.Sprintf("没有操作该知识库文档的权限 参数(%v)", req))
+		return nil, err
+	}
+	doc := docList[0]
+	//2.状态校验
+	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
+		log.Errorf(fmt.Sprintf("非处理完成文档无法增加切片标签 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req))
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentUpdateLabelsFailed)
+	}
+	//3.查询知识库信息
+	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf(fmt.Sprintf("没有操作该知识库的权限 参数(%v)", req))
+		return nil, err
+	}
+	//4.更新切片标签
+	fileName := service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
+	err = service.RagDocSegmentLabels(ctx, &service.RagDocSegmentLabelsParams{
+		UserId:        req.UserId,
+		KnowledgeBase: knowledge.Name,
+		KnowledgeId:   knowledge.KnowledgeId,
+		FileName:      fileName,
+		ContentId:     req.ContentId,
+		Labels:        req.Labels,
+	})
+	if err != nil {
+		log.Errorf(fmt.Sprintf("update doc seg labels fail %v", err), req.DocId)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentUpdateLabelsFailed)
+	}
+	return &emptypb.Empty{}, nil
 }

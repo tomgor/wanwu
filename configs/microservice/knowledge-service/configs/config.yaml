@@ -104,6 +104,7 @@ rag-server:
   doc-url-analysis-uri: '/url_pra'
   doc-url-import-uri: '/url_insert'
   keywords-uri: '/rag/proper_noun'
+  doc-segment-update-labels-uri: '/rag/update-chunk-labels'
   timeout: 60
 
 usage-limit:

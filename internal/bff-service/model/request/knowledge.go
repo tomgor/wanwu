@@ -66,12 +66,13 @@ type CallbackMetaData struct {
 	Value  string `json:"value" validate:"required"`
 }
 
-type MetaData struct {
-	Key      string `json:"key" validate:"required"`
-	DataId   string `json:"dataId"`
-	Value    string `json:"value" validate:"required"`
-	Option   string `json:"option" validate:"required"`   //option:add(新增)、update(更新)、delete(删除),update 和delete 的时候dataId 不能为空
-	DataType string `json:"dataType" validate:"required"` //String，Number，Date
+type DocMetaData struct {
+	MetaId        string `json:"metaId"`        // 元数据id
+	MetaKey       string `json:"metaKey"`       // key
+	MetaValue     string `json:"metaValue"`     // 确定值
+	MetaValueType string `json:"metaValueType"` // string，number，time
+	MetaRule      string `json:"metaRule"`      // 正则表达式
+	Option        string `json:"option"`        // option:add(新增)、update(更新)、delete(删除),update 和delete 的时候metaId 不能为空
 }
 
 type SearchKnowledgeInfoReq struct {
