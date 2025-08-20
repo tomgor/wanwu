@@ -1,6 +1,6 @@
 <template>
   <div class="mcp-detail" id="timeScroll">
-    <span class="back" @click="back">返回MCP广场</span>
+    <span class="back" @click="back">返回工具广场</span>
     <div class="mcp-title">
       <img class="logo" v-if="detail.avatar && detail.avatar.path" :src="basePath + '/user/api/' + detail.avatar.path" />
       <div :class="['info',{fold:foldStatus}]">

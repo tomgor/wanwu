@@ -50,7 +50,7 @@
               </span>
             </div>
             <i
-              class="el-icon-delete-solid"
+              class="el-icon-delete-solid del"
               @click.stop="handleDelete(item)"
             ></i>
           </div>
@@ -133,7 +133,7 @@ export default {
       this.init();
     },
     handleClick(val) {
-      // smcpSquareId 有值 mcp广场, 否则自定义
+      // smcpSquareId 有值 工具广场, 否则自定义
       this.$router.push({path: `/mcp/detail/custom?mcpId=${val.mcpId}&mcpSquareId=${val.mcpSquareId}`})
     },
     handleAddMCP() {
