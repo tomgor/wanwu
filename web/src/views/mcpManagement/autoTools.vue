@@ -35,14 +35,23 @@
             <div class="mcp_detailBox">
               <span class="mcp_name">{{ item.name }}</span>
             </div>
-            <i
-              class="el-icon-edit-outline edit"
-              @click.stop="handleAddMCP(item.customToolId)"
-            />
-            <i
-              class="el-icon-delete-solid del"
-              @click.stop="handleDelete(item)"
-            />
+            <el-dropdown
+                placement="bottom">
+              <span class="el-dropdown-link">
+                <i class="el-icon-more"
+                    @click.stop/>
+              </span>
+              <el-dropdown-menu slot="dropdown"  style="margin-top: -10px">
+                <el-dropdown-item
+                    @click.native="handleAddMCP(item.customToolId)">
+                  编辑
+                </el-dropdown-item>
+                <el-dropdown-item
+                    @click.native="handleDelete(item)">
+                  删除
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </div>
           <div class="card-des">{{ item.description }}</div>
         </div>
