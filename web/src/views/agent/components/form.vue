@@ -277,11 +277,11 @@
                     <el-switch
                       v-model="n.enable"
                       class="bt-switch"
-                      @change="toolSwitch(n.id,n.type,n.enable)"
+                      @change="toolSwitch(n,n.type,n.enable)"
                       v-if="n.valid"
                     ></el-switch>
                     <span
-                      @click="toolRemove(n.id,n.type)"
+                      @click="toolRemove(n,n.type)"
                       class="el-icon-delete del"
                     ></span>
                   </div>
@@ -573,7 +573,7 @@ export default {
       this.editForm.assistantId = this.$route.query.id;
       setTimeout(() => {
         this.getAppDetail();
-        this.apiKeyRootUrl(); //获取api跟地址
+        // this.apiKeyRootUrl(); //获取api跟地址
       }, 500);
     }
     //判断是否发布
@@ -666,13 +666,13 @@ export default {
         }
       });
     },
-    toolSwitch(id,type,enable){
+    toolSwitch(n,type,enable){
       if(type === 'workflow'){
-        this.workflowSwitch(id,enable)
+        this.workflowSwitch(n.workFlowId,enable)
       }else if(type === 'mcp'){
-        this.mcpSwitch(id,enable)
+        this.mcpSwitch(n.mcpId,enable)
       }else{
-        this.customSwitch(id,enable)
+        this.customSwitch(n.customId,enable)
       }
     },
     customSwitch(customToolId,enable){
@@ -789,16 +789,17 @@ export default {
     preAddWorkflow() {
       this.wfDialogVisible = true;
     },
-    toolRemove(id,type){
+    toolRemove(n,type){
       if(type === 'workflow'){
-        this.doDeleteWorkflow(id);
+        this.doDeleteWorkflow(n.workFlowId);
       }else if(type === 'mcp'){
-        this.mcpRemove(id);
+        this.mcpRemove(n.mcpId);
       }else{
-        this.customRemove(id)
+        this.customRemove(n.customId)
       }
     },
     customRemove(customToolId){
+      console.log(customToolId)
       deleteCustom({assistantId:this.editForm.assistantId,customToolId}).then((res) =>{
           if (res.code === 0) {
           this.$message.success("删除成功");
