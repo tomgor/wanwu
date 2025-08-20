@@ -7,7 +7,7 @@
             :before-close="handleClose">
             <div class="tool-typ">
                 <div class="toolbtn">
-                    <div v-for="(item,index) in toolList" :key="index" @click="clickTool(item,index)" :class="[{'active':toolIndex === index}]">
+                    <div v-for="(item,index) in toolList" :key="index" @click="clickTool(item,index)" :class="[{'active':activeValue === item.value}]">
                         {{item.name}}
                     </div>
                 </div>
@@ -28,15 +28,12 @@
                     </div>
                 </template>
             </div>
-            <!-- <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="submit">确 定</el-button>
-            </span> -->
         </el-dialog>
     </div>
 </template>
 <script>
 import { getList } from '@/api/workflow.js';
-import { addWorkFlowInfo, addMcp } from "@/api/agent";
+import { addWorkFlowInfo, addMcp,customList,addCustom } from "@/api/agent";
 import { getExplorationFlowList,readWorkFlow} from "@/api/workflow";
 import { Base64 } from "js-base64";
 export default {
@@ -46,17 +43,18 @@ export default {
             toolName:'',
             dialogVisible:false,
             toolIndex:0,
-            activeValue:'mcp',
-            actionInfos:[],
+            activeValue:'auto',
             workFlowInfos:[],
             mcpInfos:[],
+            customInfos:[],
             mcpList:[],
             workFlowList:[],
+            customList:[],
             toolList:[
-                // {
-                //     value:'auto',
-                //     name:'自定义'
-                // },
+                {
+                    value:'auto',
+                    name:'自定义'
+                },
                 {
                     value:'mcp',
                     name:'MCP'
@@ -71,7 +69,7 @@ export default {
     computed:{
          contentMap() {
             return {
-            auto: this.actionInfos,
+            auto: this.customInfos,
             mcp: this.mcpInfos,
             workflow: this.workFlowInfos
             }
@@ -80,8 +78,22 @@ export default {
     created(){
         this.getMcpSelect('');
         this.getWorkflowList('');
+        this.getCustomList('')
     },
     methods:{
+        getCustomList(name){
+            customList({name}).then(res =>{
+                if(res.code === 0){
+                    customList
+                    this.customInfos = (res.data.list || []).map(m => ({
+                        ...m,
+                        checked: this.customList.some(item => item.customToolId === m.customToolId)
+                    }));
+                }
+            }).catch(() =>{
+
+            })
+        },
         goCreate(){
             if(this.activeValue === 'auto'){
                 this.$router.push({path:'/mcp'})
@@ -107,7 +119,20 @@ export default {
                 this.addWorkFlow(item)
             }else if(type === 'mcp'){
                 this.addMcpItem(item)
+            }else{
+                this.addCustomItem(item)
             }
+        },
+        addCustomItem(n){
+            addCustom({assistantId:this.assistantId,customToolId:n.customToolId}).then(res =>{
+                if(res.code === 0){
+                    n.checked = true;
+                    this.$message.success('工具添加成功');
+                    this.$emit('updateDetail');
+                }
+            }).catch(() =>{
+
+            })
         },
         addMcpItem(n){
             addMcp({assistantId:this.assistantId,mcpId:n.mcpId}).then(res =>{
@@ -133,9 +158,9 @@ export default {
                 assistantId: this.assistantId,
                 schema: Base64.decode(schema),
                 workFlowId,
-                apiAuth: {
-                type: "none",
-                },
+                // apiAuth: {
+                // type: "none",
+                // },
             };
             let res = await addWorkFlowInfo(params);
             if (res.code === 0) {
@@ -146,7 +171,7 @@ export default {
         },
         searchTool(){
             if(this.activeValue === 'auto'){
-                console.log('自定义')
+                this.getCustomList(this.toolName)
             }else if(this.activeValue === 'mcp'){
                 this.getMcpSelect(this.toolName)
             }else{
@@ -180,8 +205,9 @@ export default {
             this.dialogVisible = true;
             this.setMcp(row.mcpInfos);
             this.setWorkflow(row.workFlowInfos);
-            this.mcpList = row.mcpInfos;
-            this.workFlowList = row.workFlowInfos;
+            this.mcpList = row.mcpInfos || [];
+            this.workFlowList = row.workFlowInfos || [];
+            this.customList  = row.actionInfos || [];
         },
         setMcp(data){
            this.mcpInfos = this.mcpInfos.map(m => ({
@@ -253,12 +279,13 @@ export default {
     max-height:300px;
     overflow-y:auto;
     .toolContent_item{
-        padding:15px 20px;
+        padding:5px 20px;
         border:1px solid #dbdbdb;
         border-radius:6px;
         margin-bottom:10px;
         cursor: pointer;
         display: flex;
+        align-items:center;
         justify-content:space-between;
     }
     .toolContent_item:hover{

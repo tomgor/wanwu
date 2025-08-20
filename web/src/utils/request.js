@@ -18,6 +18,7 @@ service.interceptors.request.use(
       const user = store.getters['user/userInfo']
       const lang = localStorage.getItem('locale') || ZH // store.getters['user/lang']
       config.headers = {
+          ...config.headers,
           'Authorization': 'Bearer ' + token,
           'x-user-id': user.uid,
           "x-org-id": user.orgId,

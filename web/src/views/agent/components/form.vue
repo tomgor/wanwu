@@ -57,7 +57,7 @@
             <el-radio
               :label="'public'"
               v-model="scope"
-            >公开发布：组织内可见</el-radio>
+            >公开发布：全局可见</el-radio>
           </div>
           <div class="saveBtn">
             <el-button
@@ -277,7 +277,7 @@
                     <el-switch
                       v-model="n.enable"
                       class="bt-switch"
-                      @change="toolSwitch(n.id,n.type)"
+                      @change="toolSwitch(n.id,n.type,n.enable)"
                       v-if="n.valid"
                     ></el-switch>
                     <span
@@ -379,7 +379,6 @@
 
 <script>
 import { getApiKeyRoot, appPublish } from "@/api/appspace";
-import { deleteMcp,enableMcp } from "@/api/agent";
 import { store } from "@/store/index";
 import { mapGetters } from "vuex";
 import { getKnowledgeList } from "@/api/knowledge";
@@ -389,12 +388,16 @@ import ModelSet from "./modelSetDialog";
 // import ApiKeyDialog from "./ApiKeyDialog";
 import { selectModelList, getRerankList } from "@/api/modelAccess";
 import {
+  deleteMcp,
+  enableMcp,
   getAgentInfo,
   delWorkFlowInfo,
   delActionInfo,
   putAgentInfo,
   enableWorkFlow,
   enableAction,
+  deleteCustom,
+  enableCustom
 } from "@/api/agent";
 import ActionConfig from "./action";
 import ToolDiaglog from "./toolDialog";
@@ -541,15 +544,15 @@ export default {
       nameMap: {
         workflow: {
           displayName: "工作流",
-          propName: "workFlowName",
+          propName: "name",
         },
         mcp: {
           displayName: "MCP工具",
-          propName: "mcpName",
+          propName: "name",
         },
         action: {
           displayName: "自定义工具",
-          propName: "actionName",
+          propName: "name",
         },
         // 可以继续添加其他类型
         default: {
@@ -663,22 +666,31 @@ export default {
         }
       });
     },
-    toolSwitch(id,type){
+    toolSwitch(id,type,enable){
       if(type === 'workflow'){
-        this.workflowSwitch(id)
+        this.workflowSwitch(id,enable)
       }else if(type === 'mcp'){
-        this.mcpSwitch(id)
+        this.mcpSwitch(id,enable)
+      }else{
+        this.customSwitch(id,enable)
       }
     },
-    mcpSwitch(mcpId){
-      enableMcp({ mcpId}).then((res) => {
+    customSwitch(customToolId,enable){
+      enableCustom({assistantId:this.editForm.assistantId,customToolId,enable}).then(res =>{
         if (res.code === 0) {
           this.getAppDetail();
         }
       }).catch(() => {});
     },
-    workflowSwitch(id) {
-      enableWorkFlow({ workFlowId: id }).then((res) => {
+    mcpSwitch(mcpId,enable){
+      enableMcp({ assistantId:this.editForm.assistantId,mcpId,enable}).then((res) => {
+        if (res.code === 0) {
+          this.getAppDetail();
+        }
+      }).catch(() => {});
+    },
+    workflowSwitch(id,enable) {
+      enableWorkFlow({ assistantId:this.editForm.assistantId,workFlowId: id,enable }).then((res) => {
         if (res.code === 0) {
           this.getAppDetail();
         }
@@ -782,10 +794,20 @@ export default {
         this.doDeleteWorkflow(id);
       }else if(type === 'mcp'){
         this.mcpRemove(id);
+      }else{
+        this.customRemove(id)
       }
     },
+    customRemove(customToolId){
+      deleteCustom({assistantId:this.editForm.assistantId,customToolId}).then((res) =>{
+          if (res.code === 0) {
+          this.$message.success("删除成功");
+          this.getAppDetail();
+        }
+      }).catch((err) =>{})
+    },
     mcpRemove(mcpId){
-      deleteMcp({mcpId}).then((res) => {
+      deleteMcp({assistantId:this.editForm.assistantId,mcpId}).then((res) => {
         if (res.code === 0) {
           this.$message.success("删除成功");
           this.getAppDetail();

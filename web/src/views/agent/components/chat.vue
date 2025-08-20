@@ -38,6 +38,7 @@
                             :currentModel="currentModel"
                             :isModelDisable="isModelDisable"
                             :showModelSelect="false"
+                            :type="type"
                             @preSend="preSend"
                             @modelChange="modelChange"
                             @setSessionStatus="setSessionStatus"
@@ -51,11 +52,11 @@
 <script>
     import SessionComponentSe from './SessionComponentSe'
     import EditableDivV3 from './EditableDivV3'
-    import {delConversation,createConversation,getConversationHistory} from "@/api/agent";
+    import {delConversation,createConversation,getConversationHistory,delOpenurlConversation,openurlConversation,OpenurlConverHistory} from "@/api/agent";
     import Prologue from './Prologue'
     import sseMethod from '@/mixins/sseMethod'
     import {md} from '@/mixins/marksown-it'
-    import {mapActions, mapGetters} from 'vuex'
+    import {mapGetters} from 'vuex'
 
     export default {
         props:{
@@ -66,6 +67,10 @@
             chatType:{
                 type:String,
                 default:''
+            },
+            type:{
+                type:String,
+                default:'agentChat'
             }
         },
         components: {
@@ -127,7 +132,14 @@
             },
             async getConversationDetail(id,loading){
                 loading && this.$refs['session-com'].doLoading()
-                let res = await getConversationHistory({conversationId: id, pageSize: 1000, pageNo: 1})
+                let res = null;
+                if(this.type === "agentChat"){
+                    res = await getConversationHistory({conversationId: id, pageSize: 1000, pageNo: 1});
+                }else{
+                    const config = this.$parent.headerConfig();
+                    res = await OpenurlConverHistory({conversationId: id},this.editForm.assistantId,config);
+                }
+                
                 if (res.code === 0) {
                     let history = res.data.list ? res.data.list.map(n => {
                         return {
@@ -152,10 +164,16 @@
             //删除对话
             async preDelConversation(n) {
                 if (this.sessionStatus === 0) {
-                    //this.$message.warning('上个问题未答完')
                     return
                 }
-                let res = await delConversation({conversationId: n.conversationId})
+                let res = null;
+                if (this.type === "agentChat") {
+                    res = await delConversation({conversationId: n.conversationId})
+                }else{
+                    const config = this.$parent.headerConfig();
+                    res = await delOpenurlConversation({conversationId:n.conversationId},this.editForm.assistantId,config)
+                }
+                
                 if (res.code === 0) {
                     this.$emit('reloadList')
                     if(this.conversationId === n.conversationId){
@@ -181,7 +199,14 @@
                 }
                 //如果是新会话，先创建
                 if (!this.conversationId && this.chatType === 'chat') {
-                    let res = await createConversation({prompt: this.inputVal,assistantId:this.editForm.assistantId})
+                    let res = null;
+                    if (this.type === "agentChat") {
+                        res = await createConversation({prompt: this.inputVal,assistantId:this.editForm.assistantId})
+                    }else{
+                        const config = this.$parent.headerConfig();
+                        res = await openurlConversation({prompt: this.inputVal},this.editForm.assistantId,config)
+                    }
+                    
                     if (res.code === 0) {
                         this.conversationId = res.data.conversationId
                         this.$emit('reloadList',true)

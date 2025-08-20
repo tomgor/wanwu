@@ -362,26 +362,46 @@ export default {
             let endStr = ''
             this._print = new Print({
                 onPrintEnd: () => {
-                    //this.setStoreSessionStatus(-1)
                 }
             })
-            const trial = this.isTestChat ? true : false
-            let data = {
-                ...this.sseParams,
-                prompt,
-                trial
-            };
+
+            let data = null;
+            let headers = null;
+            //判断是是不是openurl对话
+            if(this.type === 'agentChat'){
+                this.sseApi = "/user/api/v1/assistant/stream";
+                const trial = this.isTestChat ? true : false
+                data = {
+                    ...this.sseParams,
+                    prompt,
+                    trial
+                };
+                headers = {
+                    "Content-Type": 'application/json',
+                    'Authorization': 'Bearer ' + this.token,
+                    "x-user-id": userInfo.uid,
+                    "x-org-id": userInfo.orgId
+                }
+            }else{
+                this.sseApi = `/openurl/v1/agent/${this.sseParams.assistantId}/stream`;
+                data = {
+                   conversationId:this.sseParams.conversationId, 
+                   prompt
+                }
+                headers = this.$parent.headerConfig();
+            }
 
             this.ctrlAbort = new AbortController();
             const userInfo = this.$store.state.user.userInfo || {}
             this.eventSource = new fetchEventSource(this.origin + this.sseApi, {
                 method: 'POST',
-                headers: {
-                    "Content-Type": 'application/json',
-                    'Authorization': 'Bearer ' + this.token,
-                    "x-user-id": userInfo.uid,
-                    "x-org-id": userInfo.orgId
-                },
+                headers,
+                // headers: {
+                //     "Content-Type": 'application/json',
+                //     'Authorization': 'Bearer ' + this.token,
+                //     "x-user-id": userInfo.uid,
+                //     "x-org-id": userInfo.orgId
+                // },
                 signal: this.ctrlAbort.signal,
                 body: JSON.stringify(data),
                 openWhenHidden: true, //页面退至后台保持连接

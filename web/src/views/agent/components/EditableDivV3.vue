@@ -25,9 +25,9 @@
             </div>
             <!-- 问答输入框 -->
             <div class="editable-wp flex">
-                <div class="editable-wp-left rl" >
+                <div class="editable-wp-left rl">
                      <!-- <i  class="el-icon-upload2 upload-icon" @click="preUpload"></i> -->
-                     <img class="upload-icon" :src="require('@/assets/imgs/uploadIcon.png')" @click="preUpload" />
+                     <img class="upload-icon" :src="require('@/assets/imgs/uploadIcon.png')" @click="preUpload" v-if="type !== 'webChat'"/>
                 </div>
                 <div class="editable-wp-right rl">
                     <div class="aibase-textarea editable--input" ref="editor"  @blur="onBlur" v-on:input="getPrompt"  @keydown="textareaKeydown($event)" contenteditable="true"></div>
@@ -75,7 +75,8 @@
             fileTypeArr: {type: Array, required: false,default: () => { return []}},
             showModelSelect:{type:Boolean,default:true},
             currentModel:{type:Object,default: () => { return null}},
-            isModelDisable:{type:Boolean,default:false}
+            isModelDisable:{type:Boolean,default:false},
+            type:{type:String}
         },
         components:{uploadDialog},
         data(){
