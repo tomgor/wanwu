@@ -41,7 +41,7 @@
                 :key="index"
                 class="metaItem"
             >
-              {{ item.key }}: {{ item.dataType === 'time' ? formatTimestamp(item.value) : item.value }}
+              {{ item.metaKey }}: {{ item.metaValueType === 'time' ? formatTimestamp(item.metaValue) : item.metaValue }}
             </span>
             <el-tooltip v-if="metaDataList.length > 3" :content="filterData(metaDataList.slice(3))" placement="bottom">
               <span class="metaItem">...</span>
@@ -53,7 +53,7 @@
         <el-descriptions-item label="元数据规则">
           <template v-if="metaRuleList && metaRuleList.length > 0">
             <span v-for="(item, index) in metaRuleList.slice(0, 3)" :key="index" class="metaItem">
-              {{ item.key }}: {{ item.rule }}<span v-if="index < metaRuleList.slice(0, 3).length - 1"> </span>
+              {{ item.metaKey }}: {{ item.metaRule }}<span v-if="index < metaRuleList.slice(0, 3).length - 1"> </span>
             </span>
             <el-tooltip v-if="metaRuleList.length > 3" :content="filterRule(metaRuleList.slice(3))" placement="bottom">
               <span class="metaItem">...</span>
@@ -231,15 +231,14 @@ export default {
       this.$refs.dataBase.showDiglog(data,this.obj.id)
     },
     filterData(data){
-      const formattedString = data.map(item => {
-        let value = item.value;
+      return data.map(item => {
+        let value = item.metaValue;
         // 如果是时间类型且值为时间戳，转换为日期字符串
-        if (item.dataType === 'time') {
+        if (item.metaValueType === 'time') {
           value = this.formatTimestamp(value);
         }
-        return `${item.key}:${value}`;
+        return `${item.metaKey}:${value}`;
       }).join(", ");
-      return formattedString;
     },
     formatTimestamp(timestamp) {
       if (timestamp === '') return '';
@@ -253,8 +252,7 @@ export default {
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     },
     filterRule(rule){
-      const formattedString = rule.map(item => `${item.key}:${item.rule}`).join(", ");
-      return formattedString
+      return rule.map(item => `${item.metaKey}:${item.metaRule}`).join(", ")
     },
     getList() {
       this.loading.itemStatus = true;
@@ -267,7 +265,7 @@ export default {
           this.loading.itemStatus = false;
           this.res = res.data;
           this.page.total = this.res.segmentTotalNum;
-          this.metaRuleList = res.data.metaDataList.filter(item => item.rule);
+          this.metaRuleList = res.data.metaDataList.filter(item => item.metaRule);
           this.metaDataList = res.data.metaDataList;
         })
         .catch(() => {
