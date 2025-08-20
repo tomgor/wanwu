@@ -100,7 +100,7 @@ func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.Assist
 	if err != nil {
 		return response.Assistant{}, err
 	}
-	//查询该用户有权限的所有工作流
+	//查询该用户有数据权限的所有工作流
 	accessedWorkFlowList, err := GetExplorationAppList(ctx, userId, request.GetExplorationAppListRequest{
 		AppType:    constant.AppTypeWorkflow,
 		SearchType: "all",

@@ -5,14 +5,18 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	net_url "net/url"
 	"strconv"
 	"strings"
 	"time"
+	"slices"
 
+	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	"github.com/UnicomAI/wanwu/api/proto/common"
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
@@ -251,7 +255,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		log.Debugf("智能体action配置，assistantId: %s, actionPluginList: %s", req.AssistantId, actionPluginList)
 	}
 	if assistant.HasWorkflow {
-		workflowPluginList, err = buildWorkflowPluginListAlgParam(ctx, s, req.AssistantId, reqUserId, req.Identity.OrgId)
+		workflowPluginList, err = buildWorkflowPluginListAlgParam(ctx, s, req.AssistantId, reqUserId, req.Identity.OrgId, req.AccessedWorkFlowIds)
 		if err != nil {
 			log.Errorf(err.Error())
 			SSEError(stream, "智能体workflow配置错误")
@@ -695,7 +699,7 @@ func mergeMaps(map1, map2 map[string]interface{}) map[string]interface{} {
 	return result
 }
 
-func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantId, userId, orgId string) (pluginList []PluginListAlgRequest, err error) {
+func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantId, userId, orgId string, accessedWorkFlowIds []string) (pluginList []PluginListAlgRequest, err error) {
 	pluginList = []PluginListAlgRequest{}
 	resp, status := s.cli.GetAssistantWorkflowsByAssistantID(ctx, assistantId)
 	if status != nil {
@@ -704,11 +708,38 @@ func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantI
 	for _, assistantWorkFlowModel := range resp {
 		log.Infof("Assistant服务查询到workflow，assistantId: %s, workflowId: %s, enable: %v",
 			assistantId, assistantWorkFlowModel.WorkflowId, assistantWorkFlowModel.Enable)
+		if !slices.Contains(accessedWorkFlowIds, assistantWorkFlowModel.WorkflowId) {
+			continue //核对实时查询的用户有数据权限的工作流accessedWorkFlowIds，如果WorkflowId不在accessedWorkFlowIds中，则不添加到pluginList
+		}
 		if !assistantWorkFlowModel.Enable {
 			continue
 		}
 		tmp := PluginListAlgRequest{}
-		schema, err := util.ValidateOpenAPISchema(assistantWorkFlowModel.APISchema)
+		//实时查询该工作流最新schema
+		workflowService := config.Cfg().AgentScopeWorkflow
+		url, _ := net_url.JoinPath(workflowService.Endpoint, workflowService.WorkflowSchemaUri)
+		result, err := http_client.Workflow().Get(ctx, &http_client.HttpRequestParams{
+			Url: url,
+			Params: map[string]string{
+				"workflowId": assistantWorkFlowModel.WorkflowId,
+			},
+			Timeout:    60 * time.Second,
+			MonitorKey: "workflow_schema",
+			LogLevel:   http_client.LogAll,
+		})
+		if err != nil {
+			return pluginList, err
+		}
+		var resp = &config.AgentScopeWorkFlowSchemaResp{}
+		if err = json.Unmarshal(result, resp); err != nil {
+			return pluginList, err
+		}
+		decodedBytes, err := base64.StdEncoding.DecodeString(resp.Data.Base64OpenAPISchema)
+		if err != nil {
+			return pluginList, err
+		}
+		//校验schema
+		schema, err := util.ValidateOpenAPISchema(string(decodedBytes))
 		if err != nil {
 			return pluginList, err
 		}
