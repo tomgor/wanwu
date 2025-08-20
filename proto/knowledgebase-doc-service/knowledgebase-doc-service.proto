@@ -199,10 +199,9 @@ message UrlInfo{
 }
 
 message DocSegmentLabelsReq{
-  string knowledgeId = 1;
+  string orgId = 1;
   string contentId = 2;
   string docId = 3;
   repeated string labels = 4;
   string userId = 5;
-  string orgId = 6;
 }

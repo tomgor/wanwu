@@ -1174,8 +1174,6 @@ definitions:
         type: string
       docId:
         type: string
-      knowledgeId:
-        type: string
       labels:
         items:
           type: string
@@ -1183,7 +1181,6 @@ definitions:
     required:
     - contentId
     - docId
-    - knowledgeId
     - labels
     type: object
   request.DocSegmentListReq:
