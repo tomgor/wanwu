@@ -17,7 +17,7 @@
             <img class="logo" :src="require('@/assets/imgs/robot-icon.png')"/>
             <div class="answer-content" >
                 <div class="answer-content-query">
-                  <span class="session-setting-id" v-if="$route.params && $route.params.id">智能体ID: {{$route.params.id}}</span>
+                  <span class="session-setting-id" v-if="$route.params && $route.params.id && (type && type !=='webChat')">智能体ID: {{$route.params.id}}</span>
                   <div class="echo-doc-box" v-if="n.fileName && n.fileName !== ''">
                     <img :src="require('@/assets/imgs/fileicon.png')"  class="docIcon" />
                     <div class="docInfo">
@@ -169,7 +169,7 @@ marked.setOptions({
 });
 
 export default {
-  props: ['sessionStatus','defaultUrl'],
+  props: ['sessionStatus','defaultUrl','type'],
   data(){
       return{
           md:md,

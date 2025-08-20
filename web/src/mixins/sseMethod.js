@@ -389,7 +389,7 @@ export default {
                    conversationId:this.sseParams.conversationId, 
                    prompt
                 }
-                headers = this.$parent.headerConfig();
+                headers = this.getHeaderConfig();
             }
 
             this.ctrlAbort = new AbortController();

@@ -146,17 +146,18 @@ export default {
             })
         },
         addWorkFlow(n){
-            let params = { workflowID: n.appId};
-            readWorkFlow(params).then(res => {
-                if(res.code === 0){
-                    this.doCreateWorkFlow(n,n.appId, res.data.base64OpenAPISchema);
-                }
-            })
+            // let params = { workflowID: n.appId};
+            // readWorkFlow(params).then(res => {
+            //     if(res.code === 0){
+            //         this.doCreateWorkFlow(n,n.appId, res.data.base64OpenAPISchema);
+            //     }
+            // })
+            this.doCreateWorkFlow(n,n.appId)
         },
         async doCreateWorkFlow(n,workFlowId, schema){
             let params = {
                 assistantId: this.assistantId,
-                schema: Base64.decode(schema),
+                // schema: Base64.decode(schema),
                 workFlowId,
                 // apiAuth: {
                 // type: "none",

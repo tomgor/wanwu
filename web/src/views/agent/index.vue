@@ -87,6 +87,11 @@ import sseMethod from "@/mixins/sseMethod";
 export default {
   components: { CommonLayout, Chat, ApiKeyDialog },
   mixins: [sseMethod],
+  provide(){
+    return{
+      getHeaderConfig:this.headerConfig
+    }
+  },
   data() {
     return {
       asideWidth: "260px",
@@ -171,18 +176,21 @@ export default {
     },
     async getDetail() {
       let res = null;
+      let data = null;
       if (this.chatType === "agentChat") {
         res = await getAgentInfo({ assistantId: this.editForm.assistantId });
+        data = res.data;
       } else {
         const config = this.headerConfig();
         res = await getOpenurlInfo(this.assistantId, config);
+        data = res.data.assistant;
       }
       if (res.code === 0) {
-        this.editForm.avatar = res.data.avatar;
-        this.editForm.name = res.data.name;
-        this.editForm.desc = res.data.desc;
-        this.editForm.prologue = res.data.prologue;
-        this.editForm.recommendQuestion = res.data.recommendQuestion.map(
+        this.editForm.avatar = data.avatar;
+        this.editForm.name = data.name;
+        this.editForm.desc = data.desc;
+        this.editForm.prologue = data.prologue;
+        this.editForm.recommendQuestion = data.recommendQuestion.map(
           (item) => ({ value: item })
         );
       }

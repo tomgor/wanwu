@@ -15,6 +15,7 @@
                             :sessionStatus="sessionStatus"
                             @clearHistory="clearHistory"
                             @refresh="refresh"
+                            :type="type"
                             @queryCopy="queryCopy"
                             :defaultUrl="editForm.avatar.path"
                     />
@@ -59,6 +60,7 @@
     import {mapGetters} from 'vuex'
 
     export default {
+        inject:['getHeaderConfig'],
         props:{
             editForm:{
                 type:Object,
@@ -136,7 +138,7 @@
                 if(this.type === "agentChat"){
                     res = await getConversationHistory({conversationId: id, pageSize: 1000, pageNo: 1});
                 }else{
-                    const config = this.$parent.headerConfig();
+                    const config = this.getHeaderConfig();
                     res = await OpenurlConverHistory({conversationId: id},this.editForm.assistantId,config);
                 }
                 
@@ -170,7 +172,7 @@
                 if (this.type === "agentChat") {
                     res = await delConversation({conversationId: n.conversationId})
                 }else{
-                    const config = this.$parent.headerConfig();
+                    const config = this.getHeaderConfig();
                     res = await delOpenurlConversation({conversationId:n.conversationId},this.editForm.assistantId,config)
                 }
                 
@@ -203,7 +205,7 @@
                     if (this.type === "agentChat") {
                         res = await createConversation({prompt: this.inputVal,assistantId:this.editForm.assistantId})
                     }else{
-                        const config = this.$parent.headerConfig();
+                        const config = this.getHeaderConfig();
                         res = await openurlConversation({prompt: this.inputVal},this.editForm.assistantId,config)
                     }
                     
