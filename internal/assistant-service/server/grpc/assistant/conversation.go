@@ -11,12 +11,11 @@ import (
 	"io"
 	"net/http"
 	net_url "net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
-	"slices"
 
-	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	"github.com/UnicomAI/wanwu/api/proto/common"
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
@@ -27,6 +26,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/assistant-service/pkg/util"
 	"github.com/UnicomAI/wanwu/pkg/constant"
 	"github.com/UnicomAI/wanwu/pkg/es"
+	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 	"github.com/google/uuid"
@@ -709,9 +709,13 @@ func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantI
 		log.Infof("Assistant服务查询到workflow，assistantId: %s, workflowId: %s, enable: %v",
 			assistantId, assistantWorkFlowModel.WorkflowId, assistantWorkFlowModel.Enable)
 		if !slices.Contains(accessedWorkFlowIds, assistantWorkFlowModel.WorkflowId) {
+			log.Infof("assistantId: %s, workflowId: %s, 用户没有workflow数据权限，跳过",
+				assistantId, assistantWorkFlowModel.WorkflowId)
 			continue //核对实时查询的用户有数据权限的工作流accessedWorkFlowIds，如果WorkflowId不在accessedWorkFlowIds中，则不添加到pluginList
 		}
 		if !assistantWorkFlowModel.Enable {
+			log.Infof("assistantId: %s, workflowId: %s, workflow未启用，跳过",
+				assistantId, assistantWorkFlowModel.WorkflowId)
 			continue
 		}
 		tmp := PluginListAlgRequest{}
@@ -721,7 +725,7 @@ func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantI
 		result, err := http_client.Workflow().Get(ctx, &http_client.HttpRequestParams{
 			Url: url,
 			Params: map[string]string{
-				"workflowId": assistantWorkFlowModel.WorkflowId,
+				"workflowID": assistantWorkFlowModel.WorkflowId,
 			},
 			Timeout:    60 * time.Second,
 			MonitorKey: "workflow_schema",
