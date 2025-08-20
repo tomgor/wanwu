@@ -207,7 +207,7 @@ export default {
             this.setWorkflow(row.workFlowInfos);
             this.mcpList = row.mcpInfos || [];
             this.workFlowList = row.workFlowInfos || [];
-            this.customList  = row.actionInfos || [];
+            this.customList  = row.customInfos || [];
         },
         setMcp(data){
            this.mcpInfos = this.mcpInfos.map(m => ({

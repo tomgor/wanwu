@@ -948,7 +948,7 @@ export default {
         //回显自定义插件
         this.workFlowInfos = data.workFlowInfos || [];
         this.mcpInfos = data.mcpInfos || [];
-        this.actionInfos = data.actionInfos || [];
+        this.actionInfos = data.customInfos || [];
         this.allTools = [
           ...this.workFlowInfos.map((item) => ({ ...item, type: "workflow" })),
           ...this.mcpInfos.map((item) => ({ ...item, type: "mcp" })),
