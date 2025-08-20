@@ -8427,7 +8427,6 @@
             "required": [
                 "contentId",
                 "docId",
-                "knowledgeId",
                 "labels"
             ],
             "properties": {
@@ -8435,9 +8434,6 @@
                     "type": "string"
                 },
                 "docId": {
-                    "type": "string"
-                },
-                "knowledgeId": {
                     "type": "string"
                 },
                 "labels": {

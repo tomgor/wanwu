@@ -72,9 +72,8 @@ type AnalysisUrlDocReq struct {
 }
 
 type DocSegmentLabelsReq struct {
-	KnowledgeId string   `json:"knowledgeId"  validate:"required"`
-	ContentId   string   `json:"contentId"  validate:"required"`
-	DocId       string   `json:"docId"  validate:"required"`
-	Labels      []string `json:"labels"  validate:"required"`
+	ContentId string   `json:"contentId"  validate:"required"`
+	DocId     string   `json:"docId"  validate:"required"`
+	Labels    []string `json:"labels"  validate:"required"`
 	CommonCheck
 }

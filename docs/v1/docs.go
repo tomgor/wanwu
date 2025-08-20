@@ -8434,7 +8434,6 @@ const docTemplate = `{
             "required": [
                 "contentId",
                 "docId",
-                "knowledgeId",
                 "labels"
             ],
             "properties": {
@@ -8442,9 +8441,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "docId": {
-                    "type": "string"
-                },
-                "knowledgeId": {
                     "type": "string"
                 },
                 "labels": {

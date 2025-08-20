@@ -267,13 +267,17 @@ func buildDocSegmentResp(docSegmentListResp *knowledgebase_doc_service.DocSegmen
 	var segmentContentList = make([]*response.SegmentContent, 0)
 	if len(docSegmentListResp.ContentList) > 0 {
 		for _, contentInfo := range docSegmentListResp.ContentList {
+			var contentLabels = make([]string, 0)
+			if len(contentInfo.Labels) > 0 {
+				contentLabels = contentInfo.Labels
+			}
 			segmentContentList = append(segmentContentList, &response.SegmentContent{
 				ContentId:  contentInfo.ContentId,
 				Content:    contentInfo.Content,
 				Len:        int(contentInfo.Len),
 				Available:  contentInfo.Available,
 				ContentNum: int(contentInfo.ContentNum),
-				Labels:     contentInfo.Labels,
+				Labels:     contentLabels,
 			})
 		}
 	}
@@ -335,12 +339,11 @@ func buildMetaDataResultList(metaDataList []*knowledgebase_doc_service.MetaData)
 
 func UpdateDocSegmentLabels(ctx *gin.Context, userId, orgId string, r *request.DocSegmentLabelsReq) error {
 	_, err := knowledgeBaseDoc.UpdateDocSegmentLabels(ctx.Request.Context(), &knowledgebase_doc_service.DocSegmentLabelsReq{
-		UserId:      userId,
-		OrgId:       orgId,
-		KnowledgeId: r.KnowledgeId,
-		ContentId:   r.ContentId,
-		DocId:       r.DocId,
-		Labels:      r.Labels,
+		UserId:    userId,
+		OrgId:     orgId,
+		ContentId: r.ContentId,
+		DocId:     r.DocId,
+		Labels:    r.Labels,
 	})
 	return err
 }
