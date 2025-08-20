@@ -68,7 +68,7 @@ func (c *Client) UpdateAppUrl(ctx context.Context, appUrl *model.AppUrl) *err_co
 func (c *Client) GetAppUrlInfoBySuffix(ctx context.Context, suffix string) (*model.AppUrl, *err_code.Status) {
 	appUrl := &model.AppUrl{}
 	if err := sqlopt.WithSuffix(suffix).Apply(c.db.WithContext(ctx)).First(appUrl).Error; err != nil {
-		return nil, toErrStatus("app_url_get", err.Error())
+		return nil, toErrStatus("app_url_get")
 	}
 	return appUrl, nil
 
