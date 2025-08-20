@@ -1,8 +1,57 @@
 import request from "@/utils/request"
 const BASE_URL = '/use/model/api/v1'
 
-/*----自定义------*/
-//mcp列表
+/*----自定义工具------*/
+export const getCustomList = (data)=>{
+    return request({
+        url: `${BASE_URL}/tool/custom/list`,
+        method: 'get',
+        params: data
+    })
+};
+
+export const getCustom = (data)=>{
+    return request({
+        url: `${BASE_URL}/tool/custom`,
+        method: 'get',
+        params: data
+    })
+};
+
+export const editCustom = (data)=>{
+    return request({
+        url: `${BASE_URL}/tool/custom`,
+        method: 'put',
+        data
+    })
+};
+
+export const addCustom = (data)=>{
+    return request({
+        url: `${BASE_URL}/tool/custom`,
+        method: 'post',
+        data
+    })
+};
+
+export const deleteCustom = (data)=>{
+    return request({
+        url: `${BASE_URL}/tool/custom`,
+        method: 'delete',
+        data
+    })
+};
+
+export const getSchema = (data)=>{
+    return request({
+        url: `${BASE_URL}/tool/custom/schema`,
+        method: 'post',
+        data
+    })
+};
+
+
+/*---mcp列表---*/
 export const getList = (data)=>{
     return request({
         url: `${BASE_URL}/mcp/list`,
@@ -43,7 +92,7 @@ export const setCreate = (data)=>{
     })
 };
 
-/*---第三方mcp广场---*/
+/*---第三方工具广场---*/
 export const getPublicMcpList = (data)=>{
     return request({
         url: `${BASE_URL}/mcp/square/list`,
