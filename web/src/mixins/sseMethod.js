@@ -384,7 +384,7 @@ export default {
                     "x-org-id": userInfo.orgId
                 }
             }else{
-                this.sseApi = `/openurl/v1/agent/${this.sseParams.assistantId}/stream`;
+                this.sseApi = `/service/url/openurl/v1/agent/${this.sseParams.assistantId}/stream`;
                 data = {
                    conversationId:this.sseParams.conversationId, 
                    prompt

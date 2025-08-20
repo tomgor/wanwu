@@ -270,7 +270,7 @@ export const OpenurlConverHistory = (data,suffix,config)=>{
     return service({
         url: `/service/url/openurl/v1/agent/${suffix}/conversation/detail`,
         method: 'get',
-        data,
+        params:data,
         config
     })
 }
