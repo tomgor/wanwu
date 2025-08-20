@@ -1,12 +1,13 @@
 <template>
   <el-dialog
-    title="创建标签"
+    :title="title"
     :visible.sync="dialogVisible"
     width="20%"
     :before-close="handleClose"
   >
     <div>
       <el-input
+        v-if="type !== 'section'"
         placeholder="搜索标签"
         suffix-icon="el-icon-search"
         @keyup.enter.native="addByEnterKey"
@@ -15,7 +16,7 @@
       <div
         class="add"
         @click="addTag"
-      ><span class="el-icon-plus add-icon"></span>创建标签</div>
+      ><span class="el-icon-plus add-icon"></span>{{title}}</div>
       <div class="tag-box">
         <div
           v-for="(item,index) in tagList"
@@ -26,8 +27,9 @@
         >
           <el-checkbox
             v-model="item.selected"
-            v-if="!item.showIpt"
+            v-if="!item.showIpt && type !== 'section'"
           >{{item.tagName}}</el-checkbox>
+          <span v-if="!item.showIpt && type === 'section'">{{item.tagName}}</span>
           <el-input
             v-model="item.tagName"
             v-if="item.showIpt"
@@ -58,18 +60,22 @@
 <script>
 import { delTag, tagList, createTag, editTag, bindTag,bindTagCount,updateDocTag} from "@/api/knowledge";
 export default {
-  props:['type'],
+  props:['type','title','currentList'],
   data() {
     return {
       dialogVisible: false,
       tagList: [],
       tagName: "",
-      knowledgeId: "",
+      knowledgeId: ""
     };
   },
   methods: {
     submitDialog() {
-      this.bindTag()
+      if(this.type === 'section'){
+        this.$emit('sendList',this.tagList)
+      }else{
+         this.bindTag()
+      }
     },
     bindTag(){
       const ids = this.tagList.filter((item) => item.selected).map((item) => item.tagId);
@@ -104,7 +110,14 @@ export default {
         return 'unknow'
       })
     },
-    async delTag(item) {
+    delTag(item,index){
+      if(this.type !== 'section'){
+          this.delTag_item(item)
+      }else{
+        this.tagList.splice(index,1)
+      }
+    },
+    async delTag_item(item) {
       const isBind = await this.bindTagCount(item.tagId);
       if(isBind == 'unknow') return
       await this.$confirm(
@@ -126,10 +139,15 @@ export default {
             this.getList();
         });
     },
-    showDiaglog(id) {
+    showDiaglog(id='') {
       this.dialogVisible = true;
-      this.knowledgeId = id;
-      this.getList();
+      if(this.type !== 'section'){
+        this.knowledgeId = id;
+        this.getList();
+      }else{
+        this.tagList = this.currentList;
+      }
+
     },
     handleClose() {
       this.dialogVisible = false;
@@ -145,6 +163,12 @@ export default {
     },
     inputBlur(n) {
       if(!n.tagName) return;
+
+      if(this.type === 'section'){
+        n.showIpt = false;
+        return
+      }
+
       if (n.tagId) {
         this.edit_tag(n);
       } else {

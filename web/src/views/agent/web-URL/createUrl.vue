@@ -1,7 +1,6 @@
 <template>
     <div>
         <div>
-            <el-button type="primary"  size="mini" @click="$router.push('/webChat/123')">去聊天</el-button>
             <el-button type="primary" icon="el-icon-plus" size="mini" @click="showDialog(null)">创建</el-button>
             <el-table
                 :data="tableData"

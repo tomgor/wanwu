@@ -108,13 +108,13 @@
               <div class="text item" @click="handleClick(item, index)">
                 {{ item.content }}
               </div>
-              <!-- <div class="tagList" style="border:1px solid red;">
-                <span :class="['smartDate','tagList']" v-if="formattedTagNames(n.knowledgeTagList).length === 0" @click.stop="addTag(n.knowledgeId)">
+              <div class="tagList">
+                <span :class="['smartDate','tagList']" @click.stop="addTag(item.labels,item.contentId)">
                   <span class="el-icon-price-tag icon-tag"></span>
-                  添加标签
+                  创建关键词
                 </span>
-                <span v-else @click.stop="addTag(n.knowledgeId)">{{formattedTagNames(n.knowledgeTagList) }}</span>
-              </div> -->
+                <span class="tagList-item">{{formattedTagNames(item.labels) }}</span>
+              </div>
             </el-card>
           </el-col>
         </el-row>
@@ -179,15 +179,18 @@
       </span>
     </el-dialog>
     <dataBaseDialog ref="dataBase" @updateData="updateData"/>
+    <tagDialog ref="tagDialog" type="section" :title="title" :currentList="currentList" @sendList="sendList" />
   </div>
 </template>
 <script>
-import { getSectionList,setSectionStatus } from "@/api/knowledge";
-import dataBaseDialog from './dataBaseDialog'
+import { getSectionList,setSectionStatus,sectionLabels } from "@/api/knowledge";
+import dataBaseDialog from './dataBaseDialog';
+import tagDialog from './tagDialog.vue';
 export default {
-  components:{dataBaseDialog},
+  components:{dataBaseDialog,tagDialog},
   data() {
     return {
+      title:'创建关键词',
       dialogVisible: false,
       obj: {}, // 路由参数对象
       cardObj: [
@@ -216,7 +219,9 @@ export default {
         contentList: [],
       },
       metaDataList: [],
-      metaRuleList: []
+      metaRuleList: [],
+      currentList:[],
+      contentId:''
     };
   },
   created() {
@@ -224,6 +229,36 @@ export default {
     this.getList();
   },
   methods: {
+    sendList(data){
+      const labels = data.map(item => item.tagName)
+      sectionLabels({contentId:this.contentId,docId:this.obj.id,labels}).then(res =>{
+        if(res.code === 0){
+          this.getList();
+          this.$refs.tagDialog.handleClose();
+        }
+      }).catch(err =>{})
+    },
+    addTag(data,id){
+      this.currentList = data.map(item =>({
+        ...item,
+        tagName:item,
+        checked: false,
+        showDel: false,
+        showIpt: false
+      }))
+      this.contentId = id
+      this.$refs.tagDialog.showDiaglog(id);
+    },
+    formattedTagNames(data){
+      if(!Array.isArray(data) || data.length === 0){
+        return '';
+      }
+      const tags = data.filter(item => item.selected).map(item =>  item.tagName ).join(', ');
+      if (tags.length > 30) {
+          return tags.slice(0, 30) + '...';
+      }
+      return tags;
+    },
     updateData(){
       this.getList();
     },
@@ -376,6 +411,20 @@ export default {
 };
 </script>
 <style lang="scss">
+  .smartDate{
+      padding-top:3px;
+      color:#888888;
+  }
+  .tagList{
+    cursor: pointer;
+    .icon-tag{
+      transform: rotate(-40deg);
+      margin-right:3px;
+    }
+  }
+  .tagList > .tagList-item:hover{
+      color:#384BF7;
+  }
 .showMore{
   margin-left:5px;
   background:#f4f5ff;

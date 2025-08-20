@@ -57,7 +57,7 @@
       </template>
     </div>
     <el-empty class="noData" v-if="!(listData && listData.length)" :description="$t('common.noData')"></el-empty>
-    <tagDialog ref="tagDialog" @relodaData="relodaData" type="knowledge" />
+    <tagDialog ref="tagDialog" @relodaData="relodaData" type="knowledge" :title="title"/>
   </div>
 </template>
 
@@ -87,7 +87,8 @@ export default {
     return{
       apptype:AppType,
       basePath: this.$basePath,
-      listData:[]
+      listData:[],
+      title:'创建标签'
     }
   },
   methods:{
@@ -191,7 +192,7 @@ export default {
     }
     .tagList:hover{
         color:#384BF7;
-      }
+    }
   }
 }
 </style>
