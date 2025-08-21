@@ -44,6 +44,11 @@
                             @modelChange="modelChange"
                             @setSessionStatus="setSessionStatus"
                     />
+                    <div v-if="appUrlInfo" class="appUrlInfo">
+                        <span v-if='appUrlInfo.copyrightEnable'>版权所有: {{appUrlInfo.copyright}}</span>
+                        <span v-if='appUrlInfo.privacyPolicyEnable'>隐私协议: {{appUrlInfo.privacyPolicy}}</span>
+                        <span v-if="appUrlInfo.disclaimerEnable">免责声明: {{appUrlInfo.disclaimer}}</span>
+                    </div>
                 </div>
             </div>
         </el-main>
@@ -77,6 +82,10 @@
             type:{
                 type:String,
                 default:'agentChat'
+            },
+            appUrlInfo:{
+                type:Object,
+                default:null
             }
         },
         components: {
@@ -100,6 +109,9 @@
                 hasDrawer: false,
                 drawer: true,
             }
+        },
+        mounted(){
+            console.log(this.appUrlInfo)
         },
         methods: {
             createConversion(){
@@ -274,4 +286,14 @@
 
 <style lang="scss" scoped>
 @import '@/style/chat.scss';
+.appUrlInfo{
+    margin-top:10px;
+    display:flex;
+    justify-content:center;
+    span{
+        cursor: pointer;
+        color:#bbb;
+        margin-right:15px;
+    }
+}
 </style>

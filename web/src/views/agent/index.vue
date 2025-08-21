@@ -57,6 +57,7 @@
         <Chat
           :chatType="'chat'"
           :editForm="editForm"
+          :appUrlInfo="appUrlInfo"
           :type="chatType"
           ref="agentChat"
           @reloadList="reloadList"
@@ -100,6 +101,7 @@ export default {
       asideTitle: "新建对话",
       assistantId: "",
       historyList: [],
+      appUrlInfo:{},
       editForm: {
         assistantId: "",
         avatar: {},
@@ -187,6 +189,7 @@ export default {
         const config = this.headerConfig();
         res = await getOpenurlInfo(this.assistantId, config);
         data = res.data.assistant;
+        this.appUrlInfo = res.data.appUrlInfo;
       }
       if (res.code === 0) {
         this.editForm.avatar = data.avatar;

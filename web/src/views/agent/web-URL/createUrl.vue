@@ -223,6 +223,7 @@ export default {
             if (this.$refs.form) {
               this.$refs.form.resetFields();
               this.$refs.form.clearValidate();
+              this.clear();
             }
           })
         }else{
@@ -234,6 +235,16 @@ export default {
             }
           })
         }
+      },
+      clear(){
+        this.form.copyright = '';
+        this.form.copyrightEnable = false;
+        this.form.disclaimer = '';
+        this.form.disclaimerEnable = false;
+        this.form.expiredAt = '';
+        this.form.name = '';
+        this.form.privacyPolicy = '';
+        this.form.privacyPolicyEnable = false;
       },
       submit(formName){
         this.$refs[formName].validate((valid) => {
