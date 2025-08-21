@@ -73,3 +73,27 @@ func DataPerm(db *gorm.DB, userId, orgId string) *gorm.DB {
 		return db
 	}
 }
+
+func WithAssistantID(assistantId uint32) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("assistant_id = ?", assistantId)
+	})
+}
+
+func WithCustomID(customId string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("custom_id = ?", customId)
+	})
+}
+
+func WithMCPID(mcpId string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("mcp_id = ?", mcpId)
+	})
+}
+
+func WithWorkflowID(workflowId string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("workflow_id = ?", workflowId)
+	})
+}

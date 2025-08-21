@@ -863,6 +863,13 @@ const docTemplate = `{
                     "description": "创建时间",
                     "type": "string"
                 },
+                "customInfos": {
+                    "description": "自定义工具信息",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.CustomInfos"
+                    }
+                },
                 "desc": {
                     "description": "描述",
                     "type": "string"
@@ -1023,6 +1030,29 @@ const docTemplate = `{
                 }
             }
         },
+        "response.CustomInfos": {
+            "type": "object",
+            "properties": {
+                "customDesc": {
+                    "type": "string"
+                },
+                "customId": {
+                    "type": "string"
+                },
+                "enable": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "uniqueId": {
+                    "type": "string"
+                },
+                "valid": {
+                    "type": "boolean"
+                }
+            }
+        },
         "response.ListResult": {
             "type": "object",
             "properties": {
@@ -1038,16 +1068,10 @@ const docTemplate = `{
                 "enable": {
                     "type": "boolean"
                 },
-                "id": {
-                    "type": "string"
-                },
                 "mcpDesc": {
                     "type": "string"
                 },
                 "mcpId": {
-                    "type": "string"
-                },
-                "mcpName": {
                     "type": "string"
                 },
                 "mcpServerFrom": {
@@ -1057,6 +1081,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "mcpSquareId": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "uniqueId": {
                     "type": "string"
                 },
                 "valid": {
@@ -1085,7 +1115,10 @@ const docTemplate = `{
                 "enable": {
                     "type": "boolean"
                 },
-                "id": {
+                "name": {
+                    "type": "string"
+                },
+                "uniqueId": {
                     "type": "string"
                 },
                 "valid": {
@@ -1095,9 +1128,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "workFlowId": {
-                    "type": "string"
-                },
-                "workFlowName": {
                     "type": "string"
                 }
             }

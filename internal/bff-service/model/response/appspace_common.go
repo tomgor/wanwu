@@ -4,6 +4,7 @@ import "github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 
 type AppBriefInfo struct {
 	AppId       string         `json:"appId"`       // 应用id
+	UniqueId    string         `json:"uniqueId"`    // 唯一标识
 	AppType     string         `json:"appType"`     // 应用类型
 	Avatar      request.Avatar `json:"avatar"`      // 应用图标
 	Name        string         `json:"name"`        // 应用名称
@@ -33,6 +34,6 @@ type AppUrlInfo struct {
 }
 
 type AppUrlConfig struct {
-	Assistant  Assistant   `json:"assistant"`  // 基本信息
+	Assistant  *Assistant  `json:"assistant"`  // 基本信息
 	AppUrlInfo *AppUrlInfo `json:"appUrlInfo"` // 应用Url信息
 }

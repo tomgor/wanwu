@@ -1437,121 +1437,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/assistant/mcp": {
-            "post": {
-                "security": [
-                    {
-                        "JWT": []
-                    }
-                ],
-                "description": "为智能体绑定已发布的mcp工具",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "agent"
-                ],
-                "summary": "添加mcp工具",
-                "parameters": [
-                    {
-                        "description": "mcp新增参数",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.MCPAddRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "JWT": []
-                    }
-                ],
-                "description": "为智能体解绑mcp",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "agent"
-                ],
-                "summary": "删除mcp",
-                "parameters": [
-                    {
-                        "description": "mcp id",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.MCPIdRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/assistant/mcp/enable": {
-            "put": {
-                "security": [
-                    {
-                        "JWT": []
-                    }
-                ],
-                "description": "修改智能体绑定的MCP的启用状态",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "agent"
-                ],
-                "summary": "启用/停用 MCP",
-                "parameters": [
-                    {
-                        "description": "mcp id",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.MCPIdRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/assistant/stream": {
             "post": {
                 "security": [
@@ -1764,7 +1649,237 @@ const docTemplate = `{
                 }
             }
         },
-        "/assistant/workflow": {
+        "/assistant/tool/custom": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "为智能体绑定自定义工具",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "添加自定义工具",
+                "parameters": [
+                    {
+                        "description": "自定义工具新增参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AssistantCustomToolAddRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "为智能体解绑自定义工具",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "删除自定义工具",
+                "parameters": [
+                    {
+                        "description": "智能体id与自定义工具id",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AssistantCustomToolDelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assistant/tool/custom/switch": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "修改智能体绑定的自定义工具的启用状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "启用/停用自定义工具",
+                "parameters": [
+                    {
+                        "description": "智能体id与自定义工具id",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AssistantCustomToolEnableRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assistant/tool/mcp": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "为智能体绑定已发布的mcp工具",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "添加mcp工具",
+                "parameters": [
+                    {
+                        "description": "mcp新增参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AssistantMCPToolAddRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "为智能体解绑mcp",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "删除mcp",
+                "parameters": [
+                    {
+                        "description": "mcp工具id，智能体id",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AssistantMCPToolDelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assistant/tool/mcp/switch": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "修改智能体绑定的MCP的启用状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "启用/停用 MCP",
+                "parameters": [
+                    {
+                        "description": "mcp工具id、智能体id、enable",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AssistantMCPToolEnableRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assistant/tool/workflow": {
             "post": {
                 "security": [
                     {
@@ -1789,7 +1904,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.WorkFlowAddRequest"
+                            "$ref": "#/definitions/request.AssistantWorkFlowAddRequest"
                         }
                     }
                 ],
@@ -1821,12 +1936,12 @@ const docTemplate = `{
                 "summary": "删除工作流",
                 "parameters": [
                     {
-                        "description": "工作流id",
+                        "description": "工作流id,智能体id",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.WorkFlowIdRequest"
+                            "$ref": "#/definitions/request.AssistantWorkFlowDelRequest"
                         }
                     }
                 ],
@@ -1840,7 +1955,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/assistant/workflow/enable": {
+        "/assistant/tool/workflow/switch": {
             "put": {
                 "security": [
                     {
@@ -1860,12 +1975,12 @@ const docTemplate = `{
                 "summary": "启用/停用工作流",
                 "parameters": [
                     {
-                        "description": "工作流id",
+                        "description": "工作流id,智能体id,开关",
                         "name": "data",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.WorkFlowIdRequest"
+                            "$ref": "#/definitions/request.AssistantWorkFlowToolEnableRequest"
                         }
                     }
                 ],
@@ -8068,6 +8183,102 @@ const docTemplate = `{
                 }
             }
         },
+        "request.AssistantCustomToolAddRequest": {
+            "type": "object",
+            "required": [
+                "assistantId",
+                "customToolId"
+            ],
+            "properties": {
+                "assistantId": {
+                    "type": "string"
+                },
+                "customToolId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.AssistantCustomToolDelRequest": {
+            "type": "object",
+            "required": [
+                "assistantId",
+                "customToolId"
+            ],
+            "properties": {
+                "assistantId": {
+                    "type": "string"
+                },
+                "customToolId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.AssistantCustomToolEnableRequest": {
+            "type": "object",
+            "required": [
+                "assistantId",
+                "customToolId"
+            ],
+            "properties": {
+                "assistantId": {
+                    "type": "string"
+                },
+                "customToolId": {
+                    "type": "string"
+                },
+                "enable": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "request.AssistantMCPToolAddRequest": {
+            "type": "object",
+            "required": [
+                "assistantId",
+                "mcpId"
+            ],
+            "properties": {
+                "assistantId": {
+                    "type": "string"
+                },
+                "mcpId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.AssistantMCPToolDelRequest": {
+            "type": "object",
+            "required": [
+                "assistantId",
+                "mcpId"
+            ],
+            "properties": {
+                "assistantId": {
+                    "type": "string"
+                },
+                "mcpId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.AssistantMCPToolEnableRequest": {
+            "type": "object",
+            "required": [
+                "assistantId",
+                "mcpId"
+            ],
+            "properties": {
+                "assistantId": {
+                    "type": "string"
+                },
+                "enable": {
+                    "type": "boolean"
+                },
+                "mcpId": {
+                    "type": "string"
+                }
+            }
+        },
         "request.AssistantTemplateRequest": {
             "type": "object",
             "required": [
@@ -8075,6 +8286,54 @@ const docTemplate = `{
             ],
             "properties": {
                 "assistantTemplateId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.AssistantWorkFlowAddRequest": {
+            "type": "object",
+            "required": [
+                "assistantId",
+                "workFlowId"
+            ],
+            "properties": {
+                "assistantId": {
+                    "type": "string"
+                },
+                "workFlowId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.AssistantWorkFlowDelRequest": {
+            "type": "object",
+            "required": [
+                "assistantId",
+                "workFlowId"
+            ],
+            "properties": {
+                "assistantId": {
+                    "type": "string"
+                },
+                "workFlowId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.AssistantWorkFlowToolEnableRequest": {
+            "type": "object",
+            "required": [
+                "assistantId",
+                "workFlowId"
+            ],
+            "properties": {
+                "assistantId": {
+                    "type": "string"
+                },
+                "enable": {
+                    "type": "boolean"
+                },
+                "workFlowId": {
                     "type": "string"
                 }
             }
@@ -8418,7 +8677,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "authType": {
-                    "description": "Auth类型 仅当认证类型为API Key时必填",
+                    "description": "Auth类型 仅当认证类型为API Key时必填，也可以为空",
                     "type": "string",
                     "enum": [
                         "Custom"
@@ -9144,17 +9403,6 @@ const docTemplate = `{
                 }
             }
         },
-        "request.MCPAddRequest": {
-            "type": "object",
-            "properties": {
-                "assistantId": {
-                    "type": "string"
-                },
-                "mcpId": {
-                    "type": "string"
-                }
-            }
-        },
         "request.MCPCreate": {
             "type": "object",
             "required": [
@@ -9187,17 +9435,6 @@ const docTemplate = `{
             }
         },
         "request.MCPIDReq": {
-            "type": "object",
-            "required": [
-                "mcpId"
-            ],
-            "properties": {
-                "mcpId": {
-                    "type": "string"
-                }
-            }
-        },
-        "request.MCPIdRequest": {
             "type": "object",
             "required": [
                 "mcpId"
@@ -9923,31 +10160,6 @@ const docTemplate = `{
                 }
             }
         },
-        "request.WorkFlowAddRequest": {
-            "type": "object",
-            "properties": {
-                "assistantId": {
-                    "type": "string"
-                },
-                "schema": {
-                    "type": "string"
-                },
-                "workFlowId": {
-                    "type": "string"
-                }
-            }
-        },
-        "request.WorkFlowIdRequest": {
-            "type": "object",
-            "required": [
-                "workFlowId"
-            ],
-            "properties": {
-                "workFlowId": {
-                    "type": "string"
-                }
-            }
-        },
         "response.Action": {
             "type": "object",
             "properties": {
@@ -10079,6 +10291,10 @@ const docTemplate = `{
                     "description": "发布类型(public:公开发布,private:私密发布)",
                     "type": "string"
                 },
+                "uniqueId": {
+                    "description": "唯一标识",
+                    "type": "string"
+                },
                 "updatedAt": {
                     "description": "应用更新时间(用于历史记录排序)",
                     "type": "string"
@@ -10182,6 +10398,13 @@ const docTemplate = `{
                 "createdAt": {
                     "description": "创建时间",
                     "type": "string"
+                },
+                "customInfos": {
+                    "description": "自定义工具信息",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.CustomInfos"
+                    }
                 },
                 "desc": {
                     "description": "描述",
@@ -10537,6 +10760,29 @@ const docTemplate = `{
                 }
             }
         },
+        "response.CustomInfos": {
+            "type": "object",
+            "properties": {
+                "customDesc": {
+                    "type": "string"
+                },
+                "customId": {
+                    "type": "string"
+                },
+                "enable": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "uniqueId": {
+                    "type": "string"
+                },
+                "valid": {
+                    "type": "boolean"
+                }
+            }
+        },
         "response.CustomLogin": {
             "type": "object",
             "properties": {
@@ -10650,6 +10896,13 @@ const docTemplate = `{
                         }
                     ]
                 },
+                "apiList": {
+                    "description": "api列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.CustomToolApiResponse"
+                    }
+                },
                 "customToolId": {
                     "description": "自定义工具id",
                     "type": "string"
@@ -10657,13 +10910,6 @@ const docTemplate = `{
                 "description": {
                     "description": "描述",
                     "type": "string"
-                },
-                "list": {
-                    "description": "api列表",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.CustomToolApiResponse"
-                    }
                 },
                 "name": {
                     "description": "名称",
@@ -10887,6 +11133,10 @@ const docTemplate = `{
                 },
                 "publishType": {
                     "description": "发布类型(public:公开发布,private:私密发布)",
+                    "type": "string"
+                },
+                "uniqueId": {
+                    "description": "唯一标识",
                     "type": "string"
                 },
                 "updatedAt": {
@@ -11359,16 +11609,10 @@ const docTemplate = `{
                 "enable": {
                     "type": "boolean"
                 },
-                "id": {
-                    "type": "string"
-                },
                 "mcpDesc": {
                     "type": "string"
                 },
                 "mcpId": {
-                    "type": "string"
-                },
-                "mcpName": {
                     "type": "string"
                 },
                 "mcpServerFrom": {
@@ -11378,6 +11622,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "mcpSquareId": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "uniqueId": {
                     "type": "string"
                 },
                 "valid": {
@@ -11410,6 +11660,10 @@ const docTemplate = `{
                 },
                 "serverUrl": {
                     "description": "sseUrl",
+                    "type": "string"
+                },
+                "uniqueId": {
+                    "description": "唯一标识",
                     "type": "string"
                 }
             }
@@ -12211,7 +12465,10 @@ const docTemplate = `{
                 "enable": {
                     "type": "boolean"
                 },
-                "id": {
+                "name": {
+                    "type": "string"
+                },
+                "uniqueId": {
                     "type": "string"
                 },
                 "valid": {
@@ -12221,9 +12478,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "workFlowId": {
-                    "type": "string"
-                },
-                "workFlowName": {
                     "type": "string"
                 }
             }

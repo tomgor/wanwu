@@ -9,6 +9,7 @@ type MCPSelect struct {
 	MCPID       string `json:"mcpId"`       // mcpId
 	MCPSquareID string `json:"mcpSquareId"` // 广场mcpId(非空表示来源于广场)
 	Name        string `json:"name"`        // 名称
+	UniqueId    string `json:"uniqueId"`    // 唯一标识
 	Description string `json:"description"` // 描述
 	ServerFrom  string `json:"serverFrom"`  // 来源
 	ServerURL   string `json:"serverUrl"`   // sseUrl
