@@ -182,6 +182,12 @@
 {"code":310004,"key":"mcp_delete_err","langs":{"zh":"删除MCP异常:%v"}}
 {"code":310005,"key":"mcp_custom_list_mcps_err","langs":{"zh":"获取自定义MCP列表异常:%v"}}
 {"code":310006,"key":"mcp_get_mcp_avatar_err","langs":{"zh":"获取MCP图标异常:%v"}}
+{"code":310007,"key":"mcp_create_custom_tool_err","langs":{"zh":"创建自定义工具异常:%v"}}
+{"code":310007,"key":"mcp_create_duplicate_custom_tool","langs":{"zh":"创建自定义工具异常: 已存在同名"}}
+{"code":310008,"key":"mcp_get_custom_tool_info_err","langs":{"zh":"获取自定义工具详情异常:%v"}}
+{"code":310009,"key":"mcp_get_custom_tool_list_err","langs":{"zh":"获取自定义工具列表异常:%v"}}
+{"code":310010,"key":"mcp_update_custom_tool_err","langs":{"zh":"更新自定义工具异常:%v"}}
+{"code":310011,"key":"mcp_delete_custom_tool_err","langs":{"zh":"删除自定义工具:%v"}}
 {"code":150001,"key":"rag_role_err","langs":{"zh":"角色权限错误：%v"}}
 {"code":150002,"key":"rag_info_not_exist","langs":{"zh":"文本问答信息不存在：%v"}}
 {"code":150003,"key":"rag_delete_err","langs":{"zh":"删除文本问答错误：%v"}}

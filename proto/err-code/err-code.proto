@@ -137,6 +137,11 @@ enum Code {
   MCPDeleteCustomMCPErr = 310004; // 删除自定义MCP错误
   MCPGetCustomMCPListErr = 310005; // 获取自定义MCP列表错误
   MCPGetMCPAvatarErr = 310006; // 获取MCP头像错误
+  MCPCreateCustomToolErr = 310007; // 创建自定义工具错误
+  MCPGetCustomToolInfoErr = 310008; // 获取自定义工具详情错误
+  MCPGetCustomToolListErr = 310009; // 获取自定义工具列表错误
+  MCPUpdateCustomToolErr = 310010; // 更新自定义工具错误
+  MCPDeleteCustomToolErr = 310011; // 删除自定义工具错误
 
   // --- operate-service ---
   // [320000, 329999]

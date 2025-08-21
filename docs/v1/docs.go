@@ -6316,6 +6316,323 @@ const docTemplate = `{
                 }
             }
         },
+        "/tool/custom": {
+            "get": {
+                "description": "获取自定义工具详情",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tool"
+                ],
+                "summary": "获取自定义工具详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "customToolId",
+                        "name": "customToolId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CustomToolDetail"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "修改自定义工具",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tool"
+                ],
+                "summary": "修改自定义工具",
+                "parameters": [
+                    {
+                        "description": "自定义工具信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CustomToolUpdateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建自定义工具",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tool"
+                ],
+                "summary": "创建自定义工具",
+                "parameters": [
+                    {
+                        "description": "自定义工具信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CustomToolCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除自定义工具",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tool"
+                ],
+                "summary": "删除自定义工具",
+                "parameters": [
+                    {
+                        "description": "自定义工具ID",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CustomToolIDReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/tool/custom/list": {
+            "get": {
+                "description": "获取自定义工具列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tool"
+                ],
+                "summary": "获取自定义工具列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CustomTool名称",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.CustomToolCell"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/tool/custom/schema": {
+            "post": {
+                "description": "解析自定义工具的Schema转换为API相关数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tool"
+                ],
+                "summary": "获取可用API列表（根据Schema）",
+                "parameters": [
+                    {
+                        "description": "Schema格式数据",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CustomToolSchemaReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.CustomToolApiResponse"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/tool/custom/select": {
+            "get": {
+                "description": "获取自定义工具列表（用于下拉选择）",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tool"
+                ],
+                "summary": "获取自定义工具列表（用于下拉选择）",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CustomTool名称",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/response.CustomToolSelect"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "put": {
                 "security": [
@@ -8086,6 +8403,136 @@ const docTemplate = `{
                 },
                 "tabTitle": {
                     "description": "标签页标题",
+                    "type": "string"
+                }
+            }
+        },
+        "request.CustomToolApiAuthWebRequest": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "apiKey": {
+                    "description": "apiKey 仅当认证类型为API Key时必填",
+                    "type": "string"
+                },
+                "authType": {
+                    "description": "Auth类型 仅当认证类型为API Key时必填",
+                    "type": "string",
+                    "enum": [
+                        "Custom"
+                    ]
+                },
+                "customHeaderName": {
+                    "description": "Custom Header Name 仅当认证类型为API Key时必填",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "认证类型",
+                    "type": "string",
+                    "enum": [
+                        "None",
+                        "API Key"
+                    ]
+                }
+            }
+        },
+        "request.CustomToolCreate": {
+            "type": "object",
+            "required": [
+                "apiAuth",
+                "description",
+                "name",
+                "schema"
+            ],
+            "properties": {
+                "apiAuth": {
+                    "description": "api身份认证",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.CustomToolApiAuthWebRequest"
+                        }
+                    ]
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "privacyPolicy": {
+                    "description": "隐私政策",
+                    "type": "string"
+                },
+                "schema": {
+                    "description": "schema",
+                    "type": "string"
+                }
+            }
+        },
+        "request.CustomToolIDReq": {
+            "type": "object",
+            "required": [
+                "customToolId"
+            ],
+            "properties": {
+                "customToolId": {
+                    "description": "自定义工具id",
+                    "type": "string"
+                }
+            }
+        },
+        "request.CustomToolSchemaReq": {
+            "type": "object",
+            "required": [
+                "schema"
+            ],
+            "properties": {
+                "schema": {
+                    "description": "schema",
+                    "type": "string"
+                }
+            }
+        },
+        "request.CustomToolUpdateReq": {
+            "type": "object",
+            "required": [
+                "apiAuth",
+                "customToolId",
+                "description",
+                "name",
+                "schema"
+            ],
+            "properties": {
+                "apiAuth": {
+                    "description": "api身份认证",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.CustomToolApiAuthWebRequest"
+                        }
+                    ]
+                },
+                "customToolId": {
+                    "description": "自定义工具ID",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "privacyPolicy": {
+                    "description": "隐私政策",
+                    "type": "string"
+                },
+                "schema": {
+                    "description": "schema",
                     "type": "string"
                 }
             }
@@ -10136,6 +10583,119 @@ const docTemplate = `{
                 },
                 "title": {
                     "description": "标签页标题",
+                    "type": "string"
+                }
+            }
+        },
+        "response.CustomToolApiAuthWebRequest": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "apiKey",
+                    "type": "string"
+                },
+                "authType": {
+                    "description": "Auth类型",
+                    "type": "string"
+                },
+                "customHeaderName": {
+                    "description": "自定义头名",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "认证类型: None 或 APIKey",
+                    "type": "string"
+                }
+            }
+        },
+        "response.CustomToolApiResponse": {
+            "type": "object",
+            "properties": {
+                "method": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.CustomToolCell": {
+            "type": "object",
+            "properties": {
+                "customToolId": {
+                    "description": "自定义工具id",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                }
+            }
+        },
+        "response.CustomToolDetail": {
+            "type": "object",
+            "properties": {
+                "apiAuth": {
+                    "description": "apiAuth",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.CustomToolApiAuthWebRequest"
+                        }
+                    ]
+                },
+                "customToolId": {
+                    "description": "自定义工具id",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "list": {
+                    "description": "api列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.CustomToolApiResponse"
+                    }
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "privacyPolicy": {
+                    "description": "隐私政策",
+                    "type": "string"
+                },
+                "schema": {
+                    "description": "schema",
+                    "type": "string"
+                }
+            }
+        },
+        "response.CustomToolSelect": {
+            "type": "object",
+            "properties": {
+                "customToolId": {
+                    "description": "自定义工具id",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "名称",
+                    "type": "string"
+                },
+                "uniqueId": {
+                    "description": "统一的id",
                     "type": "string"
                 }
             }
