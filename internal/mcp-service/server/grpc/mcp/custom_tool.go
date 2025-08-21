@@ -7,6 +7,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/mcp-service/client/model"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"strconv"
 )
 
 func (s *Service) CreateCustomTool(ctx context.Context, req *mcp_service.CreateCustomToolReq) (*emptypb.Empty, error) {
@@ -16,9 +17,7 @@ func (s *Service) CreateCustomTool(ctx context.Context, req *mcp_service.CreateC
 	if req.ApiAuth == nil {
 		return nil, errStatus(errs.Code_MCPCreateCustomToolErr, toErrStatus("mcp_create_custom_tool_err", "apiAuth is empty"))
 	}
-	customToolId := util.GenUUID()
 	if err := s.cli.CreateCustomTool(ctx, &model.CustomTool{
-		CustomToolId:     customToolId,
 		Name:             req.Name,
 		Description:      req.Description,
 		Schema:           req.Schema,
@@ -38,12 +37,13 @@ func (s *Service) GetCustomToolInfo(ctx context.Context, req *mcp_service.GetCus
 	if req.CustomToolId == "" {
 		return nil, errStatus(errs.Code_MCPGetCustomToolInfoErr, toErrStatus("mcp_get_custom_tool_info_err", "customToolId is empty"))
 	}
-	info, err := s.cli.GetCustomTool(ctx, req.CustomToolId)
+
+	info, err := s.cli.GetCustomTool(ctx, util.MustU32(req.CustomToolId))
 	if err != nil {
 		return nil, errStatus(errs.Code_MCPGetCustomToolInfoErr, err)
 	}
 	return &mcp_service.GetCustomToolInfoResp{
-		CustomToolId:  info.CustomToolId,
+		CustomToolId:  strconv.Itoa(int(info.ID)),
 		Name:          info.Name,
 		Description:   info.Description,
 		Schema:        info.Schema,
@@ -67,7 +67,7 @@ func (s *Service) GetCustomToolList(ctx context.Context, req *mcp_service.GetCus
 	list := make([]*mcp_service.GetCustomToolItem, 0)
 	for _, info := range infos {
 		list = append(list, &mcp_service.GetCustomToolItem{
-			CustomToolId: info.CustomToolId,
+			CustomToolId: strconv.Itoa(int(info.ID)),
 			Name:         info.Name,
 			Description:  info.Description,
 		})
@@ -84,7 +84,7 @@ func (s *Service) UpdateCustomTool(ctx context.Context, req *mcp_service.UpdateC
 		return nil, errStatus(errs.Code_MCPUpdateCustomToolErr, toErrStatus("mcp_update_custom_tool_err", "apiAuth is empty"))
 	}
 	if err := s.cli.UpdateCustomTool(ctx, &model.CustomTool{
-		CustomToolId:     req.CustomToolId,
+		ID:               util.MustU32(req.CustomToolId),
 		Name:             req.Name,
 		Description:      req.Description,
 		Schema:           req.Schema,
@@ -102,7 +102,7 @@ func (s *Service) DeleteCustomTool(ctx context.Context, req *mcp_service.DeleteC
 	if req.CustomToolId == "" {
 		return nil, errStatus(errs.Code_MCPDeleteCustomToolErr, toErrStatus("mcp_delete_custom_tool_err", "customToolId is empty"))
 	}
-	if err := s.cli.DeleteCustomTool(ctx, req.CustomToolId); err != nil {
+	if err := s.cli.DeleteCustomTool(ctx, util.MustU32(req.CustomToolId)); err != nil {
 		return nil, errStatus(errs.Code_MCPDeleteCustomToolErr, err)
 	}
 	return &emptypb.Empty{}, nil

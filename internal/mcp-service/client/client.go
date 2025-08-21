@@ -15,8 +15,8 @@ type IClient interface {
 	ListMCPs(ctx context.Context, orgID, userID, name string) ([]*model.MCPClient, *errs.Status)
 
 	CreateCustomTool(ctx context.Context, customTool *model.CustomTool) *errs.Status
-	GetCustomTool(ctx context.Context, customToolID string) (*model.CustomTool, *errs.Status)
+	GetCustomTool(ctx context.Context, customToolID uint32) (*model.CustomTool, *errs.Status)
 	ListCustomTools(ctx context.Context, orgID, userID, name string) ([]*model.CustomTool, *errs.Status)
 	UpdateCustomTool(ctx context.Context, customTool *model.CustomTool) *errs.Status
-	DeleteCustomTool(ctx context.Context, customToolID string) *errs.Status
+	DeleteCustomTool(ctx context.Context, customToolID uint32) *errs.Status
 }
