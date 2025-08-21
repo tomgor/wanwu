@@ -415,7 +415,7 @@ func RagDocSegmentLabels(ctx context.Context, ragDocSegLabelsParams *RagDocSegme
 		Url:        url,
 		Body:       paramsByte,
 		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
-		MonitorKey: "rag_doc_tag",
+		MonitorKey: "rag_doc_segment_tag",
 		LogLevel:   http_client.LogAll,
 	})
 	if err != nil {
