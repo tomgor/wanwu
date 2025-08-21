@@ -107,7 +107,10 @@ func (c *Client) UpdateAssistantCustom(ctx context.Context, custom *model.Assist
 		if err := sqlopt.SQLOptions(
 			sqlopt.WithAssistantID(custom.AssistantId),
 			sqlopt.WithCustomID(custom.CustomId),
-		).Apply(tx).Update("enable", custom.Enable).Model(&model.AssistantCustom{}).Error; err != nil {
+		).Apply(tx).
+			Model(&model.AssistantCustom{}).
+			Update("enable", custom.Enable).
+			Error; err != nil {
 			return toErrStatus("assistant_custom_update", err.Error())
 		}
 		return nil

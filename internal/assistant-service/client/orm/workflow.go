@@ -42,7 +42,7 @@ func (c *Client) UpdateAssistantWorkflow(ctx context.Context, workflow *model.As
 	}
 	return c.transaction(ctx, func(tx *gorm.DB) *err_code.Status {
 		cond := sqlopt.SQLOptions(
-			sqlopt.WithID(workflow.AssistantId),
+			sqlopt.WithAssistantID(workflow.AssistantId),
 			sqlopt.WithWorkflowID(workflow.WorkflowId),
 		).Apply(tx)
 		if err := cond.Model(workflow).Update("enable", workflow.Enable).Error; err != nil {
@@ -56,7 +56,7 @@ func (c *Client) GetAssistantWorkflow(ctx context.Context, assistantId uint32, w
 	workflow := &model.AssistantWorkflow{}
 	return workflow, c.transaction(ctx, func(tx *gorm.DB) *err_code.Status {
 		cond := sqlopt.SQLOptions(
-			sqlopt.WithID(assistantId),
+			sqlopt.WithAssistantID(assistantId),
 			sqlopt.WithWorkflowID(workflowId),
 		).Apply(tx)
 		if err := cond.First(workflow).Error; err != nil {
@@ -79,7 +79,7 @@ func (c *Client) GetAssistantWorkflowsByAssistantID(ctx context.Context, assista
 func (c *Client) DeleteAssistantWorkflow(ctx context.Context, assistantId uint32, workflowId string) *err_code.Status {
 	return c.transaction(ctx, func(tx *gorm.DB) *err_code.Status {
 		cond := sqlopt.SQLOptions(
-			sqlopt.WithID(assistantId),
+			sqlopt.WithAssistantID(assistantId),
 			sqlopt.WithWorkflowID(workflowId),
 		).Apply(tx)
 		// 2. 检查数据是否存在
