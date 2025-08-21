@@ -39,7 +39,7 @@ func (c *Client) DeleteAppUrl(ctx context.Context, urlID uint32) *err_code.Statu
 func (c *Client) UpdateAppUrl(ctx context.Context, appUrl *model.AppUrl) *err_code.Status {
 	var count int64
 	appUrlCfg := &model.AppUrl{}
-	if err := sqlopt.WithID(appUrl.ID).Apply(c.db.WithContext(ctx)).Model(appUrlCfg).Error; err != nil {
+	if err := sqlopt.WithID(appUrl.ID).Apply(c.db.WithContext(ctx)).First(appUrlCfg).Error; err != nil {
 		return toErrStatus("app_url_get")
 	}
 	if err := sqlopt.SQLOptions(
