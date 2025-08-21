@@ -66,6 +66,7 @@
           ref="apiKeyDialog"
           :appId="editForm.assistantId"
           :appType="'agent'"
+          :type="'webChat'"
         />
       </div>
     </template>
@@ -149,7 +150,7 @@ export default {
   methods: {
     initUUID() {
       const storedUUID = localStorage.getItem("chatUUID");
-      this.uuid = storedUUID || this.$guid;
+      this.uuid = storedUUID || this.$guid();
       if (!storedUUID) {
         localStorage.setItem("chatUUID", this.uuid);
       }
@@ -161,18 +162,20 @@ export default {
     },
     clearUUID() {
       localStorage.removeItem("chatUUID");
-      this.uuid = this.$guid;
+      this.uuid = this.$guid();
       localStorage.setItem("chatUUID", this.uuid);
     },
     reloadList(val) {
       this.getList(val);
     },
     headerConfig() {
-      return {
-        headers: {
-          "X-Client-ID": this.uuid,
-        },
-      };
+      if(!this.uuid){
+        return { headers: {"X-Client-ID": ''} }
+      }
+      const config = { 
+            headers: { "X-Client-ID": this.uuid}
+         }
+      return config
     },
     async getDetail() {
       let res = null;

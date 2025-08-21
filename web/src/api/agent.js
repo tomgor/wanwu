@@ -239,55 +239,62 @@ export const switchOpenurl = (data)=>{
     })
 }
 
+
 //获取智能体openurl信息
-export const getOpenurlInfo = (suffix,config)=>{
+export const getOpenurlInfo = (suffix,config={})=>{
     return service({
         url: `/service/url/openurl/v1/agent/${suffix}`,
         method: 'get',
-        config
+        ...config,
+        isOpeanUrl:true
     })
 }
 //智能体openurl创建智能体对话
-export const openurlConversation = (data,suffix,config)=>{
+export const openurlConversation = (data,suffix,config={})=>{
     return service({
         url: `/service/url/openurl/v1/agent/${suffix}/conversation`,
         method: 'post',
         data,
-        config
+        ...config,
+        isOpeanUrl:true
     })
 }
 //删除智能体openurl创建智能体对话
-export const delOpenurlConversation = (data,suffix,config)=>{
+export const delOpenurlConversation = (data,suffix,config={})=>{
     return service({
         url: `/service/url/openurl/v1/agent/${suffix}/conversation`,
         method: 'delete',
         data,
-        config
+        ...config,
+        isOpeanUrl:true
     })
 }
 //智能体openurl详情历史列表
-export const OpenurlConverHistory = (data,suffix,config)=>{
+export const OpenurlConverHistory = (data,suffix,config={})=>{
     return service({
         url: `/service/url/openurl/v1/agent/${suffix}/conversation/detail`,
         method: 'get',
         params:data,
-        config
+        ...config,
+        isOpeanUrl:true
     })
 }
 //智能体openurl对话列表
-export const OpenurlConverList = (suffix,config)=>{
+export const OpenurlConverList = (suffix,config={})=>{
     return service({
         url: `/service/url/openurl/v1/agent/${suffix}/conversation/list`,
         method: 'get',
-        config
+        ...config,
+        isOpeanUrl:true
     })
 }
 //智能体openurl流式对话
-export const OpenurlStream = (data,suffix,config)=>{
+export const OpenurlStream = (data,suffix,config={})=>{
     return service({
         url: `/service/url/openurl/v1/agent/${suffix}/stream`,
         method: 'post',
         data,
-        config
+        ...config,
+        isOpeanUrl:true
     })
 }

@@ -44,7 +44,10 @@ export default {
     },
     created() {
         const vuex = JSON.parse(localStorage.getItem("access_cert"));
-        this.access_token = vuex.user.token;
+        if(vuex){
+            this.access_token = vuex.user.token;
+        }
+
     },
     mounted(){
         //this.addVisibilitychangeEvent()
