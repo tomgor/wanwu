@@ -710,12 +710,108 @@ definitions:
     required:
     - assistantId
     type: object
+  request.AssistantCustomToolAddRequest:
+    properties:
+      assistantId:
+        type: string
+      customToolId:
+        type: string
+    required:
+    - assistantId
+    - customToolId
+    type: object
+  request.AssistantCustomToolDelRequest:
+    properties:
+      assistantId:
+        type: string
+      customToolId:
+        type: string
+    required:
+    - assistantId
+    - customToolId
+    type: object
+  request.AssistantCustomToolEnableRequest:
+    properties:
+      assistantId:
+        type: string
+      customToolId:
+        type: string
+      enable:
+        type: boolean
+    required:
+    - assistantId
+    - customToolId
+    type: object
+  request.AssistantMCPToolAddRequest:
+    properties:
+      assistantId:
+        type: string
+      mcpId:
+        type: string
+    required:
+    - assistantId
+    - mcpId
+    type: object
+  request.AssistantMCPToolDelRequest:
+    properties:
+      assistantId:
+        type: string
+      mcpId:
+        type: string
+    required:
+    - assistantId
+    - mcpId
+    type: object
+  request.AssistantMCPToolEnableRequest:
+    properties:
+      assistantId:
+        type: string
+      enable:
+        type: boolean
+      mcpId:
+        type: string
+    required:
+    - assistantId
+    - mcpId
+    type: object
   request.AssistantTemplateRequest:
     properties:
       assistantTemplateId:
         type: string
     required:
     - assistantTemplateId
+    type: object
+  request.AssistantWorkFlowAddRequest:
+    properties:
+      assistantId:
+        type: string
+      workFlowId:
+        type: string
+    required:
+    - assistantId
+    - workFlowId
+    type: object
+  request.AssistantWorkFlowDelRequest:
+    properties:
+      assistantId:
+        type: string
+      workFlowId:
+        type: string
+    required:
+    - assistantId
+    - workFlowId
+    type: object
+  request.AssistantWorkFlowToolEnableRequest:
+    properties:
+      assistantId:
+        type: string
+      enable:
+        type: boolean
+      workFlowId:
+        type: string
+    required:
+    - assistantId
+    - workFlowId
     type: object
   request.Avatar:
     properties:
@@ -939,7 +1035,7 @@ definitions:
         description: apiKey 仅当认证类型为API Key时必填
         type: string
       authType:
-        description: Auth类型 仅当认证类型为API Key时必填
+        description: Auth类型 仅当认证类型为API Key时必填，也可以为空
         enum:
         - Custom
         type: string
@@ -1441,13 +1537,6 @@ definitions:
     - password
     - username
     type: object
-  request.MCPAddRequest:
-    properties:
-      assistantId:
-        type: string
-      mcpId:
-        type: string
-    type: object
   request.MCPCreate:
     properties:
       desc:
@@ -1472,13 +1561,6 @@ definitions:
     - sseUrl
     type: object
   request.MCPIDReq:
-    properties:
-      mcpId:
-        type: string
-    required:
-    - mcpId
-    type: object
-  request.MCPIdRequest:
     properties:
       mcpId:
         type: string
@@ -1977,22 +2059,6 @@ definitions:
     - phone
     - userId
     type: object
-  request.WorkFlowAddRequest:
-    properties:
-      assistantId:
-        type: string
-      schema:
-        type: string
-      workFlowId:
-        type: string
-    type: object
-  request.WorkFlowIdRequest:
-    properties:
-      workFlowId:
-        type: string
-    required:
-    - workFlowId
-    type: object
   response.Action:
     properties:
       actionId:
@@ -2080,6 +2146,9 @@ definitions:
       publishType:
         description: 发布类型(public:公开发布,private:私密发布)
         type: string
+      uniqueId:
+        description: 唯一标识
+        type: string
       updatedAt:
         description: 应用更新时间(用于历史记录排序)
         type: string
@@ -2151,6 +2220,11 @@ definitions:
       createdAt:
         description: 创建时间
         type: string
+      customInfos:
+        description: 自定义工具信息
+        items:
+          $ref: '#/definitions/response.CustomInfos'
+        type: array
       desc:
         description: 描述
         type: string
@@ -2386,6 +2460,21 @@ definitions:
         description: 平台名称
         type: string
     type: object
+  response.CustomInfos:
+    properties:
+      customDesc:
+        type: string
+      customId:
+        type: string
+      enable:
+        type: boolean
+      name:
+        type: string
+      uniqueId:
+        type: string
+      valid:
+        type: boolean
+    type: object
   response.CustomLogin:
     properties:
       background:
@@ -2458,17 +2547,17 @@ definitions:
         allOf:
         - $ref: '#/definitions/response.CustomToolApiAuthWebRequest'
         description: apiAuth
+      apiList:
+        description: api列表
+        items:
+          $ref: '#/definitions/response.CustomToolApiResponse'
+        type: array
       customToolId:
         description: 自定义工具id
         type: string
       description:
         description: 描述
         type: string
-      list:
-        description: api列表
-        items:
-          $ref: '#/definitions/response.CustomToolApiResponse'
-        type: array
       name:
         description: 名称
         type: string
@@ -2626,6 +2715,9 @@ definitions:
         type: string
       publishType:
         description: 发布类型(public:公开发布,private:私密发布)
+        type: string
+      uniqueId:
+        description: 唯一标识
         type: string
       updatedAt:
         description: 应用更新时间(用于历史记录排序)
@@ -2938,19 +3030,19 @@ definitions:
     properties:
       enable:
         type: boolean
-      id:
-        type: string
       mcpDesc:
         type: string
       mcpId:
-        type: string
-      mcpName:
         type: string
       mcpServerFrom:
         type: string
       mcpServerUrl:
         type: string
       mcpSquareId:
+        type: string
+      name:
+        type: string
+      uniqueId:
         type: string
       valid:
         type: boolean
@@ -2974,6 +3066,9 @@ definitions:
         type: string
       serverUrl:
         description: sseUrl
+        type: string
+      uniqueId:
+        description: 唯一标识
         type: string
     type: object
   response.MCPSquareDetail:
@@ -3503,15 +3598,15 @@ definitions:
         type: string
       enable:
         type: boolean
-      id:
+      name:
+        type: string
+      uniqueId:
         type: string
       valid:
         type: boolean
       workFlowDesc:
         type: string
       workFlowId:
-        type: string
-      workFlowName:
         type: string
     type: object
 info:
@@ -4410,77 +4505,6 @@ paths:
       summary: 智能体对话列表
       tags:
       - agent
-  /assistant/mcp:
-    delete:
-      consumes:
-      - application/json
-      description: 为智能体解绑mcp
-      parameters:
-      - description: mcp id
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/request.MCPIdRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - JWT: []
-      summary: 删除mcp
-      tags:
-      - agent
-    post:
-      consumes:
-      - application/json
-      description: 为智能体绑定已发布的mcp工具
-      parameters:
-      - description: mcp新增参数
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/request.MCPAddRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - JWT: []
-      summary: 添加mcp工具
-      tags:
-      - agent
-  /assistant/mcp/enable:
-    put:
-      consumes:
-      - application/json
-      description: 修改智能体绑定的MCP的启用状态
-      parameters:
-      - description: mcp id
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/request.MCPIdRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - JWT: []
-      summary: 启用/停用 MCP
-      tags:
-      - agent
   /assistant/stream:
     post:
       consumes:
@@ -4604,18 +4628,160 @@ paths:
       summary: 智能体模板列表
       tags:
       - agent
-  /assistant/workflow:
+  /assistant/tool/custom:
+    delete:
+      consumes:
+      - application/json
+      description: 为智能体解绑自定义工具
+      parameters:
+      - description: 智能体id与自定义工具id
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.AssistantCustomToolDelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 删除自定义工具
+      tags:
+      - agent
+    post:
+      consumes:
+      - application/json
+      description: 为智能体绑定自定义工具
+      parameters:
+      - description: 自定义工具新增参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.AssistantCustomToolAddRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 添加自定义工具
+      tags:
+      - agent
+  /assistant/tool/custom/switch:
+    put:
+      consumes:
+      - application/json
+      description: 修改智能体绑定的自定义工具的启用状态
+      parameters:
+      - description: 智能体id与自定义工具id
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.AssistantCustomToolEnableRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 启用/停用自定义工具
+      tags:
+      - agent
+  /assistant/tool/mcp:
+    delete:
+      consumes:
+      - application/json
+      description: 为智能体解绑mcp
+      parameters:
+      - description: mcp工具id，智能体id
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.AssistantMCPToolDelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 删除mcp
+      tags:
+      - agent
+    post:
+      consumes:
+      - application/json
+      description: 为智能体绑定已发布的mcp工具
+      parameters:
+      - description: mcp新增参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.AssistantMCPToolAddRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 添加mcp工具
+      tags:
+      - agent
+  /assistant/tool/mcp/switch:
+    put:
+      consumes:
+      - application/json
+      description: 修改智能体绑定的MCP的启用状态
+      parameters:
+      - description: mcp工具id、智能体id、enable
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.AssistantMCPToolEnableRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 启用/停用 MCP
+      tags:
+      - agent
+  /assistant/tool/workflow:
     delete:
       consumes:
       - application/json
       description: 为智能体解绑工作流
       parameters:
-      - description: 工作流id
+      - description: 工作流id,智能体id
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/request.WorkFlowIdRequest'
+          $ref: '#/definitions/request.AssistantWorkFlowDelRequest'
       produces:
       - application/json
       responses:
@@ -4638,7 +4804,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/request.WorkFlowAddRequest'
+          $ref: '#/definitions/request.AssistantWorkFlowAddRequest'
       produces:
       - application/json
       responses:
@@ -4651,18 +4817,18 @@ paths:
       summary: 添加工作流
       tags:
       - agent
-  /assistant/workflow/enable:
+  /assistant/tool/workflow/switch:
     put:
       consumes:
       - application/json
       description: 修改智能体绑定的工作流的启用状态
       parameters:
-      - description: 工作流id
+      - description: 工作流id,智能体id,开关
         in: body
         name: data
         required: true
         schema:
-          $ref: '#/definitions/request.WorkFlowIdRequest'
+          $ref: '#/definitions/request.AssistantWorkFlowToolEnableRequest'
       produces:
       - application/json
       responses:

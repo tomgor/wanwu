@@ -7,6 +7,7 @@ import (
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
+	bff_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 	"github.com/UnicomAI/wanwu/pkg/util"
@@ -19,6 +20,7 @@ func appBriefProto2Model(ctx *gin.Context, appBrief *common.AppBrief) response.A
 	return response.AppBriefInfo{
 		AppId:     appBrief.AppId,
 		AppType:   appBrief.AppType,
+		UniqueId:  bff_util.ConcatAssistantToolUniqueId(appBrief.AppType, appBrief.AppId),
 		Avatar:    CacheAvatar(ctx, appBrief.AvatarPath),
 		Name:      appBrief.Name,
 		Desc:      appBrief.Desc,
