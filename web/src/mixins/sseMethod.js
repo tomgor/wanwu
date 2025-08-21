@@ -392,14 +392,15 @@ export default {
                    conversationId:this.sseParams.conversationId, 
                    prompt
                 }
-                console.log(this.getHeaderConfig())
-                headers = this.getHeaderConfig();
+                headers = {
+                    'X-Client-ID':this.getHeaderConfig().headers['X-Client-ID']
+                };
             }
 
             this.ctrlAbort = new AbortController();
             this.eventSource = new fetchEventSource(this.origin + this.sseApi, {
                 method: 'POST',
-                ...headers,
+                headers,
                 // headers: {
                 //     "Content-Type": 'application/json',
                 //     'Authorization': 'Bearer ' + this.token,
