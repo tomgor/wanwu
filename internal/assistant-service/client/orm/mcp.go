@@ -117,7 +117,7 @@ func (c *Client) UpdateAssistantMCP(ctx context.Context, mcp *model.AssistantMCP
 		if err := sqlopt.SQLOptions(
 			sqlopt.WithAssistantID(mcp.AssistantId),
 			sqlopt.WithMCPID(mcp.MCPId),
-		).Apply(tx).Update("enable", mcp.Enable).Model(&model.AssistantMCP{}).Error; err != nil {
+		).Apply(tx).Model(&model.AssistantMCP{}).Update("enable", mcp.Enable).Error; err != nil {
 			return toErrStatus("assistant_mcp_update", err.Error())
 		}
 		return nil

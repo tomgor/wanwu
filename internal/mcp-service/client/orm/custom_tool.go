@@ -3,6 +3,7 @@ package orm
 import (
 	"context"
 	"errors"
+
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/mcp-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/mcp-service/client/orm/sqlopt"
@@ -43,7 +44,7 @@ func (c *Client) ListCustomTools(ctx context.Context, orgID, userID, name string
 		sqlopt.WithOrgID(orgID),
 		sqlopt.WithUserID(userID),
 		sqlopt.LikeName(name),
-	).Apply(c.db).WithContext(ctx).Order("id DESC").Find(&customToolInfos).Error; err != nil {
+	).Apply(c.db).WithContext(ctx).Find(&customToolInfos).Error; err != nil {
 		return nil, toErrStatus("mcp_get_custom_tool_list_err", err.Error())
 	}
 	return customToolInfos, nil
