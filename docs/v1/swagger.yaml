@@ -933,6 +933,96 @@ definitions:
         description: 标签页标题
         type: string
     type: object
+  request.CustomToolApiAuthWebRequest:
+    properties:
+      apiKey:
+        description: apiKey 仅当认证类型为API Key时必填
+        type: string
+      authType:
+        description: Auth类型 仅当认证类型为API Key时必填
+        enum:
+        - Custom
+        type: string
+      customHeaderName:
+        description: Custom Header Name 仅当认证类型为API Key时必填
+        type: string
+      type:
+        description: 认证类型
+        enum:
+        - None
+        - API Key
+        type: string
+    required:
+    - type
+    type: object
+  request.CustomToolCreate:
+    properties:
+      apiAuth:
+        allOf:
+        - $ref: '#/definitions/request.CustomToolApiAuthWebRequest'
+        description: api身份认证
+      description:
+        description: 描述
+        type: string
+      name:
+        description: 名称
+        type: string
+      privacyPolicy:
+        description: 隐私政策
+        type: string
+      schema:
+        description: schema
+        type: string
+    required:
+    - apiAuth
+    - description
+    - name
+    - schema
+    type: object
+  request.CustomToolIDReq:
+    properties:
+      customToolId:
+        description: 自定义工具id
+        type: string
+    required:
+    - customToolId
+    type: object
+  request.CustomToolSchemaReq:
+    properties:
+      schema:
+        description: schema
+        type: string
+    required:
+    - schema
+    type: object
+  request.CustomToolUpdateReq:
+    properties:
+      apiAuth:
+        allOf:
+        - $ref: '#/definitions/request.CustomToolApiAuthWebRequest'
+        description: api身份认证
+      customToolId:
+        description: 自定义工具ID
+        type: string
+      description:
+        description: 描述
+        type: string
+      name:
+        description: 名称
+        type: string
+      privacyPolicy:
+        description: 隐私政策
+        type: string
+      schema:
+        description: schema
+        type: string
+    required:
+    - apiAuth
+    - customToolId
+    - description
+    - name
+    - schema
+    type: object
   request.DelApiKeyRequest:
     properties:
       apiId:
@@ -2324,6 +2414,84 @@ definitions:
         description: 标签页图标
       title:
         description: 标签页标题
+        type: string
+    type: object
+  response.CustomToolApiAuthWebRequest:
+    properties:
+      apiKey:
+        description: apiKey
+        type: string
+      authType:
+        description: Auth类型
+        type: string
+      customHeaderName:
+        description: 自定义头名
+        type: string
+      type:
+        description: '认证类型: None 或 APIKey'
+        type: string
+    type: object
+  response.CustomToolApiResponse:
+    properties:
+      method:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+    type: object
+  response.CustomToolCell:
+    properties:
+      customToolId:
+        description: 自定义工具id
+        type: string
+      description:
+        description: 描述
+        type: string
+      name:
+        description: 名称
+        type: string
+    type: object
+  response.CustomToolDetail:
+    properties:
+      apiAuth:
+        allOf:
+        - $ref: '#/definitions/response.CustomToolApiAuthWebRequest'
+        description: apiAuth
+      customToolId:
+        description: 自定义工具id
+        type: string
+      description:
+        description: 描述
+        type: string
+      list:
+        description: api列表
+        items:
+          $ref: '#/definitions/response.CustomToolApiResponse'
+        type: array
+      name:
+        description: 名称
+        type: string
+      privacyPolicy:
+        description: 隐私政策
+        type: string
+      schema:
+        description: schema
+        type: string
+    type: object
+  response.CustomToolSelect:
+    properties:
+      customToolId:
+        description: 自定义工具id
+        type: string
+      description:
+        description: 描述
+        type: string
+      name:
+        description: 名称
+        type: string
+      uniqueId:
+        description: 统一的id
         type: string
     type: object
   response.DeleteFileResp:
@@ -7100,6 +7268,193 @@ paths:
       summary: 获取词表数据列表
       tags:
       - safety
+  /tool/custom:
+    delete:
+      consumes:
+      - application/json
+      description: 删除自定义工具
+      parameters:
+      - description: 自定义工具ID
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CustomToolIDReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除自定义工具
+      tags:
+      - tool
+    get:
+      consumes:
+      - application/json
+      description: 获取自定义工具详情
+      parameters:
+      - description: customToolId
+        in: query
+        name: customToolId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CustomToolDetail'
+              type: object
+      summary: 获取自定义工具详情
+      tags:
+      - tool
+    post:
+      consumes:
+      - application/json
+      description: 创建自定义工具
+      parameters:
+      - description: 自定义工具信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CustomToolCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 创建自定义工具
+      tags:
+      - tool
+    put:
+      consumes:
+      - application/json
+      description: 修改自定义工具
+      parameters:
+      - description: 自定义工具信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CustomToolUpdateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 修改自定义工具
+      tags:
+      - tool
+  /tool/custom/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取自定义工具列表
+      parameters:
+      - description: CustomTool名称
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.CustomToolCell'
+                        type: array
+                    type: object
+              type: object
+      summary: 获取自定义工具列表
+      tags:
+      - tool
+  /tool/custom/schema:
+    post:
+      consumes:
+      - application/json
+      description: 解析自定义工具的Schema转换为API相关数据
+      parameters:
+      - description: Schema格式数据
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.CustomToolSchemaReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.CustomToolApiResponse'
+                        type: array
+                    type: object
+              type: object
+      summary: 获取可用API列表（根据Schema）
+      tags:
+      - tool
+  /tool/custom/select:
+    get:
+      consumes:
+      - application/json
+      description: 获取自定义工具列表（用于下拉选择）
+      parameters:
+      - description: CustomTool名称
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.CustomToolSelect'
+                        type: array
+                    type: object
+              type: object
+      summary: 获取自定义工具列表（用于下拉选择）
+      tags:
+      - tool
   /user:
     delete:
       consumes:

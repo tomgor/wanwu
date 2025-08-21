@@ -101,3 +101,9 @@ func WithUpdateLock() SQLOption {
 		})
 	})
 }
+
+func WithCustomToolID(customToolID string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("custom_tool_id = ?", customToolID)
+	})
+}

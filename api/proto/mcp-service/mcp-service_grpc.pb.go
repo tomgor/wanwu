@@ -20,14 +20,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MCPService_GetSquareMCP_FullMethodName     = "/mcp_service.MCPService/GetSquareMCP"
-	MCPService_GetSquareMCPList_FullMethodName = "/mcp_service.MCPService/GetSquareMCPList"
-	MCPService_CreateCustomMCP_FullMethodName  = "/mcp_service.MCPService/CreateCustomMCP"
-	MCPService_GetCustomMCP_FullMethodName     = "/mcp_service.MCPService/GetCustomMCP"
-	MCPService_DeleteCustomMCP_FullMethodName  = "/mcp_service.MCPService/DeleteCustomMCP"
-	MCPService_GetCustomMCPList_FullMethodName = "/mcp_service.MCPService/GetCustomMCPList"
-	MCPService_GetMCPToolList_FullMethodName   = "/mcp_service.MCPService/GetMCPToolList"
-	MCPService_GetMCPAvatar_FullMethodName     = "/mcp_service.MCPService/GetMCPAvatar"
+	MCPService_GetSquareMCP_FullMethodName      = "/mcp_service.MCPService/GetSquareMCP"
+	MCPService_GetSquareMCPList_FullMethodName  = "/mcp_service.MCPService/GetSquareMCPList"
+	MCPService_CreateCustomMCP_FullMethodName   = "/mcp_service.MCPService/CreateCustomMCP"
+	MCPService_GetCustomMCP_FullMethodName      = "/mcp_service.MCPService/GetCustomMCP"
+	MCPService_DeleteCustomMCP_FullMethodName   = "/mcp_service.MCPService/DeleteCustomMCP"
+	MCPService_GetCustomMCPList_FullMethodName  = "/mcp_service.MCPService/GetCustomMCPList"
+	MCPService_GetMCPToolList_FullMethodName    = "/mcp_service.MCPService/GetMCPToolList"
+	MCPService_GetMCPAvatar_FullMethodName      = "/mcp_service.MCPService/GetMCPAvatar"
+	MCPService_CreateCustomTool_FullMethodName  = "/mcp_service.MCPService/CreateCustomTool"
+	MCPService_GetCustomToolInfo_FullMethodName = "/mcp_service.MCPService/GetCustomToolInfo"
+	MCPService_GetCustomToolList_FullMethodName = "/mcp_service.MCPService/GetCustomToolList"
+	MCPService_UpdateCustomTool_FullMethodName  = "/mcp_service.MCPService/UpdateCustomTool"
+	MCPService_DeleteCustomTool_FullMethodName  = "/mcp_service.MCPService/DeleteCustomTool"
 )
 
 // MCPServiceClient is the client API for MCPService service.
@@ -45,6 +50,12 @@ type MCPServiceClient interface {
 	// --- tool ---
 	GetMCPToolList(ctx context.Context, in *GetMCPToolListReq, opts ...grpc.CallOption) (*MCPToolList, error)
 	GetMCPAvatar(ctx context.Context, in *GetMCPAvatarReq, opts ...grpc.CallOption) (*MCPAvatar, error)
+	// --- CustomTool ---
+	CreateCustomTool(ctx context.Context, in *CreateCustomToolReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetCustomToolInfo(ctx context.Context, in *GetCustomToolInfoReq, opts ...grpc.CallOption) (*GetCustomToolInfoResp, error)
+	GetCustomToolList(ctx context.Context, in *GetCustomToolListReq, opts ...grpc.CallOption) (*GetCustomToolListResp, error)
+	UpdateCustomTool(ctx context.Context, in *UpdateCustomToolReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteCustomTool(ctx context.Context, in *DeleteCustomToolReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type mCPServiceClient struct {
@@ -135,6 +146,56 @@ func (c *mCPServiceClient) GetMCPAvatar(ctx context.Context, in *GetMCPAvatarReq
 	return out, nil
 }
 
+func (c *mCPServiceClient) CreateCustomTool(ctx context.Context, in *CreateCustomToolReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, MCPService_CreateCustomTool_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mCPServiceClient) GetCustomToolInfo(ctx context.Context, in *GetCustomToolInfoReq, opts ...grpc.CallOption) (*GetCustomToolInfoResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCustomToolInfoResp)
+	err := c.cc.Invoke(ctx, MCPService_GetCustomToolInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mCPServiceClient) GetCustomToolList(ctx context.Context, in *GetCustomToolListReq, opts ...grpc.CallOption) (*GetCustomToolListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCustomToolListResp)
+	err := c.cc.Invoke(ctx, MCPService_GetCustomToolList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mCPServiceClient) UpdateCustomTool(ctx context.Context, in *UpdateCustomToolReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, MCPService_UpdateCustomTool_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mCPServiceClient) DeleteCustomTool(ctx context.Context, in *DeleteCustomToolReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, MCPService_DeleteCustomTool_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MCPServiceServer is the server API for MCPService service.
 // All implementations must embed UnimplementedMCPServiceServer
 // for forward compatibility.
@@ -150,6 +211,12 @@ type MCPServiceServer interface {
 	// --- tool ---
 	GetMCPToolList(context.Context, *GetMCPToolListReq) (*MCPToolList, error)
 	GetMCPAvatar(context.Context, *GetMCPAvatarReq) (*MCPAvatar, error)
+	// --- CustomTool ---
+	CreateCustomTool(context.Context, *CreateCustomToolReq) (*emptypb.Empty, error)
+	GetCustomToolInfo(context.Context, *GetCustomToolInfoReq) (*GetCustomToolInfoResp, error)
+	GetCustomToolList(context.Context, *GetCustomToolListReq) (*GetCustomToolListResp, error)
+	UpdateCustomTool(context.Context, *UpdateCustomToolReq) (*emptypb.Empty, error)
+	DeleteCustomTool(context.Context, *DeleteCustomToolReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedMCPServiceServer()
 }
 
@@ -183,6 +250,21 @@ func (UnimplementedMCPServiceServer) GetMCPToolList(context.Context, *GetMCPTool
 }
 func (UnimplementedMCPServiceServer) GetMCPAvatar(context.Context, *GetMCPAvatarReq) (*MCPAvatar, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMCPAvatar not implemented")
+}
+func (UnimplementedMCPServiceServer) CreateCustomTool(context.Context, *CreateCustomToolReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCustomTool not implemented")
+}
+func (UnimplementedMCPServiceServer) GetCustomToolInfo(context.Context, *GetCustomToolInfoReq) (*GetCustomToolInfoResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCustomToolInfo not implemented")
+}
+func (UnimplementedMCPServiceServer) GetCustomToolList(context.Context, *GetCustomToolListReq) (*GetCustomToolListResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCustomToolList not implemented")
+}
+func (UnimplementedMCPServiceServer) UpdateCustomTool(context.Context, *UpdateCustomToolReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCustomTool not implemented")
+}
+func (UnimplementedMCPServiceServer) DeleteCustomTool(context.Context, *DeleteCustomToolReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCustomTool not implemented")
 }
 func (UnimplementedMCPServiceServer) mustEmbedUnimplementedMCPServiceServer() {}
 func (UnimplementedMCPServiceServer) testEmbeddedByValue()                    {}
@@ -349,6 +431,96 @@ func _MCPService_GetMCPAvatar_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MCPService_CreateCustomTool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCustomToolReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MCPServiceServer).CreateCustomTool(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MCPService_CreateCustomTool_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MCPServiceServer).CreateCustomTool(ctx, req.(*CreateCustomToolReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MCPService_GetCustomToolInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCustomToolInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MCPServiceServer).GetCustomToolInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MCPService_GetCustomToolInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MCPServiceServer).GetCustomToolInfo(ctx, req.(*GetCustomToolInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MCPService_GetCustomToolList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCustomToolListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MCPServiceServer).GetCustomToolList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MCPService_GetCustomToolList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MCPServiceServer).GetCustomToolList(ctx, req.(*GetCustomToolListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MCPService_UpdateCustomTool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCustomToolReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MCPServiceServer).UpdateCustomTool(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MCPService_UpdateCustomTool_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MCPServiceServer).UpdateCustomTool(ctx, req.(*UpdateCustomToolReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MCPService_DeleteCustomTool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCustomToolReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MCPServiceServer).DeleteCustomTool(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MCPService_DeleteCustomTool_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MCPServiceServer).DeleteCustomTool(ctx, req.(*DeleteCustomToolReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MCPService_ServiceDesc is the grpc.ServiceDesc for MCPService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -387,6 +559,26 @@ var MCPService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetMCPAvatar",
 			Handler:    _MCPService_GetMCPAvatar_Handler,
+		},
+		{
+			MethodName: "CreateCustomTool",
+			Handler:    _MCPService_CreateCustomTool_Handler,
+		},
+		{
+			MethodName: "GetCustomToolInfo",
+			Handler:    _MCPService_GetCustomToolInfo_Handler,
+		},
+		{
+			MethodName: "GetCustomToolList",
+			Handler:    _MCPService_GetCustomToolList_Handler,
+		},
+		{
+			MethodName: "UpdateCustomTool",
+			Handler:    _MCPService_UpdateCustomTool_Handler,
+		},
+		{
+			MethodName: "DeleteCustomTool",
+			Handler:    _MCPService_DeleteCustomTool_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
