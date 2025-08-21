@@ -1,7 +1,7 @@
 <template>
     <div class="weburl-container">
         <div class="weburl-title">
-            <span class="el-icon-arrow-left goback"></span>
+            <span class="el-icon-arrow-left goback" @click="goback"></span>
             <span class="weburl-title-text">发布配置</span>
         </div>
         <CommonLayout
@@ -56,6 +56,9 @@ export default {
     methods:{
         checkTool(item){
             this.active = item.type
+        },
+        goback(){
+            this.$router.back()
         }
     }
 }

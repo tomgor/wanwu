@@ -392,13 +392,14 @@ export default {
                    conversationId:this.sseParams.conversationId, 
                    prompt
                 }
+                console.log(this.getHeaderConfig())
                 headers = this.getHeaderConfig();
             }
 
             this.ctrlAbort = new AbortController();
             this.eventSource = new fetchEventSource(this.origin + this.sseApi, {
                 method: 'POST',
-                headers,
+                ...headers,
                 // headers: {
                 //     "Content-Type": 'application/json',
                 //     'Authorization': 'Bearer ' + this.token,
@@ -408,6 +409,7 @@ export default {
                 signal: this.ctrlAbort.signal,
                 body: JSON.stringify(data),
                 openWhenHidden: true, //页面退至后台保持连接
+                ...(this.type === 'webChat' && { isOpeanUrl: true }),
                 onopen: async(e) => {
                     console.log("已建立SSE连接~",new Date().getTime());
                     if (e.status !== 200) {
