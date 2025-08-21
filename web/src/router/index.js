@@ -41,6 +41,10 @@ const constantRoutes = [
     {
         path: '/webChat/:id',
         component:resolve =>require(['@/views/agent'],resolve),
+        meta:{
+            requiresAuth: false, 
+            isPublic: true 
+        }
     },
     {
         path: '/portal',

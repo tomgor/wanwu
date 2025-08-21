@@ -60,7 +60,11 @@
     import {mapGetters} from 'vuex'
 
     export default {
-        inject:['getHeaderConfig'],
+        inject:{
+            getHeaderConfig:{
+                default:() => null
+            }
+        },
         props:{
             editForm:{
                 type:Object,
