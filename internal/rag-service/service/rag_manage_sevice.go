@@ -91,7 +91,7 @@ func RagStreamChat(ctx context.Context, userId string, req *RagChatParams) (<-ch
 
 		//1.开启超时监控
 		if params.Timeout == 0 {
-			params.Timeout = time.Minute * 1
+			params.Timeout = time.Minute * 10
 		}
 		ctx, cancel := context.WithTimeout(ctx, params.Timeout)
 		defer cancel()
@@ -134,7 +134,7 @@ func buildHttpParams(userId string, req *RagChatParams) (*http_client.HttpReques
 		Url:        url,
 		Body:       body,
 		Headers:    map[string]string{"X-uid": userId},
-		Timeout:    time.Minute * 3,
+		Timeout:    time.Minute * 10,
 		MonitorKey: "rag_search_service",
 		LogLevel:   http_client.LogAll,
 	}, nil
