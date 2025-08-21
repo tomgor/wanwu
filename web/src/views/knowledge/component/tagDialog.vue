@@ -69,6 +69,19 @@ export default {
       knowledgeId: ""
     };
   },
+  watch:{
+    currentList:{
+      handler(val){
+        if(val.length){
+          this.tagList = val
+        }else{
+          this.tagList = []
+        }
+      },
+      deep:true,
+      immediate:true
+    }
+  },
   methods: {
     submitDialog() {
       if(this.type === 'section'){
@@ -144,10 +157,7 @@ export default {
       if(this.type !== 'section'){
         this.knowledgeId = id;
         this.getList();
-      }else{
-        this.tagList = this.currentList;
       }
-
     },
     handleClose() {
       this.dialogVisible = false;

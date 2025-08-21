@@ -109,11 +109,11 @@
                 {{ item.content }}
               </div>
               <div class="tagList">
-                <span :class="['smartDate','tagList']" @click.stop="addTag(item.labels,item.contentId)">
+                <span :class="['smartDate','tagList']" @click.stop="addTag(item.labels,item.contentId)" v-if="item.labels.length === 0">
                   <span class="el-icon-price-tag icon-tag"></span>
                   创建关键词
                 </span>
-                <span class="tagList-item">{{formattedTagNames(item.labels) }}</span>
+                <span class="tagList-item" @click.stop="addTag(item.labels,item.contentId)" v-else>{{formattedTagNames(item.labels) }}</span>
               </div>
             </el-card>
           </el-col>
@@ -239,23 +239,28 @@ export default {
       }).catch(err =>{})
     },
     addTag(data,id){
-      this.currentList = data.map(item =>({
-        ...item,
-        tagName:item,
-        checked: false,
-        showDel: false,
-        showIpt: false
-      }))
+      if(data.length > 0){
+          this.currentList = data.map(item =>({
+          tagName:item,
+          checked: false,
+          showDel: false,
+          showIpt: false
+        }))
+      }else{
+        this.currentList = []
+      }
       this.contentId = id
-      this.$refs.tagDialog.showDiaglog(id);
+      this.$refs.tagDialog.showDiaglog();
     },
     formattedTagNames(data){
+      let tags = ''
       if(!Array.isArray(data) || data.length === 0){
         return '';
       }
-      const tags = data.filter(item => item.selected).map(item =>  item.tagName ).join(', ');
-      if (tags.length > 30) {
-          return tags.slice(0, 30) + '...';
+      if(data.length > 3){
+        tags = data.slice(0, 3).join(', ') + (data.length > 3 ? '...' : '');
+      }else{
+        tags = data.join(', ');
       }
       return tags;
     },
@@ -420,6 +425,9 @@ export default {
     .icon-tag{
       transform: rotate(-40deg);
       margin-right:3px;
+    }
+    .tagList-item{
+      color:#888;
     }
   }
   .tagList > .tagList-item:hover{
