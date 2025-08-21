@@ -3,6 +3,7 @@ package mp_qwen
 import (
 	"context"
 	"net/url"
+	"strings"
 
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 )
@@ -17,6 +18,10 @@ func (cfg *LLM) NewReq(req *mp_common.LLMReq) (mp_common.ILLMReq, error) {
 	m, err := req.Data()
 	if err != nil {
 		return nil, err
+	}
+	// Qwen3 开源模型仅在非思考模式下支持非流式输出方式
+	if !*req.Stream && strings.HasPrefix(req.Model, "qwen3") {
+		m["enable_thinking"] = false
 	}
 	return mp_common.NewLLMReq(m), nil
 }
