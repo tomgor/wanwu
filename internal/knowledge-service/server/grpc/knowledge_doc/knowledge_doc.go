@@ -584,13 +584,17 @@ func (s *Service) UpdateDocSegmentLabels(ctx context.Context, req *knowledgebase
 	}
 	//4.更新切片标签
 	fileName := service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
+	var labels = req.Labels
+	if len(labels) == 0 {
+		labels = make([]string, 0)
+	}
 	err = service.RagDocSegmentLabels(ctx, &service.RagDocSegmentLabelsParams{
 		UserId:        req.UserId,
 		KnowledgeBase: knowledge.Name,
 		KnowledgeId:   knowledge.KnowledgeId,
 		FileName:      fileName,
 		ContentId:     req.ContentId,
-		Labels:        req.Labels,
+		Labels:        labels,
 	})
 	if err != nil {
 		log.Errorf(fmt.Sprintf("update doc seg labels fail %v", err), req.DocId)
