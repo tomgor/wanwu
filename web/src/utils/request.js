@@ -17,13 +17,20 @@ service.interceptors.request.use(
       const token = store.getters['user/token']
       const user = store.getters['user/userInfo']
       const lang = localStorage.getItem('locale') || ZH // store.getters['user/lang']
+      const isWebUrl = window.location.href.includes('/webChat')
       config.headers = {
+        ...config.headers
+      }
+      if(!isWebUrl){
+          config.headers = {
           ...config.headers,
           'Authorization': 'Bearer ' + token,
           'x-user-id': user.uid,
           "x-org-id": user.orgId,
           ...(config.hasLang && { 'x-language': lang })
+        }
       }
+
       return config
   },
   error => {

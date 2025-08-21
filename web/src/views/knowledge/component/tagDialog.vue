@@ -78,8 +78,7 @@ export default {
           this.tagList = []
         }
       },
-      deep:true,
-      immediate:true
+      deep:true
     }
   },
   methods: {
@@ -209,6 +208,10 @@ export default {
     addTag() {
       const emptyTag = this.tagList.find(tag => !tag.tagId && tag.tagName === "");
       if(emptyTag) return;
+      if(this.type === 'section' && this.tagList.length > 10){
+        this.$message.warning('最多可创建10个关键词')
+        return;
+      }
       this.tagList.unshift({
         tagName: "",
         checked: false,
