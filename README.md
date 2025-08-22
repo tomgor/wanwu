@@ -229,14 +229,6 @@
 
 ------
 
-### &#x1F517; 致谢
-
-- [AgentScope](https://github.com/modelscope/agentscope)
-- [LangChain](https://github.com/langchain-ai/langchain)
-- [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent)
-
-------
-
 ### &#x1F4F0; TODO LIST
 
 - [ ] 多模态模型接入
@@ -261,7 +253,11 @@
 
 - **【Q】Windows系统Agent(agent-wanwu)启动报错：bash: ./start_all.sh: /bin/bash^M: bad interpreter**
 
-    【A】git配置关闭自动回车换行(CRLF)，执行 `git config --global core.autocrlf false` 后，关闭服务，重新clone wanwu仓库，重启服务**
+    【A】git配置关闭自动回车换行(CRLF)，执行 `git config --global core.autocrlf false` 后，关闭服务，重新clone wanwu仓库，重启服务
+
+- **【Q】系统服务正常启动后，mysql-wanwu-worker和elastic-wanwu-setup容器退出：状态码为Exited (0)**
+
+    【A】正常，这两个容器用于完成一些初始化任务，执行完成后会自动退出
 
 - **【Q】模型导入相关**
 
@@ -293,6 +289,16 @@
     
     6. 导入Rerank模型同上述导入LLM，注意推理URL不带 /rerank 后缀
     ```
+
+------
+
+### &#x1F517; 致谢
+
+- [AgentScope](https://github.com/modelscope/agentscope)
+- [LangChain](https://github.com/langchain-ai/langchain)
+- [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent)
+
+------
 
 ### ⚖️ 许可证
 元景万悟智能体平台根据Apache License 2.0发布。
