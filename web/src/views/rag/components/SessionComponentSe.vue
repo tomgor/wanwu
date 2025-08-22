@@ -50,7 +50,7 @@
         <div class="session-error" v-if="n.error"><i class="el-icon-warning"></i>&nbsp;{{n.response}}</div>
 
         <!--回答 文字+图片-->
-        <div v-if="(n.response && !n.error)" class="session-answer">
+        <div v-if="(n.response && !n.error)" class="session-answer" :id="'message-container'+i">
           <div :class="['session-item','rl']">
             <img class="logo" :src="'/user/api/'+ defaultUrl"/>
             <div class="session-wrap" style="width:calc(100% - 30px);">
@@ -61,12 +61,14 @@
               <!--内容-->
               <div class="answer-content"  v-bind:class="{'ds-res':showDSBtn(n.response)}" v-html="showDSBtn(n.response)?replaceHTML(n.response,n):n.response"></div>
               <!--出处-->
-              <div v-if="n.searchList && n.searchList.length" class="search-list">
+              <div v-if="n.searchList && n.searchList.length && sessionStatus !== 0" class="search-list">
                 <div v-for="(m,j) in n.searchList" :key="`${j}sdsl`" class="search-list-item">
                   <div class="serach-list-item">
                     <span @click="collapseClick(n,m,j)"><i :class="['',m.collapse?'el-icon-caret-bottom':'el-icon-caret-right']"></i>出处：</span>
                     <a v-if="m.link" :href="m.link" target="_blank">{{m.link}}</a>
-                    <span v-if="m.title" style="margin-left: 10px" v-html="m.title"></span>
+                    <span v-if="m.title">
+                      <sub class="subTag" :data-parents-index="i" :data-collapse="m.collapse?'true':'false'">{{j + 1}}</sub> {{m.title}}
+                    </span>
                     <!-- <span @click="goPreview($event,m)" class="search-doc">查看全文</span> -->
                   </div>
                   <el-collapse-transition>
@@ -86,6 +88,7 @@
 
 <script>
 import {marked} from 'marked'
+import smoothscroll from 'smoothscroll-polyfill';
 var highlight = require('highlight.js');
 import 'highlight.js/styles/atom-one-dark.css';
 
@@ -149,6 +152,34 @@ export default {
     mounted(){
       this.setupScrollListener();
       // this.listenerImg();
+      smoothscroll.polyfill();
+      document.addEventListener('click', (e) => {
+        if(this.sessionStatus === 0) return;
+        const citationElement = e.target.closest('.citation');
+        const tagIndex = citationElement.textContent;
+        const allSubTag = document.querySelectorAll('.subTag');
+        const parentsIndex = allSubTag[tagIndex - 1].dataset.parentsIndex;
+        const collapse = allSubTag[tagIndex - 1].dataset.collapse;
+        const searchList = document.querySelectorAll('.snippet')
+        const snippet = searchList[tagIndex - 1];
+        if(allSubTag.length === 0) return;
+        if(citationElement && collapse === 'false'){
+            this.$set(
+            this.session_data.history[parentsIndex].searchList[tagIndex - 1],
+            'collapse',
+            true
+          );
+        }
+        // console.log(snippet)
+        // if(!isElementInViewport(snippet)){
+        //   snippet.scrollIntoView({ 
+        //     behavior: 'smooth',
+        //     block: 'start'
+        //   })
+        // }
+        
+        e.stopPropagation();
+      });
     },
     beforeDestroy(){
       const container = document.getElementById('timeScroll');
@@ -158,6 +189,19 @@ export default {
       clearTimeout(this.scrollTimeout);
     },
     methods:{
+        isElementInViewport(el,i){
+          const elemRect = el.getBoundingClientRect();
+          const messageBox = document.getElementById('message-container'+i);
+          const containerRect = messageBox.getBoundingClientRect();
+          // 检查元素是否在视口的上下左右边界内  
+          const inViewport = (
+            elemRect.top >= containerRect.top &&
+            elemRect.left >= containerRect.left &&
+            elemRect.bottom <= containerRect.bottom &&
+            elemRect.right <= containerRect.right
+          );
+          return inViewport;
+        },
         goPreview(event,item){
           event.stopPropagation(); // 阻止事件冒泡
           let { meta_data } = item;
@@ -313,7 +357,6 @@ export default {
             }else{
                 this.$set(n.searchList,j, {...m,collapse:false})
             }
-            //this.scrollBottom()
         },
         doLoading(){
           this.loading = true
@@ -331,6 +374,8 @@ export default {
         },
         replaceLastData(index,data){
           this.$set(this.session_data.history,index,data)
+          // const allCitations = document.querySelectorAll('.citation');
+          // console.log(allCitations)
           this.scrollBottom()
         },
         getFileSizeDisplay(fileSize){
@@ -509,7 +554,24 @@ export default {
     margin-left:10px;
     cursor: pointer;
     color: #384BF7;
-    
+  }
+  .subTag{
+    display: inline-flex;
+    color: #384BF7;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #384BF7;
+    line-height: 18px;
+    vertical-align: middle;
+    margin-left: 2px;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-bottom: 2px;
+    transform: scale(0.8);
   }
 }
 
@@ -547,6 +609,29 @@ img.failed::after {
       }
     section li{
       list-style-position: inside; /* 将标记符号放在内容框内 */
+    }
+    .citation{
+      display: inline-flex;
+      color: #384BF7;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      border: 1px solid #384BF7;
+      cursor: pointer;
+      line-height: 18px;
+      vertical-align: middle;
+      margin-left: 2px;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-bottom: 2px;
+      transform: scale(0.8);
+    }
+    .citation-active{
+      background: #384BF7;
+      color:#fff;
     }
   }
   .search-list{

@@ -665,6 +665,25 @@ export default {
         padding:0 15px 10px 15px;
         position: relative;
         color: #333;
+        .citation{
+          display: inline-flex;
+          color: #384BF7;
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          border: 1px solid #384BF7;
+          cursor: pointer;
+          line-height: 18px;
+          vertical-align: middle;
+          margin-left: 5px;
+          justify-content: center;
+          align-items: center;
+          font-size: 14px;
+          overflow: hidden;
+          white-space: nowrap;
+          margin-bottom: 2px;
+          transform: scale(0.8);
+        }
         .answer-content-query{
           display: flex;
           flex-wrap: wrap;
