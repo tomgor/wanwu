@@ -443,6 +443,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		}
 	}
 	requestBody["mcp_tools"] = mcpReqData.McpTools
+	requestBody["auto_citation"] = true // 开启自动引文，定后端写死
 	log.Infof("requestBody = %+v", requestBody)
 	// 向底层智能体能力接口发起请求
 	requestBodyBytes, err := json.Marshal(requestBody)

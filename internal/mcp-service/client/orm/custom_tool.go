@@ -30,9 +30,9 @@ func (c *Client) CreateCustomTool(ctx context.Context, customTool *model.CustomT
 	})
 }
 
-func (c *Client) GetCustomTool(ctx context.Context, customToolID string) (*model.CustomTool, *err_code.Status) {
+func (c *Client) GetCustomTool(ctx context.Context, ID uint32) (*model.CustomTool, *err_code.Status) {
 	info := &model.CustomTool{}
-	if err := sqlopt.WithCustomToolID(customToolID).Apply(c.db).WithContext(ctx).First(info).Error; err != nil {
+	if err := sqlopt.WithID(ID).Apply(c.db).WithContext(ctx).First(info).Error; err != nil {
 		return nil, toErrStatus("mcp_get_custom_tool_info_err", err.Error())
 	}
 	return info, nil
@@ -51,7 +51,7 @@ func (c *Client) ListCustomTools(ctx context.Context, orgID, userID, name string
 }
 
 func (c *Client) UpdateCustomTool(ctx context.Context, customTool *model.CustomTool) *err_code.Status {
-	if err := sqlopt.WithCustomToolID(customTool.CustomToolId).Apply(c.db).WithContext(ctx).Model(customTool).Updates(map[string]interface{}{
+	if err := sqlopt.WithID(customTool.ID).Apply(c.db).WithContext(ctx).Model(customTool).Updates(map[string]interface{}{
 		"name":               customTool.Name,
 		"description":        customTool.Description,
 		"schema":             customTool.Schema,
@@ -66,8 +66,8 @@ func (c *Client) UpdateCustomTool(ctx context.Context, customTool *model.CustomT
 	return nil
 }
 
-func (c *Client) DeleteCustomTool(ctx context.Context, customToolID string) *err_code.Status {
-	if err := sqlopt.WithCustomToolID(customToolID).Apply(c.db).WithContext(ctx).Delete(&model.CustomTool{}).Error; err != nil {
+func (c *Client) DeleteCustomTool(ctx context.Context, ID uint32) *err_code.Status {
+	if err := sqlopt.WithID(ID).Apply(c.db).WithContext(ctx).Delete(&model.CustomTool{}).Error; err != nil {
 		return toErrStatus("mcp_delete_custom_tool_err", err.Error())
 	}
 	return nil

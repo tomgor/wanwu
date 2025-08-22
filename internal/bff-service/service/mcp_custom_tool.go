@@ -73,7 +73,13 @@ func DeleteCustomTool(ctx *gin.Context, userID, orgID string, req request.Custom
 }
 
 func UpdateCustomTool(ctx *gin.Context, userID, orgID string, req request.CustomToolUpdateReq) error {
-	_, err := mcp.UpdateCustomTool(ctx.Request.Context(), &mcp_service.UpdateCustomToolReq{
+
+	_, err := GetCustomToolSchemaAPI(ctx, userID, orgID, request.CustomToolSchemaReq{Schema: req.Schema})
+	if err != nil {
+		return err
+	}
+
+	_, err = mcp.UpdateCustomTool(ctx.Request.Context(), &mcp_service.UpdateCustomToolReq{
 		CustomToolId: req.CustomToolID,
 		Name:         req.Name,
 		Description:  req.Description,
