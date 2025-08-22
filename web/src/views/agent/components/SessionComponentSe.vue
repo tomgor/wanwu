@@ -224,12 +224,13 @@ export default {
       document.addEventListener('click', (e) => {
         if(this.sessionStatus === 0) return;
         const citationElement = e.target.closest('.citation');
+        if(!citationElement) return;
         const tagIndex = citationElement.textContent;
         const allSubTag = document.querySelectorAll('.subTag');
         const parentsIndex = allSubTag[tagIndex - 1].dataset.parentsIndex;
         const collapse = allSubTag[tagIndex - 1].dataset.collapse;
         if(allSubTag.length === 0) return;
-        if(citationElement && collapse === 'false'){
+        if(collapse === 'false'){
             this.$set(
             this.session_data.history[parentsIndex].searchList[tagIndex - 1],
             'collapse',
@@ -692,6 +693,25 @@ export default {
     section li{
       list-style-position: inside; /* 将标记符号放在内容框内 */
     }
+    .citation{
+          display: inline-flex;
+          color: #384BF7;
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          border: 1px solid #384BF7;
+          cursor: pointer;
+          line-height: 18px;
+          vertical-align: middle;
+          margin-left: 5px;
+          justify-content: center;
+          align-items: center;
+          font-size: 14px;
+          overflow: hidden;
+          white-space: nowrap;
+          margin-bottom: 2px;
+          transform: scale(0.8);
+        }
   }
   .search-list{
     img{
@@ -725,25 +745,6 @@ export default {
         padding:0 15px 10px 15px;
         position: relative;
         color: #333;
-        .citation{
-          display: inline-flex;
-          color: #384BF7;
-          border-radius: 50%;
-          width: 18px;
-          height: 18px;
-          border: 1px solid #384BF7;
-          cursor: pointer;
-          line-height: 18px;
-          vertical-align: middle;
-          margin-left: 5px;
-          justify-content: center;
-          align-items: center;
-          font-size: 14px;
-          overflow: hidden;
-          white-space: nowrap;
-          margin-bottom: 2px;
-          transform: scale(0.8);
-        }
         .answer-content-query{
           display: flex;
           flex-wrap: wrap;

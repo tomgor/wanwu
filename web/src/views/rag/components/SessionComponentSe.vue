@@ -158,12 +158,13 @@ export default {
       document.addEventListener('click', (e) => {
         if(this.sessionStatus === 0) return;
         const citationElement = e.target.closest('.citation');
+        if(!citationElement) return;
         const tagIndex = citationElement.textContent;
         const allSubTag = document.querySelectorAll('.subTag');
         const parentsIndex = allSubTag[tagIndex - 1].dataset.parentsIndex;
         const collapse = allSubTag[tagIndex - 1].dataset.collapse;
         if(allSubTag.length === 0) return;
-        if(citationElement && collapse === 'false'){
+        if(collapse === 'false'){
             this.$set(
             this.session_data.history[parentsIndex].searchList[tagIndex - 1],
             'collapse',
