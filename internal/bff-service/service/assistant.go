@@ -564,14 +564,15 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		modelInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: resp.ModelConfig.ModelId})
 		if err != nil {
 			log.Errorf("获取模型信息失败，模型ID: %s, 错误: %v", resp.ModelConfig.ModelId, err)
-			return nil, err
 		}
-		modelConfig, err = appModelConfigProto2Model(resp.ModelConfig, modelInfo.DisplayName)
-		if err != nil {
-			log.Errorf("模型配置Proto转换到模型失败，模型ID: %s, 错误: %v", resp.ModelConfig.ModelId, err)
-			return nil, err
+		if modelInfo != nil {
+			modelConfig, err = appModelConfigProto2Model(resp.ModelConfig, modelInfo.DisplayName)
+			if err != nil {
+				log.Errorf("模型配置Proto转换到模型失败，模型ID: %s, 错误: %v", resp.ModelConfig.ModelId, err)
+				return nil, err
+			}
+			log.Debugf("模型配置转换成功: %+v", modelConfig)
 		}
-		log.Debugf("模型配置转换成功: %+v", modelConfig)
 	} else {
 		log.Debugf("模型配置为空或模型ID为空")
 	}
