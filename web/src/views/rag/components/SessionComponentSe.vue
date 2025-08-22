@@ -63,7 +63,7 @@
               <!--出处-->
               <div v-if="n.searchList && n.searchList.length && sessionStatus !== 0" class="search-list">
                 <div v-for="(m,j) in n.searchList" :key="`${j}sdsl`" class="search-list-item">
-                  <div class="serach-list-item">
+                  <div class="serach-list-item" v-if="citationsArray.includes(j+1)">
                     <span @click="collapseClick(n,m,j)"><i :class="['',m.collapse?'el-icon-caret-bottom':'el-icon-caret-right']"></i>出处：</span>
                     <a v-if="m.link" :href="m.link" target="_blank">{{m.link}}</a>
                     <span v-if="m.title">
@@ -110,6 +110,7 @@ export default {
   props: ['sessionStatus','defaultUrl'],
   data(){
       return{
+          citationsArray:[],
           autoScroll:true,
           scrollTimeout:null,
           isDs:['txt2txt-002-001','txt2txt-002-002','txt2txt-002-004','txt2txt-002-005','txt2txt-002-006','txt2txt-002-007','txt2txt-002-008'].indexOf(this.$route.params.id) !=-1,
@@ -139,6 +140,7 @@ export default {
           },
           imgConfig:["jpeg", "PNG", "png", "JPG", "jpg",'bmp','webp'],
           audioConfig:["mp3", "wav"],
+          debounceTimer:null
       }
   },
     watch: {
@@ -160,8 +162,6 @@ export default {
         const allSubTag = document.querySelectorAll('.subTag');
         const parentsIndex = allSubTag[tagIndex - 1].dataset.parentsIndex;
         const collapse = allSubTag[tagIndex - 1].dataset.collapse;
-        const searchList = document.querySelectorAll('.snippet')
-        const snippet = searchList[tagIndex - 1];
         if(allSubTag.length === 0) return;
         if(citationElement && collapse === 'false'){
             this.$set(
@@ -170,14 +170,7 @@ export default {
             true
           );
         }
-        // console.log(snippet)
-        // if(!isElementInViewport(snippet)){
-        //   snippet.scrollIntoView({ 
-        //     behavior: 'smooth',
-        //     block: 'start'
-        //   })
-        // }
-        
+        document.getElementById('timeScroll').scrollTop = document.getElementById('timeScroll').scrollHeight;
         e.stopPropagation();
       });
     },
@@ -187,20 +180,21 @@ export default {
         container.removeEventListener('scroll', this.handleScroll);
       }
       clearTimeout(this.scrollTimeout);
+      clearTimeout(this.debounceTimer)
     },
     methods:{
-        isElementInViewport(el,i){
-          const elemRect = el.getBoundingClientRect();
-          const messageBox = document.getElementById('message-container'+i);
-          const containerRect = messageBox.getBoundingClientRect();
-          // 检查元素是否在视口的上下左右边界内  
-          const inViewport = (
-            elemRect.top >= containerRect.top &&
-            elemRect.left >= containerRect.left &&
-            elemRect.bottom <= containerRect.bottom &&
-            elemRect.right <= containerRect.right
-          );
-          return inViewport;
+        setCitations() {
+          const allCitations = document.querySelectorAll('.citation');
+          const citationsSet = new Set();
+          
+          allCitations.forEach(element => {
+            const text = element.textContent.trim();
+            if (text) {
+              citationsSet.add(Number(text));
+            }
+          });
+          
+          this.citationsArray = Array.from(citationsSet);
         },
         goPreview(event,item){
           event.stopPropagation(); // 阻止事件冒泡
@@ -373,10 +367,17 @@ export default {
             this.scrollBottom()
         },
         replaceLastData(index,data){
-          this.$set(this.session_data.history,index,data)
-          // const allCitations = document.querySelectorAll('.citation');
-          // console.log(allCitations)
+          if(!data.response){
+            data.response = '无响应数据'
+          }
           this.scrollBottom()
+          this.$set(this.session_data.history,index,data)
+          if(this.debounceTimer){
+            clearTimeout(this.debounceTimer)
+          }
+          this.debounceTimer = setTimeout(() =>{
+            this.setCitations()
+          },500)
         },
         getFileSizeDisplay(fileSize){
             if (!fileSize || typeof fileSize !== 'number' || isNaN(fileSize)) {

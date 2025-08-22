@@ -87,12 +87,14 @@
             <el-image v-for="(g,k) in n.gen_file_url_list" :key="k" :src='g' :preview-src-list="[g]"></el-image>
           </div>
           <!--出处-->
-          <div v-if="n.searchList && n.searchList.length" class="search-list">
+          <div v-if="n.searchList && n.searchList.length && sessionStatus !== 0" class="search-list">
             <div v-for="(m,j) in n.searchList" :key="`${j}sdsl`" class="search-list-item">
-              <div class="serach-list-item">
+              <div class="serach-list-item" v-if="citationsArray.includes(j+1)">
                 <span @click="collapseClick(n,m,j)"><i :class="['',m.collapse?'el-icon-caret-bottom':'el-icon-caret-right']"></i>出处：</span>
                 <a v-if="m.link" :href="m.link" target="_blank">{{m.link}}</a>
-                <span v-if="m.title" style="margin-left: 10px" v-html="m.title"></span>
+                <span v-if="m.title">
+                  <sub class="subTag" :data-parents-index="i" :data-collapse="m.collapse?'true':'false'">{{j + 1}}</sub> {{m.title}}
+                </span>
                 <!-- <span @click="goPreview($event,m)" class="search-doc">查看全文</span> -->
               </div>
               <el-collapse-transition>
@@ -149,6 +151,7 @@
 </template>
 
 <script>
+import smoothscroll from 'smoothscroll-polyfill';
 import { md } from '@/mixins/marksown-it'
 import {marked} from 'marked'
 var highlight = require('highlight.js');
@@ -172,6 +175,7 @@ export default {
   props: ['sessionStatus','defaultUrl','type'],
   data(){
       return{
+          citationsArray:[],
           md:md,
           autoScroll:true,
           scrollTimeout:null,
@@ -202,6 +206,7 @@ export default {
           },
           imgConfig:["jpeg", "PNG", "png", "JPG", "jpg",'bmp','webp'],
           audioConfig:["mp3", "wav"],
+          debounceTimer:null
       }
   },
     watch: {
@@ -215,6 +220,25 @@ export default {
     mounted(){
       this.setupScrollListener();
       // this.listenerImg();
+      smoothscroll.polyfill();
+      document.addEventListener('click', (e) => {
+        if(this.sessionStatus === 0) return;
+        const citationElement = e.target.closest('.citation');
+        const tagIndex = citationElement.textContent;
+        const allSubTag = document.querySelectorAll('.subTag');
+        const parentsIndex = allSubTag[tagIndex - 1].dataset.parentsIndex;
+        const collapse = allSubTag[tagIndex - 1].dataset.collapse;
+        if(allSubTag.length === 0) return;
+        if(citationElement && collapse === 'false'){
+            this.$set(
+            this.session_data.history[parentsIndex].searchList[tagIndex - 1],
+            'collapse',
+            true
+          );
+        }
+        document.getElementById('timeScroll').scrollTop = document.getElementById('timeScroll').scrollHeight;
+        e.stopPropagation();
+      });
     },
     beforeDestroy(){
       const container = document.getElementById('timeScroll');
@@ -222,13 +246,26 @@ export default {
         container.removeEventListener('scroll', this.handleScroll);
       }
       clearTimeout(this.scrollTimeout);
-      
+      clearTimeout(this.debounceTimer)
       // 移除图片错误事件监听器
       if (this.imageErrorHandler) {
         document.body.removeEventListener('error', this.imageErrorHandler, true);
       }
     },
     methods:{
+          setCitations() {
+            const allCitations = document.querySelectorAll('.citation');
+            const citationsSet = new Set();
+            
+            allCitations.forEach(element => {
+              const text = element.textContent.trim();
+              if (text) {
+                citationsSet.add(Number(text));
+              }
+            });
+            
+            this.citationsArray = Array.from(citationsSet);
+          },
           goPreview(event,item){
             event.stopPropagation(); // 阻止事件冒泡
             let { meta_data } = item;
@@ -405,6 +442,12 @@ export default {
           this.$set(this.session_data.history,index,data)
           this.scrollBottom()
           this.codeScrollBottom();//code内容置底
+          if(this.debounceTimer){
+            clearTimeout(this.debounceTimer)
+          }
+          this.debounceTimer = setTimeout(() =>{
+            this.setCitations()
+          },500)
         },
         getFileSizeDisplay(fileSize){
             if (!fileSize || typeof fileSize !== 'number' || isNaN(fileSize)) {
@@ -599,6 +642,24 @@ export default {
     cursor: pointer;
     color: #384BF7;
   }
+  .subTag{
+    display: inline-flex;
+    color: #384BF7;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #384BF7;
+    line-height: 18px;
+    vertical-align: middle;
+    margin-left: 2px;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-bottom: 2px;
+    transform: scale(0.8);
+  }
 }
 
 /deep/{
@@ -661,7 +722,6 @@ export default {
         border-radius: 6px;
       }
       .answer-content{
-        // width: calc(100% - 30px);
         padding:0 15px 10px 15px;
         position: relative;
         color: #333;
