@@ -42,6 +42,7 @@ type RagChatParams struct {
 	TopP              float32          `json:"top_p"`              // 多样性
 	RepetitionPenalty float32          `json:"repetition_penalty"` // 重复惩罚/频率惩罚
 	ReturnMeta        bool             `json:"return_meta"`        // 是否返回元数据
+	AutoCitation      bool             `json:"auto_citation"`      // 是否自动角标
 }
 
 type WeightParams struct {
@@ -165,6 +166,8 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	ragChatParams.History = []*HistoryItem{}
 	ragChatParams.RewriteQuery = true
 	ragChatParams.ReturnMeta = true
+	//自动角标
+	ragChatParams.AutoCitation = true
 
 	// 模型参数
 	ragChatParams.CustomModelInfo = &CustomModelInfo{LlmModelID: rag.ModelConfig.ModelId}
