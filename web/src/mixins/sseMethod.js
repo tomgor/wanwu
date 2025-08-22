@@ -470,8 +470,8 @@ export default {
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
-                                        endStr = convertLatexSyntax(endStr)
-                                        endStr = parseSub(endStr)
+                                        // endStr = convertLatexSyntax(endStr)
+                                        // endStr = parseSub(endStr)
                                         const finalResponse = String(endStr)
                                         let fillData = {
                                             ...commonData,
