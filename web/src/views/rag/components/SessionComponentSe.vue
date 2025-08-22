@@ -67,7 +67,7 @@
                     <span @click="collapseClick(n,m,j)"><i :class="['',m.collapse?'el-icon-caret-bottom':'el-icon-caret-right']"></i>出处：</span>
                     <a v-if="m.link" :href="m.link" target="_blank">{{m.link}}</a>
                     <span v-if="m.title" style="margin-left: 10px" v-html="m.title"></span>
-                    <span @click="goPreview($event,m)" class="search-doc">查看全文</span>
+                    <!-- <span @click="goPreview($event,m)" class="search-doc">查看全文</span> -->
                   </div>
                   <el-collapse-transition>
                     <div v-show="m.collapse?true:false"  class="snippet">

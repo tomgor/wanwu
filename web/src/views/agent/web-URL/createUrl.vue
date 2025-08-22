@@ -1,7 +1,6 @@
 <template>
     <div>
         <div>
-            <el-button type="primary"  size="mini" @click="$router.push('/webChat/123')">去聊天</el-button>
             <el-button type="primary" icon="el-icon-plus" size="mini" @click="showDialog(null)">创建</el-button>
             <el-table
                 :data="tableData"
@@ -105,6 +104,7 @@
               </el-form-item>
               <el-form-item prop="copyrightEnable">
                 <el-switch
+                  :disabled="!form.copyright"
                   v-model="form.copyrightEnable"
                   active-color="#384BF7">
                 </el-switch>
@@ -118,10 +118,11 @@
                     <span class="el-icon-question tips"></span>
                   </el-tooltip>
                 </template>
-                <el-input v-model="form.privacyPolicy" placeholder="请输入隐私政策链接"></el-input>
+                <el-input v-model="form.privacyPolicy" placeholder="请输入隐私政策链接" @blur="urlBlur"></el-input>
               </el-form-item>
               <el-form-item prop="privacyPolicyEnable">
                 <el-switch
+                  :disabled="!form.privacyPolicy"
                   v-model="form.privacyPolicyEnable"
                   active-color="#384BF7">
                 </el-switch>
@@ -139,6 +140,7 @@
               </el-form-item>
               <el-form-item prop="disclaimerEnable">
                 <el-switch
+                  :disabled="!form.disclaimer"
                   v-model="form.disclaimerEnable"
                   active-color="#384BF7">
                 </el-switch>
@@ -182,6 +184,17 @@ export default {
       this.getList();
     },
     methods:{
+        urlBlur(){
+          const text = this.form.privacyPolicy;
+          if(!this.isValidUrl(text)){
+            this.$message.warning('链接效验不合格')
+            this.form.privacyPolicy = '';
+          }
+        },
+        isValidUrl(string) {
+          const pattern = /^https?:\/\/(?:[-\w.])+(?:\:[0-9]+)?(?:\/(?:[\w/_.])*(?:\?(?:[\w&=%.])*)?(?:\#(?:[\w.])*)?)?$/;
+          return pattern.test(string.trim());
+        },
         handleCopy(row){
           let text = row.suffix;
           var textareaEl = document.createElement("textarea");
@@ -224,6 +237,7 @@ export default {
             if (this.$refs.form) {
               this.$refs.form.resetFields();
               this.$refs.form.clearValidate();
+              this.clear();
             }
           })
         }else{
@@ -235,6 +249,16 @@ export default {
             }
           })
         }
+      },
+      clear(){
+        this.form.copyright = '';
+        this.form.copyrightEnable = false;
+        this.form.disclaimer = '';
+        this.form.disclaimerEnable = false;
+        this.form.expiredAt = '';
+        this.form.name = '';
+        this.form.privacyPolicy = '';
+        this.form.privacyPolicyEnable = false;
       },
       submit(formName){
         this.$refs[formName].validate((valid) => {

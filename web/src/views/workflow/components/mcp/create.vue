@@ -12,9 +12,9 @@
         <el-button-group class="mcpBtn">
           <!-- <el-button
             type="primary"
-            @click="handleClick('MCP广场')"
-            :class="{ active: active === 'MCP广场' }"
-            >MCP广场</el-button
+            @click="handleClick('工具广场')"
+            :class="{ active: active === '工具广场' }"
+            >工具广场</el-button
           > -->
           <el-button
             type="primary"

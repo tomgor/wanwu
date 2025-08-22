@@ -41,7 +41,7 @@
                 :key="index"
                 class="metaItem"
             >
-              {{ item.key }}: {{ item.dataType === 'time' ? formatTimestamp(item.value) : item.value }}
+              {{ item.metaKey }}: {{ item.metaValueType === 'time' ? formatTimestamp(item.metaValue) : item.metaValue }}
             </span>
             <el-tooltip v-if="metaDataList.length > 3" :content="filterData(metaDataList.slice(3))" placement="bottom">
               <span class="metaItem">...</span>
@@ -53,7 +53,7 @@
         <el-descriptions-item label="元数据规则">
           <template v-if="metaRuleList && metaRuleList.length > 0">
             <span v-for="(item, index) in metaRuleList.slice(0, 3)" :key="index" class="metaItem">
-              {{ item.key }}: {{ item.rule }}<span v-if="index < metaRuleList.slice(0, 3).length - 1"> </span>
+              {{ item.metaKey }}: {{ item.metaRule }}<span v-if="index < metaRuleList.slice(0, 3).length - 1"> </span>
             </span>
             <el-tooltip v-if="metaRuleList.length > 3" :content="filterRule(metaRuleList.slice(3))" placement="bottom">
               <span class="metaItem">...</span>
@@ -107,6 +107,13 @@
               </div>
               <div class="text item" @click="handleClick(item, index)">
                 {{ item.content }}
+              </div>
+              <div class="tagList">
+                <span :class="['smartDate','tagList']" @click.stop="addTag(item.labels,item.contentId)" v-if="item.labels.length === 0">
+                  <span class="el-icon-price-tag icon-tag"></span>
+                  创建关键词
+                </span>
+                <span class="tagList-item" @click.stop="addTag(item.labels,item.contentId)" v-else>{{formattedTagNames(item.labels) }}</span>
               </div>
             </el-card>
           </el-col>
@@ -172,15 +179,18 @@
       </span>
     </el-dialog>
     <dataBaseDialog ref="dataBase" @updateData="updateData"/>
+    <tagDialog ref="tagDialog" type="section" :title="title" :currentList="currentList" @sendList="sendList" />
   </div>
 </template>
 <script>
-import { getSectionList,setSectionStatus } from "@/api/knowledge";
-import dataBaseDialog from './dataBaseDialog'
+import { getSectionList,setSectionStatus,sectionLabels } from "@/api/knowledge";
+import dataBaseDialog from './dataBaseDialog';
+import tagDialog from './tagDialog.vue';
 export default {
-  components:{dataBaseDialog},
+  components:{dataBaseDialog,tagDialog},
   data() {
     return {
+      title:'创建关键词',
       dialogVisible: false,
       obj: {}, // 路由参数对象
       cardObj: [
@@ -209,7 +219,9 @@ export default {
         contentList: [],
       },
       metaDataList: [],
-      metaRuleList: []
+      metaRuleList: [],
+      currentList:[],
+      contentId:''
     };
   },
   created() {
@@ -217,6 +229,41 @@ export default {
     this.getList();
   },
   methods: {
+    sendList(data){
+      const labels = data.map(item => item.tagName)
+      sectionLabels({contentId:this.contentId,docId:this.obj.id,labels}).then(res =>{
+        if(res.code === 0){
+          this.getList();
+          this.$refs.tagDialog.handleClose();
+        }
+      }).catch(err =>{})
+    },
+    addTag(data,id){
+      if(data.length > 0){
+          this.currentList = data.map(item =>({
+          tagName:item,
+          checked: false,
+          showDel: false,
+          showIpt: false
+        }))
+      }else{
+        this.currentList = []
+      }
+      this.contentId = id
+      this.$refs.tagDialog.showDiaglog();
+    },
+    formattedTagNames(data){
+      let tags = ''
+      if(!Array.isArray(data) || data.length === 0){
+        return '';
+      }
+      if(data.length > 3){
+        tags = data.slice(0, 3).join(', ') + (data.length > 3 ? '...' : '');
+      }else{
+        tags = data.join(', ');
+      }
+      return tags;
+    },
     updateData(){
       this.getList();
     },
@@ -224,15 +271,14 @@ export default {
       this.$refs.dataBase.showDiglog(data,this.obj.id)
     },
     filterData(data){
-      const formattedString = data.map(item => {
-        let value = item.value;
+      return data.map(item => {
+        let value = item.metaValue;
         // 如果是时间类型且值为时间戳，转换为日期字符串
-        if (item.dataType === 'time') {
+        if (item.metaValueType === 'time') {
           value = this.formatTimestamp(value);
         }
-        return `${item.key}:${value}`;
+        return `${item.metaKey}:${value}`;
       }).join(", ");
-      return formattedString;
     },
     formatTimestamp(timestamp) {
       if (timestamp === '') return '';
@@ -246,8 +292,7 @@ export default {
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     },
     filterRule(rule){
-      const formattedString = rule.map(item => `${item.key}:${item.rule}`).join(", ");
-      return formattedString
+      return rule.map(item => `${item.metaKey}:${item.metaRule}`).join(", ")
     },
     getList() {
       this.loading.itemStatus = true;
@@ -260,7 +305,7 @@ export default {
           this.loading.itemStatus = false;
           this.res = res.data;
           this.page.total = this.res.segmentTotalNum;
-          this.metaRuleList = res.data.metaDataList.filter(item => item.rule);
+          this.metaRuleList = res.data.metaDataList.filter(item => item.metaRule);
           this.metaDataList = res.data.metaDataList;
         })
         .catch(() => {
@@ -371,6 +416,23 @@ export default {
 };
 </script>
 <style lang="scss">
+  .smartDate{
+      padding-top:3px;
+      color:#888888;
+  }
+  .tagList{
+    cursor: pointer;
+    .icon-tag{
+      transform: rotate(-40deg);
+      margin-right:3px;
+    }
+    .tagList-item{
+      color:#888;
+    }
+  }
+  .tagList > .tagList-item:hover{
+      color:#384BF7;
+  }
 .showMore{
   margin-left:5px;
   background:#f4f5ff;
