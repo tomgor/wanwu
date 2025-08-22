@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>
+    <div class="header">
       <div class="header-api">
         <el-tag
           effect="plain"
@@ -49,7 +49,7 @@
   </div>
 </template>
 <script>
-import { createApiKey, delApiKey, getApiKeyList } from "@/api/appspace";
+import { getApiKeyRoot,createApiKey,delApiKey,getApiKeyList } from "@/api/appspace";
 export default {
   props: {
     appType: {
@@ -65,14 +65,27 @@ export default {
     return {
       apiURL: "",
       tableData: [],
+      dialogVisible:false
     };
   },
   created() {
     this.getTableData();
+    this.apiKeyRootUrl();
   },
   methods: {
+    handleClose(){
+      this.dialogVisible = false;
+    },
+    apiKeyRootUrl() {
+      const data = { appId: this.appId, appType:this.appType };
+      getApiKeyRoot(data).then((res) => {
+        if (res.code === 0) {
+          this.apiURL = res.data || "";
+        }
+      });
+    },
     openApiDialog(){
-
+      this.handleCreate();
     },
     handleCopy(row) {
       let text = row.apiKey;
@@ -92,7 +105,7 @@ export default {
       const data = { appId: this.appId, appType: this.appType };
       createApiKey(data).then((res) => {
         if (res.code === 0) {
-          this.tableData.push(res.data);
+          this.getTableData()
         }
       });
     },
@@ -129,3 +142,33 @@ export default {
   },
 };
 </script>
+<style lang="scss" scoped>
+  .header{
+    width:100%;
+    display:flex;
+    justify-content:flex-start;
+    align-items:flex-start;
+    height:60px;
+    .header-api {
+      padding: 6px 10px;
+      box-shadow: 1px 2px 2px #ddd;
+      background-color: #fff;
+      border-radius: 6px;
+      width:450px;
+      .root-url {
+        background-color: #eceefe;
+        color: #384bf7;
+        border: none;
+      }
+    }
+    .apikeyBtn{
+      margin-left:10px;
+      border:1px solid #384bf7;
+      padding:12px;
+      color: #384bf7;
+      display:flex;
+      align-items:center;
+    }
+  }
+
+</style>

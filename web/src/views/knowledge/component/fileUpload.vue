@@ -538,7 +538,7 @@ export default {
       this.ruleForm = {
         docAnalyzer:['text'],
         docMetaData:[],//元数据管理数据
-        docPreprocess:[],//'deleteLinks','replaceSymbols'
+        docPreprocess:['replaceSymbols'],//'deleteLinks','replaceSymbols'
         docSegment:{
           segmentType:this.ruleForm.docSegment.segmentType,
           splitter:[],//"！","。","？","?","!",".","......"
@@ -555,6 +555,7 @@ export default {
         ...item,
         checked: false
       }))
+      this.$refs.ruleForm.clearValidate();
     },
     uploadOnChange(file, fileList){
       if (!fileList.length) return;

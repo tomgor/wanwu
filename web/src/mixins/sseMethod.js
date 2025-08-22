@@ -44,7 +44,10 @@ export default {
     },
     created() {
         const vuex = JSON.parse(localStorage.getItem("access_cert"));
-        this.access_token = vuex.user.token;
+        if(vuex){
+            this.access_token = vuex.user.token;
+        }
+
     },
     mounted(){
         //this.addVisibilitychangeEvent()
@@ -284,7 +287,8 @@ export default {
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
-                                        // console.log('===>',new Date().getTime(), endStr)
+                                        endStr = convertLatexSyntax(endStr)
+                                        endStr = parseSub(endStr)
                                         let fillData = {
                                             ...commonData,
                                             "response": md.render(endStr),
@@ -338,6 +342,7 @@ export default {
         },
         sendEventSource(prompt, msgStr, lastIndex) {
             console.log('####  sendEventSource',new Date().getTime())
+            const userInfo = this.$store.state.user.userInfo || {}
             if (this.sessionStatus === 0) {
                 this.$message.warning('上个问题没有回答完！')
                 return
@@ -362,29 +367,51 @@ export default {
             let endStr = ''
             this._print = new Print({
                 onPrintEnd: () => {
-                    //this.setStoreSessionStatus(-1)
                 }
             })
-            const trial = this.isTestChat ? true : false
-            let data = {
-                ...this.sseParams,
-                prompt,
-                trial
-            };
 
-            this.ctrlAbort = new AbortController();
-            const userInfo = this.$store.state.user.userInfo || {}
-            this.eventSource = new fetchEventSource(this.origin + this.sseApi, {
-                method: 'POST',
-                headers: {
+            let data = null;
+            let headers = null;
+            //判断是是不是openurl对话
+            if(this.type === 'agentChat'){
+                this.sseApi = "/user/api/v1/assistant/stream";
+                const trial = this.isTestChat ? true : false
+                data = {
+                    ...this.sseParams,
+                    prompt,
+                    trial
+                };
+                headers = {
                     "Content-Type": 'application/json',
                     'Authorization': 'Bearer ' + this.token,
                     "x-user-id": userInfo.uid,
                     "x-org-id": userInfo.orgId
-                },
+                }
+            }else{
+                this.sseApi = `/service/url/openurl/v1/agent/${this.sseParams.assistantId}/stream`;
+                data = {
+                   conversationId:this.sseParams.conversationId, 
+                   prompt
+                }
+                headers = {
+                    'X-Client-ID':this.getHeaderConfig().headers['X-Client-ID']
+                };
+            }
+
+            this.ctrlAbort = new AbortController();
+            this.eventSource = new fetchEventSource(this.origin + this.sseApi, {
+                method: 'POST',
+                headers,
+                // headers: {
+                //     "Content-Type": 'application/json',
+                //     'Authorization': 'Bearer ' + this.token,
+                //     "x-user-id": userInfo.uid,
+                //     "x-org-id": userInfo.orgId
+                // },
                 signal: this.ctrlAbort.signal,
                 body: JSON.stringify(data),
                 openWhenHidden: true, //页面退至后台保持连接
+                ...(this.type === 'webChat' && { isOpeanUrl: true }),
                 onopen: async(e) => {
                     console.log("已建立SSE连接~",new Date().getTime());
                     if (e.status !== 200) {
@@ -443,6 +470,8 @@ export default {
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
+                                        // endStr = convertLatexSyntax(endStr)
+                                        // endStr = parseSub(endStr)
                                         const finalResponse = String(endStr)
                                         let fillData = {
                                             ...commonData,

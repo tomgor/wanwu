@@ -4,7 +4,7 @@ import { fetchPermFirPath } from '@/utils/util'
 import { PERMS as menuPerms } from "./constants"
 import { basePath } from "@/utils/config"
 
-const white_list = [basePath + '/aibase', '/login'] // '/register'
+const white_list = [basePath + '/aibase','/login','/webChat'] // '/register'
 export const PERMS = menuPerms
 
 export const checkPerm = (perm) => {
@@ -40,7 +40,7 @@ router.beforeEach(async (to, from, next) => {
       }
   } else {
       if(white_list.some(item =>{ return to.path.indexOf(item)>-1 })){
-            next()
+          next()
         }else{
           window.location.href = window.location.origin + basePath + '/aibase/login'
         }

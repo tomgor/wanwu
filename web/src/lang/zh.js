@@ -20,7 +20,7 @@ export default {
     menu: {
         explore: '应用广场',
         workspace: '工作室',
-        mcp: 'MCP广场',
+        mcp: '工具广场',
         safetyGuard:'安全护栏',
         app: {
             index: '应用空间',

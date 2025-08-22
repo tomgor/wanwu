@@ -1,7 +1,7 @@
 <template>
     <div class="weburl-container">
         <div class="weburl-title">
-            <span class="el-icon-arrow-left goback"></span>
+            <span class="el-icon-arrow-left goback" @click="goback"></span>
             <span class="weburl-title-text">发布配置</span>
         </div>
         <CommonLayout
@@ -17,8 +17,8 @@
             </div>
         </template>
         <template #main-content>
-            <CreateApi ref="CreateApi" v-if="active === 'api'"/>
-            <CreateUrl ref="CreateUrl" v-else/>
+            <CreateApi ref="CreateApi" v-if="active === 'api'" :appId="appId" :appType="appType" />
+            <CreateUrl ref="CreateUrl" v-else :appId="appId" :appType="appType" />
         </template>
         </CommonLayout>
     </div>
@@ -31,8 +31,10 @@ export default {
     components: {CommonLayout,CreateApi,CreateUrl},
     data(){
         return{
+            appId:'',
+            appType:'',
             active:'url',
-            asideWidth:'320',
+            asideWidth:'260px',
             toolList:[
                 {
                     name:'Web URL',
@@ -47,9 +49,16 @@ export default {
             ]
         }
     },
+    created(){
+        this.appId = this.$route.query.appId;
+        this.appType = this.$route.query.appType;
+    },  
     methods:{
         checkTool(item){
             this.active = item.type
+        },
+        goback(){
+            this.$router.back()
         }
     }
 }

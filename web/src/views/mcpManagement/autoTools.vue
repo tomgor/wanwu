@@ -14,7 +14,7 @@
 
       <div class="card-box">
         <div class="card card-item-create">
-          <div class="app-card-create" @click="handleAddMCP">
+          <div class="app-card-create" @click="handleAddMCP('')">
             <div class="create-img-wrap">
               <img class="create-type" src="@/assets/imgs/create_tools.svg" alt="" />
               <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
@@ -28,35 +28,43 @@
           class="card"
           v-for="(item, index) in list"
           :key="index"
-          @click.stop="handleClick(item)"
+          @click.stop="handleClick(item.customToolId)"
         >
           <div class="card-title">
-            <img class="card-logo" src="@/assets/imgs/toolImg.svg" />
+            <img class="card-logo" src="@/assets/imgs/toolImg.png" />
             <div class="mcp_detailBox">
               <span class="mcp_name">{{ item.name }}</span>
-              <span class="mcp_from">
-                <label>
-                  {{ item.from }}
-                </label>
-              </span>
             </div>
-            <i
-              class="el-icon-delete-solid"
-              @click.stop="handleDelete(item)"
-            ></i>
+            <el-dropdown
+                placement="bottom">
+              <span class="el-dropdown-link">
+                <i class="el-icon-more"
+                    @click.stop/>
+              </span>
+              <el-dropdown-menu slot="dropdown"  style="margin-top: -10px">
+                <el-dropdown-item
+                    @click.native="handleAddMCP(item.customToolId)">
+                  编辑
+                </el-dropdown-item>
+                <el-dropdown-item
+                    @click.native="handleDelete(item)">
+                  删除
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </div>
-          <div class="card-des">{{ item.desc }}</div>
+          <div class="card-des">{{ item.description }}</div>
         </div>
       </div>
       <el-empty class="noData" v-if="!(list && list.length)" :description="$t('common.noData')"></el-empty>
     </div>
-    <addDialog  ref="addDialog"></addDialog>
+    <addDialog  ref="addDialog" @handleClose="handleClose"></addDialog>
   </div>
 </template>
 <script>
 import addDialog from "./addToolDialog.vue";
 import SearchInput from "@/components/searchInput.vue"
-import { getList, setDelete } from "@/api/mcp";
+import { getCustomList, deleteCustom } from "@/api/mcp";
 export default {
   components: { SearchInput, addDialog },
   data() {
@@ -93,7 +101,7 @@ export default {
       const params = {
         name: searchInput.value,
       }
-      getList(params)
+      getCustomList(params)
         .then((res) => {
           this.list = res.data.list || []
           cb && cb(this.list)
@@ -110,12 +118,11 @@ export default {
         }
       })
     },
-    handleClick(val) {
-      // smcpSquareId 有值 mcp广场, 否则自定义
-      this.$router.push({path: `/mcp/detail/custom?mcpId=${val.mcpId}&mcpSquareId=${val.mcpSquareId}`})
+    handleClick(customToolId) {
+      this.$refs.addDialog.showDialog(customToolId, true);
     },
-    handleAddMCP() {
-      this.$refs.addDialog.showDialog();
+    handleAddMCP(customToolId) {
+      this.$refs.addDialog.showDialog(customToolId, false);
     },
     handleDelete(item) {
       this.$confirm(
@@ -129,8 +136,8 @@ export default {
           center: true,
         }
       ).then(async () => {
-        setDelete({
-          mcpId: item.mcpId,
+        deleteCustom({
+          customToolId: item.customToolId,
         }).then((res) => {
           if (res.code === 0) {
             this.$message.success("删除成功")
@@ -141,6 +148,9 @@ export default {
         })
       })
     },
+    handleClose() {
+      this.init()
+    }
   },
 };
 </script>
