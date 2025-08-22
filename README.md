@@ -185,6 +185,32 @@
 
 ------
 
+### ⬆️ 版本升级
+
+1. 基于上述Docker安装步骤，将系统服务完整停止
+
+2. 更新至最新版本代码
+
+    2.1 wanwu仓库目录内，更新代码
+    ```bash
+    # 切换到main分支
+    git checkout main
+    # 拉取最新代码
+    git pull
+    ```
+
+    2.2 重新拷贝环境变量文件（如果有环境变量修改，请自行重新修改）
+    ```bash
+    # 备份当前.env文件
+    cp .env .env.old
+    # 拷贝.env文件
+    cp .env.bak .env
+    ```
+
+3. 基于上述Docker安装步骤，将系统服务完整启动
+
+------
+
 ### &#x1F4D1; 使用万悟
 
 为了帮助您快速上手本项目，我们强烈推荐先查看[ 文档操作手册](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual)。我们为用户提供了交互式、结构化的操作指南，您可以直接在其中查看操作说明、接口文档等，极大地降低了学习和使用的门槛。详细功能清单如下：
