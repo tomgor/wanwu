@@ -236,7 +236,7 @@ export default {
       })
       getSchema(params)
           .then((res) => {
-            this.apiList = res.data.apiList || []
+            this.apiList = res.data.list || []
           })
     },
     preAuthorize() {
