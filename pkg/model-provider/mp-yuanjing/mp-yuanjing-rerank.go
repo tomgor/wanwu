@@ -17,6 +17,7 @@ type Rerank struct {
 
 func (cfg *Rerank) NewReq(req *mp_common.RerankReq) (mp_common.IRerankReq, error) {
 	m := map[string]interface{}{
+		"model": req.Model,
 		"texts": req.Documents,
 		"query": req.Query,
 	}
