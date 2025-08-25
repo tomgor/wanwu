@@ -22,6 +22,7 @@ type Config struct {
 	Minio     *MinioConfig `mapstructure:"minio" json:"minio"`
 	Knowledge Knowledge    `mapstructure:"knowledge" json:"knowledge" yaml:"knowledge"`
 	MCP       Mcp          `mapstructure:"mcp" json:"mcp"`
+
 	AgentScopeWorkflow AgentScopeWorkflow `mapstructure:"agentscope-workflow" json:"agentscope-workflow"`
 }
 
@@ -34,7 +35,7 @@ type Mcp struct {
 }
 
 type AgentScopeWorkflow struct {
-	Endpoint string `mapstructure:"endpoint" json:"endpoint"`
+	Endpoint          string `mapstructure:"endpoint" json:"endpoint"`
 	WorkflowSchemaUri string `mapstructure:"workflow_schema_uri" json:"workflow_schema_uri"`
 }
 

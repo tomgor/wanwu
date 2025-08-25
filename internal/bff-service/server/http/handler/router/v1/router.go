@@ -29,6 +29,9 @@ func Register(apiV1 *gin.RouterGroup) {
 	// rag
 	registerRag(apiV1)
 
+	// workflow
+	registerWorkflow(apiV1)
+
 	// assistant
 	registerAssistant(apiV1)
 

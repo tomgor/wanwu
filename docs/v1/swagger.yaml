@@ -2059,6 +2059,13 @@ definitions:
     - phone
     - userId
     type: object
+  request.WorkflowIDReq:
+    properties:
+      workflow_id:
+        type: string
+    required:
+    - workflow_id
+    type: object
   response.Action:
     properties:
       actionId:
@@ -2418,6 +2425,11 @@ definitions:
       createdAt:
         type: string
       title:
+        type: string
+    type: object
+  response.CozeWorkflowIDData:
+    properties:
+      workflow_id:
         type: string
     type: object
   response.CreateKnowledgeResp:
@@ -4139,6 +4151,62 @@ paths:
       summary: 更新RAG配置信息
       tags:
       - rag
+  /appspace/workflow:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 创建Workflow的请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.AppBriefConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CozeWorkflowIDData'
+              type: object
+      security:
+      - JWT: []
+      summary: 创建Workflow
+      tags:
+      - workflow
+  /appspace/workflow/copy:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 创建Workflow的请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.WorkflowIDReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CozeWorkflowIDData'
+              type: object
+      security:
+      - JWT: []
+      summary: 拷贝Workflow
+      tags:
+      - workflow
   /assistant:
     get:
       consumes:

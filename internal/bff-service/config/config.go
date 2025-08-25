@@ -35,6 +35,7 @@ type Config struct {
 	Operate   ServiceConfig      `json:"operate" mapstructure:"operate"`
 	Agent     AgentServiceConfig `json:"agent" mapstructure:"agent"`
 
+	Workflow           WorkflowServiceConfig           `json:"workflow" mapstructure:"workflow"`
 	AgentScopeWorkFlow AgentScopeWorkFlowServiceConfig `json:"agentscope-workflow" mapstructure:"agentscope-workflow"`
 }
 
@@ -71,6 +72,14 @@ type DecryptPasswd struct {
 
 type ServiceConfig struct {
 	Host string `json:"host" mapstructure:"host"`
+}
+
+type WorkflowServiceConfig struct {
+	Endpoint  string `json:"endpoint" mapstructure:"endpoint"`
+	ListUri   string `json:"list_uri" mapstructure:"list_uri"`
+	CreateUri string `json:"create_uri" mapstructure:"create_uri"`
+	DeleteUri string `json:"delete_uri" mapstructure:"delete_uri"`
+	CopyUri   string `json:"copy_uri" mapstructure:"copy_uri"`
 }
 
 type AgentScopeWorkFlowServiceConfig struct {
