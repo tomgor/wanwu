@@ -15,6 +15,7 @@
                             :sessionStatus="sessionStatus"
                             @clearHistory="clearHistory"
                             @refresh="refresh"
+                            :type="type"
                             @queryCopy="queryCopy"
                             :defaultUrl="editForm.avatar.path"
                     />
@@ -38,10 +39,16 @@
                             :currentModel="currentModel"
                             :isModelDisable="isModelDisable"
                             :showModelSelect="false"
+                            :type="type"
                             @preSend="preSend"
                             @modelChange="modelChange"
                             @setSessionStatus="setSessionStatus"
                     />
+                    <div v-if="appUrlInfo" class="appUrlInfo">
+                        <span v-if='appUrlInfo.copyrightEnable'>版权所有: {{appUrlInfo.copyright}}</span>
+                        <span v-if='appUrlInfo.privacyPolicyEnable'>隐私协议: <a :href="appUrlInfo.privacyPolicy" target="_blank" style="color:#384BF7;">{{appUrlInfo.privacyPolicy}}</a></span>
+                        <span v-if="appUrlInfo.disclaimerEnable">免责声明: {{appUrlInfo.disclaimer}}</span>
+                    </div>
                 </div>
             </div>
         </el-main>
@@ -51,13 +58,18 @@
 <script>
     import SessionComponentSe from './SessionComponentSe'
     import EditableDivV3 from './EditableDivV3'
-    import {delConversation,createConversation,getConversationHistory} from "@/api/agent";
+    import {delConversation,createConversation,getConversationHistory,delOpenurlConversation,openurlConversation,OpenurlConverHistory} from "@/api/agent";
     import Prologue from './Prologue'
     import sseMethod from '@/mixins/sseMethod'
     import {md} from '@/mixins/marksown-it'
-    import {mapActions, mapGetters} from 'vuex'
+    import {mapGetters} from 'vuex'
 
     export default {
+        inject:{
+            getHeaderConfig:{
+                default:() => null
+            }
+        },
         props:{
             editForm:{
                 type:Object,
@@ -66,6 +78,14 @@
             chatType:{
                 type:String,
                 default:''
+            },
+            type:{
+                type:String,
+                default:'agentChat'
+            },
+            appUrlInfo:{
+                type:Object,
+                default:null
             }
         },
         components: {
@@ -127,7 +147,14 @@
             },
             async getConversationDetail(id,loading){
                 loading && this.$refs['session-com'].doLoading()
-                let res = await getConversationHistory({conversationId: id, pageSize: 1000, pageNo: 1})
+                let res = null;
+                if(this.type === "agentChat"){
+                    res = await getConversationHistory({conversationId: id, pageSize: 1000, pageNo: 1});
+                }else{
+                    const config = this.getHeaderConfig();
+                    res = await OpenurlConverHistory({conversationId: id},this.editForm.assistantId,config);
+                }
+                
                 if (res.code === 0) {
                     let history = res.data.list ? res.data.list.map(n => {
                         return {
@@ -152,10 +179,16 @@
             //删除对话
             async preDelConversation(n) {
                 if (this.sessionStatus === 0) {
-                    //this.$message.warning('上个问题未答完')
                     return
                 }
-                let res = await delConversation({conversationId: n.conversationId})
+                let res = null;
+                if (this.type === "agentChat") {
+                    res = await delConversation({conversationId: n.conversationId})
+                }else{
+                    const config = this.getHeaderConfig();
+                    res = await delOpenurlConversation({conversationId:n.conversationId},this.editForm.assistantId,config)
+                }
+                
                 if (res.code === 0) {
                     this.$emit('reloadList')
                     if(this.conversationId === n.conversationId){
@@ -181,7 +214,14 @@
                 }
                 //如果是新会话，先创建
                 if (!this.conversationId && this.chatType === 'chat') {
-                    let res = await createConversation({prompt: this.inputVal,assistantId:this.editForm.assistantId})
+                    let res = null;
+                    if (this.type === "agentChat") {
+                        res = await createConversation({prompt: this.inputVal,assistantId:this.editForm.assistantId})
+                    }else{
+                        const config = this.getHeaderConfig();
+                        res = await openurlConversation({prompt: this.inputVal},this.editForm.assistantId,config)
+                    }
+                    
                     if (res.code === 0) {
                         this.conversationId = res.data.conversationId
                         this.$emit('reloadList',true)
@@ -243,4 +283,14 @@
 
 <style lang="scss" scoped>
 @import '@/style/chat.scss';
+.appUrlInfo{
+    margin-top:10px;
+    display:flex;
+    justify-content:center;
+    span{
+        cursor: pointer;
+        color:#bbb;
+        margin-right:15px;
+    }
+}
 </style>

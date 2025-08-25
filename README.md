@@ -7,12 +7,11 @@
 
 ### 📢 新闻
 
-- **[2025-08-15]** 
-  - 新增导入火山引擎Embedding模型
-  - 新增知识库自定义分段添加分段标识和文本预处理规则
-  - 新增知识库文件上传元数据管理
-  - 新增知识库详情内元数据编辑
-  - 新增知识库文档解析类型.doc、.xls、.md、.ofd、.wps
+- **[2025-08-22]** 
+  - 新增智能体发布为Web URL
+  - 新增知识库分段内容打关键词标签
+  - 升级工具广场，支持用户导入自定义工具
+  - 新增智能体关联用户自定义工具
 
 ------
 
@@ -186,6 +185,32 @@
 
 ------
 
+### ⬆️ 版本升级
+
+1. 基于上述Docker安装步骤，将系统服务完整停止
+
+2. 更新至最新版本代码
+
+    2.1 wanwu仓库目录内，更新代码
+    ```bash
+    # 切换到main分支
+    git checkout main
+    # 拉取最新代码
+    git pull
+    ```
+
+    2.2 重新拷贝环境变量文件（如果有环境变量修改，请自行重新修改）
+    ```bash
+    # 备份当前.env文件
+    cp .env .env.old
+    # 拷贝.env文件
+    cp .env.bak .env
+    ```
+
+3. 基于上述Docker安装步骤，将系统服务完整启动
+
+------
+
 ### &#x1F4D1; 使用万悟
 
 为了帮助您快速上手本项目，我们强烈推荐先查看[ 文档操作手册](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual)。我们为用户提供了交互式、结构化的操作指南，您可以直接在其中查看操作说明、接口文档等，极大地降低了学习和使用的门槛。详细功能清单如下：
@@ -204,14 +229,6 @@
 
 ------
 
-### &#x1F517; 致谢
-
-- [AgentScope](https://github.com/modelscope/agentscope)
-- [LangChain](https://github.com/langchain-ai/langchain)
-- [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent)
-
-------
-
 ### &#x1F4F0; TODO LIST
 
 - [ ] 多模态模型接入
@@ -219,10 +236,8 @@
 - [ ] 工作流发布为API
 - [ ] 增加工作流节点类型
 - [ ] 支持工作流的导入导出
-- [ ] 支持自定义工具
 - [ ] 知识库共享
 - [ ] 智能体和模型测评
-- [ ] 知识库支撑对分段内容打标签
 - [ ] 知识库支持分段内容添加
 - [ ] 智能体监控统计
 - [ ] 模型体验
@@ -238,7 +253,11 @@
 
 - **【Q】Windows系统Agent(agent-wanwu)启动报错：bash: ./start_all.sh: /bin/bash^M: bad interpreter**
 
-    【A】git配置关闭自动回车换行(CRLF)，执行 `git config --global core.autocrlf false` 后，关闭服务，重新clone wanwu仓库，重启服务**
+    【A】git配置关闭自动回车换行(CRLF)，执行 `git config --global core.autocrlf false` 后，关闭服务，重新clone wanwu仓库，重启服务
+
+- **【Q】系统服务正常启动后，mysql-wanwu-worker和elastic-wanwu-setup容器退出：状态码为Exited (0)**
+
+    【A】正常，这两个容器用于完成一些初始化任务，执行完成后会自动退出
 
 - **【Q】模型导入相关**
 
@@ -270,6 +289,16 @@
     
     6. 导入Rerank模型同上述导入LLM，注意推理URL不带 /rerank 后缀
     ```
+
+------
+
+### &#x1F517; 致谢
+
+- [AgentScope](https://github.com/modelscope/agentscope)
+- [LangChain](https://github.com/langchain-ai/langchain)
+- [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent)
+
+------
 
 ### ⚖️ 许可证
 元景万悟智能体平台根据Apache License 2.0发布。

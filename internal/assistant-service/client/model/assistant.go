@@ -16,6 +16,7 @@ type Assistant struct {
 	HasAction           bool   `gorm:"column:has_action;type:tinyint;comment:是否包含action"`
 	HasWorkflow         bool   `gorm:"column:has_workflow;type:tinyint;comment:是否包含workflow"`
 	HasMCP              bool   `gorm:"column:has_mcp;type:tinyint;comment:是否包含mcp"`
+	HasCustom           bool   `gorm:"column:has_custom;type:tinyint;comment:是否包含自定义工具"`
 	Scope               int    `gorm:"column:scope;type:tinyint;comment:智能体可见范围"`
 	UserId              string `gorm:"column:user_id;index:idx_assistant_user_id;comment:用户id"`
 	OrgId               string `gorm:"column:org_id;index:idx_assistant_org_id;comment:组织id"`

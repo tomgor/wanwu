@@ -19,3 +19,45 @@ type MCPCreate struct {
 func (req *MCPCreate) Check() error {
 	return nil
 }
+
+type CustomToolCreate struct {
+	Name          string                      `json:"name" validate:"required"`        // 名称
+	Description   string                      `json:"description" validate:"required"` // 描述
+	ApiAuth       CustomToolApiAuthWebRequest `json:"apiAuth" validate:"required"`     // api身份认证
+	Schema        string                      `json:"schema"  validate:"required"`     // schema
+	PrivacyPolicy string                      `json:"privacyPolicy"`                   // 隐私政策
+}
+
+func (req *CustomToolCreate) Check() error { return nil }
+
+type CustomToolApiAuthWebRequest struct {
+	Type             string `json:"type" validate:"required,oneof='None' 'API Key'"` // 认证类型
+	APIKey           string `json:"apiKey"`                                          // apiKey 仅当认证类型为API Key时必填
+	CustomHeaderName string `json:"customHeaderName"`                                // Custom Header Name 仅当认证类型为API Key时必填
+	AuthType         string `json:"authType" validate:"omitempty,oneof=Custom"`      // Auth类型 仅当认证类型为API Key时必填，也可以为空
+}
+
+func (req *CustomToolApiAuthWebRequest) Check() error { return nil }
+
+type CustomToolUpdateReq struct {
+	CustomToolID  string                      `json:"customToolId" validate:"required"` // 自定义工具ID
+	Name          string                      `json:"name" validate:"required"`         // 名称
+	Description   string                      `json:"description" validate:"required"`  // 描述
+	ApiAuth       CustomToolApiAuthWebRequest `json:"apiAuth" validate:"required"`      // api身份认证
+	Schema        string                      `json:"schema"  validate:"required"`      // schema
+	PrivacyPolicy string                      `json:"privacyPolicy"`                    // 隐私政策
+}
+
+func (req *CustomToolUpdateReq) Check() error { return nil }
+
+type CustomToolIDReq struct {
+	CustomToolID string `json:"customToolId" validate:"required"` // 自定义工具id
+}
+
+func (req *CustomToolIDReq) Check() error { return nil }
+
+type CustomToolSchemaReq struct {
+	Schema string `json:"schema" validate:"required"` // schema
+}
+
+func (req *CustomToolSchemaReq) Check() error { return nil }

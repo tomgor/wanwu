@@ -42,6 +42,7 @@ type RagChatParams struct {
 	TopP              float32          `json:"top_p"`              // 多样性
 	RepetitionPenalty float32          `json:"repetition_penalty"` // 重复惩罚/频率惩罚
 	ReturnMeta        bool             `json:"return_meta"`        // 是否返回元数据
+	AutoCitation      bool             `json:"auto_citation"`      // 是否自动角标
 }
 
 type WeightParams struct {
@@ -91,7 +92,7 @@ func RagStreamChat(ctx context.Context, userId string, req *RagChatParams) (<-ch
 
 		//1.开启超时监控
 		if params.Timeout == 0 {
-			params.Timeout = time.Minute * 1
+			params.Timeout = time.Minute * 10
 		}
 		ctx, cancel := context.WithTimeout(ctx, params.Timeout)
 		defer cancel()
@@ -134,7 +135,7 @@ func buildHttpParams(userId string, req *RagChatParams) (*http_client.HttpReques
 		Url:        url,
 		Body:       body,
 		Headers:    map[string]string{"X-uid": userId},
-		Timeout:    time.Minute * 3,
+		Timeout:    time.Minute * 10,
 		MonitorKey: "rag_search_service",
 		LogLevel:   http_client.LogAll,
 	}, nil
@@ -165,6 +166,8 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	ragChatParams.History = []*HistoryItem{}
 	ragChatParams.RewriteQuery = true
 	ragChatParams.ReturnMeta = true
+	//自动角标
+	ragChatParams.AutoCitation = true
 
 	// 模型参数
 	ragChatParams.CustomModelInfo = &CustomModelInfo{LlmModelID: rag.ModelConfig.ModelId}

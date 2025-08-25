@@ -811,9 +811,6 @@ const docTemplate = `{
         },
         "mp_common.OpenAIMsg": {
             "type": "object",
-            "required": [
-                "role"
-            ],
             "properties": {
                 "content": {
                     "type": "string"

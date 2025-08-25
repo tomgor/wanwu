@@ -10,7 +10,7 @@
         <LinkIcon type="agent" />
       </div>
       <div class="header-right">
-        <div class="header-api">
+        <!-- <div class="header-api">
           <el-tag
             effect="plain"
             class="root-url"
@@ -24,8 +24,8 @@
         >
           <img :src="require('@/assets/imgs/apikey.png')" />
           API秘钥
-        </el-button>
-        <!-- <el-button
+        </el-button> -->
+        <el-button
           size="small"
           type="primary"
           style="padding:13px 12px;"
@@ -33,7 +33,7 @@
         >
          <span class="el-icon-setting"></span>
           发布配置
-        </el-button> -->
+        </el-button>
         <el-button
           size="small"
           type="primary"
@@ -57,7 +57,7 @@
             <el-radio
               :label="'public'"
               v-model="scope"
-            >公开发布：组织内可见</el-radio>
+            >公开发布：全局可见</el-radio>
           </div>
           <div class="saveBtn">
             <el-button
@@ -277,11 +277,11 @@
                     <el-switch
                       v-model="n.enable"
                       class="bt-switch"
-                      @change="toolSwitch(n.id,n.type)"
+                      @change="toolSwitch(n,n.type,n.enable)"
                       v-if="n.valid"
                     ></el-switch>
                     <span
-                      @click="toolRemove(n.id,n.type)"
+                      @click="toolRemove(n,n.type)"
                       class="el-icon-delete del"
                     ></span>
                   </div>
@@ -349,11 +349,11 @@
       :modelform="editForm.modelConfig"
     />
     <!-- apikey -->
-    <ApiKeyDialog
+    <!-- <ApiKeyDialog
       ref="apiKeyDialog"
       :appId="editForm.assistantId"
       :appType="'agent'"
-    />
+    /> -->
     <!-- 选择工作类型 -->
     <ToolDiaglog
       ref="toolDiaglog"
@@ -379,22 +379,25 @@
 
 <script>
 import { getApiKeyRoot, appPublish } from "@/api/appspace";
-import { deleteMcp,enableMcp } from "@/api/agent";
 import { store } from "@/store/index";
 import { mapGetters } from "vuex";
 import { getKnowledgeList } from "@/api/knowledge";
 import CreateIntelligent from "@/components/createApp/createIntelligent";
 import setSafety from "@/components/setSafety";
 import ModelSet from "./modelSetDialog";
-import ApiKeyDialog from "./ApiKeyDialog";
+// import ApiKeyDialog from "./ApiKeyDialog";
 import { selectModelList, getRerankList } from "@/api/modelAccess";
 import {
+  deleteMcp,
+  enableMcp,
   getAgentInfo,
   delWorkFlowInfo,
   delActionInfo,
   putAgentInfo,
   enableWorkFlow,
   enableAction,
+  deleteCustom,
+  enableCustom
 } from "@/api/agent";
 import ActionConfig from "./action";
 import ToolDiaglog from "./toolDialog";
@@ -412,7 +415,7 @@ export default {
     CreateIntelligent,
     ModelSet,
     ActionConfig,
-    ApiKeyDialog,
+    // ApiKeyDialog,
     ToolDiaglog,
     LinkDialog,
     setSafety,
@@ -541,15 +544,15 @@ export default {
       nameMap: {
         workflow: {
           displayName: "工作流",
-          propName: "workFlowName",
+          propName: "name",
         },
         mcp: {
           displayName: "MCP工具",
-          propName: "mcpName",
+          propName: "name",
         },
         action: {
           displayName: "自定义工具",
-          propName: "actionName",
+          propName: "name",
         },
         // 可以继续添加其他类型
         default: {
@@ -570,7 +573,7 @@ export default {
       this.editForm.assistantId = this.$route.query.id;
       setTimeout(() => {
         this.getAppDetail();
-        this.apiKeyRootUrl(); //获取api跟地址
+        // this.apiKeyRootUrl(); //获取api跟地址
       }, 500);
     }
     //判断是否发布
@@ -590,7 +593,7 @@ export default {
   },
   methods: {
     handlePublishSet(){
-      this.$router.push({path:`/agent/publishSet/id=${this.editForm.assistantId}`})
+      this.$router.push({path:`/agent/publishSet`,query:{appId:this.editForm.assistantId,appType:'agent'}})
     },
     setKnowledgeSet(data){
       this.editForm.knowledgeConfig = data;
@@ -663,22 +666,31 @@ export default {
         }
       });
     },
-    toolSwitch(id,type){
+    toolSwitch(n,type,enable){
       if(type === 'workflow'){
-        this.workflowSwitch(id)
+        this.workflowSwitch(n.workFlowId,enable)
       }else if(type === 'mcp'){
-        this.mcpSwitch(id)
+        this.mcpSwitch(n.mcpId,enable)
+      }else{
+        this.customSwitch(n.customId,enable)
       }
     },
-    mcpSwitch(mcpId){
-      enableMcp({ mcpId}).then((res) => {
+    customSwitch(customToolId,enable){
+      enableCustom({assistantId:this.editForm.assistantId,customToolId,enable}).then(res =>{
         if (res.code === 0) {
           this.getAppDetail();
         }
       }).catch(() => {});
     },
-    workflowSwitch(id) {
-      enableWorkFlow({ workFlowId: id }).then((res) => {
+    mcpSwitch(mcpId,enable){
+      enableMcp({ assistantId:this.editForm.assistantId,mcpId,enable}).then((res) => {
+        if (res.code === 0) {
+          this.getAppDetail();
+        }
+      }).catch(() => {});
+    },
+    workflowSwitch(id,enable) {
+      enableWorkFlow({ assistantId:this.editForm.assistantId,workFlowId: id,enable }).then((res) => {
         if (res.code === 0) {
           this.getAppDetail();
         }
@@ -740,17 +752,17 @@ export default {
         }
       });
     },
-    apiKeyRootUrl() {
-      const data = { appId: this.editForm.assistantId, appType: "agent" };
-      getApiKeyRoot(data).then((res) => {
-        if (res.code === 0) {
-          this.apiURL = res.data || "";
-        }
-      });
-    },
-    openApiDialog() {
-      this.$refs.apiKeyDialog.showDialog();
-    },
+    // apiKeyRootUrl() {
+    //   const data = { appId: this.editForm.assistantId, appType: "agent" };
+    //   getApiKeyRoot(data).then((res) => {
+    //     if (res.code === 0) {
+    //       this.apiURL = res.data || "";
+    //     }
+    //   });
+    // },
+    // openApiDialog() {
+    //   this.$refs.apiKeyDialog.showDialog();
+    // },
     setModelSet(data) {
       this.editForm.modelConfig = data;
     },
@@ -777,15 +789,26 @@ export default {
     preAddWorkflow() {
       this.wfDialogVisible = true;
     },
-    toolRemove(id,type){
+    toolRemove(n,type){
       if(type === 'workflow'){
-        this.doDeleteWorkflow(id);
+        this.doDeleteWorkflow(n.workFlowId);
       }else if(type === 'mcp'){
-        this.mcpRemove(id);
+        this.mcpRemove(n.mcpId);
+      }else{
+        this.customRemove(n.customId)
       }
     },
+    customRemove(customToolId){
+      console.log(customToolId)
+      deleteCustom({assistantId:this.editForm.assistantId,customToolId}).then((res) =>{
+          if (res.code === 0) {
+          this.$message.success("删除成功");
+          this.getAppDetail();
+        }
+      }).catch((err) =>{})
+    },
     mcpRemove(mcpId){
-      deleteMcp({mcpId}).then((res) => {
+      deleteMcp({assistantId:this.editForm.assistantId,mcpId}).then((res) => {
         if (res.code === 0) {
           this.$message.success("删除成功");
           this.getAppDetail();
@@ -926,7 +949,7 @@ export default {
         //回显自定义插件
         this.workFlowInfos = data.workFlowInfos || [];
         this.mcpInfos = data.mcpInfos || [];
-        this.actionInfos = data.actionInfos || [];
+        this.actionInfos = data.customInfos || [];
         this.allTools = [
           ...this.workFlowInfos.map((item) => ({ ...item, type: "workflow" })),
           ...this.mcpInfos.map((item) => ({ ...item, type: "mcp" })),
@@ -1090,18 +1113,18 @@ export default {
   .header-right {
     display: flex;
     align-items: center;
-    .header-api {
-      padding: 6px 10px;
-      box-shadow: 1px 2px 2px #ddd;
-      background-color: #fff;
-      margin: 0 10px;
-      border-radius: 6px;
-      .root-url {
-        background-color: #eceefe;
-        color: #384bf7;
-        border: none;
-      }
-    }
+    // .header-api {
+    //   padding: 6px 10px;
+    //   box-shadow: 1px 2px 2px #ddd;
+    //   background-color: #fff;
+    //   margin: 0 10px;
+    //   border-radius: 6px;
+    //   .root-url {
+    //     background-color: #eceefe;
+    //     color: #384bf7;
+    //     border: none;
+    //   }
+    // }
   }
 }
 .agent-from-content {

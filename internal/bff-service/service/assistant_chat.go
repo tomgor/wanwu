@@ -10,6 +10,7 @@ import (
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
+	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/ahocorasick"
 	"github.com/UnicomAI/wanwu/pkg/constant"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
@@ -32,6 +33,28 @@ func AssistantConversionStream(ctx *gin.Context, userId, orgId string, req reque
 }
 
 func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req request.ConversionStreamRequest) (<-chan string, error) {
+	// 实时获取有数据权限的工作流，把所有工作流的id传给GRPC
+	accessedWorkFlowList, err := GetExplorationAppList(ctx, userId, request.GetExplorationAppListRequest{
+		AppType:    constant.AppTypeWorkflow,
+		SearchType: "all",
+	})
+	if err != nil {
+		return nil, err
+	}
+	var accessedWorkFlowIds []string
+	if accessedWorkFlowList != nil && accessedWorkFlowList.List != nil {
+		log.Debugf("accessedWorkFlowList.List的实际类型: %T", accessedWorkFlowList.List)
+		// 类型断言：将[]interface{}转换为[]*response.ExplorationAppInfo
+		if appInfoList, ok := accessedWorkFlowList.List.([]*response.ExplorationAppInfo); ok {
+			for _, appInfo := range appInfoList {
+				accessedWorkFlowIds = append(accessedWorkFlowIds, appInfo.AppId)
+			}
+		} else {
+			log.Debugf("类型断言失败，无法转换为[]response.ExplorationAppInfo，实际类型: %T", accessedWorkFlowList.List)
+		}
+	} else {
+		log.Debugf("accessedWorkFlowList为空或List为空")
+	}
 	// 根据agentID获取敏感词配置
 	agentInfo, err := assistant.GetAssistantInfo(ctx, &assistant_service.GetAssistantInfoReq{
 		AssistantId: req.AssistantId,
@@ -86,6 +109,7 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 			UserId: userId,
 			OrgId:  orgId,
 		},
+		AccessedWorkFlowIds: accessedWorkFlowIds,
 	})
 	if err != nil {
 		return nil, err

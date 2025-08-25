@@ -5,10 +5,13 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	net_url "net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -23,8 +26,11 @@ import (
 	"github.com/UnicomAI/wanwu/internal/assistant-service/pkg/util"
 	"github.com/UnicomAI/wanwu/pkg/constant"
 	"github.com/UnicomAI/wanwu/pkg/es"
+	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
+	pkgUtil "github.com/UnicomAI/wanwu/pkg/util"
+
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -32,13 +38,13 @@ import (
 // ConversationCreate 创建对话
 func (s *Service) ConversationCreate(ctx context.Context, req *assistant_service.ConversationCreateReq) (*assistant_service.ConversationCreateResp, error) {
 	// 组装model参数
-	assistantID, err := strconv.ParseUint(req.AssistantId, 10, 32)
+	assistantID, err := pkgUtil.U32(req.AssistantId)
 	if err != nil {
 		return nil, err
 	}
 
 	conversation := &model.Conversation{
-		AssistantId: uint32(assistantID),
+		AssistantId: assistantID,
 		Title:       req.Prompt, // 使用prompt作为初始标题
 		UserId:      req.Identity.UserId,
 		OrgId:       req.Identity.OrgId,
@@ -239,19 +245,28 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		requestBody["file_name"] = req.FileInfo.FileName
 	}
 
-	actionPluginList := []PluginListAlgRequest{}
 	workflowPluginList := []PluginListAlgRequest{}
-	if assistant.HasAction {
-		actionPluginList, err = buildActionPluginListAlgParam(ctx, s, req.AssistantId, reqUserId, req.Identity.OrgId)
+	//actionPluginList := []PluginListAlgRequest{}
+	customPluginList := []PluginListAlgRequest{}
+	//if assistant.HasAction {
+	//	actionPluginList, err = buildActionPluginListAlgParam(ctx, s, req.AssistantId, reqUserId, req.Identity.OrgId)
+	//	if err != nil {
+	//		log.Errorf(err.Error())
+	//		SSEError(stream, "智能体action配置错误")
+	//		return err
+	//	}
+	//	log.Debugf("智能体action配置，assistantId: %s, actionPluginList: %s", req.AssistantId, actionPluginList)
+	//}
+	if assistant.HasCustom {
+		customPluginList, err = buildCustomToolListAlgParam(ctx, s, req.AssistantId, reqUserId, req.Identity.OrgId)
 		if err != nil {
 			log.Errorf(err.Error())
-			SSEError(stream, "智能体action配置错误")
+			SSEError(stream, "智能体custom配置错误")
 			return err
 		}
-		log.Debugf("智能体action配置，assistantId: %s, actionPluginList: %s", req.AssistantId, actionPluginList)
 	}
 	if assistant.HasWorkflow {
-		workflowPluginList, err = buildWorkflowPluginListAlgParam(ctx, s, req.AssistantId, reqUserId, req.Identity.OrgId)
+		workflowPluginList, err = buildWorkflowPluginListAlgParam(ctx, s, req.AssistantId, reqUserId, req.Identity.OrgId, req.AccessedWorkFlowIds)
 		if err != nil {
 			log.Errorf(err.Error())
 			SSEError(stream, "智能体workflow配置错误")
@@ -259,9 +274,12 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		}
 		log.Debugf("智能体workflow配置，assistantId: %s, workflowPluginList: %s", req.AssistantId, workflowPluginList)
 	}
-	allPlugin := append(actionPluginList, workflowPluginList...)
+	//allPlugin := append(actionPluginList, workflowPluginList...)
+	//requestBody["plugin_list"] = allPlugin
+	//log.Debugf("智能体plugin_list，assistantId: %s, plugin_list: %s", req.AssistantId, allPlugin)
+	allPlugin := append(customPluginList, workflowPluginList...)
 	requestBody["plugin_list"] = allPlugin
-	log.Debugf("智能体plugin_list，assistantId: %s, plugin_list: %s", req.AssistantId, allPlugin)
+	log.Debugf("智能体custom_plugin_list，assistantId: %s, custom_plugin_list: %s", req.AssistantId, allPlugin)
 
 	// 将string类型的ModelConfig转换为common.AppModelConfig
 	var modelConfig *common.AppModelConfig
@@ -399,7 +417,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	// 添加 MCP 信息
 	mcpReqData := &model.RequestData{}
 	mcpReqData.McpTools = make(map[string]model.MCPToolInfo)
-	mcpInfos, errMCP := s.cli.GetAssistantMCPList(ctx, map[string]interface{}{"assistant_id": assistant.ID})
+	mcpInfos, errMCP := s.cli.GetAssistantMCPList(ctx, assistant.ID)
 	if errMCP != nil {
 		log.Errorf("Assistant服务获取MCP信息失败，assistantId: %s, error: %v", req.AssistantId, errMCP)
 		SSEError(stream, "获取MCP信息失败")
@@ -412,7 +430,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		if err != nil {
 			log.Errorf("Assistant服务获取MCP Custom信息失败，assistantId: %s, error: %v", req.AssistantId, err)
 			SSEError(stream, "获取MCP信息失败")
-			return errStatus(errs.Code_AssistantMCPErr, status)
+			continue
 		}
 
 		// 仅当MCP Custom开启时，才添加到请求参数中
@@ -425,6 +443,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 		}
 	}
 	requestBody["mcp_tools"] = mcpReqData.McpTools
+	requestBody["auto_citation"] = true // 开启自动引文，定后端写死
 	log.Infof("requestBody = %+v", requestBody)
 	// 向底层智能体能力接口发起请求
 	requestBodyBytes, err := json.Marshal(requestBody)
@@ -695,20 +714,55 @@ func mergeMaps(map1, map2 map[string]interface{}) map[string]interface{} {
 	return result
 }
 
-func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantId, userId, orgId string) (pluginList []PluginListAlgRequest, err error) {
+func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantId, userId, orgId string, accessedWorkFlowIds []string) (pluginList []PluginListAlgRequest, err error) {
 	pluginList = []PluginListAlgRequest{}
-	resp, status := s.cli.GetAssistantWorkflowsByAssistantID(ctx, assistantId)
+	assistantIdConv, err := pkgUtil.U32(assistantId)
+	if err != nil {
+		return pluginList, err
+	}
+	resp, status := s.cli.GetAssistantWorkflowsByAssistantID(ctx, assistantIdConv)
 	if status != nil {
 		return pluginList, errStatus(errs.Code_AssistantConversationErr, status)
 	}
 	for _, assistantWorkFlowModel := range resp {
 		log.Infof("Assistant服务查询到workflow，assistantId: %s, workflowId: %s, enable: %v",
 			assistantId, assistantWorkFlowModel.WorkflowId, assistantWorkFlowModel.Enable)
+		if !slices.Contains(accessedWorkFlowIds, assistantWorkFlowModel.WorkflowId) {
+			log.Infof("assistantId: %s, workflowId: %s, 用户没有workflow数据权限，跳过",
+				assistantId, assistantWorkFlowModel.WorkflowId)
+			continue //核对实时查询的用户有数据权限的工作流accessedWorkFlowIds，如果WorkflowId不在accessedWorkFlowIds中，则不添加到pluginList
+		}
 		if !assistantWorkFlowModel.Enable {
+			log.Infof("assistantId: %s, workflowId: %s, workflow未启用，跳过",
+				assistantId, assistantWorkFlowModel.WorkflowId)
 			continue
 		}
 		tmp := PluginListAlgRequest{}
-		schema, err := util.ValidateOpenAPISchema(assistantWorkFlowModel.APISchema)
+		//实时查询该工作流最新schema
+		workflowService := config.Cfg().AgentScopeWorkflow
+		url, _ := net_url.JoinPath(workflowService.Endpoint, workflowService.WorkflowSchemaUri)
+		result, err := http_client.Workflow().Get(ctx, &http_client.HttpRequestParams{
+			Url: url,
+			Params: map[string]string{
+				"workflowID": assistantWorkFlowModel.WorkflowId,
+			},
+			Timeout:    60 * time.Second,
+			MonitorKey: "workflow_schema",
+			LogLevel:   http_client.LogAll,
+		})
+		if err != nil {
+			return pluginList, err
+		}
+		var resp = &config.AgentScopeWorkFlowSchemaResp{}
+		if err = json.Unmarshal(result, resp); err != nil {
+			return pluginList, err
+		}
+		decodedBytes, err := base64.StdEncoding.DecodeString(resp.Data.Base64OpenAPISchema)
+		if err != nil {
+			return pluginList, err
+		}
+		//校验schema
+		schema, err := util.ValidateOpenAPISchema(string(decodedBytes))
 		if err != nil {
 			return pluginList, err
 		}
@@ -727,18 +781,32 @@ func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantI
 	return pluginList, nil
 }
 
-func buildActionPluginListAlgParam(ctx context.Context, s *Service, assistantId, userId, orgId string) (pluginList []PluginListAlgRequest, err error) {
+func buildCustomToolListAlgParam(ctx context.Context, s *Service, assistantId, userId, orgId string) (pluginList []PluginListAlgRequest, err error) {
 	pluginList = []PluginListAlgRequest{}
-	resp, status := s.cli.GetAssistantActionsByAssistantID(ctx, assistantId)
+	// 获取自定义工具列表
+	assistantIdConv, err := pkgUtil.U32(assistantId)
+	if err != nil {
+		return pluginList, err
+	}
+	resp, status := s.cli.GetAssistantCustomList(ctx, assistantIdConv)
 	if status != nil {
 		return pluginList, errStatus(errs.Code_AssistantConversationErr, status)
 	}
-	for _, assistantActionModel := range resp {
-		if !assistantActionModel.Enable {
+	for _, assistantCustomTool := range resp {
+		if !assistantCustomTool.Enable {
 			continue
 		}
 		tmp := PluginListAlgRequest{}
-		schema, err := util.ValidateOpenAPISchema(assistantActionModel.APISchema)
+		// 获取自定义工具详情
+		info, err := MCP.GetCustomToolInfo(ctx, &mcp_service.GetCustomToolInfoReq{
+			CustomToolId: assistantCustomTool.CustomId,
+		})
+		if err != nil {
+			//return pluginList, err
+			log.Infof("Assistant服务获取CustomTool信息失败，assistantId: %s,error: %v", assistantId, err)
+			continue
+		}
+		schema, err := util.ValidateOpenAPISchema(info.Schema)
 		if err != nil {
 			return pluginList, err
 		}
@@ -752,12 +820,12 @@ func buildActionPluginListAlgParam(ctx context.Context, s *Service, assistantId,
 			return pluginList, err
 		}
 
-		if assistantActionModel.Type == "apiKey" {
+		if info.ApiAuth.Type == "apiKey" {
 			apiAuth := APIAuth{
 				Type:  "apiKey",
 				In:    "query",
-				Name:  assistantActionModel.CustomHeaderName,
-				Value: assistantActionModel.APIKey,
+				Name:  info.ApiAuth.CustomHeaderName,
+				Value: info.ApiAuth.ApiKey,
 			}
 			tmp.APIAuth = &apiAuth
 		}

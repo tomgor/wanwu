@@ -337,8 +337,6 @@ definitions:
         items:
           $ref: '#/definitions/mp_common.ToolCall'
         type: array
-    required:
-    - role
     type: object
   mp_common.OpenAIRespChoice:
     properties:

@@ -2,25 +2,24 @@ package service
 
 import (
 	"encoding/json"
-	"errors"
 	"sort"
-	"strconv"
 
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	knowledgeBase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
+	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
+	bff_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/util"
 	"github.com/UnicomAI/wanwu/pkg/constant"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 func AssistantCreate(ctx *gin.Context, userId, orgId string, req request.AppBriefConfig) (*response.AssistantCreateResp, error) {
-	resp, err := assistant.AssistantCreate(ctx, &assistant_service.AssistantCreateReq{
+	resp, err := assistant.AssistantCreate(ctx.Request.Context(), &assistant_service.AssistantCreateReq{
 		AssistantBrief: appBriefConfigModel2Proto(req),
 		Identity: &assistant_service.Identity{
 			UserId: userId,
@@ -36,7 +35,7 @@ func AssistantCreate(ctx *gin.Context, userId, orgId string, req request.AppBrie
 }
 
 func AssistantUpdate(ctx *gin.Context, userId, orgId string, req request.AssistantBrief) (interface{}, error) {
-	_, err := assistant.AssistantUpdate(ctx, &assistant_service.AssistantUpdateReq{
+	_, err := assistant.AssistantUpdate(ctx.Request.Context(), &assistant_service.AssistantUpdateReq{
 		AssistantId:    req.AssistantId,
 		AssistantBrief: appBriefConfigModel2Proto(req.AppBriefConfig),
 		Identity: &assistant_service.Identity{
@@ -44,10 +43,7 @@ func AssistantUpdate(ctx *gin.Context, userId, orgId string, req request.Assista
 			OrgId:  orgId,
 		},
 	})
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
+	return nil, err
 }
 
 func AssistantConfigUpdate(ctx *gin.Context, userId, orgId string, req request.AssistantConfig) (interface{}, error) {
@@ -59,7 +55,7 @@ func AssistantConfigUpdate(ctx *gin.Context, userId, orgId string, req request.A
 	if err != nil {
 		return nil, err
 	}
-	_, err = assistant.AssistantConfigUpdate(ctx, &assistant_service.AssistantConfigUpdateReq{
+	_, err = assistant.AssistantConfigUpdate(ctx.Request.Context(), &assistant_service.AssistantConfigUpdateReq{
 		AssistantId:         req.AssistantId,
 		Prologue:            req.Prologue,
 		Instructions:        req.Instructions,
@@ -83,14 +79,11 @@ func AssistantConfigUpdate(ctx *gin.Context, userId, orgId string, req request.A
 		},
 	})
 
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
+	return nil, err
 }
 
-func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.AssistantIdRequest) (response.Assistant, error) {
-	resp, err := assistant.GetAssistantInfo(ctx, &assistant_service.GetAssistantInfoReq{
+func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.AssistantIdRequest) (*response.Assistant, error) {
+	resp, err := assistant.GetAssistantInfo(ctx.Request.Context(), &assistant_service.GetAssistantInfoReq{
 		AssistantId: req.AssistantId,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
@@ -98,74 +91,72 @@ func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.Assist
 		},
 	})
 	if err != nil {
-		return response.Assistant{}, err
+		return nil, err
 	}
-	//查询该用户有权限的所有工作流
+	//查询该用户有数据权限的所有工作流
 	accessedWorkFlowList, err := GetExplorationAppList(ctx, userId, request.GetExplorationAppListRequest{
 		AppType:    constant.AppTypeWorkflow,
 		SearchType: "all",
 	})
 	if err != nil {
-		return response.Assistant{}, err
+		return nil, err
 	}
 	// 查询该用户所有权限的所有 MCP
 	accessedMCPList, err := AssistantMCPList(ctx, req.AssistantId, userId, orgId)
 	if err != nil {
-		return response.Assistant{}, err
+		return nil, err
 	}
-	assistant, err := transAssistantResp2Model(ctx, resp, accessedWorkFlowList, accessedMCPList)
+	// 查询该用户所有权限的 Custom
+	accessedCustomList, err := AssistantCustomList(ctx, req.AssistantId, userId, orgId)
 	if err != nil {
-		return response.Assistant{}, err
+		return nil, err
+	}
+	assistant, err := transAssistantResp2Model(ctx, resp, accessedWorkFlowList, accessedMCPList, accessedCustomList)
+	if err != nil {
+		return nil, err
 	}
 	return assistant, nil
 }
 
-func AssistantWorkFlowCreate(ctx *gin.Context, userId, orgId string, req request.WorkFlowAddRequest) (interface{}, error) {
-	_, err := assistant.AssistantWorkFlowCreate(ctx, &assistant_service.AssistantWorkFlowCreateReq{
+func AssistantWorkFlowCreate(ctx *gin.Context, userId, orgId string, req request.AssistantWorkFlowAddRequest) error {
+	_, err := assistant.AssistantWorkFlowCreate(ctx.Request.Context(), &assistant_service.AssistantWorkFlowCreateReq{
 		AssistantId: req.AssistantId,
-		Schema:      req.Schema,
 		WorkFlowId:  req.WorkFlowId,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
 		},
 	})
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
+	return err
 }
 
-func AssistantWorkFlowDelete(ctx *gin.Context, userId, orgId string, req request.WorkFlowIdRequest) (interface{}, error) {
-	_, err := assistant.AssistantWorkFlowDelete(ctx, &assistant_service.AssistantWorkFlowDeleteReq{
-		WorkFlowId: req.WorkFlowId,
+func AssistantWorkFlowDelete(ctx *gin.Context, userId, orgId string, req request.AssistantWorkFlowDelRequest) error {
+	_, err := assistant.AssistantWorkFlowDelete(ctx.Request.Context(), &assistant_service.AssistantWorkFlowDeleteReq{
+		AssistantId: req.AssistantId,
+		WorkFlowId:  req.WorkFlowId,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
 		},
 	})
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
+	return err
 }
 
-func AssistantWorkFlowEnableSwitch(ctx *gin.Context, userId, orgId string, req request.WorkFlowIdRequest) (interface{}, error) {
-	_, err := assistant.AssistantWorkFlowEnableSwitch(ctx, &assistant_service.AssistantWorkFlowEnableSwitchReq{
-		WorkFlowId: req.WorkFlowId,
+func AssistantWorkFlowEnableSwitch(ctx *gin.Context, userId, orgId string, req request.AssistantWorkFlowToolEnableRequest) error {
+	_, err := assistant.AssistantWorkFlowEnableSwitch(ctx.Request.Context(), &assistant_service.AssistantWorkFlowEnableSwitchReq{
+		AssistantId: req.AssistantId,
+		WorkFlowId:  req.WorkFlowId,
+		Enable:      req.Enable,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
 		},
 	})
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
+	return err
 }
 
-func AssistantMCPCreate(ctx *gin.Context, userId, orgId string, req request.MCPAddRequest) (interface{}, error) {
-	_, err := assistant.AssistantMCPCreate(ctx, &assistant_service.AssistantMCPCreateReq{
+func AssistantMCPCreate(ctx *gin.Context, userId, orgId string, req request.AssistantMCPToolAddRequest) error {
+	_, err := assistant.AssistantMCPCreate(ctx.Request.Context(), &assistant_service.AssistantMCPCreateReq{
 		AssistantId: req.AssistantId,
 		McpId:       req.MCPId,
 		Identity: &assistant_service.Identity{
@@ -173,38 +164,69 @@ func AssistantMCPCreate(ctx *gin.Context, userId, orgId string, req request.MCPA
 			OrgId:  orgId,
 		},
 	})
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
+	return err
 }
 
-func AssistantMCPDelete(ctx *gin.Context, userId, orgId string, req request.MCPIdRequest) (interface{}, error) {
-	_, err := assistant.AssistantMCPDelete(ctx, &assistant_service.AssistantMCPDeleteReq{
-		McpId: req.MCPId,
+func AssistantMCPDelete(ctx *gin.Context, userId, orgId string, req request.AssistantMCPToolDelRequest) error {
+	_, err := assistant.AssistantMCPDelete(ctx.Request.Context(), &assistant_service.AssistantMCPDeleteReq{
+		AssistantId: req.AssistantId,
+		McpId:       req.MCPId,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
 		},
 	})
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
+	return err
 }
 
-func AssistantMCPEnableSwitch(ctx *gin.Context, userId, orgId string, req request.MCPIdRequest) (interface{}, error) {
-	_, err := assistant.AssistantMCPEnableSwitch(ctx, &assistant_service.AssistantMCPEnableSwitchReq{
-		McpId: req.MCPId,
+func AssistantMCPEnableSwitch(ctx *gin.Context, userId, orgId string, req request.AssistantMCPToolEnableRequest) error {
+	_, err := assistant.AssistantMCPEnableSwitch(ctx.Request.Context(), &assistant_service.AssistantMCPEnableSwitchReq{
+		AssistantId: req.AssistantId,
+		McpId:       req.MCPId,
+		Enable:      req.Enable,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
 		},
 	})
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
+	return err
+}
+
+func AssistantCustomToolCreate(ctx *gin.Context, userId, orgId string, req request.AssistantCustomToolAddRequest) error {
+	_, err := assistant.AssistantCustomToolCreate(ctx.Request.Context(), &assistant_service.AssistantCustomToolCreateReq{
+		AssistantId:  req.AssistantId,
+		CustomToolId: req.CustomToolId,
+		Identity: &assistant_service.Identity{
+			UserId: userId,
+			OrgId:  orgId,
+		},
+	})
+	return err
+}
+
+func AssistantCustomToolDelete(ctx *gin.Context, userId, orgId string, req request.AssistantCustomToolDelRequest) error {
+	_, err := assistant.AssistantCustomToolDelete(ctx.Request.Context(), &assistant_service.AssistantCustomToolDeleteReq{
+		AssistantId:  req.AssistantId,
+		CustomToolId: req.CustomToolId,
+		Identity: &assistant_service.Identity{
+			UserId: userId,
+			OrgId:  orgId,
+		},
+	})
+	return err
+}
+
+func AssistantCustomToolEnableSwitch(ctx *gin.Context, userId, orgId string, req request.AssistantCustomToolEnableRequest) error {
+	_, err := assistant.AssistantCustomToolEnableSwitch(ctx.Request.Context(), &assistant_service.AssistantCustomToolEnableSwitchReq{
+		AssistantId:  req.AssistantId,
+		CustomToolId: req.CustomToolId,
+		Enable:       req.Enable,
+		Identity: &assistant_service.Identity{
+			UserId: userId,
+			OrgId:  orgId,
+		},
+	})
+	return err
 }
 
 func AssistantMCPList(ctx *gin.Context, assistantId, userId, orgId string) ([]*response.MCPInfos, error) {
@@ -220,34 +242,78 @@ func AssistantMCPList(ctx *gin.Context, assistantId, userId, orgId string) ([]*r
 		return nil, err
 	}
 
-	// 获取MCP 详情
-	valid := true
 	var retMCPInfos []*response.MCPInfos
 	for _, m := range resp.AssistantMCPInfos {
+		// 每个MCP单独判断有效性，避免影响其他项
+		valid := true
+		enable := m.Enable
 		mcpInfo, err := GetMCP(ctx, m.McpId)
 		if err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				valid = false
-			} else {
-				return nil, err
-			}
+			valid = false  // 仅当前MCP标记为无效
+			enable = false // 查询失败，默认禁用
+			log.Warnf("MCP查询失败, MCPID: %s, 报错为： %s", m.McpId, err)
+			// 错误时仍保留记录，但mcpInfo相关字段用默认值
+			mcpInfo = &response.MCPDetail{} // 假设MCPInfo是该结构体的实际类型，初始化空对象避免nil
 		}
 
-		// 组装为 MCPInfos
+		// 组装为 MCPInfos，使用安全的字段访问
 		retMCPInfos = append(retMCPInfos, &response.MCPInfos{
-			Id:            strconv.Itoa(int(m.Id)),
 			MCPId:         m.McpId,
+			UniqueId:      bff_util.ConcatAssistantToolUniqueId("mcp", m.McpId),
 			MCPSquareId:   mcpInfo.MCPSquareID,
-			Enable:        m.Enable,
+			Enable:        enable,
 			MCPName:       mcpInfo.MCPInfo.Name,
 			MCPDesc:       mcpInfo.MCPInfo.Desc,
 			MCPServerFrom: mcpInfo.MCPInfo.From,
 			MCPServerUrl:  mcpInfo.MCPInfo.SSEURL,
-			Valid:         valid,
+			Valid:         valid, // 仅当前MCP的有效性
 		})
 	}
 
 	return retMCPInfos, nil
+}
+
+func AssistantCustomList(ctx *gin.Context, assistantId, userId, orgId string) ([]*response.CustomInfos, error) {
+	// 获取该用户的所有 Custom 列表
+	resp, err := assistant.AssistantCustomToolGetList(ctx.Request.Context(), &assistant_service.AssistantCustomToolGetListReq{
+		AssistantId: assistantId,
+		Identity: &assistant_service.Identity{
+			UserId: userId,
+			OrgId:  orgId,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var retCustomInfos []*response.CustomInfos
+	for _, c := range resp.AssistantCustomToolInfos {
+		valid := true
+		enable := c.Enable
+		// 查询自定义工具详情
+		mcpResp, err := mcp.GetCustomToolInfo(ctx.Request.Context(), &mcp_service.GetCustomToolInfoReq{
+			CustomToolId: c.CustomToolId,
+		})
+
+		if err != nil {
+			valid = false  // 仅当前自定义工具标记为无效
+			enable = false // 查询失败，默认禁用
+			log.Warnf("自定义工具查询失败, 自定义工具ID: %s, 报错为： %s", c.CustomToolId, err)
+			// 错误时保持mcpResp为初始化的空对象，避免nil
+			mcpResp = &mcp_service.GetCustomToolInfoResp{}
+		}
+
+		// 组装为 CustomInfos，安全访问字段
+		retCustomInfos = append(retCustomInfos, &response.CustomInfos{
+			CustomId:   c.CustomToolId,
+			UniqueId:   bff_util.ConcatAssistantToolUniqueId("custom", c.CustomToolId),
+			Enable:     enable,
+			CustomName: mcpResp.Name, // 即使报错，mcpResp也非nil，避免空指针
+			CustomDesc: mcpResp.Description,
+			Valid:      valid, // 仅当前项的有效性
+		})
+	}
+	return retCustomInfos, nil
 }
 
 func AssistantActionCreate(ctx *gin.Context, userId, orgId string, req request.ActionAddRequest) (response.ActionAddResponse, error) {
@@ -350,7 +416,7 @@ func AssistantActionEnableSwitch(ctx *gin.Context, userId, orgId string, req req
 }
 
 func ConversationCreate(ctx *gin.Context, userId, orgId string, req request.ConversationCreateRequest) (response.ConversationCreateResp, error) {
-	resp, err := assistant.ConversationCreate(ctx, &assistant_service.ConversationCreateReq{
+	resp, err := assistant.ConversationCreate(ctx.Request.Context(), &assistant_service.ConversationCreateReq{
 		AssistantId: req.AssistantId,
 		Prompt:      req.Prompt,
 		Identity: &assistant_service.Identity{
@@ -367,7 +433,7 @@ func ConversationCreate(ctx *gin.Context, userId, orgId string, req request.Conv
 }
 
 func ConversationDelete(ctx *gin.Context, userId, orgId string, req request.ConversationIdRequest) (interface{}, error) {
-	_, err := assistant.ConversationDelete(ctx, &assistant_service.ConversationDeleteReq{
+	_, err := assistant.ConversationDelete(ctx.Request.Context(), &assistant_service.ConversationDeleteReq{
 		ConversationId: req.ConversationId,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
@@ -381,7 +447,7 @@ func ConversationDelete(ctx *gin.Context, userId, orgId string, req request.Conv
 }
 
 func GetConversationList(ctx *gin.Context, userId, orgId string, req request.ConversationGetListRequest) (response.PageResult, error) {
-	resp, err := assistant.GetConversationList(ctx, &assistant_service.GetConversationListReq{
+	resp, err := assistant.GetConversationList(ctx.Request.Context(), &assistant_service.GetConversationListReq{
 		AssistantId: req.AssistantId,
 		PageSize:    int32(req.PageSize),
 		PageNo:      int32(req.PageNo),
@@ -396,7 +462,7 @@ func GetConversationList(ctx *gin.Context, userId, orgId string, req request.Con
 }
 
 func GetConversationDetailList(ctx *gin.Context, userId, orgId string, req request.ConversationGetDetailListRequest) (response.PageResult, error) {
-	resp, err := assistant.GetConversationDetailList(ctx, &assistant_service.GetConversationDetailListReq{
+	resp, err := assistant.GetConversationDetailList(ctx.Request.Context(), &assistant_service.GetConversationDetailListReq{
 		ConversationId: req.ConversationId,
 		PageSize:       int32(req.PageSize),
 		PageNo:         int32(req.PageNo),
@@ -486,11 +552,11 @@ func transSafetyConfig2Proto(tables []request.SensitiveTable) []*assistant_servi
 	return result
 }
 
-func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.AssistantInfo, accessedWorkFlowList *response.ListResult, mcpInfos []*response.MCPInfos) (response.Assistant, error) {
+func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.AssistantInfo, accessedWorkFlowList *response.ListResult, mcpInfos []*response.MCPInfos, customInfos []*response.CustomInfos) (*response.Assistant, error) {
 	log.Debugf("开始转换Assistant响应到模型，响应内容: %+v", resp)
 	if resp == nil {
 		log.Debugf("Assistant响应为空，返回空Assistant模型")
-		return response.Assistant{}, nil
+		return nil, nil
 	}
 	var modelConfig request.AppModelConfig
 	if resp.ModelConfig != nil && resp.ModelConfig.ModelId != "" {
@@ -498,14 +564,15 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		modelInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: resp.ModelConfig.ModelId})
 		if err != nil {
 			log.Errorf("获取模型信息失败，模型ID: %s, 错误: %v", resp.ModelConfig.ModelId, err)
-			return response.Assistant{}, err
 		}
-		modelConfig, err = appModelConfigProto2Model(resp.ModelConfig, modelInfo.DisplayName)
-		if err != nil {
-			log.Errorf("模型配置Proto转换到模型失败，模型ID: %s, 错误: %v", resp.ModelConfig.ModelId, err)
-			return response.Assistant{}, err
+		if modelInfo != nil {
+			modelConfig, err = appModelConfigProto2Model(resp.ModelConfig, modelInfo.DisplayName)
+			if err != nil {
+				log.Errorf("模型配置Proto转换到模型失败，模型ID: %s, 错误: %v", resp.ModelConfig.ModelId, err)
+				return nil, err
+			}
+			log.Debugf("模型配置转换成功: %+v", modelConfig)
 		}
-		log.Debugf("模型配置转换成功: %+v", modelConfig)
 	} else {
 		log.Debugf("模型配置为空或模型ID为空")
 	}
@@ -515,12 +582,12 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		modelInfo, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{ModelId: resp.RerankConfig.ModelId})
 		if err != nil {
 			log.Errorf("获取Rerank模型信息失败，模型ID: %s, 错误: %v", resp.RerankConfig.ModelId, err)
-			return response.Assistant{}, err
+			return nil, err
 		}
 		rerankConfig, err = appModelConfigProto2Model(resp.RerankConfig, modelInfo.DisplayName)
 		if err != nil {
 			log.Errorf("Rerank配置Proto转换到模型失败，模型ID: %s, 错误: %v", resp.RerankConfig.ModelId, err)
-			return response.Assistant{}, err
+			return nil, err
 		}
 		log.Debugf("Rerank配置转换成功: %+v", rerankConfig)
 	} else {
@@ -546,11 +613,11 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		workFlowInfos = make([]*response.WorkFlowInfos, 0, len(resp.WorkFlowInfos))
 		for _, wf := range resp.WorkFlowInfos {
 			workFlowInfo := &response.WorkFlowInfos{
-				Id:         wf.Id,
 				WorkFlowId: wf.WorkFlowId,
 				ApiName:    wf.ApiName,
 				Enable:     wf.Enable,
 				Valid:      true, // 默认设置为有效
+				UniqueId:   bff_util.ConcatAssistantToolUniqueId("workflow", wf.WorkFlowId),
 			}
 
 			// 在accessedWorkFlowList中查找匹配的工作流
@@ -608,7 +675,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	}
 	knowledgeBaseConfig, err := transKnowledgeBases2Model(ctx, resp.KnowledgeBaseConfig)
 	if err != nil {
-		return response.Assistant{}, err
+		return nil, err
 	}
 	assistantModel := response.Assistant{
 		AssistantId:         resp.AssistantId,
@@ -625,6 +692,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		ActionInfos:         actionInfos,
 		WorkFlowInfos:       workFlowInfos,
 		MCPInfos:            mcpInfos,
+		CustomInfos:         customInfos,
 		CreatedAt:           util.Time2Str(resp.CreatTime),
 		UpdatedAt:           util.Time2Str(resp.UpdateTime),
 	}
@@ -639,7 +707,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		assistantModel.SafetyConfig.Tables = sensitiveTableList
 	}
 	log.Debugf("Assistant响应到模型转换完成，结果: %+v", assistantModel)
-	return assistantModel, nil
+	return &assistantModel, nil
 }
 
 func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.AssistantKnowledgeBaseConfig) (request.AppKnowledgebaseConfig, error) {

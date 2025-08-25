@@ -1,12 +1,6 @@
 package service
 
 import (
-	"fmt"
-	"regexp"
-	"strconv"
-	"strings"
-	"time"
-
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_doc_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-doc-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -18,6 +12,8 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
+	"regexp"
+	"strings"
 )
 
 const (
@@ -271,12 +267,17 @@ func buildDocSegmentResp(docSegmentListResp *knowledgebase_doc_service.DocSegmen
 	var segmentContentList = make([]*response.SegmentContent, 0)
 	if len(docSegmentListResp.ContentList) > 0 {
 		for _, contentInfo := range docSegmentListResp.ContentList {
+			var contentLabels = make([]string, 0)
+			if len(contentInfo.Labels) > 0 {
+				contentLabels = contentInfo.Labels
+			}
 			segmentContentList = append(segmentContentList, &response.SegmentContent{
 				ContentId:  contentInfo.ContentId,
 				Content:    contentInfo.Content,
 				Len:        int(contentInfo.Len),
 				Available:  contentInfo.Available,
 				ContentNum: int(contentInfo.ContentNum),
+				Labels:     contentLabels,
 			})
 		}
 	}
@@ -293,17 +294,17 @@ func buildDocSegmentResp(docSegmentListResp *knowledgebase_doc_service.DocSegmen
 	}
 }
 
-func buildMetaDataList(metaDataList []*request.MetaData) []*knowledgebase_doc_service.MetaData {
+func buildMetaDataList(metaDataList []*request.DocMetaData) []*knowledgebase_doc_service.MetaData {
 	if len(metaDataList) == 0 {
 		return make([]*knowledgebase_doc_service.MetaData, 0)
 	}
-	return lo.Map(metaDataList, func(item *request.MetaData, index int) *knowledgebase_doc_service.MetaData {
+	return lo.Map(metaDataList, func(item *request.DocMetaData, index int) *knowledgebase_doc_service.MetaData {
 		return &knowledgebase_doc_service.MetaData{
-			DataId:    item.DataId,
-			Key:       item.Key,
-			Value:     item.Value,
+			MetaId:    item.MetaId,
+			Key:       item.MetaKey,
+			Value:     item.MetaValue,
 			Option:    item.Option,
-			ValueType: item.DataType,
+			ValueType: item.MetaValueType,
 		}
 	})
 }
@@ -314,57 +315,35 @@ func buildCallbackMetaDataList(metaDataList []*request.CallbackMetaData) []*know
 	}
 	return lo.Map(metaDataList, func(item *request.CallbackMetaData, index int) *knowledgebase_doc_service.MetaData {
 		return &knowledgebase_doc_service.MetaData{
-			DataId: item.MetaId,
+			MetaId: item.MetaId,
 			Key:    item.Key,
 			Value:  item.Value,
 		}
 	})
 }
 
-func buildMetaDataResultList(metaDataList []*knowledgebase_doc_service.MetaData) []*response.MetaData {
+func buildMetaDataResultList(metaDataList []*knowledgebase_doc_service.MetaData) []*response.DocMetaData {
 	if len(metaDataList) == 0 {
-		return make([]*response.MetaData, 0)
+		return make([]*response.DocMetaData, 0)
 	}
-	return lo.Map(metaDataList, func(item *knowledgebase_doc_service.MetaData, index int) *response.MetaData {
-		return &response.MetaData{
-			DataId:      item.DataId,
-			Key:         item.Key,
-			Value:       item.Value,
-			FormatValue: buildFormatValue(item.ValueType, item.Value),
-			DataType:    item.ValueType,
-			Rule:        item.Rule,
+	return lo.Map(metaDataList, func(item *knowledgebase_doc_service.MetaData, index int) *response.DocMetaData {
+		return &response.DocMetaData{
+			MetaId:        item.MetaId,
+			MetaKey:       item.Key,
+			MetaValue:     item.Value,
+			MetaValueType: item.ValueType,
+			MetaRule:      item.Rule,
 		}
 	})
 }
 
-func buildFormatValue(valueType, value string) string {
-	if valueType == "time" {
-		timestamp, err := formatTimestamp(value)
-		if err == nil {
-			return timestamp
-		}
-	}
-	return value
-}
-
-func formatTimestamp(timestampStr string) (string, error) {
-	// 将字符串转换为整数
-	timestamp, err := strconv.ParseInt(timestampStr, 10, 64)
-	if err != nil {
-		return "", fmt.Errorf("invalid timestamp: %v", err)
-	}
-
-	// 根据时间戳长度进行处理
-	var t time.Time
-	switch len(timestampStr) {
-	case 10: // 秒级时间戳
-		t = time.Unix(timestamp, 0)
-	case 13: // 毫秒级时间戳
-		t = time.Unix(timestamp/1000, (timestamp%1000)*1e6)
-	default:
-		return "", fmt.Errorf("unsupported timestamp length: %d (expected 10 or 13 digits)", len(timestampStr))
-	}
-
-	// 格式化为标准日期时间字符串
-	return t.Format("2006-01-02 15:04"), nil
+func UpdateDocSegmentLabels(ctx *gin.Context, userId, orgId string, r *request.DocSegmentLabelsReq) error {
+	_, err := knowledgeBaseDoc.UpdateDocSegmentLabels(ctx.Request.Context(), &knowledgebase_doc_service.DocSegmentLabelsReq{
+		UserId:    userId,
+		OrgId:     orgId,
+		ContentId: r.ContentId,
+		DocId:     r.DocId,
+		Labels:    r.Labels,
+	})
+	return err
 }

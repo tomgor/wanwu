@@ -3,13 +3,13 @@
     <div class="common_bg">
       <div class="page-title">
         <img class="page-title-img" src="@/assets/imgs/mcp.png" alt="" />
-        <span class="page-title-name">MCP广场</span>
+        <span class="page-title-name">工具广场</span>
       </div>
       <!-- tabs -->
       <div class="mcp-tabs">
         <div :class="['mcp-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">精选推荐</div>
         <div :class="['mcp-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">导入MCP服务</div>
-        <!-- <div :class="['mcp-tab',{ 'active': tabActive === 3 }]" @click="tabClick(3)">自定义工具</div> -->
+        <div :class="['mcp-tab',{ 'active': tabActive === 3 }]" @click="tabClick(3)">自定义工具</div>
       </div>
 
       <square ref="square" v-if="tabActive === 0"/>
@@ -109,7 +109,18 @@ export default {
   .el-tabs__nav-wrap::after {
     display: none;
   }
-  .el-icon-delete-solid {
+  .edit {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 30px;
+    color: #777;
+
+    &:hover {
+      color: $color;
+    }
+  }
+  .del {
     display: none;
     position: absolute;
     top: 10px;
@@ -144,7 +155,11 @@ export default {
         box-shadow: 0 2px 8px #171a220d, 0 4px 16px #0000000f;
         border: 1px solid $border_color;
 
-        .el-icon-delete-solid {
+        .del {
+          display: block;
+        }
+
+        .edit {
           display: block;
         }
       }

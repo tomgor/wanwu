@@ -53,9 +53,9 @@
 {"code":110005,"key":"bff_sensitive_check_resp_default_reply","langs":{"en":"the response contains sensitive content. In accordance with relevant security requirements, this round of dialogue has been terminated. Please clear the history or start a new dialogue.","zh":"回答中包含敏感内容，根据相关安全要求，该轮对话终止，请清除历史信息或者重新开启新的对话"}}
 {"code":0,"key":"","langs":{}}
 {"code":0,"key":"------ custom ------","langs":{}}
-{"code":0,"key":"bff_custom_home_title","langs":{"en":"Intelligent agent platform","zh":"智能体平台"}}
-{"code":0,"key":"bff_custom_tab_title","langs":{"en":"Intelligent agent platform","zh":"智能体平台"}}
-{"code":0,"key":"bff_custom_login_welcome_text","langs":{"en":"Hi! Welcome to the large model intelligent agent platform","zh":"嗨！欢迎来到大模型智能体平台"}}
+{"code":0,"key":"bff_custom_home_title","langs":{"en":"Yuanjing Wanwu Intelligent Body Development Platform","zh":"元景万悟智能体开发平台"}}
+{"code":0,"key":"bff_custom_tab_title","langs":{"en":"Yuanjing Wanwu","zh":"元景万悟"}}
+{"code":0,"key":"bff_custom_login_welcome_text","langs":{"en":"Hi! Welcome to Yuanjing Wanwu Intelligent Body Development Platform","zh":"嗨！欢迎来到元景万悟智能体开发平台"}}
 {"code":0,"key":"bff_custom_about_copyright","langs":{"zh":"© 大模型开源平台"}}
 {"code":0,"key":"bff_custom_login_platform_desc","langs":{}}
 {"code":120002,"key":"iam_captcha_refresh","langs":{"en":"refresh but key or code empty","zh":"刷新验证码时 key 或 code 为空"}}
@@ -172,6 +172,7 @@
 {"code":145004,"key":"","langs":{"zh":"已存在同名知识库分隔符"}}
 {"code":145005,"key":"","langs":{"zh":"查询知识库标分隔符表失败，请稍后重试"}}
 {"code":145008,"key":"","langs":{"zh":"没有操作该知识库分隔符的权限"}}
+{"code":145009,"key":"","langs":{"zh":"更新文档切片标签失败，请稍后重试"}}
 {"code":310001,"key":"mcp_get_square_err","langs":{"zh":"广场MCP不存在"}}
 {"code":310001,"key":"mcp_check_exist_err","langs":{"zh":"检查MCP是否存在来自广场异常: %v"}}
 {"code":310002,"key":"mcp_create_duplicate_square","langs":{"zh":"创建MCP异常: 已存在来自广场"}}
@@ -181,6 +182,12 @@
 {"code":310004,"key":"mcp_delete_err","langs":{"zh":"删除MCP异常:%v"}}
 {"code":310005,"key":"mcp_custom_list_mcps_err","langs":{"zh":"获取自定义MCP列表异常:%v"}}
 {"code":310006,"key":"mcp_get_mcp_avatar_err","langs":{"zh":"获取MCP图标异常:%v"}}
+{"code":310007,"key":"mcp_create_custom_tool_err","langs":{"zh":"创建自定义工具异常:%v"}}
+{"code":310007,"key":"mcp_create_duplicate_custom_tool","langs":{"zh":"创建自定义工具异常: 已存在同名"}}
+{"code":310008,"key":"mcp_get_custom_tool_info_err","langs":{"zh":"获取自定义工具详情异常:%v"}}
+{"code":310009,"key":"mcp_get_custom_tool_list_err","langs":{"zh":"获取自定义工具列表异常:%v"}}
+{"code":310010,"key":"mcp_update_custom_tool_err","langs":{"zh":"更新自定义工具异常:%v"}}
+{"code":310011,"key":"mcp_delete_custom_tool_err","langs":{"zh":"删除自定义工具:%v"}}
 {"code":150001,"key":"rag_role_err","langs":{"zh":"角色权限错误：%v"}}
 {"code":150002,"key":"rag_info_not_exist","langs":{"zh":"文本问答信息不存在：%v"}}
 {"code":150003,"key":"rag_delete_err","langs":{"zh":"删除文本问答错误：%v"}}
@@ -266,12 +273,12 @@
 {"code":300003,"key":"app_safety_sensitive_vocabulary_list_get_by_ids","langs":{"zh":"批量获取敏感词失败: %v"}}
 {"code":300003,"key":"app_safety_sensitive_table_not_found","langs":{"zh":"敏感词表(%v)不存在"}}
 {"code":300009,"key":"app_url_get_by_name","langs":{"zh":"获取应用(%v)错误: %v"}}
-{"code":0,"key":"app_url_same_name","langs":{"zh":"存在同名应用(%v)，请修改后重试"}}
-{"code":0,"key":"app_url_create","langs":{"zh":"创建URL(%v)失败: %v"}}
-{"code":0,"key":"app_url_delete","langs":{"zh":"删除URL(%v)错误: %v"}}
-{"code":0,"key":"app_url_update","langs":{"zh":"更新URL(%v)失败: %v"}}
-{"code":0,"key":"app_url_get","langs":{"zh":"获取URL失败"}}
-{"code":0,"key":"app_url_get_list","langs":{"zh":"获取应用(%v)类型(%v)列表失败: %v"}}
-{"code":0,"key":"app_url_update_switch","langs":{"zh":"URL(%v)状态修改失败: %v"}}
+{"code":300009,"key":"app_url_same_name","langs":{"zh":"存在同名应用(%v)，请修改后重试"}}
+{"code":300009,"key":"app_url_create","langs":{"zh":"创建URL(%v)失败: %v"}}
+{"code":300009,"key":"app_url_delete","langs":{"zh":"删除URL(%v)错误: %v"}}
+{"code":300009,"key":"app_url_update","langs":{"zh":"更新URL(%v)失败: %v"}}
+{"code":300009,"key":"app_url_get","langs":{"zh":"获取URL失败"}}
+{"code":300009,"key":"app_url_get_list","langs":{"zh":"获取应用(%v)类型(%v)列表失败: %v"}}
+{"code":300009,"key":"app_url_update_switch","langs":{"zh":"URL(%v)状态修改失败: %v"}}
 {"code":300010,"key":"","langs":{"zh":"URL已被禁用"}}
 {"code":300011,"key":"","langs":{"zh":"URL已过期"}}

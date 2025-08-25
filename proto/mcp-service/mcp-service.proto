@@ -20,6 +20,13 @@ service MCPService {
     // --- tool ---
     rpc GetMCPToolList(GetMCPToolListReq) returns (MCPToolList) {}
     rpc GetMCPAvatar(GetMCPAvatarReq) returns (MCPAvatar) {}
+
+    // --- CustomTool ---
+    rpc CreateCustomTool(CreateCustomToolReq) returns (google.protobuf.Empty) {}
+    rpc GetCustomToolInfo(GetCustomToolInfoReq) returns (GetCustomToolInfoResp) {}
+    rpc GetCustomToolList(GetCustomToolListReq) returns (GetCustomToolListResp) {}
+    rpc UpdateCustomTool(UpdateCustomToolReq) returns (google.protobuf.Empty) {}
+    rpc DeleteCustomTool(DeleteCustomToolReq) returns (google.protobuf.Empty) {}
 }
 
 // --- req ---
@@ -147,4 +154,68 @@ message MCPToolInputSchema {
 message MCPToolInputSchemaValue {
     string type = 1;
     string description = 2;
+}
+
+// --- customTool ---
+
+message Identity {
+    string userId = 1;
+    string orgId = 2;
+}
+
+message CreateCustomToolReq {
+    string schema = 1;
+    ApiAuthWebRequest apiAuth = 2;
+    Identity identity = 3;
+    string name = 4;
+    string description = 5;
+    string privacyPolicy = 6;
+}
+
+message ApiAuthWebRequest{
+    string type = 1;
+    string apiKey = 2;
+    string customHeaderName = 3;
+    string authType = 4;
+}
+
+message GetCustomToolInfoReq {
+    string customToolId = 1;
+}
+
+message GetCustomToolInfoResp {
+    string customToolId = 1;
+    string schema = 2;
+    ApiAuthWebRequest apiAuth = 3;
+    string name = 4;
+    string description = 5;
+    string privacyPolicy = 6;
+}
+
+message GetCustomToolListReq {
+    Identity identity = 1;
+    string name = 2;
+}
+
+message GetCustomToolItem {
+    string customToolId = 1;
+    string name = 2;
+    string description = 3;
+}
+
+message GetCustomToolListResp {
+    repeated GetCustomToolItem list = 1;
+}
+
+message UpdateCustomToolReq {
+    string customToolId = 1;
+    string schema = 2;
+    ApiAuthWebRequest apiAuth = 3;
+    string name = 4;
+    string description = 5;
+    string privacyPolicy = 6;
+}
+
+message DeleteCustomToolReq {
+    string customToolId = 1;
 }

@@ -73,6 +73,7 @@ enum Code {
   KnowledgeSplitterDuplicateName = 145004; // 已存在同名知识库分隔符
   KnowledgeSplitterSelectFailed = 145005; // 查询知识库标分隔符表失败，请稍后重试
   KnowledgeSplitterAccessDenied = 145008; // 没有操作该知识库分隔符的权限
+  KnowledgeDocSegmentUpdateLabelsFailed = 145009;  // 更新文档切片标签失败，请稍后重试
 
   // --- rag-service ---
   // [150000, 159999]
@@ -94,6 +95,7 @@ enum Code {
   AssistantWorkflowErr = 160003; // 智能体workflow相关错误
   AssistantConversationErr = 160004; // 智能体对话相关错误
   AssistantMCPErr = 160005; // 智能体MCP相关错误
+  AssistantCustomErr = 160006; // 智能体自定义工具相关错误
 
   // --- workflow-service ---
   // [210000, 219999]
@@ -136,6 +138,11 @@ enum Code {
   MCPDeleteCustomMCPErr = 310004; // 删除自定义MCP错误
   MCPGetCustomMCPListErr = 310005; // 获取自定义MCP列表错误
   MCPGetMCPAvatarErr = 310006; // 获取MCP头像错误
+  MCPCreateCustomToolErr = 310007; // 创建自定义工具错误
+  MCPGetCustomToolInfoErr = 310008; // 获取自定义工具详情错误
+  MCPGetCustomToolListErr = 310009; // 获取自定义工具列表错误
+  MCPUpdateCustomToolErr = 310010; // 更新自定义工具错误
+  MCPDeleteCustomToolErr = 310011; // 删除自定义工具错误
 
   // --- operate-service ---
   // [320000, 329999]

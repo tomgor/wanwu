@@ -11,6 +11,7 @@ import (
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/client/model"
 	"github.com/UnicomAI/wanwu/pkg/log"
+	"github.com/UnicomAI/wanwu/pkg/util"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -243,20 +244,20 @@ func (s *Service) GetAssistantListMyAll(ctx context.Context, req *assistant_serv
 // GetAssistantInfo 查看智能体详情
 func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.GetAssistantInfoReq) (*assistant_service.AssistantInfo, error) {
 	// 转换ID
-	assistantID, err := strconv.ParseUint(req.AssistantId, 10, 32)
+	assistantId, err := util.U32(req.AssistantId)
 	if err != nil {
 		return nil, err
 	}
 
 	// 调用client方法获取智能体详情
-	assistant, status := s.cli.GetAssistant(ctx, uint32(assistantID))
+	assistant, status := s.cli.GetAssistant(ctx, assistantId)
 	if status != nil {
 		return nil, errStatus(errs.Code_AssistantErr, status)
 	}
 
 	// 获取关联的Actions和WorkFlows
 	actions, _ := s.cli.GetAssistantActionsByAssistantID(ctx, req.AssistantId)
-	workflows, _ := s.cli.GetAssistantWorkflowsByAssistantID(ctx, req.AssistantId)
+	workflows, _ := s.cli.GetAssistantWorkflowsByAssistantID(ctx, assistantId)
 
 	// 转换Actions
 	var actionInfos []*assistant_service.ActionInfos
@@ -274,7 +275,6 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 		workFlowInfos = append(workFlowInfos, &assistant_service.WorkFlowInfos{
 			Id:         strconv.FormatUint(uint64(workflow.ID), 10),
 			WorkFlowId: workflow.WorkflowId,
-			ApiName:    workflow.Name,
 			Enable:     workflow.Enable,
 		})
 	}

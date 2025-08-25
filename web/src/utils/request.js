@@ -18,11 +18,13 @@ service.interceptors.request.use(
       const user = store.getters['user/userInfo']
       const lang = localStorage.getItem('locale') || ZH // store.getters['user/lang']
       config.headers = {
-          'Authorization': 'Bearer ' + token,
-          'x-user-id': user.uid,
-          "x-org-id": user.orgId,
-          ...(config.hasLang && { 'x-language': lang })
+      ...config.headers,
+      ...(!config.isOpeanUrl && {'Authorization': 'Bearer ' + token}),
+      ...(!config.isOpeanUrl && {'x-user-id': user.uid}),
+      ...(!config.isOpeanUrl && {"x-org-id": user.orgId}),
+      ...(config.hasLang && { 'x-language': lang })
       }
+      
       return config
   },
   error => {

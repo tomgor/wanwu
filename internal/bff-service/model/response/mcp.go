@@ -9,6 +9,7 @@ type MCPSelect struct {
 	MCPID       string `json:"mcpId"`       // mcpId
 	MCPSquareID string `json:"mcpSquareId"` // 广场mcpId(非空表示来源于广场)
 	Name        string `json:"name"`        // 名称
+	UniqueId    string `json:"uniqueId"`    // 唯一标识
 	Description string `json:"description"` // 描述
 	ServerFrom  string `json:"serverFrom"`  // 来源
 	ServerURL   string `json:"serverUrl"`   // sseUrl
@@ -77,4 +78,61 @@ type MCPToolInputSchema struct {
 type MCPToolInputSchemaValue struct {
 	Type        string `json:"type"`        // 字段类型
 	Description string `json:"description"` // 字段描述
+}
+
+type CustomToolApiAuthWebRequest struct {
+	Type             string `json:"type"`             // 认证类型: None 或 APIKey
+	APIKey           string `json:"apiKey"`           // apiKey
+	CustomHeaderName string `json:"customHeaderName"` // 自定义头名
+	AuthType         string `json:"authType"`         // Auth类型
+}
+
+type CustomToolApiResponse struct {
+	Name   string `json:"name"`
+	Method string `json:"method"`
+	Path   string `json:"path"`
+}
+
+type CustomToolDetail struct {
+	CustomToolId  string                      `json:"customToolId"`  // 自定义工具id
+	Name          string                      `json:"name"`          // 名称
+	Description   string                      `json:"description"`   // 描述
+	Schema        string                      `json:"schema"`        // schema
+	ApiAuth       CustomToolApiAuthWebRequest `json:"apiAuth"`       // apiAuth
+	ApiList       []CustomToolApiResponse     `json:"apiList"`       // api列表
+	PrivacyPolicy string                      `json:"privacyPolicy"` // 隐私政策
+}
+
+type CustomToolCell struct {
+	CustomToolId string `json:"customToolId"` // 自定义工具id
+	Name         string `json:"name"`         // 名称
+	Description  string `json:"description"`  // 描述
+}
+
+type CustomToolSelect struct {
+	UniqueId     string `json:"uniqueId"`     // 统一的id
+	CustomToolId string `json:"customToolId"` // 自定义工具id
+	Name         string `json:"name"`         // 名称
+	Description  string `json:"description"`  // 描述
+}
+
+// 精简OpenAPI结构体
+type OpenAPI struct {
+	OpenAPI string              `json:"openapi" yaml:"openapi"`
+	Paths   map[string]PathItem `json:"paths" yaml:"paths"`
+}
+
+type PathItem struct {
+	Get     *Operation `json:"get" yaml:"get"`
+	Post    *Operation `json:"post" yaml:"post"`
+	Put     *Operation `json:"put" yaml:"put"`
+	Delete  *Operation `json:"delete" yaml:"delete"`
+	Patch   *Operation `json:"patch" yaml:"patch"`
+	Head    *Operation `json:"head" yaml:"head"`
+	Options *Operation `json:"options" yaml:"options"`
+}
+
+type Operation struct {
+	OperationID string `json:"operationId" yaml:"operationId"`
+	Summary     string `json:"summary" yaml:"summary"`
 }

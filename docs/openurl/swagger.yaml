@@ -313,6 +313,11 @@ definitions:
       createdAt:
         description: 创建时间
         type: string
+      customInfos:
+        description: 自定义工具信息
+        items:
+          $ref: '#/definitions/response.CustomInfos'
+        type: array
       desc:
         description: 描述
         type: string
@@ -418,6 +423,21 @@ definitions:
       title:
         type: string
     type: object
+  response.CustomInfos:
+    properties:
+      customDesc:
+        type: string
+      customId:
+        type: string
+      enable:
+        type: boolean
+      name:
+        type: string
+      uniqueId:
+        type: string
+      valid:
+        type: boolean
+    type: object
   response.ListResult:
     properties:
       list: {}
@@ -428,19 +448,19 @@ definitions:
     properties:
       enable:
         type: boolean
-      id:
-        type: string
       mcpDesc:
         type: string
       mcpId:
-        type: string
-      mcpName:
         type: string
       mcpServerFrom:
         type: string
       mcpServerUrl:
         type: string
       mcpSquareId:
+        type: string
+      name:
+        type: string
+      uniqueId:
         type: string
       valid:
         type: boolean
@@ -459,15 +479,15 @@ definitions:
         type: string
       enable:
         type: boolean
-      id:
+      name:
+        type: string
+      uniqueId:
         type: string
       valid:
         type: boolean
       workFlowDesc:
         type: string
       workFlowId:
-        type: string
-      workFlowName:
         type: string
     type: object
 info:

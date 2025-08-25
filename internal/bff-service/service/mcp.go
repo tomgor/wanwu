@@ -9,6 +9,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	mcp_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/mcp-util"
+	bff_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/gin-gonic/gin"
@@ -109,6 +110,7 @@ func GetMCPSelect(ctx *gin.Context, userID, orgID string, name string) (*respons
 		list = append(list, response.MCPSelect{
 			MCPID:       mcpInfo.McpId,
 			MCPSquareID: mcpInfo.Info.McpSquareId,
+			UniqueId:    bff_util.ConcatAssistantToolUniqueId("mcp", mcpInfo.McpId),
 			Name:        mcpInfo.Info.Name,
 			Description: mcpInfo.Info.Desc,
 			ServerFrom:  mcpInfo.Info.From,

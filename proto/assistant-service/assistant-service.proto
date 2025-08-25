@@ -28,6 +28,12 @@ service AssistantService {
   rpc AssistantMCPEnableSwitch(AssistantMCPEnableSwitchReq) returns (google.protobuf.Empty) {}
   rpc AssistantMCPGetList(AssistantMCPGetListReq) returns (AssistantMCPList) {}
 
+  // --- custom ---
+  rpc AssistantCustomToolCreate(AssistantCustomToolCreateReq) returns (google.protobuf.Empty) {}
+  rpc AssistantCustomToolDelete(AssistantCustomToolDeleteReq) returns (google.protobuf.Empty) {}
+  rpc AssistantCustomToolEnableSwitch(AssistantCustomToolEnableSwitchReq) returns (google.protobuf.Empty) {}
+  rpc AssistantCustomToolGetList(AssistantCustomToolGetListReq) returns (AssistantCustomToolList) {}
+
   // --- action ---
   rpc AssistantActionCreate(AssistantActionCreateReq) returns (AssistantActionCreateResp) {}
   rpc AssistantActionDelete(AssistantActionDeleteReq) returns (google.protobuf.Empty) {}
@@ -173,13 +179,16 @@ message AssistantWorkFlowCreateReq {
 }
 
 message AssistantWorkFlowDeleteReq {
-  string workFlowId = 1;
-  Identity identity = 2;
+  string assistantId = 1;
+  string workFlowId = 2;
+  Identity identity = 3;
 }
 
 message AssistantWorkFlowEnableSwitchReq {
-  string workFlowId = 1;
-  Identity identity = 2;
+  string assistantId = 1;
+  string workFlowId = 2;
+  bool enable = 3;
+  Identity identity = 4;
 }
 
 message AssistantMCPCreateReq {
@@ -189,13 +198,16 @@ message AssistantMCPCreateReq {
 }
 
 message AssistantMCPDeleteReq {
-  string mcpId = 1;
-  Identity identity = 2;
+  string assistantId = 1;
+  string mcpId = 2;
+  Identity identity = 3;
 }
 
 message AssistantMCPEnableSwitchReq {
-  string mcpId = 1;
-  Identity identity = 2;
+  string assistantId = 1;
+  string mcpId = 2;
+  bool enable = 3;
+  Identity identity = 4;
 }
 
 message AssistantMCPGetListReq {
@@ -216,6 +228,45 @@ message AssistantMCPInfo {
 
 message AssistantMCPList {
   repeated AssistantMCPInfo assistantMCPInfos = 1;
+}
+
+message AssistantCustomToolCreateReq {
+  string assistantId = 1;
+  string customToolId = 2;
+  Identity identity = 3;
+}
+
+message AssistantCustomToolDeleteReq {
+  string assistantId = 1;
+  string customToolId = 2;
+  Identity identity = 3;
+}
+
+message AssistantCustomToolEnableSwitchReq {
+  string assistantId = 1;
+  string customToolId = 2;
+  bool enable = 3;
+  Identity identity = 4;
+}
+
+message AssistantCustomToolGetListReq {
+  string assistantId = 1;
+  Identity identity = 2;
+}
+
+message AssistantCustomToolInfo {
+  uint32 id = 1;
+  uint32 assistantId = 2;
+  string customToolId = 3;
+  bool enable = 4;
+  string userId = 5;
+  string orgId = 6;
+  int64 createdAt = 7;
+  int64 updatedAt = 8;
+}
+
+message AssistantCustomToolList {
+  repeated AssistantCustomToolInfo assistantCustomToolInfos = 1;
 }
 
 message AssistantActionCreateReq {
@@ -347,6 +398,7 @@ message AssistantConversionStreamReq {
   string prompt = 5;
   string appPublishType = 6;
   Identity identity = 7;
+  repeated string accessedWorkFlowIds = 8;
 }
 
 message ConversionStreamFile{

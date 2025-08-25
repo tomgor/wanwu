@@ -99,17 +99,17 @@ func GetAssistantInfo(ctx *gin.Context) {
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.WorkFlowAddRequest	true	"工作流新增参数"
+//	@Param			data	body		request.AssistantWorkFlowAddRequest	true	"工作流新增参数"
 //	@Success		200		{object}	response.Response
-//	@Router			/assistant/workflow [post]
+//	@Router			/assistant/tool/workflow [post]
 func AssistantWorkFlowCreate(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)
-	var req request.WorkFlowAddRequest
+	var req request.AssistantWorkFlowAddRequest
 	if !gin_util.Bind(ctx, &req) {
 		return
 	}
-	resp, err := service.AssistantWorkFlowCreate(ctx, userId, orgId, req)
-	gin_util.Response(ctx, resp, err)
+	err := service.AssistantWorkFlowCreate(ctx, userId, orgId, req)
+	gin_util.Response(ctx, nil, err)
 }
 
 // AssistantWorkFlowDelete
@@ -120,17 +120,17 @@ func AssistantWorkFlowCreate(ctx *gin.Context) {
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.WorkFlowIdRequest	true	"工作流id"
+//	@Param			data	body		request.AssistantWorkFlowDelRequest	true	"工作流id,智能体id"
 //	@Success		200		{object}	response.Response
-//	@Router			/assistant/workflow [delete]
+//	@Router			/assistant/tool/workflow [delete]
 func AssistantWorkFlowDelete(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)
-	var req request.WorkFlowIdRequest
+	var req request.AssistantWorkFlowDelRequest
 	if !gin_util.Bind(ctx, &req) {
 		return
 	}
-	resp, err := service.AssistantWorkFlowDelete(ctx, userId, orgId, req)
-	gin_util.Response(ctx, resp, err)
+	err := service.AssistantWorkFlowDelete(ctx, userId, orgId, req)
+	gin_util.Response(ctx, nil, err)
 }
 
 // AssistantWorkFlowEnableSwitch
@@ -141,17 +141,17 @@ func AssistantWorkFlowDelete(ctx *gin.Context) {
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.WorkFlowIdRequest	true	"工作流id"
+//	@Param			data	body		request.AssistantWorkFlowToolEnableRequest	true	"工作流id,智能体id,开关"
 //	@Success		200		{object}	response.Response
-//	@Router			/assistant/workflow/enable [put]
+//	@Router			/assistant/tool/workflow/switch [put]
 func AssistantWorkFlowEnableSwitch(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)
-	var req request.WorkFlowIdRequest
+	var req request.AssistantWorkFlowToolEnableRequest
 	if !gin_util.Bind(ctx, &req) {
 		return
 	}
-	resp, err := service.AssistantWorkFlowEnableSwitch(ctx, userId, orgId, req)
-	gin_util.Response(ctx, resp, err)
+	err := service.AssistantWorkFlowEnableSwitch(ctx, userId, orgId, req)
+	gin_util.Response(ctx, nil, err)
 }
 
 // AssistantMCPCreate
@@ -162,17 +162,17 @@ func AssistantWorkFlowEnableSwitch(ctx *gin.Context) {
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.MCPAddRequest	true	"mcp新增参数"
+//	@Param			data	body		request.AssistantMCPToolAddRequest	true	"mcp新增参数"
 //	@Success		200		{object}	response.Response
-//	@Router			/assistant/mcp [post]
+//	@Router			/assistant/tool/mcp [post]
 func AssistantMCPCreate(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)
-	var req request.MCPAddRequest
+	var req request.AssistantMCPToolAddRequest
 	if !gin_util.Bind(ctx, &req) {
 		return
 	}
-	resp, err := service.AssistantMCPCreate(ctx, userId, orgId, req)
-	gin_util.Response(ctx, resp, err)
+	err := service.AssistantMCPCreate(ctx, userId, orgId, req)
+	gin_util.Response(ctx, nil, err)
 }
 
 // AssistantMCPDelete
@@ -183,17 +183,17 @@ func AssistantMCPCreate(ctx *gin.Context) {
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.MCPIdRequest	true	"mcp id"
+//	@Param			data	body		request.AssistantMCPToolDelRequest	true	"mcp工具id，智能体id"
 //	@Success		200		{object}	response.Response
-//	@Router			/assistant/mcp [delete]
+//	@Router			/assistant/tool/mcp [delete]
 func AssistantMCPDelete(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)
-	var req request.MCPIdRequest
+	var req request.AssistantMCPToolDelRequest
 	if !gin_util.Bind(ctx, &req) {
 		return
 	}
-	resp, err := service.AssistantMCPDelete(ctx, userId, orgId, req)
-	gin_util.Response(ctx, resp, err)
+	err := service.AssistantMCPDelete(ctx, userId, orgId, req)
+	gin_util.Response(ctx, nil, err)
 }
 
 // AssistantMCPEnableSwitch
@@ -204,17 +204,80 @@ func AssistantMCPDelete(ctx *gin.Context) {
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.MCPIdRequest	true	"mcp id"
+//	@Param			data	body		request.AssistantMCPToolEnableRequest	true	"mcp工具id、智能体id、enable"
 //	@Success		200		{object}	response.Response
-//	@Router			/assistant/mcp/enable [put]
+//	@Router			/assistant/tool/mcp/switch [put]
 func AssistantMCPEnableSwitch(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)
-	var req request.MCPIdRequest
+	var req request.AssistantMCPToolEnableRequest
 	if !gin_util.Bind(ctx, &req) {
 		return
 	}
-	resp, err := service.AssistantMCPEnableSwitch(ctx, userId, orgId, req)
-	gin_util.Response(ctx, resp, err)
+	err := service.AssistantMCPEnableSwitch(ctx, userId, orgId, req)
+	gin_util.Response(ctx, nil, err)
+}
+
+// AssistantCustomToolCreate
+//
+//	@Tags			agent
+//	@Summary		添加自定义工具
+//	@Description	为智能体绑定自定义工具
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.AssistantCustomToolAddRequest	true	"自定义工具新增参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/assistant/tool/custom [post]
+func AssistantCustomToolCreate(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.AssistantCustomToolAddRequest
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.AssistantCustomToolCreate(ctx, userId, orgId, req)
+	gin_util.Response(ctx, nil, err)
+}
+
+// AssistantCustomToolDelete
+//
+//	@Tags			agent
+//	@Summary		删除自定义工具
+//	@Description	为智能体解绑自定义工具
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.AssistantCustomToolDelRequest	true	"智能体id与自定义工具id"
+//	@Success		200		{object}	response.Response
+//	@Router			/assistant/tool/custom [delete]
+func AssistantCustomToolDelete(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.AssistantCustomToolDelRequest
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.AssistantCustomToolDelete(ctx, userId, orgId, req)
+	gin_util.Response(ctx, nil, err)
+}
+
+// AssistantCustomToolEnableSwitch
+//
+//	@Tags			agent
+//	@Summary		启用/停用自定义工具
+//	@Description	修改智能体绑定的自定义工具的启用状态
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.AssistantCustomToolEnableRequest	true	"智能体id与自定义工具id"
+//	@Success		200		{object}	response.Response
+//	@Router			/assistant/tool/custom/switch [put]
+func AssistantCustomToolEnableSwitch(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.AssistantCustomToolEnableRequest
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.AssistantCustomToolEnableSwitch(ctx, userId, orgId, req)
+	gin_util.Response(ctx, nil, err)
 }
 
 // AssistantActionCreate

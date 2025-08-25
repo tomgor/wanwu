@@ -237,6 +237,14 @@ export const getSectionList = (params)=>{
         params
     })
 };
+//更新文档切片标签
+export const sectionLabels = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/doc/segment/labels`,
+        method: 'post',
+        data
+    })
+};
 export const setSectionStatus = (data)=>{
     return service({
         url: `${BASE_URL}/knowledge/doc/segment/status/update`,

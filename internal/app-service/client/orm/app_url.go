@@ -38,10 +38,14 @@ func (c *Client) DeleteAppUrl(ctx context.Context, urlID uint32) *err_code.Statu
 
 func (c *Client) UpdateAppUrl(ctx context.Context, appUrl *model.AppUrl) *err_code.Status {
 	var count int64
+	appUrlCfg := &model.AppUrl{}
+	if err := sqlopt.WithID(appUrl.ID).Apply(c.db.WithContext(ctx)).First(appUrlCfg).Error; err != nil {
+		return toErrStatus("app_url_get")
+	}
 	if err := sqlopt.SQLOptions(
-		sqlopt.WithAppID(appUrl.AppID),
-		sqlopt.WithAppType(appUrl.AppType),
-		sqlopt.WithName(appUrl.Name),
+		sqlopt.WithAppID(appUrlCfg.AppID),
+		sqlopt.WithAppType(appUrlCfg.AppType),
+		sqlopt.WithName(appUrlCfg.Name),
 	).Apply(c.db.WithContext(ctx)).Where("id != ?", appUrl.ID).Model(&model.AppUrl{}).Count(&count).Error; err != nil {
 		return toErrStatus("app_url_get_by_name", appUrl.Name, err.Error())
 	}
@@ -68,7 +72,7 @@ func (c *Client) UpdateAppUrl(ctx context.Context, appUrl *model.AppUrl) *err_co
 func (c *Client) GetAppUrlInfoBySuffix(ctx context.Context, suffix string) (*model.AppUrl, *err_code.Status) {
 	appUrl := &model.AppUrl{}
 	if err := sqlopt.WithSuffix(suffix).Apply(c.db.WithContext(ctx)).First(appUrl).Error; err != nil {
-		return nil, toErrStatus("app_url_get", err.Error())
+		return nil, toErrStatus("app_url_get")
 	}
 	return appUrl, nil
 

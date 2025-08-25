@@ -42,32 +42,49 @@ type AssistantIdRequest struct {
 
 func (a *AssistantIdRequest) Check() error { return nil }
 
-type WorkFlowAddRequest struct {
-	AssistantId string `json:"assistantId" form:"assistantId"`
-	Schema      string `json:"schema"  form:"schema"`
-	WorkFlowId  string `json:"workFlowId" form:"workFlowId"`
+type AssistantWorkFlowAddRequest struct {
+	AssistantId string `json:"assistantId" validate:"required"`
+	WorkFlowId  string `json:"workFlowId" validate:"required"`
 }
 
-func (w *WorkFlowAddRequest) Check() error { return nil }
+func (w *AssistantWorkFlowAddRequest) Check() error { return nil }
 
-type WorkFlowIdRequest struct {
-	WorkFlowId string `json:"workFlowId" form:"workFlowId" validate:"required"`
+type AssistantWorkFlowDelRequest struct {
+	AssistantId string `json:"assistantId" validate:"required"`
+	WorkFlowId  string `json:"workFlowId" validate:"required"`
 }
 
-func (w *WorkFlowIdRequest) Check() error { return nil }
+func (w *AssistantWorkFlowDelRequest) Check() error { return nil }
 
-type MCPAddRequest struct {
-	AssistantId string `json:"assistantId" form:"assistantId"`
-	MCPId       string `json:"mcpId" form:"mcpId"`
+type AssistantWorkFlowToolEnableRequest struct {
+	AssistantId string `json:"assistantId" validate:"required"`
+	WorkFlowId  string `json:"workFlowId" validate:"required"`
+	Enable      bool   `json:"enable"`
 }
 
-func (m *MCPAddRequest) Check() error { return nil }
+func (w *AssistantWorkFlowToolEnableRequest) Check() error { return nil }
 
-type MCPIdRequest struct {
-	MCPId string `json:"mcpId" form:"mcpId" validate:"required"`
+type AssistantMCPToolAddRequest struct {
+	AssistantId string `json:"assistantId" validate:"required"`
+	MCPId       string `json:"mcpId" validate:"required"`
 }
 
-func (w *MCPIdRequest) Check() error { return nil }
+func (m *AssistantMCPToolAddRequest) Check() error { return nil }
+
+type AssistantMCPToolDelRequest struct {
+	AssistantId string `json:"assistantId" validate:"required"`
+	MCPId       string `json:"mcpId" validate:"required"`
+}
+
+func (w *AssistantMCPToolDelRequest) Check() error { return nil }
+
+type AssistantMCPToolEnableRequest struct {
+	AssistantId string `json:"assistantId" validate:"required"`
+	MCPId       string `json:"mcpId" validate:"required"`
+	Enable      bool   `json:"enable"`
+}
+
+func (a *AssistantMCPToolEnableRequest) Check() error { return nil }
 
 type ActionAddRequest struct {
 	AssistantId string            `json:"assistantId"  validate:"required"`
@@ -168,3 +185,25 @@ type AssistantTemplateRequest struct {
 }
 
 func (a *AssistantTemplateRequest) Check() error { return nil }
+
+type AssistantCustomToolAddRequest struct {
+	AssistantId  string `json:"assistantId" validate:"required"`
+	CustomToolId string `json:"customToolId" validate:"required"`
+}
+
+func (c *AssistantCustomToolAddRequest) Check() error { return nil }
+
+type AssistantCustomToolDelRequest struct {
+	AssistantId  string `json:"assistantId" validate:"required"`
+	CustomToolId string `json:"customToolId" validate:"required"`
+}
+
+func (c *AssistantCustomToolDelRequest) Check() error { return nil }
+
+type AssistantCustomToolEnableRequest struct {
+	AssistantId  string `json:"assistantId" validate:"required"`
+	CustomToolId string `json:"customToolId" validate:"required"`
+	Enable       bool   `json:"enable"`
+}
+
+func (c *AssistantCustomToolEnableRequest) Check() error { return nil }

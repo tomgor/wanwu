@@ -40,6 +40,10 @@ export default {
         type: String,
         required: true
         },
+        type:{
+           type: String, 
+           default:''
+        }
     },
     data(){
         return{
@@ -48,7 +52,9 @@ export default {
         }
     },
     created(){
-        this.getTableData()
+        if(this.type !== 'webChat'){
+           this.getTableData()
+        }
     },
     methods:{
         showDialog(){

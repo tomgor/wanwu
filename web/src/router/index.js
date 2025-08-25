@@ -39,6 +39,10 @@ const constantRoutes = [
         component:resolve =>require(['@/components/filePreview/JsPreviewExcel'],resolve),
     },
     {
+        path: '/webChat/:id',
+        component:resolve =>require(['@/views/agent'],resolve),
+    },
+    {
         path: '/portal',
         name: 'portal',
         component:resolve =>require(['@/views/layout'],resolve),
@@ -163,7 +167,7 @@ const constantRoutes = [
                 meta:{perm: [PERMS.SAFRTY]},
             },
             {
-                path:'/agent/publishSet/:id',
+                path:'/agent/publishSet',
                 component:resolve =>require(['@/views/agent/web-URL'],resolve),
                 meta:{perm: [PERMS.AGENT]},
             },
