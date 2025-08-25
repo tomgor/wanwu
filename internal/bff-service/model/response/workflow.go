@@ -1,5 +1,12 @@
 package response
 
+import "github.com/UnicomAI/wanwu/internal/bff-service/config"
+
+type CozeWorkflowModelInfo struct {
+	ModelBrief
+	ModelParams []config.WorkflowModelParam `json:"model_params"`
+}
+
 type CozeWorkflowListResp struct {
 	Code int                   `json:"code"`
 	Msg  string                `json:"msg"`

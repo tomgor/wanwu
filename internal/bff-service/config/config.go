@@ -75,11 +75,37 @@ type ServiceConfig struct {
 }
 
 type WorkflowServiceConfig struct {
-	Endpoint  string `json:"endpoint" mapstructure:"endpoint"`
-	ListUri   string `json:"list_uri" mapstructure:"list_uri"`
-	CreateUri string `json:"create_uri" mapstructure:"create_uri"`
-	DeleteUri string `json:"delete_uri" mapstructure:"delete_uri"`
-	CopyUri   string `json:"copy_uri" mapstructure:"copy_uri"`
+	Endpoint    string               `json:"endpoint" mapstructure:"endpoint"`
+	ListUri     string               `json:"list_uri" mapstructure:"list_uri"`
+	CreateUri   string               `json:"create_uri" mapstructure:"create_uri"`
+	DeleteUri   string               `json:"delete_uri" mapstructure:"delete_uri"`
+	CopyUri     string               `json:"copy_uri" mapstructure:"copy_uri"`
+	ModelParams []WorkflowModelParam `json:"model_params" mapstructure:"model_params"`
+}
+
+type WorkflowModelParam struct {
+	Name      string `json:"name" mapstructure:"name"`
+	Desc      string `json:"desc" mapstructure:"desc"`
+	Label     string `json:"label" mapstructure:"label"`
+	Type      int    `json:"type" mapstructure:"type"`
+	Precision int    `json:"precision" mapstructure:"precision"`
+	Min       string `json:"min" mapstructure:"min"`
+	Max       string `json:"max" mapstructure:"max"`
+
+	ParamClass WorkflowModelParamClass      `json:"param_class" mapstructure:"param_class"`
+	DefaultVal WorkflowModelParamDefaultVal `json:"default_val" mapstructure:"default_val"`
+}
+
+type WorkflowModelParamClass struct {
+	ClassID int    `json:"class_id" mapstructure:"class_id"`
+	Label   string `json:"label" mapstructure:"label"`
+}
+
+type WorkflowModelParamDefaultVal struct {
+	Precise    string `json:"precise" mapstructure:"precise"`
+	Balance    string `json:"balance" mapstructure:"balance"`
+	Creative   string `json:"creative" mapstructure:"creative"`
+	DefaultVal string `json:"default_val" mapstructure:"default_val"`
 }
 
 type AgentScopeWorkFlowServiceConfig struct {

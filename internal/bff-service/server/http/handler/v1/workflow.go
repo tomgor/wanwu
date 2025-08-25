@@ -4,8 +4,24 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
 	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
+	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 	"github.com/gin-gonic/gin"
 )
+
+// ListLlmModelsByWorkflow
+//
+//	@Tags		workflow
+//	@Summary	llm模型列表（用于workflow）
+//	@Description
+//	@Security	JWT
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.CozeWorkflowModelInfo}}
+//	@Router		/appspace/workflow/model/select/llm [get]
+func ListLlmModelsByWorkflow(ctx *gin.Context) {
+	resp, err := service.ListLlmModelsByWorkflow(ctx, getUserID(ctx), getOrgID(ctx), mp.ModelTypeLLM)
+	gin_util.Response(ctx, resp, err)
+}
 
 // CreateWorkflow
 //

@@ -171,6 +171,76 @@ workflow:
   create_uri: /api/workflow_api/create
   delete_uri: /api/workflow_api/delete
   copy_uri: /api/workflow_api/copy
+  model_params:
+    - name: temperature
+      desc: "- **temperature**: 调高温度会使得模型的输出更多样性和创新性，反之，降低温度会使输出内容更加遵循指令要求但减少多样性。建议不要与“Top p”同时调整。"
+      label: "生成随机性"
+      type: 1
+      precision: 2
+      min: "0"
+      max: "2"
+      param_class:
+        class_id: 1
+        label: "生成多样性"
+      default_val:
+        precise: "0.3"
+        balance: "0.8"
+        creative: "1"
+        default_val: "1"
+    - name: top_p
+      desc: "- **Top p 为累计概率**: 模型在生成输出时会从概率最高的词汇开始选择，直到这些词汇的总概率累积达到Top p 值。这样可以限制模型只选择这些高概率的词汇，从而控制输出内容的多样性。建议不要与“生成随机性”同时调整。"
+      label: "Top P"
+      type: 1
+      precision: 2
+      min: "0"
+      max: "1"
+      param_class:
+        class_id: 1
+        label: "生成多样性"
+      default_val:
+        precise: "1"
+        balance: "1"
+        creative: "1"
+        default_val: "0.7"
+    - name: frequency_penalty
+      desc: "- **frequency penalty**: 当该值为正时，会阻止模型频繁使用相同的词汇和短语，从而增加输出内容的多样性。"
+      label: "重复语句惩罚"
+      type: 1
+      precision: 2
+      min: "-2"
+      max: "2"
+      param_class:
+        class_id: 1
+        label: "生成多样性"
+      default_val:
+        precise: "2"
+        balance: "0"
+        creative: "0"
+        default_val: "0"
+    - name: max_tokens
+      desc: "控制模型输出的Tokens 长度上限。通常 100 Tokens 约等于 150 个中文汉字。"
+      label: "最大回复长度"
+      type: 2
+      precision: 0
+      min: "0"
+      max: "16384"
+      param_class:
+        class_id: 2
+        label: "输入及输出设置"
+      default_val:
+        default_val: "4096"
+    - name: response_format
+      desc: "- **文本**: 使用普通文本格式回复\n- **Markdown**: 将引导模型使用Markdown格式输出回复\n- **JSON**: 将引导模型使用JSON格式输出"
+      label: "输出格式"
+      type: 2
+      precision: 0
+      min: ""
+      max: ""
+      param_class:
+        class_id: 2
+        label: "输入及输出设置"
+      default_val:
+        default_val: "0"
 
 agentscope-workflow:
   endpoint: http://agentscope-wanwu:6672

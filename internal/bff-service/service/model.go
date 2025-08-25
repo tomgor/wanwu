@@ -21,7 +21,7 @@ func ImportModel(ctx *gin.Context, userId, orgId string, req *request.ImportOrUp
 	if err = ValidateModel(ctx, clientReq); err != nil {
 		return grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("An error occurred during model import validation: Invalid model: %v, err : %v", clientReq.Model, err))
 	}
-	_, err = model.ImportModel(ctx, clientReq)
+	_, err = model.ImportModel(ctx.Request.Context(), clientReq)
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func UpdateModel(ctx *gin.Context, userId, orgId string, req *request.ImportOrUp
 }
 
 func DeleteModel(ctx *gin.Context, userId, orgId string, req *request.DeleteModelRequest) error {
-	_, err := model.DeleteModel(ctx, &model_service.DeleteModelReq{
+	_, err := model.DeleteModel(ctx.Request.Context(), &model_service.DeleteModelReq{
 		Provider:  req.Provider,
 		ModelType: req.ModelType,
 		Model:     req.Model,
@@ -61,7 +61,7 @@ func DeleteModel(ctx *gin.Context, userId, orgId string, req *request.DeleteMode
 }
 
 func GetModel(ctx *gin.Context, userId, orgId string, req *request.GetModelRequest) (*response.ModelInfo, error) {
-	resp, err := model.GetModel(ctx, &model_service.GetModelReq{
+	resp, err := model.GetModel(ctx.Request.Context(), &model_service.GetModelReq{
 		Provider:  req.Provider,
 		ModelType: req.ModelType,
 		Model:     req.Model,
@@ -75,7 +75,7 @@ func GetModel(ctx *gin.Context, userId, orgId string, req *request.GetModelReque
 }
 
 func ListModels(ctx *gin.Context, userId, orgId string, req *request.ListModelsRequest) (*response.ListResult, error) {
-	resp, err := model.ListModels(ctx, &model_service.ListModelsReq{
+	resp, err := model.ListModels(ctx.Request.Context(), &model_service.ListModelsReq{
 		Provider:    req.Provider,
 		ModelType:   req.ModelType,
 		DisplayName: req.DisplayName,
@@ -93,7 +93,7 @@ func ListModels(ctx *gin.Context, userId, orgId string, req *request.ListModelsR
 }
 
 func ChangeModelStatus(ctx *gin.Context, userId, orgId string, req *request.ModelStatusRequest) error {
-	_, err := model.ChangeModelStatus(ctx, &model_service.ModelStatusReq{
+	_, err := model.ChangeModelStatus(ctx.Request.Context(), &model_service.ModelStatusReq{
 		Provider:  req.Provider,
 		ModelType: req.ModelType,
 		IsActive:  req.IsActive,
@@ -108,7 +108,7 @@ func ChangeModelStatus(ctx *gin.Context, userId, orgId string, req *request.Mode
 }
 
 func GetModelById(ctx *gin.Context, req *request.GetModelByIdRequest) (*response.ModelInfo, error) {
-	resp, err := model.GetModelById(ctx, &model_service.GetModelByIdReq{
+	resp, err := model.GetModelById(ctx.Request.Context(), &model_service.GetModelByIdReq{
 		ModelId: req.ModelId,
 	})
 	if err != nil {
@@ -118,7 +118,7 @@ func GetModelById(ctx *gin.Context, req *request.GetModelByIdRequest) (*response
 }
 
 func ListTypeModels(ctx *gin.Context, userId, orgId string, req *request.ListTypeModelsRequest) (*response.ListResult, error) {
-	resp, err := model.ListTypeModels(ctx, &model_service.ListTypeModelsReq{
+	resp, err := model.ListTypeModels(ctx.Request.Context(), &model_service.ListTypeModelsReq{
 		ModelType: req.ModelType,
 		UserId:    userId,
 		OrgId:     orgId,

@@ -6,14 +6,38 @@ import (
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
+	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	"github.com/UnicomAI/wanwu/pkg/constant"
 	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
+	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
 )
+
+func ListLlmModelsByWorkflow(ctx *gin.Context, userId, orgId, modelT string) (*response.ListResult, error) {
+	modelResp, err := ListTypeModels(ctx, userId, orgId, &request.ListTypeModelsRequest{ModelType: mp.ModelTypeLLM})
+	if err != nil {
+		return nil, err
+	}
+	var rets []response.CozeWorkflowModelInfo
+	for _, modelBrief := range modelResp.List.([]*response.ModelBrief) {
+		rets = append(rets, toModelBriefByWorkflow(modelBrief))
+	}
+	return &response.ListResult{
+		List:  rets,
+		Total: modelResp.Total,
+	}, nil
+}
+
+func toModelBriefByWorkflow(modelBrief *response.ModelBrief) response.CozeWorkflowModelInfo {
+	return response.CozeWorkflowModelInfo{
+		ModelBrief:  *modelBrief,
+		ModelParams: config.Cfg().Workflow.ModelParams,
+	}
+}
 
 // ListWorkflow userID/orgID数据隔离，用于【工作流】
 func ListWorkflow(ctx *gin.Context, orgID, name string) (*response.CozeWorkflowListData, error) {

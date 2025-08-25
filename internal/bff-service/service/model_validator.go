@@ -2,7 +2,6 @@ package service
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -89,7 +88,7 @@ func ValidateLLMModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) erro
 		if err != nil {
 			return err
 		}
-		resp, _, err := iLLM.ChatCompletions(context.Background(), llmReq)
+		resp, _, err := iLLM.ChatCompletions(ctx.Request.Context(), llmReq)
 		if err != nil {
 			return err
 		}
