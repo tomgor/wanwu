@@ -31,7 +31,7 @@
           @click.stop="handleClick(item.customToolId)"
         >
           <div class="card-title">
-            <img class="card-logo" src="@/assets/imgs/toolImg.svg" />
+            <img class="card-logo" src="@/assets/imgs/toolImg.png" />
             <div class="mcp_detailBox">
               <span class="mcp_name">{{ item.name }}</span>
             </div>

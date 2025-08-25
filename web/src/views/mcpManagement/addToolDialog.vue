@@ -236,7 +236,7 @@ export default {
       })
       getSchema(params)
           .then((res) => {
-            this.apiList = res.data.apiList || []
+            this.apiList = res.data.list || []
           })
     },
     preAuthorize() {
@@ -246,6 +246,11 @@ export default {
       this.$refs.form.validate(async (valid) => {
         if (!valid) return;
         this.loading = true
+        if(this.form.apiAuth.type === 'None'){
+          this.form.apiAuth.authType = '';
+          this.form.apiAuth.apiKey = '';
+          this.form.apiAuth.customHeaderName = ''
+        }
         const params = {
           ...this.form
         }

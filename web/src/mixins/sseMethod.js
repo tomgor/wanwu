@@ -287,7 +287,8 @@ export default {
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
-                                        // console.log('===>',new Date().getTime(), endStr)
+                                        endStr = convertLatexSyntax(endStr)
+                                        endStr = parseSub(endStr)
                                         let fillData = {
                                             ...commonData,
                                             "response": md.render(endStr),
@@ -469,6 +470,8 @@ export default {
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
+                                        // endStr = convertLatexSyntax(endStr)
+                                        // endStr = parseSub(endStr)
                                         const finalResponse = String(endStr)
                                         let fillData = {
                                             ...commonData,
