@@ -1,5 +1,44 @@
 basePath: /v1
 definitions:
+  config.WorkflowModelParam:
+    properties:
+      default_val:
+        $ref: '#/definitions/config.WorkflowModelParamDefaultVal'
+      desc:
+        type: string
+      label:
+        type: string
+      max:
+        type: string
+      min:
+        type: string
+      name:
+        type: string
+      param_class:
+        $ref: '#/definitions/config.WorkflowModelParamClass'
+      precision:
+        type: integer
+      type:
+        type: integer
+    type: object
+  config.WorkflowModelParamClass:
+    properties:
+      class_id:
+        type: integer
+      label:
+        type: string
+    type: object
+  config.WorkflowModelParamDefaultVal:
+    properties:
+      balance:
+        type: string
+      creative:
+        type: string
+      default_val:
+        type: string
+      precise:
+        type: string
+    type: object
   mp.AppModelParams:
     properties:
       providerOpenAICompatible:
@@ -2432,6 +2471,55 @@ definitions:
       workflow_id:
         type: string
     type: object
+  response.CozeWorkflowModelInfo:
+    properties:
+      avatar:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 模型图标路径
+      createdAt:
+        type: string
+      displayName:
+        description: 模型显示名称
+        type: string
+      isActive:
+        description: '启用状态（true: 启用，false: 禁用）'
+        type: boolean
+      model:
+        description: 模型名称
+        type: string
+      model_params:
+        items:
+          $ref: '#/definitions/config.WorkflowModelParam'
+        type: array
+      modelId:
+        type: string
+      modelType:
+        enum:
+        - llm
+        - embedding
+        - rerank
+        type: string
+      orgId:
+        type: string
+      provider:
+        description: 模型供应商
+        enum:
+        - OpenAI-API-compatible
+        - YuanJing
+        type: string
+      publishDate:
+        description: 模型发布时间
+        type: string
+      updatedAt:
+        type: string
+      userId:
+        type: string
+    required:
+    - model
+    - modelType
+    - provider
+    type: object
   response.CreateKnowledgeResp:
     properties:
       knowledgeId:
@@ -4205,6 +4293,32 @@ paths:
       security:
       - JWT: []
       summary: 拷贝Workflow
+      tags:
+      - workflow
+  /appspace/workflow/model/select/llm:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        $ref: '#/definitions/response.CozeWorkflowModelInfo'
+                    type: object
+              type: object
+      security:
+      - JWT: []
+      summary: llm模型列表（用于workflow）
       tags:
       - workflow
   /assistant:

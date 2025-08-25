@@ -913,6 +913,57 @@
                 }
             }
         },
+        "/appspace/workflow/model/select/llm": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workflow"
+                ],
+                "summary": "llm模型列表（用于workflow）",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "$ref": "#/definitions/response.CozeWorkflowModelInfo"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/assistant": {
             "get": {
                 "security": [
@@ -7237,6 +7288,66 @@
         }
     },
     "definitions": {
+        "config.WorkflowModelParam": {
+            "type": "object",
+            "properties": {
+                "default_val": {
+                    "$ref": "#/definitions/config.WorkflowModelParamDefaultVal"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "max": {
+                    "type": "string"
+                },
+                "min": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "param_class": {
+                    "$ref": "#/definitions/config.WorkflowModelParamClass"
+                },
+                "precision": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "config.WorkflowModelParamClass": {
+            "type": "object",
+            "properties": {
+                "class_id": {
+                    "type": "integer"
+                },
+                "label": {
+                    "type": "string"
+                }
+            }
+        },
+        "config.WorkflowModelParamDefaultVal": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "string"
+                },
+                "creative": {
+                    "type": "string"
+                },
+                "default_val": {
+                    "type": "string"
+                },
+                "precise": {
+                    "type": "string"
+                }
+            }
+        },
         "mp.AppModelParams": {
             "type": "object",
             "properties": {
@@ -10806,6 +10917,77 @@
             "type": "object",
             "properties": {
                 "workflow_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.CozeWorkflowModelInfo": {
+            "type": "object",
+            "required": [
+                "model",
+                "modelType",
+                "provider"
+            ],
+            "properties": {
+                "avatar": {
+                    "description": "模型图标路径",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/request.Avatar"
+                        }
+                    ]
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "displayName": {
+                    "description": "模型显示名称",
+                    "type": "string"
+                },
+                "isActive": {
+                    "description": "启用状态（true: 启用，false: 禁用）",
+                    "type": "boolean"
+                },
+                "model": {
+                    "description": "模型名称",
+                    "type": "string"
+                },
+                "modelId": {
+                    "type": "string"
+                },
+                "modelType": {
+                    "type": "string",
+                    "enum": [
+                        "llm",
+                        "embedding",
+                        "rerank"
+                    ]
+                },
+                "model_params": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/config.WorkflowModelParam"
+                    }
+                },
+                "orgId": {
+                    "type": "string"
+                },
+                "provider": {
+                    "description": "模型供应商",
+                    "type": "string",
+                    "enum": [
+                        "OpenAI-API-compatible",
+                        "YuanJing"
+                    ]
+                },
+                "publishDate": {
+                    "description": "模型发布时间",
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userId": {
                     "type": "string"
                 }
             }
