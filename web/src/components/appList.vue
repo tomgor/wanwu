@@ -267,10 +267,10 @@ export default {
     },
     async workflowCopy(row) {
       const params = {
-        workflowID: row.appId,
+        workflow_id: row.appId,
       }
 
-      const isExample = row.appId === 'example'
+      const isExample = false // row.appId === 'example' 新版工作流无模板copy接口，暂定统一走工作流copy接口
       const exampleParams = {
         configName: row.name + '_' + this.$t('common.copy.copyText'),
         configENName: "",
