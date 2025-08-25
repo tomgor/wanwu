@@ -110,6 +110,12 @@ func (c *Client) DeleteApp(ctx context.Context, appId, appType string) *errs.Sta
 		if err := deleteAppRelatedDataByUnPublish(tx, appId, appType); err != nil {
 			return err
 		}
+		if err := sqlopt.SQLOptions(
+			sqlopt.WithAppID(appId),
+			sqlopt.WithAppType(appType),
+		).Apply(tx).Delete(&model.AppUrl{}).Error; err != nil {
+			return fmt.Errorf("failed to delete app open url: %v", err)
+		}
 		return nil
 	})
 	if err != nil {
