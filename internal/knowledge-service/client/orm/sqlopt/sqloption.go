@@ -103,10 +103,10 @@ func WithUserID(userID string) SQLOption {
 func WithPermit(orgID, userID string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		if len(orgID) > 0 {
-			return db.Where("org_id = ?", orgID)
+			db = db.Where("org_id = ?", orgID)
 		}
 		if len(userID) > 0 {
-			return db.Where("user_id = ?", userID)
+			db = db.Where("user_id = ?", userID)
 		}
 		return db
 	})
