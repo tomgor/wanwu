@@ -19,7 +19,7 @@ func (cfg *LLM) NewReq(req *mp_common.LLMReq) (mp_common.ILLMReq, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Qwen3 开源模型仅在非思考模式下支持非流式输出方式
+	// Qwen3 开源模型仅在非思考模式下支持非流式输出方式, 不支持qwq系列模型
 	if !*req.Stream && strings.HasPrefix(req.Model, "qwen3") {
 		m["enable_thinking"] = false
 	}
