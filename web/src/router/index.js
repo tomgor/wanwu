@@ -118,7 +118,7 @@ const constantRoutes = [
             },
             {
                 path: '/workflow',
-                component:resolve =>require(['@/views/workflow'],resolve),
+                component:resolve =>require(['@/views/workflowNew'],resolve),
                 meta:{perm: [PERMS.WORKFLOW]},
             },
             {
