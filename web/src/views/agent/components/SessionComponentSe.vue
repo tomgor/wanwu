@@ -87,15 +87,13 @@
             <el-image v-for="(g,k) in n.gen_file_url_list" :key="k" :src='g' :preview-src-list="[g]"></el-image>
           </div>
           <!--出处-->
-          <!-- && sessionStatus !== 0 -->
-          <div v-if="n.searchList && n.searchList.length" class="search-list">
+          <div v-if="n.searchList && n.searchList.length && sessionStatus !== 0" class="search-list">
             <div v-for="(m,j) in n.searchList" :key="`${j}sdsl`" class="search-list-item">
-              <!-- v-if="citationsArray.includes(j+1)" -->
-              <div class="serach-list-item">
+              <div class="serach-list-item" v-if="citationsArray.includes(j+1)">
                 <span @click="collapseClick(n,m,j)"><i :class="['',m.collapse?'el-icon-caret-bottom':'el-icon-caret-right']"></i>出处：</span>
                 <a v-if="m.link" :href="m.link" target="_blank">{{m.link}}</a>
-                <span v-if="m.title" v-html="m.title">
-                  <!-- <sub class="subTag" :data-parents-index="i" :data-collapse="m.collapse?'true':'false'">{{j + 1}}</sub> {{m.title}} -->
+                <span v-if="m.title">
+                  <sub class="subTag" :data-parents-index="i" :data-collapse="m.collapse?'true':'false'">{{j + 1}}</sub> {{m.title}}
                 </span>
                 <!-- <span @click="goPreview($event,m)" class="search-doc">查看全文</span> -->
               </div>
