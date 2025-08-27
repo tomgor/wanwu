@@ -9,7 +9,7 @@ import (
 )
 
 func (c *Client) CreateAssistantCustom(ctx context.Context, assistantId uint32, customId string, userId, orgID string) *err_code.Status {
-	if err := c.db.Create(&model.AssistantCustom{
+	if err := c.db.WithContext(ctx).Create(&model.AssistantCustom{
 		AssistantId: assistantId,
 		CustomId:    customId,
 		Enable:      true, // 默认打开
@@ -25,7 +25,7 @@ func (c *Client) DeleteAssistantCustom(ctx context.Context, assistantId uint32, 
 	if err := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(assistantId),
 		sqlopt.WithCustomID(customId),
-	).Apply(c.db).Delete(&model.AssistantCustom{}).Error; err != nil {
+	).Apply(c.db.WithContext(ctx)).Delete(&model.AssistantCustom{}).Error; err != nil {
 		return toErrStatus("assistant_custom_delete", err.Error())
 	}
 	return nil
@@ -36,7 +36,7 @@ func (c *Client) GetAssistantCustom(ctx context.Context, assistantId uint32, cus
 	if err := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(assistantId),
 		sqlopt.WithCustomID(customId),
-	).Apply(c.db).First(custom).Error; err != nil {
+	).Apply(c.db.WithContext(ctx)).First(custom).Error; err != nil {
 		return nil, toErrStatus("assistant_custom_get", err.Error())
 	}
 	return custom, nil
@@ -46,7 +46,7 @@ func (c *Client) UpdateAssistantCustom(ctx context.Context, custom *model.Assist
 	if err := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(custom.AssistantId),
 		sqlopt.WithCustomID(custom.CustomId),
-	).Apply(c.db).
+	).Apply(c.db.WithContext(ctx)).
 		Model(&model.AssistantCustom{}).
 		Updates(map[string]interface{}{
 			"enable": custom.Enable,
@@ -59,7 +59,7 @@ func (c *Client) UpdateAssistantCustom(ctx context.Context, custom *model.Assist
 
 func (c *Client) GetAssistantCustomList(ctx context.Context, assistantId uint32) ([]*model.AssistantCustom, *err_code.Status) {
 	var customList []*model.AssistantCustom
-	if err := sqlopt.WithAssistantID(assistantId).Apply(c.db).Find(&customList).Error; err != nil {
+	if err := sqlopt.WithAssistantID(assistantId).Apply(c.db.WithContext(ctx)).Find(&customList).Error; err != nil {
 		return nil, toErrStatus("assistant_custom_list", err.Error())
 	}
 	return customList, nil
