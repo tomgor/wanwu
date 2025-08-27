@@ -9,13 +9,26 @@ import (
 )
 
 func (c *Client) CreateAssistantMCP(ctx context.Context, assistantId uint32, mcpId string, userId, orgID string) *err_code.Status {
-	if err := c.db.WithContext(ctx).Create(&model.AssistantMCP{
+	// 检查是否已存在
+	var count int64
+	if err := sqlopt.SQLOptions(
+		sqlopt.WithAssistantID(assistantId),
+		sqlopt.WithMCPID(mcpId),
+	).Apply(c.db.WithContext(ctx)).Model(&model.AssistantMCP{}).
+		Count(&count).Error; err != nil {
+		return toErrStatus("assistant_mcp_create", err.Error())
+	}
+	if count > 0 {
+		return toErrStatus("assistant_mcp_create", "mcp already exists")
+	}
+	err := c.db.WithContext(ctx).Create(&model.AssistantMCP{
 		AssistantId: assistantId,
 		MCPId:       mcpId,
 		Enable:      true, // 默认开
 		UserId:      userId,
 		OrgId:       orgID,
-	}).Error; err != nil {
+	}).Error
+	if err != nil {
 		return toErrStatus("assistant_mcp_create", err.Error())
 	}
 	return nil
@@ -51,13 +64,17 @@ func (c *Client) GetAssistantMCPList(ctx context.Context, assistantId uint32) ([
 }
 
 func (c *Client) UpdateAssistantMCP(ctx context.Context, mcp *model.AssistantMCP) *err_code.Status {
-	if err := sqlopt.SQLOptions(
+	result := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(mcp.AssistantId),
 		sqlopt.WithMCPID(mcp.MCPId),
 	).Apply(c.db.WithContext(ctx)).Model(&model.AssistantMCP{}).Updates(map[string]interface{}{
 		"enable": mcp.Enable,
-	}).Error; err != nil {
-		return toErrStatus("assistant_mcp_update", err.Error())
+	})
+	if result.Error != nil {
+		return toErrStatus("assistant_mcp_update", result.Error.Error())
+	}
+	if result.RowsAffected == 0 {
+		return toErrStatus("assistant_mcp_update", "mcp not exists")
 	}
 	return nil
 }

@@ -9,23 +9,39 @@ import (
 )
 
 func (c *Client) CreateAssistantWorkflow(ctx context.Context, workflow *model.AssistantWorkflow) *err_code.Status {
-	// 创建Workflow
-	if err := c.db.WithContext(ctx).Create(workflow).Error; err != nil {
+	// 检查是否已存在
+	var count int64
+	if err := sqlopt.SQLOptions(
+		sqlopt.WithAssistantID(workflow.AssistantId),
+		sqlopt.WithWorkflowID(workflow.WorkflowId),
+	).Apply(c.db.WithContext(ctx)).Model(&model.AssistantWorkflow{}).
+		Count(&count).Error; err != nil {
 		return toErrStatus("assistant_workflow_create", err.Error())
 	}
+	if count > 0 {
+		return toErrStatus("assistant_workflow_create", "workflow already exists")
+	}
 
+	// 创建Workflow
+	err := c.db.WithContext(ctx).Create(workflow).Error
+	if err != nil {
+		return toErrStatus("assistant_workflow_create", err.Error())
+	}
 	return nil
 }
 
 func (c *Client) UpdateAssistantWorkflow(ctx context.Context, workflow *model.AssistantWorkflow) *err_code.Status {
-	cond := sqlopt.SQLOptions(
+	result := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(workflow.AssistantId),
 		sqlopt.WithWorkflowID(workflow.WorkflowId),
-	).Apply(c.db.WithContext(ctx))
-	if err := cond.Model(workflow).Updates(map[string]interface{}{
+	).Apply(c.db.WithContext(ctx)).Model(&model.AssistantWorkflow{}).Updates(map[string]interface{}{
 		"enable": workflow.Enable,
-	}).Error; err != nil {
-		return toErrStatus("assistant_workflow_update", err.Error())
+	})
+	if result.Error != nil {
+		return toErrStatus("assistant_workflow_update", result.Error.Error())
+	}
+	if result.RowsAffected == 0 {
+		return toErrStatus("assistant_workflow_update", "workflow not exists")
 	}
 	return nil
 }
