@@ -113,6 +113,7 @@ message KnowledgeInfo {
   string description = 4;
   EmbeddingModelInfo embeddingModelInfo = 5;
   repeated KnowledgeTagInfo knowledgeTagInfoList = 6;
+  string createdAt = 7;
 }
 
 message KnowledgeTagInfo {

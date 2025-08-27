@@ -25,6 +25,7 @@ type KnowledgeInfo struct {
 	DocCount           int                 `json:"docCount"`           //文档数量
 	EmbeddingModelInfo *EmbeddingModelInfo `json:"embeddingModelInfo"` //embedding模型信息
 	KnowledgeTagList   []*KnowledgeTag     `json:"knowledgeTagList"`   //知识库标签列表
+	CreateAt           string              `json:"createAt"`           //创建时间
 }
 
 type ChunkSearchList struct {

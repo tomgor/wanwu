@@ -12,6 +12,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/util"
 	rag_service "github.com/UnicomAI/wanwu/internal/knowledge-service/service"
 	"github.com/UnicomAI/wanwu/pkg/log"
+	pkg_util "github.com/UnicomAI/wanwu/pkg/util"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
@@ -19,9 +20,7 @@ import (
 )
 
 const (
-	HitTopK                   = 3
-	HitThreshold      float64 = 0.4
-	DefaultTermWeight         = 1
+	DefaultTermWeight = 1
 )
 
 func (s *Service) SelectKnowledgeList(ctx context.Context, req *knowledgebase_service.KnowledgeSelectReq) (*knowledgebase_service.KnowledgeSelectListResp, error) {
@@ -231,6 +230,7 @@ func buildKnowledgeInfo(knowledge *model.KnowledgeBase) *knowledgebase_service.K
 		Description:        knowledge.Description,
 		DocCount:           int32(knowledge.DocCount),
 		EmbeddingModelInfo: embeddingModelInfo,
+		CreatedAt:          pkg_util.Time2Str(knowledge.CreatedAt),
 	}
 }
 
