@@ -56,6 +56,8 @@ message KnowledgeMatchParams{
   float keywordPriority = 5;// 关键词权重
   int32 topK = 6;//topK 获取最高的几行
   float score = 7;//score 过滤分数阈值
+  float termWeight = 8; // 关键词系数
+  bool termWeightEnable = 9; // 关键词系数开关
 }
 
 message CreateKnowledgeReq{

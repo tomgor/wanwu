@@ -34,6 +34,10 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+const (
+	DefaultTermWeight = 1
+)
+
 // ConversationCreate 创建对话
 func (s *Service) ConversationCreate(ctx context.Context, req *assistant_service.ConversationCreateReq) (*assistant_service.ConversationCreateResp, error) {
 	// 组装model参数
@@ -497,6 +501,7 @@ func (s *Service) setKnowledgebaseParams(ctx context.Context, sseReq *config.Age
 			Threshold:      knowledgebaseConfig.Threshold,
 			TopK:           int(knowledgebaseConfig.TopK),
 			RewriteQuery:   true,
+			TermWeight:     buildTermWeight(knowledgebaseConfig),
 		}
 		sseReq.UseKnow = true
 		if modelConfig != nil {
@@ -676,6 +681,15 @@ func buildRerankMod(priorityType int32) string {
 	return "rerank_model"
 }
 
+// buildTermWeight 构造关键词系数
+func buildTermWeight(knowConfig *RAGKnowledgeBaseConfig) float32 {
+	if knowConfig.TermWeightEnable {
+		return knowConfig.TermWeight
+	} else {
+		return DefaultTermWeight
+	}
+}
+
 // buildWeight 构造权重信息
 func buildWeight(knowConfig *RAGKnowledgeBaseConfig) []float64 {
 	if knowConfig.PriorityMatch != 1 {
@@ -715,6 +729,8 @@ type RAGKnowledgeBaseConfig struct {
 	KeywordPriority   float32  `json:"keywordPriority"`   // 关键词权重
 	PriorityMatch     int32    `json:"priorityMatch"`     // 权重匹配，仅混合检索模式下有效，1 表示启用
 	SemanticsPriority float32  `json:"semanticsPriority"` // 语义权重
+	TermWeight        float32  `json:"termWeight"`        // 关键词系数, 默认为1
+	TermWeightEnable  bool     `json:"termWeightEnable"`  // 关键词系数开关
 }
 
 type AppOnlineSearchConfig struct {

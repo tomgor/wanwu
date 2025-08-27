@@ -104,6 +104,20 @@ type RagDocSegmentLabelsParams struct {
 	Labels        []string `json:"labels"`        // 需要为该chunk关联的标签列表
 }
 
+type RagCreateDocSegmentParams struct {
+	UserId          string       `json:"userId"`            // 发起请求的用户ID
+	KnowledgeBase   string       `json:"knowledgeBase"`     // 知识库的名称
+	KnowledgeId     string       `json:"kb_id"`             // 知识库的唯一ID
+	FileName        string       `json:"fileName"`          // 与chunk关联的文件名
+	MaxSentenceSize int          `json:"max_sentence_size"` // 最大分段长度限制
+	Chunks          []*ChunkItem `json:"chunks"`            // 分段数据列表
+}
+
+type ChunkItem struct {
+	Content string   `json:"content"`
+	Labels  []string `json:"labels"`
+}
+
 type RagGetDocSegmentResp struct {
 	RagCommonResp
 	Data *ContentListResp `json:"data"`
@@ -422,6 +436,35 @@ func RagDocSegmentLabels(ctx context.Context, ragDocSegLabelsParams *RagDocSegme
 		return err
 	}
 	var resp RagCommonResp
+	if err := json.Unmarshal(result, &resp); err != nil {
+		log.Errorf(err.Error())
+		return err
+	}
+	if resp.Code != successCode {
+		return errors.New(resp.Message)
+	}
+	return nil
+}
+
+// RagCreateDocSegment 更新文档切片标签
+func RagCreateDocSegment(ctx context.Context, ragCreateDocSegmentParams *RagCreateDocSegmentParams) error {
+	ragServer := config.GetConfig().RagServer
+	url := ragServer.Endpoint + ragServer.DocSegmentCreateUri
+	paramsByte, err := json.Marshal(ragCreateDocSegmentParams)
+	if err != nil {
+		return err
+	}
+	result, err := http.GetClient().PostJson(ctx, &http_client.HttpRequestParams{
+		Url:        url,
+		Body:       paramsByte,
+		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
+		MonitorKey: "rag_doc_segment_create",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return err
+	}
+	var resp RagDocSegmentCreateResp
 	if err := json.Unmarshal(result, &resp); err != nil {
 		log.Errorf(err.Error())
 		return err

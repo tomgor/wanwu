@@ -31,6 +31,7 @@ const (
 	KnowledgeBaseDocService_UpdateDocSegmentStatus_FullMethodName  = "/knowledgebase_doc_service.KnowledgeBaseDocService/UpdateDocSegmentStatus"
 	KnowledgeBaseDocService_AnalysisDocUrl_FullMethodName          = "/knowledgebase_doc_service.KnowledgeBaseDocService/AnalysisDocUrl"
 	KnowledgeBaseDocService_UpdateDocSegmentLabels_FullMethodName  = "/knowledgebase_doc_service.KnowledgeBaseDocService/UpdateDocSegmentLabels"
+	KnowledgeBaseDocService_CreateDocSegment_FullMethodName        = "/knowledgebase_doc_service.KnowledgeBaseDocService/CreateDocSegment"
 )
 
 // KnowledgeBaseDocServiceClient is the client API for KnowledgeBaseDocService service.
@@ -59,6 +60,8 @@ type KnowledgeBaseDocServiceClient interface {
 	AnalysisDocUrl(ctx context.Context, in *AnalysisUrlDocReq, opts ...grpc.CallOption) (*AnalysisUrlDocResp, error)
 	// 更新文档元数据标签
 	UpdateDocSegmentLabels(ctx context.Context, in *DocSegmentLabelsReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 新增文档分片
+	CreateDocSegment(ctx context.Context, in *CreateDocSegmentReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type knowledgeBaseDocServiceClient struct {
@@ -179,6 +182,16 @@ func (c *knowledgeBaseDocServiceClient) UpdateDocSegmentLabels(ctx context.Conte
 	return out, nil
 }
 
+func (c *knowledgeBaseDocServiceClient) CreateDocSegment(ctx context.Context, in *CreateDocSegmentReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, KnowledgeBaseDocService_CreateDocSegment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KnowledgeBaseDocServiceServer is the server API for KnowledgeBaseDocService service.
 // All implementations must embed UnimplementedKnowledgeBaseDocServiceServer
 // for forward compatibility.
@@ -205,6 +218,8 @@ type KnowledgeBaseDocServiceServer interface {
 	AnalysisDocUrl(context.Context, *AnalysisUrlDocReq) (*AnalysisUrlDocResp, error)
 	// 更新文档元数据标签
 	UpdateDocSegmentLabels(context.Context, *DocSegmentLabelsReq) (*emptypb.Empty, error)
+	// 新增文档分片
+	CreateDocSegment(context.Context, *CreateDocSegmentReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedKnowledgeBaseDocServiceServer()
 }
 
@@ -247,6 +262,9 @@ func (UnimplementedKnowledgeBaseDocServiceServer) AnalysisDocUrl(context.Context
 }
 func (UnimplementedKnowledgeBaseDocServiceServer) UpdateDocSegmentLabels(context.Context, *DocSegmentLabelsReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateDocSegmentLabels not implemented")
+}
+func (UnimplementedKnowledgeBaseDocServiceServer) CreateDocSegment(context.Context, *CreateDocSegmentReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDocSegment not implemented")
 }
 func (UnimplementedKnowledgeBaseDocServiceServer) mustEmbedUnimplementedKnowledgeBaseDocServiceServer() {
 }
@@ -468,6 +486,24 @@ func _KnowledgeBaseDocService_UpdateDocSegmentLabels_Handler(srv interface{}, ct
 	return interceptor(ctx, in, info, handler)
 }
 
+func _KnowledgeBaseDocService_CreateDocSegment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDocSegmentReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KnowledgeBaseDocServiceServer).CreateDocSegment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KnowledgeBaseDocService_CreateDocSegment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KnowledgeBaseDocServiceServer).CreateDocSegment(ctx, req.(*CreateDocSegmentReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // KnowledgeBaseDocService_ServiceDesc is the grpc.ServiceDesc for KnowledgeBaseDocService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -518,6 +554,10 @@ var KnowledgeBaseDocService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateDocSegmentLabels",
 			Handler:    _KnowledgeBaseDocService_UpdateDocSegmentLabels_Handler,
+		},
+		{
+			MethodName: "CreateDocSegment",
+			Handler:    _KnowledgeBaseDocService_CreateDocSegment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

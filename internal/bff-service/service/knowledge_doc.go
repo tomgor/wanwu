@@ -347,3 +347,14 @@ func UpdateDocSegmentLabels(ctx *gin.Context, userId, orgId string, r *request.D
 	})
 	return err
 }
+
+func CreateDocSegment(ctx *gin.Context, userId, orgId string, r *request.CreateDocSegmentReq) error {
+	_, err := knowledgeBaseDoc.CreateDocSegment(ctx.Request.Context(), &knowledgebase_doc_service.CreateDocSegmentReq{
+		UserId:  userId,
+		OrgId:   orgId,
+		DocId:   r.DocId,
+		Content: r.Content,
+		Labels:  r.Labels,
+	})
+	return err
+}

@@ -29,6 +29,8 @@ service KnowledgeBaseDocService {
   rpc AnalysisDocUrl(AnalysisUrlDocReq) returns (AnalysisUrlDocResp) {}
   // 更新文档元数据标签
   rpc UpdateDocSegmentLabels(DocSegmentLabelsReq) returns (google.protobuf.Empty) {}
+  // 新增文档分片
+  rpc CreateDocSegment(CreateDocSegmentReq) returns (google.protobuf.Empty) {}
 }
 
 
@@ -204,4 +206,12 @@ message DocSegmentLabelsReq{
   string docId = 3;
   repeated string labels = 4;
   string userId = 5;
+}
+
+message CreateDocSegmentReq{
+  string userId = 1;
+  string orgId = 2;
+  string docId = 3;
+  string content = 4;
+  repeated string labels = 5;
 }

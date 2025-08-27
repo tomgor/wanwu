@@ -19,8 +19,9 @@ import (
 )
 
 const (
-	HitTopK              = 3
-	HitThreshold float64 = 0.4
+	HitTopK                   = 3
+	HitThreshold      float64 = 0.4
+	DefaultTermWeight         = 1
 )
 
 func (s *Service) SelectKnowledgeList(ctx context.Context, req *knowledgebase_service.KnowledgeSelectReq) (*knowledgebase_service.KnowledgeSelectListResp, error) {
@@ -154,6 +155,7 @@ func (s *Service) KnowledgeHit(ctx context.Context, req *knowledgebase_service.K
 		RetrieveMethod: buildRetrieveMethod(matchParams.MatchType),
 		RerankMod:      buildRerankMod(priorityMatch),
 		Weight:         buildWeight(priorityMatch, matchParams.SemanticsPriority, matchParams.KeywordPriority),
+		TermWeight:     buildTermWeight(matchParams.TermWeight, matchParams.TermWeightEnable),
 	})
 	if err != nil {
 		log.Errorf("RagKnowledgeHit error %s", err)
@@ -333,5 +335,14 @@ func buildWeight(priorityType int32, semanticsPriority float32, keywordPriority 
 	return &rag_service.WeightParams{
 		VectorWeight: semanticsPriority,
 		TextWeight:   keywordPriority,
+	}
+}
+
+// buildTermWeight 构造关键词系数信息
+func buildTermWeight(termWeight float32, termWeightEnable bool) float32 {
+	if termWeightEnable {
+		return termWeight
+	} else {
+		return DefaultTermWeight
 	}
 }

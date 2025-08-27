@@ -80,6 +80,8 @@ func ragKBConfigToProto(knowledgeConfig request.AppKnowledgebaseConfig) *rag_ser
 		PriorityMatch:     configParams.PriorityMatch,
 		SemanticsPriority: configParams.SemanticsPriority,
 		KeywordPriority:   configParams.KeywordPriority,
+		TermWeight:        configParams.TermWeight,
+		TermWeightEnable:  configParams.TermWeightEnable,
 	}
 	return knowledgeBaseConfig
 }

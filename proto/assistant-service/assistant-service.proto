@@ -113,6 +113,8 @@ message AssistantKnowledgeBaseConfig {
   float keywordPriority = 6;// 关键词权重
   int32 priorityMatch = 7;// 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
   float semanticsPriority = 8;// 语义权重
+  float termWeight = 9; // 关键词系数
+  bool termWeightEnable = 10; // 关键词系数开关
 }
 
 message AssistantOnlineSearchConfig {

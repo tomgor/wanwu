@@ -155,6 +155,8 @@ func (s *Service) UpdateRagConfig(ctx context.Context, in *rag_service.UpdateRag
 			PriorityMatch:     in.KnowledgeBaseConfig.PriorityMatch,
 			SemanticsPriority: float64(in.KnowledgeBaseConfig.SemanticsPriority),
 			KeywordPriority:   float64(in.KnowledgeBaseConfig.KeywordPriority),
+			TermWeight:        float64(in.KnowledgeBaseConfig.TermWeight),
+			TermWeightEnable:  in.KnowledgeBaseConfig.TermWeightEnable,
 		},
 		SensitiveConfig: model.SensitiveConfig{
 			Enable:   in.SensitiveConfig.Enable,
