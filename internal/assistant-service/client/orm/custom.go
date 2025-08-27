@@ -9,13 +9,28 @@ import (
 )
 
 func (c *Client) CreateAssistantCustom(ctx context.Context, assistantId uint32, customId string, userId, orgID string) *err_code.Status {
-	if err := c.db.WithContext(ctx).Create(&model.AssistantCustom{
+	// 检查是否已存在
+	var count int64
+	if err := sqlopt.SQLOptions(
+		sqlopt.WithAssistantID(assistantId),
+		sqlopt.WithCustomID(customId),
+	).Apply(c.db.WithContext(ctx)).Model(&model.AssistantCustom{}).
+		Count(&count).Error; err != nil {
+		return toErrStatus("assistant_custom_create", err.Error())
+	}
+	if count > 0 {
+		return toErrStatus("assistant_custom_create", "custom already exists")
+	}
+
+	err := c.db.WithContext(ctx).Create(&model.AssistantCustom{
 		AssistantId: assistantId,
 		CustomId:    customId,
 		Enable:      true, // 默认打开
 		UserId:      userId,
 		OrgId:       orgID,
-	}).Error; err != nil {
+	}).Error
+
+	if err != nil {
 		return toErrStatus("assistant_custom_create", err.Error())
 	}
 	return nil
@@ -43,17 +58,22 @@ func (c *Client) GetAssistantCustom(ctx context.Context, assistantId uint32, cus
 }
 
 func (c *Client) UpdateAssistantCustom(ctx context.Context, custom *model.AssistantCustom) *err_code.Status {
-	if err := sqlopt.SQLOptions(
+	// 更新
+	result := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(custom.AssistantId),
 		sqlopt.WithCustomID(custom.CustomId),
 	).Apply(c.db.WithContext(ctx)).
 		Model(&model.AssistantCustom{}).
 		Updates(map[string]interface{}{
 			"enable": custom.Enable,
-		}).
-		Error; err != nil {
-		return toErrStatus("assistant_custom_update", err.Error())
+		})
+	if result.Error != nil {
+		return toErrStatus("assistant_custom_update", result.Error.Error())
 	}
+	if result.RowsAffected == 0 {
+		return toErrStatus("assistant_custom_update", "custom not exists")
+	}
+
 	return nil
 }
 
