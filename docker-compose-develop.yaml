@@ -238,7 +238,7 @@ services:
   
   workflow:
     restart: always
-    image: ${WANWU_GO_IMAGE}
+    image: ${WANWU_WORKFLOW_BASE_IMAGE}
     container_name: workflow-wanwu
     networks:
       - ${WANWU_DOCKER_NETWORK}
@@ -249,6 +249,9 @@ services:
       - /etc/localtime:/etc/localtime
       - ../wanwu-workflow/wanwu-backend/bin/${WANWU_ARCH}/workflow-wanwu:/app/bin/workflow-wanwu
       - ../wanwu-workflow/wanwu-backend/configs:/app/configs
+      - ../wanwu-workflow/backend/infra/impl/document/parser/builtin/parse_pdf.py:/app/parse_pdf.py
+      - ../wanwu-workflow/backend/infra/impl/document/parser/builtin/parse_docx.py:/app/parse_docx.py
+      - ../wanwu-workflow/backend/infra/impl/coderunner/script/sandbox.py:/app/sandbox.py
       - ${WANWU_PROJECT_DIR}/workflow-wanwu/log:/app/log
     environment:
       DB_NAME: ${WANWU_DB_NAME}
@@ -270,6 +273,9 @@ services:
       # 用于workflow-wanwu:8998代理minio-wanwu:9000
       MINIO_API_HOST: http://${WANWU_MINIO_ENDPOINT}
       MINIO_PROXY_ENDPOINT: :8998
+      # 用于code节点运行
+      CODE_RUNNER_TYPE: sandbox
+      CODE_RUNNER_ALLOW_NET: "cdn.jsdelivr.net"
     working_dir: /app
     command: ./bin/workflow-wanwu
 

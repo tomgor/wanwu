@@ -526,6 +526,50 @@ services:
       timeout: 5s
       retries: 99
       start_period: 10s
+  
+  workflow:
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    restart: always
+    image: ${WANWU_WORKFLOW_IMAGE}
+    container_name: workflow-wanwu
+    networks:
+      - ${WANWU_DOCKER_NETWORK}
+    ports:
+      - 8998:8998
+      - 8999:8999
+    volumes:
+      - ${WANWU_PROJECT_DIR}/workflow-wanwu/log:/app/log
+    environment:
+      DB_NAME: ${WANWU_DB_NAME}
+      DB_MYSQL_ADDRESS: ${WANWU_MYSQL_ADDRESS}
+      DB_MYSQL_PASSWORD: ${WANWU_MYSQL_PASSWORD}
+      REDIS_HOST: ${WANWU_REDIS_HOST}
+      REDIS_PORT: ${WANWU_REDIS_PORT}
+      REDIS_PASSWORD: ${WANWU_REDIS_PASSWORD}
+      MINIO_ENDPOINT: ${WANWU_MINIO_ENDPOINT}
+      MINIO_USER: ${WANWU_MINIO_USER}
+      MINIO_PASSWORD: ${WANWU_MINIO_PASSWORD}
+      # --- 以下env用于workflow-wanwu适配 ---
+      WANWU_EXTERNAL_IP: ${WANWU_EXTERNAL_IP}
+      WANWU_EXTERNAL_PORT: ${WANWU_EXTERNAL_PORT}
+      WANWU_CALLBACK_LLM_BASE_URL: http://bff-service:6668/callback/v1/model
+      # 用于nginx 8081代理workflow-wanwu:8998
+      WANWU_MINIO_PROXY_ENDPOINT: ${WANWU_EXTERNAL_IP}:${WANWU_EXTERNAL_PORT}
+      WANWU_MINIO_PROXY_PREFIX: /workflow/minio/presign
+      # 用于workflow-wanwu:8998代理minio-wanwu:9000
+      MINIO_API_HOST: http://${WANWU_MINIO_ENDPOINT}
+      MINIO_PROXY_ENDPOINT: :8998
+      # 用于code节点运行
+      CODE_RUNNER_TYPE: sandbox
+      CODE_RUNNER_ALLOW_NET: "cdn.jsdelivr.net"
+    working_dir: /app
+    command: ./bin/workflow-wanwu
 
   agentscope:
     depends_on:
