@@ -13,7 +13,7 @@ import (
 func (s *Service) AssistantMCPCreate(ctx context.Context, req *assistant_service.AssistantMCPCreateReq) (*emptypb.Empty, error) {
 	assistantId := util.MustU32(req.AssistantId)
 
-	if status := s.cli.CreateAssistantMCP(ctx, assistantId, req.McpId); status != nil {
+	if status := s.cli.CreateAssistantMCP(ctx, assistantId, req.McpId, req.Identity.UserId, req.Identity.OrgId); status != nil {
 		return nil, errStatus(errs.Code_AssistantMCPErr, status)
 	}
 

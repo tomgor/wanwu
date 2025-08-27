@@ -10,14 +10,3 @@ type AssistantMCP struct {
 	CreatedAt   int64  `gorm:"autoCreateTime:milli;comment:创建时间"`
 	UpdatedAt   int64  `gorm:"autoUpdateTime:milli;comment:更新时间"`
 }
-
-type MCPToolInfo struct {
-	URL       string `json:"url"`
-	Transport string `json:"transport"`
-}
-
-type ToolsMap map[string]MCPToolInfo
-
-type RequestData struct {
-	McpTools ToolsMap `json:"mcp_tools"`
-}

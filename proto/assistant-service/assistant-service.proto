@@ -34,13 +34,6 @@ service AssistantService {
   rpc AssistantCustomToolEnableSwitch(AssistantCustomToolEnableSwitchReq) returns (google.protobuf.Empty) {}
   rpc AssistantCustomToolGetList(AssistantCustomToolGetListReq) returns (AssistantCustomToolList) {}
 
-  // --- action ---
-  rpc AssistantActionCreate(AssistantActionCreateReq) returns (AssistantActionCreateResp) {}
-  rpc AssistantActionDelete(AssistantActionDeleteReq) returns (google.protobuf.Empty) {}
-  rpc AssistantActionUpdate(AssistantActionUpdateReq) returns (google.protobuf.Empty) {}
-  rpc GetAssistantActionInfo(GetAssistantActionInfoReq) returns (GetAssistantActionInfoResp) {}
-  rpc AssistantActionEnableSwitch(AssistantActionEnableSwitchReq) returns (google.protobuf.Empty) {}
-
   // --- conversation ---
   rpc ConversationCreate(ConversationCreateReq) returns (ConversationCreateResp) {}
   rpc ConversationDelete(ConversationDeleteReq) returns (google.protobuf.Empty) {}
@@ -146,17 +139,11 @@ message AssistantInfo {
   AssistantOnlineSearchConfig onlineSearchConfig = 9;     // 在线搜索配置
   int32 scope = 10;
   repeated WorkFlowInfos workFlowInfos = 11;
-  repeated ActionInfos actionInfos = 12;
   int64 creatTime = 13;
   int64 updateTime = 14;
   AssistantSafetyConfig safetyConfig = 15;
 }
 
-message ActionInfos{
-  string actionId = 1;
-  string apiName = 2;
-  bool enable = 3;
-}
 
 message WorkFlowInfos{
   string id = 1;
@@ -267,58 +254,6 @@ message AssistantCustomToolInfo {
 
 message AssistantCustomToolList {
   repeated AssistantCustomToolInfo assistantCustomToolInfos = 1;
-}
-
-message AssistantActionCreateReq {
-  string assistantId = 1;
-  string schema = 2;
-  ApiAuthWebRequest apiAuth = 3;
-  Identity identity = 4;
-}
-message AssistantActionCreateResp{
-  string actionId = 1;
-  repeated ActionApi list = 2;
-}
-message ApiAuthWebRequest{
-  string type = 1;
-  string apiKey = 2;
-  string customHeaderName = 3;
-  string authType = 4;
-}
-
-message AssistantActionDeleteReq {
-  string actionId = 1;
-  Identity identity = 2;
-}
-
-message AssistantActionUpdateReq {
-  string actionId = 1;
-  string schema = 2;
-  ApiAuthWebRequest apiAuth = 3;
-  Identity identity = 4;
-}
-
-message GetAssistantActionInfoReq {
-  string actionId = 1;
-  Identity identity = 2;
-}
-
-message GetAssistantActionInfoResp {
-  string actionId = 1;
-  string schema = 2;
-  string schemaType = 3;
-  ApiAuthWebRequest apiAuth = 4;
-  repeated ActionApi list = 5;
-}
-message ActionApi{
-  string name = 1;
-  string method = 2;
-  string path = 3;
-}
-
-message AssistantActionEnableSwitchReq {
-  string actionId = 1;
-  Identity identity = 2;
 }
 
 message ConversationCreateReq {

@@ -730,20 +730,6 @@ const docTemplate = `{
                 }
             }
         },
-        "response.ActionInfos": {
-            "type": "object",
-            "properties": {
-                "actionId": {
-                    "type": "string"
-                },
-                "apiName": {
-                    "type": "string"
-                },
-                "enable": {
-                    "type": "boolean"
-                }
-            }
-        },
         "response.AppUrlConfig": {
             "type": "object",
             "properties": {
@@ -841,13 +827,6 @@ const docTemplate = `{
                 "name"
             ],
             "properties": {
-                "actionInfos": {
-                    "description": "action信息",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.ActionInfos"
-                    }
-                },
                 "assistantId": {
                     "type": "string"
                 },

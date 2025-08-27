@@ -78,7 +78,15 @@ func (c *Client) ListMCPs(ctx context.Context, orgID, userID, name string) ([]*m
 		sqlopt.WithUserID(userID),
 		sqlopt.LikeName(name),
 	).Apply(c.db).WithContext(ctx).Order("id DESC").Find(&mcpInfos).Error; err != nil {
-		return nil, toErrStatus("mcp_list_mcps_err", err.Error())
+		return nil, toErrStatus("mcp_get_custom_tool_list_err", err.Error())
+	}
+	return mcpInfos, nil
+}
+
+func (c *Client) ListMCPsByMCPIdList(ctx context.Context, mcpIDList []uint32) ([]*model.MCPClient, *errs.Status) {
+	var mcpInfos []*model.MCPClient
+	if err := sqlopt.WithIDs(mcpIDList).Apply(c.db).WithContext(ctx).Order("id DESC").Find(&mcpInfos).Error; err != nil {
+		return nil, toErrStatus("mcp_get_custom_tool_list_err", err.Error())
 	}
 	return mcpInfos, nil
 }

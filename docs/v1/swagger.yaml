@@ -452,39 +452,6 @@ definitions:
         description: Title is a human-readable title for the tool, useful for UI display
         type: string
     type: object
-  request.ActionAddRequest:
-    properties:
-      apiAuth:
-        $ref: '#/definitions/request.ApiAuthWebRequest'
-      assistantId:
-        type: string
-      schema:
-        type: string
-    required:
-    - apiAuth
-    - assistantId
-    - schema
-    type: object
-  request.ActionIdRequest:
-    properties:
-      actionId:
-        type: string
-    required:
-    - actionId
-    type: object
-  request.ActionUpdateRequest:
-    properties:
-      actionId:
-        type: string
-      apiAuth:
-        $ref: '#/definitions/request.ApiAuthWebRequest'
-      schema:
-        type: string
-    required:
-    - actionId
-    - apiAuth
-    - schema
-    type: object
   request.AnalysisUrlDocReq:
     properties:
       knowledgeId:
@@ -496,17 +463,6 @@ definitions:
     required:
     - knowledgeId
     - urlList
-    type: object
-  request.ApiAuthWebRequest:
-    properties:
-      apiKey:
-        type: string
-      authType:
-        type: string
-      customHeaderName:
-        type: string
-      type:
-        type: string
     type: object
   request.AppBriefConfig:
     properties:
@@ -2105,56 +2061,12 @@ definitions:
     required:
     - workflow_id
     type: object
-  response.Action:
-    properties:
-      actionId:
-        type: string
-      apiAuth:
-        $ref: '#/definitions/response.ApiAuthWebRequest'
-      list:
-        items:
-          $ref: '#/definitions/response.ActionApiResponse'
-        type: array
-      schema:
-        type: string
-      schemaType:
-        type: string
-    type: object
-  response.ActionApiResponse:
-    properties:
-      method:
-        type: string
-      name:
-        type: string
-      path:
-        type: string
-    type: object
-  response.ActionInfos:
-    properties:
-      actionId:
-        type: string
-      apiName:
-        type: string
-      enable:
-        type: boolean
-    type: object
   response.AnalysisDocUrlResp:
     properties:
       urlList:
         items:
           $ref: '#/definitions/response.Url'
         type: array
-    type: object
-  response.ApiAuthWebRequest:
-    properties:
-      apiKey:
-        type: string
-      authType:
-        type: string
-      customHeaderName:
-        type: string
-      type:
-        type: string
     type: object
   response.ApiResponse:
     properties:
@@ -2252,11 +2164,6 @@ definitions:
     type: object
   response.Assistant:
     properties:
-      actionInfos:
-        description: action信息
-        items:
-          $ref: '#/definitions/response.ActionInfos'
-        type: array
       assistantId:
         type: string
       avatar:
@@ -4398,127 +4305,6 @@ paths:
       security:
       - JWT: []
       summary: 修改智能体基本信息
-      tags:
-      - agent
-  /assistant/action:
-    delete:
-      consumes:
-      - application/json
-      description: 为智能体解绑action
-      parameters:
-      - description: action的id
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/request.ActionIdRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - JWT: []
-      summary: 删除action
-      tags:
-      - agent
-    get:
-      consumes:
-      - application/json
-      description: 查看智能体action详情
-      parameters:
-      - description: action的id
-        in: query
-        name: actionId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/response.Action'
-              type: object
-      security:
-      - JWT: []
-      summary: 查看智能体action详情
-      tags:
-      - agent
-    post:
-      consumes:
-      - application/json
-      description: 为智能体绑定action
-      parameters:
-      - description: action新增参数
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/request.ActionAddRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - JWT: []
-      summary: 添加action
-      tags:
-      - agent
-    put:
-      consumes:
-      - application/json
-      description: 为智能体修改action参数
-      parameters:
-      - description: action编辑参数
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/request.ActionUpdateRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - JWT: []
-      summary: 编辑action
-      tags:
-      - agent
-  /assistant/action/enable:
-    put:
-      consumes:
-      - application/json
-      description: 修改智能体绑定的action的启用状态
-      parameters:
-      - description: action的id
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/request.ActionIdRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - JWT: []
-      summary: 启用/停用action
       tags:
       - agent
   /assistant/config:

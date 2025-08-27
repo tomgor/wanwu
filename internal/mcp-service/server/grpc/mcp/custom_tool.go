@@ -2,12 +2,12 @@ package mcp
 
 import (
 	"context"
+
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
 	"github.com/UnicomAI/wanwu/internal/mcp-service/client/model"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"strconv"
 )
 
 func (s *Service) CreateCustomTool(ctx context.Context, req *mcp_service.CreateCustomToolReq) (*emptypb.Empty, error) {
@@ -43,7 +43,7 @@ func (s *Service) GetCustomToolInfo(ctx context.Context, req *mcp_service.GetCus
 		return nil, errStatus(errs.Code_MCPGetCustomToolInfoErr, err)
 	}
 	return &mcp_service.GetCustomToolInfoResp{
-		CustomToolId:  strconv.Itoa(int(info.ID)),
+		CustomToolId:  util.Int2Str(info.ID),
 		Name:          info.Name,
 		Description:   info.Description,
 		Schema:        info.Schema,
@@ -67,7 +67,35 @@ func (s *Service) GetCustomToolList(ctx context.Context, req *mcp_service.GetCus
 	list := make([]*mcp_service.GetCustomToolItem, 0)
 	for _, info := range infos {
 		list = append(list, &mcp_service.GetCustomToolItem{
-			CustomToolId: strconv.Itoa(int(info.ID)),
+			CustomToolId: util.Int2Str(info.ID),
+			Name:         info.Name,
+			Description:  info.Description,
+		})
+	}
+	return &mcp_service.GetCustomToolListResp{
+		List: list,
+	}, nil
+}
+func (s *Service) GetCustomToolByCustomToolIdList(ctx context.Context, req *mcp_service.GetCustomToolByCustomToolIdListReq) (*mcp_service.GetCustomToolListResp, error) {
+	if len(req.CustomToolIdList) == 0 {
+		return nil, errStatus(errs.Code_MCPGetCustomToolListErr, toErrStatus("mcp_get_custom_tool_list_err", "customToolIdList is empty"))
+	}
+
+	// 批量转换 string 为 uint32
+	var ids []uint32
+	for _, idStr := range req.CustomToolIdList {
+		id := util.MustU32(idStr)
+		ids = append(ids, id)
+	}
+
+	infos, err := s.cli.ListCustomToolsByCustomToolIDs(ctx, ids)
+	if err != nil {
+		return nil, errStatus(errs.Code_MCPGetCustomToolListErr, err)
+	}
+	list := make([]*mcp_service.GetCustomToolItem, 0)
+	for _, info := range infos {
+		list = append(list, &mcp_service.GetCustomToolItem{
+			CustomToolId: util.Int2Str(info.ID),
 			Name:         info.Name,
 			Description:  info.Description,
 		})

@@ -226,15 +226,6 @@ definitions:
     required:
     - prompt
     type: object
-  response.ActionInfos:
-    properties:
-      actionId:
-        type: string
-      apiName:
-        type: string
-      enable:
-        type: boolean
-    type: object
   response.AppUrlConfig:
     properties:
       appUrlInfo:
@@ -299,11 +290,6 @@ definitions:
     type: object
   response.Assistant:
     properties:
-      actionInfos:
-        description: action信息
-        items:
-          $ref: '#/definitions/response.ActionInfos'
-        type: array
       assistantId:
         type: string
       avatar:

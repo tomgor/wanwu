@@ -16,18 +16,11 @@ type Assistant struct {
 	OnlineSearchConfig     request.OnlineSearchConfig     `json:"onlineSearchConfig"`  // 在线搜索配置
 	SafetyConfig           request.AppSafetyConfig        `json:"safetyConfig"`        // 敏感词表配置
 	Scope                  int32                          `json:"scope"`               // 作用域
-	ActionInfos            []*ActionInfos                 `json:"actionInfos"`         // action信息
 	WorkFlowInfos          []*WorkFlowInfos               `json:"workFlowInfos"`       // 工作流信息
 	MCPInfos               []*MCPInfos                    `json:"mcpInfos"`            // MCP信息
 	CustomInfos            []*CustomInfos                 `json:"customInfos"`         // 自定义工具信息
 	CreatedAt              string                         `json:"createdAt"`           // 创建时间
 	UpdatedAt              string                         `json:"updatedAt"`           // 更新时间
-}
-
-type ActionInfos struct {
-	ActionId string `json:"actionId"`
-	ApiName  string `json:"apiName"`
-	Enable   bool   `json:"enable"`
 }
 
 type WorkFlowInfos struct {
@@ -59,32 +52,6 @@ type CustomInfos struct {
 	CustomName string `json:"name"`
 	CustomDesc string `json:"customDesc"`
 	Valid      bool   `json:"valid"`
-}
-
-type Action struct {
-	ActionId   string              `json:"actionId"`
-	Schema     string              `json:"schema"`
-	SchemaType string              `json:"schemaType"`
-	ApiAuth    ApiAuthWebRequest   `json:"apiAuth"`
-	ApiList    []ActionApiResponse `json:"list"`
-}
-
-type ApiAuthWebRequest struct {
-	Type             string `json:"type"`
-	APIKey           string `json:"apiKey"`
-	CustomHeaderName string `json:"customHeaderName"`
-	AuthType         string `json:"authType"`
-}
-
-type ActionAddResponse struct {
-	ActionId string              `json:"actionId"`
-	ApiList  []ActionApiResponse `json:"list"`
-}
-
-type ActionApiResponse struct {
-	Name   string `json:"name"`
-	Method string `json:"method"`
-	Path   string `json:"path"`
 }
 
 type ConversationInfo struct {

@@ -242,34 +242,64 @@ func AssistantMCPList(ctx *gin.Context, assistantId, userId, orgId string) ([]*r
 		return nil, err
 	}
 
-	var retMCPInfos []*response.MCPInfos
-	for _, m := range resp.AssistantMCPInfos {
-		// 每个MCP单独判断有效性，避免影响其他项
-		valid := true
-		enable := m.Enable
-		mcpInfo, err := GetMCP(ctx, m.McpId)
-		if err != nil {
-			valid = false  // 仅当前MCP标记为无效
-			enable = false // 查询失败，默认禁用
-			log.Warnf("MCP查询失败, MCPID: %s, 报错为： %s", m.McpId, err)
-			// 错误时仍保留记录，但mcpInfo相关字段用默认值
-			mcpInfo = &response.MCPDetail{} // 假设MCPInfo是该结构体的实际类型，初始化空对象避免nil
-		}
-
-		// 组装为 MCPInfos，使用安全的字段访问
-		retMCPInfos = append(retMCPInfos, &response.MCPInfos{
-			MCPId:         m.McpId,
-			UniqueId:      bff_util.ConcatAssistantToolUniqueId("mcp", m.McpId),
-			MCPSquareId:   mcpInfo.MCPSquareID,
-			Enable:        enable,
-			MCPName:       mcpInfo.MCPInfo.Name,
-			MCPDesc:       mcpInfo.MCPInfo.Desc,
-			MCPServerFrom: mcpInfo.MCPInfo.From,
-			MCPServerUrl:  mcpInfo.MCPInfo.SSEURL,
-			Valid:         valid, // 仅当前MCP的有效性
-		})
+	// 若查询结果为空，返回空列表
+	if len(resp.AssistantMCPInfos) == 0 {
+		return nil, nil
 	}
 
+	// 提取MCP ID列表
+	var mcpIds []string
+	for _, m := range resp.AssistantMCPInfos {
+		mcpIds = append(mcpIds, m.McpId)
+	}
+
+	// 批量查询MCP详情
+	mcpResp, err := mcp.GetCustomMCPByMCPIdList(ctx.Request.Context(), &mcp_service.GetCustomMCPByMCPIdListReq{
+		McpIdList: mcpIds,
+	})
+
+	// 构建MCP详情映射
+	mcpDetailMap := make(map[string]*mcp_service.CustomMCPInfo)
+	if err == nil && mcpResp != nil { // 仅当查询成功且响应有效时才构建映射
+		for _, item := range mcpResp.Infos {
+			mcpDetailMap[item.McpId] = item
+		}
+	}
+
+	// 构建返回结果
+	var retMCPInfos []*response.MCPInfos
+	for _, m := range resp.AssistantMCPInfos {
+		item, exists := mcpDetailMap[m.McpId]
+		if exists {
+			// 有效MCP
+			retMCPInfos = append(retMCPInfos, &response.MCPInfos{
+				MCPId:         m.McpId,
+				UniqueId:      bff_util.ConcatAssistantToolUniqueId("mcp", m.McpId),
+				MCPSquareId:   item.Info.McpSquareId,
+				Enable:        m.Enable,
+				MCPName:       item.Info.Name,
+				MCPDesc:       item.Info.Desc,
+				MCPServerFrom: item.Info.From,
+				MCPServerUrl:  item.SseUrl,
+				Valid:         true,
+			})
+		} else {
+			// 无效MCP
+			retMCPInfos = append(retMCPInfos, &response.MCPInfos{
+				MCPId:         m.McpId,
+				UniqueId:      bff_util.ConcatAssistantToolUniqueId("mcp", m.McpId),
+				MCPSquareId:   "",
+				Enable:        false, // 失效时禁用
+				MCPName:       "",
+				MCPDesc:       "",
+				MCPServerFrom: "",
+				MCPServerUrl:  "",
+				Valid:         false,
+			})
+		}
+	}
+
+	// 即使详情查询失败，也返回组装后的结果
 	return retMCPInfos, nil
 }
 
@@ -277,142 +307,63 @@ func AssistantCustomList(ctx *gin.Context, assistantId, userId, orgId string) ([
 	// 获取该用户的所有 Custom 列表
 	resp, err := assistant.AssistantCustomToolGetList(ctx.Request.Context(), &assistant_service.AssistantCustomToolGetListReq{
 		AssistantId: assistantId,
-		Identity: &assistant_service.Identity{
-			UserId: userId,
-			OrgId:  orgId,
-		},
 	})
 	if err != nil {
 		return nil, err
 	}
 
+	// 若查询为空，返回空列表
+	if len(resp.AssistantCustomToolInfos) == 0 {
+		return nil, nil
+	}
+
+	// 提取自定义工具ID列表
+	var customToolIds []string
+	for _, c := range resp.AssistantCustomToolInfos {
+		customToolIds = append(customToolIds, c.CustomToolId)
+	}
+
+	// 批量查询自定义工具详情
+	mcpResp, err := mcp.GetCustomToolByCustomToolIdList(ctx.Request.Context(), &mcp_service.GetCustomToolByCustomToolIdListReq{
+		CustomToolIdList: customToolIds,
+	})
+
+	// 构建ID到工具信息的映射
+	customToolMap := make(map[string]*mcp_service.GetCustomToolItem)
+	if err == nil && mcpResp != nil { // 仅当查询成功且响应有效时才构建映射
+		for _, item := range mcpResp.List {
+			customToolMap[item.CustomToolId] = item
+		}
+	}
+
+	// 组装返回结果
 	var retCustomInfos []*response.CustomInfos
 	for _, c := range resp.AssistantCustomToolInfos {
-		valid := true
-		enable := c.Enable
-		// 查询自定义工具详情
-		mcpResp, err := mcp.GetCustomToolInfo(ctx.Request.Context(), &mcp_service.GetCustomToolInfoReq{
-			CustomToolId: c.CustomToolId,
-		})
-
-		if err != nil {
-			valid = false  // 仅当前自定义工具标记为无效
-			enable = false // 查询失败，默认禁用
-			log.Warnf("自定义工具查询失败, 自定义工具ID: %s, 报错为： %s", c.CustomToolId, err)
-			// 错误时保持mcpResp为初始化的空对象，避免nil
-			mcpResp = &mcp_service.GetCustomToolInfoResp{}
+		item, exists := customToolMap[c.CustomToolId]
+		if exists {
+			// 有效工具
+			retCustomInfos = append(retCustomInfos, &response.CustomInfos{
+				CustomId:   c.CustomToolId,
+				UniqueId:   bff_util.ConcatAssistantToolUniqueId("custom", c.CustomToolId),
+				Enable:     c.Enable,
+				CustomName: item.Name,
+				CustomDesc: item.Description,
+				Valid:      true,
+			})
+		} else {
+			// 无效工具
+			retCustomInfos = append(retCustomInfos, &response.CustomInfos{
+				CustomId:   c.CustomToolId,
+				UniqueId:   bff_util.ConcatAssistantToolUniqueId("custom", c.CustomToolId),
+				Enable:     false,
+				CustomName: "",
+				CustomDesc: "",
+				Valid:      false,
+			})
 		}
-
-		// 组装为 CustomInfos，安全访问字段
-		retCustomInfos = append(retCustomInfos, &response.CustomInfos{
-			CustomId:   c.CustomToolId,
-			UniqueId:   bff_util.ConcatAssistantToolUniqueId("custom", c.CustomToolId),
-			Enable:     enable,
-			CustomName: mcpResp.Name, // 即使报错，mcpResp也非nil，避免空指针
-			CustomDesc: mcpResp.Description,
-			Valid:      valid, // 仅当前项的有效性
-		})
 	}
+
 	return retCustomInfos, nil
-}
-
-func AssistantActionCreate(ctx *gin.Context, userId, orgId string, req request.ActionAddRequest) (response.ActionAddResponse, error) {
-	resp, err := assistant.AssistantActionCreate(ctx, &assistant_service.AssistantActionCreateReq{
-		AssistantId: req.AssistantId,
-		Schema:      req.Schema,
-		ApiAuth: &assistant_service.ApiAuthWebRequest{
-			Type:             req.ApiAuth.Type,
-			ApiKey:           req.ApiAuth.APIKey,
-			CustomHeaderName: req.ApiAuth.CustomHeaderName,
-			AuthType:         req.ApiAuth.AuthType,
-		},
-		Identity: &assistant_service.Identity{
-			UserId: userId,
-			OrgId:  orgId,
-		},
-	})
-	if err != nil {
-		return response.ActionAddResponse{}, err
-	}
-	return response.ActionAddResponse{
-		ActionId: resp.ActionId,
-		ApiList:  transActionApiResponseList(resp.List),
-	}, nil
-}
-
-func transActionApiResponseList(list []*assistant_service.ActionApi) []response.ActionApiResponse {
-	var responseList []response.ActionApiResponse
-	for _, api := range list {
-		responseList = append(responseList, response.ActionApiResponse{
-			Name:   api.Name,
-			Method: api.Method,
-			Path:   api.Path,
-		})
-	}
-	return responseList
-}
-
-func AssistantActionDelete(ctx *gin.Context, userId, orgId string, req request.ActionIdRequest) (interface{}, error) {
-	_, err := assistant.AssistantActionDelete(ctx, &assistant_service.AssistantActionDeleteReq{
-		ActionId: req.ActionId,
-		Identity: &assistant_service.Identity{
-			UserId: userId,
-			OrgId:  orgId,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
-}
-
-func AssistantActionUpdate(ctx *gin.Context, userId, orgId string, req request.ActionUpdateRequest) (interface{}, error) {
-	_, err := assistant.AssistantActionUpdate(ctx, &assistant_service.AssistantActionUpdateReq{
-		ActionId: req.ActionId,
-		Schema:   req.Schema,
-		ApiAuth: &assistant_service.ApiAuthWebRequest{
-			Type:             req.ApiAuth.Type,
-			ApiKey:           req.ApiAuth.APIKey,
-			CustomHeaderName: req.ApiAuth.CustomHeaderName,
-			AuthType:         req.ApiAuth.AuthType,
-		},
-		Identity: &assistant_service.Identity{
-			UserId: userId,
-			OrgId:  orgId,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
-}
-
-func GetAssistantActionInfo(ctx *gin.Context, userId, orgId string, req request.ActionIdRequest) (response.Action, error) {
-	resp, err := assistant.GetAssistantActionInfo(ctx, &assistant_service.GetAssistantActionInfoReq{
-		ActionId: req.ActionId,
-		Identity: &assistant_service.Identity{
-			UserId: userId,
-			OrgId:  orgId,
-		},
-	})
-	if err != nil {
-		return response.Action{}, err
-	}
-	return transActionResp2Model(resp), nil
-}
-
-func AssistantActionEnableSwitch(ctx *gin.Context, userId, orgId string, req request.ActionIdRequest) (interface{}, error) {
-	_, err := assistant.AssistantActionEnableSwitch(ctx, &assistant_service.AssistantActionEnableSwitchReq{
-		ActionId: req.ActionId,
-		Identity: &assistant_service.Identity{
-			UserId: userId,
-			OrgId:  orgId,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
 }
 
 func ConversationCreate(ctx *gin.Context, userId, orgId string, req request.ConversationCreateRequest) (response.ConversationCreateResp, error) {
@@ -593,21 +544,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	} else {
 		log.Debugf("Rerank配置为空或模型ID为空")
 	}
-	var actionInfos []*response.ActionInfos
-	if resp.ActionInfos != nil {
-		actionInfos = make([]*response.ActionInfos, 0, len(resp.ActionInfos))
-		for _, action := range resp.ActionInfos {
-			actionInfos = append(actionInfos, &response.ActionInfos{
-				ActionId: action.ActionId,
-				ApiName:  action.ApiName,
-				Enable:   action.Enable,
-			})
-			log.Debugf("添加动作信息: ActionId=%s, ApiName=%s", action.ActionId, action.ApiName)
-		}
-		log.Debugf("总共添加 %d 个动作信息", len(actionInfos))
-	} else {
-		log.Debugf("动作信息为空")
-	}
+
 	var workFlowInfos []*response.WorkFlowInfos
 	if resp.WorkFlowInfos != nil {
 		workFlowInfos = make([]*response.WorkFlowInfos, 0, len(resp.WorkFlowInfos))
@@ -689,7 +626,6 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		OnlineSearchConfig:  onlineSearchConfig,
 		SafetyConfig:        request.AppSafetyConfig{Enable: resp.SafetyConfig.GetEnable()},
 		Scope:               resp.Scope,
-		ActionInfos:         actionInfos,
 		WorkFlowInfos:       workFlowInfos,
 		MCPInfos:            mcpInfos,
 		CustomInfos:         customInfos,
@@ -748,40 +684,4 @@ func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.Ass
 		},
 	}, nil
 
-}
-
-func transActionResp2Model(resp *assistant_service.GetAssistantActionInfoResp) response.Action {
-	if resp == nil {
-		return response.Action{}
-	}
-
-	var apiList []response.ActionApiResponse
-	if resp.List != nil {
-		apiList = make([]response.ActionApiResponse, 0, len(resp.List))
-		for _, api := range resp.List {
-			apiList = append(apiList, response.ActionApiResponse{
-				Name:   api.Name,
-				Method: api.Method,
-				Path:   api.Path,
-			})
-		}
-	}
-
-	return response.Action{
-		ActionId:   resp.ActionId,
-		Schema:     resp.Schema,
-		SchemaType: resp.SchemaType,
-		ApiAuth: func() response.ApiAuthWebRequest {
-			if resp.ApiAuth != nil {
-				return response.ApiAuthWebRequest{
-					Type:             resp.ApiAuth.Type,
-					APIKey:           resp.ApiAuth.ApiKey,
-					CustomHeaderName: resp.ApiAuth.CustomHeaderName,
-					AuthType:         resp.ApiAuth.AuthType,
-				}
-			}
-			return response.ApiAuthWebRequest{}
-		}(),
-		ApiList: apiList,
-	}
 }

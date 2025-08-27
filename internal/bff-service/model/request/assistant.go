@@ -86,35 +86,6 @@ type AssistantMCPToolEnableRequest struct {
 
 func (a *AssistantMCPToolEnableRequest) Check() error { return nil }
 
-type ActionAddRequest struct {
-	AssistantId string            `json:"assistantId"  validate:"required"`
-	Schema      string            `json:"schema"  validate:"required"`
-	ApiAuth     ApiAuthWebRequest `json:"apiAuth" validate:"required"`
-}
-
-func (a *ActionAddRequest) Check() error { return nil }
-
-type ApiAuthWebRequest struct {
-	Type             string `json:"type"`
-	APIKey           string `json:"apiKey"`
-	CustomHeaderName string `json:"customHeaderName"`
-	AuthType         string `json:"authType"`
-}
-
-type ActionUpdateRequest struct {
-	ActionId string            `json:"actionId"  validate:"required"`
-	Schema   string            `json:"schema"  validate:"required"`
-	ApiAuth  ApiAuthWebRequest `json:"apiAuth"  validate:"required"`
-}
-
-func (a *ActionUpdateRequest) Check() error { return nil }
-
-type ActionIdRequest struct {
-	ActionId string `json:"actionId" form:"actionId"  validate:"required"`
-}
-
-func (a *ActionIdRequest) Check() error { return nil }
-
 type ConversationCreateRequest struct {
 	AssistantId string `json:"assistantId"  validate:"required"`
 	Prompt      string `json:"prompt"  validate:"required"`
