@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -742,64 +741,53 @@ func mergeMaps(map1, map2 map[string]interface{}) map[string]interface{} {
 }
 
 func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantId string, accessedWorkFlowIds []string) (pluginList []config.PluginListAlgRequest, err error) {
-	pluginList = []config.PluginListAlgRequest{}
-	assistantIdConv := pkgUtil.MustU32(assistantId)
-	resp, status := s.cli.GetAssistantWorkflowsByAssistantID(ctx, assistantIdConv)
+	workflows, status := s.cli.GetAssistantWorkflowsByAssistantID(ctx, pkgUtil.MustU32(assistantId))
 	if status != nil {
-		return pluginList, errStatus(errs.Code_AssistantConversationErr, status)
+		return nil, errStatus(errs.Code_AssistantConversationErr, status)
 	}
-	for _, assistantWorkFlowModel := range resp {
-		log.Infof("Assistant服务查询到workflow，assistantId: %s, workflowId: %s, enable: %v",
-			assistantId, assistantWorkFlowModel.WorkflowId, assistantWorkFlowModel.Enable)
-		if !slices.Contains(accessedWorkFlowIds, assistantWorkFlowModel.WorkflowId) {
-			log.Infof("assistantId: %s, workflowId: %s, 用户没有workflow数据权限，跳过",
-				assistantId, assistantWorkFlowModel.WorkflowId)
-			continue //核对实时查询的用户有数据权限的工作流accessedWorkFlowIds，如果WorkflowId不在accessedWorkFlowIds中，则不添加到pluginList
-		}
-		if !assistantWorkFlowModel.Enable {
-			log.Infof("assistantId: %s, workflowId: %s, workflow未启用，跳过",
-				assistantId, assistantWorkFlowModel.WorkflowId)
+	// workflow ids
+	var workflowIDs []string
+	for _, workflow := range workflows {
+		if !workflow.Enable {
 			continue
 		}
-		tmp := config.PluginListAlgRequest{}
-		//实时查询该工作流最新schema
-		workflowService := config.Cfg().AgentScopeWorkflow
-		url, _ := net_url.JoinPath(workflowService.Endpoint, workflowService.WorkflowSchemaUri)
-		result, err := http_client.Workflow().Get(ctx, &http_client.HttpRequestParams{
-			Url: url,
-			Params: map[string]string{
-				"workflowID": assistantWorkFlowModel.WorkflowId,
-			},
-			Timeout:    60 * time.Second,
-			MonitorKey: "workflow_schema",
-			LogLevel:   http_client.LogAll,
-		})
-		if err != nil {
-			return pluginList, err
+		if !slices.Contains(accessedWorkFlowIds, workflow.WorkflowId) {
+			continue
 		}
-		var resp = &config.AgentScopeWorkFlowSchemaResp{}
-		if err = json.Unmarshal(result, resp); err != nil {
-			return pluginList, err
-		}
-		decodedBytes, err := base64.StdEncoding.DecodeString(resp.Data.Base64OpenAPISchema)
+		workflowIDs = append(workflowIDs, workflow.WorkflowId)
+	}
+	if len(workflowIDs) == 0 {
+		return nil, nil
+	}
+	// workflow schemas
+	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.ListSchemaUri)
+	reqBody, _ := json.Marshal(map[string]interface{}{
+		"workflow_ids": workflowIDs,
+	})
+	result, err := http_client.Workflow().PostJson(ctx, &http_client.HttpRequestParams{
+		Url:        url,
+		Body:       reqBody,
+		Timeout:    time.Minute,
+		MonitorKey: "workflow_schema",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var schemas []map[string]interface{}
+	if err = json.Unmarshal(result, &schemas); err != nil {
+		return nil, err
+	}
+	for _, schema := range schemas {
+		schemaByte, err := json.Marshal(schema)
 		if err != nil {
-			return pluginList, err
+			return nil, err
 		}
 		//校验schema
-		schema, err := util.ValidateOpenAPISchema(string(decodedBytes))
-		if err != nil {
-			return pluginList, err
+		if _, err := util.ValidateOpenAPISchema(string(schemaByte)); err != nil {
+			return nil, err
 		}
-		// 将*openapi3.T转换为map[string]interface{}
-		bytes, err := json.Marshal(schema)
-		if err != nil {
-			return pluginList, err
-		}
-		err = json.Unmarshal(bytes, &tmp.APISchema)
-		if err != nil {
-			return pluginList, err
-		}
-		pluginList = append(pluginList, tmp)
+		pluginList = append(pluginList, config.PluginListAlgRequest{APISchema: schema})
 	}
 	log.Infof("Assistant服务查询到workflow，assistantId: %s, workflowList: %v", assistantId, pluginList)
 	return pluginList, nil
