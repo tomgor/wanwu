@@ -105,6 +105,7 @@ rag-server:
   doc-url-import-uri: '/url_insert'
   keywords-uri: '/rag/proper_noun'
   doc-segment-update-labels-uri: '/rag/update-chunk-labels'
+  doc-segment-create-uri: '/rag/batch-add-chunks'
   timeout: 60
 
 usage-limit:

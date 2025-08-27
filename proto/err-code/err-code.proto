@@ -74,6 +74,7 @@ enum Code {
   KnowledgeSplitterSelectFailed = 145005; // 查询知识库标分隔符表失败，请稍后重试
   KnowledgeSplitterAccessDenied = 145008; // 没有操作该知识库分隔符的权限
   KnowledgeDocSegmentUpdateLabelsFailed = 145009;  // 更新文档切片标签失败，请稍后重试
+  KnowledgeDocSegmentCreateFailed = 145010; // 新增文档分段失败，请稍后重试
 
   // --- rag-service ---
   // [150000, 159999]

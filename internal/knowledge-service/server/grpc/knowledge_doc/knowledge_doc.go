@@ -602,3 +602,61 @@ func (s *Service) UpdateDocSegmentLabels(ctx context.Context, req *knowledgebase
 	}
 	return &emptypb.Empty{}, nil
 }
+
+func (s *Service) CreateDocSegment(ctx context.Context, req *knowledgebase_doc_service.CreateDocSegmentReq) (*emptypb.Empty, error) {
+	//1.查询文档详情
+	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf(fmt.Sprintf("没有操作该知识库文档的权限 参数(%v)", req))
+		return nil, err
+	}
+	doc := docList[0]
+	//2.状态校验
+	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
+		log.Errorf(fmt.Sprintf("非处理完成文档无法增加切片 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req))
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentUpdateLabelsFailed)
+	}
+	//3.查询知识库信息
+	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf(fmt.Sprintf("没有操作该知识库的权限 参数(%v)", req))
+		return nil, err
+	}
+	//4.获取文档名称
+	fileName := service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
+	//5.查询最大分段长度
+	importTask, err := orm.SelectKnowledgeImportTaskById(ctx, doc.ImportTaskId)
+	if err != nil {
+		log.Errorf(fmt.Sprintf("没有查询到导入任务 参数(%v)", req))
+		return nil, err
+	}
+	var segmentConfig = &model.SegmentConfig{}
+	err = json.Unmarshal([]byte(importTask.SegmentConfig), segmentConfig)
+	if err != nil {
+		log.Errorf("SegmentConfig process error %s", err.Error())
+		return nil, err
+	}
+
+	var labels = req.Labels
+	if len(labels) == 0 {
+		labels = make([]string, 0)
+	}
+	var chunks []*service.ChunkItem
+	chunks = append(chunks, &service.ChunkItem{
+		Content: req.Content,
+		Labels:  labels,
+	})
+	err = service.RagCreateDocSegment(ctx, &service.RagCreateDocSegmentParams{
+		UserId:          req.UserId,
+		KnowledgeBase:   knowledge.Name,
+		KnowledgeId:     knowledge.KnowledgeId,
+		FileName:        fileName,
+		MaxSentenceSize: segmentConfig.MaxSplitter,
+		Chunks:          chunks,
+	})
+	if err != nil {
+		log.Errorf(fmt.Sprintf("create doc segment fail %v", err), req.DocId)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentCreateFailed)
+	}
+	return &emptypb.Empty{}, nil
+}

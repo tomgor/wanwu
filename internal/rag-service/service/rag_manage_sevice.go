@@ -21,12 +21,13 @@ const (
 	DefaultTemperature      = 0.14
 	DefaultTopP             = 0.85
 	DefaultFrequencyPenalty = 1.1
+	DefaultTermWeight       = 1
 )
 
 type RagChatParams struct {
 	KnowledgeBase     []string         `json:"knowledgeBase"`
 	Question          string           `json:"question"`
-	Threshold         float32          `json:"threshold"`
+	Threshold         float32          `json:"threshold"` // Score阈值
 	TopK              int32            `json:"topK"`
 	Stream            bool             `json:"stream"`
 	Chichat           bool             `json:"chichat"` // 当知识库召回结果为空时是否使用默认话术（兜底），默认为true
@@ -39,10 +40,11 @@ type RagChatParams struct {
 	RetrieveMethod    string           `json:"retrieve_method"` // hybrid_search:混合搜索， semantic_search:向量搜索， full_text_search：文本搜索
 	Weight            *WeightParams    `json:"weights"`         // 权重搜索下的权重配置
 	Temperature       float32          `json:"temperature"`
-	TopP              float32          `json:"top_p"`              // 多样性
-	RepetitionPenalty float32          `json:"repetition_penalty"` // 重复惩罚/频率惩罚
-	ReturnMeta        bool             `json:"return_meta"`        // 是否返回元数据
-	AutoCitation      bool             `json:"auto_citation"`      // 是否自动角标
+	TopP              float32          `json:"top_p"`                   // 多样性
+	RepetitionPenalty float32          `json:"repetition_penalty"`      // 重复惩罚/频率惩罚
+	ReturnMeta        bool             `json:"return_meta"`             // 是否返回元数据
+	AutoCitation      bool             `json:"auto_citation"`           // 是否自动角标
+	TermWeight        float32          `json:"term_weight_coefficient"` // 关键词系数
 }
 
 type WeightParams struct {
@@ -158,7 +160,11 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	}
 	ragChatParams.KnowledgeBase = kbNameList
 	ragChatParams.RerankModelId = buildRerankId(knowledgeConfig.PriorityMatch, rag.RerankConfig.ModelId)
-
+	if rag.KnowledgeBaseConfig.TermWeightEnable {
+		ragChatParams.TermWeight = float32(rag.KnowledgeBaseConfig.TermWeight)
+	} else {
+		ragChatParams.TermWeight = DefaultTermWeight
+	}
 	// RAG属性参数
 	ragChatParams.Question = req.Question
 	ragChatParams.Stream = true
@@ -213,11 +219,11 @@ func buildRerankId(priorityType int32, rerankId string) string {
 func buildRetrieveMethod(matchType string) string {
 	switch matchType {
 	case "vector":
-		return "semantic_search"
+		return "semantic_search" // 向量检索
 	case "text":
-		return "full_text_search"
+		return "full_text_search" // 全文检索
 	case "mix":
-		return "hybrid_search"
+		return "hybrid_search" // 混合检索
 	}
 	return ""
 }

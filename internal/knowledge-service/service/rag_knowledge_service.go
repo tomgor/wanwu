@@ -29,6 +29,16 @@ type RagCommonResp struct {
 	Message string `json:"message"`
 }
 
+type RagDocSegmentCreateResp struct {
+	Code    int           `json:"code"`
+	Message string        `json:"message"`
+	Data    SegmentResult `json:"data"`
+}
+
+type SegmentResult struct {
+	SuccessCount int `json:"success_count"` // 分段成功导入数量
+}
+
 type RagUpdateParams struct {
 	UserId          string `json:"userId"`
 	KnowledgeBaseId string `json:"kb_id"`
@@ -47,10 +57,11 @@ type KnowledgeHitParams struct {
 	KnowledgeBase  []string      `json:"knowledgeBase" validate:"required"`
 	Threshold      float64       `json:"threshold"`
 	TopK           int32         `json:"topK"`
-	RerankModelId  string        `json:"rerank_model_id"` // rerankId
-	RerankMod      string        `json:"rerank_mod"`      // rerank_model:重排序模式，weighted_score：权重搜索
-	RetrieveMethod string        `json:"retrieve_method"` // hybrid_search:混合搜索， semantic_search:向量搜索， full_text_search：文本搜索
-	Weight         *WeightParams `json:"weights"`         // 权重搜索下的权重配置
+	RerankModelId  string        `json:"rerank_model_id"`         // rerankId
+	RerankMod      string        `json:"rerank_mod"`              // rerank_model:重排序模式，weighted_score：权重搜索
+	RetrieveMethod string        `json:"retrieve_method"`         // hybrid_search:混合搜索， semantic_search:向量搜索， full_text_search：文本搜索
+	Weight         *WeightParams `json:"weights"`                 // 权重搜索下的权重配置
+	TermWeight     float32       `json:"term_weight_coefficient"` // 关键词系数
 }
 
 type WeightParams struct {

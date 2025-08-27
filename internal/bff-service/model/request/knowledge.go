@@ -41,6 +41,8 @@ type KnowledgeMatchParams struct {
 	KeywordPriority   float32 `json:"keywordPriority"`                // 关键词权重
 	TopK              int32   `json:"topK"`                           //topK 获取最高的几行
 	Threshold         float32 `json:"threshold"`                      //threshold 过滤分数阈值
+	TermWeight        float32 `json:"termWeight"`                     // 关键词系数
+	TermWeightEnable  bool    `json:"termWeightEnable"`               // 关键词系数开关
 	CommonCheck
 }
 

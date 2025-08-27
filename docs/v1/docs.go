@@ -3185,6 +3185,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/knowledge/doc/segment/create": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "新增文档切片",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge"
+                ],
+                "summary": "新增文档切片",
+                "parameters": [
+                    {
+                        "description": "新增文档切片请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateDocSegmentReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/knowledge/doc/segment/labels": {
             "post": {
                 "security": [
@@ -7851,6 +7890,14 @@ const docTemplate = `{
                     "description": "语义权重",
                     "type": "number"
                 },
+                "termWeight": {
+                    "description": "关键词系数，默认为1",
+                    "type": "number"
+                },
+                "termWeightEnable": {
+                    "description": "关键词系数开关",
+                    "type": "boolean"
+                },
                 "threshold": {
                     "description": "过滤阈值",
                     "type": "number"
@@ -8460,6 +8507,31 @@ const docTemplate = `{
                 },
                 "trial": {
                     "type": "boolean"
+                }
+            }
+        },
+        "request.CreateDocSegmentReq": {
+            "type": "object",
+            "required": [
+                "content",
+                "docId",
+                "labels"
+            ],
+            "properties": {
+                "content": {
+                    "description": "分段内容",
+                    "type": "string"
+                },
+                "docId": {
+                    "description": "文档id",
+                    "type": "string"
+                },
+                "labels": {
+                    "description": "关键词列表",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -9271,6 +9343,14 @@ const docTemplate = `{
                 "semanticsPriority": {
                     "description": "语义权重",
                     "type": "number"
+                },
+                "termWeight": {
+                    "description": "关键词系数",
+                    "type": "number"
+                },
+                "termWeightEnable": {
+                    "description": "关键词系数开关",
+                    "type": "boolean"
                 },
                 "threshold": {
                     "description": "threshold 过滤分数阈值",

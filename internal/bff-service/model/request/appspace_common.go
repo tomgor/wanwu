@@ -76,6 +76,8 @@ type AppKnowledgebaseParams struct {
 	PriorityMatch     int32   `json:"priorityMatch"`     // 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
 	SemanticsPriority float32 `json:"semanticsPriority"` // 语义权重
 	KeywordPriority   float32 `json:"keywordPriority"`   // 关键词权重
+	TermWeight        float32 `json:"termWeight"`        // 关键词系数，默认为1
+	TermWeightEnable  bool    `json:"termWeightEnable"`  // 关键词系数开关
 }
 
 type AppSafetyConfig struct {

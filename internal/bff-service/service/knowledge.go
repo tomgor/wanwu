@@ -107,6 +107,8 @@ func KnowledgeHit(ctx *gin.Context, userId, orgId string, r *request.KnowledgeHi
 			KeywordPriority:   matchParams.KeywordPriority,
 			TopK:              matchParams.TopK,
 			Score:             matchParams.Threshold,
+			TermWeight:        matchParams.TermWeight,
+			TermWeightEnable:  matchParams.TermWeightEnable,
 		},
 	})
 	if err != nil {

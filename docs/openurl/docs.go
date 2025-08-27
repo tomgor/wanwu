@@ -587,6 +587,14 @@ const docTemplate = `{
                     "description": "语义权重",
                     "type": "number"
                 },
+                "termWeight": {
+                    "description": "关键词系数，默认为1",
+                    "type": "number"
+                },
+                "termWeightEnable": {
+                    "description": "关键词系数开关",
+                    "type": "boolean"
+                },
                 "threshold": {
                     "description": "过滤阈值",
                     "type": "number"

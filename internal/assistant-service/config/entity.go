@@ -25,6 +25,7 @@ type KnParams struct {
 	Threshold      float32     `json:"threshold"`
 	TopK           int         `json:"topK"`
 	RewriteQuery   bool        `json:"rewrite_query"`
+	TermWeight     float32     `json:"term_weight_coefficient"` // 关键词系数, 默认为1
 }
 
 type AgentSSERequest struct {

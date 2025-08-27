@@ -77,3 +77,10 @@ type DocSegmentLabelsReq struct {
 	Labels    []string `json:"labels"  validate:"required"`
 	CommonCheck
 }
+
+type CreateDocSegmentReq struct {
+	DocId   string   `json:"docId"  validate:"required"`   // 文档id
+	Labels  []string `json:"labels"  validate:"required"`  // 关键词列表
+	Content string   `json:"content"  validate:"required"` // 分段内容
+	CommonCheck
+}

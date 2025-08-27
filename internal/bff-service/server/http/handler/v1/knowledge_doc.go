@@ -195,3 +195,24 @@ func UpdateDocSegmentLabels(ctx *gin.Context) {
 	err := service.UpdateDocSegmentLabels(ctx, userId, orgId, &req)
 	gin_util.Response(ctx, nil, err)
 }
+
+// CreateDocSegment
+//
+//	@Tags			knowledge
+//	@Summary		新增文档切片
+//	@Description	新增文档切片
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.CreateDocSegmentReq	true	"新增文档切片请求参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/knowledge/doc/segment/create [post]
+func CreateDocSegment(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.CreateDocSegmentReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.CreateDocSegment(ctx, userId, orgId, &req)
+	gin_util.Response(ctx, nil, err)
+}
