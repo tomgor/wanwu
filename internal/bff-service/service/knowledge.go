@@ -134,6 +134,7 @@ func buildKnowledgeInfoList(knowledgeListResp *knowledgebase_service.KnowledgeSe
 				ModelId: knowledge.EmbeddingModelInfo.ModelId,
 			},
 			KnowledgeTagList: buildTagList(knowledge.KnowledgeTagInfoList),
+			CreateAt:         knowledge.CreatedAt,
 		})
 	}
 	return &response.KnowledgeListResp{KnowledgeList: list}

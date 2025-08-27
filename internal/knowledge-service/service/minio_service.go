@@ -5,8 +5,10 @@ import (
 	"context"
 	"errors"
 	"io"
+	"mime"
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -72,6 +74,13 @@ func CopyFile(ctx context.Context, srcFilePath string, destObjectNamePre string)
 		Bucket: minioConfig.Bucket,
 		Object: destObjectName,
 	}
+	contentType := getContentType(destObjectName)
+	if len(contentType) > 0 {
+		destOptions.ReplaceMetadata = true
+		destOptions.UserMetadata = map[string]string{
+			"Content-Type": contentType,
+		}
+	}
 	srcOptions := minio.CopySrcOptions{
 		Bucket: bucketName,
 		Object: objectName,
@@ -87,13 +96,29 @@ func CopyFile(ctx context.Context, srcFilePath string, destObjectNamePre string)
 	return uploadInfo.Location, fileName, uploadInfo.Size, nil
 }
 
+func getContentType(uri string) (contentType string) {
+	_ = mime.AddExtensionType(".svg", "image/svg+xml")
+	_ = mime.AddExtensionType(".svgz", "image/svg+xml")
+	_ = mime.AddExtensionType(".webp", "image/webp")
+	_ = mime.AddExtensionType(".ico", "image/x-icon")
+	fileExtension := path.Base(uri)
+	ext := path.Ext(fileExtension)
+	contentType = mime.TypeByExtension(ext)
+	return
+}
+
 func UploadFile(ctx context.Context, dir string, fileName string, reader io.Reader, objectSize int64) (string, int64, error) {
 	bucketName := config.GetConfig().Minio.Bucket
 	// 上传文件。
 	//milli := time.Now().UnixMilli()
 	var uploadInfo minio.UploadInfo
 	objectName := buildObjectName(dir, fileName)
-	uploadInfo, err := minio_client.Knowledge().Cli().PutObject(ctx, bucketName, objectName, reader, objectSize, minio.PutObjectOptions{})
+	contentType := getContentType(objectName)
+	putObjectOptions := minio.PutObjectOptions{}
+	if len(contentType) > 0 {
+		putObjectOptions.ContentType = contentType
+	}
+	uploadInfo, err := minio_client.Knowledge().Cli().PutObject(ctx, bucketName, objectName, reader, objectSize, putObjectOptions)
 
 	//log_config.LogRpcJsonNoParams("minio", "PutObject", err, milli)
 	if err != nil {
