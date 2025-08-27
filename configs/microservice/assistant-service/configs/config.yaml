@@ -84,6 +84,6 @@ knowledge:
 mcp:
   host: mcp-service:9898
 
-agentscope-workflow:
-  endpoint: http://agentscope-wanwu:6672
-  workflow_schema_uri: "/workflow/openapi_schema_no_auth"
+workflow:
+  endpoint: http://workflow-wanwu:8999
+  list_schema_uri: /v1/workflow/list_schema_by_wanwu
