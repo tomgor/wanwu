@@ -16,6 +16,7 @@ service MCPService {
     rpc GetCustomMCP(GetCustomMCPReq) returns (CustomMCPDetail) {}
     rpc DeleteCustomMCP(DeleteCustomMCPReq) returns (google.protobuf.Empty) {}
     rpc GetCustomMCPList(GetCustomMCPListReq) returns (CustomMCPList) {}
+    rpc GetCustomMCPByMCPIdList(GetCustomMCPByMCPIdListReq) returns (CustomMCPList) {}
     
     // --- tool ---
     rpc GetMCPToolList(GetMCPToolListReq) returns (MCPToolList) {}
@@ -25,6 +26,7 @@ service MCPService {
     rpc CreateCustomTool(CreateCustomToolReq) returns (google.protobuf.Empty) {}
     rpc GetCustomToolInfo(GetCustomToolInfoReq) returns (GetCustomToolInfoResp) {}
     rpc GetCustomToolList(GetCustomToolListReq) returns (GetCustomToolListResp) {}
+    rpc GetCustomToolByCustomToolIdList(GetCustomToolByCustomToolIdListReq) returns (GetCustomToolListResp) {}
     rpc UpdateCustomTool(UpdateCustomToolReq) returns (google.protobuf.Empty) {}
     rpc DeleteCustomTool(DeleteCustomToolReq) returns (google.protobuf.Empty) {}
 }
@@ -71,6 +73,10 @@ message GetCustomMCPListReq {
     string orgId = 1;
     string userId = 2;
     string name = 3;
+}
+
+message GetCustomMCPByMCPIdListReq {
+    repeated string mcpIdList = 1;
 }
 
 message CustomMCPList {
@@ -195,6 +201,11 @@ message GetCustomToolInfoResp {
 message GetCustomToolListReq {
     Identity identity = 1;
     string name = 2;
+}
+
+message GetCustomToolByCustomToolIdListReq {
+    Identity identity = 1;
+    repeated string customToolIdList = 2;
 }
 
 message GetCustomToolItem {

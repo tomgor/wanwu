@@ -82,6 +82,28 @@ func (s *Service) GetCustomMCPList(ctx context.Context, req *mcp_service.GetCust
 	}
 	return &mcp_service.CustomMCPList{Infos: infos}, nil
 }
+func (s *Service) GetCustomMCPByMCPIdList(ctx context.Context, req *mcp_service.GetCustomMCPByMCPIdListReq) (*mcp_service.CustomMCPList, error) {
+	// 校验MCP ID列表是否为空
+	if len(req.McpIdList) == 0 {
+		return nil, errStatus(errs.Code_MCPGetCustomMCPListErr, toErrStatus("mcp_get_custom_tool_list_err", "mcp id list is empty"))
+	}
+
+	// 转换为uint32列表
+	mcpIdList := make([]uint32, 0, len(req.McpIdList))
+	for _, mcpId := range req.McpIdList {
+		mcpIdList = append(mcpIdList, util.MustU32(mcpId))
+	}
+
+	mcps, err := s.cli.ListMCPsByMCPIdList(ctx, mcpIdList)
+	if err != nil {
+		return nil, errStatus(errs.Code_MCPGetCustomMCPListErr, err)
+	}
+	infos := make([]*mcp_service.CustomMCPInfo, 0, len(mcps))
+	for _, mcp := range mcps {
+		infos = append(infos, buildCustomMCPInfo(mcp))
+	}
+	return &mcp_service.CustomMCPList{Infos: infos}, nil
+}
 
 func (s *Service) GetMCPAvatar(ctx context.Context, req *mcp_service.GetMCPAvatarReq) (*mcp_service.MCPAvatar, error) {
 	if req.AvatarPath == "" {

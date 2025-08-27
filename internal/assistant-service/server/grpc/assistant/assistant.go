@@ -255,19 +255,8 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 		return nil, errStatus(errs.Code_AssistantErr, status)
 	}
 
-	// 获取关联的Actions和WorkFlows
-	actions, _ := s.cli.GetAssistantActionsByAssistantID(ctx, req.AssistantId)
+	// 获取关联的WorkFlows
 	workflows, _ := s.cli.GetAssistantWorkflowsByAssistantID(ctx, assistantId)
-
-	// 转换Actions
-	var actionInfos []*assistant_service.ActionInfos
-	for _, action := range actions {
-		actionInfos = append(actionInfos, &assistant_service.ActionInfos{
-			ActionId: strconv.FormatUint(uint64(action.ID), 10),
-			ApiName:  action.ActionName,
-			Enable:   action.Enable,
-		})
-	}
 
 	// 转换WorkFlows
 	var workFlowInfos []*assistant_service.WorkFlowInfos
@@ -356,7 +345,6 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 		SafetyConfig:        safetyConfig,
 		Scope:               int32(assistant.Scope),
 		WorkFlowInfos:       workFlowInfos,
-		ActionInfos:         actionInfos,
 		CreatTime:           assistant.CreatedAt,
 		UpdateTime:          assistant.UpdatedAt,
 	}, nil

@@ -28,11 +28,6 @@ func registerAssistant(apiV1 *gin.RouterGroup) {
 	mid.Sub("agent").Reg(apiV1, "/assistant/tool/mcp", http.MethodDelete, v1.AssistantMCPDelete, "删除mcp工具")
 	mid.Sub("agent").Reg(apiV1, "/assistant/tool/mcp/switch", http.MethodPut, v1.AssistantMCPEnableSwitch, "启用/停用mcp")
 
-	mid.Sub("agent").Reg(apiV1, "/assistant/action", http.MethodPost, v1.AssistantActionCreate, "添加action")
-	mid.Sub("agent").Reg(apiV1, "/assistant/action", http.MethodDelete, v1.AssistantActionDelete, "删除action")
-	mid.Sub("agent").Reg(apiV1, "/assistant/action", http.MethodPut, v1.AssistantActionUpdate, "编辑action")
-	mid.Sub("agent").Reg(apiV1, "/assistant/action", http.MethodGet, v1.GetAssistantActionInfo, "查看智能体action详情")
-
 	mid.Sub("agent").Reg(apiV1, "/assistant/tool/custom", http.MethodPost, v1.AssistantCustomToolCreate, "智能体添加自定义工具")
 	mid.Sub("agent").Reg(apiV1, "/assistant/tool/custom", http.MethodDelete, v1.AssistantCustomToolDelete, "智能体删除自定义工具")
 	mid.Sub("agent").Reg(apiV1, "/assistant/tool/custom/switch", http.MethodPut, v1.AssistantCustomToolEnableSwitch, "智能体启用/停用自定义工具")

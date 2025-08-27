@@ -1099,205 +1099,6 @@
                 }
             }
         },
-        "/assistant/action": {
-            "get": {
-                "security": [
-                    {
-                        "JWT": []
-                    }
-                ],
-                "description": "查看智能体action详情",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "agent"
-                ],
-                "summary": "查看智能体action详情",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "action的id",
-                        "name": "actionId",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/response.Action"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "JWT": []
-                    }
-                ],
-                "description": "为智能体修改action参数",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "agent"
-                ],
-                "summary": "编辑action",
-                "parameters": [
-                    {
-                        "description": "action编辑参数",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.ActionUpdateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "JWT": []
-                    }
-                ],
-                "description": "为智能体绑定action",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "agent"
-                ],
-                "summary": "添加action",
-                "parameters": [
-                    {
-                        "description": "action新增参数",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.ActionAddRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "JWT": []
-                    }
-                ],
-                "description": "为智能体解绑action",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "agent"
-                ],
-                "summary": "删除action",
-                "parameters": [
-                    {
-                        "description": "action的id",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.ActionIdRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/assistant/action/enable": {
-            "put": {
-                "security": [
-                    {
-                        "JWT": []
-                    }
-                ],
-                "description": "修改智能体绑定的action的启用状态",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "agent"
-                ],
-                "summary": "启用/停用action",
-                "parameters": [
-                    {
-                        "description": "action的id",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.ActionIdRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/assistant/config": {
             "put": {
                 "security": [
@@ -7942,55 +7743,6 @@
                 }
             }
         },
-        "request.ActionAddRequest": {
-            "type": "object",
-            "required": [
-                "apiAuth",
-                "assistantId",
-                "schema"
-            ],
-            "properties": {
-                "apiAuth": {
-                    "$ref": "#/definitions/request.ApiAuthWebRequest"
-                },
-                "assistantId": {
-                    "type": "string"
-                },
-                "schema": {
-                    "type": "string"
-                }
-            }
-        },
-        "request.ActionIdRequest": {
-            "type": "object",
-            "required": [
-                "actionId"
-            ],
-            "properties": {
-                "actionId": {
-                    "type": "string"
-                }
-            }
-        },
-        "request.ActionUpdateRequest": {
-            "type": "object",
-            "required": [
-                "actionId",
-                "apiAuth",
-                "schema"
-            ],
-            "properties": {
-                "actionId": {
-                    "type": "string"
-                },
-                "apiAuth": {
-                    "$ref": "#/definitions/request.ApiAuthWebRequest"
-                },
-                "schema": {
-                    "type": "string"
-                }
-            }
-        },
         "request.AnalysisUrlDocReq": {
             "type": "object",
             "required": [
@@ -8006,23 +7758,6 @@
                     "items": {
                         "type": "string"
                     }
-                }
-            }
-        },
-        "request.ApiAuthWebRequest": {
-            "type": "object",
-            "properties": {
-                "apiKey": {
-                    "type": "string"
-                },
-                "authType": {
-                    "type": "string"
-                },
-                "customHeaderName": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
                 }
             }
         },
@@ -10375,57 +10110,6 @@
                 }
             }
         },
-        "response.Action": {
-            "type": "object",
-            "properties": {
-                "actionId": {
-                    "type": "string"
-                },
-                "apiAuth": {
-                    "$ref": "#/definitions/response.ApiAuthWebRequest"
-                },
-                "list": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.ActionApiResponse"
-                    }
-                },
-                "schema": {
-                    "type": "string"
-                },
-                "schemaType": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.ActionApiResponse": {
-            "type": "object",
-            "properties": {
-                "method": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.ActionInfos": {
-            "type": "object",
-            "properties": {
-                "actionId": {
-                    "type": "string"
-                },
-                "apiName": {
-                    "type": "string"
-                },
-                "enable": {
-                    "type": "boolean"
-                }
-            }
-        },
         "response.AnalysisDocUrlResp": {
             "type": "object",
             "properties": {
@@ -10434,23 +10118,6 @@
                     "items": {
                         "$ref": "#/definitions/response.Url"
                     }
-                }
-            }
-        },
-        "response.ApiAuthWebRequest": {
-            "type": "object",
-            "properties": {
-                "apiKey": {
-                    "type": "string"
-                },
-                "authType": {
-                    "type": "string"
-                },
-                "customHeaderName": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
                 }
             }
         },
@@ -10592,13 +10259,6 @@
                 "name"
             ],
             "properties": {
-                "actionInfos": {
-                    "description": "action信息",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.ActionInfos"
-                    }
-                },
                 "assistantId": {
                     "type": "string"
                 },

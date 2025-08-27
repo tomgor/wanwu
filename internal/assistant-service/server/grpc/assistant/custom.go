@@ -13,7 +13,7 @@ import (
 func (s *Service) AssistantCustomToolCreate(ctx context.Context, req *assistant_service.AssistantCustomToolCreateReq) (*empty.Empty, error) {
 	assistantId := util.MustU32(req.AssistantId)
 
-	if status := s.cli.CreateAssistantCustom(ctx, assistantId, req.CustomToolId); status != nil {
+	if status := s.cli.CreateAssistantCustom(ctx, assistantId, req.CustomToolId, req.Identity.UserId, req.Identity.OrgId); status != nil {
 		return nil, errStatus(errs.Code_AssistantCustomErr, status)
 	}
 

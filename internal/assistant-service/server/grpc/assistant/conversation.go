@@ -218,13 +218,6 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	log.Debugf("Assistant服务获取到智能体信息，assistantId: %s, 名称: %s, Scope: %d, userId: %s, orgId: %s",
 		req.AssistantId, assistant.Name, assistant.Scope, assistant.UserId, assistant.OrgId)
 
-	// 公开的智能体，xuid使用智能体创建者用户信息
-	xuid := reqUserId
-	if req.AppPublishType == constant.AppPublishPublic {
-		xuid = assistant.UserId
-		log.Debugf("Assistant服务公开智能体，使用创建者信息，assistantId: %s, userId: %s", req.AssistantId, assistant.UserId)
-	}
-
 	// 获取Assistant配置
 	assistantConfig := config.Cfg().Assistant
 	if assistantConfig.SseUrl == "" {
@@ -234,229 +227,94 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	}
 
 	// 组装智能体能力接口请求体
-	requestBody := make(map[string]interface{})
-	requestBody["input"] = req.Prompt
-	requestBody["stream"] = true
+	sseReq := &config.AgentSSERequest{
+		Input:        req.Prompt,
+		Stream:       true,
+		AutoCitation: true,
+	}
+
 	if assistant.Instructions != "" {
-		requestBody["system_role"] = assistant.Instructions
+		sseReq.SystemRole = assistant.Instructions
 	}
+
 	if req.FileInfo.FileUrl != "" {
-		requestBody["upload_file_url"] = req.FileInfo.FileUrl
-		requestBody["file_name"] = req.FileInfo.FileName
+		sseReq.UploadFileUrl = req.FileInfo.FileUrl
+		sseReq.FileName = req.FileInfo.FileName
 	}
 
-	workflowPluginList := []PluginListAlgRequest{}
-	//actionPluginList := []PluginListAlgRequest{}
-	customPluginList := []PluginListAlgRequest{}
-	//if assistant.HasAction {
-	//	actionPluginList, err = buildActionPluginListAlgParam(ctx, s, req.AssistantId, reqUserId, req.Identity.OrgId)
-	//	if err != nil {
-	//		log.Errorf(err.Error())
-	//		SSEError(stream, "智能体action配置错误")
-	//		return err
-	//	}
-	//	log.Debugf("智能体action配置，assistantId: %s, actionPluginList: %s", req.AssistantId, actionPluginList)
-	//}
-	if assistant.HasCustom {
-		customPluginList, err = buildCustomToolListAlgParam(ctx, s, req.AssistantId, reqUserId, req.Identity.OrgId)
-		if err != nil {
-			log.Errorf(err.Error())
-			SSEError(stream, "智能体custom配置错误")
-			return err
-		}
-	}
-	if assistant.HasWorkflow {
-		workflowPluginList, err = buildWorkflowPluginListAlgParam(ctx, s, req.AssistantId, reqUserId, req.Identity.OrgId, req.AccessedWorkFlowIds)
-		if err != nil {
-			log.Errorf(err.Error())
-			SSEError(stream, "智能体workflow配置错误")
-			return err
-		}
-		log.Debugf("智能体workflow配置，assistantId: %s, workflowPluginList: %s", req.AssistantId, workflowPluginList)
-	}
-	//allPlugin := append(actionPluginList, workflowPluginList...)
-	//requestBody["plugin_list"] = allPlugin
-	//log.Debugf("智能体plugin_list，assistantId: %s, plugin_list: %s", req.AssistantId, allPlugin)
-	allPlugin := append(customPluginList, workflowPluginList...)
-	requestBody["plugin_list"] = allPlugin
-	log.Debugf("智能体custom_plugin_list，assistantId: %s, custom_plugin_list: %s", req.AssistantId, allPlugin)
-
-	// 将string类型的ModelConfig转换为common.AppModelConfig
-	var modelConfig *common.AppModelConfig
-	if assistant.ModelConfig != "" {
-		log.Debugf("Assistant服务解析模型配置，assistantId: %s, modelConfig: %s", req.AssistantId, assistant.ModelConfig)
-		modelConfig = &common.AppModelConfig{}
-		if err := json.Unmarshal([]byte(assistant.ModelConfig), modelConfig); err != nil {
-			log.Errorf("Assistant服务解析智能体模型配置失败，assistantId: %s, error: %v, modelConfigRaw: %s", req.AssistantId, err, assistant.ModelConfig)
-			SSEError(stream, "智能体模型配置解析失败")
-			return err
-		}
-		log.Debugf("Assistant服务成功解析智能体模型配置，assistantId: %s, provider: %s, model: %s, modelId: %s, modelType: %s",
-			req.AssistantId, modelConfig.Provider, modelConfig.Model, modelConfig.ModelId, modelConfig.ModelType)
-
-		modelEndpoint := mp.ToModelEndpoint(modelConfig.ModelId, modelConfig.Model)
-		log.Debugf("Assistant服务生成模型端点，assistantId: %s, modelEndpoint: %+v", req.AssistantId, modelEndpoint)
-		requestBody["model"] = modelEndpoint["model"]
-		requestBody["model_url"] = modelEndpoint["model_url"]
-
-		_, modelParams, _ := mp.ToModelParams(modelConfig.Provider, modelConfig.ModelType, modelConfig.Config)
-		log.Debugf("Assistant服务生成模型参数，assistantId: %s, modelParams: %+v", req.AssistantId, modelParams)
-		if modelParams != nil {
-			requestBody = mergeMaps(requestBody, modelParams)
-		}
-	} else {
-		log.Warnf("Assistant服务智能体模型配置为空，assistantId: %s", req.AssistantId)
+	// 模型参数配置
+	modelConfig, err := s.setModelConfigParams(sseReq, assistant)
+	if err != nil {
+		SSEError(stream, "智能体模型配置解析失败")
+		return err
 	}
 
-	onlineSearchConfig := &AppOnlineSearchConfig{}
-	log.Debugf("Assistant服务解析智能体在线搜索配置，assistantId: %s, onlineSearchConfig: %+v", req.AssistantId, assistant.OnlineSearchConfig)
-	if assistant.OnlineSearchConfig != "" {
-		if err := json.Unmarshal([]byte(assistant.OnlineSearchConfig), onlineSearchConfig); err != nil {
-			log.Errorf("Assistant服务解析智能体在线搜索配置失败，assistantId: %s, error: %v, onlineSearchConfigRaw: %s", req.AssistantId, err, assistant.OnlineSearchConfig)
-			SSEError(stream, "智能体在线搜索配置解析失败")
-			return err
-		}
-		log.Debugf("Assistant服务解析智能体在线搜索配置，assistantId: %s, onlineSearchConfig: %+v", req.AssistantId, onlineSearchConfig)
-	}
-	if onlineSearchConfig.Enable && onlineSearchConfig.SearchUrl != "" && onlineSearchConfig.SearchKey != "" {
-		requestBody["search_url"] = onlineSearchConfig.SearchUrl
-		requestBody["search_key"] = onlineSearchConfig.SearchKey
-		requestBody["search_rerank_id"] = onlineSearchConfig.SearchRerankId
-		requestBody["use_search"] = true
-		log.Debugf("Assistant服务添加在线搜索配置到请求参数，assistantId: %s, search_url: %s, search_key: %s, use_search: %v", req.AssistantId, onlineSearchConfig.SearchUrl, onlineSearchConfig.SearchKey, onlineSearchConfig.Enable)
+	// 知识库参数配置
+	if err := s.setKnowledgebaseParams(ctx, sseReq, req, assistant, modelConfig); err != nil {
+		SSEError(stream, "智能体知识库配置解析失败")
+		return err
 	}
 
-	knowledgebaseConfig := &RAGKnowledgeBaseConfig{}
-	if assistant.KnowledgebaseConfig != "" {
-		// 将string类型的knowledgebase_config转换为common.AppKnowledgebaseConfig
-		if errK := json.Unmarshal([]byte(assistant.KnowledgebaseConfig), knowledgebaseConfig); errK != nil {
-			log.Errorf("Assistant服务解析智能体知识库配置失败，assistantId: %s, error: %v, knowledgebaseConfigRaw: %s", req.AssistantId, errK, assistant.KnowledgebaseConfig)
-			SSEError(stream, "智能体知识库配置解析失败")
-			return errK
-		}
-		log.Debugf("Assistant服务解析知识库成功，knowledgebaseConfig: %+v", knowledgebaseConfig)
-	}
-	// 已选知识库
-	if len(knowledgebaseConfig.KnowledgeBaseIds) > 0 {
-		rerankEndpoint, errR := buildRerank(req, stream, knowledgebaseConfig, assistant)
-		if errR != nil {
-			return errR
-		}
-		knowledgeInfoList, errf := Knowledge.SelectKnowledgeDetailByIdList(ctx, &knowledgebase_service.KnowledgeDetailSelectListReq{
-			KnowledgeIds: knowledgebaseConfig.KnowledgeBaseIds,
-		})
-		log.Infof("knowledgeInfoList = %+v", knowledgeInfoList)
-		if errf != nil {
-			return errf
-		}
-		var knowNames []string
-		for _, v := range knowledgeInfoList.List {
-			knowNames = append(knowNames, v.Name)
-		}
-
-		requestBody["kn_params"] = map[string]interface{}{
-			"knowledgeBase":   knowNames,
-			"rerank_id":       rerankEndpoint["model_id"],
-			"model":           rerankEndpoint["model"],
-			"model_url":       rerankEndpoint["model_url"],
-			"rerank_mod":      buildRerankMod(knowledgebaseConfig.PriorityMatch),
-			"retrieve_method": buildRetrieveMethod(knowledgebaseConfig.MatchType),
-			"weights":         buildWeight(knowledgebaseConfig),
-			"max_history":     knowledgebaseConfig.MaxHistory,
-			"threshold":       knowledgebaseConfig.Threshold,
-			"topK":            knowledgebaseConfig.TopK,
-			"rewrite_query":   true,
-		}
-		requestBody["use_know"] = true
-		requestBody["model_id"] = modelConfig.ModelId
-		log.Infof("requestBody = %+v", requestBody)
+	// plugin参数配置
+	if err := s.setCustomAndWorkflowParams(ctx, sseReq, req.AssistantId, req.AccessedWorkFlowIds); err != nil {
+		SSEError(stream, "智能体plugin配置错误")
+		return err
 	}
 
-	// 如果不是试用模式，查询历史聊天记录并添加到请求参数中
+	// 在线搜索参数配置
+	if err := s.setOnlineSearchParams(sseReq, assistant); err != nil {
+		SSEError(stream, "智能体在线搜索配置解析失败")
+		return err
+	}
+
+	// MCP 信息参数配置
+	if err := s.setMCPParams(ctx, sseReq, assistant); err != nil {
+		SSEError(stream, "智能体MCP配置解析失败")
+		return err
+	}
+
+	// 历史聊天记录配置
 	if !req.Trial && req.ConversationId != "" {
-		// 组装查询条件
-		fieldConditions := map[string]interface{}{
-			"conversationId": req.ConversationId,
-			"userId":         reqUserId,
-			"orgId":          req.Identity.OrgId,
-		}
-
-		// 使用通配符查询所有对话详情索引
-		indexPattern := "conversation_detail_infos_*"
-
-		// 从ES查询历史聊天记录，查询所有记录用于构建history
-		documents, _, err := es.Assistant().SearchByFields(ctx, indexPattern, fieldConditions, 0, 1000)
-		if err != nil {
-			log.Warnf("Assistant服务查询历史聊天记录失败，conversationId: %s, userId: %s, error: %v", req.ConversationId, reqUserId, err)
-		} else {
-			// 解析查询结果并构建history数组
-			var historyList []AssistantConversionHistory
-			for _, doc := range documents {
-				var detail model.ConversationDetails
-				if err := json.Unmarshal(doc, &detail); err != nil {
-					log.Warnf("Assistant服务解析ES历史聊天记录失败: %v", err)
-					continue
-				}
-
-				history := AssistantConversionHistory{
-					Query:         detail.Prompt,
-					UploadFileUrl: detail.FileUrl,
-					Response:      detail.Response,
-				}
-				historyList = append(historyList, history)
-			}
-
-			if len(historyList) > 0 {
-				// 将history添加到请求参数中
-				requestBody["history"] = historyList
-				log.Debugf("Assistant服务添加历史聊天记录到请求参数，conversationId: %s, 历史记录数: %d", req.ConversationId, len(historyList))
-			}
-		}
+		s.setHistoryParams(ctx, sseReq, req)
 	}
 
-	// 添加 MCP 信息
-	mcpReqData := &model.RequestData{}
-	mcpReqData.McpTools = make(map[string]model.MCPToolInfo)
-	mcpInfos, errMCP := s.cli.GetAssistantMCPList(ctx, assistant.ID)
-	if errMCP != nil {
-		log.Errorf("Assistant服务获取MCP信息失败，assistantId: %s, error: %v", req.AssistantId, errMCP)
-		SSEError(stream, "获取MCP信息失败")
-		return errStatus(errs.Code_AssistantMCPErr, status)
-	}
-	for _, m := range mcpInfos {
-		mcpCustom, err := MCP.GetCustomMCP(ctx, &mcp_service.GetCustomMCPReq{
-			McpId: m.MCPId,
-		})
-		if err != nil {
-			log.Errorf("Assistant服务获取MCP Custom信息失败，assistantId: %s, error: %v", req.AssistantId, err)
-			SSEError(stream, "获取MCP信息失败")
-			continue
-		}
-
-		// 仅当MCP Custom开启时，才添加到请求参数中
-		if m.Enable {
-			// 组装MCP Custom信息
-			mcpReqData.McpTools[mcpCustom.Info.Name] = model.MCPToolInfo{
-				URL:       mcpCustom.SseUrl,
-				Transport: "sse",
-			}
-		}
-	}
-	requestBody["mcp_tools"] = mcpReqData.McpTools
-	requestBody["auto_citation"] = true // 开启自动引文，定后端写死
-	log.Infof("requestBody = %+v", requestBody)
-	// 向底层智能体能力接口发起请求
-	requestBodyBytes, err := json.Marshal(requestBody)
+	// 底层智能体能力接口请求体
+	var requestBody map[string]interface{}
+	reqBytes, err := json.Marshal(sseReq)
 	if err != nil {
 		log.Errorf("Assistant服务序列化请求体失败，assistantId: %s, error: %v", req.AssistantId, err)
 		SSEError(stream, "请求参数错误")
 		return err
 	}
+	if err := json.Unmarshal(reqBytes, &requestBody); err != nil {
+		log.Errorf("Assistant服务反序列化请求体到map失败，assistantId: %s, error: %v", req.AssistantId, err)
+		SSEError(stream, "请求参数错误")
+		return err
+	}
+
+	// 合并动态模型参数
+	if sseReq.ModelParams != nil {
+		requestBody = mergeMaps(requestBody, sseReq.ModelParams)
+	}
+
+	requestBodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		log.Errorf("Assistant服务序列化最终请求体失败，assistantId: %s, error: %v", req.AssistantId, err)
+		SSEError(stream, "请求参数错误")
+		return err
+	}
 
 	timeout := 300 * time.Second
-
 	startTime := time.Now()
 	id := uuid.New().String()
+
+	// 公开的智能体，xuid使用智能体创建者用户信息
+	xuid := reqUserId
+	if req.AppPublishType == constant.AppPublishPublic {
+		xuid = assistant.UserId
+		log.Debugf("Assistant服务公开智能体，使用创建者信息，assistantId: %s, userId: %s", req.AssistantId, assistant.UserId)
+	}
+
 	log.Infof("Assistant服务开始调用HttpRequestLlmStream，uuid: %s, assistantId: %s, url: %s, userId: %s, timeout: %v, body: %s",
 		id, req.AssistantId, assistantConfig.SseUrl, reqUserId, timeout, string(requestBodyBytes))
 	sseResp, err := HttpRequestLlmStream(ctx, assistantConfig.SseUrl, reqUserId, xuid, bytes.NewReader(requestBodyBytes), timeout)
@@ -566,25 +424,215 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	return nil
 }
 
-func buildRerank(req *assistant_service.AssistantConversionStreamReq, stream assistant_service.AssistantService_AssistantConversionStreamServer, knowledgebaseConfig *RAGKnowledgeBaseConfig, assistant *model.Assistant) (map[string]interface{}, error) {
-	var rerankEndpoint map[string]interface{}
+// 设置模型配置参数
+func (s *Service) setModelConfigParams(sseReq *config.AgentSSERequest, assistant *model.Assistant) (*common.AppModelConfig, error) {
+	if assistant.ModelConfig == "" {
+		log.Warnf("Assistant服务智能体模型配置为空，assistantId: %s", assistant.ID)
+		return nil, nil
+	}
+
+	log.Debugf("Assistant服务解析模型配置，assistantId: %s, modelConfig: %s", assistant.ID, assistant.ModelConfig)
+	modelConfig := &common.AppModelConfig{}
+	if err := json.Unmarshal([]byte(assistant.ModelConfig), modelConfig); err != nil {
+		return nil, fmt.Errorf("Assistant服务解析智能体模型配置失败，assistantId: %d, error: %v, modelConfigRaw: %s", assistant.ID, err, assistant.ModelConfig)
+	}
+
+	log.Debugf("Assistant服务成功解析智能体模型配置，assistantId: %s, provider: %s, model: %s, modelId: %s, modelType: %s",
+		assistant.ID, modelConfig.Provider, modelConfig.Model, modelConfig.ModelId, modelConfig.ModelType)
+
+	modelEndpoint := mp.ToModelEndpoint(modelConfig.ModelId, modelConfig.Model)
+	log.Debugf("Assistant服务生成模型端点，assistantId: %s, modelEndpoint: %+v", assistant.ID, modelEndpoint)
+	sseReq.Model = modelEndpoint["model"].(string)
+	sseReq.ModelUrl = modelEndpoint["model_url"].(string)
+
+	_, modelParams, _ := mp.ToModelParams(modelConfig.Provider, modelConfig.ModelType, modelConfig.Config)
+	log.Debugf("Assistant服务生成模型参数，assistantId: %s, modelParams: %+v", assistant.ID, modelParams)
+	if modelParams != nil {
+		sseReq.ModelParams = modelParams
+	}
+
+	return modelConfig, nil
+}
+
+// 设置知识库参数
+func (s *Service) setKnowledgebaseParams(ctx context.Context, sseReq *config.AgentSSERequest, req *assistant_service.AssistantConversionStreamReq, assistant *model.Assistant, modelConfig *common.AppModelConfig) error {
+	knowledgebaseConfig := &RAGKnowledgeBaseConfig{}
+	if assistant.KnowledgebaseConfig == "" {
+		return nil
+	}
+
+	if err := json.Unmarshal([]byte(assistant.KnowledgebaseConfig), knowledgebaseConfig); err != nil {
+		log.Errorf("Assistant服务解析智能体知识库配置失败，assistantId: %s, error: %v, knowledgebaseConfigRaw: %s", req.AssistantId, err, assistant.KnowledgebaseConfig)
+		return err
+	}
+	log.Debugf("Assistant服务解析知识库成功，knowledgebaseConfig: %+v", knowledgebaseConfig)
+
+	if len(knowledgebaseConfig.KnowledgeBaseIds) > 0 {
+		rerankEndpoint, err := buildRerank(req, knowledgebaseConfig, assistant)
+		if err != nil {
+			return err
+		}
+		knowledgeInfoList, err := Knowledge.SelectKnowledgeDetailByIdList(ctx, &knowledgebase_service.KnowledgeDetailSelectListReq{
+			KnowledgeIds: knowledgebaseConfig.KnowledgeBaseIds,
+		})
+		if err != nil {
+			log.Errorf("Assistant服务获取知识库详情失败, err: %v", err)
+			return err
+		}
+		log.Infof("knowledgeInfoList = %+v", knowledgeInfoList)
+
+		var knowNames []string
+		for _, v := range knowledgeInfoList.List {
+			knowNames = append(knowNames, v.Name)
+		}
+
+		sseReq.KnParams = &config.KnParams{
+			KnowledgeBase:  knowNames,
+			RerankId:       rerankEndpoint["model_id"],
+			Model:          rerankEndpoint["model"],
+			ModelUrl:       rerankEndpoint["model_url"],
+			RerankMod:      buildRerankMod(knowledgebaseConfig.PriorityMatch),
+			RetrieveMethod: buildRetrieveMethod(knowledgebaseConfig.MatchType),
+			Weights:        buildWeight(knowledgebaseConfig),
+			MaxHistory:     int(knowledgebaseConfig.MaxHistory),
+			Threshold:      knowledgebaseConfig.Threshold,
+			TopK:           int(knowledgebaseConfig.TopK),
+			RewriteQuery:   true,
+		}
+		sseReq.UseKnow = true
+		if modelConfig != nil {
+			sseReq.ModelId = modelConfig.ModelId
+		}
+	}
+	return nil
+}
+
+// 设置plugin参数：自定义工具和工作流
+func (s *Service) setCustomAndWorkflowParams(ctx context.Context, sseReq *config.AgentSSERequest, assistantId string, accessedWorkFlowIds []string) error {
+	customPluginList, err := buildCustomToolListAlgParam(ctx, s, assistantId)
+	if err != nil {
+		return fmt.Errorf("智能体custom配置错误: %w", err)
+	}
+
+	workflowPluginList, err := buildWorkflowPluginListAlgParam(ctx, s, assistantId, accessedWorkFlowIds)
+	if err != nil {
+		return fmt.Errorf("智能体workflow配置错误: %w", err)
+	}
+
+	log.Debugf("智能体workflow配置，assistantId: %s, workflowPluginList: %s", assistantId, workflowPluginList)
+	allPlugin := append(customPluginList, workflowPluginList...)
+	sseReq.PluginList = allPlugin
+	log.Debugf("智能体custom_plugin_list，assistantId: %s, custom_plugin_list: %s", assistantId, allPlugin)
+	return nil
+}
+
+// 设置在线搜索参数
+func (s *Service) setOnlineSearchParams(sseReq *config.AgentSSERequest, assistant *model.Assistant) error {
+	if assistant.OnlineSearchConfig == "" {
+		return nil
+	}
+
+	onlineSearchConfig := &AppOnlineSearchConfig{}
+	log.Debugf("Assistant服务解析智能体在线搜索配置，assistantId: %s, onlineSearchConfig: %+v", assistant.ID, assistant.OnlineSearchConfig)
+	if err := json.Unmarshal([]byte(assistant.OnlineSearchConfig), onlineSearchConfig); err != nil {
+		return fmt.Errorf("Assistant服务解析智能体在线搜索配置失败，assistantId: %d, error: %v, onlineSearchConfigRaw: %s", assistant.ID, err, assistant.OnlineSearchConfig)
+	}
+	log.Debugf("Assistant服务解析智能体在线搜索配置，assistantId: %s, onlineSearchConfig: %+v", assistant.ID, onlineSearchConfig)
+
+	if onlineSearchConfig.Enable && onlineSearchConfig.SearchUrl != "" && onlineSearchConfig.SearchKey != "" {
+		sseReq.SearchUrl = onlineSearchConfig.SearchUrl
+		sseReq.SearchKey = onlineSearchConfig.SearchKey
+		sseReq.SearchRerankId = onlineSearchConfig.SearchRerankId
+		sseReq.UseSearch = true
+		log.Debugf("Assistant服务添加在线搜索配置到请求参数，assistantId: %s, search_url: %s, search_key: %s, use_search: %v", assistant.ID, onlineSearchConfig.SearchUrl, onlineSearchConfig.SearchKey, onlineSearchConfig.Enable)
+	}
+	return nil
+}
+
+// 设置MCP参数
+func (s *Service) setMCPParams(ctx context.Context, sseReq *config.AgentSSERequest, assistant *model.Assistant) error {
+	mcpInfos, err := s.cli.GetAssistantMCPList(ctx, assistant.ID)
+	if err != nil {
+		return fmt.Errorf("Assistant服务获取MCP信息失败，assistantId: %d, error: %v", assistant.ID, err)
+	}
+
+	mcpTools := make(map[string]config.MCPToolInfo)
+	for _, m := range mcpInfos {
+		if !m.Enable {
+			continue
+		}
+		mcpCustom, err := MCP.GetCustomMCP(ctx, &mcp_service.GetCustomMCPReq{
+			McpId: m.MCPId,
+		})
+		if err != nil {
+			log.Errorf("Assistant服务获取MCP Custom信息失败，assistantId: %d, error: %v", assistant.ID, err)
+			// 单个MCP获取失败不影响整体流程
+			continue
+		}
+		mcpTools[mcpCustom.Info.Name] = config.MCPToolInfo{
+			URL:       mcpCustom.SseUrl,
+			Transport: "sse",
+		}
+	}
+	sseReq.McpTools = mcpTools
+	return nil
+}
+
+// 设置历史记录参数
+func (s *Service) setHistoryParams(ctx context.Context, sseReq *config.AgentSSERequest, req *assistant_service.AssistantConversionStreamReq) {
+	fieldConditions := map[string]interface{}{
+		"conversationId": req.ConversationId,
+		"userId":         req.Identity.UserId,
+		"orgId":          req.Identity.OrgId,
+	}
+	indexPattern := "conversation_detail_infos_*"
+
+	documents, _, err := es.Assistant().SearchByFields(ctx, indexPattern, fieldConditions, 0, 1000)
+	if err != nil {
+		log.Warnf("Assistant服务查询历史聊天记录失败，conversationId: %s, userId: %s, error: %v", req.ConversationId, req.Identity.UserId, err)
+		return
+	}
+
+	var historyList []config.AssistantConversionHistory
+	for _, doc := range documents {
+		var detail model.ConversationDetails
+		if err := json.Unmarshal(doc, &detail); err != nil {
+			log.Warnf("Assistant服务解析ES历史聊天记录失败: %v", err)
+			continue
+		}
+		history := config.AssistantConversionHistory{
+			Query:         detail.Prompt,
+			UploadFileUrl: detail.FileUrl,
+			Response:      detail.Response,
+		}
+		historyList = append(historyList, history)
+	}
+
+	if len(historyList) > 0 {
+		sseReq.History = historyList
+		log.Debugf("Assistant服务添加历史聊天记录到请求参数，conversationId: %s, 历史记录数: %d", req.ConversationId, len(historyList))
+	}
+}
+
+func buildRerank(req *assistant_service.AssistantConversionStreamReq, knowledgebaseConfig *RAGKnowledgeBaseConfig, assistant *model.Assistant) (map[string]interface{}, error) {
+	rerankModel := map[string]interface{}{}
+
+	log.Debugf("Assistant服务解析知识库rerank配置，assistantId: %s", req.AssistantId)
 	if knowledgebaseConfig.PriorityMatch != 1 {
 		rerankConfig := &common.AppModelConfig{}
 		if assistant.RerankConfig != "" {
 			if err := json.Unmarshal([]byte(assistant.RerankConfig), rerankConfig); err != nil {
 				log.Errorf("Assistant服务解析智能体rerank配置失败，assistantId: %s, error: %v, rerankConfigRaw: %s", req.AssistantId, err, assistant.RerankConfig)
-				SSEError(stream, "智能体rerank配置解析失败")
 				return nil, err
 			}
 			if rerankConfig.Model == "" || rerankConfig.ModelId == "" {
 				log.Errorf("Assistant服务缺少rerank配置，assistantId: %s", req.AssistantId)
-				SSEError(stream, "智能体缺少rerank配置")
 				return nil, fmt.Errorf("智能体缺少rerank配置")
 			}
 		}
-		rerankEndpoint = mp.ToModelEndpoint(rerankConfig.ModelId, rerankConfig.Model)
+		rerankModel = mp.ToModelEndpoint(rerankConfig.ModelId, rerankConfig.Model)
 	}
-	return rerankEndpoint, nil
+	return rerankModel, nil
 }
 
 // 使用独立上下文保存对话的辅助函数
@@ -630,32 +678,11 @@ func buildRerankMod(priorityType int32) string {
 }
 
 // buildWeight 构造权重信息
-func buildWeight(knowConfig *RAGKnowledgeBaseConfig) *WeightParams {
+func buildWeight(knowConfig *RAGKnowledgeBaseConfig) []float64 {
 	if knowConfig.PriorityMatch != 1 {
 		return nil
 	}
-	return &WeightParams{
-		VectorWeight: knowConfig.SemanticsPriority,
-		TextWeight:   knowConfig.KeywordPriority,
-	}
-}
-
-type AssistantConversionHistory struct {
-	Query         string `json:"query"`
-	UploadFileUrl string `json:"upload_file_url"`
-	Response      string `json:"response"`
-}
-
-type PluginListAlgRequest struct {
-	APISchema map[string]interface{} `json:"api_schema"`
-	APIAuth   *APIAuth               `json:"api_auth,omitempty"`
-}
-
-type APIAuth struct {
-	Type  string `json:"type"`
-	In    string `json:"in"`
-	Name  string `json:"name"`
-	Value string `json:"value"`
+	return []float64{float64(knowConfig.SemanticsPriority), float64(knowConfig.KeywordPriority)}
 }
 
 type AppKnowledgebaseConfig struct {
@@ -714,12 +741,9 @@ func mergeMaps(map1, map2 map[string]interface{}) map[string]interface{} {
 	return result
 }
 
-func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantId, userId, orgId string, accessedWorkFlowIds []string) (pluginList []PluginListAlgRequest, err error) {
-	pluginList = []PluginListAlgRequest{}
-	assistantIdConv, err := pkgUtil.U32(assistantId)
-	if err != nil {
-		return pluginList, err
-	}
+func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantId string, accessedWorkFlowIds []string) (pluginList []config.PluginListAlgRequest, err error) {
+	pluginList = []config.PluginListAlgRequest{}
+	assistantIdConv := pkgUtil.MustU32(assistantId)
 	resp, status := s.cli.GetAssistantWorkflowsByAssistantID(ctx, assistantIdConv)
 	if status != nil {
 		return pluginList, errStatus(errs.Code_AssistantConversationErr, status)
@@ -737,7 +761,7 @@ func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantI
 				assistantId, assistantWorkFlowModel.WorkflowId)
 			continue
 		}
-		tmp := PluginListAlgRequest{}
+		tmp := config.PluginListAlgRequest{}
 		//实时查询该工作流最新schema
 		workflowService := config.Cfg().AgentScopeWorkflow
 		url, _ := net_url.JoinPath(workflowService.Endpoint, workflowService.WorkflowSchemaUri)
@@ -781,13 +805,10 @@ func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantI
 	return pluginList, nil
 }
 
-func buildCustomToolListAlgParam(ctx context.Context, s *Service, assistantId, userId, orgId string) (pluginList []PluginListAlgRequest, err error) {
-	pluginList = []PluginListAlgRequest{}
+func buildCustomToolListAlgParam(ctx context.Context, s *Service, assistantId string) (pluginList []config.PluginListAlgRequest, err error) {
+	pluginList = []config.PluginListAlgRequest{}
 	// 获取自定义工具列表
-	assistantIdConv, err := pkgUtil.U32(assistantId)
-	if err != nil {
-		return pluginList, err
-	}
+	assistantIdConv := pkgUtil.MustU32(assistantId)
 	resp, status := s.cli.GetAssistantCustomList(ctx, assistantIdConv)
 	if status != nil {
 		return pluginList, errStatus(errs.Code_AssistantConversationErr, status)
@@ -796,7 +817,7 @@ func buildCustomToolListAlgParam(ctx context.Context, s *Service, assistantId, u
 		if !assistantCustomTool.Enable {
 			continue
 		}
-		tmp := PluginListAlgRequest{}
+		tmp := config.PluginListAlgRequest{}
 		// 获取自定义工具详情
 		info, err := MCP.GetCustomToolInfo(ctx, &mcp_service.GetCustomToolInfoReq{
 			CustomToolId: assistantCustomTool.CustomId,
@@ -821,7 +842,7 @@ func buildCustomToolListAlgParam(ctx context.Context, s *Service, assistantId, u
 		}
 
 		if info.ApiAuth.Type == "apiKey" {
-			apiAuth := APIAuth{
+			apiAuth := config.APIAuth{
 				Type:  "apiKey",
 				In:    "query",
 				Name:  info.ApiAuth.CustomHeaderName,

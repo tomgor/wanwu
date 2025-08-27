@@ -17,13 +17,6 @@ type IClient interface {
 	GetAssistantList(ctx context.Context, userID, orgID string, name string) ([]*model.Assistant, int64, *err_code.Status)
 	CheckSameAssistantName(ctx context.Context, userID, orgID, name, assistantID string) *err_code.Status
 
-	//================AssistantAction================
-	CreateAssistantAction(ctx context.Context, action *model.AssistantAction) *err_code.Status
-	DeleteAssistantAction(ctx context.Context, actionID uint32) *err_code.Status
-	UpdateAssistantAction(ctx context.Context, action *model.AssistantAction) *err_code.Status
-	GetAssistantAction(ctx context.Context, actionID uint32) (*model.AssistantAction, *err_code.Status)
-	GetAssistantActionsByAssistantID(ctx context.Context, assistantID string) ([]*model.AssistantAction, *err_code.Status)
-
 	//================AssistantWorkflow================
 	CreateAssistantWorkflow(ctx context.Context, workflow *model.AssistantWorkflow) *err_code.Status
 	DeleteAssistantWorkflow(ctx context.Context, assistantId uint32, workflowId string) *err_code.Status
@@ -32,14 +25,14 @@ type IClient interface {
 	GetAssistantWorkflowsByAssistantID(ctx context.Context, assistantId uint32) ([]*model.AssistantWorkflow, *err_code.Status)
 
 	//================AssistantMCP================
-	CreateAssistantMCP(ctx context.Context, assistantId uint32, mcpId string) *err_code.Status
+	CreateAssistantMCP(ctx context.Context, assistantId uint32, mcpId string, userId, orgID string) *err_code.Status
 	DeleteAssistantMCP(ctx context.Context, assistantId uint32, mcpId string) *err_code.Status
 	GetAssistantMCP(ctx context.Context, assistantId uint32, mcpId string) (*model.AssistantMCP, *err_code.Status)
 	GetAssistantMCPList(ctx context.Context, assistantId uint32) ([]*model.AssistantMCP, *err_code.Status)
 	UpdateAssistantMCP(ctx context.Context, mcp *model.AssistantMCP) *err_code.Status
 
 	//================AssistantCustom================
-	CreateAssistantCustom(ctx context.Context, assistantId uint32, customId string) *err_code.Status
+	CreateAssistantCustom(ctx context.Context, assistantId uint32, customId string, userId, orgID string) *err_code.Status
 	DeleteAssistantCustom(ctx context.Context, assistantId uint32, customId string) *err_code.Status
 	GetAssistantCustom(ctx context.Context, assistantId uint32, customId string) (*model.AssistantCustom, *err_code.Status)
 	UpdateAssistantCustom(ctx context.Context, custom *model.AssistantCustom) *err_code.Status

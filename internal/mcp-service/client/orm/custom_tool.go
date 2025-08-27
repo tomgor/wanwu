@@ -50,6 +50,14 @@ func (c *Client) ListCustomTools(ctx context.Context, orgID, userID, name string
 	return customToolInfos, nil
 }
 
+func (c *Client) ListCustomToolsByCustomToolIDs(ctx context.Context, ids []uint32) ([]*model.CustomTool, *err_code.Status) {
+	var customToolInfos []*model.CustomTool
+	if err := sqlopt.WithIDs(ids).Apply(c.db).WithContext(ctx).Find(&customToolInfos).Error; err != nil {
+		return nil, toErrStatus("mcp_get_custom_tool_list_err", err.Error())
+	}
+	return customToolInfos, nil
+}
+
 func (c *Client) UpdateCustomTool(ctx context.Context, customTool *model.CustomTool) *err_code.Status {
 	if err := sqlopt.WithID(customTool.ID).Apply(c.db).WithContext(ctx).Model(customTool).Updates(map[string]interface{}{
 		"name":               customTool.Name,
