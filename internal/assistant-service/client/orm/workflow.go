@@ -10,7 +10,7 @@ import (
 
 func (c *Client) CreateAssistantWorkflow(ctx context.Context, workflow *model.AssistantWorkflow) *err_code.Status {
 	// 创建Workflow
-	if err := c.db.Create(workflow).Error; err != nil {
+	if err := c.db.WithContext(ctx).Create(workflow).Error; err != nil {
 		return toErrStatus("assistant_workflow_create", err.Error())
 	}
 
@@ -21,7 +21,7 @@ func (c *Client) UpdateAssistantWorkflow(ctx context.Context, workflow *model.As
 	cond := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(workflow.AssistantId),
 		sqlopt.WithWorkflowID(workflow.WorkflowId),
-	).Apply(c.db)
+	).Apply(c.db.WithContext(ctx))
 	if err := cond.Model(workflow).Updates(map[string]interface{}{
 		"enable": workflow.Enable,
 	}).Error; err != nil {
@@ -35,7 +35,7 @@ func (c *Client) GetAssistantWorkflow(ctx context.Context, assistantId uint32, w
 	if err := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(assistantId),
 		sqlopt.WithWorkflowID(workflowId),
-	).Apply(c.db).First(workflow).Error; err != nil {
+	).Apply(c.db.WithContext(ctx)).First(workflow).Error; err != nil {
 		return nil, toErrStatus("assistant_workflow_get", err.Error())
 	}
 	return workflow, nil
@@ -43,7 +43,7 @@ func (c *Client) GetAssistantWorkflow(ctx context.Context, assistantId uint32, w
 
 func (c *Client) GetAssistantWorkflowsByAssistantID(ctx context.Context, assistantId uint32) ([]*model.AssistantWorkflow, *err_code.Status) {
 	var workflows []*model.AssistantWorkflow
-	if err := sqlopt.WithAssistantID(assistantId).Apply(c.db).Find(&workflows).Error; err != nil {
+	if err := sqlopt.WithAssistantID(assistantId).Apply(c.db.WithContext(ctx)).Find(&workflows).Error; err != nil {
 		return nil, toErrStatus("assistant_workflows_get_by_assistant_id", err.Error())
 	}
 	return workflows, nil
@@ -53,7 +53,7 @@ func (c *Client) DeleteAssistantWorkflow(ctx context.Context, assistantId uint32
 	if err := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(assistantId),
 		sqlopt.WithWorkflowID(workflowId),
-	).Apply(c.db).Delete(&model.AssistantWorkflow{}).Error; err != nil {
+	).Apply(c.db.WithContext(ctx)).Delete(&model.AssistantWorkflow{}).Error; err != nil {
 		return toErrStatus("assistant_workflow_delete", err.Error())
 	}
 	return nil
