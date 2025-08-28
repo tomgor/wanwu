@@ -72,7 +72,7 @@ func (s *Service) SelectKnowledgeDetailByIdList(ctx context.Context, req *knowle
 
 func (s *Service) CreateKnowledge(ctx context.Context, req *knowledgebase_service.CreateKnowledgeReq) (*knowledgebase_service.CreateKnowledgeResp, error) {
 	//1.重名校验
-	err := orm.CheckSameKnowledgeName(ctx, req.UserId, req.OrgId, req.Name)
+	err := orm.CheckSameKnowledgeName(ctx, req.UserId, req.OrgId, req.Name, "")
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (s *Service) UpdateKnowledge(ctx context.Context, req *knowledgebase_servic
 		return nil, err
 	}
 	//2.重名校验
-	err = orm.CheckSameKnowledgeName(ctx, req.UserId, req.OrgId, req.Name)
+	err = orm.CheckSameKnowledgeName(ctx, req.UserId, req.OrgId, req.Name, knowledge.KnowledgeId)
 	if err != nil {
 		return nil, err
 	}

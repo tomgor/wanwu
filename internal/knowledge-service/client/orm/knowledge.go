@@ -89,9 +89,9 @@ func SelectKnowledgeByIdNoDeleteCheck(ctx context.Context, knowledgeId, userId, 
 }
 
 // CheckSameKnowledgeName 知识库名称是否存在同名
-func CheckSameKnowledgeName(ctx context.Context, userId, orgId, name string) error {
+func CheckSameKnowledgeName(ctx context.Context, userId, orgId, name, knowledgeId string) error {
 	var count int64
-	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.WithName(name), sqlopt.WithDelete(0)).
+	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.WithName(name), sqlopt.WithoutKnowledgeID(knowledgeId), sqlopt.WithDelete(0)).
 		Apply(db.GetHandle(ctx), &model.KnowledgeBase{}).
 		Count(&count).Error
 	if err != nil {
