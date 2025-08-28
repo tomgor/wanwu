@@ -9,6 +9,7 @@ import (
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	sse_util "github.com/UnicomAI/wanwu/pkg/sse-util"
 	"github.com/gin-gonic/gin"
@@ -147,5 +148,8 @@ func getAppUrlInfoAndCheck(ctx *gin.Context, suffix string) (*app_service.AppUrl
 	if appUrlInfo.ExpiredAt != 0 && time.Now().After(time.Unix(appUrlInfo.ExpiredAt/1000, 0)) {
 		return nil, grpc_util.ErrorStatus(err_code.Code_AppUrlExpired)
 	}
+	// 设置UserID、OrgID（通过http调用工作流接口header需要传递）
+	ctx.Set(gin_util.USER_ID, appUrlInfo.UserId)
+	ctx.Set(gin_util.X_ORG_ID, appUrlInfo.OrgId)
 	return appUrlInfo, nil
 }

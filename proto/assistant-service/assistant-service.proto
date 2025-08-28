@@ -131,16 +131,17 @@ message GetAssistantListMyAllReq {
 
 message AssistantInfo {
   string assistantId = 1;
-  common.AppBriefConfig assistantBrief = 2;
-  string prologue = 3;
-  string instructions = 4;
-  repeated string recommendQuestion = 5;
-  common.AppModelConfig modelConfig = 6;                  // 模型配置
-  AssistantKnowledgeBaseConfig knowledgeBaseConfig = 7;  // 知识库
-  common.AppModelConfig rerankConfig = 8;                  // Rerank模型  
-  AssistantOnlineSearchConfig onlineSearchConfig = 9;     // 在线搜索配置
-  int32 scope = 10;
-  repeated WorkFlowInfos workFlowInfos = 11;
+  Identity identity = 2;
+  common.AppBriefConfig assistantBrief = 3;
+  string prologue = 4;
+  string instructions = 5;
+  repeated string recommendQuestion = 6;
+  common.AppModelConfig modelConfig = 7;                 // 模型配置
+  AssistantKnowledgeBaseConfig knowledgeBaseConfig = 8;  // 知识库
+  common.AppModelConfig rerankConfig = 9;                // Rerank模型  
+  AssistantOnlineSearchConfig onlineSearchConfig = 10;   // 在线搜索配置
+  int32 scope = 11;
+  repeated WorkFlowInfos workFlowInfos = 12;
   int64 creatTime = 13;
   int64 updateTime = 14;
   AssistantSafetyConfig safetyConfig = 15;

@@ -330,6 +330,10 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 
 	return &assistant_service.AssistantInfo{
 		AssistantId: strconv.FormatUint(uint64(assistant.ID), 10),
+		Identity: &assistant_service.Identity{
+			UserId: assistant.UserId,
+			OrgId:  assistant.OrgId,
+		},
 		AssistantBrief: &common.AppBriefConfig{
 			Name:       assistant.Name,
 			AvatarPath: assistant.AvatarPath,
