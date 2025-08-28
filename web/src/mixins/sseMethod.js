@@ -472,13 +472,12 @@ export default {
                                             response: [0,1,2,3,4,6,20,21,10].includes(commonData.qa_type)?md.render(finalResponse):finalResponse.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
                                             // response:finalResponse,
                                             oriResponse:endStr,
-                                            searchList:(search_list && search_list.length) ? search_list.some(n => n.title.indexOf('yunyingshang') > -1)? []: search_list.map(n => ({
+                                            searchList:(search_list && search_list.length) ? search_list.map(n => ({
                                                   ...n, // 复制原有的对象属性
                                                   snippet: md.render(n.snippet) // 对snippet进行Markdown渲染
                                                 }))
                                             : []
                                         }
-
                                         this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                                         if(worldObj.finish !== 0){
                                             if(worldObj.finish === 4){

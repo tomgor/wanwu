@@ -89,11 +89,12 @@
           <!--出处-->
           <div v-if="n.searchList && n.searchList.length && sessionStatus !== 0" class="search-list">
             <div v-for="(m,j) in n.searchList" :key="`${j}sdsl`" class="search-list-item">
-              <div class="serach-list-item" v-if="citationsArray.includes(j+1)">
+              <!-- citationsArray.includes(j+1) && n.qa_type === 1  -->
+              <div class="serach-list-item" v-if="showSearchList(j,n.qa_type)">
                 <span @click="collapseClick(n,m,j)"><i :class="['',m.collapse?'el-icon-caret-bottom':'el-icon-caret-right']"></i>出处：</span>
-                <a v-if="m.link" :href="m.link" target="_blank">{{m.link}}</a>
+                <a v-if="m.link" :href="m.link" target="_blank" class="link">{{m.link}}</a>
                 <span v-if="m.title">
-                  <sub class="subTag" :data-parents-index="i" :data-collapse="m.collapse?'true':'false'">{{j + 1}}</sub> {{m.title}}
+                  <sub class="subTag" :data-parents-index="i" :data-collapse="m.collapse?'true':'false'" v-if="n.qa_type === 1">{{j + 1}}</sub> {{m.title}}
                 </span>
                 <!-- <span @click="goPreview($event,m)" class="search-doc">查看全文</span> -->
               </div>
@@ -254,18 +255,22 @@ export default {
       }
     },
     methods:{
+          showSearchList(j,qa_type){
+            return qa_type === 1 ? this.citationsArray.includes(j + 1) : true;
+          },
           setCitations() {
             const allCitations = document.querySelectorAll('.citation');
             const citationsSet = new Set();
+            if(allCitations.length > 0){
+                allCitations.forEach(element => {
+                const text = element.textContent.trim();
+                if (text) {
+                  citationsSet.add(Number(text));
+                }
+              });
+              this.citationsArray = Array.from(citationsSet);
+            }
             
-            allCitations.forEach(element => {
-              const text = element.textContent.trim();
-              if (text) {
-                citationsSet.add(Number(text));
-              }
-            });
-            
-            this.citationsArray = Array.from(citationsSet);
           },
           goPreview(event,item){
             event.stopPropagation(); // 阻止事件冒泡
@@ -636,8 +641,9 @@ export default {
 
 <style scoped lang="scss">
 .serach-list-item{
-  display: flex;
-  align-items: center;
+  .link:hover{
+    color: #384BF7!important;
+  }
   .search-doc{
     margin-left:10px;
     cursor: pointer;
