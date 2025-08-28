@@ -32,6 +32,8 @@
                         loading-text="模型加载中..."
                         class="cover-input-icon"
                         style="width:100%;"
+                        filterable
+                        clearable
                     >
                         <el-option
                         v-for="(item,index) in rerankOptions"
