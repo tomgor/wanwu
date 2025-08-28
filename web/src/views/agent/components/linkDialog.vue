@@ -70,6 +70,9 @@ export default {
             }
         }
     },
+    created(){
+        this.getRerankData();
+    },
     methods:{
         rerankVisible(val){
             if(val){
@@ -99,11 +102,12 @@ export default {
             
         },
         showDialog(){
-            this.dialogVisible = true
+            this.dialogVisible = true;
              if(this.linkform !== null){
                 this.form.searchUrl = this.linkform.searchUrl;
                 this.form.searchKey = this.linkform.searchKey;
                 this.form.searchRerankId = this.linkform.searchRerankId;
+                console.log(this.form)
             }
         }
     }
