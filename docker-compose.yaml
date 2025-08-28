@@ -566,7 +566,7 @@ services:
       MINIO_API_HOST: http://${WANWU_MINIO_ENDPOINT}
       MINIO_PROXY_ENDPOINT: :8998
       # 用于code节点运行
-      CODE_RUNNER_TYPE: sandbox
+      CODE_RUNNER_TYPE: local
       CODE_RUNNER_ALLOW_NET: "cdn.jsdelivr.net"
     working_dir: /app
     command: ./bin/workflow-wanwu
