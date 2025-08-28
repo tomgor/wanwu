@@ -402,12 +402,6 @@ export default {
             this.eventSource = new fetchEventSource(this.origin + this.sseApi, {
                 method: 'POST',
                 headers,
-                // headers: {
-                //     "Content-Type": 'application/json',
-                //     'Authorization': 'Bearer ' + this.token,
-                //     "x-user-id": userInfo.uid,
-                //     "x-org-id": userInfo.orgId
-                // },
                 signal: this.ctrlAbort.signal,
                 body: JSON.stringify(data),
                 openWhenHidden: true, //页面退至后台保持连接

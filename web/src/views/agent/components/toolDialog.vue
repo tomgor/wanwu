@@ -34,8 +34,7 @@
 <script>
 import { getList } from '@/api/workflow.js';
 import { addWorkFlowInfo, addMcp,customList,addCustom } from "@/api/agent";
-import { getExplorationFlowList,readWorkFlow} from "@/api/workflow";
-import { Base64 } from "js-base64";
+import { getExplorationFlowList} from "@/api/workflow";
 export default {
     props:['assistantId'],
     data(){
@@ -84,10 +83,9 @@ export default {
         getCustomList(name){
             customList({name}).then(res =>{
                 if(res.code === 0){
-                    customList
                     this.customInfos = (res.data.list || []).map(m => ({
                         ...m,
-                        checked: this.customList.some(item => item.customToolId === m.customToolId)
+                        checked: this.customList.some(item => item.customId === m.customToolId)
                     }));
                 }
             }).catch(() =>{
@@ -146,22 +144,12 @@ export default {
             })
         },
         addWorkFlow(n){
-            // let params = { workflowID: n.appId};
-            // readWorkFlow(params).then(res => {
-            //     if(res.code === 0){
-            //         this.doCreateWorkFlow(n,n.appId, res.data.base64OpenAPISchema);
-            //     }
-            // })
             this.doCreateWorkFlow(n,n.appId)
         },
         async doCreateWorkFlow(n,workFlowId, schema){
             let params = {
                 assistantId: this.assistantId,
-                // schema: Base64.decode(schema),
-                workFlowId,
-                // apiAuth: {
-                // type: "none",
-                // },
+                workFlowId
             };
             let res = await addWorkFlowInfo(params);
             if (res.code === 0) {
@@ -192,7 +180,7 @@ export default {
 
             })
             },
-            getWorkflowList(name) {
+        getWorkflowList(name) {
                 getExplorationFlowList({name,appType:'workflow',searchType:'all'}).then(res =>{
                     if (res.code === 0) {
                         this.workFlowInfos = (res.data.list || []).map(m => ({
@@ -206,6 +194,7 @@ export default {
             this.dialogVisible = true;
             this.setMcp(row.mcpInfos);
             this.setWorkflow(row.workFlowInfos);
+            this.setCustom(row.customInfos)
             this.mcpList = row.mcpInfos || [];
             this.workFlowList = row.workFlowInfos || [];
             this.customList  = row.customInfos || [];
@@ -222,9 +211,15 @@ export default {
             checked: data.some(item => item.workFlowId === m.appId)
             }));
         },
+        setCustom(data){
+            this.customInfos = this.customInfos.map(m => ({
+                ...m,
+                checked: data.some(item => item.customId === m.customToolId)
+            }));
+        },
         handleClose(){
             this.toolIndex = -1;
-            this.activeValue = '';
+            this.activeValue = 'auto'
             this.dialogVisible = false;
         },
         clickTool(item,i){

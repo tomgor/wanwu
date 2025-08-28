@@ -687,6 +687,7 @@ export default {
       const data = {
         mcpInfos: this.mcpInfos,
         workFlowInfos: this.workFlowInfos,
+        customInfos:this.actionInfos
       };
       this.$refs.toolDiaglog.showDialog(data);
     },
