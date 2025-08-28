@@ -42,6 +42,15 @@ func WithKnowledgeID(id string) SQLOption {
 	})
 }
 
+func WithoutKnowledgeID(knowledgeId string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if len(knowledgeId) == 0 {
+			return db
+		}
+		return db.Where("knowledge_id != ?", knowledgeId)
+	})
+}
+
 func WithKnowledgeIDList(idList []string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		if len(idList) > 0 {
