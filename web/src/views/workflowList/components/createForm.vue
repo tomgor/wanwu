@@ -81,7 +81,8 @@ export default {
           { required: true, message: this.$t('list.nameRules'), trigger: "blur" },
           {
             validator: (rule, value, callback) => {
-              if (/^[A-Za-z0-9.\u4e00-\u9fa5_-]+$/.test(value)) {
+              // 对其新版工作流名称规则
+              if (/^[a-zA-Z][a-zA-Z0-9_]{0,63}$/.test(value)) {
                 callback();
               } else {
                 callback(
