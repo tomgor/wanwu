@@ -34,10 +34,6 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-const (
-	DefaultTermWeight = 1
-)
-
 // ConversationCreate 创建对话
 func (s *Service) ConversationCreate(ctx context.Context, req *assistant_service.ConversationCreateReq) (*assistant_service.ConversationCreateResp, error) {
 	// 组装model参数
@@ -685,9 +681,8 @@ func buildRerankMod(priorityType int32) string {
 func buildTermWeight(knowConfig *RAGKnowledgeBaseConfig) float32 {
 	if knowConfig.TermWeightEnable {
 		return knowConfig.TermWeight
-	} else {
-		return DefaultTermWeight
 	}
+	return 0.0
 }
 
 // buildWeight 构造权重信息

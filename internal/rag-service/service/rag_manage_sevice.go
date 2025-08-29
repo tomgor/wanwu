@@ -162,8 +162,6 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	ragChatParams.RerankModelId = buildRerankId(knowledgeConfig.PriorityMatch, rag.RerankConfig.ModelId)
 	if rag.KnowledgeBaseConfig.TermWeightEnable {
 		ragChatParams.TermWeight = float32(rag.KnowledgeBaseConfig.TermWeight)
-	} else {
-		ragChatParams.TermWeight = DefaultTermWeight
 	}
 	// RAG属性参数
 	ragChatParams.Question = req.Question
