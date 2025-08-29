@@ -110,11 +110,9 @@
 
 - 元景万悟智能体平台的工作流模块使用的是以下项目，可到其仓库查看详情。
 
-  - v0.1.8以前：[wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git)项目
+  - v0.1.8以前：[wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git) 项目
 
-  - v0.2.0开始：[wanwu-workflow](https://github.com/UnicomAI/wanwu-workflow.git)项目
-
-    
+  - v0.2.0开始：[wanwu-workflow](https://github.com/UnicomAI/wanwu-workflow/tree/dev/wanwu-backend) 项目
 
 - **Docker安装（推荐）**
 
