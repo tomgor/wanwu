@@ -6,7 +6,7 @@
   >
     <template #main-content>
       <div class="app-content">
-        <div class="app-header-api">
+        <!-- <div class="app-header-api">
             <span class="app_name"><span class="el-icon-arrow-left goBack" @click="goBack"></span>{{editForm.name}}</span>
             <div class="header-api-box">
                 <div class="header-api-url">
@@ -18,9 +18,9 @@
                     API秘钥
                 </el-button>
             </div>
-        </div>
+        </div> -->
         <Chat :editForm="editForm" :chatType="'chat'"/>
-        <ApiKeyDialog ref="apiKeyDialog" :appId="editForm.appId" :appType="'rag'" />
+        <!-- <ApiKeyDialog ref="apiKeyDialog" :appId="editForm.appId" :appType="'rag'" /> -->
       </div>
     </template>
   </CommonLayout>
@@ -28,11 +28,11 @@
 <script>
 import CommonLayout from '@/components/exploreContainer.vue'
 import Chat from './components/chat.vue'
-import ApiKeyDialog from './components/ApiKeyDialog.vue'
+// import ApiKeyDialog from './components/ApiKeyDialog.vue'
 import {getApiKeyRoot} from "@/api/appspace";
 import { getRagInfo } from "@/api/rag";
 export default {
-    components: {CommonLayout,Chat,ApiKeyDialog },
+    components: {CommonLayout,Chat },
     data(){
         return {
             apiURL:'',
@@ -58,7 +58,7 @@ export default {
         if(this.$route.query.id){
             this.editForm.appId = this.$route.query.id;
             this.getDetail()
-            this.apiKeyRootUrl()
+            // this.apiKeyRootUrl()
         }
     },
     methods:{
