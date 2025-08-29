@@ -10,7 +10,15 @@
             prop="tables"
             :rules="[{ required: true, message: '请选择敏感词表', trigger: 'blur'}]"
             >
-                <el-select v-model="ruleForm.tables" placeholder="请选择" @visible-change="visibleChange" style="width:65%;" multiple value-key="tableId">
+                <el-select 
+                    v-model="ruleForm.tables" 
+                    placeholder="请选择" 
+                    @visible-change="visibleChange" 
+                    style="width:65%;" 
+                    multiple 
+                    value-key="tableId" 
+                    filterable
+                    clearable>
                     <el-option
                     v-for="item in safetyOptions"
                     :key="item.tableId"

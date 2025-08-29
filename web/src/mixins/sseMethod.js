@@ -402,12 +402,6 @@ export default {
             this.eventSource = new fetchEventSource(this.origin + this.sseApi, {
                 method: 'POST',
                 headers,
-                // headers: {
-                //     "Content-Type": 'application/json',
-                //     'Authorization': 'Bearer ' + this.token,
-                //     "x-user-id": userInfo.uid,
-                //     "x-org-id": userInfo.orgId
-                // },
                 signal: this.ctrlAbort.signal,
                 body: JSON.stringify(data),
                 openWhenHidden: true, //页面退至后台保持连接
@@ -470,21 +464,20 @@ export default {
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
-                                        // endStr = convertLatexSyntax(endStr)
-                                        // endStr = parseSub(endStr)
+                                        endStr = convertLatexSyntax(endStr)
+                                        endStr = parseSub(endStr)
                                         const finalResponse = String(endStr)
                                         let fillData = {
                                             ...commonData,
                                             response: [0,1,2,3,4,6,20,21,10].includes(commonData.qa_type)?md.render(finalResponse):finalResponse.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
                                             // response:finalResponse,
                                             oriResponse:endStr,
-                                            searchList:(search_list && search_list.length) ? search_list.some(n => n.title.indexOf('yunyingshang') > -1)? []: search_list.map(n => ({
+                                            searchList:(search_list && search_list.length) ? search_list.map(n => ({
                                                   ...n, // 复制原有的对象属性
                                                   snippet: md.render(n.snippet) // 对snippet进行Markdown渲染
                                                 }))
                                             : []
                                         }
-
                                         this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                                         if(worldObj.finish !== 0){
                                             if(worldObj.finish === 4){
@@ -505,7 +498,7 @@ export default {
                                 this.$refs['session-com'].scrollBottom()
                             })
 
-                        }else if(data.code === 7){
+                        }else if(data.code === 7 || data.code === 1){
                             this.setStoreSessionStatus(-1)
                             let fillData = {
                                 ...commonData,

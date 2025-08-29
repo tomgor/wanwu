@@ -78,10 +78,12 @@ export default {
       workflowID: "",
       rules: {
         configName: [
-          { required: true, message: this.$t('list.nameRules'), trigger: "blur" },
+          { required: true, message: this.$t('list.nameRules'), trigger: "change" },
+          { max:30, message:this.$t('list.pluginNameRules'), trigger: "change" },
           {
             validator: (rule, value, callback) => {
-              if (/^[A-Za-z0-9.\u4e00-\u9fa5_-]+$/.test(value)) {
+              // 对其新版工作流名称规则
+              if (/^[a-zA-Z][a-zA-Z0-9_]{0,63}$/.test(value)) {
                 callback();
               } else {
                 callback(
@@ -93,9 +95,6 @@ export default {
             },
             trigger: "change",
           },
-          {
-            max:30,message:this.$t('list.pluginNameRules'),trigger: "blur"
-          }
         ],
         configENName: [
           { required: false, message: this.$t('list.enNameRules'), trigger: "blur" },
@@ -171,12 +170,15 @@ export default {
         }
         return;
       }
-      let res = await createWorkFlow(this.form);
+      let res = await createWorkFlow({
+        name: this.form.configName,
+        desc: this.form.configDesc
+      });
       if (res.code === 0) {
         this.$message.success(this.$t('list.createSuccess'));
         this.dialogVisible = false;
-        let { workflowID } = res.data;
-        let querys = { id:workflowID };
+        let { workflow_id } = res.data;
+        let querys = { id: workflow_id };
         if(this.form.isStream){
           querys.isStream = true
         }

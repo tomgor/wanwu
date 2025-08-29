@@ -392,7 +392,7 @@ export default {
         tips:'提示',
         confirm:'确 定',
         delSuccess:'删除成功',
-        nameplaceholder:'输入工作流名称 ，仅支持中文、英文、数字、下划线、中划线、英文（.）',
+        nameplaceholder:'输入工作流名称，仅支持字母、数字和下划线，并以字母开头',
         descplaceholder:'输入工作流描述，大模型将根据此描述识别并调用该工作流',
         cancel:'取 消',
         nameRules:'请填写工作流名称',

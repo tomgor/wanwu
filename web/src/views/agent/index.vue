@@ -31,7 +31,7 @@
     </template>
     <template #main-content>
       <div class="app-content">
-        <div
+        <!-- <div
           class="app-header-api"
           v-if="chatType === 'agentChat'"
         >
@@ -53,7 +53,7 @@
               API秘钥
             </el-button>
           </div>
-        </div>
+        </div> -->
         <Chat
           :chatType="'chat'"
           :editForm="editForm"
@@ -63,12 +63,12 @@
           @reloadList="reloadList"
           @setHistoryStatus="setHistoryStatus"
         />
-        <ApiKeyDialog
+        <!-- <ApiKeyDialog
           ref="apiKeyDialog"
           :appId="editForm.assistantId"
           :appType="'agent'"
           :type="'webChat'"
-        />
+        /> -->
       </div>
     </template>
   </CommonLayout>
@@ -77,7 +77,7 @@
 import CommonLayout from "@/components/exploreContainer.vue";
 import Chat from "./components/chat.vue";
 import { mapGetters } from "vuex";
-import ApiKeyDialog from "./components/ApiKeyDialog.vue";
+// import ApiKeyDialog from "./components/ApiKeyDialog.vue";
 import {
   getAgentInfo,
   getOpenurlInfo,
@@ -87,7 +87,7 @@ import {
 import { getApiKeyRoot } from "@/api/appspace";
 import sseMethod from "@/mixins/sseMethod";
 export default {
-  components: { CommonLayout, Chat, ApiKeyDialog },
+  components: { CommonLayout, Chat },
   mixins: [sseMethod],
   provide(){
     return{
@@ -135,7 +135,7 @@ export default {
       this.initUUID();
     } else {
       this.chatType = "agentChat";
-      this.apiKeyRootUrl();
+      // this.apiKeyRootUrl();
     }
     this.getDetail();
     this.getList();

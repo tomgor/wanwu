@@ -18,9 +18,9 @@
           <el-tab-pane label="文本问答" name="rag">
             <AppList :appData="listData" :isShowTool="false" :appFrom="'explore'" />
           </el-tab-pane>
-          <el-tab-pane label="工作流" name="workflow">
+          <!--<el-tab-pane label="工作流" name="workflow">
             <AppList :appData="listData" :isShowTool="false" :appFrom="'explore'" />
-          </el-tab-pane>
+          </el-tab-pane>-->
         </el-tabs>
         </div>
     </div>

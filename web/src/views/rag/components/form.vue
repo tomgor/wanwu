@@ -62,6 +62,7 @@
                 :disabled="isPublish"
                 :loading="modelLoading"
                 clearable
+                filterable
               >
                 <el-option
                   v-for="(item,index) in modleOptions"
@@ -79,7 +80,6 @@
                 <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
                 关联知识库
               </span>
-              <!-- <span class="el-icon-s-operation operation" @click="showKnowledgeSet"></span> -->
             </p>
             <div class="rl">
               <el-select 

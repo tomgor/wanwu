@@ -10,21 +10,6 @@
         <LinkIcon type="agent" />
       </div>
       <div class="header-right">
-        <!-- <div class="header-api">
-          <el-tag
-            effect="plain"
-            class="root-url"
-          >API根地址</el-tag>
-          {{apiURL}}
-        </div>
-        <el-button
-          size="small"
-          @click="openApiDialog"
-          class="apikeyBtn"
-        >
-          <img :src="require('@/assets/imgs/apikey.png')" />
-          API秘钥
-        </el-button> -->
         <el-button
           size="small"
           type="primary"
@@ -115,6 +100,7 @@
                 :disabled="isPublish"
                 :loading="modelLoading"
                 clearable
+                filterable
               >
                 <el-option
                   v-for="(item,index) in modleOptions"
@@ -348,12 +334,6 @@
       ref="modelSetDialog"
       :modelform="editForm.modelConfig"
     />
-    <!-- apikey -->
-    <!-- <ApiKeyDialog
-      ref="apiKeyDialog"
-      :appId="editForm.assistantId"
-      :appType="'agent'"
-    /> -->
     <!-- 选择工作类型 -->
     <ToolDiaglog
       ref="toolDiaglog"
@@ -378,14 +358,13 @@
 </template>
 
 <script>
-import { getApiKeyRoot, appPublish } from "@/api/appspace";
+import { appPublish } from "@/api/appspace";
 import { store } from "@/store/index";
 import { mapGetters } from "vuex";
 import { getKnowledgeList } from "@/api/knowledge";
 import CreateIntelligent from "@/components/createApp/createIntelligent";
 import setSafety from "@/components/setSafety";
 import ModelSet from "./modelSetDialog";
-// import ApiKeyDialog from "./ApiKeyDialog";
 import { selectModelList, getRerankList } from "@/api/modelAccess";
 import {
   deleteMcp,
@@ -415,7 +394,6 @@ export default {
     CreateIntelligent,
     ModelSet,
     ActionConfig,
-    // ApiKeyDialog,
     ToolDiaglog,
     LinkDialog,
     setSafety,
@@ -573,7 +551,6 @@ export default {
       this.editForm.assistantId = this.$route.query.id;
       setTimeout(() => {
         this.getAppDetail();
-        // this.apiKeyRootUrl(); //获取api跟地址
       }, 500);
     }
     //判断是否发布
@@ -707,10 +684,10 @@ export default {
       }
     },
     addTool() {
-      // this.wfDialogVisible = true
       const data = {
         mcpInfos: this.mcpInfos,
         workFlowInfos: this.workFlowInfos,
+        customInfos:this.actionInfos
       };
       this.$refs.toolDiaglog.showDialog(data);
     },
@@ -752,17 +729,6 @@ export default {
         }
       });
     },
-    // apiKeyRootUrl() {
-    //   const data = { appId: this.editForm.assistantId, appType: "agent" };
-    //   getApiKeyRoot(data).then((res) => {
-    //     if (res.code === 0) {
-    //       this.apiURL = res.data || "";
-    //     }
-    //   });
-    // },
-    // openApiDialog() {
-    //   this.$refs.apiKeyDialog.showDialog();
-    // },
     setModelSet(data) {
       this.editForm.modelConfig = data;
     },

@@ -18,7 +18,7 @@
                 label="Key"
                 :rules="[{ required: true, message: '请输入Key', trigger: 'blur' }]"
                 >
-                    <el-input v-model="form.searchKey"></el-input>
+                    <el-input v-model="form.searchKey" type="password"></el-input>
                 </el-form-item>
                 <el-form-item 
                 label="Rerank模型"
@@ -32,6 +32,8 @@
                         loading-text="模型加载中..."
                         class="cover-input-icon"
                         style="width:100%;"
+                        filterable
+                        clearable
                     >
                         <el-option
                         v-for="(item,index) in rerankOptions"
@@ -70,6 +72,9 @@ export default {
             }
         }
     },
+    created(){
+        this.getRerankData();
+    },
     methods:{
         rerankVisible(val){
             if(val){
@@ -99,11 +104,12 @@ export default {
             
         },
         showDialog(){
-            this.dialogVisible = true
+            this.dialogVisible = true;
              if(this.linkform !== null){
                 this.form.searchUrl = this.linkform.searchUrl;
                 this.form.searchKey = this.linkform.searchKey;
                 this.form.searchRerankId = this.linkform.searchRerankId;
+                console.log(this.form)
             }
         }
     }
