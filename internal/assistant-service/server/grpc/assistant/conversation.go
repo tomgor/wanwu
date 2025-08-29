@@ -23,7 +23,6 @@ import (
 	"github.com/UnicomAI/wanwu/internal/assistant-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/config"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/pkg/util"
-	"github.com/UnicomAI/wanwu/pkg/constant"
 	"github.com/UnicomAI/wanwu/pkg/es"
 	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -307,12 +306,8 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	startTime := time.Now()
 	id := uuid.New().String()
 
-	// 公开的智能体，xuid使用智能体创建者用户信息
-	xuid := reqUserId
-	if req.AppPublishType == constant.AppPublishPublic {
-		xuid = assistant.UserId
-		log.Debugf("Assistant服务公开智能体，使用创建者信息，assistantId: %s, userId: %s", req.AssistantId, assistant.UserId)
-	}
+	// xuid通过智能体传给RAG使用，要求xuid和知识库创建人userId一致，当前版本智能体创建人userId和知识库创建人userId一致。后面做了知识库分享之后这里可能需要改造。
+	xuid := assistant.UserId
 
 	log.Infof("Assistant服务开始调用HttpRequestLlmStream，uuid: %s, assistantId: %s, url: %s, userId: %s, timeout: %v, body: %s",
 		id, req.AssistantId, assistantConfig.SseUrl, reqUserId, timeout, string(requestBodyBytes))
