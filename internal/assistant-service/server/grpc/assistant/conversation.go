@@ -430,7 +430,7 @@ func (s *Service) setModelConfigParams(sseReq *config.AgentSSERequest, assistant
 	if err := json.Unmarshal([]byte(assistant.ModelConfig), modelConfig); err != nil {
 		return nil, fmt.Errorf("Assistant服务解析智能体模型配置失败，assistantId: %d, error: %v, modelConfigRaw: %s", assistant.ID, err, assistant.ModelConfig)
 	}
-
+	sseReq.ModelId = modelConfig.ModelId
 	log.Debugf("Assistant服务成功解析智能体模型配置，assistantId: %s, provider: %s, model: %s, modelId: %s, modelType: %s",
 		assistant.ID, modelConfig.Provider, modelConfig.Model, modelConfig.ModelId, modelConfig.ModelType)
 
@@ -488,16 +488,13 @@ func (s *Service) setKnowledgebaseParams(ctx context.Context, sseReq *config.Age
 			RerankMod:      buildRerankMod(knowledgebaseConfig.PriorityMatch),
 			RetrieveMethod: buildRetrieveMethod(knowledgebaseConfig.MatchType),
 			Weights:        buildWeight(knowledgebaseConfig),
-			MaxHistory:     int(knowledgebaseConfig.MaxHistory),
+			MaxHistory:     knowledgebaseConfig.MaxHistory,
 			Threshold:      knowledgebaseConfig.Threshold,
-			TopK:           int(knowledgebaseConfig.TopK),
+			TopK:           knowledgebaseConfig.TopK,
 			RewriteQuery:   true,
 			TermWeight:     buildTermWeight(knowledgebaseConfig),
 		}
 		sseReq.UseKnow = true
-		if modelConfig != nil {
-			sseReq.ModelId = modelConfig.ModelId
-		}
 	}
 	return nil
 }
@@ -610,9 +607,7 @@ func (s *Service) setHistoryParams(ctx context.Context, sseReq *config.AgentSSER
 }
 
 func buildRerank(req *assistant_service.AssistantConversionStreamReq, knowledgebaseConfig *RAGKnowledgeBaseConfig, assistant *model.Assistant) (map[string]interface{}, error) {
-	rerankModel := map[string]interface{}{}
-
-	log.Debugf("Assistant服务解析知识库rerank配置，assistantId: %s", req.AssistantId)
+	var rerankEndpoint map[string]interface{}
 	if knowledgebaseConfig.PriorityMatch != 1 {
 		rerankConfig := &common.AppModelConfig{}
 		if assistant.RerankConfig != "" {
@@ -625,9 +620,9 @@ func buildRerank(req *assistant_service.AssistantConversionStreamReq, knowledgeb
 				return nil, fmt.Errorf("智能体缺少rerank配置")
 			}
 		}
-		rerankModel = mp.ToModelEndpoint(rerankConfig.ModelId, rerankConfig.Model)
+		rerankEndpoint = mp.ToModelEndpoint(rerankConfig.ModelId, rerankConfig.Model)
 	}
-	return rerankModel, nil
+	return rerankEndpoint, nil
 }
 
 // 使用独立上下文保存对话的辅助函数
@@ -681,11 +676,14 @@ func buildTermWeight(knowConfig *RAGKnowledgeBaseConfig) float32 {
 }
 
 // buildWeight 构造权重信息
-func buildWeight(knowConfig *RAGKnowledgeBaseConfig) []float64 {
+func buildWeight(knowConfig *RAGKnowledgeBaseConfig) *config.WeightParams {
 	if knowConfig.PriorityMatch != 1 {
 		return nil
 	}
-	return []float64{float64(knowConfig.SemanticsPriority), float64(knowConfig.KeywordPriority)}
+	return &config.WeightParams{
+		VectorWeight: knowConfig.SemanticsPriority,
+		TextWeight:   knowConfig.KeywordPriority,
+	}
 }
 
 type AppKnowledgebaseConfig struct {
@@ -728,11 +726,6 @@ type AppOnlineSearchConfig struct {
 	SearchKey      string `json:"searchKey"`
 	SearchRerankId string `json:"SearchRerankId"`
 	Enable         bool   `json:"enable"`
-}
-
-type WeightParams struct {
-	VectorWeight float32 `json:"vector_weight"` //语义权重
-	TextWeight   float32 `json:"text_weight"`   //关键字权重
 }
 
 func mergeMaps(map1, map2 map[string]interface{}) map[string]interface{} {

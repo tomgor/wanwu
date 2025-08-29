@@ -14,18 +14,23 @@ type AssistantConversionHistory struct {
 }
 
 type KnParams struct {
-	KnowledgeBase  []string    `json:"knowledgeBase"`
-	RerankId       interface{} `json:"rerank_id"`
-	Model          interface{} `json:"model"`
-	ModelUrl       interface{} `json:"model_url"`
-	RerankMod      string      `json:"rerank_mod"`
-	RetrieveMethod string      `json:"retrieve_method"`
-	Weights        []float64   `json:"weights,omitempty"`
-	MaxHistory     int         `json:"max_history"`
-	Threshold      float32     `json:"threshold"`
-	TopK           int         `json:"topK"`
-	RewriteQuery   bool        `json:"rewrite_query"`
-	TermWeight     float32     `json:"term_weight_coefficient"` // 关键词系数, 默认为1
+	KnowledgeBase  []string      `json:"knowledgeBase"`
+	RerankId       interface{}   `json:"rerank_id"`
+	Model          interface{}   `json:"model"`
+	ModelUrl       interface{}   `json:"model_url"`
+	RerankMod      string        `json:"rerank_mod"`
+	RetrieveMethod string        `json:"retrieve_method"`
+	Weights        *WeightParams `json:"weights,omitempty"`
+	MaxHistory     int32         `json:"max_history"`
+	Threshold      float32       `json:"threshold"`
+	TopK           int32         `json:"topK"`
+	RewriteQuery   bool          `json:"rewrite_query"`
+	TermWeight     float32       `json:"term_weight_coefficient"` // 关键词系数, 默认为1
+}
+
+type WeightParams struct {
+	VectorWeight float32 `json:"vector_weight"` //语义权重
+	TextWeight   float32 `json:"text_weight"`   //关键字权重
 }
 
 type AgentSSERequest struct {
