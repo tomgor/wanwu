@@ -298,7 +298,6 @@
 
 ### &#x1F517; 致谢
 
-- [AgentScope](https://github.com/modelscope/agentscope)
 - [Coze](https://github.com/coze-dev)
 - [LangChain](https://github.com/langchain-ai/langchain)
 - [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent)

@@ -98,32 +98,44 @@ doc-center:
       val: 5.文本问答.md
     - key: agent
       val: 7.智能体.md
-    - key: workflow-MCPClientNode
-      val: 6.工作流/MCP.md
-    - key: workflow-IntentionNode
-      val: 6.工作流/意图识别.md
-    - key: workflow-ApiNode
-      val: 6.工作流/API.md
-    - key: workflow-PythonNode
-      val: 6.工作流/代码.md
-    - key: workflow-LLMNode
-      val: 6.工作流/大模型.md
-    - key: workflow-SwitchNode
-      val: 6.工作流/分支器.md
-    - key: workflow-RAGNode
-      val: 6.工作流/知识库.md
-    - key: workflow-FileGenerateNode
-      val: 6.工作流/文档生成.md
-    - key: workflow-FileParseNode
-      val: 6.工作流/文档解析.md
-    - key: workflow-TemplateTransformNode
-      val: 6.工作流/模板转换.md
-    - key: workflow-EndNode
-      val: 6.工作流/结束.md
-    - key: workflow-StartNode
+    - key: workflow-1
       val: 6.工作流/开始.md
-
-
+    - key: workflow-2
+      val: 6.工作流/结束.md
+    - key: workflow-3
+      val: 6.工作流/大模型.md
+    - key: workflow-5
+      val: 6.工作流/代码.md
+    - key: workflow-8
+      val: 6.工作流/选择器.md
+    - key: workflow-13
+      val: 6.工作流/输出.md
+    - key: workflow-15
+      val: 6.工作流/文本处理.md
+    - key: workflow-21
+      val: 6.工作流/循环.md
+    - key: workflow-28
+      val: 6.工作流/批处理.md
+    - key: workflow-30
+      val: 6.工作流/输入.md
+    - key: workflow-32
+      val: 6.工作流/变量聚合.md
+    - key: workflow-45
+      val: 6.工作流/HTTP请求.md
+    - key: workflow-58
+      val: 6.工作流/JSON序列化.md
+    - key: workflow-1006
+      val: 6.工作流/知识库.md
+    - key: workflow-1007
+      val: 6.工作流/文档生成.md
+    - key: workflow-1008
+      val: 6.工作流/文档解析.md
+    - key: workflow-1009
+      val: 6.工作流/MCP.md
+    - key: workflow-1022
+      val: 6.工作流/意图识别.md
+    - key: workflow-1059
+      val: 6.工作流/JSON反序列化.md
 
 # --- middleware ---
 
