@@ -209,7 +209,7 @@ def agent_start():
                 weights = kn_params.get('weights',None)
                 max_history = kn_params.get('max_history')
                 rewrite_query = kn_params.get('rewrite_query')
-
+                term_weight_coefficient = kn_params.get('term_weight_coefficient',1.0)
 
 
 
@@ -356,7 +356,8 @@ def agent_start():
                     "retrieve_method":retrieve_method,
                     "weights":weights,
                     "max_history":max_history,
-                    "rewrite_query":rewrite_query
+                    "rewrite_query":rewrite_query,
+                    "term_weight_coefficient":term_weight_coefficient
                 }
 
 
@@ -482,11 +483,8 @@ def agent_start():
                                 print('大模型输出是:',chunk)
                                 answer['response'] = chunk.content
                                 assistant_reply += chunk.content
-                                if first_chunk:
-                                    answer["search_list"] = bing_search_list  # 仅第一条输出
-                                    first_chunk = False
-                                else:
-                                    answer["search_list"] = []  # 后续为空
+                                answer["search_list"] = bing_search_list  # 仅第一条输出
+
 
                                 if hasattr(chunk, "response_metadata"):
                                     if 'finish_reason' in chunk.response_metadata and chunk.response_metadata['finish_reason']=='stop':
