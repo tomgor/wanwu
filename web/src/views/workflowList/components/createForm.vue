@@ -78,7 +78,8 @@ export default {
       workflowID: "",
       rules: {
         configName: [
-          { required: true, message: this.$t('list.nameRules'), trigger: "blur" },
+          { required: true, message: this.$t('list.nameRules'), trigger: "change" },
+          { max:30, message:this.$t('list.pluginNameRules'), trigger: "change" },
           {
             validator: (rule, value, callback) => {
               // 对其新版工作流名称规则
@@ -94,9 +95,6 @@ export default {
             },
             trigger: "change",
           },
-          {
-            max:30,message:this.$t('list.pluginNameRules'),trigger: "blur"
-          }
         ],
         configENName: [
           { required: false, message: this.$t('list.enNameRules'), trigger: "blur" },
