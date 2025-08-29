@@ -19,10 +19,6 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-const (
-	DefaultTermWeight = 1
-)
-
 func (s *Service) SelectKnowledgeList(ctx context.Context, req *knowledgebase_service.KnowledgeSelectReq) (*knowledgebase_service.KnowledgeSelectListResp, error) {
 	list, err := orm.SelectKnowledgeList(ctx, req.UserId, req.OrgId, req.Name, req.TagIdList)
 	if err != nil {
@@ -342,7 +338,6 @@ func buildWeight(priorityType int32, semanticsPriority float32, keywordPriority 
 func buildTermWeight(termWeight float32, termWeightEnable bool) float32 {
 	if termWeightEnable {
 		return termWeight
-	} else {
-		return DefaultTermWeight
 	}
+	return 0.0
 }
