@@ -18,7 +18,7 @@
                 label="Key"
                 :rules="[{ required: true, message: '请输入Key', trigger: 'blur' }]"
                 >
-                    <el-input v-model="form.searchKey"></el-input>
+                    <el-input v-model="form.searchKey" type="password"></el-input>
                 </el-form-item>
                 <el-form-item 
                 label="Rerank模型"

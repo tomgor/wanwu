@@ -8,7 +8,11 @@
             <el-table
                 :data="tableData"
                 style="width: 100%">
-                <el-table-column label="密钥"  prop="apiKey"  width="300" />
+                <el-table-column label="密钥"  prop="apiKey"  width="300" >
+                    <template slot-scope="scope">
+                        <span>{{scope.row.apiKey.slice(0,6) + '******'}}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column label="创建时间"  prop="createdAt"  />
                 <el-table-column label="操作" width="200">
                 <template slot-scope="scope">
