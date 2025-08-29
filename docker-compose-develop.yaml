@@ -282,28 +282,28 @@ services:
     working_dir: /app
     command: ./bin/workflow-wanwu
 
-  agentscope:
-    restart: always
-    image: ${WANWU_AGENTSCOPE_BASE_IMAGE}
-    container_name: agentscope-wanwu
-    networks:
-      - ${WANWU_DOCKER_NETWORK}
-    ports:
-      - 6672:6672
-    volumes:
-      - ../wanwu-agentscope:/agentscope
-      - ./configs/microservice/agentscope/configs/config.yaml:/agentscope/src/agentscope/aibigmodel_workflow/config.yaml
-      - ${WANWU_PROJECT_DIR}/agentscope/logs:/agentscope/logs
-    environment:
-      DB_NAME: ${WANWU_DB_NAME}
-      DATABASE_HOST: ${WANWU_MYSQL_HOST}
-      DATABASE_PORT: ${WANWU_MYSQL_PORT}
-      DATABASE_PASSWORD: ${WANWU_MYSQL_PASSWORD}
-      REDIS_HOST: ${WANWU_REDIS_HOST}
-      REDIS_PORT: ${WANWU_REDIS_PORT}
-      REDIS_PASSWORD: ${WANWU_REDIS_PASSWORD}
-    working_dir: /agentscope
-    command: python3 /agentscope/src/agentscope/aibigmodel_workflow/app.py
+  # agentscope:
+  #   restart: always
+  #   image: ${WANWU_AGENTSCOPE_BASE_IMAGE}
+  #   container_name: agentscope-wanwu
+  #   networks:
+  #     - ${WANWU_DOCKER_NETWORK}
+  #   ports:
+  #     - 6672:6672
+  #   volumes:
+  #     - ../wanwu-agentscope:/agentscope
+  #     - ./configs/microservice/agentscope/configs/config.yaml:/agentscope/src/agentscope/aibigmodel_workflow/config.yaml
+  #     - ${WANWU_PROJECT_DIR}/agentscope/logs:/agentscope/logs
+  #   environment:
+  #     DB_NAME: ${WANWU_DB_NAME}
+  #     DATABASE_HOST: ${WANWU_MYSQL_HOST}
+  #     DATABASE_PORT: ${WANWU_MYSQL_PORT}
+  #     DATABASE_PASSWORD: ${WANWU_MYSQL_PASSWORD}
+  #     REDIS_HOST: ${WANWU_REDIS_HOST}
+  #     REDIS_PORT: ${WANWU_REDIS_PORT}
+  #     REDIS_PASSWORD: ${WANWU_REDIS_PASSWORD}
+  #   working_dir: /agentscope
+  #   command: python3 /agentscope/src/agentscope/aibigmodel_workflow/app.py
 
   # ------ middleware ------
   kibana:
