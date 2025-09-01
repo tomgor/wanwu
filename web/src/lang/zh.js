@@ -32,6 +32,7 @@ export default {
         knowledge: '知识库',
         account: '账户',
         setting: '设置',
+        settingTip: '系统管理员账户不可新增用户或角色。请切换至具体子组织，进行相应操作。',
         userInfo: '个人信息',
         org: '组织管理',
         modelAccess: '模型管理',
