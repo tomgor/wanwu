@@ -83,7 +83,10 @@
                   @click="menuClick(item)"
                 >
                   <img class="menu--popover-item-img" :src="item.img" alt="" />
-                  <span class="menu--popover-item-name">{{item.name}}</span>
+                  <el-tooltip v-if="item.isTip" effect="dark" :content="item.tipContent" placement="top-start">
+                    <span style="display:inline-block; width: 150px" class="menu--popover-item-name">{{item.name}}</span>
+                  </el-tooltip>
+                  <span v-if="!item.isTip" class="menu--popover-item-name">{{item.name}}</span>
                   <img v-if="item.icon" class="menu--popover-item-icon" :src="item.icon" alt="" />
                   <span v-if="item.version" class="menu--popover-item-version">
                     {{version || ''}}
@@ -247,7 +250,14 @@ export default {
       popoverList: [
         [
           {name: this.$t('menu.account'), path: '/userInfo', img: require('@/assets/imgs/user_icon.svg')},
-          {name: this.$t('menu.setting'), path: '/permission', img: require('@/assets/imgs/setting_icon.svg'), perm: PERMS.PERMISSION}
+          {
+            name: this.$t('menu.setting'),
+            path: '/permission',
+            img: require('@/assets/imgs/setting_icon.svg'),
+            isTip: true,
+            tipContent: this.$t('menu.settingTip'),
+            perm: PERMS.PERMISSION
+          }
         ],
         [
           {name: this.$t('menu.helpDoc'), img: require('@/assets/imgs/helpDoc_icon.svg'), icon: require('@/assets/imgs/link_icon.png'), redirect: () => {

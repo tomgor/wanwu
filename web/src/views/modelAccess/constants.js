@@ -2,12 +2,14 @@ export const LLM = 'llm'
 export const RERANK = 'rerank'
 export const EMBEDDING = 'embedding'
 export const OCR = 'ocr'
+export const GUI = 'gui'
 
 export const MODEL_TYPE_OBJ = {
     [LLM]: 'LLM',
     [RERANK]: 'Rerank',
     [EMBEDDING]: 'Embedding',
-    [OCR]: 'OCR'
+    [OCR]: 'OCR',
+    [GUI]: 'GUI'
 }
 
 export const MODEL_TYPE = Object.keys(MODEL_TYPE_OBJ).map(key => ({key, name: MODEL_TYPE_OBJ[key]}))
@@ -42,10 +44,10 @@ export const PROVIDER_TYPE = Object.keys(PROVIDER_OBJ)
             children: key === YUAN_JING
                 ? MODEL_TYPE
                 : key === OLLAMA
-                    ? MODEL_TYPE.filter(item => ![OCR, RERANK].includes(item.key))
+                    ? MODEL_TYPE.filter(item => [LLM, EMBEDDING].includes(item.key))
                     : key === HUOSHAN
                         ? MODEL_TYPE.filter(item => [LLM, EMBEDDING].includes(item.key))
-                        : MODEL_TYPE.filter(item => item.key !== OCR)
+                        : MODEL_TYPE.filter(item => ![OCR, GUI].includes(item.key))
         })
     })
 
