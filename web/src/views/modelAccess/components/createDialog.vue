@@ -16,6 +16,9 @@
               {{item.name}}
             </el-radio>
           </el-radio-group>
+          <div v-if="createForm.modelType === embedding && provider.key === yuanjing" class="embedding-tip">
+            {{$t('modelAccess.table.embeddingTip')}}
+          </div>
         </el-form-item>
         <el-form-item :label="$t('modelAccess.table.modelName')" prop="model">
           <el-input :disabled="isEdit" v-model="createForm.model" :placeholder="$t('common.input.placeholder')"></el-input>
@@ -103,6 +106,8 @@ import {
   DEFAULT_CALLING,
   TYPE_OBJ,
   OLLAMA,
+  EMBEDDING,
+  YUAN_JING
 } from "../constants"
 
 export default {
@@ -125,6 +130,8 @@ export default {
       typeObj: TYPE_OBJ,
       llm: LLM,
       ollama: OLLAMA,
+      embedding: EMBEDDING,
+      yuanjing: YUAN_JING,
       createForm: {
         model: '',
         displayName: '',
@@ -147,6 +154,7 @@ export default {
         displayName: [
           { pattern: /^(?!_)[a-zA-Z0-9-_.\u4e00-\u9fa5]+$/, message: this.$t('common.hint.modelName'), trigger: "blur"},
           { min: 2, max: 50, message: this.$t('common.hint.modelNameLimit'), trigger: 'blur'},
+          { required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'},
         ],
         modelType: [{ required: true, message: this.$t('common.select.placeholder'), trigger: "change"}],
         endpointUrl: [
@@ -256,6 +264,10 @@ export default {
       margin-left: 12px;
       color: #909399 !important;
     }
+  }
+  .embedding-tip {
+    color: #F56C6C;
+    line-height: 16px;
   }
 }
 </style>
