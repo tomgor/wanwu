@@ -192,9 +192,9 @@
         this.$refs.createDialog.openDialog(item.key)
       },
       preUpdate(row) {
-        const {model, modelType, provider} = row || {}
+        const {modelId} = row || {}
 
-        getModelDetail({model, modelType, provider}).then(res => {
+        getModelDetail({modelId}).then(res => {
           const rowObj = res.data || {}
           const newRow = {...rowObj, ...rowObj.config}
           this.$refs.createDialog.openDialog(provider, newRow)
@@ -206,8 +206,8 @@
           cancelButtonText: this.$t('common.confirm.cancel'),
           type: 'warning'
         }).then(async () => {
-          const {model, modelType, provider} = row || {}
-          let res = await deleteModel({model, modelType, provider})
+          const {modelId} = row || {}
+          let res = await deleteModel({modelId})
           if (res.code === 0) {
             this.$message.success(this.$t('common.message.success'))
             await this.getTableData()
@@ -220,8 +220,8 @@
           cancelButtonText: this.$t('common.confirm.cancel'),
           type: 'warning'
         }).then(async() => {
-          const {model, modelType, provider} = row || {}
-          let res = await changeModelStatus({model, modelType, provider, isActive: val})
+          const {modelId} = row || {}
+          let res = await changeModelStatus({modelId, isActive: val})
           if (res.code === 0) {
             this.$message.success(this.$t('common.message.success'))
             await this.getTableData()
