@@ -82,19 +82,19 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req *mp_common.LLMRe
 			if len(data.Choices) > 0 && data.Choices[0].Delta != nil {
 				answer = answer + data.Choices[0].Delta.Content
 				delta := data.Choices[0].Delta
-				if !firstFlag && delta.ReasoningContent != nil && *delta.ReasoningContent != "" && delta.Content == "" {
-					delta.Content = "<think>\n" +
-						delta.Content + *delta.ReasoningContent
-					firstFlag = true
-					reasonContentFlag = true
+				if firstFlag && !endFlag && delta.ReasoningContent != nil {
+					delta.Content = delta.Content + *delta.ReasoningContent
 				}
 				if !endFlag && delta.Content != "" && ((delta.ReasoningContent != nil &&
 					*delta.ReasoningContent == "") || delta.ReasoningContent == nil) && reasonContentFlag {
 					delta.Content = "\n</think>\n" + delta.Content
 					endFlag = true
 				}
-				if firstFlag && !endFlag && delta.ReasoningContent != nil {
-					delta.Content = delta.Content + *delta.ReasoningContent
+				if !firstFlag && delta.ReasoningContent != nil && *delta.ReasoningContent != "" && delta.Content == "" {
+					delta.Content = "<think>\n" +
+						delta.Content + *delta.ReasoningContent
+					firstFlag = true
+					reasonContentFlag = true
 				}
 			}
 			dataByte, _ := json.Marshal(data)
