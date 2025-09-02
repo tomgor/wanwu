@@ -307,11 +307,11 @@ export default {
                             // this.$nextTick(()=>{
                             //     this.$refs['session-com'].scrollBottom()
                             // })
-                        }else if(data.code === 7){
+                        }else if(data.code === 7 || data.code === '-1'){
                             this.setStoreSessionStatus(-1)
                             let fillData = {
                                 ...commonData,
-                                "response": data.message                              
+                                "response": data.message || data.msg                             
                             }
                             this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                         }

@@ -65,7 +65,7 @@
                 <div v-for="(m,j) in n.searchList" :key="`${j}sdsl`" class="search-list-item">
                   <div class="serach-list-item" v-if="citationsArray.includes(j+1)">
                     <span @click="collapseClick(n,m,j)"><i :class="['',m.collapse?'el-icon-caret-bottom':'el-icon-caret-right']"></i>出处：</span>
-                    <a v-if="m.link" :href="m.link" target="_blank">{{m.link}}</a>
+                    <a v-if="m.link" :href="m.link" target="_blank" class="link">{{m.link}}</a>
                     <span v-if="m.title">
                       <sub class="subTag" :data-parents-index="i" :data-collapse="m.collapse?'true':'false'">{{j + 1}}</sub> {{m.title}}
                     </span>
@@ -550,12 +550,13 @@ export default {
 
 <style scoped lang="scss">
 .serach-list-item{
-  display: flex;
-  align-items: center;
+  .link:hover{
+    color: #384BF7!important;
+  }
   .search-doc{
     margin-left:10px;
     cursor: pointer;
-    color: #384BF7;
+    color: #384BF7!important;
   }
   .subTag{
     display: inline-flex;

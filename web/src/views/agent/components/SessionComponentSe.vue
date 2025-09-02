@@ -647,7 +647,7 @@ export default {
   .search-doc{
     margin-left:10px;
     cursor: pointer;
-    color: #384BF7;
+    color: #384BF7!important;
   }
   .subTag{
     display: inline-flex;

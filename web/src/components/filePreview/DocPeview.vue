@@ -56,17 +56,6 @@ export default {
             this.loading = false;
         });
       }
-
-      // axios({
-      //   method: 'get',
-      //   responseType: 'blob', // 设置响应文件格式
-      //   url: this.fileUrl
-      // }).then(({ data }) => {
-      //   this.$nextTick(() => {
-      //     // renderAsync(data, this.$refs.wordRef) // 渲染到页面预览
-      //     this.loading = false
-      //   })
-      // })
     },
     renderedHandler() {
       console.log('渲染完成')
