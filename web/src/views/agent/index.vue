@@ -200,16 +200,6 @@ export default {
           (item) => ({ value: item })
         );
       }
-
-      // getAgentInfo({assistantId:this.editForm.assistantId}).then(res =>{
-      //     if(res.code === 0){
-      //         this.editForm.avatar = res.data.avatar;
-      //         this.editForm.name = res.data.name;
-      //         this.editForm.desc = res.data.desc;
-      //         this.editForm.prologue = res.data.prologue;
-      //         this.editForm.recommendQuestion = res.data.recommendQuestion.map(item =>({value:item}));
-      //     }
-      // })
     },
     async getList(noInit) {
       let res = null;
@@ -239,24 +229,6 @@ export default {
       } else {
         this.historyList = [];
       }
-      // getConversationlist({assistantId:this.assistantId,pageNo:1,pageSize:1000}).then(res =>{
-      //     if(res.code === 0){
-      //         if(res.data.list && res.data.list.length > 0){
-      //             this.historyList = res.data.list.map(n =>{
-      //                 return {...n, hover: false, active: false}
-      //             })
-      //             if (noInit) {
-      //                 this.historyList[0].active = true  //noInit 是true时，左侧默认选中第一个,但是不要调接口刷新详情
-      //             } else {
-      //                 this.historyClick[this.historyList[0]]
-      //             }
-      //         }else{
-      //             this.historyList = []
-      //         }
-      //     }else{
-      //         this.historyList = []
-      //     }
-      // })
     },
     setHistoryStatus() {
       this.historyList.forEach((m) => {

@@ -64,6 +64,13 @@
       </el-descriptions>
 
       <div class="btn">
+         <el-button
+          type="primary"
+          @click="createChunk"
+          size="mini"
+          :loading="loading.start"
+          >新增分段</el-button
+        >
         <el-button
           type="primary"
           @click="handleStatus('start')"
@@ -178,16 +185,18 @@
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
     </el-dialog>
-    <dataBaseDialog ref="dataBase" @updateData="updateData"/>
+    <dataBaseDialog ref="dataBase" @updateData="updateData" />
     <tagDialog ref="tagDialog" type="section" :title="title" :currentList="currentList" @sendList="sendList" />
+    <createChunk ref="createChunk" @updateData="updateData" />
   </div>
 </template>
 <script>
 import { getSectionList,setSectionStatus,sectionLabels } from "@/api/knowledge";
 import dataBaseDialog from './dataBaseDialog';
 import tagDialog from './tagDialog.vue';
+import createChunk from './createChunk.vue'
 export default {
-  components:{dataBaseDialog,tagDialog},
+  components:{dataBaseDialog,tagDialog,createChunk},
   data() {
     return {
       title:'创建关键词',
@@ -229,6 +238,9 @@ export default {
     this.getList();
   },
   methods: {
+    createChunk(){
+      this.$refs.createChunk.showDiglog(this.obj.id)
+    },
     sendList(data){
       const labels = data.map(item => item.tagName)
       sectionLabels({contentId:this.contentId,docId:this.obj.id,labels}).then(res =>{
