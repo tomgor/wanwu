@@ -103,14 +103,26 @@
                     >{{$t('knowledgeManage.length')}}:{{ item.content.length }}{{$t('knowledgeManage.character')}}</span
                   >
                 </span>
-
-                <el-switch
-                  style="float: right; padding: 3px 0"
-                  v-model="item.available"
-                  active-color="#384bf7"
-                  @change="handleStatusChange(item, index)"
-                >
-                </el-switch>
+                <div>
+                  <el-switch
+                    style="padding: 3px 0;"
+                    v-model="item.available"
+                    active-color="#384bf7"
+                    @change="handleStatusChange(item, index)"
+                  >
+                  </el-switch>
+                  <el-dropdown @command="handleCommand" placement="bottom">
+                    <span class="el-dropdown-link">
+                      <i class="el-icon-more more"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item class="card-delete" :command="{type: 'delete', item}">
+                        <i class="el-icon-delete card-opera-icon" />
+                        {{$t('common.button.delete')}}
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </div>
               </div>
               <div class="text item" @click="handleClick(item, index)">
                 {{ item.content }}
@@ -177,11 +189,20 @@
             align="center"
             :render-header="renderHeader"
           >
+          <template slot-scope="scope">
+              <el-input 
+                type="textarea"
+                v-model="scope.row.content"
+                :autosize="{ minRows: 3, maxRows: 5}"
+                >
+              </el-input>
+          </template>
           </el-table-column>
         </el-table>
       </div>
 
       <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleSubmit">确定</el-button>
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
     </el-dialog>
@@ -191,7 +212,7 @@
   </div>
 </template>
 <script>
-import { getSectionList,setSectionStatus,sectionLabels } from "@/api/knowledge";
+import { getSectionList,setSectionStatus,sectionLabels,delSegment,editSegment } from "@/api/knowledge";
 import dataBaseDialog from './dataBaseDialog';
 import tagDialog from './tagDialog.vue';
 import createChunk from './createChunk.vue'
@@ -238,6 +259,31 @@ export default {
     this.getList();
   },
   methods: {
+    handleSubmit(){
+      editSegment({content:this.cardObj[0]['content'],contentId:this.cardObj[0]['contentId'],docId:this.obj.id}).then(res =>{
+        if(res.code === 0){
+          this.$message.success('操作成功');
+          this.dialogVisible = false;
+          this.getList();
+        }
+      }).catch(() =>{})
+    },
+    handleCommand(value){
+      const {type, item} = value || {}
+       switch (type) {
+          case 'delete':
+            this.delSection(item)
+            break
+        }
+    },
+    delSection(item){
+      delSegment({contentId:item.contentId,docId:this.obj.id}).then(res =>{
+        if(res.code === 0){
+          this.$message.success('删除成功');
+          this.getList();
+        }
+      }).catch(() =>{})
+    },
     createChunk(){
       this.$refs.createChunk.showDiglog(this.obj.id)
     },
@@ -525,15 +571,11 @@ export default {
         text-overflow: ellipsis;
       }
 
-      .clearfix:before,
-      .clearfix:after {
-        display: table;
-        content: "";
+      .clearfix{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
       }
-      .clearfix:after {
-        clear: both;
-      }
-
       .card-box {
         margin-bottom: 10px;
 
@@ -541,6 +583,13 @@ export default {
           &:hover {
             cursor: pointer;
             transform: scale(1.03);
+          }
+          .more{
+            margin-left:5px;
+            cursor: pointer;
+            transform: rotate(90deg);
+            font-size: 16px;
+            color: #8c8c8f;
           }
         }
       }

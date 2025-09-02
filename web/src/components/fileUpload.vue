@@ -6,7 +6,7 @@
             action=""
             :show-file-list="false"
             :auto-upload="false"
-            accept=".xlsx"
+            :accept="accept"
             :file-list="fileList"
             :on-change="uploadOnChange"
             >
@@ -68,7 +68,7 @@
 import uploadChunk from "@/mixins/uploadChunk";
 import { delfile } from "@/api/chunkFile";
 export default {
-    props:['templateUrl'],
+    props:['templateUrl','accept'],
     mixins: [uploadChunk],
     data(){
         return{
@@ -78,15 +78,15 @@ export default {
     methods:{
         uploadOnChange(file, fileList){
             if (!fileList.length) return;
+            this.fileList = fileList;
             if(this.fileList.length > 0){
-                this.fileList = fileList;
                 this.maxSizeBytes = 0;
                 this.isExpire = true;
                 this.startUpload();
             }
         },
         uploadFile(chunkFileName){
-            this.$emit(uploadFile,chunkFileName)
+            this.$emit('uploadFile',chunkFileName)
         },
         clearFileList(){
             this.fileList = [];
@@ -120,6 +120,12 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.success{
+    color: #67C23A;
+}
+.fail{
+    color: #F56C6C;
+}
 .upload-box{
     .upload-img{
         width:56px;
