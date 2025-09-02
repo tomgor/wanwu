@@ -63,17 +63,13 @@ message ModelBrief {
 message DeleteModelReq {
     string userId = 1;
     string orgId = 2;
-    string provider = 3;        // 模型供应商
-    string modelType = 4;       // 模型类型
-    string model = 5;           // 模型名称
+    string modelId = 3;
 }
 
 message GetModelReq{
     string userId = 1;
     string orgId = 2;
-    string provider = 3;        // 模型供应商
-    string modelType = 4;       // 模型类型
-    string model = 5;           // 模型名称
+    string modelId = 3;
 }
 
 message ListModelsReq{
@@ -86,12 +82,10 @@ message ListModelsReq{
 }
 
 message ModelStatusReq {
-    string modelType = 1;       // 模型类型
-    string provider = 2;        // 模型供应商
-    bool isActive = 3;          // 启用状态（true: 启用，false: 禁用）
-    string userId = 4;
-    string orgId = 5;
-    string model = 6;           // 模型名称
+    string modelId = 1;
+    bool isActive = 2;          // 启用状态（true: 启用，false: 禁用）
+    string userId = 3;
+    string orgId = 4;
 }
 
 message GetModelByIdReq{

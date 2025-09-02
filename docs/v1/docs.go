@@ -8917,26 +8917,10 @@ const docTemplate = `{
         "request.DeleteModelRequest": {
             "type": "object",
             "required": [
-                "model",
-                "modelType",
-                "provider"
+                "modelId"
             ],
             "properties": {
-                "model": {
-                    "description": "模型名称",
-                    "type": "string"
-                },
-                "modelType": {
-                    "description": "模型类型",
-                    "type": "string",
-                    "enum": [
-                        "llm",
-                        "embedding",
-                        "rerank"
-                    ]
-                },
-                "provider": {
-                    "description": "模型供应商",
+                "modelId": {
                     "type": "string"
                 }
             }
@@ -9240,6 +9224,7 @@ const docTemplate = `{
         "request.ImportOrUpdateModelRequest": {
             "type": "object",
             "required": [
+                "displayName",
                 "model",
                 "modelType",
                 "provider"
@@ -9503,30 +9488,14 @@ const docTemplate = `{
         "request.ModelStatusRequest": {
             "type": "object",
             "required": [
-                "model",
-                "modelType",
-                "provider"
+                "modelId"
             ],
             "properties": {
                 "isActive": {
                     "description": "启用状态（true: 启用，false: 禁用）",
                     "type": "boolean"
                 },
-                "model": {
-                    "description": "模型名称",
-                    "type": "string"
-                },
-                "modelType": {
-                    "description": "模型类型",
-                    "type": "string",
-                    "enum": [
-                        "llm",
-                        "embedding",
-                        "rerank"
-                    ]
-                },
-                "provider": {
-                    "description": "模型供应商",
+                "modelId": {
                     "type": "string"
                 }
             }
@@ -11272,6 +11241,10 @@ const docTemplate = `{
         "response.KnowledgeInfo": {
             "type": "object",
             "properties": {
+                "createAt": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
                 "description": {
                     "description": "知识库描述",
                     "type": "string"

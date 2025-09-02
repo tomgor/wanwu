@@ -20,19 +20,19 @@ func (c *Client) ImportModel(ctx context.Context, tab *model_client.ModelImporte
 		}
 		db.Rollback()
 	}()
-	// 先查询是否已存在相同的记录
-	if err := sqlopt.SQLOptions(
-		sqlopt.WithProvider(tab.Provider),
-		sqlopt.WithModelType(tab.ModelType),
-		sqlopt.WithModel(tab.Model),
-		sqlopt.WithOrgID(tab.OrgID),
-		sqlopt.WithUserID(tab.UserID),
-	).Apply(db).Select("id").First(&model_client.ModelImported{}).Error; err == nil {
-		return toErrStatus("model_create_err", "model with same identifier exist")
-	} else if err != gorm.ErrRecordNotFound {
-		// 其他错误
-		return toErrStatus("model_create_err", err.Error())
-	}
+	// 查询是否已存在相同的模型(0.2.1版本下掉）
+	//if err := sqlopt.SQLOptions(
+	//	sqlopt.WithProvider(tab.Provider),
+	//	sqlopt.WithModelType(tab.ModelType),
+	//	sqlopt.WithModel(tab.Model),
+	//	sqlopt.WithOrgID(tab.OrgID),
+	//	sqlopt.WithUserID(tab.UserID),
+	//).Apply(db).Select("id").First(&model_client.ModelImported{}).Error; err == nil {
+	//	return toErrStatus("model_create_err", "model with same identifier exist")
+	//} else if err != gorm.ErrRecordNotFound {
+	//	// 其他错误
+	//	return toErrStatus("model_create_err", err.Error())
+	//}
 
 	if tab.DisplayName != "" {
 		if err := sqlopt.SQLOptions(
@@ -59,9 +59,7 @@ func (c *Client) DeleteModel(ctx context.Context, tab *model_client.ModelImporte
 	// 查询
 	var existing model_client.ModelImported
 	if err := sqlopt.SQLOptions(
-		sqlopt.WithProvider(tab.Provider),
-		sqlopt.WithModelType(tab.ModelType),
-		sqlopt.WithModel(tab.Model),
+		sqlopt.WithID(tab.ID),
 		sqlopt.WithOrgID(tab.OrgID),
 		sqlopt.WithUserID(tab.UserID),
 	).Apply(c.db).WithContext(ctx).Select("id").First(&existing).Error; err != nil {
@@ -100,9 +98,7 @@ func (c *Client) ChangeModelStatus(ctx context.Context, tab *model_client.ModelI
 	// 查询
 	var existing model_client.ModelImported
 	if err := sqlopt.SQLOptions(
-		sqlopt.WithProvider(tab.Provider),
-		sqlopt.WithModelType(tab.ModelType),
-		sqlopt.WithModel(tab.Model),
+		sqlopt.WithID(tab.ID),
 		sqlopt.WithOrgID(tab.OrgID),
 		sqlopt.WithUserID(tab.UserID),
 	).Apply(c.db).WithContext(ctx).Select("id").First(&existing).Error; err != nil {
@@ -136,9 +132,7 @@ func (c *Client) GetModelByIds(ctx context.Context, modelIds []uint32) ([]*model
 func (c *Client) GetModel(ctx context.Context, tab *model_client.ModelImported) (*model_client.ModelImported, *errs.Status) {
 	info := &model_client.ModelImported{}
 	if err := sqlopt.SQLOptions(
-		sqlopt.WithProvider(tab.Provider),
-		sqlopt.WithModelType(tab.ModelType),
-		sqlopt.WithModel(tab.Model),
+		sqlopt.WithID(tab.ID),
 		sqlopt.WithOrgID(tab.OrgID),
 		sqlopt.WithUserID(tab.UserID),
 	).Apply(c.db).WithContext(ctx).First(info).Error; err != nil {

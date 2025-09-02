@@ -7,12 +7,15 @@ import (
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 )
 
+type BaseModelRequest struct {
+	ModelId string `json:"modelId" form:"modelId" validate:"required"`
+}
 type ModelConfig struct {
 	ModelId     string      `json:"modelId"`
 	Provider    string      `json:"provider" validate:"required" enums:"OpenAI-API-compatible,YuanJing"` // 模型供应商
 	Model       string      `json:"model" validate:"required"`                                           // 模型名称
 	ModelType   string      `json:"modelType" validate:"required" enums:"llm,embedding,rerank"`          // 模型类型
-	DisplayName string      `json:"displayName"`                                                         // 模型显示名称
+	DisplayName string      `json:"displayName" validate:"required"`                                     // 模型显示名称
 	Avatar      Avatar      `json:"avatar" `                                                             // 模型图标路径
 	PublishDate string      `json:"publishDate"`                                                         // 模型发布时间
 	Config      interface{} `json:"config"`

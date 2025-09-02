@@ -1206,23 +1206,10 @@ definitions:
     type: object
   request.DeleteModelRequest:
     properties:
-      model:
-        description: 模型名称
-        type: string
-      modelType:
-        description: 模型类型
-        enum:
-        - llm
-        - embedding
-        - rerank
-        type: string
-      provider:
-        description: 模型供应商
+      modelId:
         type: string
     required:
-    - model
-    - modelType
-    - provider
+    - modelId
     type: object
   request.DeleteSensitiveVocabularyReq:
     properties:
@@ -1465,6 +1452,7 @@ definitions:
         description: 模型发布时间
         type: string
     required:
+    - displayName
     - model
     - modelType
     - provider
@@ -1618,23 +1606,10 @@ definitions:
       isActive:
         description: '启用状态（true: 启用，false: 禁用）'
         type: boolean
-      model:
-        description: 模型名称
-        type: string
-      modelType:
-        description: 模型类型
-        enum:
-        - llm
-        - embedding
-        - rerank
-        type: string
-      provider:
-        description: 模型供应商
+      modelId:
         type: string
     required:
-    - model
-    - modelType
-    - provider
+    - modelId
     type: object
   request.OnlineSearchConfig:
     properties:
@@ -2817,6 +2792,9 @@ definitions:
     type: object
   response.KnowledgeInfo:
     properties:
+      createAt:
+        description: 创建时间
+        type: string
       description:
         description: 知识库描述
         type: string
