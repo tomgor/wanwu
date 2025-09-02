@@ -208,7 +208,7 @@
     </el-dialog>
     <dataBaseDialog ref="dataBase" @updateData="updateData" />
     <tagDialog ref="tagDialog" type="section" :title="title" :currentList="currentList" @sendList="sendList" />
-    <createChunk ref="createChunk" @updateData="updateData" />
+    <createChunk ref="createChunk" @updateData="updateData" @updateDataBatch="updateDataBatch" />
   </div>
 </template>
 <script>
@@ -251,14 +251,40 @@ export default {
       metaDataList: [],
       metaRuleList: [],
       currentList:[],
-      contentId:''
+      contentId:'',
+      timer:null,
+      refreshCount:0,
     };
   },
   created() {
     this.obj = this.$route.query;
     this.getList();
   },
+  beforeDestroy(){
+    this.clearTimer()
+  },
   methods: {
+    updateDataBatch(){
+      this.startTimer();
+    },
+    startTimer(){
+      this.clearTimer();
+      if (this.refreshCount >= 2) {
+        return;
+      }
+      const delay = this.refreshCount === 0 ? 1000 : 3000;
+      this.timer = setTimeout(() =>{
+        this.getList()
+        this.refreshCount++;
+        this.startTimer()
+      },delay)
+    },
+    clearTimer() {
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+      }
+    },
     handleSubmit(){
       editSegment({content:this.cardObj[0]['content'],contentId:this.cardObj[0]['contentId'],docId:this.obj.id}).then(res =>{
         if(res.code === 0){

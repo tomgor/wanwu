@@ -132,11 +132,10 @@ export default {
                     const data = {content:this.ruleForm.content,docId:this.ruleForm.docId,labels:this.ruleForm.labels}
                     createSegment(data).then(res =>{
                         if(res.code === 0){
+                            this.$message.success('创建成功');
                             if(!this.checkType.length){
-                                this.$message.success('创建成功');
                                 this.dialogVisible = false;
                             }else{
-                                this.$message.success('创建成功');
                                 this.clearForm()
                             }
                             this.$emit('updateData')
@@ -153,7 +152,7 @@ export default {
                 if(res.code === 0){
                     this.$message.success('创建成功');
                     this.dialogVisible = false;
-                    this.$emit('updateData')
+                    this.$emit('updateDataBatch')
                 }
             }).catch(() =>{})
         },
