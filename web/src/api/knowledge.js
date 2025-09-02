@@ -382,3 +382,17 @@ export const createBatchSegment = (data)=>{
         data
     })
 };
+export const delSegment = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/doc/segment/delete`,
+        method: 'delete',
+        data
+    })
+};
+export const editSegment = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/doc/segment/update`,
+        method: 'post',
+        data
+    })
+};

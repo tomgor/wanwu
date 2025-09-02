@@ -16,7 +16,7 @@
             prop="fileUploadId"
             :rules="[{ required: true, message: '请上传文件', trigger: 'blur' }]"
         >
-            <fileUpload ref="fileUpload" :templateUrl="templateUrl" @uploadFile="uploadFile" />
+            <fileUpload ref="fileUpload" :templateUrl="templateUrl" @uploadFile="uploadFile" :accept="accept"/>
         </el-form-item>
         <template v-if="createType === 'single'">
             <el-form-item 
@@ -32,7 +32,7 @@
                 v-for="(tag,index) in ruleForm.labels"
                 closable
                 :disable-transitions="false"
-                @close="handleClose(index)">
+                @close="handleTagClose(index)">
                 {{tag}}
                 </el-tag>
                 <el-input
@@ -67,6 +67,7 @@ export default {
     components:{fileUpload},
     data(){
         return{
+            accept:'.csv',
             checkType:[],
             inputVisible:false,
             inputValue:'',
@@ -106,7 +107,7 @@ export default {
                 this.$refs.saveTagInput.$refs.input.focus();
             });
         },
-        handleClose(index){
+        handleTagClose(index){
             this.ruleForm.labels.splice(index,1);
         },
         handleInputConfirm(){
@@ -118,11 +119,11 @@ export default {
                 this.$message.warning('请输入关键词')
             }
         },
-        ruleForm(formName){
+        submit(formName){
             if(this.createType === 'single'){
-                handleSingle(formName)
+                this.handleSingle(formName);
             }else{
-                handleFile()
+                this.handleFile();
             }
         },
         handleSingle(formName){
@@ -135,6 +136,7 @@ export default {
                                 this.$message.success('创建成功');
                                 this.dialogVisible = false;
                             }else{
+                                this.$message.success('创建成功');
                                 this.clearForm()
                             }
                             this.$emit('updateData')
@@ -158,6 +160,7 @@ export default {
         clearForm(){
             this.ruleForm.content = ''
             this.ruleForm.labels = []
+            this.checkType = []
         }
     }
 }
