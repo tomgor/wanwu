@@ -192,7 +192,7 @@
         this.$refs.createDialog.openDialog(item.key)
       },
       preUpdate(row) {
-        const {modelId} = row || {}
+        const {modelId, provider} = row || {}
 
         getModelDetail({modelId}).then(res => {
           const rowObj = res.data || {}
