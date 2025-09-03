@@ -56,7 +56,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submit('ruleForm')">确 定</el-button>
+        <el-button type="primary" @click="submit('ruleForm')" :loading="btnLoading">确 定</el-button>
     </span>
     </el-dialog>
 </template>
@@ -67,6 +67,7 @@ export default {
     components:{fileUpload},
     data(){
         return{
+            btnLoading:false,
             accept:'.csv',
             checkType:[],
             inputVisible:false,
@@ -129,6 +130,7 @@ export default {
         handleSingle(formName){
             this.$refs[formName].validate((valid) =>{
                 if(valid){
+                    this.btnLoading = true;
                     const data = {content:this.ruleForm.content,docId:this.ruleForm.docId,labels:this.ruleForm.labels}
                     createSegment(data).then(res =>{
                         if(res.code === 0){
@@ -138,23 +140,30 @@ export default {
                             }else{
                                 this.clearForm()
                             }
+                            this.btnLoading = false;
                             this.$emit('updateData')
                         }
-                    }).catch(() =>{})
+                    }).catch(() =>{
+                        this.btnLoading = false;
+                    })
                 }else{
                    return false; 
                 }
             })
         },
         handleFile(){
+            this.btnLoading = true;
             const data = {fileUploadId:this.ruleForm.fileUploadId,docId:this.ruleForm.docId};
             createBatchSegment(data).then(res =>{
                 if(res.code === 0){
                     this.$message.success('创建成功');
                     this.dialogVisible = false;
+                    this.btnLoading = false;
                     this.$emit('updateDataBatch')
                 }
-            }).catch(() =>{})
+            }).catch(() =>{
+                this.btnLoading = false;
+            })
         },
         clearForm(){
             this.ruleForm.content = ''
