@@ -174,6 +174,9 @@
 {"code":145008,"key":"","langs":{"zh":"没有操作该知识库分隔符的权限"}}
 {"code":145009,"key":"","langs":{"zh":"更新文档切片标签失败，请稍后重试"}}
 {"code":145010,"key":"","langs":{"zh":"导入文档分段失败，请稍后重试"}}
+{"code":145011,"key":"","langs":{"zh":"分段长度超过最大值"}}
+{"code":145012,"key":"","langs":{"zh":"更新文档分段失败，请稍后重试"}}
+{"code":145013,"key":"","langs":{"zh":"删除文档分段失败，请稍后重试"}}
 {"code":310001,"key":"mcp_get_square_err","langs":{"zh":"广场MCP不存在"}}
 {"code":310001,"key":"mcp_check_exist_err","langs":{"zh":"检查MCP是否存在来自广场异常: %v"}}
 {"code":310002,"key":"mcp_create_duplicate_square","langs":{"zh":"创建MCP异常: 已存在来自广场"}}

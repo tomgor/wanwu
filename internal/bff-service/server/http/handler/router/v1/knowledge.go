@@ -21,11 +21,16 @@ func registerKnowledge(apiV1 *gin.RouterGroup) {
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/import/tip", http.MethodGet, v1.GetDocImportTip, "获取知识库文档上传状态")
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc", http.MethodDelete, v1.DeleteDoc, "删除文档")
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/meta", http.MethodPost, v1.UpdateDocMetaData, "更新文档元数据")
-	// 知识库文档切片
+
+	// 知识库文档切片增删改查
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/segment/list", http.MethodGet, v1.GetDocSegmentList, "获取文档切分结果")
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/segment/status/update", http.MethodPost, v1.UpdateDocSegmentStatus, "更新文档切片启用状态")
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/segment/labels", http.MethodPost, v1.UpdateDocSegmentLabels, "更新文档切片标签")
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/segment/create", http.MethodPost, v1.CreateDocSegment, "新增文档切片")
+	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/segment/batch/create", http.MethodPost, v1.BatchCreateDocSegment, "批量新增文档切片")
+	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/segment/delete", http.MethodDelete, v1.DeleteDocSegment, "删除文档切片")
+	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/segment/update", http.MethodPost, v1.UpdateDocSegment, "更新文档切片")
+
 	// 知识库url文档导入
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/url/analysis", http.MethodPost, v1.AnalysisDocUrl, "解析url")
 

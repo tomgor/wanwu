@@ -24,13 +24,19 @@ service KnowledgeBaseDocService {
   // 获取知识库文档切分结果
   rpc GetDocSegmentList(DocSegmentListReq) returns (DocSegmentListResp) {}
   // 更新文档切片状态
-  rpc UpdateDocSegmentStatus(UpdateDocSegmentReq) returns (google.protobuf.Empty) {}
+  rpc UpdateDocSegmentStatus(UpdateDocSegmentStatusReq) returns (google.protobuf.Empty) {}
   // url上传功能-解析url
   rpc AnalysisDocUrl(AnalysisUrlDocReq) returns (AnalysisUrlDocResp) {}
   // 更新文档元数据标签
   rpc UpdateDocSegmentLabels(DocSegmentLabelsReq) returns (google.protobuf.Empty) {}
   // 新增文档分片
   rpc CreateDocSegment(CreateDocSegmentReq) returns (google.protobuf.Empty) {}
+  // 批量新增文档分片
+  rpc BatchCreateDocSegment(BatchCreateDocSegmentReq) returns (google.protobuf.Empty) {}
+  // 删除文档分片
+  rpc DeleteDocSegment(DeleteDocSegmentReq) returns (google.protobuf.Empty) {}
+  // 更新文档分片
+  rpc UpdateDocSegment(UpdateDocSegmentReq) returns (google.protobuf.Empty) {}
 }
 
 
@@ -144,6 +150,7 @@ message DocSegmentListResp{
   string segType = 7;
   string splitter = 8;
   repeated MetaData metaDataList = 9;//文档元数据信息
+  string segmentImportStatus = 10;//文档分段导入状态
 }
 
 message SegmentContent{
@@ -174,7 +181,7 @@ message DocSegmentListReq{
   int32 pageNo = 5;
 }
 
-message UpdateDocSegmentReq{
+message UpdateDocSegmentStatusReq{
   string userId = 1;
   string orgId = 2;
   string docId = 3;
@@ -214,4 +221,26 @@ message CreateDocSegmentReq{
   string docId = 3;
   string content = 4;
   repeated string labels = 5;
+}
+
+message BatchCreateDocSegmentReq{
+  string userId = 1;
+  string orgId = 2;
+  string docId = 3;
+  string fileUrl = 4;
+}
+
+message DeleteDocSegmentReq{
+  string userId = 1;
+  string orgId = 2;
+  string docId = 3;
+  string contentId = 4;
+}
+
+message UpdateDocSegmentReq{
+  string userId = 1;
+  string orgId = 2;
+  string docId = 3;
+  string contentId = 4;
+  string content = 5;
 }

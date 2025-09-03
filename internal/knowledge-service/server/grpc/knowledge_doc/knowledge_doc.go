@@ -23,17 +23,22 @@ import (
 )
 
 const (
-	noSplitter      = "未设置"
-	DocImportIng    = 1
-	DocImportFinish = 2
-	DocImportError  = 3
+	fiveMinutes               int64 = 5 * 60 * 1000
+	noSplitter                      = "未设置"
+	segmentImportingMessage         = "分段内容正在上传解析中"
+	segmentCompleteFormat           = "分段内容解析完成，成功%d，失败%d"
+	segmentPartCompleteFormat       = "分段内容解析完成，成功%d"
+	segmentCompleteFail             = "分段内容解析失败"
+	DocImportIng                    = 1
+	DocImportFinish                 = 2
+	DocImportError                  = 3
 )
 
 func (s *Service) GetDocList(ctx context.Context, req *knowledgebase_doc_service.GetDocListReq) (*knowledgebase_doc_service.GetDocListResp, error) {
 	list, total, err := orm.GetDocList(ctx, req.UserId, req.OrgId, req.KnowledgeId,
 		req.DocName, req.DocTag, util.BuildDocReqStatusList(int(req.Status)), req.PageSize, req.PageNum)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("获取知识库列表失败(%v)  参数(%v)", err, req))
+		log.Errorf("获取知识库列表失败(%v)  参数(%v)", err, req)
 		return nil, util.ErrCode(errs.Code_KnowledgeBaseSelectFailed)
 	}
 	return buildDocListResp(list, total, req.PageSize, req.PageNum), nil
@@ -56,7 +61,7 @@ func (s *Service) ImportDoc(ctx context.Context, req *knowledgebase_doc_service.
 func (s *Service) UpdateDocStatus(ctx context.Context, req *knowledgebase_doc_service.UpdateDocStatusReq) (*emptypb.Empty, error) {
 	err := orm.UpdateDocStatusDocId(ctx, req.DocId, int(req.Status), buildMetaParamsList(removeDuplicateMeta(req.MetaDataList)))
 	if err != nil {
-		log.Errorf(fmt.Sprintf("update doc fail %v", err), req.DocId)
+		log.Errorf("docId: %v update doc fail %v", req.DocId, err)
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateStatusFailed)
 	}
 	return &emptypb.Empty{}, nil
@@ -69,19 +74,19 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 	//1.查询文档详情
 	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("没有操作该知识库文档的权限 参数(%v)", req))
+		log.Errorf("没有操作该知识库文档的权限 参数(%v)", req)
 		return nil, err
 	}
 	doc := docList[0]
 	//2.状态校验
 	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
-		log.Errorf(fmt.Sprintf("非处理完成文档无法增加元数据 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req))
+		log.Errorf("非处理完成文档无法增加元数据 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req)
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaStatusFailed)
 	}
 	//3.查询知识库信息
 	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("没有操作该知识库的权限 参数(%v)", req))
+		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
 		return nil, err
 	}
 	//4.更新标签
@@ -90,7 +95,7 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 	addList, updateList, deleteList := buildMetaModelList(metaDataList, doc.OrgId, doc.UserId, req.DocId)
 	params, err := buildMetaRagParams(metaDataList)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("update buildMetaRagParams fail %v", err), req.DocId)
+		log.Errorf("docId %v update buildMetaRagParams fail %v", req.DocId, err)
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaFailed)
 	}
 	err = orm.UpdateDocStatusDocMeta(ctx, req.DocId, addList, updateList, deleteList,
@@ -101,7 +106,7 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 			MetaList:      params,
 		})
 	if err != nil {
-		log.Errorf(fmt.Sprintf("update doc tag fail %v", err), req.DocId)
+		log.Errorf("docId %v update doc tag fail %v", req.DocId, err)
 		return nil, util.ErrCode(errs.Code_KnowledgeDocUpdateMetaFailed)
 	}
 	return &emptypb.Empty{}, nil
@@ -110,7 +115,7 @@ func (s *Service) UpdateDocMetaData(ctx context.Context, req *knowledgebase_doc_
 func (s *Service) InitDocStatus(ctx context.Context, req *knowledgebase_doc_service.InitDocStatusReq) (*emptypb.Empty, error) {
 	err := orm.InitDocStatus(ctx, req.UserId, req.OrgId)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("init doc fail %v", err), req)
+		log.Errorf("init doc fail %v", err, req)
 		return nil, util.ErrCode(errs.Code_KnowledgeGeneral)
 	}
 	return &emptypb.Empty{}, nil
@@ -120,7 +125,7 @@ func (s *Service) DeleteDoc(ctx context.Context, req *knowledgebase_doc_service.
 	//1.查询文档详情
 	docList, err := orm.SelectDocByDocIdList(ctx, req.Ids, req.UserId, req.OrgId)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("没有操作该知识库的权限 参数(%v)", req))
+		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
 		return nil, err
 	}
 	//2.校验导入状态
@@ -188,21 +193,27 @@ func (s *Service) GetDocSegmentList(ctx context.Context, req *knowledgebase_doc_
 	//1.查询文档详情
 	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("没有操作该知识库的权限 参数(%v)", req))
+		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
 		return nil, err
 	}
 	docInfo := docList[0]
 	//2.查询知识库详情
 	knowledge, err := orm.SelectKnowledgeById(ctx, docInfo.KnowledgeId, req.UserId, req.OrgId)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("查询知识库详情失败 参数(%v)", req))
+		log.Errorf("查询知识库详情失败 参数(%v)", req)
 		return nil, err
 	}
 	//3.查询知识库导入详情
 	importTask, err := orm.SelectKnowledgeImportTaskById(ctx, docInfo.ImportTaskId)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("查询知识库导入详情失败 参数(%v)", req))
+		log.Errorf("查询知识库导入详情失败 参数(%v)", req)
 		return nil, err
+	}
+	//4.查询最新导入详情
+	segmentImportTask, err := orm.SelectSegmentLatestImportTaskByDocID(ctx, docInfo.DocId)
+	//此处失败不影响详情展示
+	if err != nil {
+		log.Errorf("查询知识库导入详情失败 参数(%v)", req)
 	}
 	//4.查询分片信息
 	segmentListResp, err := service.RagGetDocSegmentList(ctx, &service.RagGetDocSegmentParams{
@@ -217,28 +228,28 @@ func (s *Service) GetDocSegmentList(ctx context.Context, req *knowledgebase_doc_
 	}
 	//5.查询文档元数据,忽略错误
 	metaDataList, _ := orm.SelectDocMetaList(ctx, req.UserId, req.OrgId, req.DocId)
-	return buildSegmentListResp(importTask, docInfo, segmentListResp, req.PageNo, req.PageSize, metaDataList)
+	return buildSegmentListResp(importTask, docInfo, segmentListResp, req.PageNo, req.PageSize, metaDataList, segmentImportTask)
 }
 
-func (s *Service) UpdateDocSegmentStatus(ctx context.Context, req *knowledgebase_doc_service.UpdateDocSegmentReq) (*emptypb.Empty, error) {
+func (s *Service) UpdateDocSegmentStatus(ctx context.Context, req *knowledgebase_doc_service.UpdateDocSegmentStatusReq) (*emptypb.Empty, error) {
 	//1.查询文档详情
 	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("没有操作该知识库的权限 参数(%v)", req))
+		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
 		return nil, err
 	}
 	docInfo := docList[0]
 	//2.查询知识库详情
 	knowledge, err := orm.SelectKnowledgeById(ctx, docInfo.KnowledgeId, req.UserId, req.OrgId)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("查询知识库详情失败 参数(%v)", req))
+		log.Errorf("查询知识库详情失败 参数(%v)", req)
 		return nil, err
 	}
 	//3.更新文档状态
 	var params = buildDocUpdateSegmentStatusParams(req, knowledge, docInfo)
 	err = service.RagDocUpdateDocSegmentStatus(ctx, params)
 	if err != nil {
-		log.Errorf(fmt.Sprintf("UpdateFileStatus 更新知识库文档切片启用状态 失败(%v)  参数(%v)", err, req))
+		log.Errorf("UpdateFileStatus 更新知识库文档切片启用状态 失败(%v)  参数(%v)", err, req)
 		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentStatusUpdateFail)
 	}
 	return &emptypb.Empty{}, nil
@@ -258,6 +269,251 @@ func (s *Service) AnalysisDocUrl(ctx context.Context, req *knowledgebase_doc_ser
 		})
 	}
 	return &knowledgebase_doc_service.AnalysisUrlDocResp{UrlList: retUrlList}, nil
+}
+
+func (s *Service) UpdateDocSegmentLabels(ctx context.Context, req *knowledgebase_doc_service.DocSegmentLabelsReq) (*emptypb.Empty, error) {
+	//1.查询文档详情
+	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf("没有操作该知识库文档的权限 参数(%v)", req)
+		return nil, err
+	}
+	doc := docList[0]
+	//2.状态校验
+	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
+		log.Errorf("非处理完成文档无法增加切片标签 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentUpdateLabelsFailed)
+	}
+	//3.查询知识库信息
+	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
+		return nil, err
+	}
+	//4.更新切片标签
+	fileName := service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
+	var labels = req.Labels
+	if len(labels) == 0 {
+		labels = make([]string, 0)
+	}
+	err = service.RagDocSegmentLabels(ctx, &service.RagDocSegmentLabelsParams{
+		UserId:        req.UserId,
+		KnowledgeBase: knowledge.Name,
+		KnowledgeId:   knowledge.KnowledgeId,
+		FileName:      fileName,
+		ContentId:     req.ContentId,
+		Labels:        labels,
+	})
+	if err != nil {
+		log.Errorf("docId %v update doc seg labels fail %v", req.DocId, err)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentUpdateLabelsFailed)
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *Service) CreateDocSegment(ctx context.Context, req *knowledgebase_doc_service.CreateDocSegmentReq) (*emptypb.Empty, error) {
+	//1.查询文档详情
+	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf("没有操作该知识库文档的权限 参数(%v)", req)
+		return nil, err
+	}
+	doc := docList[0]
+	//2.状态校验
+	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
+		log.Errorf("非处理完成文档无法增加切片 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentCreateFailed)
+	}
+	//3.查询知识库信息
+	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
+		return nil, err
+	}
+	//4.获取文档名称
+	fileName := service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
+	//5.查询最大分段长度
+	importTask, err := orm.SelectKnowledgeImportTaskById(ctx, doc.ImportTaskId)
+	if err != nil {
+		log.Errorf("没有查询到导入任务 参数(%v)", req)
+		return nil, err
+	}
+	var segmentConfig = &model.SegmentConfig{}
+	err = json.Unmarshal([]byte(importTask.SegmentConfig), segmentConfig)
+	if err != nil {
+		log.Errorf("SegmentConfig process error %s", err.Error())
+		return nil, err
+	}
+	//6.检验分段长度
+	if len(req.Content) > segmentConfig.MaxSplitter {
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentExceedMaxSize)
+	}
+	//7.发送rag请求
+	var labels = req.Labels
+	if len(labels) == 0 {
+		labels = make([]string, 0)
+	}
+	var chunks []*service.ChunkItem
+	chunks = append(chunks, &service.ChunkItem{
+		Content: req.Content,
+		Labels:  labels,
+	})
+	err = service.RagCreateDocSegment(ctx, &service.RagCreateDocSegmentParams{
+		UserId:          req.UserId,
+		KnowledgeBase:   knowledge.Name,
+		KnowledgeId:     knowledge.KnowledgeId,
+		FileName:        fileName,
+		MaxSentenceSize: segmentConfig.MaxSplitter,
+		Chunks:          chunks,
+	})
+	if err != nil {
+		log.Errorf("docId %v create doc segment fail %v", req.DocId, err)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentCreateFailed)
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *Service) BatchCreateDocSegment(ctx context.Context, req *knowledgebase_doc_service.BatchCreateDocSegmentReq) (*emptypb.Empty, error) {
+	//1.查询文档详情
+	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf("没有操作该知识库文档的权限 参数(%v)", req)
+		return nil, err
+	}
+	doc := docList[0]
+	//2.状态校验
+	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
+		log.Errorf("非处理完成文档无法增加切片 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentCreateFailed)
+	}
+	//3.查询知识库信息
+	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
+		return nil, err
+	}
+	//4.获取文档名称
+	fileName := service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
+	//5.查询最大分段长度
+	importTask, err := orm.SelectKnowledgeImportTaskById(ctx, doc.ImportTaskId)
+	if err != nil {
+		log.Errorf("没有查询到导入任务 参数(%v)", req)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentCreateFailed)
+	}
+	var segmentConfig = &model.SegmentConfig{}
+	err = json.Unmarshal([]byte(importTask.SegmentConfig), segmentConfig)
+	if err != nil {
+		log.Errorf("SegmentConfig process error %s", err.Error())
+		return nil, err
+	}
+
+	task, err := buildDocSegmentImportTask(knowledge, fileName, doc.DocId, segmentConfig, req)
+	if err != nil {
+		log.Errorf("docId %v create doc segment import task params fail %v", req.DocId, err)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentCreateFailed)
+	}
+
+	err = orm.CreateDocSegmentImportTask(ctx, task)
+	if err != nil {
+		log.Errorf("docId %v create doc segment import task fail %v", req.DocId, err)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentCreateFailed)
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *Service) UpdateDocSegment(ctx context.Context, req *knowledgebase_doc_service.UpdateDocSegmentReq) (*emptypb.Empty, error) {
+	//1.查询文档详情
+	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf("没有操作该知识库文档的权限 参数(%v)", req)
+		return nil, err
+	}
+	doc := docList[0]
+	//2.状态校验
+	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
+		log.Errorf("非处理完成文档无法更新切片 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentUpdateFailed)
+	}
+	//3.查询知识库信息
+	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
+		return nil, err
+	}
+	//4.获取文档名称
+	fileName := service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
+	//5.查询最大分段长度
+	importTask, err := orm.SelectKnowledgeImportTaskById(ctx, doc.ImportTaskId)
+	if err != nil {
+		log.Errorf("没有查询到导入任务 参数(%v)", req)
+		return nil, err
+	}
+	var segmentConfig = &model.SegmentConfig{}
+	err = json.Unmarshal([]byte(importTask.SegmentConfig), segmentConfig)
+	if err != nil {
+		log.Errorf("SegmentConfig process error %s", err.Error())
+		return nil, err
+	}
+	//6.检验分段长度
+	if len(req.Content) > segmentConfig.MaxSplitter {
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentExceedMaxSize)
+	}
+	//7.发送rag请求
+	var chunks []*service.ChunkItem
+	chunks = append(chunks, &service.ChunkItem{
+		Content: req.Content,
+	})
+	err = service.RagCreateDocSegment(ctx, &service.RagCreateDocSegmentParams{
+		UserId:          req.UserId,
+		KnowledgeBase:   knowledge.Name,
+		KnowledgeId:     knowledge.KnowledgeId,
+		FileName:        fileName,
+		MaxSentenceSize: segmentConfig.MaxSplitter,
+		Chunks:          chunks,
+	})
+	if err != nil {
+		log.Errorf("docId %v update doc segment fail %v", req.DocId, err)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentUpdateFailed)
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *Service) DeleteDocSegment(ctx context.Context, req *knowledgebase_doc_service.DeleteDocSegmentReq) (*emptypb.Empty, error) {
+	//1.查询文档详情
+	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf("没有操作该知识库文档的权限 参数(%v)", req)
+		return nil, err
+	}
+	doc := docList[0]
+	//2.状态校验
+	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
+		log.Errorf("非处理完成文档无法删除切片 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentDeleteFailed)
+	}
+	//3.查询知识库信息
+	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
+	if err != nil {
+		log.Errorf("没有操作该知识库的权限 参数(%v)", req)
+		return nil, err
+	}
+	//4.获取文档名称
+	fileName := service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
+	//7.发送rag请求
+	var chunks []*service.ChunkItem
+	chunks = append(chunks, &service.ChunkItem{})
+	err = service.RagCreateDocSegment(ctx, &service.RagCreateDocSegmentParams{
+		UserId:        req.UserId,
+		KnowledgeBase: knowledge.Name,
+		KnowledgeId:   knowledge.KnowledgeId,
+		FileName:      fileName,
+		Chunks:        chunks,
+	})
+	if err != nil {
+		log.Errorf("docId %v delete doc segment fail %v", req.DocId, err)
+		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentDeleteFailed)
+	}
+	return &emptypb.Empty{}, nil
 }
 
 func checkDocStatus(docList []*model.KnowledgeDoc) ([]uint32, []*model.KnowledgeDoc, error) {
@@ -384,7 +640,8 @@ func buildImportTask(req *knowledgebase_doc_service.ImportDocReq) (*model.Knowle
 
 // buildSegmentListResp 构造文档分段列表
 func buildSegmentListResp(importTask *model.KnowledgeImportTask, doc *model.KnowledgeDoc,
-	segmentListResp *service.ContentListResp, pageNo, pageSize int32, metaDataList []*model.KnowledgeDocMeta) (*knowledgebase_doc_service.DocSegmentListResp, error) {
+	segmentListResp *service.ContentListResp, pageNo, pageSize int32, metaDataList []*model.KnowledgeDocMeta,
+	segmentImportTask *model.DocSegmentImportTask) (*knowledgebase_doc_service.DocSegmentListResp, error) {
 	var config = &model.SegmentConfig{}
 	err := json.Unmarshal([]byte(importTask.SegmentConfig), config)
 	if err != nil {
@@ -394,17 +651,40 @@ func buildSegmentListResp(importTask *model.KnowledgeImportTask, doc *model.Know
 
 	content := segmentListResp.List[0]
 	var resp = &knowledgebase_doc_service.DocSegmentListResp{
-		FileName:        doc.Name,
-		MaxSegmentSize:  int32(config.MaxSplitter),
-		SegType:         config.SegmentType,
-		CreatedAt:       util2.Time2Str(doc.CreatedAt),
-		Splitter:        buildSplitter(config.Splitter),
-		PageTotal:       buildPageTotal(int32(content.MetaData.ChunkTotalNum), pageSize),
-		SegmentTotalNum: int32(content.MetaData.ChunkTotalNum),
-		ContentList:     buildContentList(segmentListResp.List, pageNo, pageSize),
-		MetaDataList:    buildMetaList(metaDataList),
+		FileName:            doc.Name,
+		MaxSegmentSize:      int32(config.MaxSplitter),
+		SegType:             config.SegmentType,
+		CreatedAt:           util2.Time2Str(doc.CreatedAt),
+		Splitter:            buildSplitter(config.Splitter),
+		PageTotal:           buildPageTotal(int32(content.MetaData.ChunkTotalNum), pageSize),
+		SegmentTotalNum:     int32(content.MetaData.ChunkTotalNum),
+		ContentList:         buildContentList(segmentListResp.List, pageNo, pageSize),
+		MetaDataList:        buildMetaList(metaDataList),
+		SegmentImportStatus: buildSegmentImportStatus(segmentImportTask),
 	}
 	return resp, nil
+}
+
+func buildSegmentImportStatus(segmentImportTask *model.DocSegmentImportTask) string {
+	if segmentImportTask == nil {
+		return ""
+	}
+	if segmentImportTask.Status == model.DocSegmentImportInit {
+		return segmentImportingMessage
+	} else if segmentImportTask.Status == model.DocSegmentImportImporting {
+		timeSpan := time.Now().UnixMilli() - segmentImportTask.UpdatedAt
+		if timeSpan < fiveMinutes {
+			return segmentImportingMessage
+		}
+		//大于5分钟标识异步任务中间断了，todo 异步更新任务
+	}
+	if segmentImportTask.SuccessCount <= 0 {
+		return segmentCompleteFail
+	}
+	if segmentImportTask.TotalCount <= 0 {
+		return fmt.Sprintf(segmentPartCompleteFormat, segmentImportTask.SuccessCount)
+	}
+	return fmt.Sprintf(segmentCompleteFormat, segmentImportTask.SuccessCount, segmentImportTask.TotalCount-segmentImportTask.SuccessCount)
 }
 
 func buildMetaList(metaDataList []*model.KnowledgeDocMeta) []*knowledgebase_doc_service.MetaData {
@@ -538,7 +818,7 @@ func buildContentList(contentList []service.FileSplitContent, pageNo int32, page
 	return retList
 }
 
-func buildDocUpdateSegmentStatusParams(req *knowledgebase_doc_service.UpdateDocSegmentReq, knowledge *model.KnowledgeBase, docInfo *model.KnowledgeDoc) interface{} {
+func buildDocUpdateSegmentStatusParams(req *knowledgebase_doc_service.UpdateDocSegmentStatusReq, knowledge *model.KnowledgeBase, docInfo *model.KnowledgeDoc) interface{} {
 	//前端逻辑，all + status 组合控制一键开启和一键关停，比如：all：true，status：false 则标识一键关停
 	//但是底层 只要all false 就是一键关停
 	var status = req.ContentStatus == "true"
@@ -563,100 +843,30 @@ func buildDocUpdateSegmentStatusParams(req *knowledgebase_doc_service.UpdateDocS
 	}
 }
 
-func (s *Service) UpdateDocSegmentLabels(ctx context.Context, req *knowledgebase_doc_service.DocSegmentLabelsReq) (*emptypb.Empty, error) {
-	//1.查询文档详情
-	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
-	if err != nil {
-		log.Errorf(fmt.Sprintf("没有操作该知识库文档的权限 参数(%v)", req))
-		return nil, err
-	}
-	doc := docList[0]
-	//2.状态校验
-	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
-		log.Errorf(fmt.Sprintf("非处理完成文档无法增加切片标签 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req))
-		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentUpdateLabelsFailed)
-	}
-	//3.查询知识库信息
-	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
-	if err != nil {
-		log.Errorf(fmt.Sprintf("没有操作该知识库的权限 参数(%v)", req))
-		return nil, err
-	}
-	//4.更新切片标签
-	fileName := service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
-	var labels = req.Labels
-	if len(labels) == 0 {
-		labels = make([]string, 0)
-	}
-	err = service.RagDocSegmentLabels(ctx, &service.RagDocSegmentLabelsParams{
-		UserId:        req.UserId,
-		KnowledgeBase: knowledge.Name,
-		KnowledgeId:   knowledge.KnowledgeId,
-		FileName:      fileName,
-		ContentId:     req.ContentId,
-		Labels:        labels,
-	})
-	if err != nil {
-		log.Errorf(fmt.Sprintf("update doc seg labels fail %v", err), req.DocId)
-		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentUpdateLabelsFailed)
-	}
-	return &emptypb.Empty{}, nil
-}
-
-func (s *Service) CreateDocSegment(ctx context.Context, req *knowledgebase_doc_service.CreateDocSegmentReq) (*emptypb.Empty, error) {
-	//1.查询文档详情
-	docList, err := orm.SelectDocByDocIdList(ctx, []string{req.DocId}, req.UserId, req.OrgId)
-	if err != nil {
-		log.Errorf(fmt.Sprintf("没有操作该知识库文档的权限 参数(%v)", req))
-		return nil, err
-	}
-	doc := docList[0]
-	//2.状态校验
-	if util.BuildDocRespStatus(doc.Status) != model.DocSuccess {
-		log.Errorf(fmt.Sprintf("非处理完成文档无法增加切片 状态(%d) 错误(%v) 参数(%v)", doc.Status, err, req))
-		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentUpdateLabelsFailed)
-	}
-	//3.查询知识库信息
-	knowledge, err := orm.SelectKnowledgeById(ctx, doc.KnowledgeId, req.UserId, req.OrgId)
-	if err != nil {
-		log.Errorf(fmt.Sprintf("没有操作该知识库的权限 参数(%v)", req))
-		return nil, err
-	}
-	//4.获取文档名称
-	fileName := service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
-	//5.查询最大分段长度
-	importTask, err := orm.SelectKnowledgeImportTaskById(ctx, doc.ImportTaskId)
-	if err != nil {
-		log.Errorf(fmt.Sprintf("没有查询到导入任务 参数(%v)", req))
-		return nil, err
-	}
-	var segmentConfig = &model.SegmentConfig{}
-	err = json.Unmarshal([]byte(importTask.SegmentConfig), segmentConfig)
-	if err != nil {
-		log.Errorf("SegmentConfig process error %s", err.Error())
-		return nil, err
-	}
-
-	var labels = req.Labels
-	if len(labels) == 0 {
-		labels = make([]string, 0)
-	}
-	var chunks []*service.ChunkItem
-	chunks = append(chunks, &service.ChunkItem{
-		Content: req.Content,
-		Labels:  labels,
-	})
-	err = service.RagCreateDocSegment(ctx, &service.RagCreateDocSegmentParams{
-		UserId:          req.UserId,
-		KnowledgeBase:   knowledge.Name,
+// buildDocSegmentImportTask 构造导入任务
+func buildDocSegmentImportTask(knowledge *model.KnowledgeBase, fileName, docId string,
+	segmentConfig *model.SegmentConfig, req *knowledgebase_doc_service.BatchCreateDocSegmentReq) (*model.DocSegmentImportTask, error) {
+	params := &model.DocSegmentImportParams{
 		KnowledgeId:     knowledge.KnowledgeId,
+		KnowledgeName:   knowledge.Name,
 		FileName:        fileName,
 		MaxSentenceSize: segmentConfig.MaxSplitter,
-		Chunks:          chunks,
-	})
-	if err != nil {
-		log.Errorf(fmt.Sprintf("create doc segment fail %v", err), req.DocId)
-		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentCreateFailed)
+		FileUrl:         req.FileUrl,
 	}
-	return &emptypb.Empty{}, nil
+	marshal, err := json.Marshal(params)
+	if err != nil {
+		log.Errorf("DocSegmentImportParams process error %s", err.Error())
+		return nil, err
+	}
+
+	return &model.DocSegmentImportTask{
+		ImportId:     generator.GetGenerator().NewID(),
+		DocId:        docId,
+		Status:       model.DocSegmentImportInit,
+		ImportParams: string(marshal),
+		CreatedAt:    time.Now().UnixMilli(),
+		UpdatedAt:    time.Now().UnixMilli(),
+		UserId:       req.UserId,
+		OrgId:        req.OrgId,
+	}, nil
 }
