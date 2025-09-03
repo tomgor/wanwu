@@ -216,3 +216,66 @@ func CreateDocSegment(ctx *gin.Context) {
 	err := service.CreateDocSegment(ctx, userId, orgId, &req)
 	gin_util.Response(ctx, nil, err)
 }
+
+// BatchCreateDocSegment
+//
+//	@Tags			knowledge
+//	@Summary		批量新增文档切片
+//	@Description	批量新增文档切片
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.BatchCreateDocSegmentReq	true	"批量新增文档切片请求参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/knowledge/doc/segment/batch/create [post]
+func BatchCreateDocSegment(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.BatchCreateDocSegmentReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.BatchCreateDocSegment(ctx, userId, orgId, &req)
+	gin_util.Response(ctx, nil, err)
+}
+
+// DeleteDocSegment
+//
+//	@Tags			knowledge
+//	@Summary		删除文档切片
+//	@Description	删除文档切片
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.DeleteDocSegmentReq	true	"删除文档切片请求参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/knowledge/doc/segment/delete [delete]
+func DeleteDocSegment(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.DeleteDocSegmentReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.DeleteDocSegment(ctx, userId, orgId, &req)
+	gin_util.Response(ctx, nil, err)
+}
+
+// UpdateDocSegment
+//
+//	@Tags			knowledge
+//	@Summary		更新文档切片
+//	@Description	更新文档切片
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.UpdateDocSegmentReq	true	"更新文档切片请求参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/knowledge/doc/segment/update [post]
+func UpdateDocSegment(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.UpdateDocSegmentReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.UpdateDocSegment(ctx, userId, orgId, &req)
+	gin_util.Response(ctx, nil, err)
+}

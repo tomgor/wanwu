@@ -3185,6 +3185,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/knowledge/doc/segment/batch/create": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "批量新增文档切片",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge"
+                ],
+                "summary": "批量新增文档切片",
+                "parameters": [
+                    {
+                        "description": "批量新增文档切片请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.BatchCreateDocSegmentReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/knowledge/doc/segment/create": {
             "post": {
                 "security": [
@@ -8340,6 +8379,23 @@ const docTemplate = `{
                 },
                 "path": {
                     "description": "前端请求地址，例如：/v1/static/avatar/abc/def.png (请求非必填)",
+                    "type": "string"
+                }
+            }
+        },
+        "request.BatchCreateDocSegmentReq": {
+            "type": "object",
+            "required": [
+                "docId",
+                "fileUploadId"
+            ],
+            "properties": {
+                "docId": {
+                    "description": "文档id",
+                    "type": "string"
+                },
+                "fileUploadId": {
+                    "description": "fileUploadId",
                     "type": "string"
                 }
             }

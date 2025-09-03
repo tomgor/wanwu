@@ -53,6 +53,7 @@ enum Code {
   KnowledgeDocImportUrlFailed = 142007; // 获取上传文档失败，请稍后重试
   KnowledgeDocUpdateMetaFailed = 142008; // 更新文档元数据失败，请稍后重试
   KnowledgeDocUpdateMetaStatusFailed = 142009; // 非处理完成文档无法更新元数据，请稍后重试
+  KnowledgeDocSegmentFileCSVTypeFail = 142010; // 上传文档必须是csv，请修改后重试
   KnowledgeTagCreateFailed = 143001; // 新建知识库标签失败，请稍后重试
   KnowledgeTagDeleteFailed = 143002; // 删除知识库标签失败，请稍后重试
   KnowledgeTagUpdateFailed = 143003; // 修改知识库标签失败，请稍后重试
@@ -75,6 +76,9 @@ enum Code {
   KnowledgeSplitterAccessDenied = 145008; // 没有操作该知识库分隔符的权限
   KnowledgeDocSegmentUpdateLabelsFailed = 145009;  // 更新文档切片标签失败，请稍后重试
   KnowledgeDocSegmentCreateFailed = 145010; // 新增文档分段失败，请稍后重试
+  KnowledgeDocSegmentExceedMaxSize = 145011; // 分段长度超过最大值
+  KnowledgeDocSegmentUpdateFailed = 145012; // 更新文档分段失败，请稍后重试
+  KnowledgeDocSegmentDeleteFailed = 145013; // 删除文档分段失败，请稍后重试
 
   // --- rag-service ---
   // [150000, 159999]
