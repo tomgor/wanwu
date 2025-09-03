@@ -84,3 +84,22 @@ type CreateDocSegmentReq struct {
 	Content string   `json:"content"  validate:"required"` // 分段内容
 	CommonCheck
 }
+
+type BatchCreateDocSegmentReq struct {
+	DocId        string `json:"docId"  validate:"required"`        // 文档id
+	FileUploadId string `json:"fileUploadId"  validate:"required"` // fileUploadId
+	CommonCheck
+}
+
+type DeleteDocSegmentReq struct {
+	DocId     string `json:"docId"  validate:"required"` // 文档id
+	ContentId string `json:"contentId"  validate:"required"`
+	CommonCheck
+}
+
+type UpdateDocSegmentReq struct {
+	DocId     string `json:"docId"  validate:"required"`
+	ContentId string `json:"contentId"  validate:"required"`
+	Content   string `json:"content"  validate:"required"`
+	CommonCheck
+}

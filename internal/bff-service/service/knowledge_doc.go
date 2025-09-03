@@ -12,6 +12,7 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -211,7 +212,7 @@ func GetDocSegmentList(ctx *gin.Context, userId, orgId string, req *request.DocS
 }
 
 func UpdateDocSegmentStatus(ctx *gin.Context, userId, orgId string, r *request.UpdateDocSegmentStatusReq) error {
-	_, err := knowledgeBaseDoc.UpdateDocSegmentStatus(ctx.Request.Context(), &knowledgebase_doc_service.UpdateDocSegmentReq{
+	_, err := knowledgeBaseDoc.UpdateDocSegmentStatus(ctx.Request.Context(), &knowledgebase_doc_service.UpdateDocSegmentStatusReq{
 		UserId:        userId,
 		OrgId:         orgId,
 		DocId:         r.DocId,
@@ -355,6 +356,46 @@ func CreateDocSegment(ctx *gin.Context, userId, orgId string, r *request.CreateD
 		DocId:   r.DocId,
 		Content: r.Content,
 		Labels:  r.Labels,
+	})
+	return err
+}
+
+func BatchCreateDocSegment(ctx *gin.Context, userId, orgId string, r *request.BatchCreateDocSegmentReq) error {
+	docUrl, err := minio.GetUploadFileWithExpire(ctx, r.FileUploadId)
+	if err != nil {
+		log.Errorf("GetUploadFileWithNotExpire error %v", err)
+		return grpc_util.ErrorStatus(errs.Code_KnowledgeDocImportUrlFailed)
+	}
+	ext := filepath.Ext(docUrl)
+	if ".csv" != ext {
+		return grpc_util.ErrorStatus(errs.Code_KnowledgeDocSegmentFileCSVTypeFail)
+	}
+	_, err = knowledgeBaseDoc.BatchCreateDocSegment(ctx.Request.Context(), &knowledgebase_doc_service.BatchCreateDocSegmentReq{
+		UserId:  userId,
+		OrgId:   orgId,
+		DocId:   r.DocId,
+		FileUrl: docUrl,
+	})
+	return err
+}
+
+func DeleteDocSegment(ctx *gin.Context, userId, orgId string, r *request.DeleteDocSegmentReq) error {
+	_, err := knowledgeBaseDoc.DeleteDocSegment(ctx.Request.Context(), &knowledgebase_doc_service.DeleteDocSegmentReq{
+		UserId:    userId,
+		OrgId:     orgId,
+		DocId:     r.DocId,
+		ContentId: r.ContentId,
+	})
+	return err
+}
+
+func UpdateDocSegment(ctx *gin.Context, userId, orgId string, r *request.UpdateDocSegmentReq) error {
+	_, err := knowledgeBaseDoc.UpdateDocSegment(ctx.Request.Context(), &knowledgebase_doc_service.UpdateDocSegmentReq{
+		UserId:    userId,
+		OrgId:     orgId,
+		DocId:     r.DocId,
+		ContentId: r.ContentId,
+		Content:   r.Content,
 	})
 	return err
 }

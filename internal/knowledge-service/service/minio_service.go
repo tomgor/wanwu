@@ -5,10 +5,8 @@ import (
 	"context"
 	"errors"
 	"io"
-	"mime"
 	"net/url"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -20,9 +18,18 @@ import (
 )
 
 func DownloadFile(ctx context.Context, minioFilePath string) ([]byte, error) {
-	bucketName := config.GetConfig().Minio.Bucket
-	_, objectName, _ := SplitFilePath(minioFilePath)
+	bucketName, objectName, _ := SplitFilePath(minioFilePath)
 	object, err := minio_client.Knowledge().GetObject(ctx, bucketName, objectName)
+	if err != nil {
+		log.Errorf("DownloadFile error %s", err)
+		return nil, err
+	}
+	return object, nil
+}
+
+func DownloadFileObject(ctx context.Context, minioFilePath string) (*minio.Object, error) {
+	bucketName, objectName, _ := SplitFilePath(minioFilePath)
+	object, err := minio_client.Knowledge().Cli().GetObject(ctx, bucketName, objectName, minio.GetObjectOptions{})
 	if err != nil {
 		log.Errorf("DownloadFile error %s", err)
 		return nil, err
@@ -97,14 +104,14 @@ func CopyFile(ctx context.Context, srcFilePath string, destObjectNamePre string)
 }
 
 func getContentType(uri string) (contentType string) {
-	_ = mime.AddExtensionType(".svg", "image/svg+xml")
-	_ = mime.AddExtensionType(".svgz", "image/svg+xml")
-	_ = mime.AddExtensionType(".webp", "image/webp")
-	_ = mime.AddExtensionType(".ico", "image/x-icon")
-	fileExtension := path.Base(uri)
-	ext := path.Ext(fileExtension)
-	contentType = mime.TypeByExtension(ext)
-	return
+	//_ = mime.AddExtensionType(".svg", "image/svg+xml")
+	//_ = mime.AddExtensionType(".svgz", "image/svg+xml")
+	//_ = mime.AddExtensionType(".webp", "image/webp")
+	//_ = mime.AddExtensionType(".ico", "image/x-icon")
+	//fileExtension := path.Base(uri)
+	//ext := path.Ext(fileExtension)
+	//contentType = mime.TypeByExtension(ext)
+	return ""
 }
 
 func UploadFile(ctx context.Context, dir string, fileName string, reader io.Reader, objectSize int64) (string, int64, error) {
