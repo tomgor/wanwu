@@ -409,7 +409,7 @@ export default {
         delete:'删除',
         view:'查看自定义',
         copyDemo:'复制样例并查看',
-        deleteTips:'删除后，历史引用了本工作流的智能体将自动取消引用，且此操作不可撤回,是否确认删除？',
+        deleteTips:'删除后，历史引用了本工作流的智能体将自动取消引用，且此操作不可撤回，是否确认删除？',
         tips:'提示',
         confirm:'确 定',
         delSuccess:'删除成功',

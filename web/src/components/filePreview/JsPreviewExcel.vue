@@ -11,12 +11,11 @@
 </template>
 
 <script>
-import { VueOfficeExcel } from '@vue-office/excel';
+import  VueOfficeExcel  from '@vue-office/excel';
 import '@vue-office/excel/lib/index.css';
 
 export default {
   name: 'ExcelPreview',
-
   components: {
     VueOfficeExcel
   },
