@@ -119,7 +119,7 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 			}
 			for _, info := range apps {
 				if historyApp.AppID == info.AppID && historyApp.AppType == info.AppType {
-					historyApp.UserID = info.UserID
+					appInfo.UserID = info.UserID
 					break
 				}
 			}
