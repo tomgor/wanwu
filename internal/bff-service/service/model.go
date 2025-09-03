@@ -48,11 +48,9 @@ func UpdateModel(ctx *gin.Context, userId, orgId string, req *request.ImportOrUp
 
 func DeleteModel(ctx *gin.Context, userId, orgId string, req *request.DeleteModelRequest) error {
 	_, err := model.DeleteModel(ctx.Request.Context(), &model_service.DeleteModelReq{
-		Provider:  req.Provider,
-		ModelType: req.ModelType,
-		Model:     req.Model,
-		UserId:    userId,
-		OrgId:     orgId,
+		ModelId: req.ModelId,
+		UserId:  userId,
+		OrgId:   orgId,
 	})
 	if err != nil {
 		return err
@@ -62,11 +60,9 @@ func DeleteModel(ctx *gin.Context, userId, orgId string, req *request.DeleteMode
 
 func GetModel(ctx *gin.Context, userId, orgId string, req *request.GetModelRequest) (*response.ModelInfo, error) {
 	resp, err := model.GetModel(ctx.Request.Context(), &model_service.GetModelReq{
-		Provider:  req.Provider,
-		ModelType: req.ModelType,
-		Model:     req.Model,
-		UserId:    userId,
-		OrgId:     orgId,
+		ModelId: req.ModelId,
+		UserId:  userId,
+		OrgId:   orgId,
 	})
 	if err != nil {
 		return nil, err
@@ -94,12 +90,10 @@ func ListModels(ctx *gin.Context, userId, orgId string, req *request.ListModelsR
 
 func ChangeModelStatus(ctx *gin.Context, userId, orgId string, req *request.ModelStatusRequest) error {
 	_, err := model.ChangeModelStatus(ctx.Request.Context(), &model_service.ModelStatusReq{
-		Provider:  req.Provider,
-		ModelType: req.ModelType,
-		IsActive:  req.IsActive,
-		Model:     req.Model,
-		UserId:    userId,
-		OrgId:     orgId,
+		ModelId:  req.ModelId,
+		IsActive: req.IsActive,
+		UserId:   userId,
+		OrgId:    orgId,
 	})
 	if err != nil {
 		return err

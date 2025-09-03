@@ -52,9 +52,7 @@ func (s *Service) UpdateModel(ctx context.Context, req *model_service.ModelInfo)
 
 func (s *Service) DeleteModel(ctx context.Context, req *model_service.DeleteModelReq) (*emptypb.Empty, error) {
 	if err := s.cli.DeleteModel(ctx, &model.ModelImported{
-		Provider:  req.Provider,
-		ModelType: req.ModelType,
-		Model:     req.Model,
+		ID: util.MustU32(req.ModelId),
 		PublicModel: model.PublicModel{
 			OrgID:  req.OrgId,
 			UserID: req.UserId,
@@ -67,10 +65,8 @@ func (s *Service) DeleteModel(ctx context.Context, req *model_service.DeleteMode
 
 func (s *Service) ChangeModelStatus(ctx context.Context, req *model_service.ModelStatusReq) (*emptypb.Empty, error) {
 	if err := s.cli.ChangeModelStatus(ctx, &model.ModelImported{
-		Provider:  req.Provider,
-		ModelType: req.ModelType,
-		Model:     req.Model,
-		IsActive:  req.IsActive,
+		ID:       util.MustU32(req.ModelId),
+		IsActive: req.IsActive,
 		PublicModel: model.PublicModel{
 			OrgID:  req.OrgId,
 			UserID: req.UserId,
@@ -132,9 +128,7 @@ func toModelInfos(modelInfos []*model.ModelImported) *model_service.ModelInfos {
 
 func (s *Service) GetModel(ctx context.Context, req *model_service.GetModelReq) (*model_service.ModelInfo, error) {
 	modelInfo, err := s.cli.GetModel(ctx, &model.ModelImported{
-		Provider:  req.Provider,
-		ModelType: req.ModelType,
-		Model:     req.Model,
+		ID: util.MustU32(req.ModelId),
 		PublicModel: model.PublicModel{
 			OrgID:  req.OrgId,
 			UserID: req.UserId,
