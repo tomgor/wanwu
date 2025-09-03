@@ -3263,6 +3263,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/knowledge/doc/segment/delete": {
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "删除文档切片",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge"
+                ],
+                "summary": "删除文档切片",
+                "parameters": [
+                    {
+                        "description": "删除文档切片请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DeleteDocSegmentReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/knowledge/doc/segment/labels": {
             "post": {
                 "security": [
@@ -3379,6 +3418,45 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/request.UpdateDocSegmentStatusReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/knowledge/doc/segment/update": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "更新文档切片",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge"
+                ],
+                "summary": "更新文档切片",
+                "parameters": [
+                    {
+                        "description": "更新文档切片请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateDocSegmentReq"
                         }
                     }
                 ],
@@ -4629,30 +4707,13 @@ const docTemplate = `{
                 "summary": "‌查询单个模型",
                 "parameters": [
                     {
-                        "enum": [
-                            "llm",
-                            "embedding",
-                            "rerank"
-                        ],
-                        "type": "string",
-                        "description": "模型类型",
-                        "name": "modelType",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "模型名称",
-                        "name": "model",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "模型供应商",
-                        "name": "provider",
-                        "in": "query",
-                        "required": true
+                        "description": "模型ID",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GetModelRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -4885,6 +4946,57 @@ const docTemplate = `{
                     "model"
                 ],
                 "summary": "embedding模型列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "$ref": "#/definitions/response.ModelBrief"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/model/select/gui": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "model"
+                ],
+                "summary": "gui模型列表",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -8913,6 +9025,22 @@ const docTemplate = `{
                 }
             }
         },
+        "request.DeleteDocSegmentReq": {
+            "type": "object",
+            "required": [
+                "contentId",
+                "docId"
+            ],
+            "properties": {
+                "contentId": {
+                    "type": "string"
+                },
+                "docId": {
+                    "description": "文档id",
+                    "type": "string"
+                }
+            }
+        },
         "request.DeleteFileReq": {
             "type": "object",
             "properties": {
@@ -9273,6 +9401,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "splitterName": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.GetModelRequest": {
+            "type": "object",
+            "required": [
+                "modelId"
+            ],
+            "properties": {
+                "modelId": {
                     "type": "string"
                 }
             }
@@ -9878,6 +10017,25 @@ const docTemplate = `{
                 },
                 "appType": {
                     "description": "应用类型",
+                    "type": "string"
+                }
+            }
+        },
+        "request.UpdateDocSegmentReq": {
+            "type": "object",
+            "required": [
+                "content",
+                "contentId",
+                "docId"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "contentId": {
+                    "type": "string"
+                },
+                "docId": {
                     "type": "string"
                 }
             }

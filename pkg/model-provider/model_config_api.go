@@ -34,6 +34,11 @@ type IOcr interface {
 	Ocr(ctx *gin.Context, req mp_common.IOcrReq, headers ...mp_common.Header) (mp_common.IOcrResp, error)
 }
 
+type IGui interface {
+	NewReq(req *mp_common.GuiReq) (mp_common.IGuiReq, error)
+	Gui(ctx context.Context, req mp_common.IGuiReq, headers ...mp_common.Header) (mp_common.IGuiResp, error)
+}
+
 // ToModelConfig 返回ILLM、IEmbedding或IRerank
 func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 	if cfg == "" {
@@ -62,6 +67,8 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 			ret = &mp_yuanjing.Embedding{}
 		case ModelTypeOcr:
 			ret = &mp_yuanjing.Ocr{}
+		case ModelTypeGui:
+			ret = &mp_yuanjing.Gui{}
 		default:
 			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
 		}

@@ -6,6 +6,7 @@ const (
 	ModelTypeEmbedding = "embedding"
 	ModelTypeRerank    = "rerank"
 	ModelTypeOcr       = "ocr"
+	ModelTypeGui       = "gui"
 )
 
 // model provider

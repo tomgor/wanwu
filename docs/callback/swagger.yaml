@@ -116,6 +116,78 @@ definitions:
       name:
         type: string
     type: object
+  mp_common.GuiContent:
+    properties:
+      action:
+        type: string
+      box:
+        items:
+          type: integer
+        type: array
+      description:
+        type: string
+      operation:
+        type: string
+      sensitivity:
+        type: string
+      value:
+        type: string
+    required:
+    - action
+    - description
+    - operation
+    type: object
+  mp_common.GuiReq:
+    properties:
+      algo:
+        description: 算法名称，默认gui_agent_v1
+        type: string
+      current_screenshot:
+        description: 当前屏幕截图，Base64编码的图像字符串
+        type: string
+      current_screenshot_height:
+        description: 当前屏幕截图的高度
+        type: integer
+      current_screenshot_width:
+        description: 当前屏幕截图的宽度
+        type: integer
+      current_screenshot_xml:
+        description: 屏幕布局导出的xml文件
+        type: string
+      history:
+        description: 当前任务的历史返回结果，历次返回结果中的content字段
+        items:
+          type: string
+        type: array
+      platform:
+        description: 平台信息，移动端填写Mobile, Windows端填写WIN，Mac端填写MAC
+        type: string
+      task:
+        description: 当前用户任务
+        type: string
+    required:
+    - current_screenshot
+    - current_screenshot_height
+    - current_screenshot_width
+    - history
+    - platform
+    - task
+    type: object
+  mp_common.GuiResp:
+    properties:
+      code:
+        type: integer
+      content:
+        $ref: '#/definitions/mp_common.GuiContent'
+      message:
+        type: string
+      usage:
+        $ref: '#/definitions/mp_common.Usage'
+    required:
+    - content
+    - message
+    - usage
+    type: object
   mp_common.LLMReq:
     properties:
       do_sample:
@@ -901,6 +973,32 @@ paths:
           schema:
             $ref: '#/definitions/mp_common.EmbeddingResp'
       summary: Model Embeddings
+      tags:
+      - callback
+  /model/{modelId}/gui:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 模型ID
+        in: path
+        name: modelId
+        required: true
+        type: string
+      - description: 请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/mp_common.GuiReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mp_common.GuiResp'
+      summary: Model Gui
       tags:
       - callback
   /model/{modelId}/ocr:

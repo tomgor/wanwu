@@ -76,10 +76,8 @@ func DeleteModel(ctx *gin.Context) {
 //	@Security	JWT
 //	@Accept		json
 //	@Produce	json
-//	@Param		modelType	query		string	true	"模型类型"	Enums(llm,embedding,rerank)
-//	@Param		model		query		string	true	"模型名称"
-//	@Param		provider	query		string	true	"模型供应商"
-//	@Success	200			{object}	response.Response{data=response.ModelInfo}
+//	@Param		data	body		request.GetModelRequest	true	"模型ID"
+//	@Success	200		{object}	response.Response{data=response.ModelInfo}
 //	@Router		/model [get]
 func GetModel(ctx *gin.Context) {
 	var req request.GetModelRequest
@@ -197,6 +195,23 @@ func ListEmbeddingModels(ctx *gin.Context) {
 func ListOcrModels(ctx *gin.Context) {
 	resp, err := service.ListTypeModels(ctx, getUserID(ctx), getOrgID(ctx), &request.ListTypeModelsRequest{
 		ModelType: mp.ModelTypeOcr,
+	})
+	gin_util.Response(ctx, resp, err)
+}
+
+// ListGuiModels
+//
+//	@Tags		model
+//	@Summary	gui模型列表
+//	@Description
+//	@Security	JWT
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelBrief}}
+//	@Router		/model/select/gui [get]
+func ListGuiModels(ctx *gin.Context) {
+	resp, err := service.ListTypeModels(ctx, getUserID(ctx), getOrgID(ctx), &request.ListTypeModelsRequest{
+		ModelType: mp.ModelTypeGui,
 	})
 	gin_util.Response(ctx, resp, err)
 }

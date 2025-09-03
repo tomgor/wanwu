@@ -1179,6 +1179,17 @@ definitions:
     required:
     - docIdList
     type: object
+  request.DeleteDocSegmentReq:
+    properties:
+      contentId:
+        type: string
+      docId:
+        description: 文档id
+        type: string
+    required:
+    - contentId
+    - docId
+    type: object
   request.DeleteFileReq:
     properties:
       fileList:
@@ -1427,6 +1438,13 @@ definitions:
     properties:
       splitterName:
         type: string
+    type: object
+  request.GetModelRequest:
+    properties:
+      modelId:
+        type: string
+    required:
+    - modelId
     type: object
   request.ImportOrUpdateModelRequest:
     properties:
@@ -1837,6 +1855,19 @@ definitions:
       appType:
         description: 应用类型
         type: string
+    type: object
+  request.UpdateDocSegmentReq:
+    properties:
+      content:
+        type: string
+      contentId:
+        type: string
+      docId:
+        type: string
+    required:
+    - content
+    - contentId
+    - docId
     type: object
   request.UpdateDocSegmentStatusReq:
     properties:
@@ -5617,6 +5648,30 @@ paths:
       summary: 新增文档切片
       tags:
       - knowledge
+  /knowledge/doc/segment/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除文档切片
+      parameters:
+      - description: 删除文档切片请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DeleteDocSegmentReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 删除文档切片
+      tags:
+      - knowledge
   /knowledge/doc/segment/labels:
     post:
       consumes:
@@ -5692,6 +5747,30 @@ paths:
       security:
       - JWT: []
       summary: 更新文档切片启用状态
+      tags:
+      - knowledge
+  /knowledge/doc/segment/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新文档切片
+      parameters:
+      - description: 更新文档切片请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateDocSegmentReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 更新文档切片
       tags:
       - knowledge
   /knowledge/doc/url/analysis:
@@ -6442,25 +6521,12 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: 模型类型
-        enum:
-        - llm
-        - embedding
-        - rerank
-        in: query
-        name: modelType
+      - description: 模型ID
+        in: body
+        name: data
         required: true
-        type: string
-      - description: 模型名称
-        in: query
-        name: model
-        required: true
-        type: string
-      - description: 模型供应商
-        in: query
-        name: provider
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/request.GetModelRequest'
       produces:
       - application/json
       responses:
@@ -6594,6 +6660,32 @@ paths:
       security:
       - JWT: []
       summary: embedding模型列表
+      tags:
+      - model
+  /model/select/gui:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        $ref: '#/definitions/response.ModelBrief'
+                    type: object
+              type: object
+      security:
+      - JWT: []
+      summary: gui模型列表
       tags:
       - model
   /model/select/llm:
