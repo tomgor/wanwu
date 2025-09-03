@@ -56,6 +56,9 @@
             v-if="!isShowTool"
             class="favorite-wrap"
           >
+          <el-tooltip class="item" effect="dark" :content="n.user.userName" placement="top-start">
+            <span class="user-name">{{n.user ? n.user.userName.length>6 ? n.user.userName.substring(0,6)+'...' : n.user.userName  : ''}}</span>
+          </el-tooltip>
             <img
               v-if="!n.isFavorite"
               class="favorite"

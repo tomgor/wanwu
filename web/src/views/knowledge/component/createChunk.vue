@@ -89,7 +89,8 @@ export default {
                 this.ruleForm.fileUploadId = '';
                 this.$refs.fileUpload.clearFileList();
             }else{
-                this.clearForm()
+                this.clearForm();
+                this.$refs.ruleForm.clearValidate();
             }
         },
         uploadFile(fileUploadId){

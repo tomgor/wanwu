@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100vh; overflow: auto;" ref="container">
-    <vue-office-excel
+    <VueOfficeExcel
       :src="page.url"
       :options="options"
       style="height: 100vh;"

@@ -69,6 +69,12 @@
             padding: 10px 10px 10px 20px;
             border-top: 1px solid #ededed;
             color: #88888B;
+            .user-name{
+                width: auto;
+                position: absolute;
+                bottom:2px;
+                right: 30px;
+            }
             .favorite-wrap {
                 float: right;
             }
