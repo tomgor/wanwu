@@ -11239,6 +11239,14 @@ const docTemplate = `{
                 "updatedAt": {
                     "description": "应用更新时间(用于历史记录排序)",
                     "type": "string"
+                },
+                "user": {
+                    "description": "作者信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.User"
+                        }
+                    ]
                 }
             }
         },
@@ -12432,6 +12440,19 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.User": {
+            "type": "object",
+            "properties": {
+                "userId": {
+                    "description": "用户ID",
+                    "type": "string"
+                },
+                "userName": {
+                    "description": "用户名称",
                     "type": "string"
                 }
             }

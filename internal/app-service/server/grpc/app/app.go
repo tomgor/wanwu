@@ -95,6 +95,7 @@ func (s *Service) RecordAppHistory(ctx context.Context, req *app_service.RecordA
 // --- internal ---
 func toProtoExpApp(record *orm.ExplorationAppInfo) *app_service.ExplorationAppInfo {
 	return &app_service.ExplorationAppInfo{
+		UserId:      record.UserID,
 		AppId:       record.AppId,
 		AppType:     record.AppType,
 		CreatedAt:   record.CreatedAt,
