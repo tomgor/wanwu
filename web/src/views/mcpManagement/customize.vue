@@ -141,7 +141,7 @@ export default {
     },
     handleDelete(item) {
       this.$confirm(
-        "确定要删除 <span style='font-weight: bold;'>" + item.name + "</span> 该服务吗？",
+        "删除后，历史引用了本MCP服务的智能体将自动取消引用，且此操作不可撤回,确定要删除吗？",
         "提示",
         {
           confirmButtonText: "确定",

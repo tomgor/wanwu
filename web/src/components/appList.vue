@@ -311,14 +311,33 @@ export default {
       }
     },
     async cancelPublish(row) {
+      let confirmed = true;
       const params = {
         appId: row.appId,
         appType: row.appType
       };
-      const res = await appCancelPublish(params)
-      if (res.code === 0) {
-        this.$message.success(this.$t("common.message.success"))
-        this.$emit("reloadData")
+      
+      //工作流取消发布，需弹窗提示
+      if(row.appType === 'workflow'){
+        confirmed = await this.showDeleteConfirm('取消发布后，历史引用了本工作流的智能体将自动取消引用，且此操作不可撤回');
+      }
+      
+      if(confirmed){
+        const res = await appCancelPublish(params)
+        if (res.code === 0) {
+          this.$message.success(this.$t("common.message.success"))
+          this.$emit("reloadData")
+        }
+      }
+    },
+    async showDeleteConfirm(tips){
+      try{
+        await this.$alert(tips, this.$t("list.tips"), {
+          confirmButtonText: this.$t("list.confirm"),
+        });
+        return true;
+      }catch(err){
+        return false;
       }
     },
     workflowOperation(method, row) {
