@@ -7,10 +7,12 @@ import (
 	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	"github.com/UnicomAI/wanwu/api/proto/common"
+	iam_service "github.com/UnicomAI/wanwu/api/proto/iam-service"
 	rag_service "github.com/UnicomAI/wanwu/api/proto/rag-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	"github.com/UnicomAI/wanwu/pkg/constant"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 )
@@ -44,6 +46,25 @@ func GetExplorationAppList(ctx *gin.Context, userId string, req request.GetExplo
 	sort.SliceStable(apps, func(i, j int) bool {
 		return apps[i].CreatedAt > apps[j].CreatedAt
 	})
+	// 填充作者信息
+	var userIds []string
+	for _, app := range apps {
+		userIds = append(userIds, app.User.UserId)
+	}
+	ret, err := iam.GetUserSelectByUserIDs(ctx, &iam_service.GetUserSelectByUserIDsReq{
+		UserIds: userIds,
+	})
+	if err != nil {
+		return nil, err
+	}
+	for _, app := range apps {
+		app.User.UserName = gin_util.I18nKey(ctx, "iam_user_deleted")
+		for _, user := range ret.Selects {
+			if app.User.UserId == user.Id {
+				app.User.UserName = user.Name
+			}
+		}
+	}
 	return &response.ListResult{
 		List:  apps,
 		Total: explorationApp.Total,
@@ -112,6 +133,7 @@ func explorerationFilterRag(ctx *gin.Context, explorationApp []*app_service.Expl
 				appInfo.UpdatedAt = util.Time2Str(expApp.UpdatedAt)
 				appInfo.PublishType = expApp.PublishType
 				appInfo.IsFavorite = expApp.IsFavorite
+				appInfo.User.UserId = expApp.UserId
 				retAppList = append(retAppList, appInfo)
 				break
 			}
@@ -167,6 +189,7 @@ func explorerationFilterAgent(ctx *gin.Context, apps []*app_service.ExplorationA
 				appInfo.UpdatedAt = util.Time2Str(expApp.UpdatedAt)
 				appInfo.PublishType = expApp.PublishType
 				appInfo.IsFavorite = expApp.IsFavorite
+				appInfo.User.UserId = expApp.UserId
 				retAppList = append(retAppList, appInfo)
 				break
 			}
@@ -223,6 +246,7 @@ func explorerationFilterWorkFlow(ctx *gin.Context, apps []*app_service.Explorati
 				appInfo.PublishType = expApp.PublishType
 				appInfo.IsFavorite = expApp.IsFavorite
 				retAppList = append(retAppList, appInfo)
+				appInfo.User.UserId = expApp.UserId
 				break
 			}
 		}

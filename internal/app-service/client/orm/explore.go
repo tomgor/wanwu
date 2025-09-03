@@ -30,8 +30,12 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 		if err := query.Order("id DESC").Find(&apps).Error; err != nil {
 			return nil, toErrStatus("app_explore_apps_get", err.Error())
 		}
+		if len(apps) == 0 {
+			break
+		}
 		for _, app := range apps {
 			appInfo := &ExplorationAppInfo{
+				UserID:      app.UserID,
 				AppId:       app.AppID,
 				AppType:     app.AppType,
 				CreatedAt:   app.CreatedAt,
@@ -47,17 +51,35 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 			}
 			ret = append(ret, appInfo)
 		}
-		return ret, nil
 	case "favorite":
+		if len(favoriteApps) == 0 {
+			break
+		}
+		var appIds []string
 		for _, app := range favoriteApps {
-			ret = append(ret, &ExplorationAppInfo{
+			appIds = append(appIds, app.AppID)
+		}
+		apps, err := c.getAppByIds(ctx, appIds)
+		if err != nil {
+			return nil, err
+		}
+		for _, app := range favoriteApps {
+			appInfo := &ExplorationAppInfo{
+				UserID:      "",
 				AppId:       app.AppID,
 				AppType:     app.AppType,
 				CreatedAt:   app.CreatedAt,
 				UpdatedAt:   app.UpdatedAt,
 				IsFavorite:  true,
 				PublishType: "",
-			})
+			}
+			for _, info := range apps {
+				if app.AppID == info.AppID && app.AppType == info.AppType {
+					appInfo.UserID = info.UserID
+					break
+				}
+			}
+			ret = append(ret, appInfo)
 		}
 	case "history":
 		var historyApps []*model.AppHistory
@@ -69,6 +91,17 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 		).Apply(c.db.WithContext(ctx)).
 			Order("updated_at DESC").Find(&historyApps).Error; err != nil {
 			return nil, toErrStatus("app_history_apps_get", err.Error())
+		}
+		if len(historyApps) == 0 {
+			break
+		}
+		var appIds []string
+		for _, r := range historyApps {
+			appIds = append(appIds, r.AppID)
+		}
+		apps, err := c.getAppByIds(ctx, appIds)
+		if err != nil {
+			return nil, err
 		}
 		for _, historyApp := range historyApps {
 			appInfo := &ExplorationAppInfo{
@@ -84,10 +117,14 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 					break
 				}
 			}
+			for _, info := range apps {
+				if historyApp.AppID == info.AppID && historyApp.AppType == info.AppType {
+					historyApp.UserID = info.UserID
+					break
+				}
+			}
 			ret = append(ret, appInfo)
 		}
-		return ret, nil
-
 	}
 	return ret, nil
 }
@@ -124,4 +161,12 @@ func (c *Client) ChangeExplorationAppFavorite(ctx context.Context, userId, orgId
 		return toErrStatus("app_favorite_app_delete", appId, err.Error())
 	}
 	return nil
+}
+
+func (c *Client) getAppByIds(ctx context.Context, appIds []string) ([]*model.App, *errs.Status) {
+	var apps []*model.App
+	if err := sqlopt.WithAppIDs(appIds).Apply(c.db.WithContext(ctx)).Find(&apps).Error; err != nil {
+		return nil, toErrStatus("app_explore_apps_get", err.Error())
+	}
+	return apps, nil
 }

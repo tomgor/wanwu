@@ -88,6 +88,7 @@ message ExplorationAppInfo{
   int64 updatedAt = 4;
   bool isFavorite = 5;
   string publishType = 6;
+  string userId = 7;
 }
 
 message AppInfo{

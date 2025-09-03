@@ -11183,6 +11183,14 @@ const docTemplate = `{
                 "updatedAt": {
                     "description": "应用更新时间(用于历史记录排序)",
                     "type": "string"
+                },
+                "user": {
+                    "description": "作者信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.User"
+                        }
+                    ]
                 }
             }
         },
@@ -11272,6 +11280,10 @@ const docTemplate = `{
         "response.KnowledgeInfo": {
             "type": "object",
             "properties": {
+                "createAt": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
                 "description": {
                     "description": "知识库描述",
                     "type": "string"
@@ -12372,6 +12384,19 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.User": {
+            "type": "object",
+            "properties": {
+                "userId": {
+                    "description": "用户ID",
+                    "type": "string"
+                },
+                "userName": {
+                    "description": "用户名称",
                     "type": "string"
                 }
             }

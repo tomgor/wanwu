@@ -2759,6 +2759,10 @@ definitions:
       updatedAt:
         description: 应用更新时间(用于历史记录排序)
         type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/response.User'
+        description: 作者信息
     type: object
   response.GetKnowledgeKeywordListResp:
     properties:
@@ -2817,6 +2821,9 @@ definitions:
     type: object
   response.KnowledgeInfo:
     properties:
+      createAt:
+        description: 创建时间
+        type: string
       description:
         description: 知识库描述
         type: string
@@ -3551,6 +3558,15 @@ definitions:
       fileSize:
         type: integer
       url:
+        type: string
+    type: object
+  response.User:
+    properties:
+      userId:
+        description: 用户ID
+        type: string
+      userName:
+        description: 用户名称
         type: string
     type: object
   response.UserID:

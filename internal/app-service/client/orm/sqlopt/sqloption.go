@@ -46,6 +46,12 @@ func WithUserID(userID string) SQLOption {
 	})
 }
 
+func WithAppIDs(Ids []string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("app_id IN (?)", Ids)
+	})
+}
+
 func WithExcludeUserID(userID string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		if userID != "" {

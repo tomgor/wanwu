@@ -127,8 +127,7 @@ message GetUserSelectNotInOrgReq {
 }
 
 message GetUserSelectByUserIDsReq {
-  string orgId = 1;
-  repeated string userIds = 2;
+  repeated string userIds = 1;
 }
 
 message GetUserListReq {

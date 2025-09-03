@@ -48,6 +48,7 @@ type ExplorationAppInfo struct {
 	UpdatedAt   int64
 	IsFavorite  bool
 	PublishType string
+	UserID      string
 }
 
 type SensitiveWordTableWithWord struct {
