@@ -30,6 +30,14 @@ func (s *Service) AssistantMCPDelete(ctx context.Context, req *assistant_service
 	return &emptypb.Empty{}, nil
 }
 
+// AssistantMCPDeleteByMCPId 删除mcp
+func (s *Service) AssistantMCPDeleteByMCPId(ctx context.Context, req *assistant_service.AssistantMCPDeleteByMCPIdReq) (*emptypb.Empty, error) {
+	if status := s.cli.DeleteAssistantMCPByMCPId(ctx, req.McpId); status != nil {
+		return nil, errStatus(errs.Code_AssistantMCPErr, status)
+	}
+	return &emptypb.Empty{}, nil
+}
+
 // AssistantMCPEnableSwitch mcp开关
 func (s *Service) AssistantMCPEnableSwitch(ctx context.Context, req *assistant_service.AssistantMCPEnableSwitchReq) (*emptypb.Empty, error) {
 	assistantId := util.MustU32(req.AssistantId)

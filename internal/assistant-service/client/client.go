@@ -29,12 +29,14 @@ type IClient interface {
 	CreateAssistantMCP(ctx context.Context, assistantId uint32, mcpId string, userId, orgID string) *err_code.Status
 	DeleteAssistantMCP(ctx context.Context, assistantId uint32, mcpId string) *err_code.Status
 	GetAssistantMCP(ctx context.Context, assistantId uint32, mcpId string) (*model.AssistantMCP, *err_code.Status)
+	DeleteAssistantMCPByMCPId(ctx context.Context, mcpId string) *err_code.Status
 	GetAssistantMCPList(ctx context.Context, assistantId uint32) ([]*model.AssistantMCP, *err_code.Status)
 	UpdateAssistantMCP(ctx context.Context, mcp *model.AssistantMCP) *err_code.Status
 
 	//================AssistantCustom================
 	CreateAssistantCustom(ctx context.Context, assistantId uint32, customId string, userId, orgID string) *err_code.Status
 	DeleteAssistantCustom(ctx context.Context, assistantId uint32, customId string) *err_code.Status
+	DeleteAssistantCustomByCustomToolId(ctx context.Context, customId string) *err_code.Status
 	GetAssistantCustom(ctx context.Context, assistantId uint32, customId string) (*model.AssistantCustom, *err_code.Status)
 	UpdateAssistantCustom(ctx context.Context, custom *model.AssistantCustom) *err_code.Status
 	GetAssistantCustomList(ctx context.Context, assistantId uint32) ([]*model.AssistantCustom, *err_code.Status)

@@ -29,6 +29,13 @@ func (s *Service) AssistantCustomToolDelete(ctx context.Context, req *assistant_
 	return &empty.Empty{}, nil
 }
 
+func (s *Service) AssistantCustomToolDeleteByCustomToolId(ctx context.Context, req *assistant_service.AssistantCustomToolDeleteByCustomToolIdReq) (*empty.Empty, error) {
+	if status := s.cli.DeleteAssistantCustomByCustomToolId(ctx, req.CustomToolId); status != nil {
+		return nil, errStatus(errs.Code_AssistantCustomErr, status)
+	}
+	return &empty.Empty{}, nil
+}
+
 func (s *Service) AssistantCustomToolEnableSwitch(ctx context.Context, req *assistant_service.AssistantCustomToolEnableSwitchReq) (*empty.Empty, error) {
 	assistantId := util.MustU32(req.AssistantId)
 
