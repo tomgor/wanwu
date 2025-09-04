@@ -34,7 +34,8 @@ export default {
             dialogVisible:false,
             knowledgeData:[],
             knowledgeList:[],
-            checkedData:[]
+            checkedData:[],
+            toolName:''
         }
     },
     created(){
@@ -57,10 +58,10 @@ export default {
         },
         searchTool(){
         },
-        showDialog(row){
+        showDialog(data){
             this.dialogVisible = true;
-            this.setKnowledge(row.knowledgeBaseConfig.knowledgebases);
-            this.knowledgeList = row.knowledgeBaseConfig.knowledgebases || [];
+            this.setKnowledge(data);
+            this.knowledgeList = data || [];
         },
         setKnowledge(data){
            this.knowledgeData = this.knowledgeData.map(m => ({
