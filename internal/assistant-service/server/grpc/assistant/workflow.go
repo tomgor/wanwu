@@ -70,3 +70,13 @@ func (s *Service) AssistantWorkFlowEnableSwitch(ctx context.Context, req *assist
 
 	return &emptypb.Empty{}, nil
 }
+
+func (s *Service) AssistantWorkFlowDeleteByWorkflowId(ctx context.Context, req *assistant_service.AssistantWorkFlowDeleteByWorkflowIdReq) (*emptypb.Empty, error) {
+	workflowId := req.WorkflowId
+
+	if status := s.cli.DeleteAssistantWorkflowByWorkflowId(ctx, workflowId); status != nil {
+		return nil, errStatus(errs.Code_AssistantWorkflowErr, status)
+	}
+
+	return &emptypb.Empty{}, nil
+}

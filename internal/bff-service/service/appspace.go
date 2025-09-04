@@ -38,7 +38,12 @@ func DeleteAppSpaceApp(ctx *gin.Context, userId, orgId, appId, appType string) e
 	case constant.AppTypeWorkflow:
 		// AgentScope Workflow
 		// err = DeleteAgentScopeWorkFlow(ctx, userId, orgId, appId)
-
+		_, err = assistant.AssistantWorkFlowDeleteByWorkflowId(ctx.Request.Context(), &assistant_service.AssistantWorkFlowDeleteByWorkflowIdReq{
+			WorkflowId: appId,
+		})
+		if err != nil {
+			return err
+		}
 		// Coze Workflow
 		err = DeleteWorkflow(ctx, orgId, appId)
 	}
@@ -142,6 +147,14 @@ func PublishApp(ctx *gin.Context, userId, orgId string, req request.PublishAppRe
 }
 
 func UnPublishApp(ctx *gin.Context, userId, orgId string, req request.UnPublishAppRequest) error {
+	if req.AppType == constant.AppTypeWorkflow {
+		_, err := assistant.AssistantWorkFlowDeleteByWorkflowId(ctx.Request.Context(), &assistant_service.AssistantWorkFlowDeleteByWorkflowIdReq{
+			WorkflowId: req.AppId,
+		})
+		if err != nil {
+			return err
+		}
+	}
 	_, err := app.UnPublishApp(ctx.Request.Context(), &app_service.UnPublishAppReq{
 		AppId:   req.AppId,
 		AppType: req.AppType,
