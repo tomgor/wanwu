@@ -12,7 +12,6 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	bff_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/util"
-	"github.com/UnicomAI/wanwu/pkg/constant"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
@@ -93,14 +92,6 @@ func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.Assist
 	if err != nil {
 		return nil, err
 	}
-	//查询该用户有数据权限的所有工作流
-	accessedWorkFlowList, err := GetExplorationAppList(ctx, userId, request.GetExplorationAppListRequest{
-		AppType:    constant.AppTypeWorkflow,
-		SearchType: "all",
-	})
-	if err != nil {
-		return nil, err
-	}
 	// 查询该用户所有权限的所有 MCP
 	accessedMCPList, err := AssistantMCPList(ctx, req.AssistantId, userId, orgId)
 	if err != nil {
@@ -111,7 +102,7 @@ func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.Assist
 	if err != nil {
 		return nil, err
 	}
-	assistant, err := transAssistantResp2Model(ctx, resp, accessedWorkFlowList, accessedMCPList, accessedCustomList)
+	assistant, err := transAssistantResp2Model(ctx, resp, accessedMCPList, accessedCustomList)
 	if err != nil {
 		return nil, err
 	}
@@ -478,7 +469,7 @@ func transSafetyConfig2Proto(tables []request.SensitiveTable) []*assistant_servi
 	return result
 }
 
-func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.AssistantInfo, accessedWorkFlowList *response.ListResult, mcpInfos []*response.MCPInfos, customInfos []*response.CustomInfos) (*response.Assistant, error) {
+func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.AssistantInfo, mcpInfos []*response.MCPInfos, customInfos []*response.CustomInfos) (*response.Assistant, error) {
 	log.Debugf("开始转换Assistant响应到模型，响应内容: %+v", resp)
 	if resp == nil {
 		log.Debugf("Assistant响应为空，返回空Assistant模型")
@@ -521,47 +512,33 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	}
 
 	var workFlowInfos []*response.WorkFlowInfos
-	if resp.WorkFlowInfos != nil {
-		workFlowInfos = make([]*response.WorkFlowInfos, 0, len(resp.WorkFlowInfos))
+	if len(resp.WorkFlowInfos) > 0 {
+		var workflowIds []string
+		for _, wf := range resp.WorkFlowInfos {
+			workflowIds = append(workflowIds, wf.WorkFlowId)
+		}
+		cozeWorkflowList, err := ListWorkflowByIDs(ctx, "", workflowIds)
+		if err != nil {
+			return nil, err
+		}
 		for _, wf := range resp.WorkFlowInfos {
 			workFlowInfo := &response.WorkFlowInfos{
 				WorkFlowId: wf.WorkFlowId,
 				ApiName:    wf.ApiName,
 				Enable:     wf.Enable,
-				Valid:      true, // 默认设置为有效
 				UniqueId:   bff_util.ConcatAssistantToolUniqueId("workflow", wf.WorkFlowId),
 			}
 
-			// 在accessedWorkFlowList中查找匹配的工作流
-			found := false
-			if accessedWorkFlowList != nil && accessedWorkFlowList.List != nil {
-				log.Debugf("accessedWorkFlowList.List的实际类型: %T", accessedWorkFlowList.List)
-				// 类型断言：将[]interface{}转换为[]*response.ExplorationAppInfo
-				if appInfoList, ok := accessedWorkFlowList.List.([]*response.ExplorationAppInfo); ok {
-					for _, appInfo := range appInfoList {
-						if appInfo.AppId == wf.WorkFlowId {
-							// 找到匹配的工作流，设置名称和描述
-							workFlowInfo.WorkFlowName = appInfo.Name
-							workFlowInfo.WorkFlowDesc = appInfo.Desc
-							found = true
-							break
-						}
-					}
-				} else {
-					log.Debugf("类型断言失败，无法转换为[]response.ExplorationAppInfo，实际类型: %T", accessedWorkFlowList.List)
+			for _, info := range cozeWorkflowList.Workflows {
+				if info.WorkflowId == wf.WorkFlowId {
+					// 找到匹配的工作流，设置名称和描述
+					workFlowInfo.WorkFlowName = info.Name
+					workFlowInfo.WorkFlowDesc = info.Desc
 				}
-			} else {
-				log.Debugf("accessedWorkFlowList为空或List为空")
-			}
-
-			// 如果没有找到匹配的工作流，设置为无效
-			if !found {
-				workFlowInfo.Valid = false
-				log.Debugf("工作流未找到或无权限访问: WorkFlowId=%s", wf.WorkFlowId)
 			}
 
 			workFlowInfos = append(workFlowInfos, workFlowInfo)
-			log.Debugf("添加工作流信息: WorkFlowId=%s, ApiName=%s, Valid=%d", wf.WorkFlowId, wf.ApiName, workFlowInfo.Valid)
+			log.Debugf("添加工作流信息: WorkFlowId=%s, ApiName=%s", wf.WorkFlowId, wf.ApiName)
 		}
 		log.Debugf("总共添加 %d 个工作流信息", len(workFlowInfos))
 	} else {
