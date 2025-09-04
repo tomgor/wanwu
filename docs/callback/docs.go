@@ -252,6 +252,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/model/{modelId}/gui": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callback"
+                ],
+                "summary": "Model Gui",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "模型ID",
+                        "name": "modelId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mp_common.GuiReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mp_common.GuiResp"
+                        }
+                    }
+                }
+            }
+        },
         "/model/{modelId}/ocr": {
             "post": {
                 "consumes": [
@@ -507,6 +547,107 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "mp_common.GuiContent": {
+            "type": "object",
+            "required": [
+                "action",
+                "description",
+                "operation"
+            ],
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "box": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "operation": {
+                    "type": "string"
+                },
+                "sensitivity": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "mp_common.GuiReq": {
+            "type": "object",
+            "required": [
+                "current_screenshot",
+                "current_screenshot_height",
+                "current_screenshot_width",
+                "history",
+                "platform",
+                "task"
+            ],
+            "properties": {
+                "algo": {
+                    "description": "算法名称，默认gui_agent_v1",
+                    "type": "string"
+                },
+                "current_screenshot": {
+                    "description": "当前屏幕截图，Base64编码的图像字符串",
+                    "type": "string"
+                },
+                "current_screenshot_height": {
+                    "description": "当前屏幕截图的高度",
+                    "type": "integer"
+                },
+                "current_screenshot_width": {
+                    "description": "当前屏幕截图的宽度",
+                    "type": "integer"
+                },
+                "current_screenshot_xml": {
+                    "description": "屏幕布局导出的xml文件",
+                    "type": "string"
+                },
+                "history": {
+                    "description": "当前任务的历史返回结果，历次返回结果中的content字段",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "platform": {
+                    "description": "平台信息，移动端填写Mobile, Windows端填写WIN，Mac端填写MAC",
+                    "type": "string"
+                },
+                "task": {
+                    "description": "当前用户任务",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_common.GuiResp": {
+            "type": "object",
+            "required": [
+                "content",
+                "message",
+                "usage"
+            ],
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "content": {
+                    "$ref": "#/definitions/mp_common.GuiContent"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "usage": {
+                    "$ref": "#/definitions/mp_common.Usage"
                 }
             }
         },

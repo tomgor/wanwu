@@ -15,4 +15,5 @@ func Register(openAPI *gin.RouterGroup) {
 	mid.Sub("callback").Reg(openAPI, "/model/:modelId/embeddings", http.MethodPost, callback.ModelEmbeddings, "Model Embeddings")
 	mid.Sub("callback").Reg(openAPI, "/model/:modelId/rerank", http.MethodPost, callback.ModelRerank, "Model rerank")
 	mid.Sub("callback").Reg(openAPI, "/model/:modelId/ocr", http.MethodPost, callback.ModelOcr, "Model ocr")
+	mid.Sub("callback").Reg(openAPI, "/model/:modelId/gui", http.MethodPost, callback.ModelGui, "Model gui")
 }

@@ -131,6 +131,24 @@ func ModelOcr(ctx *gin.Context) {
 	service.ModelOcr(ctx, ctx.Param("modelId"), &data)
 }
 
+// ModelGui
+//
+//	@Tags		callback
+//	@Summary	Model Gui
+//	@Accept		json
+//	@Produce	json
+//	@Param		modelId	path		string				true	"模型ID"
+//	@Param		data	body		mp_common.GuiReq{}	true	"请求参数"
+//	@Success	200		{object}	mp_common.GuiResp{}
+//	@Router		/model/{modelId}/gui [post]
+func ModelGui(ctx *gin.Context) {
+	var data mp_common.GuiReq
+	if !gin_util.Bind(ctx, &data) {
+		return
+	}
+	service.ModelGui(ctx, ctx.Param("modelId"), &data)
+}
+
 // UpdateDocStatus
 //
 //	@Tags			callback
