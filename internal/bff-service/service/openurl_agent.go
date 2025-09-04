@@ -65,7 +65,7 @@ func GetAppUrlInfo(ctx *gin.Context, suffix string) (*response.AppUrlConfig, err
 	if err != nil {
 		return nil, err
 	}
-	assistantResp, err := transAssistantResp2Model(ctx, assistantInfo, nil, nil, nil)
+	assistantResp, err := transAssistantResp2Model(ctx, assistantInfo, nil, nil)
 	if err != nil {
 		return nil, err
 	}

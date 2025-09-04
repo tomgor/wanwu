@@ -30,7 +30,6 @@ type WorkFlowInfos struct {
 	Enable       bool   `json:"enable"`
 	WorkFlowName string `json:"name"`
 	WorkFlowDesc string `json:"workFlowDesc"`
-	Valid        bool   `json:"valid"`
 }
 
 type MCPInfos struct {
