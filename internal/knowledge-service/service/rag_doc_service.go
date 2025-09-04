@@ -105,15 +105,38 @@ type RagDocSegmentLabelsParams struct {
 }
 
 type RagCreateDocSegmentParams struct {
-	UserId          string       `json:"userId"`            // 发起请求的用户ID
-	KnowledgeBase   string       `json:"knowledgeBase"`     // 知识库的名称
-	KnowledgeId     string       `json:"kb_id"`             // 知识库的唯一ID
-	FileName        string       `json:"fileName"`          // 与chunk关联的文件名
-	MaxSentenceSize int          `json:"max_sentence_size"` // 最大分段长度限制
-	Chunks          []*ChunkItem `json:"chunks"`            // 分段数据列表
+	UserId          string          `json:"userId"`            // 发起请求的用户ID
+	KnowledgeBase   string          `json:"knowledgeBase"`     // 知识库的名称
+	KnowledgeId     string          `json:"kb_id"`             // 知识库的唯一ID
+	FileName        string          `json:"fileName"`          // 与chunk关联的文件名
+	MaxSentenceSize int             `json:"max_sentence_size"` // 最大分段长度限制
+	Chunks          []*NewChunkItem `json:"chunks"`            // 分段数据列表
 }
 
-type ChunkItem struct {
+type RagUpdateDocSegmentParams struct {
+	UserId          string           `json:"userId"`            // 发起请求的用户ID
+	KnowledgeBase   string           `json:"knowledgeBase"`     // 知识库的名称
+	KnowledgeId     string           `json:"kb_id"`             // 知识库的唯一ID
+	FileName        string           `json:"fileName"`          // 与chunk关联的文件名
+	MaxSentenceSize int              `json:"max_sentence_size"` // 最大分段长度限制
+	Chunk           *UpdateChunkItem `json:"chunk"`             // 分段数据列表
+}
+
+type RagDeleteDocSegmentParams struct {
+	UserId        string   `json:"userId"`        // 发起请求的用户ID
+	KnowledgeBase string   `json:"knowledgeBase"` // 知识库的名称
+	KnowledgeId   string   `json:"kb_id"`         // 知识库的唯一ID
+	FileName      string   `json:"fileName"`      // 与chunk关联的文件名
+	ChunkIds      []string `json:"chunk_ids"`     // 分段数据列表
+}
+
+type UpdateChunkItem struct {
+	ChunkId string   `json:"chunk_id"`
+	Content string   `json:"content"`
+	Labels  []string `json:"labels"`
+}
+
+type NewChunkItem struct {
 	Content string   `json:"content"`
 	Labels  []string `json:"labels"`
 }
@@ -124,7 +147,8 @@ type RagGetDocSegmentResp struct {
 }
 
 type ContentListResp struct {
-	List []FileSplitContent `json:"content_list"`
+	List          []FileSplitContent `json:"content_list"`
+	ChunkTotalNum int                `json:"chunk_total_num"`
 }
 
 type FileSplitContent struct {
@@ -351,7 +375,7 @@ func RagDocUpdateDocSegmentStatus(ctx context.Context, docSegmentStatusUpdatePar
 	}
 	var resp RagCommonResp
 	if err := json.Unmarshal(result, &resp); err != nil {
-		log.Errorf(err.Error())
+		log.Errorf("rag segment update unmarshal err: %v", err.Error())
 		return err
 	}
 	if resp.Code != successCode {
@@ -404,7 +428,7 @@ func RagDocUrlAnalysis(ctx context.Context, docUrlParams *DocUrlParams) (*DocUrl
 	}
 	var resp = &DocUrlResp{}
 	if err := json.Unmarshal(result, resp); err != nil {
-		log.Errorf(err.Error())
+		log.Errorf("rag doc analysis unmarshal err: %v", err.Error())
 		return nil, err
 	}
 	if resp.ResponseInfo.Code != successCode {
@@ -437,7 +461,7 @@ func RagDocSegmentLabels(ctx context.Context, ragDocSegLabelsParams *RagDocSegme
 	}
 	var resp RagCommonResp
 	if err := json.Unmarshal(result, &resp); err != nil {
-		log.Errorf(err.Error())
+		log.Errorf("rag update doc segment labels unmarshal err: %v", err.Error())
 		return err
 	}
 	if resp.Code != successCode {
@@ -446,7 +470,7 @@ func RagDocSegmentLabels(ctx context.Context, ragDocSegLabelsParams *RagDocSegme
 	return nil
 }
 
-// RagCreateDocSegment 更新文档切片标签
+// RagCreateDocSegment 新增文档切片
 func RagCreateDocSegment(ctx context.Context, ragCreateDocSegmentParams *RagCreateDocSegmentParams) error {
 	ragServer := config.GetConfig().RagServer
 	url := ragServer.Endpoint + ragServer.DocSegmentCreateUri
@@ -464,9 +488,67 @@ func RagCreateDocSegment(ctx context.Context, ragCreateDocSegmentParams *RagCrea
 	if err != nil {
 		return err
 	}
-	var resp RagDocSegmentCreateResp
+	var resp RagDocSegmentResp
 	if err := json.Unmarshal(result, &resp); err != nil {
-		log.Errorf(err.Error())
+		log.Errorf("rag create doc segment unmarshal err: %v", err.Error())
+		return err
+	}
+	if resp.Code != successCode {
+		return errors.New(resp.Message)
+	}
+	return nil
+}
+
+// RagUpdateDocSegment 更新文档切片
+func RagUpdateDocSegment(ctx context.Context, ragUpdateDocSegmentParams *RagUpdateDocSegmentParams) error {
+	ragServer := config.GetConfig().RagServer
+	url := ragServer.Endpoint + ragServer.DocSegmentUpdateUri
+	paramsByte, err := json.Marshal(ragUpdateDocSegmentParams)
+	if err != nil {
+		return err
+	}
+	result, err := http.GetClient().PostJson(ctx, &http_client.HttpRequestParams{
+		Url:        url,
+		Body:       paramsByte,
+		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
+		MonitorKey: "rag_doc_segment_update",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return err
+	}
+	var resp RagCommonResp
+	if err := json.Unmarshal(result, &resp); err != nil {
+		log.Errorf("rag update doc segment unmarshal err: %v", err.Error())
+		return err
+	}
+	if resp.Code != successCode {
+		return errors.New(resp.Message)
+	}
+	return nil
+}
+
+// RagDeleteDocSegment 删除文档切片
+func RagDeleteDocSegment(ctx context.Context, ragDeleteDocSegmentParams *RagDeleteDocSegmentParams) error {
+	ragServer := config.GetConfig().RagServer
+	url := ragServer.Endpoint + ragServer.DocSegmentDeleteUri
+	paramsByte, err := json.Marshal(ragDeleteDocSegmentParams)
+	if err != nil {
+		return err
+	}
+	result, err := http.GetClient().PostJson(ctx, &http_client.HttpRequestParams{
+		Url:        url,
+		Body:       paramsByte,
+		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
+		MonitorKey: "rag_doc_segment_delete",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return err
+	}
+	var resp RagDocSegmentResp
+	if err := json.Unmarshal(result, &resp); err != nil {
+		log.Errorf("rag delete doc segment unmarshal err: %v", err.Error())
 		return err
 	}
 	if resp.Code != successCode {

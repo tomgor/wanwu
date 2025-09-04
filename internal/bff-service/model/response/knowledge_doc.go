@@ -19,15 +19,16 @@ type DocImportTipResp struct {
 }
 
 type DocSegmentResp struct {
-	FileName           string            `json:"fileName"`        //名称
-	PageTotal          int               `json:"pageTotal"`       //总页数
-	SegmentTotalNum    int               `json:"segmentTotalNum"` //分段数量
-	MaxSegmentSize     int               `json:"maxSegmentSize"`  //设置最大长度
-	SegmentType        string            `json:"segmentType"`     //分段方式 0自动分段 1自定义分段
-	UploadTime         string            `json:"uploadTime"`      //上传时间
-	Splitter           string            `json:"splitter"`        // 分隔符（只有自定义分段必填）
-	MetaDataList       []*DocMetaData    `json:"metaDataList"`    //文档元数据
-	SegmentContentList []*SegmentContent `json:"contentList"`     //内容
+	FileName            string            `json:"fileName"`            //名称
+	PageTotal           int               `json:"pageTotal"`           //总页数
+	SegmentTotalNum     int               `json:"segmentTotalNum"`     //分段数量
+	MaxSegmentSize      int               `json:"maxSegmentSize"`      //设置最大长度
+	SegmentType         string            `json:"segmentType"`         //分段方式 0自动分段 1自定义分段
+	UploadTime          string            `json:"uploadTime"`          //上传时间
+	Splitter            string            `json:"splitter"`            // 分隔符（只有自定义分段必填）
+	MetaDataList        []*DocMetaData    `json:"metaDataList"`        //文档元数据
+	SegmentContentList  []*SegmentContent `json:"contentList"`         //内容
+	SegmentImportStatus string            `json:"segmentImportStatus"` //分段导入状态描述
 }
 
 type DocMetaData struct {

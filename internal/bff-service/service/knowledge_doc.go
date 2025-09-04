@@ -283,15 +283,16 @@ func buildDocSegmentResp(docSegmentListResp *knowledgebase_doc_service.DocSegmen
 		}
 	}
 	return &response.DocSegmentResp{
-		FileName:           docSegmentListResp.FileName,
-		PageTotal:          int(docSegmentListResp.PageTotal),
-		SegmentTotalNum:    int(docSegmentListResp.SegmentTotalNum),
-		MaxSegmentSize:     int(docSegmentListResp.MaxSegmentSize),
-		SegmentType:        docSegmentListResp.SegType,
-		UploadTime:         docSegmentListResp.CreatedAt,
-		Splitter:           docSegmentListResp.Splitter,
-		SegmentContentList: segmentContentList,
-		MetaDataList:       buildMetaDataResultList(docSegmentListResp.MetaDataList),
+		FileName:            docSegmentListResp.FileName,
+		PageTotal:           int(docSegmentListResp.PageTotal),
+		SegmentTotalNum:     int(docSegmentListResp.SegmentTotalNum),
+		MaxSegmentSize:      int(docSegmentListResp.MaxSegmentSize),
+		SegmentType:         docSegmentListResp.SegType,
+		UploadTime:          docSegmentListResp.CreatedAt,
+		Splitter:            docSegmentListResp.Splitter,
+		SegmentContentList:  segmentContentList,
+		MetaDataList:        buildMetaDataResultList(docSegmentListResp.MetaDataList),
+		SegmentImportStatus: docSegmentListResp.SegmentImportStatus,
 	}
 }
 
