@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -71,7 +72,15 @@ func GetMCP(ctx *gin.Context, mcpID string) (*response.MCPDetail, error) {
 }
 
 func DeleteMCP(ctx *gin.Context, mcpID string) error {
-	_, err := mcp.DeleteCustomMCP(ctx.Request.Context(), &mcp_service.DeleteCustomMCPReq{
+	// 删除智能体表AssistantMCP相关记录
+	_, err := assistant.AssistantMCPDeleteByMCPId(ctx.Request.Context(), &assistant_service.AssistantMCPDeleteByMCPIdReq{
+		McpId: mcpID,
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = mcp.DeleteCustomMCP(ctx.Request.Context(), &mcp_service.DeleteCustomMCPReq{
 		McpId: mcpID,
 	})
 	return err

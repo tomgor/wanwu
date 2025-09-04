@@ -2,6 +2,8 @@ package service
 
 import (
 	"encoding/json"
+
+	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -66,7 +68,15 @@ func GetCustomToolInfo(ctx *gin.Context, userID, orgID string, customToolId stri
 }
 
 func DeleteCustomTool(ctx *gin.Context, userID, orgID string, req request.CustomToolIDReq) error {
-	_, err := mcp.DeleteCustomTool(ctx.Request.Context(), &mcp_service.DeleteCustomToolReq{
+	// 删除智能体AssistantCustom中记录
+	_, err := assistant.AssistantCustomToolDeleteByCustomToolId(ctx.Request.Context(), &assistant_service.AssistantCustomToolDeleteByCustomToolIdReq{
+		CustomToolId: req.CustomToolID,
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = mcp.DeleteCustomTool(ctx.Request.Context(), &mcp_service.DeleteCustomToolReq{
 		CustomToolId: req.CustomToolID,
 	})
 	return err

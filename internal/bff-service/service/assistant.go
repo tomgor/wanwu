@@ -281,20 +281,6 @@ func AssistantMCPList(ctx *gin.Context, assistantId, userId, orgId string) ([]*r
 				MCPDesc:       item.Info.Desc,
 				MCPServerFrom: item.Info.From,
 				MCPServerUrl:  item.SseUrl,
-				Valid:         true,
-			})
-		} else {
-			// 无效MCP
-			retMCPInfos = append(retMCPInfos, &response.MCPInfos{
-				MCPId:         m.McpId,
-				UniqueId:      bff_util.ConcatAssistantToolUniqueId("mcp", m.McpId),
-				MCPSquareId:   "",
-				Enable:        false, // 失效时禁用
-				MCPName:       "",
-				MCPDesc:       "",
-				MCPServerFrom: "",
-				MCPServerUrl:  "",
-				Valid:         false,
 			})
 		}
 	}
@@ -348,17 +334,6 @@ func AssistantCustomList(ctx *gin.Context, assistantId, userId, orgId string) ([
 				Enable:     c.Enable,
 				CustomName: item.Name,
 				CustomDesc: item.Description,
-				Valid:      true,
-			})
-		} else {
-			// 无效工具
-			retCustomInfos = append(retCustomInfos, &response.CustomInfos{
-				CustomId:   c.CustomToolId,
-				UniqueId:   bff_util.ConcatAssistantToolUniqueId("custom", c.CustomToolId),
-				Enable:     false,
-				CustomName: "",
-				CustomDesc: "",
-				Valid:      false,
 			})
 		}
 	}

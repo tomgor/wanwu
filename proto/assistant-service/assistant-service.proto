@@ -32,12 +32,14 @@ service AssistantService {
   // --- custom ---
   rpc AssistantCustomToolCreate(AssistantCustomToolCreateReq) returns (google.protobuf.Empty) {}
   rpc AssistantCustomToolDelete(AssistantCustomToolDeleteReq) returns (google.protobuf.Empty) {}
+  rpc AssistantMCPDeleteByMCPId(AssistantMCPDeleteByMCPIdReq) returns (google.protobuf.Empty) {}
   rpc AssistantCustomToolEnableSwitch(AssistantCustomToolEnableSwitchReq) returns (google.protobuf.Empty) {}
   rpc AssistantCustomToolGetList(AssistantCustomToolGetListReq) returns (AssistantCustomToolList) {}
 
   // --- conversation ---
   rpc ConversationCreate(ConversationCreateReq) returns (ConversationCreateResp) {}
   rpc ConversationDelete(ConversationDeleteReq) returns (google.protobuf.Empty) {}
+  rpc AssistantCustomToolDeleteByCustomToolId(AssistantCustomToolDeleteByCustomToolIdReq) returns (google.protobuf.Empty) {}
   rpc GetConversationList(GetConversationListReq) returns (GetConversationListResp) {}
   rpc GetConversationDetailList(GetConversationDetailListReq) returns (GetConversationDetailListResp) {}
   rpc AssistantConversionStream(AssistantConversionStreamReq) returns (stream AssistantConversionStreamResp) {}
@@ -194,6 +196,11 @@ message AssistantMCPDeleteReq {
   Identity identity = 3;
 }
 
+message AssistantMCPDeleteByMCPIdReq {
+  string mcpId = 1;
+  Identity identity = 2;
+}
+
 message AssistantMCPEnableSwitchReq {
   string assistantId = 1;
   string mcpId = 2;
@@ -231,6 +238,11 @@ message AssistantCustomToolDeleteReq {
   string assistantId = 1;
   string customToolId = 2;
   Identity identity = 3;
+}
+
+message AssistantCustomToolDeleteByCustomToolIdReq {
+  string customToolId = 1;
+  Identity identity = 2;
 }
 
 message AssistantCustomToolEnableSwitchReq {

@@ -46,6 +46,15 @@ func (c *Client) DeleteAssistantCustom(ctx context.Context, assistantId uint32, 
 	return nil
 }
 
+func (c *Client) DeleteAssistantCustomByCustomToolId(ctx context.Context, customId string) *err_code.Status {
+	if err := sqlopt.SQLOptions(
+		sqlopt.WithCustomID(customId),
+	).Apply(c.db.WithContext(ctx)).Delete(&model.AssistantCustom{}).Error; err != nil {
+		return toErrStatus("assistant_custom_delete", err.Error())
+	}
+	return nil
+}
+
 func (c *Client) GetAssistantCustom(ctx context.Context, assistantId uint32, customId string) (*model.AssistantCustom, *err_code.Status) {
 	custom := &model.AssistantCustom{}
 	if err := sqlopt.SQLOptions(
