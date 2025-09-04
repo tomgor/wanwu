@@ -10,6 +10,7 @@ import (
 	"io"
 	"strings"
 	"sync"
+	"unicode/utf8"
 
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm"
@@ -181,12 +182,12 @@ func doDocSegmentImport(ctx context.Context, importTaskParams *model.DocSegmentI
 // csv 文件行处理器
 func buildLineProcessor(importTask *model.DocSegmentImportTask, importParams *model.DocSegmentImportParams) func(ctx context.Context, strings []string) error {
 	return func(ctx context.Context, lineData []string) error {
-		if len(lineData[0]) > importParams.MaxSentenceSize {
+		if utf8.RuneCountInString(lineData[0]) > importParams.MaxSentenceSize {
 			return errors.New("line exceeds max sentence")
 		}
 
-		var chunks []*service.ChunkItem
-		chunks = append(chunks, &service.ChunkItem{
+		var chunks []*service.NewChunkItem
+		chunks = append(chunks, &service.NewChunkItem{
 			Content: lineData[0],
 			Labels:  strings.Split(lineData[1], ","),
 		})
@@ -227,10 +228,19 @@ func processCsvFileLine(ctx context.Context, csvUrl string,
 	reader.Comment = '#'        // 设置注释字符
 	reader.FieldsPerRecord = -1 // 允许可变字段数量
 
+	// 读取并跳过表头行
+	_, err = reader.Read()
+	if err != nil {
+		if err == io.EOF {
+			log.Errorf("csv file is empty")
+			return 0, nil
+		}
+		log.Errorf("read header line err: %v", err)
+	}
+
 	var lineCount = 0
 	// 逐行读取CSV内容
 	for {
-		lineCount++
 		record, err := reader.Read()
 		if err == io.EOF {
 			break
@@ -240,6 +250,7 @@ func processCsvFileLine(ctx context.Context, csvUrl string,
 			log.Errorf("解析CSV行时出错: %v, lineCount %d", err, lineCount)
 			continue
 		}
+		lineCount++
 		if len(record) < 2 {
 			err = fmt.Errorf("line data not ok lineCount %d", lineCount)
 			// 可以选择记录错误并继续，或者直接返回错误

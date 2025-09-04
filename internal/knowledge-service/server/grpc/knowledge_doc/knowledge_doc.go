@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_doc_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-doc-service"
@@ -345,7 +346,7 @@ func (s *Service) CreateDocSegment(ctx context.Context, req *knowledgebase_doc_s
 		return nil, err
 	}
 	//6.检验分段长度
-	if len(req.Content) > segmentConfig.MaxSplitter {
+	if utf8.RuneCountInString(req.Content) > segmentConfig.MaxSplitter {
 		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentExceedMaxSize)
 	}
 	//7.发送rag请求
@@ -353,8 +354,8 @@ func (s *Service) CreateDocSegment(ctx context.Context, req *knowledgebase_doc_s
 	if len(labels) == 0 {
 		labels = make([]string, 0)
 	}
-	var chunks []*service.ChunkItem
-	chunks = append(chunks, &service.ChunkItem{
+	var chunks []*service.NewChunkItem
+	chunks = append(chunks, &service.NewChunkItem{
 		Content: req.Content,
 		Labels:  labels,
 	})
@@ -455,21 +456,21 @@ func (s *Service) UpdateDocSegment(ctx context.Context, req *knowledgebase_doc_s
 		return nil, err
 	}
 	//6.检验分段长度
-	if len(req.Content) > segmentConfig.MaxSplitter {
+	if utf8.RuneCountInString(req.Content) > segmentConfig.MaxSplitter {
 		return nil, util.ErrCode(errs.Code_KnowledgeDocSegmentExceedMaxSize)
 	}
 	//7.发送rag请求
-	var chunks []*service.ChunkItem
-	chunks = append(chunks, &service.ChunkItem{
-		Content: req.Content,
-	})
-	err = service.RagCreateDocSegment(ctx, &service.RagCreateDocSegmentParams{
+	err = service.RagUpdateDocSegment(ctx, &service.RagUpdateDocSegmentParams{
 		UserId:          req.UserId,
 		KnowledgeBase:   knowledge.Name,
 		KnowledgeId:     knowledge.KnowledgeId,
 		FileName:        fileName,
 		MaxSentenceSize: segmentConfig.MaxSplitter,
-		Chunks:          chunks,
+		Chunk: &service.UpdateChunkItem{
+			ChunkId: req.ContentId,
+			Content: req.Content,
+			Labels:  make([]string, 0),
+		},
 	})
 	if err != nil {
 		log.Errorf("docId %v update doc segment fail %v", req.DocId, err)
@@ -500,14 +501,12 @@ func (s *Service) DeleteDocSegment(ctx context.Context, req *knowledgebase_doc_s
 	//4.获取文档名称
 	fileName := service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
 	//7.发送rag请求
-	var chunks []*service.ChunkItem
-	chunks = append(chunks, &service.ChunkItem{})
-	err = service.RagCreateDocSegment(ctx, &service.RagCreateDocSegmentParams{
+	err = service.RagDeleteDocSegment(ctx, &service.RagDeleteDocSegmentParams{
 		UserId:        req.UserId,
 		KnowledgeBase: knowledge.Name,
 		KnowledgeId:   knowledge.KnowledgeId,
 		FileName:      fileName,
-		Chunks:        chunks,
+		ChunkIds:      []string{req.ContentId},
 	})
 	if err != nil {
 		log.Errorf("docId %v delete doc segment fail %v", req.DocId, err)
@@ -649,15 +648,14 @@ func buildSegmentListResp(importTask *model.KnowledgeImportTask, doc *model.Know
 		return nil, err
 	}
 
-	content := segmentListResp.List[0]
 	var resp = &knowledgebase_doc_service.DocSegmentListResp{
 		FileName:            doc.Name,
 		MaxSegmentSize:      int32(config.MaxSplitter),
 		SegType:             config.SegmentType,
 		CreatedAt:           util2.Time2Str(doc.CreatedAt),
 		Splitter:            buildSplitter(config.Splitter),
-		PageTotal:           buildPageTotal(int32(content.MetaData.ChunkTotalNum), pageSize),
-		SegmentTotalNum:     int32(content.MetaData.ChunkTotalNum),
+		PageTotal:           buildPageTotal(int32(segmentListResp.ChunkTotalNum), pageSize),
+		SegmentTotalNum:     int32(segmentListResp.ChunkTotalNum),
 		ContentList:         buildContentList(segmentListResp.List, pageNo, pageSize),
 		MetaDataList:        buildMetaList(metaDataList),
 		SegmentImportStatus: buildSegmentImportStatus(segmentImportTask),

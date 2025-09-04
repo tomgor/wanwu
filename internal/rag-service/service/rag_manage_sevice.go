@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/UnicomAI/wanwu/internal/rag-service/config"
 	"net/http"
-	"strconv"
 	"time"
 
 	knowledgeBase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
@@ -102,14 +101,14 @@ func RagStreamChat(ctx context.Context, userId string, req *RagChatParams) (<-ch
 		resp, err := http_client.GetClient().PostJsonOriResp(ctx, params)
 		if err != nil {
 			log.Errorf("request %+v rag stream err: %v", params, err)
-			ret <- fmt.Sprintf("error: 调用下游服务失败: %v", err)
+			ret <- "error: 调用下游服务异常"
 			return
 		}
 		defer resp.Body.Close() // 确保响应体关闭
 
 		if resp.StatusCode != http.StatusOK {
 			log.Errorf("request %+v rag stream returned non-OK status: %d", params, resp.StatusCode)
-			ret <- fmt.Sprintf("error: 调用下游服务失败: %s", strconv.Itoa(resp.StatusCode))
+			ret <- "error: 调用下游服务异常"
 			return
 		}
 		log.Infof("resp: %v", resp)
@@ -119,7 +118,7 @@ func RagStreamChat(ctx context.Context, userId string, req *RagChatParams) (<-ch
 		}
 		if err := scan.Err(); err != nil {
 			log.Errorf("error reading stream from %v: %v", params, err)
-			ret <- fmt.Sprintf("error: 调用下游服务失败: %s", strconv.Itoa(resp.StatusCode))
+			ret <- "error: 调用下游服务异常"
 		}
 	}()
 

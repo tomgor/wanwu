@@ -29,7 +29,7 @@ type RagCommonResp struct {
 	Message string `json:"message"`
 }
 
-type RagDocSegmentCreateResp struct {
+type RagDocSegmentResp struct {
 	Code    int           `json:"code"`
 	Message string        `json:"message"`
 	Data    SegmentResult `json:"data"`

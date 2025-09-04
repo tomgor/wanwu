@@ -7,6 +7,7 @@ import (
 	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
+	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/gin-gonic/gin"
 )
 
@@ -100,7 +101,7 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 	}
 	modelConfig, rerankConfig, err := appModelRerankProto2Model(ctx, resp)
 	if err != nil {
-		return &response.RagInfo{}, err
+		log.Errorf("ragId: %v gets config fail: %v", req.RagID, err.Error())
 	}
 	ragInfo := &response.RagInfo{
 		RagID:               resp.RagId,

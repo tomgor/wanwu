@@ -106,6 +106,8 @@ rag-server:
   keywords-uri: '/rag/proper_noun'
   doc-segment-update-labels-uri: '/rag/update-chunk-labels'
   doc-segment-create-uri: '/rag/batch-add-chunks'
+  doc-segment-update-uri: '/rag/update-chunk'
+  doc-segment-delete-uri: '/rag/batch-delete-chunks'
   timeout: 60
 
 usage-limit:

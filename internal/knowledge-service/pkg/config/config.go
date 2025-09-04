@@ -142,5 +142,7 @@ type RagServerConfig struct {
 	KeywordsUri               string `mapstructure:"keywords-uri" json:"keywords-uri"`
 	DocSegmentUpdateLabelsUri string `mapstructure:"doc-segment-update-labels-uri" json:"doc-segment-update-labels-uri"`
 	DocSegmentCreateUri       string `mapstructure:"doc-segment-create-uri" json:"doc-segment-create-uri"`
+	DocSegmentUpdateUri       string `mapstructure:"doc-segment-update-uri" json:"doc-segment-update-uri"`
+	DocSegmentDeleteUri       string `mapstructure:"doc-segment-delete-uri" json:"doc-segment-delete-uri"`
 	Timeout                   int64  `mapstructure:"timeout" json:"timeout"`
 }
