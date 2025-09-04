@@ -512,7 +512,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	}
 
 	var workFlowInfos []*response.WorkFlowInfos
-	if resp.WorkFlowInfos != nil && len(resp.WorkFlowInfos) > 0 {
+	if len(resp.WorkFlowInfos) > 0 {
 		var workflowIds []string
 		for _, wf := range resp.WorkFlowInfos {
 			workflowIds = append(workflowIds, wf.WorkFlowId)
