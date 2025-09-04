@@ -611,19 +611,6 @@ export default {
         }
       });
     },
-    //获取知识库列表
-    getKnowledgeList() {
-      getKnowledgeList().then((res) => {
-        if (res.code === 0) {
-          this.knowledgeData = res.data.map((item) => {
-            return {
-              label: item.name,
-              value: item.id,
-            };
-          });
-        }
-      });
-    },
     showSafety() {
       this.$refs.setSafety.showDialog(this.editForm.safetyConfig.tables);
     },
