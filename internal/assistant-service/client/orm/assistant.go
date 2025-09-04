@@ -52,6 +52,15 @@ func (c *Client) DeleteAssistant(ctx context.Context, assistantID uint32) *err_c
 		if err := sqlopt.WithID(assistantID).Apply(tx).Delete(&model.Assistant{}).Error; err != nil {
 			return toErrStatus("assistant_delete", err.Error())
 		}
+		if err := sqlopt.WithAssistantID(assistantID).Apply(tx).Delete(&model.AssistantWorkflow{}).Error; err != nil {
+			return toErrStatus("assistant_delete", err.Error())
+		}
+		if err := sqlopt.WithAssistantID(assistantID).Apply(tx).Delete(&model.AssistantMCP{}).Error; err != nil {
+			return toErrStatus("assistant_delete", err.Error())
+		}
+		if err := sqlopt.WithAssistantID(assistantID).Apply(tx).Delete(&model.AssistantCustom{}).Error; err != nil {
+			return toErrStatus("assistant_delete", err.Error())
+		}
 		return nil
 	})
 }

@@ -23,6 +23,7 @@ type IClient interface {
 	UpdateAssistantWorkflow(ctx context.Context, workflow *model.AssistantWorkflow) *err_code.Status
 	GetAssistantWorkflow(ctx context.Context, assistantId uint32, workflowId string) (*model.AssistantWorkflow, *err_code.Status)
 	GetAssistantWorkflowsByAssistantID(ctx context.Context, assistantId uint32) ([]*model.AssistantWorkflow, *err_code.Status)
+	DeleteAssistantWorkflowByWorkflowId(ctx context.Context, workflowId string) *err_code.Status
 
 	//================AssistantMCP================
 	CreateAssistantMCP(ctx context.Context, assistantId uint32, mcpId string, userId, orgID string) *err_code.Status

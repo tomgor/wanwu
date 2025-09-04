@@ -6,11 +6,9 @@ import (
 	"io"
 	"strings"
 
-	app_service "github.com/UnicomAI/wanwu/api/proto/app-service"
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
-	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/ahocorasick"
 	"github.com/UnicomAI/wanwu/pkg/constant"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
@@ -40,22 +38,6 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 	if err != nil {
 		return nil, err
 	}
-	// 实时获取有数据权限的工作流，把所有工作流的id传给GRPC
-	accessedWorkFlowList, err := GetExplorationAppList(ctx, agentInfo.Identity.GetUserId(), request.GetExplorationAppListRequest{
-		AppType:    constant.AppTypeWorkflow,
-		SearchType: "all",
-	})
-	if err != nil {
-		return nil, err
-	}
-	var accessedWorkFlowIds []string
-	if accessedWorkFlowList != nil && accessedWorkFlowList.List != nil {
-		if appInfoList, ok := accessedWorkFlowList.List.([]*response.ExplorationAppInfo); ok {
-			for _, appInfo := range appInfoList {
-				accessedWorkFlowIds = append(accessedWorkFlowIds, appInfo.AppId)
-			}
-		}
-	}
 
 	var matchDicts []ahocorasick.DictConfig
 	// 如果Enable为true,则处理敏感词
@@ -79,16 +61,6 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req_default_reply")
 		}
 	}
-	appList, err := app.GetAppListByIds(ctx.Request.Context(), &app_service.GetAppListByIdsReq{
-		AppIdsList: []string{req.AssistantId},
-	})
-	if err != nil {
-		return nil, err
-	}
-	var publishType string
-	if len(appList.Infos) > 0 {
-		publishType = appList.Infos[0].PublishType
-	}
 	stream, err := assistant.AssistantConversionStream(ctx.Request.Context(), &assistant_service.AssistantConversionStreamReq{
 		AssistantId:    req.AssistantId,
 		ConversationId: req.ConversationId,
@@ -97,14 +69,12 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 			FileSize: req.FileInfo.FileSize,
 			FileUrl:  req.FileInfo.FileUrl,
 		},
-		Trial:          req.Trial,
-		Prompt:         req.Prompt,
-		AppPublishType: publishType,
+		Trial:  req.Trial,
+		Prompt: req.Prompt,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
 		},
-		AccessedWorkFlowIds: accessedWorkFlowIds,
 	})
 	if err != nil {
 		return nil, err
