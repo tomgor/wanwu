@@ -293,7 +293,7 @@ export default {
                                             ...commonData,
                                             "response": md.render(endStr),
                                             oriResponse:endStr,
-                                            searchList:(search_list && search_list.length) ? search_list.some(n => n.title.indexOf('yunyingshang') > -1)? []: search_list.map(n => ({
+                                            searchList:(search_list && search_list.length) ? search_list.map(n => ({
                                                   ...n, // 复制原有的对象属性
                                                   snippet: md.render(n.snippet) // 对snippet进行Markdown渲染
                                                 }))
@@ -307,11 +307,11 @@ export default {
                             // this.$nextTick(()=>{
                             //     this.$refs['session-com'].scrollBottom()
                             // })
-                        }else if(data.code === 7 || data.code === '-1'){
+                        }else if(data.code === 7 || data.code === -1){
                             this.setStoreSessionStatus(-1)
                             let fillData = {
                                 ...commonData,
-                                "response": data.message || data.msg                             
+                                "response": data.message                            
                             }
                             this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                         }

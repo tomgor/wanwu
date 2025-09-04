@@ -61,6 +61,9 @@
           </template>
           <span v-else>无数据</span>
         </el-descriptions-item>
+        <el-descriptions-item label="批量新增分段状态">
+          <span>{{res.segmentImportStatus}}</span>
+        </el-descriptions-item>
       </el-descriptions>
 
       <div class="btn">
