@@ -10,7 +10,6 @@ import (
 	"io"
 	"net/http"
 	net_url "net/url"
-	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -254,7 +253,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	}
 
 	// plugin参数配置
-	if err := s.setCustomAndWorkflowParams(ctx, sseReq, req.AssistantId, req.AccessedWorkFlowIds); err != nil {
+	if err := s.setCustomAndWorkflowParams(ctx, sseReq, req.AssistantId); err != nil {
 		SSEError(stream, "智能体plugin配置错误")
 		return err
 	}
@@ -500,13 +499,13 @@ func (s *Service) setKnowledgebaseParams(ctx context.Context, sseReq *config.Age
 }
 
 // 设置plugin参数：自定义工具和工作流
-func (s *Service) setCustomAndWorkflowParams(ctx context.Context, sseReq *config.AgentSSERequest, assistantId string, accessedWorkFlowIds []string) error {
+func (s *Service) setCustomAndWorkflowParams(ctx context.Context, sseReq *config.AgentSSERequest, assistantId string) error {
 	customPluginList, err := buildCustomToolListAlgParam(ctx, s, assistantId)
 	if err != nil {
 		return fmt.Errorf("智能体custom配置错误: %w", err)
 	}
 
-	workflowPluginList, err := buildWorkflowPluginListAlgParam(ctx, s, assistantId, accessedWorkFlowIds)
+	workflowPluginList, err := buildWorkflowPluginListAlgParam(ctx, s, assistantId)
 	if err != nil {
 		return fmt.Errorf("智能体workflow配置错误: %w", err)
 	}
@@ -739,7 +738,7 @@ func mergeMaps(map1, map2 map[string]interface{}) map[string]interface{} {
 	return result
 }
 
-func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantId string, accessedWorkFlowIds []string) (pluginList []config.PluginListAlgRequest, err error) {
+func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantId string) (pluginList []config.PluginListAlgRequest, err error) {
 	workflows, status := s.cli.GetAssistantWorkflowsByAssistantID(ctx, pkgUtil.MustU32(assistantId))
 	if status != nil {
 		return nil, errStatus(errs.Code_AssistantConversationErr, status)
@@ -748,9 +747,6 @@ func buildWorkflowPluginListAlgParam(ctx context.Context, s *Service, assistantI
 	var workflowIDs []string
 	for _, workflow := range workflows {
 		if !workflow.Enable {
-			continue
-		}
-		if !slices.Contains(accessedWorkFlowIds, workflow.WorkflowId) {
 			continue
 		}
 		workflowIDs = append(workflowIDs, workflow.WorkflowId)

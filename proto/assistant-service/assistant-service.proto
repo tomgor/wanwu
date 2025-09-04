@@ -21,6 +21,7 @@ service AssistantService {
   rpc AssistantWorkFlowCreate(AssistantWorkFlowCreateReq) returns (google.protobuf.Empty) {}
   rpc AssistantWorkFlowDelete(AssistantWorkFlowDeleteReq) returns (google.protobuf.Empty) {}
   rpc AssistantWorkFlowEnableSwitch(AssistantWorkFlowEnableSwitchReq) returns (google.protobuf.Empty) {}
+  rpc AssistantWorkFlowDeleteByWorkflowId(AssistantWorkFlowDeleteByWorkflowIdReq) returns (google.protobuf.Empty) {}
 
   // --- MCP ---
   rpc AssistantMCPCreate(AssistantMCPCreateReq) returns (google.protobuf.Empty) {}
@@ -334,9 +335,7 @@ message AssistantConversionStreamReq {
   ConversionStreamFile fileInfo = 3;
   bool trial = 4;
   string prompt = 5;
-  string appPublishType = 6;
-  Identity identity = 7;
-  repeated string accessedWorkFlowIds = 8;
+  Identity identity = 6;
 }
 
 message ConversionStreamFile{
@@ -347,5 +346,10 @@ message ConversionStreamFile{
 
 message ConversationDeleteByAssistantIdReq {
   string assistantId = 1;
+  Identity identity = 2;
+}
+
+message AssistantWorkFlowDeleteByWorkflowIdReq {
+  string workflowId = 1;
   Identity identity = 2;
 }
