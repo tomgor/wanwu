@@ -179,16 +179,37 @@
           <div class="block recommend-box">
             <p class="block-title tool-title">
               <span>关联知识库</span>
-              <span
-                class="common-add"
-                @click="showKnowledgeSet"
-              >
-                <span class="el-icon-s-operation"></span>
-                <span class="handleBtn set">配置</span>
+              <span>
+                <span class="common-add">
+                  <span class="el-icon-plus"></span>
+                  <span class="handleBtn">添加</span>
+                </span>
+                <span
+                  class="common-add"
+                  @click="showKnowledgeSet"
+                >
+                  <span class="el-icon-s-operation"></span>
+                  <span class="handleBtn set">配置</span>
+                </span>
               </span>
             </p>
-            <div class="rl">
-              <el-select
+            <div class="rl tool-content">
+              <div class="tool-right tool">
+                  <div class="action-list">
+                    <div v-for="(n,i) in knowledgeCheckData" class="action-item" :key="'knowledge'+ i">
+                       <div class="name" style="color: #333">
+                        <span>{{i.name}}</span>
+                       </div>
+                        <div class="bt">
+                          <span>元数据过滤</span>
+                          <span
+                            class="el-icon-setting del"
+                          ></span>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              <!-- <el-select
                 v-model="editForm.knowledgeBaseIds"
                 placeholder="可输入知识库名称搜索"
                 style="width:100%;"
@@ -203,7 +224,7 @@
                   :value="item.knowledgeId"
                 >
                 </el-option>
-              </el-select>
+              </el-select> -->
             </div>
           </div>
         </div>
@@ -387,6 +408,7 @@ import {
 } from "@/api/workflow";
 import Chat from "./chat";
 import LinkIcon from "@/components/linkIcon.vue";
+import knowledgeSelect from "@/components/knowledgeSelect.vue"
 export default {
   components: {
     LinkIcon,
@@ -398,6 +420,7 @@ export default {
     LinkDialog,
     setSafety,
     knowledgeSetDialog,
+    knowledgeSelect
   },
   watch: {
     editForm: {
@@ -443,6 +466,7 @@ export default {
   },
   data() {
     return {
+      knowledgeCheckData:[],
       activeIndex:-1,
       showOperation: false,
       appId: "",
@@ -1004,6 +1028,7 @@ export default {
 .common-add {
   color: #595959;
   cursor: pointer;
+  margin-left: 10px;
   .handleBtn,
   .el-icon-plus {
     font-size: 13px !important;
