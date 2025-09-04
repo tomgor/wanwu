@@ -268,7 +268,6 @@
                       v-model="n.enable"
                       class="bt-switch"
                       @change="toolSwitch(n,n.type,n.enable)"
-                      v-if="n.valid"
                     ></el-switch>
                     <span
                       @click="toolRemove(n,n.type)"
@@ -586,7 +585,6 @@ export default {
       this.editForm.knowledgeConfig = data;
     },
     displayName(item) {
-      if (!item.valid) return `工具已失效`;
       const config = this.nameMap[item.type] || this.nameMap["default"];
       return item[config.propName] + ' ' + `(${config.displayName})`;
     },
