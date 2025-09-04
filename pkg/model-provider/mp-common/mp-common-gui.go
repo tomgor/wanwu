@@ -14,17 +14,20 @@ import (
 // --- openapi request ---
 
 type GuiReq struct {
-	Algo                    string   `json:"algo,omitempty"`                                // 算法名称，默认gui_agent_v1
-	Platform                string   `json:"platform" validate:"required"`                  // 平台信息，移动端填写Mobile, Windows端填写WIN，Mac端填写MAC
-	CurrentScreenshotXml    string   `json:"current_screenshot_xml,omitempty"`              // 屏幕布局导出的xml文件
-	CurrentScreenshot       string   `json:"current_screenshot" validate:"required"`        // 当前屏幕截图，Base64编码的图像字符串
-	CurrentScreenshotWidth  *int     `json:"current_screenshot_width" validate:"required"`  // 当前屏幕截图的宽度
-	CurrentScreenshotHeight *int     `json:"current_screenshot_height" validate:"required"` // 当前屏幕截图的高度
-	Task                    string   `json:"task" validate:"required"`                      //当前用户任务
-	History                 []string `json:"history" validate:"required"`                   //当前任务的历史返回结果，历次返回结果中的content字段
+	Algo                    string   `json:"algo,omitempty"`                                     // 算法名称，默认gui_agent_v1
+	Platform                string   `json:"platform" validate:"required"`                       // 平台信息，移动端填写Mobile, Windows端填写WIN，Mac端填写MAC
+	CurrentScreenshotXml    string   `json:"current_screenshot_xml,omitempty"`                   // 屏幕布局导出的xml文件
+	CurrentScreenshot       string   `json:"current_screenshot" validate:"required"`             // 当前屏幕截图，Base64编码的图像字符串
+	CurrentScreenshotWidth  int      `json:"current_screenshot_width" validate:"required,gt=0"`  // 当前屏幕截图的宽度
+	CurrentScreenshotHeight int      `json:"current_screenshot_height" validate:"required,gt=0"` // 当前屏幕截图的高度
+	Task                    string   `json:"task" validate:"required"`                           //当前用户任务
+	History                 []string `json:"history"`                                            //当前任务的历史返回结果，历次返回结果中的content字段
 }
 
 func (req *GuiReq) Check() error {
+	if req.History == nil {
+		req.History = make([]string, 0)
+	}
 	return nil
 }
 

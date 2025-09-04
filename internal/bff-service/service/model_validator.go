@@ -269,8 +269,8 @@ func ValidateGuideModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) er
 		Algo:                    "gui_agent_v1",
 		Platform:                "Mobile",
 		CurrentScreenshot:       "data:image/jpeg;base64," + imageBase64,
-		CurrentScreenshotHeight: &height,
-		CurrentScreenshotWidth:  &width,
+		CurrentScreenshotHeight: height,
+		CurrentScreenshotWidth:  width,
 		Task:                    "点击屏幕以开始",
 		History:                 []string{},
 	}
