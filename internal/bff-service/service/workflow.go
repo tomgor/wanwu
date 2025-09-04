@@ -71,7 +71,7 @@ func ListWorkflow(ctx *gin.Context, orgID, name string) (*response.CozeWorkflowL
 func ListWorkflowByIDs(ctx *gin.Context, name string, workflowIDs []string) (*response.CozeWorkflowListData, error) {
 	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.ListUri)
 	ret := &response.CozeWorkflowListResp{}
-	if resp, err := resty.New().
+	request := resty.New().
 		R().
 		SetContext(ctx).
 		SetHeader("Content-Type", "application/json").
@@ -81,9 +81,13 @@ func ListWorkflowByIDs(ctx *gin.Context, name string, workflowIDs []string) (*re
 			"name": name,
 			"page": "1",
 			"size": "99999",
-		}).
-		SetResult(ret).
-		Post(url); err != nil {
+		})
+	if len(workflowIDs) > 0 {
+		request = request.SetBody(map[string]interface{}{
+			"workflow_ids": workflowIDs,
+		})
+	}
+	if resp, err := request.SetResult(ret).Post(url); err != nil {
 		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_apps_list", err.Error())
 	} else if resp.StatusCode() >= 300 {
 		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_apps_list", fmt.Sprintf("[%v] %v", resp.StatusCode(), resp.String()))
