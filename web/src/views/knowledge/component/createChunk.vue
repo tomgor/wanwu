@@ -139,11 +139,13 @@ export default {
                             this.$message.success('创建成功');
                             if(!this.checkType.length){
                                 this.dialogVisible = false;
+                                this.$emit('updateDataBatch')
                             }else{
                                 this.clearForm()
+                                this.$emit('updateData')
                             }
                             this.btnLoading = false;
-                            this.$emit('updateDataBatch')
+                            
                         }
                     }).catch(() =>{
                         this.btnLoading = false;

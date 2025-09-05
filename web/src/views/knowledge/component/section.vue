@@ -211,7 +211,7 @@
     </el-dialog>
     <dataBaseDialog ref="dataBase" @updateData="updateData" />
     <tagDialog ref="tagDialog" type="section" :title="title" :currentList="currentList" @sendList="sendList" />
-    <createChunk ref="createChunk"  @updateDataBatch="updateDataBatch" />
+    <createChunk ref="createChunk"  @updateDataBatch="updateDataBatch" @updateData="updateData"/>
   </div>
 </template>
 <script>
