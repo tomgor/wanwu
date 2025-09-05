@@ -281,10 +281,6 @@ def agent_start():
                     llm = ChatOpenAI(
                         model_name=model,
                         streaming=True,
-                        top_p=top_p,
-                        temperature=temperature,
-                        frequency_penalty=frequency_penalty,
-                        presence_penalty=presence_penalty,
                         base_url=model_url,
                         openai_api_key=os.environ["ARK_API_KEY"],
                     )
@@ -306,7 +302,8 @@ def agent_start():
 
                     assistant_reply = ""
                     messages.append({"role": "user", "content": question})
-                    messages.append({"role": "system", "content": system_role})
+                    if system_role:
+                        messages.append({"role": "system", "content": system_role})
                     for chunk in llm.stream(messages):
                         if hasattr(chunk, "content"):
                             print('大模型输出是:', chunk)
@@ -532,9 +529,10 @@ def agent_start():
                     headers = {
                         "Content-Type": "application/json"
                     }
-
-                    question = '问题是:'+question+'\n'+'以下是chatdoc工具可能用到的参数：'+'upload_file_url:'+upload_file_url
-
+                    if upload_file_url:
+                        question = '问题是:'+question+'\n'+'以下是chatdoc工具可能用到的参数：'+'upload_file_url:'+upload_file_url
+                    else:
+                        question = '问题是:' + question
                     print('送入action问题是:',question)
                     print('plugin_list是什么:',plugin_list)
                     if function_call:
@@ -631,10 +629,6 @@ def agent_start():
                         llm = ChatOpenAI(
                             model_name=model,
                             streaming=True,
-                            top_p = top_p,
-                            temperature = temperature,
-                            frequency_penalty = frequency_penalty,
-                            presence_penalty = presence_penalty,
                             base_url=model_url,
                             openai_api_key=os.environ["ARK_API_KEY"],
                         )
@@ -655,7 +649,8 @@ def agent_start():
 }
                         assistant_reply = ""
                         messages.append({"role": "user", "content": question})
-                        messages.append({"role": "system", "content": system_role})
+                        if system_role:
+                            messages.append({"role": "system", "content": system_role})
                         for chunk in llm.stream(messages):
                             if hasattr(chunk, "content"):
                                 print('大模型输出是:',chunk)
@@ -684,10 +679,6 @@ def agent_start():
                     llm = ChatOpenAI(
                         model_name=model,
                         streaming=True,
-                        top_p = top_p,
-                        temperature = temperature,
-                        frequency_penalty = frequency_penalty,
-                        presence_penalty = presence_penalty,
                         base_url=model_url,
                         openai_api_key=os.environ["ARK_API_KEY"],
                     )
@@ -710,7 +701,9 @@ def agent_start():
                     
                     assistant_reply = ""
                     messages.append({"role": "user", "content": question})
-                    messages.append({"role": "system", "content": system_role})
+                    if system_role:
+                        messages.append({"role": "system", "content": system_role})
+                    print('送给大模型的输入:messages')
                     for chunk in llm.stream(messages):
                         if hasattr(chunk, "content"):
                             print('大模型输出是:',chunk)
