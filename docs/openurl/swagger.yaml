@@ -475,8 +475,6 @@ definitions:
         type: string
       uniqueId:
         type: string
-      valid:
-        type: boolean
       workFlowDesc:
         type: string
       workFlowId:

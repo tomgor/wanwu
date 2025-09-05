@@ -587,7 +587,6 @@ const docTemplate = `{
                 "current_screenshot",
                 "current_screenshot_height",
                 "current_screenshot_width",
-                "history",
                 "platform",
                 "task"
             ],

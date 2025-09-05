@@ -11294,6 +11294,10 @@ const docTemplate = `{
                     "description": "总页数",
                     "type": "integer"
                 },
+                "segmentImportStatus": {
+                    "description": "分段导入状态描述",
+                    "type": "string"
+                },
                 "segmentTotalNum": {
                     "description": "分段数量",
                     "type": "integer"
@@ -12719,9 +12723,6 @@ const docTemplate = `{
                 },
                 "uniqueId": {
                     "type": "string"
-                },
-                "valid": {
-                    "type": "boolean"
                 },
                 "workFlowDesc": {
                     "type": "string"

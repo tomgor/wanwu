@@ -1108,9 +1108,6 @@ const docTemplate = `{
                 "uniqueId": {
                     "type": "string"
                 },
-                "valid": {
-                    "type": "boolean"
-                },
                 "workFlowDesc": {
                     "type": "string"
                 },

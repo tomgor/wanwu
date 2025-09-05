@@ -169,7 +169,6 @@ definitions:
     - current_screenshot
     - current_screenshot_height
     - current_screenshot_width
-    - history
     - platform
     - task
     type: object
