@@ -61,7 +61,7 @@
         <div class="session-error" v-if="n.error"><i class="el-icon-warning"></i>&nbsp;{{n.response}}</div>
 
         <!--回答 文字+图片-->
-        <div v-if="(n.response && !n.error)" class="session-answer">
+        <div v-if="(n.response && !n.error)" class="session-answer" :id="'message-container'+i">
           <div  v-if="[0,1,2,3,4,6,20,21,10].includes(n.qa_type)" :class="['session-item','rl']">
              <img class="logo" :src="'/user/api/'+ defaultUrl" />
             <div class="session-wrap" style="width:calc(100% - 30px);">
@@ -87,10 +87,9 @@
             <el-image v-for="(g,k) in n.gen_file_url_list" :key="k" :src='g' :preview-src-list="[g]"></el-image>
           </div>
           <!--出处-->
-          <div v-if="n.searchList && n.searchList.length && sessionStatus !== 0" class="search-list">
+          <div v-if="n.searchList && n.searchList.length && n.finish === 1" class="search-list">
             <div v-for="(m,j) in n.searchList" :key="`${j}sdsl`" class="search-list-item">
-              <!-- citationsArray.includes(j+1) && n.qa_type === 1  -->
-              <div class="serach-list-item" v-if="showSearchList(j,n.qa_type)">
+              <div class="serach-list-item" v-if="showSearchList(j,n.qa_type,n.citations)">
                 <span @click="collapseClick(n,m,j)"><i :class="['',m.collapse?'el-icon-caret-bottom':'el-icon-caret-right']"></i>出处：</span>
                 <a v-if="m.link" :href="m.link" target="_blank" class="link">{{m.link}}</a>
                 <span v-if="m.title">
@@ -176,7 +175,6 @@ export default {
   props: ['sessionStatus','defaultUrl','type'],
   data(){
       return{
-          citationsArray:[],
           md:md,
           autoScroll:true,
           scrollTimeout:null,
@@ -248,28 +246,27 @@ export default {
         container.removeEventListener('scroll', this.handleScroll);
       }
       clearTimeout(this.scrollTimeout);
-      clearTimeout(this.debounceTimer)
       // 移除图片错误事件监听器
       if (this.imageErrorHandler) {
         document.body.removeEventListener('error', this.imageErrorHandler, true);
       }
     },
     methods:{
-          showSearchList(j,qa_type){
-            return qa_type === 1 ? this.citationsArray.includes(j + 1) : true;
+          showSearchList(j,qa_type,citations){
+            return qa_type === 1 ? citations.includes(j + 1) : true;
           },
-          setCitations() {
-            const allCitations = document.querySelectorAll('.citation');
+          setCitations(index) {
+            let citation  = `#message-container${index} .citation`
+            const allCitations = document.querySelectorAll(citation);
             const citationsSet = new Set();
-            if(allCitations.length > 0){
-                allCitations.forEach(element => {
-                const text = element.textContent.trim();
-                if (text) {
-                  citationsSet.add(Number(text));
-                }
-              });
-              this.citationsArray = Array.from(citationsSet);
-            }
+            allCitations.forEach(element => {
+              const text = element.textContent.trim();
+              if (text) {
+                citationsSet.add(Number(text));
+              }
+            });
+            
+            return Array.from(citationsSet);
             
           },
           goPreview(event,item){
@@ -448,12 +445,10 @@ export default {
           this.$set(this.session_data.history,index,data)
           this.scrollBottom()
           this.codeScrollBottom();//code内容置底
-          if(this.debounceTimer){
-            clearTimeout(this.debounceTimer)
+          if(data.finish === 1){
+            const setCitations = this.setCitations(index)
+            this.$set(this.session_data.history[index],'citations',setCitations)
           }
-          this.debounceTimer = setTimeout(() =>{
-            this.setCitations()
-          },500)
         },
         getFileSizeDisplay(fileSize){
             if (!fileSize || typeof fileSize !== 'number' || isNaN(fileSize)) {
@@ -647,7 +642,7 @@ export default {
   .search-doc{
     margin-left:10px;
     cursor: pointer;
-    color: #384BF7;
+    color: #384BF7!important;
   }
   .subTag{
     display: inline-flex;

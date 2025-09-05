@@ -55,7 +55,7 @@
             <div class="rl">
               <el-select
                 v-model="editForm.modelParams"
-                placeholder="请选择模型"
+                placeholder="可输入模型名称搜索"
                 @visible-change="visibleChange"
                 loading-text="模型加载中..."
                 class="cover-input-icon model-select"
@@ -84,7 +84,7 @@
             <div class="rl">
               <el-select 
               v-model="editForm.knowledgeBaseIds" 
-              placeholder="请选择关联知识库" 
+              placeholder="可输入知识库名称搜索" 
               class="model-select" 
               clearable 
               filterable

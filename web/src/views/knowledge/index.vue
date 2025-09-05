@@ -6,7 +6,7 @@
     </div>
     <div style="padding: 20px">
       <div class="search-box">
-        <div>
+        <div class="no-border-input">
           <search-input class="cover-input-icon" :placeholder="$t('knowledgeManage.searchPlaceholder')" ref="searchInput" @handleSearch="getTableData" />
           <el-select v-model="tagIds" placeholder="请选择标签" multiple @visible-change="tagChange" @remove-tag="removeTag">
             <el-option

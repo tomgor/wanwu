@@ -368,3 +368,31 @@ export const editSplitter = (data)=>{
         data
     })
 };
+export const createSegment = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/doc/segment/create`,
+        method: 'post',
+        data
+    })
+};
+export const createBatchSegment = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/doc/segment/batch/create`,
+        method: 'post',
+        data
+    })
+};
+export const delSegment = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/doc/segment/delete`,
+        method: 'delete',
+        data
+    })
+};
+export const editSegment = (data)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/doc/segment/update`,
+        method: 'post',
+        data
+    })
+};

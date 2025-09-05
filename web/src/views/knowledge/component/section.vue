@@ -61,9 +61,19 @@
           </template>
           <span v-else>无数据</span>
         </el-descriptions-item>
+        <el-descriptions-item label="批量新增分段状态">
+          <span>{{res.segmentImportStatus}}</span>
+        </el-descriptions-item>
       </el-descriptions>
 
       <div class="btn">
+         <el-button
+          type="primary"
+          @click="createChunk"
+          size="mini"
+          :loading="loading.start"
+          >新增分段</el-button
+        >
         <el-button
           type="primary"
           @click="handleStatus('start')"
@@ -96,14 +106,26 @@
                     >{{$t('knowledgeManage.length')}}:{{ item.content.length }}{{$t('knowledgeManage.character')}}</span
                   >
                 </span>
-
-                <el-switch
-                  style="float: right; padding: 3px 0"
-                  v-model="item.available"
-                  active-color="#384bf7"
-                  @change="handleStatusChange(item, index)"
-                >
-                </el-switch>
+                <div>
+                  <el-switch
+                    style="padding: 3px 0;"
+                    v-model="item.available"
+                    active-color="#384bf7"
+                    @change="handleStatusChange(item, index)"
+                  >
+                  </el-switch>
+                  <el-dropdown @command="handleCommand" placement="bottom">
+                    <span class="el-dropdown-link">
+                      <i class="el-icon-more more"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item class="card-delete" :command="{type: 'delete', item}">
+                        <i class="el-icon-delete card-opera-icon" />
+                        {{$t('common.button.delete')}}
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </div>
               </div>
               <div class="text item" @click="handleClick(item, index)">
                 {{ item.content }}
@@ -170,26 +192,39 @@
             align="center"
             :render-header="renderHeader"
           >
+          <template slot-scope="scope">
+              <el-input 
+                type="textarea"
+                v-model="scope.row.content"
+                :autosize="{ minRows: 3, maxRows: 5}"
+                >
+              </el-input>
+          </template>
           </el-table-column>
         </el-table>
       </div>
 
       <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleSubmit" :loading="submitLoading">确定</el-button>
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
     </el-dialog>
-    <dataBaseDialog ref="dataBase" @updateData="updateData"/>
+    <dataBaseDialog ref="dataBase" @updateData="updateData" />
     <tagDialog ref="tagDialog" type="section" :title="title" :currentList="currentList" @sendList="sendList" />
+    <createChunk ref="createChunk"  @updateDataBatch="updateDataBatch" @updateData="updateData"/>
   </div>
 </template>
 <script>
-import { getSectionList,setSectionStatus,sectionLabels } from "@/api/knowledge";
+import { getSectionList,setSectionStatus,sectionLabels,delSegment,editSegment } from "@/api/knowledge";
 import dataBaseDialog from './dataBaseDialog';
 import tagDialog from './tagDialog.vue';
+import createChunk from './createChunk.vue'
 export default {
-  components:{dataBaseDialog,tagDialog},
+  components:{dataBaseDialog,tagDialog,createChunk},
   data() {
     return {
+      submitLoading:false,
+      oldContent:'',
       title:'创建关键词',
       dialogVisible: false,
       obj: {}, // 路由参数对象
@@ -221,14 +256,76 @@ export default {
       metaDataList: [],
       metaRuleList: [],
       currentList:[],
-      contentId:''
+      contentId:'',
+      timer:null,
+      refreshCount:0,
     };
   },
   created() {
     this.obj = this.$route.query;
     this.getList();
   },
+  beforeDestroy(){
+    this.clearTimer()
+  },
   methods: {
+    updateDataBatch(){
+      this.startTimer();
+    },
+    startTimer(){
+      this.clearTimer();
+      if (this.refreshCount >= 2) {
+        return;
+      }
+      const delay = this.refreshCount === 0 ? 1000 : 3000;
+      this.timer = setTimeout(() =>{
+        this.getList()
+        this.refreshCount++;
+        this.startTimer()
+      },delay)
+    },
+    clearTimer() {
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+      }
+    },
+    handleSubmit(){
+      if(this.oldContent === this.cardObj[0]['content'] ){
+        this.$message.warning('无修改')
+        return false;
+      }
+      this.submitLoading = true;
+      editSegment({content:this.cardObj[0]['content'],contentId:this.cardObj[0]['contentId'],docId:this.obj.id}).then(res =>{
+        if(res.code === 0){
+          this.$message.success('操作成功');
+          this.dialogVisible = false;
+          this.submitLoading = false;
+          this.getList();
+        }
+      }).catch(() =>{
+        this.submitLoading = false;
+      })
+    },
+    handleCommand(value){
+      const {type, item} = value || {}
+       switch (type) {
+          case 'delete':
+            this.delSection(item)
+            break
+        }
+    },
+    delSection(item){
+      delSegment({contentId:item.contentId,docId:this.obj.id}).then(res =>{
+        if(res.code === 0){
+          this.$message.success('删除成功');
+          this.getList();
+        }
+      }).catch(() =>{})
+    },
+    createChunk(){
+      this.$refs.createChunk.showDiglog(this.obj.id)
+    },
     sendList(data){
       const labels = data.map(item => item.tagName)
       sectionLabels({contentId:this.contentId,docId:this.obj.id,labels}).then(res =>{
@@ -314,13 +411,12 @@ export default {
     },
     handleClick(item, index) {
       this.dialogVisible = true;
-      // this.$set(item, "id", index + 1);
+      this.oldContent = item.content;
       const obj = JSON.parse(JSON.stringify(item));
       this.$nextTick(() => {
         this.cardObj = [obj];
         this.activeStatus = obj.available;
       });
-      // this.cardObj[0].id = ;
     },
     handleCurrentChange(val) {
       this.page.pageNo = val;
@@ -513,15 +609,11 @@ export default {
         text-overflow: ellipsis;
       }
 
-      .clearfix:before,
-      .clearfix:after {
-        display: table;
-        content: "";
+      .clearfix{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
       }
-      .clearfix:after {
-        clear: both;
-      }
-
       .card-box {
         margin-bottom: 10px;
 
@@ -529,6 +621,13 @@ export default {
           &:hover {
             cursor: pointer;
             transform: scale(1.03);
+          }
+          .more{
+            margin-left:5px;
+            cursor: pointer;
+            transform: rotate(90deg);
+            font-size: 16px;
+            color: #8c8c8f;
           }
         }
       }

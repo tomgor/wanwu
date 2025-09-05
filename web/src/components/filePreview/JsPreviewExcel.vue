@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100vh; overflow: auto;" ref="container">
-    <vue-office-excel
+    <VueOfficeExcel
       :src="page.url"
       :options="options"
       style="height: 100vh;"
@@ -11,12 +11,11 @@
 </template>
 
 <script>
-import { VueOfficeExcel } from '@vue-office/excel';
+import  VueOfficeExcel  from '@vue-office/excel';
 import '@vue-office/excel/lib/index.css';
 
 export default {
   name: 'ExcelPreview',
-
   components: {
     VueOfficeExcel
   },

@@ -1,5 +1,5 @@
 <template>
-  <div ref="wordRef" id="fileShow" class="container" :loading="loading" style="width: 100%; height: 100%"></div>
+  <div ref="wordRef" id="fileShow" class="container" :loading="loading" style="width: 100%; height: 100%;overflow-y:auto;padding:10px;"></div>
 </template>
 <script>
 import axios from 'axios'
@@ -21,6 +21,7 @@ export default {
         if (to.query) {
           let fileUrl = to.query.fileUrl
           this.fileUrl = fileUrl
+          this.getDocPreview();
         }
       },
       immediate: true
@@ -42,7 +43,8 @@ export default {
           url: this.fileUrl
         })
 
-        const arrayBuffer = response.data;
+        const blob = response.data;
+        const arrayBuffer = await blob.arrayBuffer();
         // 使用 mammoth 将 .docx 转为 HTML
         const { value: html } = await mammoth.convertToHtml({ arrayBuffer });
         // 渲染到页面
@@ -56,17 +58,6 @@ export default {
             this.loading = false;
         });
       }
-
-      // axios({
-      //   method: 'get',
-      //   responseType: 'blob', // 设置响应文件格式
-      //   url: this.fileUrl
-      // }).then(({ data }) => {
-      //   this.$nextTick(() => {
-      //     // renderAsync(data, this.$refs.wordRef) // 渲染到页面预览
-      //     this.loading = false
-      //   })
-      // })
     },
     renderedHandler() {
       console.log('渲染完成')
@@ -77,7 +68,7 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 ocx-preview p {
   margin: 1em 0;
 }

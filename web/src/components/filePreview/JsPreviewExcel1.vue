@@ -10,12 +10,6 @@ import jsPreviewExcel from "@js-preview/excel";
 import '@js-preview/excel/lib/index.css';
 import {useRoute} from "vue-router";
 const page = ref({})
-
-// onMounted(() => {
-//   const route = useRoute()
-//   page.value = route.query || {}
-//   console.log(page.value)
-// })
 const myExcelPreviewer = ref(null);
 const testSheets = [
   { name: 'Sheet1', rows: [{ cells: [{ value: 'Test1' }] }] },

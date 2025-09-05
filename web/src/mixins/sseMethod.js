@@ -272,9 +272,9 @@ export default {
                             "searchList": data.data && data.data.searchList ? data.data.searchList: [],
                             "gen_file_url_list": [],
                             "thinkText":'思考中',
-                            "isOpen":true
+                            "isOpen":true,
+                            "citations":[]
                         }
-
                         if(data.code === 0 || data.code === 1){
                             //finish 0：进行中  1：关闭   2:敏感词关闭
                             let _sentence = data.data.output;
@@ -293,7 +293,7 @@ export default {
                                             ...commonData,
                                             "response": md.render(endStr),
                                             oriResponse:endStr,
-                                            searchList:(search_list && search_list.length) ? search_list.some(n => n.title.indexOf('yunyingshang') > -1)? []: search_list.map(n => ({
+                                            searchList:(search_list && search_list.length) ? search_list.map(n => ({
                                                   ...n, // 复制原有的对象属性
                                                   snippet: md.render(n.snippet) // 对snippet进行Markdown渲染
                                                 }))
@@ -307,11 +307,11 @@ export default {
                             // this.$nextTick(()=>{
                             //     this.$refs['session-com'].scrollBottom()
                             // })
-                        }else if(data.code === 7){
+                        }else if(data.code === 7 || data.code === -1){
                             this.setStoreSessionStatus(-1)
                             let fillData = {
                                 ...commonData,
-                                "response": data.message                              
+                                "response": data.message                            
                             }
                             this.$refs['session-com'].replaceLastData(lastIndex, fillData)
                         }
@@ -449,7 +449,8 @@ export default {
                             "gen_file_url_list":data.gen_file_url_list || [],
                             "thinkText":i18n.t('agent.thinking'),
                             'toolText':'使用工具中...',
-                            "isOpen":true
+                            "isOpen":true,
+                            "citations":[]
                         }
 
                         if(data.code === 0){

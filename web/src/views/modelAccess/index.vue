@@ -16,7 +16,18 @@
           >
             <el-option v-for="item in providerList" :key="item.key" :label="item.name" :value="item.key" />
           </el-select>
-          <div style="width: calc(100% - 260px); display: inline-block; float: right; text-align: right">
+
+          <el-select
+            v-model="params.modelType"
+            :placeholder="$t('modelAccess.table.modelType')"
+            class="modelAccess-select no-border-select"
+            style="margin-left: 15px"
+            clearable
+            @change="searchData()"
+          >
+            <el-option v-for="item in modelTypeList" :key="item.key" :label="item.name" :value="item.key" />
+          </el-select>
+          <div style="width: 100%; display: inline-block; float: right; text-align: right; margin-top: -30px">
             <el-input
               v-model="params.displayName"
               prefix-icon="el-icon-search"
@@ -115,7 +126,7 @@
   import { fetchModelList, deleteModel, changeModelStatus, getModelDetail } from "@/api/modelAccess"
   import CreateDialog from './components/createDialog.vue'
   import CreateSelectDialog from "./components/createSelectDialog.vue"
-  import { MODEL_TYPE_OBJ, PROVIDER_OBJ, PROVIDER_TYPE } from "./constants"
+  import { MODEL_TYPE_OBJ, PROVIDER_OBJ, PROVIDER_TYPE, MODEL_TYPE } from "./constants"
 
   export default {
     components: { Pagination, CreateSelectDialog, CreateDialog },
@@ -123,12 +134,14 @@
       return {
         listApi: fetchModelList,
         providerList: PROVIDER_TYPE,
+        modelTypeList: MODEL_TYPE,
         basePath: this.$basePath,
         modelTypeObj: MODEL_TYPE_OBJ,
         providerObj: PROVIDER_OBJ,
         tableData: [],
         params: {
           provider: '',
+          modelType: '',
           displayName: ''
         },
         loading: false,
@@ -149,9 +162,9 @@
         }
       },
       searchData(isCreate) {
-        console.log(isCreate, '----------------------')
         if (isCreate) {
           this.params.provider = ''
+          this.params.modelType = ''
           this.params.displayName = ''
         }
         this.getTableData({...this.params})
@@ -179,9 +192,9 @@
         this.$refs.createDialog.openDialog(item.key)
       },
       preUpdate(row) {
-        const {model, modelType, provider} = row || {}
+        const {modelId, provider} = row || {}
 
-        getModelDetail({model, modelType, provider}).then(res => {
+        getModelDetail({modelId}).then(res => {
           const rowObj = res.data || {}
           const newRow = {...rowObj, ...rowObj.config}
           this.$refs.createDialog.openDialog(provider, newRow)
@@ -193,8 +206,8 @@
           cancelButtonText: this.$t('common.confirm.cancel'),
           type: 'warning'
         }).then(async () => {
-          const {model, modelType, provider} = row || {}
-          let res = await deleteModel({model, modelType, provider})
+          const {modelId} = row || {}
+          let res = await deleteModel({modelId})
           if (res.code === 0) {
             this.$message.success(this.$t('common.message.success'))
             await this.getTableData()
@@ -207,8 +220,8 @@
           cancelButtonText: this.$t('common.confirm.cancel'),
           type: 'warning'
         }).then(async() => {
-          const {model, modelType, provider} = row || {}
-          let res = await changeModelStatus({model, modelType, provider, isActive: val})
+          const {modelId} = row || {}
+          let res = await changeModelStatus({modelId, isActive: val})
           if (res.code === 0) {
             this.$message.success(this.$t('common.message.success'))
             await this.getTableData()

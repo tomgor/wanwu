@@ -93,7 +93,7 @@
             <div class="rl">
               <el-select
                 v-model="editForm.modelParams"
-                placeholder="请选择模型"
+                placeholder="可输入模型名称搜索"
                 @visible-change="visibleChange"
                 loading-text="模型加载中..."
                 class="cover-input-icon model-select"
@@ -190,7 +190,7 @@
             <div class="rl">
               <el-select
                 v-model="editForm.knowledgeBaseIds"
-                placeholder="请选择关联知识库"
+                placeholder="可输入知识库名称搜索"
                 style="width:100%;"
                 multiple
                 filterable
@@ -264,7 +264,6 @@
                       v-model="n.enable"
                       class="bt-switch"
                       @change="toolSwitch(n,n.type,n.enable)"
-                      v-if="n.valid"
                     ></el-switch>
                     <span
                       @click="toolRemove(n,n.type)"
@@ -576,7 +575,6 @@ export default {
       this.editForm.knowledgeConfig = data;
     },
     displayName(item) {
-      if (!item.valid) return `工具已失效`;
       const config = this.nameMap[item.type] || this.nameMap["default"];
       return item[config.propName] + ' ' + `(${config.displayName})`;
     },
@@ -605,19 +603,6 @@ export default {
       getRerankList().then((res) => {
         if (res.code === 0) {
           this.rerankOptions = res.data.map((item) => {
-            return {
-              label: item.name,
-              value: item.id,
-            };
-          });
-        }
-      });
-    },
-    //获取知识库列表
-    getKnowledgeList() {
-      getKnowledgeList().then((res) => {
-        if (res.code === 0) {
-          this.knowledgeData = res.data.map((item) => {
             return {
               label: item.name,
               value: item.id,

@@ -61,11 +61,11 @@
               <!--内容-->
               <div class="answer-content"  v-bind:class="{'ds-res':showDSBtn(n.response)}" v-html="showDSBtn(n.response)?replaceHTML(n.response,n):n.response"></div>
               <!--出处-->
-              <div v-if="n.searchList && n.searchList.length && sessionStatus !== 0" class="search-list">
+              <div v-if="n.searchList && n.searchList.length && n.finish === 1" class="search-list">
                 <div v-for="(m,j) in n.searchList" :key="`${j}sdsl`" class="search-list-item">
-                  <div class="serach-list-item" v-if="citationsArray.includes(j+1)">
+                  <div class="serach-list-item" v-if="n.citations && n.citations.includes(j+1)">
                     <span @click="collapseClick(n,m,j)"><i :class="['',m.collapse?'el-icon-caret-bottom':'el-icon-caret-right']"></i>出处：</span>
-                    <a v-if="m.link" :href="m.link" target="_blank">{{m.link}}</a>
+                    <a v-if="m.link" :href="m.link" target="_blank" class="link">{{m.link}}</a>
                     <span v-if="m.title">
                       <sub class="subTag" :data-parents-index="i" :data-collapse="m.collapse?'true':'false'">{{j + 1}}</sub> {{m.title}}
                     </span>
@@ -110,7 +110,6 @@ export default {
   props: ['sessionStatus','defaultUrl'],
   data(){
       return{
-          citationsArray:[],
           autoScroll:true,
           scrollTimeout:null,
           isDs:['txt2txt-002-001','txt2txt-002-002','txt2txt-002-004','txt2txt-002-005','txt2txt-002-006','txt2txt-002-007','txt2txt-002-008'].indexOf(this.$route.params.id) !=-1,
@@ -140,7 +139,6 @@ export default {
           },
           imgConfig:["jpeg", "PNG", "png", "JPG", "jpg",'bmp','webp'],
           audioConfig:["mp3", "wav"],
-          debounceTimer:null
       }
   },
     watch: {
@@ -181,11 +179,11 @@ export default {
         container.removeEventListener('scroll', this.handleScroll);
       }
       clearTimeout(this.scrollTimeout);
-      clearTimeout(this.debounceTimer)
     },
     methods:{
-        setCitations() {
-          const allCitations = document.querySelectorAll('.citation');
+        setCitations(index) {
+          let citation  = `#message-container${index} .citation`
+          const allCitations = document.querySelectorAll(citation);
           const citationsSet = new Set();
           
           allCitations.forEach(element => {
@@ -195,7 +193,7 @@ export default {
             }
           });
           
-          this.citationsArray = Array.from(citationsSet);
+          return Array.from(citationsSet);
         },
         goPreview(event,item){
           event.stopPropagation(); // 阻止事件冒泡
@@ -373,12 +371,10 @@ export default {
           }
           this.scrollBottom()
           this.$set(this.session_data.history,index,data)
-          if(this.debounceTimer){
-            clearTimeout(this.debounceTimer)
+          if(data.finish === 1){
+            const setCitations = this.setCitations(index)
+            this.$set(this.session_data.history[index],'citations',setCitations)
           }
-          this.debounceTimer = setTimeout(() =>{
-            this.setCitations()
-          },500)
         },
         getFileSizeDisplay(fileSize){
             if (!fileSize || typeof fileSize !== 'number' || isNaN(fileSize)) {
@@ -550,12 +546,13 @@ export default {
 
 <style scoped lang="scss">
 .serach-list-item{
-  display: flex;
-  align-items: center;
+  .link:hover{
+    color: #384BF7!important;
+  }
   .search-doc{
     margin-left:10px;
     cursor: pointer;
-    color: #384BF7;
+    color: #384BF7!important;
   }
   .subTag{
     display: inline-flex;
