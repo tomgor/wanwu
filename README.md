@@ -7,9 +7,11 @@
 
 ### 📢 新闻
 
-- **[2025-08-29]** 
-  - 更新升级工作流节点，包括：开始、结束、大模型、知识库、MCP、文本生成、文本解析、代码、选择器、循环、意图识别、批处理、变量聚合、输入、输出、文本处理、HTTP请求、JSON序列化、JSON反序列化
-  - 升级智能体引文角标
+- **[2025-09-05]** 
+  - 模型管理新增：联通元景供应商-GUI模型导入
+  - 知识库分段支持新增、编辑、删除
+  - 工作流新增GUI节点
+  - 应用广场新增应用作者显示
 
 ------
 
@@ -110,7 +112,7 @@
 
 - 元景万悟智能体平台的工作流模块使用的是以下项目，可到其仓库查看详情。
 
-  - v0.1.8以前：[wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git) 项目
+  - v0.1.8及以前：[wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git) 项目
 
   - v0.2.0开始：[wanwu-workflow](https://github.com/UnicomAI/wanwu-workflow/tree/dev/wanwu-backend) 项目
 
