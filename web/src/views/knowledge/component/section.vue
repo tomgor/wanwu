@@ -223,6 +223,7 @@ export default {
   components:{dataBaseDialog,tagDialog,createChunk},
   data() {
     return {
+      oldContent:'',
       title:'创建关键词',
       dialogVisible: false,
       obj: {}, // 路由参数对象
@@ -391,6 +392,7 @@ export default {
         .then((res) => {
           this.loading.itemStatus = false;
           this.res = res.data;
+          cosole.log('刷新列表---',new Date())
           this.page.total = this.res.segmentTotalNum;
           this.metaRuleList = res.data.metaDataList.filter(item => item.metaRule);
           this.metaDataList = res.data.metaDataList;
@@ -401,13 +403,12 @@ export default {
     },
     handleClick(item, index) {
       this.dialogVisible = true;
-      // this.$set(item, "id", index + 1);
+      this.oldContent = item.content;
       const obj = JSON.parse(JSON.stringify(item));
       this.$nextTick(() => {
         this.cardObj = [obj];
         this.activeStatus = obj.available;
       });
-      // this.cardObj[0].id = ;
     },
     handleCurrentChange(val) {
       this.page.pageNo = val;
