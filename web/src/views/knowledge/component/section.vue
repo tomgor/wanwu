@@ -205,7 +205,7 @@
       </div>
 
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleSubmit">确定</el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="submitLoading">确定</el-button>
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
     </el-dialog>
@@ -223,6 +223,7 @@ export default {
   components:{dataBaseDialog,tagDialog,createChunk},
   data() {
     return {
+      submitLoading:false,
       oldContent:'',
       title:'创建关键词',
       dialogVisible: false,
@@ -294,13 +295,17 @@ export default {
         this.$message.warning('无修改')
         return false;
       }
+      this.submitLoading = true;
       editSegment({content:this.cardObj[0]['content'],contentId:this.cardObj[0]['contentId'],docId:this.obj.id}).then(res =>{
         if(res.code === 0){
           this.$message.success('操作成功');
           this.dialogVisible = false;
+          this.submitLoading = false;
           this.getList();
         }
-      }).catch(() =>{})
+      }).catch(() =>{
+        this.submitLoading = false;
+      })
     },
     handleCommand(value){
       const {type, item} = value || {}
