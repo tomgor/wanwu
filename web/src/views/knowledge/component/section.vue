@@ -390,9 +390,9 @@ export default {
         pageSize:this.page.pageSize
       })
         .then((res) => {
+          console.log('刷新列表---',new Date(),Date.now())
           this.loading.itemStatus = false;
           this.res = res.data;
-          cosole.log('刷新列表---',new Date())
           this.page.total = this.res.segmentTotalNum;
           this.metaRuleList = res.data.metaDataList.filter(item => item.metaRule);
           this.metaDataList = res.data.metaDataList;
