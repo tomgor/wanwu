@@ -36,14 +36,15 @@ func DeleteAppSpaceApp(ctx *gin.Context, userId, orgId, appId, appType string) e
 			AssistantId: appId,
 		})
 	case constant.AppTypeWorkflow:
-		// AgentScope Workflow
-		// err = DeleteAgentScopeWorkFlow(ctx, userId, orgId, appId)
 		_, err = assistant.AssistantWorkFlowDeleteByWorkflowId(ctx.Request.Context(), &assistant_service.AssistantWorkFlowDeleteByWorkflowIdReq{
 			WorkflowId: appId,
 		})
 		if err != nil {
 			return err
 		}
+		// AgentScope Workflow
+		// err = DeleteAgentScopeWorkFlow(ctx, userId, orgId, appId)
+
 		// Coze Workflow
 		err = DeleteWorkflow(ctx, orgId, appId)
 	}

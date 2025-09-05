@@ -70,9 +70,8 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req *mp_common.LLMRe
 	ctx.Header("Connection", "keep-alive")
 	ctx.Header("Content-Type", "text/event-stream; charset=utf-8")
 	var (
-		firstFlag         = false // 思维链起始标识符，默认思维链未开始
-		endFlag           = false // 思维链结束标识符，默认思维链未结束
-		reasonContentFlag = false // reason_content思维标识符
+		firstFlag = false // 思维链起始标识符，默认思维链未开始
+		endFlag   = false // 思维链结束标识符，默认思维链未结束
 	)
 	var data *mp_common.LLMResp
 	for sseResp := range sseCh {
@@ -86,7 +85,7 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req *mp_common.LLMRe
 					delta.Content = delta.Content + *delta.ReasoningContent
 				}
 				if !endFlag && delta.Content != "" && ((delta.ReasoningContent != nil &&
-					*delta.ReasoningContent == "") || delta.ReasoningContent == nil) && reasonContentFlag {
+					*delta.ReasoningContent == "") || delta.ReasoningContent == nil) && firstFlag {
 					delta.Content = "\n</think>\n" + delta.Content
 					endFlag = true
 				}
@@ -94,7 +93,6 @@ func ModelChatCompletions(ctx *gin.Context, modelID string, req *mp_common.LLMRe
 					delta.Content = "<think>\n" +
 						delta.Content + *delta.ReasoningContent
 					firstFlag = true
-					reasonContentFlag = true
 				}
 			}
 			dataByte, _ := json.Marshal(data)

@@ -19,12 +19,8 @@ func (cfg *LLM) NewReq(req *mp_common.LLMReq) (mp_common.ILLMReq, error) {
 	if err != nil {
 		return nil, err
 	}
-	streamEnabled := false
-	if req.Stream != nil {
-		streamEnabled = *req.Stream
-	}
 	// Qwen3 开源模型仅在非思考模式下支持非流式输出方式, 不支持qwq系列模型
-	if !streamEnabled && strings.HasPrefix(req.Model, "qwen3") {
+	if req.Stream != nil && !*req.Stream && strings.HasPrefix(req.Model, "qwen3") {
 		m["enable_thinking"] = false
 	}
 	return mp_common.NewLLMReq(m), nil
