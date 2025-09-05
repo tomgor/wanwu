@@ -272,9 +272,9 @@ export default {
                             "searchList": data.data && data.data.searchList ? data.data.searchList: [],
                             "gen_file_url_list": [],
                             "thinkText":'思考中',
-                            "isOpen":true
+                            "isOpen":true,
+                            "citations":[]
                         }
-
                         if(data.code === 0 || data.code === 1){
                             //finish 0：进行中  1：关闭   2:敏感词关闭
                             let _sentence = data.data.output;
@@ -449,7 +449,8 @@ export default {
                             "gen_file_url_list":data.gen_file_url_list || [],
                             "thinkText":i18n.t('agent.thinking'),
                             'toolText':'使用工具中...',
-                            "isOpen":true
+                            "isOpen":true,
+                            "citations":[]
                         }
 
                         if(data.code === 0){

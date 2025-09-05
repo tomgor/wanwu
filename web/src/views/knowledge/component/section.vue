@@ -211,7 +211,7 @@
     </el-dialog>
     <dataBaseDialog ref="dataBase" @updateData="updateData" />
     <tagDialog ref="tagDialog" type="section" :title="title" :currentList="currentList" @sendList="sendList" />
-    <createChunk ref="createChunk" @updateData="updateData" @updateDataBatch="updateDataBatch" />
+    <createChunk ref="createChunk"  @updateDataBatch="updateDataBatch" />
   </div>
 </template>
 <script>
@@ -290,6 +290,10 @@ export default {
       }
     },
     handleSubmit(){
+      if(this.oldContent === this.cardObj[0]['content'] ){
+        this.$message.warning('无修改')
+        return false;
+      }
       editSegment({content:this.cardObj[0]['content'],contentId:this.cardObj[0]['contentId'],docId:this.obj.id}).then(res =>{
         if(res.code === 0){
           this.$message.success('操作成功');
@@ -390,7 +394,6 @@ export default {
         pageSize:this.page.pageSize
       })
         .then((res) => {
-          console.log('刷新列表---',new Date(),Date.now())
           this.loading.itemStatus = false;
           this.res = res.data;
           this.page.total = this.res.segmentTotalNum;

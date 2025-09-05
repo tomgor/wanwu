@@ -102,6 +102,7 @@ export default {
         showDiglog(docId){
             this.dialogVisible = true
             this.ruleForm.docId = docId
+            this.clearForm()
         },
         showInput(){
             this.inputVisible = true;
@@ -131,21 +132,18 @@ export default {
         handleSingle(formName){
             this.$refs[formName].validate((valid) =>{
                 if(valid){
-                    console.log('开始创建---',new Date(),Date.now())
                     this.btnLoading = true;
                     const data = {content:this.ruleForm.content,docId:this.ruleForm.docId,labels:this.ruleForm.labels}
                     createSegment(data).then(res =>{
                         if(res.code === 0){
                             this.$message.success('创建成功');
-                            console.log('创建成功---',new Date(),Date.now())
-
                             if(!this.checkType.length){
                                 this.dialogVisible = false;
                             }else{
                                 this.clearForm()
                             }
                             this.btnLoading = false;
-                            this.$emit('updateData')
+                            this.$emit('updateDataBatch')
                         }
                     }).catch(() =>{
                         this.btnLoading = false;
