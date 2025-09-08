@@ -1,0 +1,143 @@
+<template>
+    <div>
+        <el-dialog
+            title="选择知识库"
+            :visible.sync="dialogVisible"
+            width="40%"
+            :before-close="handleClose">
+            <div class="tool-typ">
+                <el-input v-model="toolName" placeholder="输入知识库名称搜索" class="tool-input" suffix-icon="el-icon-search" @keyup.enter.native="searchTool" clearable></el-input>
+            </div>
+            <div class="toolContent">
+                <div 
+                    v-for="(item,i) in knowledgeData"
+                    :key="item['knowledgeId']"
+                    class="toolContent_item"
+                >
+                    <span>{{ item.name }}</span>
+                    <el-button type="text" @click="openTool($event,item)" v-if="!item.checked">添加</el-button>
+                    <el-button type="text" v-else style="color:#ccc;">已添加</el-button>
+                </div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="handleClose">取 消</el-button>
+                <el-button type="primary" @click="submit">确 定</el-button>
+            </span>
+        </el-dialog>
+    </div>
+</template>
+<script>
+import { getKnowledgeList } from "@/api/knowledge";
+export default {
+    data(){
+        return {
+            dialogVisible:false,
+            knowledgeData:[],
+            knowledgeList:[],
+            checkedData:[],
+            toolName:''
+        }
+    },
+    created(){
+        this.getKnowledgeList();
+    },
+    methods:{
+        getKnowledgeList() {
+            getKnowledgeList().then((res) => {
+                if (res.code === 0) {
+                this.knowledgeData = (res.data || []).map(item => ({
+                    ...item,
+                    checked:this.knowledgeList.some(item => item.id === m.knowledgeId)
+                }));
+                }
+            });
+        },
+        openTool(e,item){
+            if(!e) return;
+            item.checked = !item.checked
+        },
+        searchTool(){
+        },
+        showDialog(data){
+            this.dialogVisible = true;
+            this.setKnowledge(data);
+            this.knowledgeList = data || [];
+        },
+        setKnowledge(data){
+           this.knowledgeData = this.knowledgeData.map(m => ({
+            ...m,
+            checked: data.some(item => item.id === m.knowledgeId)
+            }));
+        },
+        handleClose(){
+            this.dialogVisible = false;
+        },
+        submit(){
+            const data = this.knowledgeList.filter(item => item.checked);
+            this.$emit('getKnowledgeData',data);
+            this.dialogVisible = false;
+        }
+    }
+}
+</script>
+<style lang="scss" scoped>
+/deep/{
+    .el-dialog__body{
+        padding:10px 20px;
+    }
+}
+.createTool{
+    padding:10px;
+    cursor: pointer;
+    .add{
+        padding-right:5px;
+    }
+}
+.createTool:hover{
+    color: #384BF7;
+}
+.tool-typ{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom: 1px solid #dbdbdb;
+    .toolbtn{
+        display:flex;
+        justify-content:flex-start;
+        gap:20px;
+        div{
+            text-align: center;
+            padding:5px 20px;
+            border-radius:6px;
+            border:1px solid #ddd;
+            cursor: pointer;
+        }
+    }
+    .tool-input{
+        width:200px;
+    }
+}
+.toolContent{
+    padding:10px 0;
+    max-height:300px;
+    overflow-y:auto;
+    .toolContent_item{
+        padding:5px 20px;
+        border:1px solid #dbdbdb;
+        border-radius:6px;
+        margin-bottom:10px;
+        cursor: pointer;
+        display: flex;
+        align-items:center;
+        justify-content:space-between;
+    }
+    .toolContent_item:hover{
+        background:#f4f5ff;
+    }
+}
+.active{
+    border:1px solid #384BF7 !important;
+    color: #fff;
+    background:#384BF7;
+}
+</style>

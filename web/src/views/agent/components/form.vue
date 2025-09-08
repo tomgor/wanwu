@@ -179,31 +179,35 @@
           <div class="block recommend-box">
             <p class="block-title tool-title">
               <span>关联知识库</span>
-              <span
-                class="common-add"
-                @click="showKnowledgeSet"
-              >
-                <span class="el-icon-s-operation"></span>
-                <span class="handleBtn set">配置</span>
+              <span>
+                <span class="common-add" @click="showKnowledgeDiglog">
+                  <span class="el-icon-plus"></span>
+                  <span class="handleBtn">添加</span>
+                </span>
+                <span
+                  class="common-add"
+                  @click="showKnowledgeSet"
+                >
+                  <span class="el-icon-s-operation"></span>
+                  <span class="handleBtn set">配置</span>
+                </span>
               </span>
             </p>
-            <div class="rl">
-              <el-select
-                v-model="editForm.knowledgeBaseIds"
-                placeholder="可输入知识库名称搜索"
-                style="width:100%;"
-                multiple
-                filterable
-                clearable
-              >
-                <el-option
-                  v-for="item in knowledgeData"
-                  :key="item.knowledgeId"
-                  :label="item.name"
-                  :value="item.knowledgeId"
-                >
-                </el-option>
-              </el-select>
+            <div class="rl tool-conent">
+              <div class="tool-right tool">
+                  <div class="action-list">
+                    <div v-for="(n,i) in editForm.knowledgeBaseIds" class="action-item" :key="'knowledge'+ i">
+                       <div class="name" style="color: #333">
+                        <span>{{n.name}}</span>
+                       </div>
+                        <div class="bt">
+                          <el-tooltip class="item" effect="dark" content="元数据过滤" placement="top-start">
+                            <span class="el-icon-setting del"></span>
+                          </el-tooltip>
+                      </div>
+                    </div>
+                  </div>
+              </div>
             </div>
           </div>
         </div>
@@ -353,6 +357,8 @@
     />
     <!-- 知识库召回参数配置 -->
     <knowledgeSetDialog ref="knowledgeSetDialog" @setKnowledgeSet="setKnowledgeSet" />
+    <!-- 知识库选择 -->
+    <knowledgeSelect ref="knowledgeSelect" />
   </div>
 </template>
 
@@ -360,7 +366,6 @@
 import { appPublish } from "@/api/appspace";
 import { store } from "@/store/index";
 import { mapGetters } from "vuex";
-import { getKnowledgeList } from "@/api/knowledge";
 import CreateIntelligent from "@/components/createApp/createIntelligent";
 import setSafety from "@/components/setSafety";
 import ModelSet from "./modelSetDialog";
@@ -386,6 +391,7 @@ import {
 } from "@/api/workflow";
 import Chat from "./chat";
 import LinkIcon from "@/components/linkIcon.vue";
+import knowledgeSelect from "@/components/knowledgeSelect.vue"
 export default {
   components: {
     LinkIcon,
@@ -397,6 +403,7 @@ export default {
     LinkDialog,
     setSafety,
     knowledgeSetDialog,
+    knowledgeSelect
   },
   watch: {
     editForm: {
@@ -442,6 +449,7 @@ export default {
   },
   data() {
     return {
+      knowledgeCheckData:[],
       activeIndex:-1,
       showOperation: false,
       appId: "",
@@ -543,7 +551,6 @@ export default {
     this.initialEditForm = JSON.parse(JSON.stringify(this.editForm));
   },
   created() {
-    this.getKnowledgeList();
     this.getModelData(); //获取模型列表
     this.getRerankData(); //获取rerank模型
     if (this.$route.query.id) {
@@ -568,6 +575,9 @@ export default {
     store.dispatch("app/initState");
   },
   methods: {
+    showKnowledgeDiglog(){
+      this.$refs.knowledgeSelect.showDialog(this.editForm.knowledgeBaseIds)
+    },
     handlePublishSet(){
       this.$router.push({path:`/agent/publishSet`,query:{appId:this.editForm.assistantId,appType:'agent'}})
     },
@@ -781,26 +791,22 @@ export default {
       }
       this.modelLoading = false;
     },
-    async getKnowledgeList() {
-      //获取文档知识分类
-      const res = await getKnowledgeList({});
-      if (res.code === 0) {
-        this.knowledgeData = res.data.knowledgeList || [];
-      } else {
-        this.$message.error(res.message);
-      }
-    },
     async updateInfo() {
       //知识库数据
-      const knowledgeMap = new Map(
-        this.knowledgeData.map((item) => [item.knowledgeId, item])
-      );
-      const knowledgeData = this.editForm.knowledgeBaseIds
-        .map((id) => {
-          const found = knowledgeMap.get(id);
-          return found ? { id: found.knowledgeId, name: found.name } : null;
-        })
-        .filter(Boolean);
+      // const knowledgeMap = new Map(
+      //   this.knowledgeData.map((item) => [item.knowledgeId, item])
+      // );
+      // const knowledgeData = this.editForm.knowledgeBaseIds
+      //   .map((id) => {
+      //     const found = knowledgeMap.get(id);
+      //     return found ? { id: found.knowledgeId, name: found.name } : null;
+      //   })
+      //   .filter(Boolean);
+      const knowledgeData = this.editForm.knowledgeBaseIds.map(item =>({
+        id:item.knowledgeId,
+        name:item.name
+      }))
+
       //模型数据
       const modeInfo = this.modleOptions.find(
         (item) => item.modelId === this.editForm.modelParams
@@ -867,7 +873,9 @@ export default {
         this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
         const knowledgeData = res.data.knowledgeBaseConfig.knowledgebases;
         if (knowledgeData && knowledgeData.length > 0) {
-          this.editForm.knowledgeBaseIds = knowledgeData.map((item) => item.id);
+          // this.editForm.knowledgeBaseIds = knowledgeData.map((item) => item.id);
+          this.editForm.knowledgeBaseIds = knowledgeData;
+
         }
         this.editForm = {
           ...this.editForm,
@@ -989,6 +997,7 @@ export default {
 .common-add {
   color: #595959;
   cursor: pointer;
+  margin-left: 10px;
   .handleBtn,
   .el-icon-plus {
     font-size: 13px !important;
