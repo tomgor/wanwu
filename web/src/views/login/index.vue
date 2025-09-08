@@ -72,7 +72,6 @@ import { getImgVerCode, getCommonInfo } from "@/api/user"
 import { Encrypt, Urlencode } from "../../utils/crypto";
 import ChangeLang from "@/components/changeLang.vue"
 import { redirectUrl, replaceTitle, replaceIcon } from "@/utils/util"
-import {store} from "@/store";
 let urlEncrypt = (data) => {
   return Urlencode(Encrypt(data));
 };
