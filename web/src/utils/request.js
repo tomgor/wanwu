@@ -76,6 +76,7 @@ service.interceptors.response.use(
     if (status === 401) {
       Message.error(msg || 'Unauthorized')
       localStorage.removeItem('access_cert')
+      store.state.user.token = ''
       window.location.href = window.location.origin + basePath +'/aibase/login'
     } else if (Object.keys(errMessage).includes(String(status))) {
       Message.error(msg || statusText || errMessage[status])
