@@ -1179,6 +1179,17 @@ definitions:
     required:
     - docIdList
     type: object
+  request.DeleteDocSegmentReq:
+    properties:
+      contentId:
+        type: string
+      docId:
+        description: 文档id
+        type: string
+    required:
+    - contentId
+    - docId
+    type: object
   request.DeleteFileReq:
     properties:
       fileList:
@@ -1758,6 +1769,22 @@ definitions:
     required:
     - ragId
     type: object
+  request.RegisterByEmail:
+    properties:
+      code:
+        description: 邮箱验证码
+        type: string
+      email:
+        description: 邮箱
+        type: string
+      username:
+        description: 用户名
+        type: string
+    required:
+    - code
+    - email
+    - username
+    type: object
   request.RoleCreate:
     properties:
       name:
@@ -1811,6 +1838,14 @@ definitions:
     - name
     - roleId
     type: object
+  request.SendEmailCode:
+    properties:
+      email:
+        description: 邮箱
+        type: string
+    required:
+    - email
+    type: object
   request.SensitiveTable:
     properties:
       tableId:
@@ -1837,6 +1872,19 @@ definitions:
       appType:
         description: 应用类型
         type: string
+    type: object
+  request.UpdateDocSegmentReq:
+    properties:
+      content:
+        type: string
+      contentId:
+        type: string
+      docId:
+        type: string
+    required:
+    - content
+    - contentId
+    - docId
     type: object
   request.UpdateDocSegmentStatusReq:
     properties:
@@ -2708,6 +2756,11 @@ definitions:
         description: 上传时间
         type: string
     type: object
+  response.Email:
+    properties:
+      status:
+        type: boolean
+    type: object
   response.EmbeddingModelInfo:
     properties:
       modelId:
@@ -2981,6 +3034,10 @@ definitions:
         allOf:
         - $ref: '#/definitions/response.CustomLogin'
         description: 登录页标题信息
+      register:
+        allOf:
+        - $ref: '#/definitions/response.Register'
+        description: 注册信息
       tab:
         allOf:
         - $ref: '#/definitions/response.CustomTab'
@@ -3415,6 +3472,13 @@ definitions:
     - ragId
     - rerankConfig
     type: object
+  response.Register:
+    properties:
+      email:
+        allOf:
+        - $ref: '#/definitions/response.Email'
+        description: 注册邮箱
+    type: object
   response.Response:
     properties:
       code:
@@ -3651,50 +3715,24 @@ definitions:
     type: object
 info:
   contact: {}
-  description: |-
-    ## HTTP Header
-    | Header        | 说明      |
-    | ------------- | --------- |
-    | Authorization | JWT token |
-    | X-Language    | 语言Code  |
-    | X-Org-Id      | 组织ID    |
-
-    ## HTTP Status
-    | HTTP Status             | 说明                   |
-    | ----------------------- | ---------------------- |
-    | 200, StatusOK           | 请求返回成功           |
-    | 400, StatusBadRequest   | 请求返回失败，用于业务 |
-    | 401, StatusUnauthorized | JWT认证失败            |
-    | 403, StatusForbidden    | 没有权限               |
-
-    ## 权限-菜单对应表
-    | 一级权限        | 二级权限  | 三级权限 | 一级菜单 | 二级菜单 | 三级菜单 |
-    |-------------|-------|------|------|------|------|
-    | guest       |       |      | 【访客】 |      |      |
-    | common      |       |      | 【通用】 |      |      |
-    | permission  |       |      | 权限管理 |      |      |
-    | permission  | user  |      | 权限管理 | 用户管理 |      |
-    | permission  | org   |      | 权限管理 | 组织管理 |      |
-    | permission  | role  |      | 权限管理 | 角色管理 |      |
-
-    ## `/v1/user/permission`返回用例
-    ```json
-    {
-      "code": 0,
-      "data": {
-        "orgPermission": {
-          "org": {"id": "test-org-id", "name": "test-org-name"},
-          "permissions": [
-            {"perm": "permission"},
-            {"perm": "permission.user"},
-            {"perm": "permission.org"},
-            {"perm": "permission.role"}
-          ]
-        }
-      },
-      "msg": "操作成功"
-    }
-    ```
+  description: "## HTTP Header\r\n| Header        | 说明      |\r\n| ------------- |
+    --------- |\r\n| Authorization | JWT token |\r\n| X-Language    | 语言Code  |\r\n|
+    X-Org-Id      | 组织ID    |\r\n\r\n## HTTP Status\r\n| HTTP Status             |
+    说明                   |\r\n| ----------------------- | ---------------------- |\r\n|
+    200, StatusOK           | 请求返回成功           |\r\n| 400, StatusBadRequest   | 请求返回失败，用于业务
+    |\r\n| 401, StatusUnauthorized | JWT认证失败            |\r\n| 403, StatusForbidden
+    \   | 没有权限               |\r\n\r\n## 权限-菜单对应表\r\n| 一级权限        | 二级权限  | 三级权限
+    | 一级菜单 | 二级菜单 | 三级菜单 |\r\n|-------------|-------|------|------|------|------|\r\n|
+    guest       |       |      | 【访客】 |      |      |\r\n| common      |       |      |
+    【通用】 |      |      |\r\n| permission  |       |      | 权限管理 |      |      |\r\n|
+    permission  | user  |      | 权限管理 | 用户管理 |      |\r\n| permission  | org   |      |
+    权限管理 | 组织管理 |      |\r\n| permission  | role  |      | 权限管理 | 角色管理 |      |\r\n\r\n##
+    `/v1/user/permission`返回用例\r\n```json\r\n{\r\n  \"code\": 0,\r\n  \"data\": {\r\n
+    \   \"orgPermission\": {\r\n      \"org\": {\"id\": \"test-org-id\", \"name\":
+    \"test-org-name\"},\r\n      \"permissions\": [\r\n        {\"perm\": \"permission\"},\r\n
+    \       {\"perm\": \"permission.user\"},\r\n        {\"perm\": \"permission.org\"},\r\n
+    \       {\"perm\": \"permission.role\"}\r\n      ]\r\n    }\r\n  },\r\n  \"msg\":
+    \"操作成功\"\r\n}\r\n```"
   title: AI Agent Productivity Platform API
   version: v0.0.1
 paths:
@@ -4964,6 +5002,48 @@ paths:
       summary: 用户登录
       tags:
       - guest
+  /base/register/email:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 邮箱注册信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.RegisterByEmail'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 用户邮箱注册
+      tags:
+      - guest
+  /base/register/email/code:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 邮箱地址
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.SendEmailCode'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 邮箱注册验证码发送
+      tags:
+      - guest
   /custom/home:
     post:
       consumes:
@@ -5617,6 +5697,30 @@ paths:
       summary: 新增文档切片
       tags:
       - knowledge
+  /knowledge/doc/segment/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除文档切片
+      parameters:
+      - description: 删除文档切片请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DeleteDocSegmentReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 删除文档切片
+      tags:
+      - knowledge
   /knowledge/doc/segment/labels:
     post:
       consumes:
@@ -5692,6 +5796,30 @@ paths:
       security:
       - JWT: []
       summary: 更新文档切片启用状态
+      tags:
+      - knowledge
+  /knowledge/doc/segment/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新文档切片
+      parameters:
+      - description: 更新文档切片请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateDocSegmentReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 更新文档切片
       tags:
       - knowledge
   /knowledge/doc/url/analysis:

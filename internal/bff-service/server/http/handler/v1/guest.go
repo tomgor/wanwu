@@ -77,3 +77,38 @@ func GetLanguageSelect(ctx *gin.Context) {
 	resp := service.GetLanguageSelect()
 	gin_util.Response(ctx, resp, nil)
 }
+
+// RegisterByEmail
+//
+//	@Tags		guest
+//	@Summary	用户邮箱注册
+//	@Accept		json
+//	@Produce	json
+//	@Param		data	body		request.RegisterByEmail	true	"邮箱注册信息"
+//	@Success	200		{object}	response.Response
+//	@Router		/base/register/email [post]
+func RegisterByEmail(ctx *gin.Context) {
+	var req request.RegisterByEmail
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	gin_util.Response(ctx, service.RegisterByEmail(ctx, &req), nil)
+}
+
+// SendEmailCode
+//
+//	@Tags		guest
+//	@Summary	邮箱注册验证码发送
+//	@Accept		json
+//	@Produce	application/json
+//	@Param		data	body		request.SendEmailCode	true	"邮箱地址"
+//	@Success	200		{object}	response.Response
+//	@Router		/base/register/email/code [post]
+func SendEmailCode(ctx *gin.Context) {
+	var req request.SendEmailCode
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.SendEmailCode(ctx, req.Email)
+	gin_util.Response(ctx, nil, err)
+}

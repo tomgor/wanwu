@@ -14,6 +14,7 @@ enum Code {
   BFFJWT = 110002; // JWT错误
   BFFAuth = 110003; // Auth错误
   BFFSensitiveWordCheck = 110005; // 敏感词校验错误
+  BFFRegister = 110006; // 注册错误
 
   // --- iam-service ---
   // [120000, 129999]
@@ -21,6 +22,7 @@ enum Code {
   IAMInternal = 120001; // 内部错误
   IAMCaptcha = 120002; // 验证码错误
   IAMLogin = 120003; // 登录相关错误
+  IAMRegister = 120004; // 注册错误
   IAMOrg = 120011; // 组织相关错误
   IAMRole = 120021; // 角色相关错误
   IAMUser = 120031; // 用户相关错误

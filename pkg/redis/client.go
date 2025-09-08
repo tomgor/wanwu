@@ -108,6 +108,21 @@ func (c *client) HSet(ctx context.Context, key string, items []HashItem) error {
 	return c.cli.HSet(ctx, key, values).Err()
 }
 
+func (c *client) HSetWithExpire(ctx context.Context, key string, items []HashItem, expiration time.Duration) error {
+	if len(items) == 0 {
+		return nil
+	}
+	values := make([]string, 0, len(items)*2)
+	for _, item := range items {
+		values = append(values, item.K, item.V)
+	}
+	err := c.cli.HSet(ctx, key, values).Err()
+	if err != nil {
+		return err
+	}
+	return c.cli.Expire(ctx, key, expiration).Err()
+}
+
 func (c *client) HGet(ctx context.Context, key, field string) (*HashItem, error) {
 	value, err := c.cli.HGet(ctx, key, field).Result()
 	if err != nil {

@@ -16,6 +16,7 @@ type Config struct {
 	Log    LogConfig    `json:"log" mapstructure:"log"`
 	DB     db.Config    `json:"db" mapstructure:"db"`
 	Redis  redis.Config `json:"redis" mapstructure:"redis"`
+	Email  EmailConfig  `json:"email" mapstructure:"email"`
 }
 
 type ServerConfig struct {
@@ -31,6 +32,13 @@ type LogConfig struct {
 
 type DBConfig struct {
 	Name string `json:"name" mapstructure:"name"`
+}
+
+type EmailConfig struct {
+	SmtpHost  string `json:"smtp_host" mapstructure:"smtp_host"`
+	FromEmail string `json:"from_email" mapstructure:"from_email"`
+	Password  string `json:"password" mapstructure:"password"`
+	SmtpPort  int    `json:"smtp_port" mapstructure:"smtp_port"`
 }
 
 func LoadConfig(in string) error {

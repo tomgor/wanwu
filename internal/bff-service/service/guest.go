@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	iam_service "github.com/UnicomAI/wanwu/api/proto/iam-service"
 	operate_service "github.com/UnicomAI/wanwu/api/proto/operate-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
@@ -11,6 +12,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	mid "github.com/UnicomAI/wanwu/pkg/gin-util/mid-wrap"
+	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	jwt_util "github.com/UnicomAI/wanwu/pkg/jwt-util"
 	"github.com/gin-gonic/gin"
 )
@@ -33,7 +35,6 @@ func GetLanguageSelect() *response.LanguageSelect {
 }
 
 func GetLogoCustomInfo(ctx *gin.Context, mode string) (response.LogoCustomInfo, error) {
-	cfg := config.Cfg().CustomInfo
 	ret := response.LogoCustomInfo{}
 	var theme string
 	switch mode {
@@ -42,9 +43,9 @@ func GetLogoCustomInfo(ctx *gin.Context, mode string) (response.LogoCustomInfo, 
 	case customModeDark:
 		theme = customModeDark
 	default:
-		theme = cfg.DefaultMode
+		theme = config.Cfg().CustomInfo.DefaultMode
 	}
-	for _, mode := range cfg.Modes {
+	for _, mode := range config.Cfg().CustomInfo.Modes {
 		if theme != mode.Mode {
 			continue
 		}
@@ -66,10 +67,11 @@ func GetLogoCustomInfo(ctx *gin.Context, mode string) (response.LogoCustomInfo, 
 			},
 			About: response.CustomAbout{
 				LogoPath:  mode.About.LogoPath,
-				Version:   cfg.Version,
+				Version:   config.Cfg().CustomInfo.Version,
 				Copyright: gin_util.I18nKey(ctx, mode.About.Copyright),
 			},
 			LinkList: config.Cfg().DocCenter.GetDocs(),
+			Register: response.Register{Email: response.Email{Status: config.Cfg().CustomInfo.RegisterEnable}},
 		}
 		break
 	}
@@ -162,6 +164,28 @@ func Login(ctx *gin.Context, login *request.Login, language string) (*response.L
 		Language:         getLanguageByCode(resp.User.Language),
 		IsUpdatePassword: resp.Permission.LastUpdatePasswordAt != 0,
 	}, nil
+}
+
+func RegisterByEmail(ctx *gin.Context, register *request.RegisterByEmail) error {
+	if !config.Cfg().CustomInfo.RegisterEnable {
+		return grpc_util.ErrorStatus(errs.Code_BFFRegister)
+	}
+	_, err := iam.RegisterByEmail(ctx.Request.Context(), &iam_service.RegisterByEmailReq{
+		UserName: register.Username,
+		Email:    register.Email,
+		Code:     register.Code,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SendEmailCode(ctx *gin.Context, email string) error {
+	_, err := iam.SendEmailCode(ctx, &iam_service.SendEmailCodeReq{
+		Email: email,
+	})
+	return err
 }
 
 // --- internal ---

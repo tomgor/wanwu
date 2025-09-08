@@ -16,4 +16,6 @@ func registerGuest(apiV1 *gin.RouterGroup) {
 	mid.Sub("guest").Reg(apiV1, "/base/captcha", http.MethodGet, v1.GetCaptcha, "获取验证码")
 	mid.Sub("guest").Reg(apiV1, "/base/custom", http.MethodGet, v1.GetLogoCustomInfo, "自定义logo和title")
 	mid.Sub("guest").Reg(apiV1, "/base/language/select", http.MethodGet, v1.GetLanguageSelect, "获取语言列表（用于下拉选择）")
+	mid.Sub("guest").Reg(apiV1, "/base/register/email", http.MethodPost, v1.RegisterByEmail, "邮箱注册用户")
+	mid.Sub("guest").Reg(apiV1, "/base/register/email/code", http.MethodPost, v1.SendEmailCode, "邮箱注册验证码发送")
 }

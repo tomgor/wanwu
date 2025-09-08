@@ -32,6 +32,8 @@ const (
 	IAMService_ResetUserPassword_FullMethodName      = "/iam_service.IAMService/ResetUserPassword"
 	IAMService_GetUserPermission_FullMethodName      = "/iam_service.IAMService/GetUserPermission"
 	IAMService_ChangeUserLanguage_FullMethodName     = "/iam_service.IAMService/ChangeUserLanguage"
+	IAMService_RegisterByEmail_FullMethodName        = "/iam_service.IAMService/RegisterByEmail"
+	IAMService_SendEmailCode_FullMethodName          = "/iam_service.IAMService/SendEmailCode"
 	IAMService_GetOrgSelect_FullMethodName           = "/iam_service.IAMService/GetOrgSelect"
 	IAMService_GetOrgList_FullMethodName             = "/iam_service.IAMService/GetOrgList"
 	IAMService_GetOrgInfo_FullMethodName             = "/iam_service.IAMService/GetOrgInfo"
@@ -80,6 +82,10 @@ type IAMServiceClient interface {
 	GetUserPermission(ctx context.Context, in *GetUserPermissionReq, opts ...grpc.CallOption) (*UserPermission, error)
 	// 修改用户语言
 	ChangeUserLanguage(ctx context.Context, in *ChangeUserLanguageReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 邮箱注册用户
+	RegisterByEmail(ctx context.Context, in *RegisterByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 发送邮件
+	SendEmailCode(ctx context.Context, in *SendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 获取组织列表（用于下拉选择）
 	GetOrgSelect(ctx context.Context, in *GetOrgSelectReq, opts ...grpc.CallOption) (*Select, error)
 	// 获取组织列表
@@ -240,6 +246,26 @@ func (c *iAMServiceClient) ChangeUserLanguage(ctx context.Context, in *ChangeUse
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, IAMService_ChangeUserLanguage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) RegisterByEmail(ctx context.Context, in *RegisterByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, IAMService_RegisterByEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) SendEmailCode(ctx context.Context, in *SendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, IAMService_SendEmailCode_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -454,6 +480,10 @@ type IAMServiceServer interface {
 	GetUserPermission(context.Context, *GetUserPermissionReq) (*UserPermission, error)
 	// 修改用户语言
 	ChangeUserLanguage(context.Context, *ChangeUserLanguageReq) (*emptypb.Empty, error)
+	// 邮箱注册用户
+	RegisterByEmail(context.Context, *RegisterByEmailReq) (*emptypb.Empty, error)
+	// 发送邮件
+	SendEmailCode(context.Context, *SendEmailCodeReq) (*emptypb.Empty, error)
 	// 获取组织列表（用于下拉选择）
 	GetOrgSelect(context.Context, *GetOrgSelectReq) (*Select, error)
 	// 获取组织列表
@@ -535,6 +565,12 @@ func (UnimplementedIAMServiceServer) GetUserPermission(context.Context, *GetUser
 }
 func (UnimplementedIAMServiceServer) ChangeUserLanguage(context.Context, *ChangeUserLanguageReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangeUserLanguage not implemented")
+}
+func (UnimplementedIAMServiceServer) RegisterByEmail(context.Context, *RegisterByEmailReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterByEmail not implemented")
+}
+func (UnimplementedIAMServiceServer) SendEmailCode(context.Context, *SendEmailCodeReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendEmailCode not implemented")
 }
 func (UnimplementedIAMServiceServer) GetOrgSelect(context.Context, *GetOrgSelectReq) (*Select, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrgSelect not implemented")
@@ -823,6 +859,42 @@ func _IAMService_ChangeUserLanguage_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).ChangeUserLanguage(ctx, req.(*ChangeUserLanguageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_RegisterByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterByEmailReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).RegisterByEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_RegisterByEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).RegisterByEmail(ctx, req.(*RegisterByEmailReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_SendEmailCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendEmailCodeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).SendEmailCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_SendEmailCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).SendEmailCode(ctx, req.(*SendEmailCodeReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1205,6 +1277,14 @@ var IAMService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ChangeUserLanguage",
 			Handler:    _IAMService_ChangeUserLanguage_Handler,
+		},
+		{
+			MethodName: "RegisterByEmail",
+			Handler:    _IAMService_RegisterByEmail_Handler,
+		},
+		{
+			MethodName: "SendEmailCode",
+			Handler:    _IAMService_SendEmailCode_Handler,
 		},
 		{
 			MethodName: "GetOrgSelect",

@@ -143,9 +143,10 @@ type DocLinkConfig struct {
 }
 
 type CustomInfoConfig struct {
-	DefaultMode string        `json:"default_mode" mapstructure:"default_mode"`
-	Modes       []CustomTheme `json:"modes" mapstructure:"modes"`
-	Version     string        `json:"version" mapstructure:"version"`
+	DefaultMode    string        `json:"default_mode" mapstructure:"default_mode"`
+	Modes          []CustomTheme `json:"modes" mapstructure:"modes"`
+	Version        string        `json:"version" mapstructure:"version"`
+	RegisterEnable bool          `json:"register_enable" mapstructure:"register_enable"`
 }
 
 type CustomTheme struct {

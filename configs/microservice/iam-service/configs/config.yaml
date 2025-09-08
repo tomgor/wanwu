@@ -61,3 +61,9 @@ redis:
   password: Wanwu123456
   standalone: true
   master_name: mymaster
+
+email:
+  smtp_host: smtp.qq.com
+  smtp_port: 587
+  from_email: 
+  password: 

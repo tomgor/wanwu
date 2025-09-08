@@ -35,6 +35,10 @@ service IAMService {
   rpc GetUserPermission(GetUserPermissionReq) returns (UserPermission) {}
   // 修改用户语言
   rpc ChangeUserLanguage(ChangeUserLanguageReq) returns (google.protobuf.Empty){}
+  // 邮箱注册用户
+  rpc RegisterByEmail(RegisterByEmailReq) returns (google.protobuf.Empty) {}
+  // 发送邮件
+  rpc SendEmailCode(SendEmailCodeReq) returns (google.protobuf.Empty) {}
 
   // --- org ---
 
@@ -81,7 +85,6 @@ service IAMService {
   rpc GetCaptcha(GetCaptchaReq) returns (GetCaptchaResp) {}
   // 登录
   rpc Login(LoginReq) returns (LoginResp) {}
-  
 }
 
 message Perm {
@@ -213,6 +216,12 @@ message UserPermission {
 message ChangeUserLanguageReq{
   string userId = 1;
   string language = 2;
+}
+
+message RegisterByEmailReq{
+  string userName = 1;
+  string email = 2;
+  string code = 3;
 }
 
 // --- org ---
@@ -384,4 +393,8 @@ message LoginReq {
 message LoginResp {
   UserInfo user = 1;
   UserPermission permission = 2;
+}
+
+message SendEmailCodeReq {
+  string email = 1;
 }

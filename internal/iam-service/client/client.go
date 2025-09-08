@@ -75,4 +75,7 @@ type IClient interface {
 
 	RefreshCaptcha(ctx context.Context, key, code string) *errs.Status
 	CheckCaptcha(ctx context.Context, key, code string) *errs.Status
+
+	// --- register ---
+	SendEmailCode(ctx context.Context, email string) *errs.Status
 }
