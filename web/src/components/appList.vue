@@ -237,7 +237,7 @@ export default {
       this.dialogVisible = false
     },
     isCanClick(n) {
-      return this.isShowTool ? (!n.publishType && n.appId !== 'example') : true
+      return this.isShowTool ? ((n.appType === 'workflow' && !n.publishType && n.appId !== 'example') || n.appType !== 'workflow') : true
     },
     // 公用删除方法
     async handleDelete() {
