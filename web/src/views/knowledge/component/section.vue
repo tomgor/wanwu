@@ -61,6 +61,9 @@
           </template>
           <span v-else>无数据</span>
         </el-descriptions-item>
+        <el-descriptions-item label="批量新增分段状态">
+          <span>{{res.segmentImportStatus}}</span>
+        </el-descriptions-item>
       </el-descriptions>
 
       <div class="btn">
@@ -202,13 +205,13 @@
       </div>
 
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleSubmit">确定</el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="submitLoading">确定</el-button>
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
     </el-dialog>
     <dataBaseDialog ref="dataBase" @updateData="updateData" />
     <tagDialog ref="tagDialog" type="section" :title="title" :currentList="currentList" @sendList="sendList" />
-    <createChunk ref="createChunk" @updateData="updateData" />
+    <createChunk ref="createChunk"  @updateDataBatch="updateDataBatch" @updateData="updateData"/>
   </div>
 </template>
 <script>
@@ -220,6 +223,8 @@ export default {
   components:{dataBaseDialog,tagDialog,createChunk},
   data() {
     return {
+      submitLoading:false,
+      oldContent:'',
       title:'创建关键词',
       dialogVisible: false,
       obj: {}, // 路由参数对象
@@ -251,22 +256,56 @@ export default {
       metaDataList: [],
       metaRuleList: [],
       currentList:[],
-      contentId:''
+      contentId:'',
+      timer:null,
+      refreshCount:0,
     };
   },
   created() {
     this.obj = this.$route.query;
     this.getList();
   },
+  beforeDestroy(){
+    this.clearTimer()
+  },
   methods: {
+    updateDataBatch(){
+      this.startTimer();
+    },
+    startTimer(){
+      this.clearTimer();
+      if (this.refreshCount >= 2) {
+        return;
+      }
+      const delay = this.refreshCount === 0 ? 1000 : 3000;
+      this.timer = setTimeout(() =>{
+        this.getList()
+        this.refreshCount++;
+        this.startTimer()
+      },delay)
+    },
+    clearTimer() {
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+      }
+    },
     handleSubmit(){
+      if(this.oldContent === this.cardObj[0]['content'] ){
+        this.$message.warning('无修改')
+        return false;
+      }
+      this.submitLoading = true;
       editSegment({content:this.cardObj[0]['content'],contentId:this.cardObj[0]['contentId'],docId:this.obj.id}).then(res =>{
         if(res.code === 0){
           this.$message.success('操作成功');
           this.dialogVisible = false;
+          this.submitLoading = false;
           this.getList();
         }
-      }).catch(() =>{})
+      }).catch(() =>{
+        this.submitLoading = false;
+      })
     },
     handleCommand(value){
       const {type, item} = value || {}
@@ -372,13 +411,12 @@ export default {
     },
     handleClick(item, index) {
       this.dialogVisible = true;
-      // this.$set(item, "id", index + 1);
+      this.oldContent = item.content;
       const obj = JSON.parse(JSON.stringify(item));
       this.$nextTick(() => {
         this.cardObj = [obj];
         this.activeStatus = obj.available;
       });
-      // this.cardObj[0].id = ;
     },
     handleCurrentChange(val) {
       this.page.pageNo = val;

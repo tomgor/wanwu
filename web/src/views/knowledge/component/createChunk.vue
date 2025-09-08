@@ -56,7 +56,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submit('ruleForm')">确 定</el-button>
+        <el-button type="primary" @click="submit('ruleForm')" :loading="btnLoading">确 定</el-button>
     </span>
     </el-dialog>
 </template>
@@ -67,6 +67,7 @@ export default {
     components:{fileUpload},
     data(){
         return{
+            btnLoading:false,
             accept:'.csv',
             checkType:[],
             inputVisible:false,
@@ -88,7 +89,8 @@ export default {
                 this.ruleForm.fileUploadId = '';
                 this.$refs.fileUpload.clearFileList();
             }else{
-                this.clearForm()
+                this.clearForm();
+                this.$refs.ruleForm.clearValidate();
             }
         },
         uploadFile(fileUploadId){
@@ -100,6 +102,7 @@ export default {
         showDiglog(docId){
             this.dialogVisible = true
             this.ruleForm.docId = docId
+            this.clearForm()
         },
         showInput(){
             this.inputVisible = true;
@@ -129,33 +132,42 @@ export default {
         handleSingle(formName){
             this.$refs[formName].validate((valid) =>{
                 if(valid){
+                    this.btnLoading = true;
                     const data = {content:this.ruleForm.content,docId:this.ruleForm.docId,labels:this.ruleForm.labels}
                     createSegment(data).then(res =>{
                         if(res.code === 0){
+                            this.$message.success('创建成功');
                             if(!this.checkType.length){
-                                this.$message.success('创建成功');
                                 this.dialogVisible = false;
+                                this.$emit('updateDataBatch')
                             }else{
-                                this.$message.success('创建成功');
                                 this.clearForm()
+                                this.$emit('updateData')
                             }
-                            this.$emit('updateData')
+                            this.btnLoading = false;
+                            
                         }
-                    }).catch(() =>{})
+                    }).catch(() =>{
+                        this.btnLoading = false;
+                    })
                 }else{
                    return false; 
                 }
             })
         },
         handleFile(){
+            this.btnLoading = true;
             const data = {fileUploadId:this.ruleForm.fileUploadId,docId:this.ruleForm.docId};
             createBatchSegment(data).then(res =>{
                 if(res.code === 0){
                     this.$message.success('创建成功');
                     this.dialogVisible = false;
-                    this.$emit('updateData')
+                    this.btnLoading = false;
+                    this.$emit('updateDataBatch')
                 }
-            }).catch(() =>{})
+            }).catch(() =>{
+                this.btnLoading = false;
+            })
         },
         clearForm(){
             this.ruleForm.content = ''

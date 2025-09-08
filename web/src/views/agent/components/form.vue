@@ -264,7 +264,6 @@
                       v-model="n.enable"
                       class="bt-switch"
                       @change="toolSwitch(n,n.type,n.enable)"
-                      v-if="n.valid"
                     ></el-switch>
                     <span
                       @click="toolRemove(n,n.type)"
@@ -576,7 +575,6 @@ export default {
       this.editForm.knowledgeConfig = data;
     },
     displayName(item) {
-      if (!item.valid) return `工具已失效`;
       const config = this.nameMap[item.type] || this.nameMap["default"];
       return item[config.propName] + ' ' + `(${config.displayName})`;
     },
@@ -605,19 +603,6 @@ export default {
       getRerankList().then((res) => {
         if (res.code === 0) {
           this.rerankOptions = res.data.map((item) => {
-            return {
-              label: item.name,
-              value: item.id,
-            };
-          });
-        }
-      });
-    },
-    //获取知识库列表
-    getKnowledgeList() {
-      getKnowledgeList().then((res) => {
-        if (res.code === 0) {
-          this.knowledgeData = res.data.map((item) => {
             return {
               label: item.name,
               value: item.id,
