@@ -250,7 +250,10 @@ func (c *Client) ChangeOrgStatus(ctx context.Context, orgID uint32, status bool)
 			return toErrStatus("iam_org_change_status", "cannot change top org status")
 		}
 		// change status
-		return toErrStatus("iam_org_change_status", changeOrgStatus(tx, orgID, status).Error())
+		if err := changeOrgStatus(tx, orgID, status); err != nil {
+			return toErrStatus("iam_org_change_status", err.Error())
+		}
+		return nil
 	})
 }
 
