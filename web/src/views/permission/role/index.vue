@@ -16,7 +16,7 @@
           <el-table-column prop="name" :label="$t('role.table.name')" align="left" />
           <el-table-column prop="creator.name" :label="$t('role.table.creator')" align="left" />
           <el-table-column prop="createdAt" :label="$t('role.table.createAt')" align="left" />
-          <!--<el-table-column align="left" :label="$t('role.table.status')">
+          <el-table-column align="left" :label="$t('role.table.status')">
             <template slot-scope="scope">
               <el-switch
                 @change="(val)=>{changeStatus(scope.row,val)}"
@@ -26,7 +26,7 @@
                 :inactive-text="$t('common.switch.stop')"
               />
             </template>
-          </el-table-column>-->
+          </el-table-column>
           <el-table-column align="left" :label="$t('common.table.operation')" width="240">
             <template slot-scope="scope">
               <el-button class="operation" type="text" @click="preUpdate(scope.row)">{{$t('common.button.edit')}}</el-button>
@@ -264,6 +264,9 @@ export default {
       display: inline-block;
       vertical-align: middle;
     }
+  }
+  /deep/ .el-switch__label * {
+    font-size: 13px;
   }
 }
 .mark-textArea /deep/ {

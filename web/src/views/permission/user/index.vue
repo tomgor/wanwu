@@ -40,7 +40,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="createdAt" :label="$t('user.table.createAt')" align="left" />
-          <!--<el-table-column align="left" :label="$t('user.table.status')">
+          <el-table-column align="left" :label="$t('user.table.status')">
             <template slot-scope="scope">
               <el-switch
                 @change="(val)=>{changeStatus(scope.row,val)}"
@@ -50,7 +50,7 @@
                 :inactive-text="$t('common.switch.stop')"
               />
             </template>
-          </el-table-column>-->
+          </el-table-column>
           <el-table-column align="left" :label="$t('common.table.operation')" width="300">
             <template slot-scope="scope">
               <el-button class="operation" type="text" @click="preUpdate(scope.row)">{{$t('common.button.edit')}}</el-button>
@@ -217,6 +217,7 @@
             { validator: checkPhone, trigger: 'blur' }
           ],
           email: [
+            { required: true, message: this.$t('common.input.placeholder'), trigger: 'blur' },
             { pattern: /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(.[a-zA-Z0-9_-]+)+$/, message: this.$t('common.hint.emailError'), trigger: "blur"}
           ],
           remark: [
@@ -423,6 +424,9 @@
       color: $color;
       border-color: $color;
       background: rgba(255, 255, 255, 0) !important;
+    }
+    /deep/ .el-switch__label * {
+      font-size: 13px;
     }
   }
   .mark-textArea /deep/ {

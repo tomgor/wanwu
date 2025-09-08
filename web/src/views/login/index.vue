@@ -114,7 +114,7 @@ export default {
   },
   created() {
     // 如果已登录，重定向到有权限的页面
-    if (localStorage.getItem("access_cert")) redirectUrl()
+    if (this.$store.state.user.token && localStorage.getItem("access_cert")) redirectUrl()
 
     this.getImgCode()
     this.getLogoInfo()
