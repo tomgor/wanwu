@@ -28,6 +28,10 @@
             >开始测试<span class="el-icon-caret-right"></span></el-button>
           </div>
         </div>
+         <div class="hitTest_input meta_box">
+          <h3>元数据过滤配置</h3>
+          <metaSet ref="metaSet" @getMetaData="getMetaData" class="metaSet"/>
+        </div>
         <div class="test_form">
           <searchConfig ref="searchConfig" @sendConfigInfo="sendConfigInfo" />
         </div>
@@ -80,8 +84,9 @@ import { hitTest } from "@/api/knowledge";
 import { md } from "@/mixins/marksown-it";
 import searchConfig from '@/components/searchConfig.vue';
 import LinkIcon from "@/components/linkIcon.vue";
+import metaSet from "@/components/metaSet";
 export default {
-  components:{LinkIcon, searchConfig},
+  components:{LinkIcon, searchConfig,metaSet},
   data() {
     return {
       md: md,
@@ -90,10 +95,14 @@ export default {
       knowledgeIdList:[this.$route.query.knowledgeId],
       searchList: [],
       score: [],
-      formInline:null
+      formInline:null,
+      metaData:[]
     };
   },
   methods: {
+    getMetaData(data){
+      this.metaData = data;
+    },
     goBack() {
       this.$router.go(-1);
     },
@@ -284,6 +293,13 @@ export default {
             color: #595959;
           }
         }
+      }
+    }
+    .meta_box{
+      margin-top:20px;
+      padding: 0 20px 20px 20px !important;
+      .metaSet{
+        width:100%;
       }
     }
   }

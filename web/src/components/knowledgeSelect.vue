@@ -39,24 +39,25 @@ export default {
         }
     },
     created(){
-        this.getKnowledgeList();
+        this.getKnowledgeList('');
     },
     methods:{
-        getKnowledgeList() {
-            getKnowledgeList().then((res) => {
+        getKnowledgeList(name) {
+            getKnowledgeList({name}).then((res) => {
                 if (res.code === 0) {
-                this.knowledgeData = (res.data || []).map(item => ({
-                    ...item,
+                this.knowledgeData = (res.data.knowledgeList || []).map(m => ({
+                    ...m,
                     checked:this.knowledgeList.some(item => item.id === m.knowledgeId)
                 }));
                 }
-            });
+            }).catch(() =>{});
         },
         openTool(e,item){
             if(!e) return;
             item.checked = !item.checked
         },
         searchTool(){
+            this.getKnowledgeList(this.toolName);
         },
         showDialog(data){
             this.dialogVisible = true;
@@ -68,12 +69,13 @@ export default {
             ...m,
             checked: data.some(item => item.id === m.knowledgeId)
             }));
+            
         },
         handleClose(){
             this.dialogVisible = false;
         },
         submit(){
-            const data = this.knowledgeList.filter(item => item.checked);
+            const data = this.knowledgeData.filter(item => item.checked);
             this.$emit('getKnowledgeData',data);
             this.dialogVisible = false;
         }

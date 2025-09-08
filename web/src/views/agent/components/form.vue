@@ -202,7 +202,7 @@
                        </div>
                         <div class="bt">
                           <el-tooltip class="item" effect="dark" content="元数据过滤" placement="top-start">
-                            <span class="el-icon-setting del"></span>
+                            <span class="el-icon-setting del" @click="showMetaSet"></span>
                           </el-tooltip>
                       </div>
                     </div>
@@ -351,14 +351,29 @@
       :linkform="editForm.onlineSearchConfig"
     />
     <!-- 敏感词设置 -->
-    <setSafety
-      ref="setSafety"
-      @sendSafety="sendSafety"
-    />
+    <setSafety ref="setSafety" @sendSafety="sendSafety" />
     <!-- 知识库召回参数配置 -->
     <knowledgeSetDialog ref="knowledgeSetDialog" @setKnowledgeSet="setKnowledgeSet" />
     <!-- 知识库选择 -->
     <knowledgeSelect ref="knowledgeSelect" />
+    <!-- 元数据设置 -->
+    <el-dialog
+      :visible.sync="metaSetVisible"
+      width="1050px"
+      class="metaSetVisible"
+      :before-close="handleMetaClose">
+      <template #title>
+         <div class="metaHeader">
+          <h3>配置元数据过滤</h3>
+          <span>[ 通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]</span>
+         </div>
+      </template>
+      <metaSet ref="metaSet" @getMetaData="getMetaData"/>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="metaSetVisible = false">取 消</el-button>
+        <el-button type="primary" @click="metaSetVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -368,6 +383,7 @@ import { store } from "@/store/index";
 import { mapGetters } from "vuex";
 import CreateIntelligent from "@/components/createApp/createIntelligent";
 import setSafety from "@/components/setSafety";
+import metaSet from "@/components/metaSet";
 import ModelSet from "./modelSetDialog";
 import { selectModelList, getRerankList } from "@/api/modelAccess";
 import {
@@ -403,7 +419,8 @@ export default {
     LinkDialog,
     setSafety,
     knowledgeSetDialog,
-    knowledgeSelect
+    knowledgeSelect,
+    metaSet
   },
   watch: {
     editForm: {
@@ -449,6 +466,8 @@ export default {
   },
   data() {
     return {
+      metaData:[],
+      metaSetVisible:false,
       knowledgeCheckData:[],
       activeIndex:-1,
       showOperation: false,
@@ -575,6 +594,15 @@ export default {
     store.dispatch("app/initState");
   },
   methods: {
+    getMetaData(data){
+      this.metaData = data;
+    },
+    handleMetaClose(){
+      this.metaSetVisible = false;
+    },
+    showMetaSet(){
+      this.metaSetVisible = true;
+    },
     showKnowledgeDiglog(){
       this.$refs.knowledgeSelect.showDialog(this.editForm.knowledgeBaseIds)
     },
@@ -992,6 +1020,28 @@ export default {
       height: 14px;
     }
   }
+  .metaSetVisible{
+    .el-dialog__header{
+      border-bottom:1px solid #dbdbdb;
+    }
+    .el-dialog__body{
+      max-height:400px;
+      overflow-y: auto;
+    }
+  }
+}
+.metaHeader{
+  display:flex;
+  justify-content: flex-start;
+  h3{
+    font-size:18px;
+  }
+  span{
+    margin-left:10px;
+    color:#666;
+    display:inline-block;
+    padding-top:5px;
+  }
 }
 //通用添加按钮
 .common-add {
@@ -1073,18 +1123,6 @@ export default {
   .header-right {
     display: flex;
     align-items: center;
-    // .header-api {
-    //   padding: 6px 10px;
-    //   box-shadow: 1px 2px 2px #ddd;
-    //   background-color: #fff;
-    //   margin: 0 10px;
-    //   border-radius: 6px;
-    //   .root-url {
-    //     background-color: #eceefe;
-    //     color: #384bf7;
-    //     border: none;
-    //   }
-    // }
   }
 }
 .agent-from-content {
