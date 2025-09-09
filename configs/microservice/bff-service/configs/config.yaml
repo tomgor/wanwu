@@ -132,11 +132,13 @@ doc-center:
       val: 6.工作流/文档解析.md
     - key: workflow-1009
       val: 6.工作流/MCP.md
+    - key: workflow-1010
+      val: 6.工作流/GUI.md
     - key: workflow-1022
       val: 6.工作流/意图识别.md
     - key: workflow-1059
       val: 6.工作流/JSON反序列化.md
-
+      
 # --- middleware ---
 
 minio:
