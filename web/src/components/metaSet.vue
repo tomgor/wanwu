@@ -244,7 +244,10 @@ export default {
        'metaDataFilterParams':{
          handler: function (val) {
             if(val){
-                const data = {metaDataFilterParams:val}
+                const data = {
+                    knowledgeId:this.knowledgeId,
+                    metaDataFilterParams:val,
+                }
                 this.$emit('getMetaData',data)
             }
          },

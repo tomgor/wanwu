@@ -196,13 +196,13 @@
             <div class="rl tool-conent">
               <div class="tool-right tool">
                   <div class="action-list">
-                    <div v-for="(n,i) in editForm.knowledgeBaseIds" class="action-item" :key="'knowledge'+ i">
+                    <div v-for="(n,i) in editForm.knowledgeList" class="action-item" :key="'knowledge'+ i">
                        <div class="name" style="color: #333">
-                        <span>{{n.name}}</span>
+                        <span>{{n.name || n.knowledgeName}}</span>
                        </div>
                         <div class="bt">
                           <el-tooltip class="item" effect="dark" content="元数据过滤" placement="top-start">
-                            <span class="el-icon-setting del" @click="showMetaSet(n)"></span>
+                            <span class="el-icon-setting del" @click="showMetaSet(n,i)"></span>
                           </el-tooltip>
                       </div>
                     </div>
@@ -370,8 +370,8 @@
       </template>
       <metaSet ref="metaSet" @getMetaData="getMetaData" :knowledgeId="currentKnowledgeId" />
       <span slot="footer" class="dialog-footer">
-        <el-button @click="metaSetVisible = false">取 消</el-button>
-        <el-button type="primary" @click="metaSetVisible = false">确 定</el-button>
+        <el-button @click="handleMetaClose">取 消</el-button>
+        <el-button type="primary" @click="submitMeta">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -436,7 +436,7 @@ export default {
             "modelParams",
             "modelConfig",
             "prologue",
-            "knowledgeBaseIds",
+            "knowledgeList",
             "instructions",
             "onlineSearchConfig",
             "safetyConfig",
@@ -466,6 +466,7 @@ export default {
   },
   data() {
     return {
+      knowledgeIndex:-1,
       currentKnowledgeId:'',
       metaData:[],
       metaSetVisible:false,
@@ -486,7 +487,7 @@ export default {
         modelParams: "",
         prologue: "", //开场白
         instructions: "", //系统提示词
-        knowledgeBaseIds: [],
+        knowledgeList:[],
         knowledgeConfig: {
           keywordPriority: 0.8, //关键词权重
           matchType: "mix", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
@@ -595,22 +596,26 @@ export default {
     store.dispatch("app/initState");
   },
   methods: {
+    submitMeta(){
+      this.$set(this.editForm.knowledgeList, this.knowledgeIndex, this.metaData);
+    },
     getMetaData(data){
       this.metaData = data;
     },
     getKnowledgeData(data){
-      this.editForm.knowledgeBaseIds = data
+      this.editForm.knowledgeList = data
     },
     handleMetaClose(){
       this.$refs.metaSet.clearData();
       this.metaSetVisible = false;
     },
-    showMetaSet(e){
-      this.currentKnowledgeId = e.id || e.knowledgeId;
+    showMetaSet(e,index){
+      this.currentKnowledgeId = e.knowledgeId;
+      this.knowledgeIndex = index;
       this.metaSetVisible = true;
     },
     showKnowledgeDiglog(){
-      this.$refs.knowledgeSelect.showDialog(this.editForm.knowledgeBaseIds)
+      this.$refs.knowledgeSelect.showDialog(this.editForm.knowledgeList)
     },
     handlePublishSet(){
       this.$router.push({path:`/agent/publishSet`,query:{appId:this.editForm.assistantId,appType:'agent'}})
@@ -626,7 +631,7 @@ export default {
       this.getAppDetail();
     },
     showKnowledgeSet() {
-      if(!this.editForm.knowledgeBaseIds.length) return;
+      if(!this.editForm.knowledgeList.length) return;
       this.$refs.knowledgeSetDialog.showDialog(this.editForm.knowledgeConfig);
     },
     //获取模型列表
@@ -794,7 +799,6 @@ export default {
       }
     },
     customRemove(customToolId){
-      console.log(customToolId)
       deleteCustom({assistantId:this.editForm.assistantId,customToolId}).then((res) =>{
           if (res.code === 0) {
           this.$message.success("删除成功");
@@ -826,21 +830,6 @@ export default {
       this.modelLoading = false;
     },
     async updateInfo() {
-      //知识库数据
-      // const knowledgeMap = new Map(
-      //   this.knowledgeData.map((item) => [item.knowledgeId, item])
-      // );
-      // const knowledgeData = this.editForm.knowledgeBaseIds
-      //   .map((id) => {
-      //     const found = knowledgeMap.get(id);
-      //     return found ? { id: found.knowledgeId, name: found.name } : null;
-      //   })
-      //   .filter(Boolean);
-      const knowledgeData = this.editForm.knowledgeBaseIds.map(item =>({
-        id:item.knowledgeId,
-        name:item.name
-      }))
-
       //模型数据
       const modeInfo = this.modleOptions.find(
         (item) => item.modelId === this.editForm.modelParams
@@ -860,8 +849,8 @@ export default {
             : [],
         instructions: this.editForm.instructions,
         knowledgeBaseConfig: {
-          knowledgebases: !knowledgeData.length ? [] : knowledgeData,
           config: this.editForm.knowledgeConfig,
+          knowledgeList:this.editForm.knowledgeList
         },
         modelConfig: {
           config: this.editForm.modelConfig,
@@ -898,19 +887,14 @@ export default {
     },
     async getAppDetail() {
       this.startLoading(0);
-      this.isSettingFromDetail = true; // 设置标志位，防止触发更新逻辑
+      this.isSettingFromDetail = true;
       let res = await getAgentInfo({ assistantId: this.editForm.assistantId });
       if (res.code === 0) {
         this.startLoading(100);
         let data = res.data;
         this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config.matchType === '' ? this.editForm.knowledgeConfig : res.data.knowledgeBaseConfig.config;
         this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
-        const knowledgeData = res.data.knowledgeBaseConfig.knowledgebases;
-        if (knowledgeData && knowledgeData.length > 0) {
-          // this.editForm.knowledgeBaseIds = knowledgeData.map((item) => item.id);
-          this.editForm.knowledgeBaseIds = knowledgeData;
-
-        }
+        this.editForm.knowledgeList = res.data.knowledgeBaseConfig.knowledgeList;
         this.editForm = {
           ...this.editForm,
           avatar: data.avatar || {},

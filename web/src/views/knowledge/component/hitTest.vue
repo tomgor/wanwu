@@ -101,10 +101,7 @@ export default {
   },
   methods: {
     getMetaData(data){
-      this.knowledgeIdList.push({
-        ...data,
-        knowledgeId:this.knowledgeId,
-      })
+      this.knowledgeIdList.push(data)
     },
     goBack() {
       this.$router.go(-1);
