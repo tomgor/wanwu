@@ -364,7 +364,10 @@ export default {
     intelligentEdit(row) {
       this.$router.push({
           path: "/agent/test",
-          query: { id: row.appId }
+          query: { 
+            id: row.appId,
+            ...(row.publishType !== '' && {publish:true})
+          }
       });
     },
     intelligentDelete(row) {
@@ -393,7 +396,10 @@ export default {
     txtQuesEdit(row) {
       this.$router.push({
           path: "/rag/test",
-          query: { id: row.appId }
+          query: { 
+            id: row.appId,
+            ...(row.publishType !== '' && {publish:true})
+          }
       });
     },
     txtQuesDelete(row) {

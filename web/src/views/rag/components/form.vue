@@ -1,5 +1,5 @@
 <template>
-  <div class="agent-from-content">
+  <div class="agent-from-content" :class="{ 'isDisabled': isPublish }">
     <div class="form-header">
       <div class="header-left">
         <span class="el-icon-arrow-left btn" @click="goBack"></span>
@@ -303,8 +303,16 @@ export default {
         this.apiKeyRootUrl(); //获取api跟地址
       }, 500);
     }
+        //判断是否发布
+    if (this.$route.query.publish) {
+      this.isPublish = true;
+    }
   },
   methods: {
+    handleMetaClose(){
+      this.$refs.metaSet.clearData();
+      this.metaSetVisible = false;
+    },
     getKnowledgeData(data){
       this.editForm.knowledgeBaseIds = data
     },
@@ -508,6 +516,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.isDisabled .header-right,.isDisabled .drawer-form > div{
+  user-select: none;
+  pointer-events: none !important;      
+}
 /deep/{
   .apikeyBtn{
     padding: 12px 10px;

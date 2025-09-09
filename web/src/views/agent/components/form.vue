@@ -1,5 +1,5 @@
 <template>
-  <div class="agent-from-content">
+  <div class="agent-from-content" :class="{ 'isDisabled': isPublish }">
     <div class="form-header">
       <div class="header-left">
         <span
@@ -602,6 +602,7 @@ export default {
       this.editForm.knowledgeBaseIds = data
     },
     handleMetaClose(){
+      this.$refs.metaSet.clearData();
       this.metaSetVisible = false;
     },
     showMetaSet(e){
@@ -1014,6 +1015,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.isDisabled .header-right,.isDisabled .drawer-form > div{
+  user-select: none;
+  pointer-events: none !important;      
+}
 /deep/ {
   .apikeyBtn {
     border: 1px solid #384bf7;
