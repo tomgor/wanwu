@@ -1,6 +1,23 @@
 <div align="center">
   <img src="https://github.com/user-attachments/assets/6ceb4269-a861-4545-84db-bad322592156" style="width:45%; height:auto;" />
-</div><br>
+<p>
+  <a href="#-核心功能模块">核心功能模块</a> •
+  <a href="#-典型应用场景">典型应用场景</a> •
+  <a href="#-快速开始">快速开始</a> •
+  <a href="#-使用万悟">使用万悟</a> •
+  <a href="#-q--a">Q & A</a> •
+  <a href="#-联系我们">联系我们</a> 
+</p>
+<p>
+  <img alt="License" src="https://img.shields.io/badge/license-apache2.0-blue.svg">
+  <img alt="Go Version" src="https://img.shields.io/badge/go-%3E%3D%201.24.0-blue">
+  </a>
+  <a href="https://github.com/UnicomAI/wanwu/releases">
+    <img alt="Release Notes" src="https://img.shields.io/github/v/release/UnicomAI/wanwu?label=Release&logo=github&color=green">
+  </a>
+</p>
+  
+</div>
 
 
 &emsp;&emsp;**元景万悟智能体平台**是一款面向**企业级**场景的**一站式**、**商用license友好**的**智能体开发平台**，致力于为企业提供安全、高效、合规的一站式AI解决方案。我们以"技术开放、生态共建"为核心理念，通过整合大语言模型、业务流程自动化等前沿技术，构建了覆盖模型全生命周期管理、MCP、联网检索、智能体快速开发、企业知识库建设、复杂工作流编排等完整功能体系的AI工程化平台。平台采用模块化架构设计，支持灵活的功能扩展和二次开发，在确保企业数据安全和隐私保护的同时，大幅降低了AI技术的应用门槛。无论是中小型企业快速构建智能化应用，还是大型企业实现复杂业务场景的智能化改造，元景万悟智能体平台都能提供强有力的技术支撑，助力企业加速数字化转型进程，实现降本增效和业务创新。
