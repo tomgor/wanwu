@@ -1,14 +1,4 @@
 import service from "@/utils/request";
-
-//获取文档知识分类
-// export const getDocList = (data) => {
-//     return service({
-//         url: `/konwledgeServe/v1/ux/doccategory/list`,
-//         method: "get",
-//         data: data,
-//     });
-// };
-
 //新增文档知识分类
 export const createDoc = (data) => {
     return service({
@@ -185,6 +175,13 @@ export const getKnowledgeList = (data)=>{
         url: `${BASE_URL}/knowledge/select`,
         method: 'post',
         data
+    })
+};
+export const getKnowledgeItem = (params)=>{
+    return service({
+        url: `${BASE_URL}/knowledge`,
+        method: 'get',
+        params
     })
 };
 export const delKnowledgeItem = (data)=>{

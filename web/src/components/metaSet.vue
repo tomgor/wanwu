@@ -2,12 +2,12 @@
     <div class="metaSet">
         <div class="tool-typ">
             <el-button icon="el-icon-plus" type="primary" @click="addMataItem" size="small">新增条件</el-button>
-            <el-switch v-model="isEnable" active-color="#384BF7"></el-switch>
+            <el-switch v-model="metaDataFilterParams.filterEnable" active-color="#384BF7"></el-switch>
         </div>
         <div class="docMetaData">
-            <div :class="['docMetaBox',docMetaData.length > 1 ? 'docMetaContainer':'']">
+            <div :class="['docMetaBox',metaDataFilterParams.metaFilterParams.length > 1 ? 'docMetaContainer':'']">
                 <div
-                    v-for="(item,index) in docMetaData"
+                    v-for="(item,index) in metaDataFilterParams.metaFilterParams"
                     class="docItem"
                 >
                     <div class="docItem_data">
@@ -15,15 +15,15 @@
                             <span>Key:</span>
                         </span>
                         <el-select
-                            v-model="item.metaValueKey"
+                            v-model="item.key"
                             placeholder="请选择"
                             @change="keyChange($event,item)"
                         >
                             <el-option
                             v-for="item in keyOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
+                            :key="item.key"
+                            :label="item.key"
+                            :value="item.key"
                             >
                             </el-option>
                         </el-select>
@@ -31,18 +31,18 @@
                     <el-divider direction="vertical"></el-divider>
                     <div class="docItem_data">
                         <span class="docItem_data_label">type:</span>
-                        <span style="min-width:80px;">{{item.metaValueType}}</span>
+                        <span style="min-width:80px;">{{item.type}}</span>
                     </div>
                     <el-divider direction="vertical"></el-divider>
                     <div class="docItem_data">
                         <span class="docItem_data_label">条件:</span>
                         <el-select
-                            v-model="item.metaValueCondition"
+                            v-model="item.condition"
                             placeholder="请选择"
                             style="width:100px;"
                         >
                             <el-option
-                            v-for="item in conditionOptions[item.metaValueType]"
+                            v-for="item in conditionOptions[item.type]"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
@@ -56,21 +56,21 @@
                         <span v-if="!item.showEdit" style="min-width:120px;">{{item.metaValue}}</span>
                         <div v-else style="min-width:120px;">
                             <el-input
-                                v-model="item.metaValue"
-                                v-if="item.metaValueType === 'string'"
+                                v-model="item.value"
+                                v-if="item.type === 'string'"
                                 @blur="metaValueBlur(item)"
                                 placeholder="string"
                             ></el-input>
                             <el-input
-                                v-model="item.metaValue"
-                                v-if="item.metaValueType === 'number'"
+                                v-model="item.value"
+                                v-if="item.type === 'number'"
                                 @blur="metaValueBlur(item)"
                                 type="number"
                                 placeholder="number"
                             ></el-input>
                             <el-date-picker
-                                v-if="item.metaValueType === 'time'"
-                                v-model="item.metaValue"
+                                v-if="item.type === 'time'"
+                                v-model="item.value"
                                 align="right"
                                 format="yyyy-MM-dd HH:mm:ss"
                                 value-format="timestamp"
@@ -83,7 +83,7 @@
                     <el-divider direction="vertical"></el-divider>
                     <div class="docItem_data docItem_data_btn">
                         <span 
-                            class="el-icon-edit-outline"
+                            class="el-icon-edit-outline setBtn"
                             @click="editMataItem(item)"
                             ></span>
                         <span
@@ -93,8 +93,8 @@
                     </div>
                 </div>
                 <el-select
-                    v-if="docMetaData.length > 1"
-                    v-model="conditionsKey"
+                    v-if="metaDataFilterParams.metaFilterParams.length > 1"
+                    v-model="metaDataFilterParams.filterLogicType"
                     class="orAnd"
                     placeholder="条件"
                 >
@@ -111,23 +111,33 @@
     </div>
 </template>
 <script>
+import {getKnowledgeItem} from "@/api/knowledge"
 export default {
+    props:{
+        knowledgeId:{
+            type:String,
+            required: true,
+            default:''
+        }
+    },
     data(){
         return {
-            isEnable:false,
-            docMetaData:[],
+            metaDataFilterParams:{
+                filterEnable:false,
+                filterLogicType:'',
+                metaFilterParams:[]
+            },
             keyOptions:[],
             conditions:[
                 {
-                    value:'且',
+                    value:'and',
                     label:'且'
                 },
                 {
-                    value:'或',
+                    value:'or',
                     label:'或'
                 }
             ],
-            conditionsKey:'',
             conditionOptions:{
                 time:[
                         {
@@ -231,10 +241,11 @@ export default {
         }
     },
     watch:{
-       docMetaData:{
+       'metaDataFilterParams':{
          handler: function (val) {
             if(val){
-                this.$emit('getMetaData',val)
+                const data = {metaDataFilterParams:val}
+                this.$emit('getMetaData',data)
             }
          },
          immediate: true,
@@ -242,8 +253,16 @@ export default {
        }
     },
     created(){
+        this.getList()
     },
     methods:{
+        getList(){
+            getKnowledgeItem({knowledgeId:this.knowledgeId}).then(res =>{
+                if(res.code === 0){
+                    this.keyOptions = res.data.knowledgeMetaDataList || []
+                }
+            }).catch(() =>{})
+        },
         isEmpty(value){
             if (value === null || value === undefined || value === '') return true;
             return false;
@@ -257,31 +276,35 @@ export default {
             item.showEdit = true
         },
         addMataItem(){
-            // if(this.docMetaData.length > 0){
-            //      if(!this.validateRequiredFields(this.docMetaData)){
-            //         this.$message.warning('存在未填信息去,请补充')
-            //         return
-            //      }
-            // }
-            this.docMetaData.push({
-                metaValueKey:'',
-                metaValueType:'',
-                metaValueCondition:'',
-                metaValue:'',
+            if(this.metaDataFilterParams.filterEnable === false){
+                this.$message.warning('请开启元数据配置后再进行添加')
+                return;
+            }
+            if(this.metaDataFilterParams.metaFilterParams.length > 0){
+                 if(!this.validateRequiredFields(this.metaDataFilterParams.metaFilterParams)){
+                    this.$message.warning('存在未填信息去,请补充')
+                    return
+                 }
+            }
+            this.metaDataFilterParams.metaFilterParams.push({
+                key:'',
+                type:'',
+                condition:'',
+                value:'',
                 showEdit:false
             })
         },
         clearData(){
-            this.docMetaData = [];
-            this.conditionsKey = '';
+            this.metaDataFilterParams.metaFilterParams = [];
+            this.metaDataFilterParams.filterLogicType = '';
         },
         keyChange(e,item){
-           item.metaValueType = e.metaValueType;
+           item.key = e.type;
         },
         delMataItem(index){
-            this.docMetaData.splice(index,1)
-            if(this.docMetaData.length === 0){
-                this.conditionsKey = '';
+            this.metaDataFilterParams.metaFilterParams.splice(index,1)
+            if(this.metaDataFilterParams.metaFilterParams.length === 0){
+                this.metaDataFilterParams.filterLogicType = '';
             }
         }
     }

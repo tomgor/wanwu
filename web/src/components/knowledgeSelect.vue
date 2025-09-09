@@ -16,7 +16,7 @@
                 >
                     <span>{{ item.name }}</span>
                     <el-button type="text" @click="openTool($event,item)" v-if="!item.checked">添加</el-button>
-                    <el-button type="text" v-else style="color:#ccc;">已添加</el-button>
+                    <el-button type="text" v-else  @click="openTool($event,item)">已添加</el-button>
                 </div>
             </div>
             <span slot="footer" class="dialog-footer">
@@ -47,7 +47,7 @@ export default {
                 if (res.code === 0) {
                 this.knowledgeData = (res.data.knowledgeList || []).map(m => ({
                     ...m,
-                    checked:this.knowledgeList.some(item => item.id === m.knowledgeId)
+                    checked:this.knowledgeList.some(item => item.id === m.knowledgeId || item.knowledgeId === m.knowledgeId)
                 }));
                 }
             }).catch(() =>{});
@@ -67,9 +67,8 @@ export default {
         setKnowledge(data){
            this.knowledgeData = this.knowledgeData.map(m => ({
             ...m,
-            checked: data.some(item => item.id === m.knowledgeId)
+            checked: data.some(item => item.id === m.knowledgeId || item.knowledgeId === m.knowledgeId)
             }));
-            
         },
         handleClose(){
             this.dialogVisible = false;

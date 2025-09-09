@@ -96,7 +96,7 @@
                        </div>
                         <div class="bt">
                           <el-tooltip class="item" effect="dark" content="元数据过滤" placement="top-start">
-                            <span class="el-icon-setting del" @click="showMetaSet"></span>
+                            <span class="el-icon-setting del" @click="showMetaSet(n)"></span>
                           </el-tooltip>
                       </div>
                     </div>
@@ -146,7 +146,7 @@
     <ApiKeyDialog ref="apiKeyDialog" :appId="editForm.appId" :appType="'rag'" />
     <setSafety ref="setSafety" @sendSafety="sendSafety" />
     <!-- 知识库选择 -->
-    <knowledgeSelect ref="knowledgeSelect" />
+    <knowledgeSelect ref="knowledgeSelect" @getKnowledgeData="getKnowledgeData" />
     <!-- 元数据设置 -->
     <el-dialog
       :visible.sync="metaSetVisible"
@@ -159,7 +159,7 @@
           <span>[ 通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]</span>
          </div>
       </template>
-      <metaSet ref="metaSet" @getMetaData="getMetaData"/>
+      <metaSet ref="metaSet" @getMetaData="getMetaData" :knowledgeId="currentKnowledgeId"/>
       <span slot="footer" class="dialog-footer">
         <el-button @click="metaSetVisible = false">取 消</el-button>
         <el-button type="primary" @click="metaSetVisible = false">确 定</el-button>
@@ -198,6 +198,7 @@ export default {
   },
   data() {
     return {
+      currentKnowledgeId:'',
       metaData:[],
       metaSetVisible:false,
       rerankOptions:[],
@@ -304,10 +305,14 @@ export default {
     }
   },
   methods: {
+    getKnowledgeData(data){
+      this.editForm.knowledgeBaseIds = data
+    },
     getMetaData(data){
       this.metaData = data;
     },
-    showMetaSet(){
+    showMetaSet(e){
+      this.currentKnowledgeId = e.id || e.knowledgeId;
       this.metaSetVisible = true;
     },
     showKnowledgeDiglog(){
@@ -759,6 +764,9 @@ export default {
       cursor:pointer;
       font-size: 16px;
       padding-right:10px;
+    }
+    .common-add{
+      cursor: pointer;
     }
     .operation:hover{
       color:#384BF7;

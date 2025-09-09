@@ -30,7 +30,7 @@
         </div>
          <div class="hitTest_input meta_box">
           <h3>元数据过滤配置</h3>
-          <metaSet ref="metaSet" @getMetaData="getMetaData" class="metaSet"/>
+          <metaSet ref="metaSet" @getMetaData="getMetaData" class="metaSet" :knowledgeId="knowledgeId" />
         </div>
         <div class="test_form">
           <searchConfig ref="searchConfig" @sendConfigInfo="sendConfigInfo" />
@@ -92,16 +92,19 @@ export default {
       md: md,
       question: "",
       resultLoading: false,
-      knowledgeIdList:[this.$route.query.knowledgeId],
+      knowledgeIdList:[],
       searchList: [],
       score: [],
       formInline:null,
-      metaData:[]
+      knowledgeId:this.$route.query.knowledgeId
     };
   },
   methods: {
     getMetaData(data){
-      this.metaData = data;
+      this.knowledgeIdList.push({
+        ...data,
+        knowledgeId:this.knowledgeId,
+      })
     },
     goBack() {
       this.$router.go(-1);

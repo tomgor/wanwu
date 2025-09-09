@@ -202,7 +202,7 @@
                        </div>
                         <div class="bt">
                           <el-tooltip class="item" effect="dark" content="元数据过滤" placement="top-start">
-                            <span class="el-icon-setting del" @click="showMetaSet"></span>
+                            <span class="el-icon-setting del" @click="showMetaSet(n)"></span>
                           </el-tooltip>
                       </div>
                     </div>
@@ -355,7 +355,7 @@
     <!-- 知识库召回参数配置 -->
     <knowledgeSetDialog ref="knowledgeSetDialog" @setKnowledgeSet="setKnowledgeSet" />
     <!-- 知识库选择 -->
-    <knowledgeSelect ref="knowledgeSelect" />
+    <knowledgeSelect ref="knowledgeSelect" @getKnowledgeData="getKnowledgeData"/>
     <!-- 元数据设置 -->
     <el-dialog
       :visible.sync="metaSetVisible"
@@ -368,7 +368,7 @@
           <span>[ 通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]</span>
          </div>
       </template>
-      <metaSet ref="metaSet" @getMetaData="getMetaData"/>
+      <metaSet ref="metaSet" @getMetaData="getMetaData" :knowledgeId="currentKnowledgeId" />
       <span slot="footer" class="dialog-footer">
         <el-button @click="metaSetVisible = false">取 消</el-button>
         <el-button type="primary" @click="metaSetVisible = false">确 定</el-button>
@@ -466,6 +466,7 @@ export default {
   },
   data() {
     return {
+      currentKnowledgeId:'',
       metaData:[],
       metaSetVisible:false,
       knowledgeCheckData:[],
@@ -597,10 +598,14 @@ export default {
     getMetaData(data){
       this.metaData = data;
     },
+    getKnowledgeData(data){
+      this.editForm.knowledgeBaseIds = data
+    },
     handleMetaClose(){
       this.metaSetVisible = false;
     },
-    showMetaSet(){
+    showMetaSet(e){
+      this.currentKnowledgeId = e.id || e.knowledgeId;
       this.metaSetVisible = true;
     },
     showKnowledgeDiglog(){
