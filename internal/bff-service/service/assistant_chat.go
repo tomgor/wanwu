@@ -110,7 +110,7 @@ func CallAssistantConversationStream(ctx *gin.Context, userId, orgId string, req
 func buildAgentChatRespLineProcessor() func(*gin.Context, string, interface{}) (string, bool, error) {
 	return func(c *gin.Context, lineText string, params interface{}) (string, bool, error) {
 		if strings.HasPrefix(lineText, "error:") {
-			errorText := fmt.Sprintf("data: {\"code\": \"-1\", \"message\": \"%s\"}\n\n", strings.TrimPrefix(lineText, "error:"))
+			errorText := fmt.Sprintf("data: {\"code\": -1, \"message\": \"%s\"}\n\n", strings.TrimPrefix(lineText, "error:"))
 			return errorText, false, nil
 		}
 		if strings.HasPrefix(lineText, "data:") {
