@@ -1,5 +1,5 @@
 <template>
-  <div class="agent-from-content">
+  <div class="agent-from-content" :class="{ 'isDisabled': isPublish }">
     <div class="form-header">
       <div class="header-left">
         <span class="el-icon-arrow-left btn" @click="goBack"></span>
@@ -80,22 +80,28 @@
                 <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
                 关联知识库
               </span>
+              <span>
+                <span class="common-add" @click="showKnowledgeDiglog">
+                  <span class="el-icon-plus"></span>
+                  <span class="handleBtn">添加</span>
+                </span>
+              </span>
             </p>
-            <div class="rl">
-              <el-select 
-              v-model="editForm.knowledgeBaseIds" 
-              placeholder="可输入知识库名称搜索" 
-              class="model-select" 
-              clearable 
-              filterable
-              multiple>
-                <el-option
-                  v-for="item in knowledgeData"
-                  :key="item.knowledgeId"
-                  :label="item.name"
-                  :value="item.knowledgeId">
-                </el-option>
-              </el-select>
+            <div class="rl knowledge-conent">
+              <div class="tool-right tool">
+                  <div class="action-list">
+                    <div v-for="(n,i) in editForm.knowledgeBaseIds" class="action-item" :key="'knowledge'+ i">
+                       <div class="name" style="color: #333">
+                        <span>{{n.name}}</span>
+                       </div>
+                        <div class="bt">
+                          <el-tooltip class="item" effect="dark" content="元数据过滤" placement="top-start">
+                            <span class="el-icon-setting del" @click="showMetaSet(n)"></span>
+                          </el-tooltip>
+                      </div>
+                    </div>
+                  </div>
+              </div>
             </div>
           </div>
         </div>
@@ -139,6 +145,26 @@
     <!-- apikey -->
     <ApiKeyDialog ref="apiKeyDialog" :appId="editForm.appId" :appType="'rag'" />
     <setSafety ref="setSafety" @sendSafety="sendSafety" />
+    <!-- 知识库选择 -->
+    <knowledgeSelect ref="knowledgeSelect" @getKnowledgeData="getKnowledgeData" />
+    <!-- 元数据设置 -->
+    <el-dialog
+      :visible.sync="metaSetVisible"
+      width="1050px"
+      class="metaSetVisible"
+      :before-close="handleMetaClose">
+      <template #title>
+         <div class="metaHeader">
+          <h3>配置元数据过滤</h3>
+          <span>[ 通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]</span>
+         </div>
+      </template>
+      <metaSet ref="metaSet" @getMetaData="getMetaData" :knowledgeId="currentKnowledgeId"/>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="metaSetVisible = false">取 消</el-button>
+        <el-button type="primary" @click="metaSetVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -147,6 +173,7 @@ import {getApiKeyRoot,appPublish} from "@/api/appspace";
 import { getKnowledgeList } from "@/api/knowledge";
 import CreateTxtQues from "@/components/createApp/createRag.vue"
 import ModelSet from "./modelSetDialog.vue";
+import metaSet from "@/components/metaSet";
 import knowledgeSet from "./knowledgeSetDialog.vue"
 import ApiKeyDialog from "./ApiKeyDialog";
 import setSafety from "@/components/setSafety";
@@ -155,6 +182,7 @@ import { getRagInfo,updateRagConfig } from "@/api/rag";
 import Chat from "./chat";
 import searchConfig from '@/components/searchConfig.vue';
 import LinkIcon from "@/components/linkIcon.vue";
+import knowledgeSelect from "@/components/knowledgeSelect.vue"
 export default {
   components: {
     LinkIcon,
@@ -164,10 +192,15 @@ export default {
     knowledgeSet,
     ApiKeyDialog,
     setSafety,
-    searchConfig
+    searchConfig,
+    knowledgeSelect,
+    metaSet
   },
   data() {
     return {
+      currentKnowledgeId:'',
+      metaData:[],
+      metaSetVisible:false,
       rerankOptions:[],
       showOperation:false,
       scope:'public',
@@ -270,8 +303,29 @@ export default {
         this.apiKeyRootUrl(); //获取api跟地址
       }, 500);
     }
+        //判断是否发布
+    if (this.$route.query.publish) {
+      this.isPublish = true;
+    }
   },
   methods: {
+    handleMetaClose(){
+      this.$refs.metaSet.clearData();
+      this.metaSetVisible = false;
+    },
+    getKnowledgeData(data){
+      this.editForm.knowledgeBaseIds = data
+    },
+    getMetaData(data){
+      this.metaData = data;
+    },
+    showMetaSet(e){
+      this.currentKnowledgeId = e.id || e.knowledgeId;
+      this.metaSetVisible = true;
+    },
+    showKnowledgeDiglog(){
+      this.$refs.knowledgeSelect.showDialog(this.editForm.knowledgeBaseIds)
+    },
     sendConfigInfo(data){
       this.editForm.knowledgeConfig = { ...data.knowledgeMatchParams };
     },
@@ -302,7 +356,8 @@ export default {
             this.editForm.rerankParams = res.data.rerankConfig.modelId;
             const knowledgeData = res.data.knowledgeBaseConfig.knowledgebases;
             if(knowledgeData && knowledgeData.length > 0){
-              this.editForm.knowledgeBaseIds = knowledgeData.map(item => item.id);
+              // this.editForm.knowledgeBaseIds = knowledgeData.map(item => item.id);
+              this.editForm.knowledgeBaseIds = knowledgeData;
             }
             this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;//需要后端修改
             this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
@@ -409,11 +464,15 @@ export default {
       this.isUpdating = true;
       try {
         //知识库数据
-        const knowledgeMap = new Map(this.knowledgeData.map(item => [item.knowledgeId, item]));
-        const knowledgeData = this.editForm.knowledgeBaseIds.map(id => {
-          const found = knowledgeMap.get(id);
-          return found ? { id: found.knowledgeId, name: found.name } : null;
-        }).filter(Boolean);
+        // const knowledgeMap = new Map(this.knowledgeData.map(item => [item.knowledgeId, item]));
+        // const knowledgeData = this.editForm.knowledgeBaseIds.map(id => {
+        //   const found = knowledgeMap.get(id);
+        //   return found ? { id: found.knowledgeId, name: found.name } : null;
+        // }).filter(Boolean);
+        const knowledgeData = this.editForm.knowledgeBaseIds.map(item =>({
+          id:item.knowledgeId,
+          name:item.name
+        }))
         //模型数据
         const modeInfo = this.modleOptions.find(item => item.modelId === this.editForm.modelParams)
         const rerankInfo = this.rerankOptions.find(item => item.modelId === this.editForm.knowledgeConfig.rerankModelId)
@@ -457,6 +516,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.isDisabled .header-right,.isDisabled .drawer-form > div{
+  user-select: none;
+  pointer-events: none !important;      
+}
 /deep/{
   .apikeyBtn{
     padding: 12px 10px;
@@ -468,7 +531,31 @@ export default {
       height:14px;
     }
   }
+  .metaSetVisible{
+    .el-dialog__header{
+      border-bottom:1px solid #dbdbdb;
+    }
+    .el-dialog__body{
+      max-height:400px;
+      overflow-y: auto;
+    }
+  }
 }
+
+.metaHeader{
+  display:flex;
+  justify-content: flex-start;
+  h3{
+    font-size:18px;
+  }
+  span{
+    margin-left:10px;
+    color:#666;
+    display:inline-block;
+    padding-top:5px;
+  }
+}
+
 .question {
   cursor: pointer;
   color: #999;
@@ -666,6 +753,21 @@ export default {
         max-height:300px;
       }
     }
+    .knowledge-conent{
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      .tool {
+        width: 100%;
+        max-height: 300px;
+        .action-list {
+          width: 100%;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        }
+      }
+    }
     .model-select{
       width:100%;
     }
@@ -674,6 +776,9 @@ export default {
       cursor:pointer;
       font-size: 16px;
       padding-right:10px;
+    }
+    .common-add{
+      cursor: pointer;
     }
     .operation:hover{
       color:#384BF7;
@@ -851,24 +956,37 @@ export default {
 }
 .action-list {
   margin: 10px 0 15px 0;
-  border: 1px solid #ddd;
+  width: 100%;
   .action-item {
     display: flex;
     justify-content: space-between;
-    border-top: 1px solid #ddd;
-    margin-top: -1px;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 5px;
+    width: 100%;
     .name {
-      border-right: 1px solid #ddd;
-      flex: 4;
+      width: 60%;
+      box-sizing: border-box;
       padding: 10px 20px;
       cursor: pointer;
       color: #2c7eea;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .bt {
       text-align: center;
-      flex: 1;
+      width: 40%;
+      display: flex;
+      justify-content: flex-end;
+      padding-right: 10px;
+      box-sizing: border-box;
       cursor: pointer;
-      padding: 10px 20px;
+      .del {
+        color: #384bf7;
+        font-size: 16px;
+      }
     }
   }
 }
