@@ -23,6 +23,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/assistant-service/config"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/pkg/util"
 	"github.com/UnicomAI/wanwu/pkg/es"
+	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
@@ -219,8 +220,8 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	assistantConfig := config.Cfg().Assistant
 	if assistantConfig.SseUrl == "" {
 		log.Errorf("Assistant服务SSE URL配置为空，assistantId: %s", req.AssistantId)
-		SSEError(stream, "智能体配置错误")
-		return fmt.Errorf("智能体配置错误")
+		SSEError(stream, "智能体SSE URL配置错误")
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "SSE URL配置错误")
 	}
 
 	// 组装智能体能力接口请求体
@@ -243,31 +244,31 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	modelConfig, err := s.setModelConfigParams(sseReq, assistant)
 	if err != nil {
 		SSEError(stream, "智能体模型配置解析失败")
-		return err
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "模型配置解析失败")
 	}
 
 	// 知识库参数配置
 	if err := s.setKnowledgebaseParams(ctx, sseReq, req, assistant, modelConfig); err != nil {
 		SSEError(stream, "智能体知识库配置解析失败")
-		return err
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "知识库配置解析失败")
 	}
 
 	// plugin参数配置
 	if err := s.setCustomAndWorkflowParams(ctx, sseReq, req.AssistantId); err != nil {
 		SSEError(stream, "智能体plugin配置错误")
-		return err
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "plugin配置错误")
 	}
 
 	// 在线搜索参数配置
 	if err := s.setOnlineSearchParams(sseReq, assistant); err != nil {
 		SSEError(stream, "智能体在线搜索配置解析失败")
-		return err
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "在线搜索配置解析失败")
 	}
 
 	// MCP 信息参数配置
 	if err := s.setMCPParams(ctx, sseReq, assistant); err != nil {
 		SSEError(stream, "智能体MCP配置解析失败")
-		return err
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "MCP配置解析失败")
 	}
 
 	// 历史聊天记录配置
@@ -281,12 +282,12 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	if err != nil {
 		log.Errorf("Assistant服务序列化请求体失败，assistantId: %s, error: %v", req.AssistantId, err)
 		SSEError(stream, "请求参数错误")
-		return err
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "请求参数错误")
 	}
 	if err := json.Unmarshal(reqBytes, &requestBody); err != nil {
 		log.Errorf("Assistant服务反序列化请求体到map失败，assistantId: %s, error: %v", req.AssistantId, err)
 		SSEError(stream, "请求参数错误")
-		return err
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "请求参数错误")
 	}
 
 	// 合并动态模型参数
@@ -298,7 +299,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	if err != nil {
 		log.Errorf("Assistant服务序列化最终请求体失败，assistantId: %s, error: %v", req.AssistantId, err)
 		SSEError(stream, "请求参数错误")
-		return err
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "请求参数错误")
 	}
 
 	timeout := 300 * time.Second
@@ -314,7 +315,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	if err != nil {
 		log.Errorf("Assistant服务调用智能体能力接口失败，assistantId: %s, uuid: %s, error: %v", req.AssistantId, id, err)
 		SSEError(stream, "智能体服务异常")
-		return err
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "智能体服务异常")
 	}
 	defer sseResp.Body.Close()
 	log.Infof("Assistant服务成功连接智能体能力接口，uuid: %s, assistantId: %s, statusCode: %d, time: %v毫秒", id, req.AssistantId, sseResp.StatusCode, time.Since(startTime).Milliseconds())
@@ -323,7 +324,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	if sseResp.StatusCode > http.StatusBadRequest {
 		log.Errorf("Assistant服务智能体能力接口返回错误状态码，assistantId: %s, statusCode: %d", req.AssistantId, sseResp.StatusCode)
 		SSEError(stream, "智能体服务异常")
-		return fmt.Errorf("智能体服务返回错误状态码: %d", sseResp.StatusCode)
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "智能体服务异常")
 	}
 
 	// 读取智能体接口返回，并写入流式响应
@@ -358,7 +359,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 				}
 				SSEError(stream, "本次回答已中断")
 			}
-			return err
+			return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "智能体服务异常")
 		}
 
 		strLine := string(line)
@@ -392,7 +393,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 				Content: jsonStrData,
 			}); err != nil {
 				log.Errorf("Assistant服务发送流式响应失败，assistantId: %s, error: %v", req.AssistantId, err)
-				return err
+				return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "智能体服务异常")
 			}
 
 			// 标记已读取到并返回了第一条有效消息
