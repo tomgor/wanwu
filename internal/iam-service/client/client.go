@@ -67,12 +67,17 @@ type IClient interface {
 	CheckUserOK(ctx context.Context, userID uint32, genTokenAt int64) (bool, string, *errs.Status)
 	CheckUserPerm(ctx context.Context, userID uint32, genTokenAt int64, orgID uint32, oneOfPerms []perm.Perm) (bool, bool, string, *errs.Status)
 
-	// --- login ---
-
-	Login(ctx context.Context, name, password, language string) (*orm.UserInfo, *orm.Permission, *errs.Status)
-
 	// --- captcha ---
 
 	RefreshCaptcha(ctx context.Context, key, code string) *errs.Status
 	CheckCaptcha(ctx context.Context, key, code string) *errs.Status
+
+	// --- login ---
+
+	Login(ctx context.Context, username, password, language string) (*orm.UserInfo, *orm.Permission, *errs.Status)
+
+	// --- register ---
+
+	RegisterSendEmailCode(ctx context.Context, email string) *errs.Status
+	RegisterByEmail(ctx context.Context, username, email, code string) *errs.Status
 }

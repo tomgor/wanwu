@@ -101,3 +101,15 @@ func LikeName(name string) SQLOption {
 		return db
 	})
 }
+
+func WithEmail(email string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("email = ?", email)
+	})
+}
+
+func WithPhone(phone string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("phone = ?", phone)
+	})
+}

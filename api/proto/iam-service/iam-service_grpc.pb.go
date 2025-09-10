@@ -50,6 +50,8 @@ const (
 	IAMService_ChangeRoleStatus_FullMethodName       = "/iam_service.IAMService/ChangeRoleStatus"
 	IAMService_GetCaptcha_FullMethodName             = "/iam_service.IAMService/GetCaptcha"
 	IAMService_Login_FullMethodName                  = "/iam_service.IAMService/Login"
+	IAMService_RegisterByEmail_FullMethodName        = "/iam_service.IAMService/RegisterByEmail"
+	IAMService_RegisterSendEmailCode_FullMethodName  = "/iam_service.IAMService/RegisterSendEmailCode"
 )
 
 // IAMServiceClient is the client API for IAMService service.
@@ -116,6 +118,11 @@ type IAMServiceClient interface {
 	GetCaptcha(ctx context.Context, in *GetCaptchaReq, opts ...grpc.CallOption) (*GetCaptchaResp, error)
 	// 登录
 	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
+	// --- register ---
+	// 邮箱注册用户
+	RegisterByEmail(ctx context.Context, in *RegisterByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 邮箱注册发送邮件
+	RegisterSendEmailCode(ctx context.Context, in *RegisterSendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type iAMServiceClient struct {
@@ -426,6 +433,26 @@ func (c *iAMServiceClient) Login(ctx context.Context, in *LoginReq, opts ...grpc
 	return out, nil
 }
 
+func (c *iAMServiceClient) RegisterByEmail(ctx context.Context, in *RegisterByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, IAMService_RegisterByEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) RegisterSendEmailCode(ctx context.Context, in *RegisterSendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, IAMService_RegisterSendEmailCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IAMServiceServer is the server API for IAMService service.
 // All implementations must embed UnimplementedIAMServiceServer
 // for forward compatibility.
@@ -490,6 +517,11 @@ type IAMServiceServer interface {
 	GetCaptcha(context.Context, *GetCaptchaReq) (*GetCaptchaResp, error)
 	// 登录
 	Login(context.Context, *LoginReq) (*LoginResp, error)
+	// --- register ---
+	// 邮箱注册用户
+	RegisterByEmail(context.Context, *RegisterByEmailReq) (*emptypb.Empty, error)
+	// 邮箱注册发送邮件
+	RegisterSendEmailCode(context.Context, *RegisterSendEmailCodeReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedIAMServiceServer()
 }
 
@@ -589,6 +621,12 @@ func (UnimplementedIAMServiceServer) GetCaptcha(context.Context, *GetCaptchaReq)
 }
 func (UnimplementedIAMServiceServer) Login(context.Context, *LoginReq) (*LoginResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedIAMServiceServer) RegisterByEmail(context.Context, *RegisterByEmailReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterByEmail not implemented")
+}
+func (UnimplementedIAMServiceServer) RegisterSendEmailCode(context.Context, *RegisterSendEmailCodeReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterSendEmailCode not implemented")
 }
 func (UnimplementedIAMServiceServer) mustEmbedUnimplementedIAMServiceServer() {}
 func (UnimplementedIAMServiceServer) testEmbeddedByValue()                    {}
@@ -1151,6 +1189,42 @@ func _IAMService_Login_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IAMService_RegisterByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterByEmailReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).RegisterByEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_RegisterByEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).RegisterByEmail(ctx, req.(*RegisterByEmailReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_RegisterSendEmailCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterSendEmailCodeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).RegisterSendEmailCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_RegisterSendEmailCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).RegisterSendEmailCode(ctx, req.(*RegisterSendEmailCodeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // IAMService_ServiceDesc is the grpc.ServiceDesc for IAMService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1277,6 +1351,14 @@ var IAMService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _IAMService_Login_Handler,
+		},
+		{
+			MethodName: "RegisterByEmail",
+			Handler:    _IAMService_RegisterByEmail_Handler,
+		},
+		{
+			MethodName: "RegisterSendEmailCode",
+			Handler:    _IAMService_RegisterSendEmailCode_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

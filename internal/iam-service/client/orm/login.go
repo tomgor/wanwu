@@ -11,18 +11,25 @@ import (
 	"gorm.io/gorm"
 )
 
-func (c *Client) Login(ctx context.Context, name, password, language string) (*UserInfo, *Permission, *errs.Status) {
+func (c *Client) Login(ctx context.Context, username, password, language string) (*UserInfo, *Permission, *errs.Status) {
 	var userInfo *UserInfo
 	var permission *Permission
 
 	return userInfo, permission, c.transaction(ctx, func(tx *gorm.DB) *errs.Status {
 		// user
 		user := &model.User{}
-		if err := sqlopt.WithName(name).Apply(tx).First(user).Error; err != nil {
-			if err == gorm.ErrRecordNotFound {
-				return toErrStatus("iam_login_invalid_name_pwd")
+		if err := sqlopt.WithName(username).Apply(tx).First(user).Error; err != nil {
+			if err != gorm.ErrRecordNotFound {
+				return toErrStatus("iam_login_err", err.Error())
 			}
-			return toErrStatus("iam_login_err", err.Error())
+			// user by email
+			if err := sqlopt.WithEmail(username).Apply(tx).First(user).Error; err != nil {
+				if err != gorm.ErrRecordNotFound {
+					return toErrStatus("iam_login_err", err.Error())
+				} else {
+					return toErrStatus("iam_login_invalid_name_pwd")
+				}
+			}
 		}
 		if user.Password != util.SHA256(password) {
 			return toErrStatus("iam_login_invalid_name_pwd")
