@@ -618,7 +618,7 @@ export default {
       this.$refs.knowledgeSelect.showDialog(this.editForm.knowledgeList)
     },
     handlePublishSet(){
-      this.$router.push({path:`/agent/publishSet`,query:{appId:this.editForm.assistantId,appType:'agent'}})
+      this.$router.push({path:`/agent/publishSet`,query:{appId:this.editForm.assistantId,appType:'agent',name:this.editForm.name}})
     },
     setKnowledgeSet(data){
       this.editForm.knowledgeConfig = data;

@@ -260,6 +260,9 @@ export default {
             if(!this.setType){
               delete this.formInline.knowledgeMatchParams.maxHistory;
             }
+            if(this.formInline.knowledgeMatchParams.priorityMatch === 1){
+              this.formInline.knowledgeMatchParams.rerankModelId = '';
+            }
             this.$emit('sendConfigInfo', this.formInline);
           }
         }, 200);
@@ -312,9 +315,9 @@ export default {
       item.mixTypeValue = n.value;
       const { knowledgeMatchParams } = this.formInline;
       knowledgeMatchParams.priorityMatch = n.value === "weight" ? 1 : 0;
-      if(n.value === 'weight'){
-        knowledgeMatchParams.rerankModelId = '';
-      }
+      // if(n.value === 'weight'){
+      //   knowledgeMatchParams.rerankModelId = '';
+      // }
     },
     showRerank(n) {
       return (

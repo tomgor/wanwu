@@ -13,7 +13,7 @@
       >
         <div class="docItem_data">
           <span class="docItem_data_label">
-            <span>Key:</span>
+            <span class="label">Key:</span>
             <el-tooltip
               class="item"
               effect="dark"
@@ -30,7 +30,7 @@
         </div>
         <el-divider direction="vertical"></el-divider>
         <div class="docItem_data">
-          <span class="docItem_data_label">type:</span>
+          <span class="docItem_data_label label">type:</span>
           <el-select
             v-model="item.metaValueType"
             placeholder="请选择"
@@ -45,9 +45,9 @@
             </el-option>
           </el-select>
         </div>
-        <el-divider direction="vertical"></el-divider>
-        <div class="docItem_data">
-          <span class="docItem_data_label">value:</span>
+        <el-divider direction="vertical" v-if="type !== 'create'"></el-divider>
+        <div class="docItem_data" v-if="type !== 'create'">
+          <span class="docItem_data_label label">value:</span>
           <el-select
             v-model="item.metadataType"
             placeholder="请选择"
@@ -95,6 +95,11 @@
         <el-divider direction="vertical"></el-divider>
         <div class="docItem_data docItem_data_btn">
           <span
+          v-if="type === 'create'"
+          class="el-icon-edit-outline setBtn"
+          @click="editMataItem(item)"
+          ></span>
+          <span
             class="el-icon-delete setBtn"
             @click="delMataItem(index)"
           ></span>
@@ -105,7 +110,7 @@
 </template>
 <script>
 export default {
-  props:['metaData'],
+  props:['metaData','type'],
   watch: {
     metaData:{
         handler(val) {
@@ -271,13 +276,16 @@ export default {
       .el-date-picker {
         min-width: 160px;
       }
+      .label{
+        min-width: fit-content;
+      }
       .docItem_data_label {
         margin-right: 5px;
         display: flex;
         align-items: center;
         .question {
           color: #aaadcc;
-          margin-left: 2px;
+          margin:2px 5px 0 2px;
           cursor: pointer;
         }
       }

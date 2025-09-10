@@ -124,7 +124,7 @@ export default {
         return {
             metaDataFilterParams:{
                 filterEnable:false,
-                filterLogicType:'',
+                filterLogicType:'and',
                 metaFilterParams:[]
             },
             keyOptions:[],
@@ -141,99 +141,91 @@ export default {
             conditionOptions:{
                 time:[
                         {
-                            value:'是',
+                            value:'is',
                             label:'是'
                         },
                         {
-                            value:'早于',
+                            value:'before',
                             label:'早于'
                         },
                         {
-                            value:'晚于',
+                            value:'after',
                             label:'晚于'
                         },
                         {
-                            value:'为空',
+                            value:'empty',
                             label:'为空'
                         },
                         {
-                            value:'不为空',
+                            value:'not empty',
                             label:'不为空'
                         }
                     ],
                 string:[
                     {
-                        value:'是',
+                        value:'is',
                         label:'是'
                     },
                     {
-                        value:'不是',
+                        value:'is not',
                         label:'不是'
                     },
                     {
-                        value:'包含',
+                        value:'contains',
                         label:'包含'
                     },
                     {
-                        value:'不包含',
+                        value:'not contains',
                         label:'不包含'
                     },
                     {
-                        value:'开始是',
+                        value:'start with',
                         label:'开始是'
                     },
                     {
-                        value:'结束是',
+                        value:'end with',
                         label:'结束是'
                     },
                     {
-                        value:'为空',
+                        value:'empty',
                         label:'为空'
                     },
                     {
-                        value:'不为空',
+                        value:'not empty',
                         label:'不为空'
-                    },
-                    {
-                        value:'在',
-                        label:'在'
-                    },
-                    {
-                        value:'不在',
-                        label:'不在'
                     }
                 ],
                 number:[
                     {
-                        value:'等于',
+                        value:'=',
                         label:'等于'
                     },
                     {
-                        value:'不等于',
+                        value:'≠',
                         label:'不等于'
                     },
                     {
-                        value:'大于',
+                        value:'>',
                         label:'大于'
                     },
                     {
-                        value:'大于等于',
+                        value:'≥',
                         label:'大于等于'
                     },
                     {
-                        value:'小于',
+                        value:'<',
                         label:'小于'
                     },
                     {
-                        value:'小于等于',
+                        value:'≤',
                         label:'小于等于'
                     },
                     {
-                        value:'为空',
+                        value:'empty',
                         label:'为空'
                     },
                     {
-                        value:'不为空',
+                        value:'not empty',
                         label:'不为空'
                     }
                 ]
