@@ -23,25 +23,25 @@
         <div class="login-form">
           <el-form ref="form" class="form" :model="form" label-position="top">
             <el-form-item :label="$t('login.form.username')" class="login-form-item">
-              <img class="login-icon" src="./img/user.png" alt="" />
+              <img class="login-icon" src="@/assets/imgs/user.png" alt="" />
               <el-input
                 v-model.trim="form.username"
                 :placeholder="$t('common.input.placeholder') + $t('login.form.username')"
               />
             </el-form-item>
             <el-form-item :label="$t('login.form.password')" class="login-form-item">
-              <img class="login-icon" src="./img/pwd.png" alt="" />
+              <img class="login-icon" src="@/assets/imgs/pwd.png" alt="" />
               <el-input
                 :type="isShowPwd ? '' : 'password'"
                 class="login-pwd-input"
                 v-model.trim="form.password"
                 :placeholder="$t('common.input.placeholder') + $t('login.form.password')"
               />
-              <img v-if="!isShowPwd" class="pwd-icon" src="./img/showPwd.png" alt="" @click="() => this.isShowPwd = true" />
-              <img v-else class="pwd-icon" src="./img/hidePwd.png" alt="" @click="() => this.isShowPwd = false" />
+              <img v-if="!isShowPwd" class="pwd-icon" src="@/assets/imgs/showPwd.png" alt="" @click="() => this.isShowPwd = true" />
+              <img v-else class="pwd-icon" src="@/assets/imgs/hidePwd.png" alt="" @click="() => this.isShowPwd = false" />
             </el-form-item>
             <el-form-item :label="$t('login.form.code')" class="login-form-item">
-              <img class="login-icon" src="./img/code.png" alt="" />
+              <img class="login-icon" src="@/assets/imgs/code.png" alt="" />
               <el-input
                 style="width: calc(100% - 90px)"
                 v-model.trim="form.code"
@@ -53,6 +53,18 @@
               </span>
             </el-form-item>
           </el-form>
+          <div class="register-bt">
+            <span v-if="register && register.email && register.email.status">
+              {{ $t('login.askAccount') }}
+              <span :style="{ color: '#384BF7', cursor: 'pointer' }" @click="$router.push({path: `/register`})">
+              {{ $t('login.register') }}
+              </span>
+            </span>
+<!--            <span :style="{ color: '#384BF7', cursor: 'pointer', float: 'right' }"-->
+<!--                  @click="$router.push({path: `/forget-password`})">-->
+<!--              {{ $t('login.forgetPassword') }}-->
+<!--            </span>-->
+          </div>
           <div class="login-bt">
             <p :class="['primary-bt', {'disabled': isDisabled()}]" :style="`background: ${loginButtonColor} !important`" @click="doLogin">
               {{$t('login.button')}}
@@ -79,7 +91,6 @@ export default {
   components: { overview, ChangeLang },
   data(){
     return{
-      loginDialogVisable:false,
       form:{
         username:'',
         password:'',
@@ -88,6 +99,11 @@ export default {
       isShowPwd: false,
       home: {},
       login: {},
+      register: {
+        email: {
+          status: false
+        }
+      },
       loginButtonColor: '',
       codeData: {
         key: '',
@@ -132,10 +148,11 @@ export default {
     },
     getLogoInfo() {
       getCommonInfo().then(res => {
-        const {login, home, tab = {}} = res.data || {}
+        const {login, home, tab, register = {}} = res.data || {}
         this.login = login || {}
         this.home = home || {}
         this.loginButtonColor = this.login.loginButtonColor || '#384BF7'
+        this.register = register
         replaceTitle(tab.title)
         replaceIcon(tab.logo ? tab.logo.path : '')
       })
@@ -288,6 +305,13 @@ export default {
         top: 13.5px;
         right: 17px;
         cursor: pointer;
+      }
+      .register-bt{
+        width: 100%;
+        height: 1px;
+        line-height: 30px;
+        font-size: 14px;
+        margin-top: -20px;
       }
       .login-bt{
         width: 100%;
