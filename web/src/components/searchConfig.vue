@@ -260,9 +260,6 @@ export default {
             if(!this.setType){
               delete this.formInline.knowledgeMatchParams.maxHistory;
             }
-            if(this.formInline.knowledgeMatchParams.priorityMatch === 1){
-              this.formInline.knowledgeMatchParams.rerankModelId = '';
-            }
             this.$emit('sendConfigInfo', this.formInline);
           }
         }, 200);

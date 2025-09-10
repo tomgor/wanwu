@@ -177,13 +177,13 @@ export const getKnowledgeList = (data)=>{
         data
     })
 };
-export const getKnowledgeItem = (params)=>{
-    return service({
-        url: `${BASE_URL}/knowledge`,
-        method: 'get',
-        params
-    })
-};
+// export const getKnowledgeItem = (params)=>{
+//     return service({
+//         url: `${BASE_URL}/knowledge`,
+//         method: 'get',
+//         params
+//     })
+// };
 export const delKnowledgeItem = (data)=>{
     return service({
         url: `${BASE_URL}/knowledge`,
@@ -391,5 +391,12 @@ export const editSegment = (data)=>{
         url: `${BASE_URL}/knowledge/doc/segment/update`,
         method: 'post',
         data
+    })
+};
+export const metaSelect = (params)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/meta/select`,
+        method: 'get',
+        params
     })
 };

@@ -154,7 +154,7 @@
       <mataData ref="mataData" @updateMeata="updateMeata" type="create"/>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose">取 消</el-button>
-        <el-button type="primary" @click="metaVisible = false">确 定</el-button>
+        <el-button type="primary" @click="submitMeta">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -164,7 +164,7 @@
 import Pagination from "@/components/pagination.vue";
 import SearchInput from "@/components/searchInput.vue";
 import mataData from './metadata.vue'
-import {getDocList,delDocItem,uploadFileTips} from "@/api/knowledge";
+import {getDocList,delDocItem,uploadFileTips,updateDocMeta} from "@/api/knowledge";
 export default {
   components: { Pagination,SearchInput,mataData},
   data() {
@@ -188,7 +188,8 @@ export default {
       timer:null,
       refreshCount:0,
       tagList:[],
-      metaVisible:false
+      metaVisible:false,
+      metaData:[]
     };
   },
   watch:{
@@ -208,11 +209,24 @@ export default {
     this.clearTimer()
   },
   methods: {
+    submitMeta(){
+      const data = {
+        docId:'',
+        knowledgeId:this.docQuery.knowledgeId,
+        metaDataList:this.metaData
+      }
+      updateDocMeta(data).then(res =>{
+        if(res.code === 0){
+          this.$message.success('操作成功');
+          this.metaVisible = false;
+        }
+      }).catch(() =>{})
+    },
     showMeta(){
       this.metaVisible = true;
     },
     updateMeata(data){
-      console.log(data)
+      this.metaData = data
     },
     handleClose(){
       this.metaVisible = false;

@@ -111,7 +111,7 @@
     </div>
 </template>
 <script>
-import {getKnowledgeItem} from "@/api/knowledge"
+import {metaSelect} from "@/api/knowledge"
 export default {
     props:{
         knowledgeId:{
@@ -252,7 +252,7 @@ export default {
     },
     methods:{
         getList(){
-            getKnowledgeItem({knowledgeId:this.knowledgeId}).then(res =>{
+            metaSelect({knowledgeId:this.knowledgeId}).then(res =>{
                 if(res.code === 0){
                     this.keyOptions = res.data.knowledgeMetaDataList || []
                 }
@@ -294,7 +294,7 @@ export default {
             this.metaDataFilterParams.filterLogicType = '';
         },
         keyChange(e,item){
-           item.key = e.type;
+           item.key = e;
         },
         delMataItem(index){
             this.metaDataFilterParams.metaFilterParams.splice(index,1)

@@ -21,22 +21,35 @@
             <template #header>
               <div style="display: inline-flex; align-items: center;">
                 <span>Key</span>
-                <el-tooltip
+                <!-- <el-tooltip
                     effect="dark"
                     content="只能包含小写字母、数字和下划线，并且必须以小写字母开头"
                     placement="top-start"
                 >
                   <i class="el-icon-question" style="margin-left: 5px; cursor: pointer;"></i>
-                </el-tooltip>
+                </el-tooltip> -->
               </div>
             </template>
             <template #default="{ row }">
-              <el-input
+              <!-- <el-input
                   v-model="row.metaKey"
                   @input="row.metaKey = row.metaKey.replace(/[^a-z0-9_]/g, '').replace(/^[^a-z]*/, '')"
                   clearable
                   :disabled="!row.editable || !row.created"
-              />
+              /> -->
+              <el-select
+                v-model="row.metaKey"
+                placeholder="请选择"
+                @change="keyChange($event,row)"
+            >
+                <el-option
+                v-for="item in keyOptions"
+                :key="item.key"
+                :label="item.key"
+                :value="item.key"
+                >
+                </el-option>
+              </el-select>
             </template>
           </el-table-column>
           <el-table-column
@@ -44,7 +57,7 @@
               label="类型"
               align="center">
             <template #default="{ row }">
-              <el-select
+              <!-- <el-select
                   v-model="row.metaValueType"
                   clearable
                   :disabled="!row.editable || !row.created"
@@ -52,7 +65,8 @@
                 <el-option value="string" label="String"></el-option>
                 <el-option value="number" label="Number"></el-option>
                 <el-option value="time" label="Time"></el-option>
-              </el-select>
+              </el-select> -->
+              <span>{{row.metaValueType}}</span>
             </template>
           </el-table-column>
           <el-table-column
@@ -135,9 +149,13 @@ export default {
       dialogVisible: false,
       tableData: [],
       docId: "",
+      keyOptions:[]
     };
   },
   methods: {
+    keyChange(e,row){
+      row.metaValueType = e
+    },
     submitDialog() {
       this.tableData.forEach(i => {
         delete i.editable

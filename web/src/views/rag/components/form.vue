@@ -90,7 +90,7 @@
             <div class="rl knowledge-conent">
               <div class="tool-right tool">
                   <div class="action-list">
-                    <div v-for="(n,i) in editForm.knowledgeBaseIds" class="action-item" :key="'knowledge'+ i">
+                    <div v-for="(n,i) in editForm.knowledgeList" class="action-item" :key="'knowledge'+ i">
                        <div class="name" style="color: #333">
                         <span>{{n.name}}</span>
                        </div>
@@ -220,7 +220,7 @@ export default {
           frequencyPenaltyEnable:true
         },
         rerankParams:'',
-        knowledgeBaseIds:[],
+        knowledgeList:[],
         knowledgeConfig:{
           keywordPriority: 0.8, //关键词权重
           matchType: "", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
@@ -272,15 +272,15 @@ export default {
         clearTimeout(this.debounceTimer)
       }
       this.debounceTimer = setTimeout(() =>{
-          const props = ['modelParams', 'modelConfig', 'knowledgeBaseIds', 'knowledgeConfig','safetyConfig'];
+          const props = ['modelParams', 'modelConfig', 'knowledgeList', 'knowledgeConfig','safetyConfig'];
           const changed = props.some(prop => {
           return JSON.stringify(newVal[prop]) !== JSON.stringify(
               (this.initialEditForm || {})[prop]
             );
           });
           if (changed && !this.isUpdating) {
-            const isMixPriorityMatch = newVal['knowledgeConfig']['matchType'] === 'mix' && newVal['knowledgeConfig']['priorityMatch']
-            if(newVal['modelParams']!== '' && newVal['knowledgeBaseIds'].length > 0 || (!isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
+            const isMixPriorityMatch = newVal['knowledgeConfig']['matchType'] === 'mix' && newVal['knowledgeConfig']['priorityMatch'];
+            if(newVal['modelParams']!== '' &&  newVal['knowledgeList'].length > 0 || (isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
               this.updateInfo();
             }
           }
@@ -314,7 +314,7 @@ export default {
       this.metaSetVisible = false;
     },
     getKnowledgeData(data){
-      this.editForm.knowledgeBaseIds = data
+      this.editForm.knowledgeList = data
     },
     getMetaData(data){
       this.metaData = data;
@@ -324,7 +324,7 @@ export default {
       this.metaSetVisible = true;
     },
     showKnowledgeDiglog(){
-      this.$refs.knowledgeSelect.showDialog(this.editForm.knowledgeBaseIds)
+      this.$refs.knowledgeSelect.showDialog(this.editForm.knowledgeList)
     },
     sendConfigInfo(data){
       this.editForm.knowledgeConfig = { ...data.knowledgeMatchParams };
@@ -354,10 +354,9 @@ export default {
               this.editForm.modelConfig = res.data.modelConfig.config;
             }
             this.editForm.rerankParams = res.data.rerankConfig.modelId;
-            const knowledgeData = res.data.knowledgeBaseConfig.knowledgebases;
+            const knowledgeData = res.data.knowledgeBaseConfig.knowledgeList;
             if(knowledgeData && knowledgeData.length > 0){
-              // this.editForm.knowledgeBaseIds = knowledgeData.map(item => item.id);
-              this.editForm.knowledgeBaseIds = knowledgeData;
+              this.editForm.knowledgeList = knowledgeData;
             }
             this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;//需要后端修改
             this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
@@ -393,7 +392,7 @@ export default {
         this.$message.warning('请选rerank择模型！')
         return false
       }
-      if(this.editForm.knowledgeBaseIds.length === 0){
+      if(this.editForm.knowledgeList.length === 0){
         this.$message.warning('请选择关联知识库！')
         return false
       }
@@ -464,22 +463,16 @@ export default {
       this.isUpdating = true;
       try {
         //知识库数据
-        // const knowledgeMap = new Map(this.knowledgeData.map(item => [item.knowledgeId, item]));
-        // const knowledgeData = this.editForm.knowledgeBaseIds.map(id => {
-        //   const found = knowledgeMap.get(id);
-        //   return found ? { id: found.knowledgeId, name: found.name } : null;
-        // }).filter(Boolean);
-        const knowledgeData = this.editForm.knowledgeBaseIds.map(item =>({
-          id:item.knowledgeId,
-          name:item.name
-        }))
         //模型数据
         const modeInfo = this.modleOptions.find(item => item.modelId === this.editForm.modelParams)
+        if(this.editForm.knowledgeConfig.matchType === 'mix' && this.editForm.knowledgeConfig.priorityMatch === 1){
+          this.editForm.knowledgeConfig.rerankModelId = ''
+        }
         const rerankInfo = this.rerankOptions.find(item => item.modelId === this.editForm.knowledgeConfig.rerankModelId)
         let fromParams = {
           ragId:this.editForm.appId,
           knowledgeBaseConfig:{
-            knowledgebases:knowledgeData,
+            knowledgeList:this.editForm.knowledgeList,
             config:this.editForm.knowledgeConfig
           },
           modelConfig:{
