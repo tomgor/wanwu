@@ -71,7 +71,7 @@ func GetLogoCustomInfo(ctx *gin.Context, mode string) (response.LogoCustomInfo, 
 				Copyright: gin_util.I18nKey(ctx, mode.About.Copyright),
 			},
 			LinkList: config.Cfg().DocCenter.GetDocs(),
-			Register: response.Register{Email: response.Email{Status: config.Cfg().CustomInfo.RegisterEnable}},
+			Register: response.CustomRegister{Email: response.CustomEmail{Status: config.Cfg().CustomInfo.RegisterByEmail != 0}},
 		}
 		break
 	}
@@ -167,22 +167,22 @@ func Login(ctx *gin.Context, login *request.Login, language string) (*response.L
 }
 
 func RegisterByEmail(ctx *gin.Context, register *request.RegisterByEmail) error {
-	if !config.Cfg().CustomInfo.RegisterEnable {
-		return grpc_util.ErrorStatus(errs.Code_BFFRegister)
+	if config.Cfg().CustomInfo.RegisterByEmail == 0 {
+		return grpc_util.ErrorStatus(errs.Code_BFFRegisterDisable)
 	}
 	_, err := iam.RegisterByEmail(ctx.Request.Context(), &iam_service.RegisterByEmailReq{
 		UserName: register.Username,
 		Email:    register.Email,
 		Code:     register.Code,
 	})
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
-func SendEmailCode(ctx *gin.Context, email string) error {
-	_, err := iam.SendEmailCode(ctx, &iam_service.SendEmailCodeReq{
+func RegisterSendEmailCode(ctx *gin.Context, email string) error {
+	if config.Cfg().CustomInfo.RegisterByEmail == 0 {
+		return grpc_util.ErrorStatus(errs.Code_BFFRegisterDisable)
+	}
+	_, err := iam.RegisterSendEmailCode(ctx.Request.Context(), &iam_service.RegisterSendEmailCodeReq{
 		Email: email,
 	})
 	return err

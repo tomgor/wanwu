@@ -26,7 +26,7 @@ type LogoCustomInfo struct {
 	Tab      CustomTab         `json:"tab"`      // 标签页信息
 	About    CustomAbout       `json:"about"`    // 关于信息
 	LinkList map[string]string `json:"linkList"` // 跳转链接列表,key为链接名称,value为URL
-	Register Register          `json:"register"` // 注册信息
+	Register CustomRegister    `json:"register"` // 注册信息
 }
 
 type CustomLogin struct {
@@ -54,11 +54,11 @@ type CustomAbout struct {
 	Copyright string `json:"copyright"` // 版权
 }
 
-type Register struct {
-	Email Email `json:"email"` // 注册邮箱
+type CustomRegister struct {
+	Email CustomEmail `json:"email"` // 注册邮箱
 }
 
-type Email struct {
+type CustomEmail struct {
 	Status bool `json:"status"`
 }
 

@@ -5,17 +5,7 @@ import (
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	iam_service "github.com/UnicomAI/wanwu/api/proto/iam-service"
-	"github.com/UnicomAI/wanwu/internal/iam-service/client/model"
-	"github.com/UnicomAI/wanwu/internal/iam-service/config"
 	"github.com/UnicomAI/wanwu/internal/iam-service/pkg/util"
-	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
-	"github.com/UnicomAI/wanwu/pkg/redis"
-	"google.golang.org/protobuf/types/known/emptypb"
-)
-
-const (
-	EmailCode = "code"
-	Password  = "password"
 )
 
 func (s *Service) GetCaptcha(ctx context.Context, req *iam_service.GetCaptchaReq) (*iam_service.GetCaptchaResp, error) {
@@ -46,45 +36,4 @@ func (s *Service) Login(ctx context.Context, req *iam_service.LoginReq) (*iam_se
 		User:       toUserInfo(user),
 		Permission: toPermission(permission),
 	}, nil
-}
-
-func (s *Service) RegisterByEmail(ctx context.Context, req *iam_service.RegisterByEmailReq) (*emptypb.Empty, error) {
-	code, redisErr := redis.IAM().HGet(ctx, req.Email, EmailCode)
-	if redisErr != nil {
-		return &emptypb.Empty{}, grpc_util.ErrorStatus(errs.Code_IAMRegister)
-	}
-	if code.V != req.Code {
-		return &emptypb.Empty{}, grpc_util.ErrorStatus(errs.Code_IAMRegister)
-	}
-	passwd, redisErr := redis.IAM().HGet(ctx, req.Email, Password)
-	if redisErr != nil {
-		return &emptypb.Empty{}, grpc_util.ErrorStatus(errs.Code_IAMRegister)
-	}
-	userID, err := s.cli.CreateUser(ctx, &model.User{
-		Status:    true,
-		CreatorID: config.AdminUserID(),
-		Name:      req.UserName,
-		Email:     req.Email,
-		Password:  passwd.V,
-	}, config.TopOrgID(), []uint32{})
-	if err != nil {
-		return &emptypb.Empty{}, errStatus(errs.Code_IAMUser, err)
-	}
-	_, err = s.cli.CreateOrg(ctx, &model.Org{
-		Status:    true,
-		CreatorID: userID,
-		ParentID:  config.TopOrgID(),
-		Name:      req.UserName + "-org",
-	})
-	if err != nil {
-		return &emptypb.Empty{}, errStatus(errs.Code_IAMOrg, err)
-	}
-	return &emptypb.Empty{}, nil
-}
-
-func (s *Service) SendEmailCode(ctx context.Context, req *iam_service.SendEmailCodeReq) (*emptypb.Empty, error) {
-	if err := s.cli.SendEmailCode(ctx, req.Email); err != nil {
-		return nil, errStatus(errs.Code_IAMRegister, err)
-	}
-	return &emptypb.Empty{}, nil
 }

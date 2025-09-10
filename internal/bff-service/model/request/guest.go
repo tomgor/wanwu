@@ -14,17 +14,18 @@ type RegisterByEmail struct {
 	Code     string `json:"code" validate:"required"`     // 邮箱验证码
 }
 
-type SendEmailCode struct {
+type RegisterSendEmailCode struct {
 	Email string `json:"email" validate:"required"` // 邮箱
 }
 
 func (l *Login) Check() error {
 	return nil
 }
+
 func (l *RegisterByEmail) Check() error {
 	return nil
 }
 
-func (l *SendEmailCode) Check() error {
+func (l *RegisterSendEmailCode) Check() error {
 	return nil
 }

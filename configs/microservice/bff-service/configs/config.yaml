@@ -78,7 +78,7 @@ custom-info:
         copyright: bff_custom_about_copyright
     - mode: dark
   version: v0.1.0
-  register_enable: true
+  register_by_email: 0
 
 doc-center:
   frontend_prefix: /aibase/docCenter/pages

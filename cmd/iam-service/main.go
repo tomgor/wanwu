@@ -11,7 +11,7 @@ import (
 
 	"github.com/UnicomAI/wanwu/internal/iam-service/client/orm"
 	"github.com/UnicomAI/wanwu/internal/iam-service/config"
-	"github.com/UnicomAI/wanwu/internal/iam-service/pkg/util"
+	smtp_util "github.com/UnicomAI/wanwu/internal/iam-service/pkg/util/smtp-util"
 	"github.com/UnicomAI/wanwu/internal/iam-service/server/grpc"
 	"github.com/UnicomAI/wanwu/pkg/db"
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -50,12 +50,14 @@ func main() {
 		log.Fatalf("init log err: %v", err)
 	}
 
+	if err := smtp_util.Init(config.Cfg().SMTP); err != nil {
+		log.Fatalf("init email err: %v", err)
+	}
+
 	if err := redis.InitIAM(ctx, config.Cfg().Redis); err != nil {
 		log.Fatalf("init redis err: %v", err)
 	}
-	if err := util.Init(config.Cfg().Email.SmtpHost, config.Cfg().Email.FromEmail, config.Cfg().Email.Password, config.Cfg().Email.SmtpPort); err != nil {
-		log.Fatalf("init emial err: %v", err)
-	}
+
 	db, err := db.New(config.Cfg().DB)
 	if err != nil {
 		log.Fatalf("init db err: %v", err)

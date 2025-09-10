@@ -83,71 +83,75 @@ func (c *Client) CreateOrg(ctx context.Context, org *model.Org) (uint32, *errs.S
 		return 0, toErrStatus("iam_org_create", "create org but id err")
 	}
 	return org.ID, c.transaction(ctx, func(tx *gorm.DB) *errs.Status {
-		var roleName string
-		// check parents
-		if org.ParentID != 0 {
-			// 正常创建组织
-			if err := sqlopt.WithID(org.ParentID).Apply(tx).First(&model.Org{}).Error; err != nil {
-				return toErrStatus("iam_org_create", err.Error())
-			}
-			// check creator
-			if err := sqlopt.WithID(org.CreatorID).Apply(tx).First(&model.User{}).Error; err != nil {
-				return toErrStatus("iam_org_create", err.Error())
-			}
-			// check name 组织名在上级组织的所有下级组织内唯一
-			if err := sqlopt.SQLOptions(
-				sqlopt.WithParentID(org.ParentID),
-				sqlopt.WithName(org.Name),
-			).Apply(tx).First(&model.Org{}).Error; err != gorm.ErrRecordNotFound {
-				if err == nil {
-					err = errors.New("already exist")
-				}
-				return toErrStatus("iam_org_create", err.Error())
-			}
-			roleName = "组织管理员"
-		} else {
-			// 创建系统内唯一顶级组织，此时系统内不能存在任何组织
-			if err := tx.First(&model.Org{}).Error; err != gorm.ErrRecordNotFound {
-				if err == nil {
-					err = errors.New("already exist")
-				}
-				return toErrStatus("iam_org_create", err.Error())
-			}
-			// check creator
-			if org.CreatorID != 0 {
-				return toErrStatus("iam_org_create", "create top org but creator not empty")
-			}
-			roleName = "超级管理员"
-		}
-		// create org
-		if err := tx.Create(org).Error; err != nil {
-			return toErrStatus("iam_org_create", err.Error())
-		}
-		// create role
-		roleID, err := createRole(tx, org.ID, org.CreatorID, roleName, "", true, nil)
-		if err != nil {
-			return toErrStatus("iam_org_create", err.Error())
-		}
-		if org.CreatorID != 0 {
-			// create org user
-			if err := tx.Create(&model.OrgUser{
-				OrgID:  org.ID,
-				UserID: org.CreatorID,
-			}).Error; err != nil {
-				return toErrStatus("iam_org_create", err.Error())
-			}
-			// create user role
-			if err := tx.Create(&model.UserRole{
-				OrgID:   org.ID,
-				UserID:  org.CreatorID,
-				RoleID:  roleID,
-				IsAdmin: true,
-			}).Error; err != nil {
-				return toErrStatus("iam_org_create", err.Error())
-			}
-		}
-		return nil
+		return createOrgTx(tx, org)
 	})
+}
+
+func createOrgTx(tx *gorm.DB, org *model.Org) *errs.Status {
+	var roleName string
+	// check parents
+	if org.ParentID != 0 {
+		// 正常创建组织
+		if err := sqlopt.WithID(org.ParentID).Apply(tx).First(&model.Org{}).Error; err != nil {
+			return toErrStatus("iam_org_create", err.Error())
+		}
+		// check creator
+		if err := sqlopt.WithID(org.CreatorID).Apply(tx).First(&model.User{}).Error; err != nil {
+			return toErrStatus("iam_org_create", err.Error())
+		}
+		// check name 组织名在上级组织的所有下级组织内唯一
+		if err := sqlopt.SQLOptions(
+			sqlopt.WithParentID(org.ParentID),
+			sqlopt.WithName(org.Name),
+		).Apply(tx).First(&model.Org{}).Error; err != gorm.ErrRecordNotFound {
+			if err == nil {
+				err = errors.New("already exist")
+			}
+			return toErrStatus("iam_org_create", err.Error())
+		}
+		roleName = "组织管理员"
+	} else {
+		// 创建系统内唯一顶级组织，此时系统内不能存在任何组织
+		if err := tx.First(&model.Org{}).Error; err != gorm.ErrRecordNotFound {
+			if err == nil {
+				err = errors.New("already exist")
+			}
+			return toErrStatus("iam_org_create", err.Error())
+		}
+		// check creator
+		if org.CreatorID != 0 {
+			return toErrStatus("iam_org_create", "create top org but creator not empty")
+		}
+		roleName = "超级管理员"
+	}
+	// create org
+	if err := tx.Create(org).Error; err != nil {
+		return toErrStatus("iam_org_create", err.Error())
+	}
+	// create role
+	roleID, err := createRole(tx, org.ID, org.CreatorID, roleName, "", true, nil)
+	if err != nil {
+		return toErrStatus("iam_org_create", err.Error())
+	}
+	if org.CreatorID != 0 {
+		// create org user
+		if err := tx.Create(&model.OrgUser{
+			OrgID:  org.ID,
+			UserID: org.CreatorID,
+		}).Error; err != nil {
+			return toErrStatus("iam_org_create", err.Error())
+		}
+		// create user role
+		if err := tx.Create(&model.UserRole{
+			OrgID:   org.ID,
+			UserID:  org.CreatorID,
+			RoleID:  roleID,
+			IsAdmin: true,
+		}).Error; err != nil {
+			return toErrStatus("iam_org_create", err.Error())
+		}
+	}
+	return nil
 }
 
 func (c *Client) UpdateOrg(ctx context.Context, org *model.Org) *errs.Status {
