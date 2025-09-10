@@ -7,10 +7,19 @@ export default {
             password: '密码',
             code: '验证码'
         },
+        askAccount: '没有账号？',
+        register: '立即注册',
+        forgetPassword: '忘记密码',
         button: '登 录',
     },
     register: {
-        title: '欢迎注册',
+        title: '注册',
+        form: {
+            username: '用户名',
+            email: '邮箱',
+            code: '验证码'
+        },
+        action: '获取',
         button: '注 册',
         back: '返回登录'
     },

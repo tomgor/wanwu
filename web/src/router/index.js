@@ -203,6 +203,10 @@ const constantRoutes = [
         component:resolve =>require(['@/views/login'],resolve),
     },
     {
+        path: '/register',
+        component: () => import('@/views/register'),
+    },
+    {
         path: '/:catchAll(.*)',
         redirect: "/"
     }

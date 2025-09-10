@@ -21,6 +21,25 @@ export const getImgVerCode = () => {
     });
 };
 
+// 邮箱注册验证码发送
+export const requestEmailCode = (data) => {
+    return service({
+        url: `${BASE_URL}/base/register/email/code`,
+        method: "post",
+        data,
+    });
+};
+
+// 用户邮箱注册
+export const register = (data) => {
+    return service({
+        url: `${BASE_URL}/base/register/email`,
+        method: "post",
+        data,
+    });
+};
+
+
 export const getLangList = () => {
     return service({
         url: `${BASE_URL}/base/language/select`,
