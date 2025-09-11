@@ -177,7 +177,7 @@
               label="元数据管理："
               prop="docAnalyzer"
             >
-            <mataData ref="mataData" @updateMeata="updateMeata"/>
+            <mataData ref="mataData" @updateMeata="updateMeata" :knowledgeId="knowledgeId"/>
             </el-form-item>
           </el-form>
         </div>

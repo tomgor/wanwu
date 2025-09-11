@@ -129,7 +129,7 @@
 <script>
 import {metaSelect} from "@/api/knowledge"
 export default {
-  props:['metaData','type'],
+  props:['metaData','type','knowledgeId'],
   watch: {
     metaData:{
         handler(val) {

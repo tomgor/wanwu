@@ -151,7 +151,7 @@
       :visible.sync="metaVisible"
       width="550px"
       :before-close="handleClose">
-      <mataData ref="mataData" @updateMeata="updateMeata" type="create"/>
+      <mataData ref="mataData" @updateMeata="updateMeata" type="create" :knowledgeId="docQuery.knowledgeId"/>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose">取 消</el-button>
         <el-button type="primary" @click="submitMeta">确 定</el-button>
