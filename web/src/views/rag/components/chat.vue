@@ -268,7 +268,7 @@
                 const conditions = [
                     { check: !this.editForm.modelParams, message: '请选择模型' },
                     { check: !isMixPriorityMatch && !rerankModelId, message: '请选择rerank模型' },
-                    { check: this.editForm.knowledgeBaseIds.length === 0, message: '请选择知识库' }
+                    { check: this.editForm.knowledgebases.length === 0, message: '请选择知识库' }
                 ];
                 for (const condition of conditions) {
                     if (condition.check) {
