@@ -96,8 +96,9 @@
                        </div>
                         <div class="bt">
                           <el-tooltip class="item" effect="dark" content="元数据过滤" placement="top-start">
-                            <span class="el-icon-setting del" @click="showMetaSet(n)"></span>
+                            <span class="el-icon-setting del" @click="showMetaSet(n,i)" style="margin-right:10px;"></span>
                           </el-tooltip>
+                          <span class="el-icon-delete del" @click="delKnowledge(i)"></span>
                       </div>
                     </div>
                   </div>
@@ -161,8 +162,8 @@
       </template>
       <metaSet ref="metaSet" @getMetaData="getMetaData" :knowledgeId="currentKnowledgeId"/>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="metaSetVisible = false">取 消</el-button>
-        <el-button type="primary" @click="metaSetVisible = false">确 定</el-button>
+        <el-button @click="handleMetaClose">取 消</el-button>
+        <el-button type="primary" @click="submitMeta">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -198,6 +199,7 @@ export default {
   },
   data() {
     return {
+      knowledgeIndex:-1,
       currentKnowledgeId:'',
       metaData:[],
       metaSetVisible:false,
@@ -309,6 +311,12 @@ export default {
     }
   },
   methods: {
+    submitMeta(){
+      this.$set(this.editForm.knowledgeList, this.knowledgeIndex, { ...this.editForm.knowledgeList[this.knowledgeIndex], ...this.metaData });
+    },
+    delKnowledge(index){
+      this.editForm.knowledgeList.splice(index,1)
+    },
     handleMetaClose(){
       this.$refs.metaSet.clearData();
       this.metaSetVisible = false;
@@ -319,8 +327,9 @@ export default {
     getMetaData(data){
       this.metaData = data;
     },
-    showMetaSet(e){
-      this.currentKnowledgeId = e.id || e.knowledgeId;
+    showMetaSet(e,index){
+      this.currentKnowledgeId = e.id;
+      this.knowledgeIndex = index;
       this.metaSetVisible = true;
     },
     showKnowledgeDiglog(){
