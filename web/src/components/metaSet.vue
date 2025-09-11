@@ -22,7 +22,7 @@
                             <el-option
                             v-for="meta in keyOptions"
                             :key="meta.metaKey"
-                            :label="meta.metaKey + '|' + '['+meta.metaValueKey+']'"
+                            :label="meta.metaKey + ' | ' + '[ '+meta.metaValueType+' ]'"
                             :value="meta.metaKey"
                             >
                             </el-option>
@@ -265,7 +265,7 @@ export default {
             return false;
         },
         validateRequiredFields(data){
-            return !data.some(obj => 
+            return data.some(obj => 
                 Object.values(obj).some(val => this.isEmpty(val))
             );
         },
@@ -274,12 +274,12 @@ export default {
                 this.$message.warning('请开启元数据配置后再进行添加')
                 return;
             }
-            // if(this.metaDataFilterParams.metaFilterParams.length > 0){
-            //      if(!this.validateRequiredFields(this.metaDataFilterParams.metaFilterParams)){
-            //         this.$message.warning('存在未填信息去,请补充')
-            //         return
-            //      }
-            // }
+            if(this.metaDataFilterParams.metaFilterParams.length > 0){
+                 if(this.validateRequiredFields(this.metaDataFilterParams.metaFilterParams)){
+                    this.$message.warning('存在未填信息,请补充')
+                    return
+                 }
+            }
             this.metaDataFilterParams.metaFilterParams.push({
                 key:'',
                 type:'',
@@ -292,8 +292,8 @@ export default {
             this.metaDataFilterParams.filterLogicType = 'and';
             this.metaDataFilterParams.filterEnable = false
         },
-        keyChange(e,item,index){
-           item.type = this.metaDataFilterParams.metaFilterParams[index]['type'];
+        keyChange(val,item,index){
+           item.type = this.keyOptions.filter(i => item.metaKey === val).map(e => e.metaValueType);
         },
         delMataItem(index){
             this.metaDataFilterParams.metaFilterParams.splice(index,1)

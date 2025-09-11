@@ -92,7 +92,7 @@ export default {
       md: md,
       question: "",
       resultLoading: false,
-      knowledgeIdList:[],
+      knowledgeIdList:{},
       searchList: [],
       score: [],
       formInline:null,
@@ -101,7 +101,7 @@ export default {
   },
   methods: {
     getMetaData(data){
-      this.knowledgeIdList.push(data)
+      this.knowledgeIdList = data
     },
     goBack() {
       this.$router.go(-1);
@@ -126,9 +126,13 @@ export default {
       if(matchType === 'mix' && priorityMatch === 1){
         this.formInline.knowledgeMatchParams.rerankModelId = '';
       }
+      if(this.$refs.metaSet.validateRequiredFields(this.knowledgeIdList['metaDataFilterParams']['metaFilterParams'])){
+        this.$message.warning('存在未填信息,请补充')
+        return
+      }
       const data = {
         ...this.formInline,
-        knowledgeIdList:this.knowledgeIdList,
+        knowledgeList:[this.knowledgeIdList],
         question: this.question,
       };
       this.test(data);
