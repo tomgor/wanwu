@@ -2160,6 +2160,72 @@ const docTemplate = `{
                 }
             }
         },
+        "/base/register/email": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "guest"
+                ],
+                "summary": "用户邮箱注册",
+                "parameters": [
+                    {
+                        "description": "邮箱注册信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.RegisterByEmail"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/base/register/email/code": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "guest"
+                ],
+                "summary": "邮箱注册验证码发送",
+                "parameters": [
+                    {
+                        "description": "邮箱地址",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.RegisterSendEmailCode"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/custom/home": {
             "post": {
                 "security": [
@@ -9904,6 +9970,40 @@ const docTemplate = `{
                 }
             }
         },
+        "request.RegisterByEmail": {
+            "type": "object",
+            "required": [
+                "code",
+                "email",
+                "username"
+            ],
+            "properties": {
+                "code": {
+                    "description": "邮箱验证码",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "邮箱",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "用户名",
+                    "type": "string"
+                }
+            }
+        },
+        "request.RegisterSendEmailCode": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "description": "邮箱",
+                    "type": "string"
+                }
+            }
+        },
         "request.RoleCreate": {
             "type": "object",
             "required": [
@@ -10963,6 +11063,14 @@ const docTemplate = `{
                 }
             }
         },
+        "response.CustomEmail": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "boolean"
+                }
+            }
+        },
         "response.CustomHome": {
             "type": "object",
             "properties": {
@@ -11037,6 +11145,19 @@ const docTemplate = `{
                 "welcomeText": {
                     "description": "登录页欢迎标词",
                     "type": "string"
+                }
+            }
+        },
+        "response.CustomRegister": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "description": "注册邮箱",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.CustomEmail"
+                        }
+                    ]
                 }
             }
         },
@@ -11728,6 +11849,14 @@ const docTemplate = `{
                     "allOf": [
                         {
                             "$ref": "#/definitions/response.CustomLogin"
+                        }
+                    ]
+                },
+                "register": {
+                    "description": "注册信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.CustomRegister"
                         }
                     ]
                 },

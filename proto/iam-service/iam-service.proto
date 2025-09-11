@@ -81,7 +81,12 @@ service IAMService {
   rpc GetCaptcha(GetCaptchaReq) returns (GetCaptchaResp) {}
   // 登录
   rpc Login(LoginReq) returns (LoginResp) {}
-  
+
+  // --- register ---
+  // 邮箱注册用户
+  rpc RegisterByEmail(RegisterByEmailReq) returns (google.protobuf.Empty) {}
+  // 邮箱注册发送邮件
+  rpc RegisterSendEmailCode(RegisterSendEmailCodeReq) returns (google.protobuf.Empty) {}
 }
 
 message Perm {
@@ -384,4 +389,16 @@ message LoginReq {
 message LoginResp {
   UserInfo user = 1;
   UserPermission permission = 2;
+}
+
+// --- register ---
+
+message RegisterByEmailReq{
+  string userName = 1;
+  string email = 2;
+  string code = 3;
+}
+
+message RegisterSendEmailCodeReq {
+  string email = 1;
 }
