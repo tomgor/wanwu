@@ -41,7 +41,7 @@ func New(cfg Config) (*gorm.DB, error) {
 		case "oceanbase":
 			connCfg = cfg.OceanBase
 		}
-		db, err = gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=%t&loc=%s",
+		db, err = gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=%t&loc=%s",
 			connCfg.User,
 			connCfg.Password,
 			connCfg.Address,
