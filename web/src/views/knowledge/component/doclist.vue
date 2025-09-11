@@ -34,6 +34,7 @@
 
               <div class="content_title">
                 <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload">{{$t('common.gpuDialog.reload')}}</el-button>
+                <el-button size="mini" type="primary" @click="showMeta">元数据管理</el-button>
                 <el-button size="mini" type="primary" @click="$router.push(`/knowledge/hitTest?knowledgeId=${docQuery.knowledgeId}`)">命中测试</el-button>
                 <el-button
                   size="mini"
@@ -144,15 +145,28 @@
         </el-main>
       </el-container>
     </div>
+    <!-- 元数据管理 -->
+    <el-dialog
+      title="元数据管理"
+      :visible.sync="metaVisible"
+      width="40%"
+      :before-close="handleClose">
+      <mataData ref="mataData" @updateMeata="updateMeata" type="create"/>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleClose">取 消</el-button>
+        <el-button type="primary" @click="submitMeta">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import Pagination from "@/components/pagination.vue";
 import SearchInput from "@/components/searchInput.vue";
-import {getDocList,delDocItem,uploadFileTips} from "@/api/knowledge";
+import mataData from './metadata.vue'
+import {getDocList,delDocItem,uploadFileTips,updateDocMeta} from "@/api/knowledge";
 export default {
-  components: { Pagination,SearchInput},
+  components: { Pagination,SearchInput,mataData},
   data() {
     return {
       knowledgeName:this.$route.query.name || '',
@@ -173,7 +187,9 @@ export default {
       currentKnowValue:null,
       timer:null,
       refreshCount:0,
-      tagList:[]
+      tagList:[],
+      metaVisible:false,
+      metaData:[]
     };
   },
   watch:{
@@ -193,6 +209,28 @@ export default {
     this.clearTimer()
   },
   methods: {
+    submitMeta(){
+      const data = {
+        docId:'',
+        knowledgeId:this.docQuery.knowledgeId,
+        metaDataList:this.metaData
+      }
+      updateDocMeta(data).then(res =>{
+        if(res.code === 0){
+          this.$message.success('操作成功');
+          this.metaVisible = false;
+        }
+      }).catch(() =>{})
+    },
+    showMeta(){
+      this.metaVisible = true;
+    },
+    updateMeata(data){
+      this.metaData = data
+    },
+    handleClose(){
+      this.metaVisible = false;
+    },
     startTimer(){
       this.clearTimer();
       if (this.refreshCount >= 2) {

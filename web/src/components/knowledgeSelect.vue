@@ -74,7 +74,10 @@ export default {
             this.dialogVisible = false;
         },
         submit(){
-            const data = this.knowledgeData.filter(item => item.checked);
+            const data = this.knowledgeData.filter(item => item.checked).map(item =>({
+                knowledgeId:item.knowledgeId,
+                name:item.name
+            }));
             this.$emit('getKnowledgeData',data);
             this.dialogVisible = false;
         }

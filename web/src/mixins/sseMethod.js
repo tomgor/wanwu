@@ -499,7 +499,7 @@ export default {
                                 this.$refs['session-com'].scrollBottom()
                             })
 
-                        }else if(data.code === 7 || data.code === 1){
+                        }else if(data.code === 7 || data.code === -1 || data.code === 1){
                             this.setStoreSessionStatus(-1)
                             let fillData = {
                                 ...commonData,

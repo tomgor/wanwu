@@ -165,23 +165,6 @@
         :loading="saveLoading"
         @click="saveUpload"
       >{{$t('knowledgeManage.confirmImport')}}</el-button>
-      <!-- <el-button
-        v-if="upLoadType === '1'"
-        type="primary"
-        size="mini"
-        :disabled="loadingResult || loadingResult"
-        :loading="uploading"
-        @click="submitVisible"
-      >上 传</el-button> -->
-      <!-- :disabled="upDisabled" -->
-      <!-- <el-button
-        type="primary"
-        v-if="upLoadType === '2'"
-        size="mini"
-        :disabled="urlSave"
-        @click="handleSave"
-        :loading="urlLoading"
-      >确认保存</el-button> -->
       <el-button
         type="primary"
         v-if="upLoadType === '2' && urlActive === 'first'"

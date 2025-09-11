@@ -13,25 +13,41 @@
       >
         <div class="docItem_data">
           <span class="docItem_data_label">
-            <span>Key:</span>
+            <span class="label">Key:</span>
             <el-tooltip
               class="item"
               effect="dark"
               content="只能包含小写字母、数字和下划线，并且必须以小写字母开头"
               placement="top-start"
             >
-              <span class="el-icon-question question"></span>
+              <span class="el-icon-question question" v-if="type === 'create'"></span>
             </el-tooltip>
           </span>
           <el-input
+            v-if="type === 'create'"
             v-model="item.metaKey"
             @blur="metakeyBlur(item)"
           ></el-input>
+          <el-select
+              v-else
+              v-model="item.metaKey"
+              placeholder="请选择"
+              @change="keyChange($event,item)"
+          >
+              <el-option
+              v-for="item in keyOptions"
+              :key="item.key"
+              :label="item.key"
+              :value="item.key"
+              >
+              </el-option>
+          </el-select>
         </div>
         <el-divider direction="vertical"></el-divider>
         <div class="docItem_data">
-          <span class="docItem_data_label">type:</span>
+          <span class="docItem_data_label label">type:</span>
           <el-select
+            v-if="type === 'create'"
             v-model="item.metaValueType"
             placeholder="请选择"
             @change="typeChange(item)"
@@ -44,10 +60,11 @@
             >
             </el-option>
           </el-select>
+          <span v-else>{{item.metaValueType}}</span>
         </div>
-        <el-divider direction="vertical"></el-divider>
-        <div class="docItem_data">
-          <span class="docItem_data_label">value:</span>
+        <el-divider direction="vertical" v-if="type !== 'create'"></el-divider>
+        <div class="docItem_data" v-if="type !== 'create'">
+          <span class="docItem_data_label label">value:</span>
           <el-select
             v-model="item.metadataType"
             placeholder="请选择"
@@ -94,7 +111,13 @@
         </div>
         <el-divider direction="vertical"></el-divider>
         <div class="docItem_data docItem_data_btn">
+          <!-- <span
+          v-if="type === 'create'"
+          class="el-icon-edit-outline setBtn"
+          @click="editMataItem(item)"
+          ></span> -->
           <span
+            v-if="type !== 'create'"
             class="el-icon-delete setBtn"
             @click="delMataItem(index)"
           ></span>
@@ -105,7 +128,7 @@
 </template>
 <script>
 export default {
-  props:['metaData'],
+  props:['metaData','type'],
   watch: {
     metaData:{
         handler(val) {
@@ -161,19 +184,35 @@ export default {
           name: "正则表达式",
         },
       ],
+      keyOptions:[]
     };
   },
+  created(){
+    this.getList()
+  },
   methods: {
+    getList(){
+      metaSelect({knowledgeId:this.knowledgeId}).then(res =>{
+          if(res.code === 0){
+              this.keyOptions = res.data.knowledgeMetaDataList || []
+          }
+      }).catch(() =>{})
+    },
+    keyChange(e,item){
+      item.metaValueType = e
+    },
     createMetaData() {
       if (this.docMetaData.length > 0 && !this.validateMetaData()) {
         return;
       }
       this.docMetaData.push({
+        metaId:"",
         metaKey: "",
         metaRule: "",
         metaValue: "",
-        metaValueType: "string",
+        metaValueType: "",
         metadataType: "value",
+        option:"add"
       });
     },
     validateMetaData() {
@@ -271,13 +310,16 @@ export default {
       .el-date-picker {
         min-width: 160px;
       }
+      .label{
+        min-width: fit-content;
+      }
       .docItem_data_label {
         margin-right: 5px;
         display: flex;
         align-items: center;
         .question {
           color: #aaadcc;
-          margin-left: 2px;
+          margin:2px 5px 0 2px;
           cursor: pointer;
         }
       }

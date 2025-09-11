@@ -123,6 +123,9 @@ export default {
         this.$message.warning("请选择Rerank模型");
         return;
       }
+      if(matchType === 'mix' && priorityMatch === 1){
+        this.formInline.knowledgeMatchParams.rerankModelId = '';
+      }
       const data = {
         ...this.formInline,
         knowledgeIdList:this.knowledgeIdList,
