@@ -70,8 +70,8 @@ func ValidateLLMModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) erro
 	if err != nil {
 		return err
 	}
-	fc, ok := result["functionCalling"].(mp_common.FCType)
-	if ok && fc == mp_common.FCTypeToolCall {
+	fc, ok := result["functionCalling"].(string)
+	if ok && mp_common.FCType(fc) == mp_common.FCTypeToolCall {
 		tools := []mp_common.OpenAITool{
 			{
 				Type: mp_common.ToolTypeFunction,
