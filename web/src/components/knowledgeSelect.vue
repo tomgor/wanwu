@@ -47,7 +47,7 @@ export default {
                 if (res.code === 0) {
                 this.knowledgeData = (res.data.knowledgeList || []).map(m => ({
                     ...m,
-                    checked:this.knowledgeList.some(item => item.id === m.knowledgeId || item.knowledgeId === m.knowledgeId)
+                    checked:this.knowledgeList.some(item => item.id === m.knowledgeId)
                 }));
                 }
             }).catch(() =>{});
@@ -67,7 +67,7 @@ export default {
         setKnowledge(data){
            this.knowledgeData = this.knowledgeData.map(m => ({
             ...m,
-            checked: data.some(item => item.id === m.knowledgeId || item.knowledgeId === m.knowledgeId)
+            checked: data.some(item => item.id === m.knowledgeId)
             }));
         },
         handleClose(){
@@ -75,7 +75,7 @@ export default {
         },
         submit(){
             const data = this.knowledgeData.filter(item => item.checked).map(item =>({
-                knowledgeId:item.knowledgeId,
+                id:item.knowledgeId,
                 name:item.name
             }));
             this.$emit('getKnowledgeData',data);

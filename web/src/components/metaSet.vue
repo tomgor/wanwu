@@ -254,6 +254,12 @@ export default {
                 }
             }).catch(() =>{})
         },
+        metaValueBlur(item){
+            if (!item.value) {
+                this.$message.warning("请输入value值");
+                return;
+            }
+        },
         isEmpty(value){
             if (value === null || value === undefined || value === '') return true;
             return false;
@@ -283,7 +289,8 @@ export default {
         },
         clearData(){
             this.metaDataFilterParams.metaFilterParams = [];
-            this.metaDataFilterParams.filterLogicType = '';
+            this.metaDataFilterParams.filterLogicType = 'and';
+            this.metaDataFilterParams.filterEnable = false
         },
         keyChange(e,item,index){
            item.type = this.metaDataFilterParams.metaFilterParams[index]['type'];
