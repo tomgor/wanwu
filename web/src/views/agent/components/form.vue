@@ -599,6 +599,7 @@ export default {
   methods: {
     submitMeta(){
       this.$set(this.editForm.knowledgebases, this.knowledgeIndex, { ...this.editForm.knowledgebases[this.knowledgeIndex], ...this.metaData });
+      this.metaSetVisible = false;
     },
     delKnowledge(index){
       this.editForm.knowledgebases.splice(index,1)
