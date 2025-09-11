@@ -9,9 +9,9 @@
             :src="basePath + '/user/api' + login.logo.path"
         />
       </div>
-<!--      <div class="container__left">-->
-<!--        {{login.welcomeText}}-->
-<!--      </div>-->
+      <div class="container__left">
+        {{login.welcomeText}}
+      </div>
       <div class="login-box">
         <p class="login-header">
           <span style="font-weight: bold">{{$t('register.title')}}</span>
