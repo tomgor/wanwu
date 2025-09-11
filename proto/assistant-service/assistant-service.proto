@@ -144,18 +144,32 @@ message AssistantInfo {
   common.AppModelConfig rerankConfig = 9;                // Rerank模型  
   AssistantOnlineSearchConfig onlineSearchConfig = 10;   // 在线搜索配置
   int32 scope = 11;
-  repeated WorkFlowInfos workFlowInfos = 12;
-  int64 creatTime = 13;
-  int64 updateTime = 14;
-  AssistantSafetyConfig safetyConfig = 15;
+  repeated AssistantWorkFlowInfos workFlowInfos = 12;
+  repeated AssistantMCPInfos mcpInfos = 13;
+  repeated AssistantCustomToolInfos customToolInfos = 14;
+  int64 creatTime = 15;
+  int64 updateTime = 16;
+  AssistantSafetyConfig safetyConfig = 17;
 }
 
 
-message WorkFlowInfos{
+message AssistantWorkFlowInfos{
   string id = 1;
   string workFlowId = 2;
   string apiName = 3;
   bool enable = 4;
+}
+
+message AssistantMCPInfos{
+  string id = 1;
+  string mcpId = 2;
+  bool enable = 3;
+}
+
+message AssistantCustomToolInfos{
+  string id = 1;
+  string customToolId = 2;
+  bool enable = 3;
 }
 
 message GetAssistantInfoReq {

@@ -259,12 +259,36 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 	workflows, _ := s.cli.GetAssistantWorkflowsByAssistantID(ctx, assistantId)
 
 	// 转换WorkFlows
-	var workFlowInfos []*assistant_service.WorkFlowInfos
+	var workFlowInfos []*assistant_service.AssistantWorkFlowInfos
 	for _, workflow := range workflows {
-		workFlowInfos = append(workFlowInfos, &assistant_service.WorkFlowInfos{
+		workFlowInfos = append(workFlowInfos, &assistant_service.AssistantWorkFlowInfos{
 			Id:         strconv.FormatUint(uint64(workflow.ID), 10),
 			WorkFlowId: workflow.WorkflowId,
 			Enable:     workflow.Enable,
+		})
+	}
+
+	// 获取关联的 MCP
+	mcps, _ := s.cli.GetAssistantMCPList(ctx, assistantId)
+	// 转换MCP
+	var mcpInfos []*assistant_service.AssistantMCPInfos
+	for _, mcp := range mcps {
+		mcpInfos = append(mcpInfos, &assistant_service.AssistantMCPInfos{
+			Id:     strconv.FormatUint(uint64(mcp.ID), 10),
+			McpId:  mcp.MCPId,
+			Enable: mcp.Enable,
+		})
+	}
+
+	// 获取关联的 CustomTool
+	customTools, _ := s.cli.GetAssistantCustomList(ctx, assistantId)
+	// 转换CustomTool
+	var customToolInfos []*assistant_service.AssistantCustomToolInfos
+	for _, customTool := range customTools {
+		customToolInfos = append(customToolInfos, &assistant_service.AssistantCustomToolInfos{
+			Id:           strconv.FormatUint(uint64(customTool.ID), 10),
+			CustomToolId: customTool.CustomId,
+			Enable:       customTool.Enable,
 		})
 	}
 
@@ -349,6 +373,8 @@ func (s *Service) GetAssistantInfo(ctx context.Context, req *assistant_service.G
 		SafetyConfig:        safetyConfig,
 		Scope:               int32(assistant.Scope),
 		WorkFlowInfos:       workFlowInfos,
+		McpInfos:            mcpInfos,
+		CustomToolInfos:     customToolInfos,
 		CreatTime:           assistant.CreatedAt,
 		UpdateTime:          assistant.UpdatedAt,
 	}, nil
