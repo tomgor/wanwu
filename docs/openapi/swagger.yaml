@@ -26,6 +26,12 @@ definitions:
     required:
     - query
     type: object
+  request.OpenAPIWorkflowRunRequest:
+    properties:
+      input:
+        additionalProperties: {}
+        type: object
+    type: object
   response.OpenAIChatHistory:
     properties:
       query:
@@ -202,6 +208,53 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: 文本问答OpenAPI
+      tags:
+      - openapi
+  /workflow/file/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 工作流OpenAPI文件上传
+      parameters:
+      - description: 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 工作流OpenAPI文件上传
+      tags:
+      - openapi
+  /workflow/run:
+    post:
+      consumes:
+      - application/json
+      description: 工作流OpenAPI
+      parameters:
+      - description: 请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.OpenAPIWorkflowRunRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 工作流OpenAPI
       tags:
       - openapi
 swagger: "2.0"

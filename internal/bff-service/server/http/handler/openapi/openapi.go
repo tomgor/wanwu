@@ -172,6 +172,55 @@ func ChatRag(ctx *gin.Context) {
 	ctx.JSON(status, resp)
 }
 
+// WorkflowRun
+//
+//	@Tags			openapi
+//	@Summary		工作流OpenAPI
+//	@Description	工作流OpenAPI
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.OpenAPIWorkflowRunRequest	true	"请求参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/workflow/run [post]
+func WorkflowRun(ctx *gin.Context) {
+	var req request.OpenAPIWorkflowRunRequest
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	resp, err := service.OpenAPIWorkflowRun(ctx, getAppID(ctx), req.Input)
+	if err != nil {
+		gin_util.Response(ctx, nil, err)
+		return
+	}
+	_, err = ctx.Writer.Write(resp)
+	if err != nil {
+		gin_util.Response(ctx, nil, err)
+		return
+	}
+	ctx.Set(gin_util.STATUS, http.StatusOK)
+	ctx.Writer.Flush()
+}
+
+// WorkflowFileUpload
+//
+//	@Tags			openapi
+//	@Summary		工作流OpenAPI文件上传
+//	@Description	工作流OpenAPI文件上传
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Param			file	formData	file	true	"文件"
+//	@Success		200		{object}	string
+//	@Success		400		{object}	response.Response
+//	@Router			/workflow/file/upload [post]
+func WorkflowFileUpload(ctx *gin.Context) {
+	resp, err := service.OpenAPIWorkflowFileUpload(ctx)
+	if err != nil {
+		gin_util.Response(ctx, nil, err)
+		return
+	}
+	ctx.String(http.StatusOK, resp)
+}
+
 // --- internal ---
 
 // 获取当前用户ID
