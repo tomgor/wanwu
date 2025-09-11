@@ -297,7 +297,7 @@ export default {
   created() {
     this.getModelData(); //获取模型列表
     this.getRerankData(); //获取rerank模型
-    this.getKnowledgeList();//获取知识库列表
+    // this.getKnowledgeList();//获取知识库列表
     if (this.$route.query.id) {
       this.editForm.appId = this.$route.query.id;
       setTimeout(() => {
