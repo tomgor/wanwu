@@ -1,10 +1,20 @@
 <template>
   <el-dialog
-    title="元数据管理"
     :visible.sync="dialogVisible"
     width="40%"
     :before-close="handleClose"
   >
+  <template #title>
+    <span class="dialog-title">元数据管理</span>
+    <!-- <el-popover
+    placement="right"
+    width="220"
+    trigger="hover"
+    >
+    <p>元数据key为空时，去<span class="link" @click="goCreate">创建元数据</span></p>
+    <span class="el-icon-question question" slot="reference"></span>
+    </el-popover> -->
+  </template>
     <div>
         <el-table
         :data="filteredTableData"
@@ -152,6 +162,10 @@ export default {
     keyChange(e,row){
       row.metaValueType = e
     },
+    goCreate(){
+      this.$route.push({path:'/knowledge/doclist'})
+      this.dialogVisible = false;
+    },
     submitDialog() {
       this.tableData.forEach(i => {
         delete i.editable
@@ -219,7 +233,20 @@ export default {
   cursor: pointer;
   color:#384BF7;
 }
-.metaValueType{
+.metaValueType,.link{
   color:#384BF7;
+}
+.dialog-title{
+  font-weight:bold;
+  line-height:24px;
+  font-size: 18px;
+  color: #434C6C;
+}
+.question{
+  color: #aaadcc;
+  margin-left: 5px;
+}
+.link{
+  cursor: pointer;
 }
 </style>

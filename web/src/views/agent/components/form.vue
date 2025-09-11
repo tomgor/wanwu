@@ -196,7 +196,7 @@
             <div class="rl tool-conent">
               <div class="tool-right tool">
                   <div class="action-list">
-                    <div v-for="(n,i) in editForm.knowledgeList" class="action-item" :key="'knowledge'+ i">
+                    <div v-for="(n,i) in editForm.knowledgebases" class="action-item" :key="'knowledge'+ i">
                        <div class="name" style="color: #333">
                         <span>{{n.name || n.knowledgeName}}</span>
                        </div>
@@ -437,7 +437,7 @@ export default {
             "modelParams",
             "modelConfig",
             "prologue",
-            "knowledgeList",
+            "knowledgebases",
             "instructions",
             "onlineSearchConfig",
             "safetyConfig",
@@ -488,7 +488,7 @@ export default {
         modelParams: "",
         prologue: "", //开场白
         instructions: "", //系统提示词
-        knowledgeList:[],
+        knowledgebases:[],
         knowledgeConfig: {
           keywordPriority: 0.8, //关键词权重
           matchType: "mix", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
@@ -598,16 +598,16 @@ export default {
   },
   methods: {
     submitMeta(){
-      this.$set(this.editForm.knowledgeList, this.knowledgeIndex, { ...this.editForm.knowledgeList[this.knowledgeIndex], ...this.metaData });
+      this.$set(this.editForm.knowledgebases, this.knowledgeIndex, { ...this.editForm.knowledgebases[this.knowledgeIndex], ...this.metaData });
     },
     delKnowledge(index){
-      this.editForm.knowledgeList.splice(index,1)
+      this.editForm.knowledgebases.splice(index,1)
     },
     getMetaData(data){
       this.metaData = data;
     },
     getKnowledgeData(data){
-      this.editForm.knowledgeList = data
+      this.editForm.knowledgebases = data
     },
     handleMetaClose(){
       this.$refs.metaSet.clearData();
@@ -619,7 +619,7 @@ export default {
       this.metaSetVisible = true;
     },
     showKnowledgeDiglog(){
-      this.$refs.knowledgeSelect.showDialog(this.editForm.knowledgeList)
+      this.$refs.knowledgeSelect.showDialog(this.editForm.knowledgebases)
     },
     handlePublishSet(){
       this.$router.push({path:`/agent/publishSet`,query:{appId:this.editForm.assistantId,appType:'agent',name:this.editForm.name}})
@@ -635,7 +635,7 @@ export default {
       this.getAppDetail();
     },
     showKnowledgeSet() {
-      if(!this.editForm.knowledgeList.length) return;
+      if(!this.editForm.knowledgebases.length) return;
       this.$refs.knowledgeSetDialog.showDialog(this.editForm.knowledgeConfig);
     },
     //获取模型列表
@@ -854,7 +854,7 @@ export default {
         instructions: this.editForm.instructions,
         knowledgeBaseConfig: {
           config: this.editForm.knowledgeConfig,
-          knowledgeList:this.editForm.knowledgeList
+          knowledgebases:this.editForm.knowledgebases
         },
         modelConfig: {
           config: this.editForm.modelConfig,
@@ -898,7 +898,7 @@ export default {
         let data = res.data;
         this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config.matchType === '' ? this.editForm.knowledgeConfig : res.data.knowledgeBaseConfig.config;
         this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
-        this.editForm.knowledgeList = res.data.knowledgeBaseConfig.knowledgeList;
+        this.editForm.knowledgebases = res.data.knowledgeBaseConfig.knowledgebases;
         this.editForm = {
           ...this.editForm,
           avatar: data.avatar || {},
