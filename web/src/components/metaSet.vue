@@ -231,7 +231,7 @@ export default {
     watch:{
        'metaDataFilterParams':{
          handler: function (val) {
-            if(val){
+            if(val && val.metaFilterParams.length > 0){
                 const data = {
                     knowledgeId:this.knowledgeId,
                     metaDataFilterParams:val,
@@ -250,7 +250,7 @@ export default {
         getList(){
             metaSelect({knowledgeId:this.knowledgeId}).then(res =>{
                 if(res.code === 0){
-                    this.keyOptions = res.data.knowledgeMetaDataList || []
+                    this.keyOptions = res.data.knowledgeMetaList || []
                 }
             }).catch(() =>{})
         },
@@ -274,12 +274,12 @@ export default {
                 this.$message.warning('请开启元数据配置后再进行添加')
                 return;
             }
-            if(this.metaDataFilterParams.metaFilterParams.length > 0){
-                 if(!this.validateRequiredFields(this.metaDataFilterParams.metaFilterParams)){
-                    this.$message.warning('存在未填信息去,请补充')
-                    return
-                 }
-            }
+            // if(this.metaDataFilterParams.metaFilterParams.length > 0){
+            //      if(!this.validateRequiredFields(this.metaDataFilterParams.metaFilterParams)){
+            //         this.$message.warning('存在未填信息去,请补充')
+            //         return
+            //      }
+            // }
             this.metaDataFilterParams.metaFilterParams.push({
                 key:'',
                 type:'',

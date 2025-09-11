@@ -195,7 +195,11 @@ export default {
     getList(){
       metaSelect({knowledgeId:this.knowledgeId}).then(res =>{
           if(res.code === 0){
-              this.keyOptions = res.data.knowledgeMetaDataList || []
+              this.keyOptions = res.data.knowledgeMetaList || []
+              if(this.type === 'create'){
+                this.docMetaData = res.data.knowledgeMetaList || []
+              }
+              
           }
       }).catch(() =>{})
     },
