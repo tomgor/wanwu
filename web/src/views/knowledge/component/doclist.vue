@@ -149,7 +149,7 @@
     <el-dialog
       title="元数据管理"
       :visible.sync="metaVisible"
-      width="40%"
+      width="550px"
       :before-close="handleClose">
       <mataData ref="mataData" @updateMeata="updateMeata" type="create"/>
       <span slot="footer" class="dialog-footer">

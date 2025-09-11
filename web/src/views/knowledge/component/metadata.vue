@@ -26,19 +26,19 @@
           <el-input
             v-if="type === 'create'"
             v-model="item.metaKey"
-            @blur="metakeyBlur(item)"
+            @blur="metakeyBlur(item,index)"
           ></el-input>
           <el-select
               v-else
               v-model="item.metaKey"
               placeholder="请选择"
-              @change="keyChange($event,item)"
+              @change="keyChange($event,item,index)"
           >
               <el-option
-              v-for="item in keyOptions"
-              :key="item.key"
-              :label="item.key"
-              :value="item.key"
+              v-for="meta in keyOptions"
+              :key="meta.metaKey"
+              :label="meta.metaKey"
+              :value="meta.metaKey"
               >
               </el-option>
           </el-select>
@@ -60,7 +60,7 @@
             >
             </el-option>
           </el-select>
-          <span v-else>{{item.metaValueType}}</span>
+          <span v-else class="metaValueType">[{{item.metaValueType}}]</span>
         </div>
         <el-divider direction="vertical" v-if="type !== 'create'"></el-divider>
         <div class="docItem_data" v-if="type !== 'create'">
@@ -81,7 +81,7 @@
           </el-select>
           <el-input
             v-model="item.metaValue"
-            v-if="item.metadataType ==='value' && item.metaValueType === 'string'"
+            v-if="(item.metadataType ==='value' && item.metaValueType === 'string') || item.metaValueType === ''"
             @blur="metaValueBlur(item)"
             placeholder="string"
           ></el-input>
@@ -109,7 +109,7 @@
           >
           </el-date-picker>
         </div>
-        <el-divider direction="vertical"></el-divider>
+        <el-divider direction="vertical" v-if="type !== 'create'"></el-divider>
         <div class="docItem_data docItem_data_btn">
           <!-- <span
           v-if="type === 'create'"
@@ -127,6 +127,7 @@
   </div>
 </template>
 <script>
+import {metaSelect} from "@/api/knowledge"
 export default {
   props:['metaData','type'],
   watch: {
@@ -198,8 +199,8 @@ export default {
           }
       }).catch(() =>{})
     },
-    keyChange(e,item){
-      item.metaValueType = e
+    keyChange(e,item,index){
+      item.metaValueType = this.docMetaData[index]['metaValueType'];
     },
     createMetaData() {
       if (this.docMetaData.length > 0 && !this.validateMetaData()) {
@@ -240,7 +241,7 @@ export default {
       item.metaValue = "";
       item.metaRule = "";
     },
-    metakeyBlur(item) {
+    metakeyBlur(item,index) {
       const regex = /^[a-z][a-z0-9_]*$/;
       if (!item.metaKey) {
         this.$message.warning("请输入key值");
@@ -249,6 +250,13 @@ export default {
       if (!regex.test(item.metaKey)) {
         this.$message.warning("请输入符合标准的key值");
         item.metaKey = "";
+        return;
+      }
+      const list  = this.docMetaData.slice(0,-1)//不与最新数据进行比较
+      const found = list.find(i => i.metaKey === item.metaKey )
+      if(found){
+        this.$message.warning("存在相同key值");
+        this.docMetaData.splice(index,1);
         return;
       }
     },
@@ -303,8 +311,7 @@ export default {
     .docItem_data {
       display: flex;
       align-items: center;
-      margin-bottom: 5px;
-      padding: 0 10px;
+      padding:5px 10px;
       .el-input,
       .el-select,
       .el-date-picker {
@@ -312,6 +319,9 @@ export default {
       }
       .label{
         min-width: fit-content;
+      }
+      .metaValueType{
+        color:#384BF7 ;
       }
       .docItem_data_label {
         margin-right: 5px;

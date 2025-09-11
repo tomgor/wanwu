@@ -11,36 +11,32 @@
                     class="docItem"
                 >
                     <div class="docItem_data">
-                        <span class="docItem_data_label">
-                            <span>Key:</span>
-                        </span>
                         <el-select
                             v-model="item.key"
-                            placeholder="请选择"
-                            @change="keyChange($event,item)"
+                            placeholder="请选择key"
+                            @change="keyChange($event,item,index)"
                         >
+                           <template #prefix>
+                              <img class="prefix" src="@/assets/imgs/key.png" />
+                           </template>
                             <el-option
-                            v-for="item in keyOptions"
-                            :key="item.key"
-                            :label="item.key"
-                            :value="item.key"
+                            v-for="meta in keyOptions"
+                            :key="meta.metaKey"
+                            :label="meta.metaKey + '|' + '['+meta.metaValueKey+']'"
+                            :value="meta.metaKey"
                             >
                             </el-option>
                         </el-select>
                     </div>
                     <el-divider direction="vertical"></el-divider>
                     <div class="docItem_data">
-                        <span class="docItem_data_label">type:</span>
-                        <span style="min-width:80px;">{{item.type}}</span>
-                    </div>
-                    <el-divider direction="vertical"></el-divider>
-                    <div class="docItem_data">
-                        <span class="docItem_data_label">条件:</span>
                         <el-select
                             v-model="item.condition"
-                            placeholder="请选择"
-                            style="width:100px;"
+                            placeholder="请选择条件"
                         >
+                            <template #prefix>
+                              <img class="prefix" src="@/assets/imgs/condition.png" style="width:18px;"/>
+                           </template>
                             <el-option
                             v-for="item in conditionOptions[item.type]"
                             :key="item.value"
@@ -52,40 +48,40 @@
                     </div>
                     <el-divider direction="vertical"></el-divider>
                     <div class="docItem_data">
-                        <span class="docItem_data_label">value:</span>
-                        <span v-if="!item.showEdit" style="min-width:120px;">{{item.metaValue}}</span>
-                        <div v-else style="min-width:120px;">
-                            <el-input
-                                v-model="item.value"
-                                v-if="item.type === 'string'"
-                                @blur="metaValueBlur(item)"
-                                placeholder="string"
-                            ></el-input>
-                            <el-input
-                                v-model="item.value"
-                                v-if="item.type === 'number'"
-                                @blur="metaValueBlur(item)"
-                                type="number"
-                                placeholder="number"
-                            ></el-input>
-                            <el-date-picker
-                                v-if="item.type === 'time'"
-                                v-model="item.value"
-                                align="right"
-                                format="yyyy-MM-dd HH:mm:ss"
-                                value-format="timestamp"
-                                type="datetime"
-                                placeholder="选择日期时间"
-                            >
-                            </el-date-picker>
-                        </div>
+                        <el-input
+                            v-model="item.value"
+                            v-if="item.type === 'string' || item.type === ''"
+                            @blur="metaValueBlur(item)"
+                            placeholder="请输入value"
+                        >
+                        <template #prefix>
+                            <img class="prefix" src="@/assets/imgs/value.png" style="width:16px;"/>
+                        </template>
+                        </el-input>
+                        <el-input
+                            v-model="item.value"
+                            v-if="item.type === 'number'"
+                            @blur="metaValueBlur(item)"
+                            type="number"
+                            placeholder="number"
+                        >
+                        <template #prefix>
+                            <img class="prefix" src="@/assets/imgs/number.png" style="width:16px;"/>
+                        </template>
+                        </el-input>
+                        <el-date-picker
+                            v-if="item.type === 'time'"
+                            v-model="item.value"
+                            align="right"
+                            format="yyyy-MM-dd HH:mm:ss"
+                            value-format="timestamp"
+                            type="datetime"
+                            placeholder="选择日期时间"
+                        >
+                        </el-date-picker>
                     </div>
                     <el-divider direction="vertical"></el-divider>
                     <div class="docItem_data docItem_data_btn">
-                        <span 
-                            class="el-icon-edit-outline setBtn"
-                            @click="editMataItem(item)"
-                            ></span>
                         <span
                             class="el-icon-delete setBtn"
                             @click="delMataItem(index)"
@@ -267,9 +263,6 @@ export default {
                 Object.values(obj).some(val => this.isEmpty(val))
             );
         },
-        editMataItem(item){
-            item.showEdit = true
-        },
         addMataItem(){
             if(this.metaDataFilterParams.filterEnable === false){
                 this.$message.warning('请开启元数据配置后再进行添加')
@@ -285,16 +278,15 @@ export default {
                 key:'',
                 type:'',
                 condition:'',
-                value:'',
-                showEdit:false
+                value:''
             })
         },
         clearData(){
             this.metaDataFilterParams.metaFilterParams = [];
             this.metaDataFilterParams.filterLogicType = '';
         },
-        keyChange(e,item){
-           item.key = e;
+        keyChange(e,item,index){
+           item.type = this.metaDataFilterParams.metaFilterParams[index]['type'];
         },
         delMataItem(index){
             this.metaDataFilterParams.metaFilterParams.splice(index,1)
@@ -310,8 +302,20 @@ export default {
     .el-dialog__body{
         padding:10px 20px;
     }
+    .el-divider--vertical{
+        margin:0;
+    }
+    .el-input__prefix{
+        display: flex;
+        align-items:center;
+        justify-content: center;
+    }
+    .el-icon-time{
+        color: #727ff9;
+    }
 }
 .metaSet{
+    width:100%;
     .tool-typ{
         display: flex;
         justify-content:space-between;
@@ -321,9 +325,12 @@ export default {
         display:flex;
         justify-content:space-between;
         align-items:center;
+        .docMetaBox{
+            width:100%;
+        }
         .docMetaContainer{
             position: relative;
-            margin-left:80px;
+            margin-left:65px;
             margin-top:15px;
         }
         .docMetaContainer::after{
@@ -348,20 +355,24 @@ export default {
             border-radius: 8px;
             background: #f7f8fa;
             margin-top: 10px;
-            width: fit-content;
+            width:100%;
             .docItem_data {
+            width:32%;
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            margin-bottom: 5px;
-            padding: 0 10px;
+            padding: 5px 10px;
             .el-input,
             .el-select,
             .el-date-picker {
-                min-width: 160px;
+                width:100%;
+            }
+            .prefix{
+                width:14px;
+                margin-left: 5px;
             }
             .docItem_data_label {
-                margin-right: 5px;
+                margin-right: 8px;
                 display: flex;
                 align-items: center;
                 .question {
@@ -376,16 +387,20 @@ export default {
                 color: #384bf7;
             }
             }
+            .docItem_data_type{
+                width:80px;
+            }
             .docItem_data_btn {
             display: flex;
             justify-content: center;
+            width:30px;
             .el-icon-delete {
                 margin-left: 5px;
             }
             }
         }
         .orAnd{
-            width:80px;
+            width:65px;
             position: absolute;
             left: 0;
             top: 50%;

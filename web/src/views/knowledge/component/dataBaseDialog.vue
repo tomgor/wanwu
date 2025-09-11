@@ -5,11 +5,6 @@
     width="40%"
     :before-close="handleClose"
   >
-    <el-button
-        @click="addItem"
-    >
-      + 创建元数据
-    </el-button>
     <div>
         <el-table
         :data="filteredTableData"
@@ -39,7 +34,7 @@
               /> -->
               <el-select
                 v-model="row.metaKey"
-                placeholder="请选择"
+                placeholder="请选择key"
                 @change="keyChange($event,row)"
             >
                 <el-option
@@ -66,7 +61,7 @@
                 <el-option value="number" label="Number"></el-option>
                 <el-option value="time" label="Time"></el-option>
               </el-select> -->
-              <span>{{row.metaValueType}}</span>
+              <span class="metaValueType">[{{row.metaValueType}}]</span>
             </template>
           </el-table-column>
           <el-table-column
@@ -76,7 +71,7 @@
               min-width="90">
             <template #default="{ row }">
               <el-input
-                  v-if="row.metaValueType === 'string'"
+                  v-if="row.metaValueType === 'string' || row.metaValueType === ''"
                   v-model="row.metaValue"
                   @blur="handleBlur(row)"
                   clearable
@@ -125,6 +120,7 @@
       class="dialog-footer"
     >
       <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button @click="addItem" type="primary">+ 创建元数据</el-button>
       <el-button
         type="primary"
         @click="submitDialog"
@@ -178,7 +174,7 @@ export default {
     addItem(){
       this.tableData.push({
         metaKey: '',
-        metaValueType: 'string',
+        metaValueType: '',
         metaValue: '',
         metaRule: '',
         metaId: '',
@@ -220,5 +216,10 @@ export default {
 }
 .table-opera-icon{
   font-size: 18px;
+  cursor: pointer;
+  color:#384BF7;
+}
+.metaValueType{
+  color:#384BF7;
 }
 </style>
