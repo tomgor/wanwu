@@ -293,7 +293,7 @@ export default {
             this.metaDataFilterParams.filterEnable = false
         },
         keyChange(val,item,index){
-           item.type = this.keyOptions.filter(i => item.metaKey === val).map(e => e.metaValueType);
+           item.type = this.keyOptions.filter(i => i.metaKey === val).map(e => e.metaValueType)[0];
         },
         delMataItem(index){
             this.metaDataFilterParams.metaFilterParams.splice(index,1)
