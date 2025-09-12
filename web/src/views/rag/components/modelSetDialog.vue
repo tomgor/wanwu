@@ -46,9 +46,9 @@ export default {
                 temperature:0.14,
                 topP:0.85,
                 frequencyPenalty:1.1,
-                temperatureEnable:true,
-                topPEnable:true,
-                frequencyPenaltyEnable:true
+                temperatureEnable:false,
+                topPEnable:false,
+                frequencyPenaltyEnable:false
             },
             modelSet: [
                 {

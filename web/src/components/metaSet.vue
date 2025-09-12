@@ -235,9 +235,8 @@ export default {
     watch:{
        'metaDataFilterParams':{
          handler: function (val) {
-            if(val && val.metaFilterParams.length > 0){
+            if(val){
                 const data = {
-                    knowledgeId:this.knowledgeId,
                     metaDataFilterParams:val,
                 }
                 this.$emit('getMetaData',data)
@@ -252,7 +251,6 @@ export default {
                 this.metaDataFilterParams = val
             }
           },
-          immediate:true,
           deep:true
        }
     },

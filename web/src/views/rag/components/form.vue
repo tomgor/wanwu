@@ -333,6 +333,7 @@ export default {
       this.currentKnowledgeId = e.id;
       this.knowledgeIndex = index;
       this.currentMetaData = e.metaDataFilterParams;
+      console.log(this.currentMetaData,e.metaDataFilterParams)
       this.metaSetVisible = true;
     },
     showKnowledgeDiglog(){

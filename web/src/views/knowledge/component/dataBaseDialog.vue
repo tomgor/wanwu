@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="dialogVisible"
-    width="55%"
+    width="60%"
     :before-close="handleClose"
   >
   <template #title>
@@ -22,26 +22,12 @@
           <el-table-column
               prop="metaKey"
               align="center">
-            <!-- 自定义表头（label + tooltip） -->
             <template #header>
               <div style="display: inline-flex; align-items: center;">
                 <span>Key</span>
-                <!-- <el-tooltip
-                    effect="dark"
-                    content="只能包含小写字母、数字和下划线，并且必须以小写字母开头"
-                    placement="top-start"
-                >
-                  <i class="el-icon-question" style="margin-left: 5px; cursor: pointer;"></i>
-                </el-tooltip> -->
               </div>
             </template>
             <template #default="{ row }">
-              <!-- <el-input
-                  v-model="row.metaKey"
-                  @input="row.metaKey = row.metaKey.replace(/[^a-z0-9_]/g, '').replace(/^[^a-z]*/, '')"
-                  clearable
-                  :disabled="!row.editable || !row.created"
-              /> -->
               <el-select
                 v-model="row.metaKey"
                 placeholder="请选择key"
@@ -62,15 +48,6 @@
               label="类型"
               align="center">
             <template #default="{ row }">
-              <!-- <el-select
-                  v-model="row.metaValueType"
-                  clearable
-                  :disabled="!row.editable || !row.created"
-              >
-                <el-option value="string" label="String"></el-option>
-                <el-option value="number" label="Number"></el-option>
-                <el-option value="time" label="Time"></el-option>
-              </el-select> -->
               <span class="metaValueType">[{{row.metaValueType}}]</span>
             </template>
           </el-table-column>

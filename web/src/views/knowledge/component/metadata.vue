@@ -211,6 +211,7 @@ export default {
       }).catch(() =>{})
     },
     keyChange(val,item){
+      item.metaValue = '';
       item.metaValueType = this.keyOptions.filter(i => i.metaKey === val).map(e => e.metaValueType)[0];
     },
     createMetaData() {

@@ -96,12 +96,17 @@ export default {
       searchList: [],
       score: [],
       formInline:null,
-      knowledgeId:this.$route.query.knowledgeId
+      knowledgeId:this.$route.query.knowledgeId,
+      name:this.$route.query.name
     };
   },
   methods: {
     getMetaData(data){
-      this.knowledgeIdList = data
+      this.knowledgeIdList = {
+        ...data,
+        id:this.knowledgeId,
+        name:this.name
+      }
     },
     goBack() {
       this.$router.go(-1);
