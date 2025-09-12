@@ -26,11 +26,3 @@ type OpenAPIRagChatRequest struct {
 func (req *OpenAPIRagChatRequest) Check() error {
 	return nil
 }
-
-type OpenAPIWorkflowRunRequest struct {
-	Input map[string]any `json:"input"`
-}
-
-func (req *OpenAPIWorkflowRunRequest) Check() error {
-	return nil
-}

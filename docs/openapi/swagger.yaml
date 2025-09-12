@@ -26,12 +26,6 @@ definitions:
     required:
     - query
     type: object
-  request.OpenAPIWorkflowRunRequest:
-    properties:
-      input:
-        additionalProperties: {}
-        type: object
-    type: object
   response.OpenAIChatHistory:
     properties:
       query:
@@ -240,13 +234,6 @@ paths:
       consumes:
       - application/json
       description: 工作流OpenAPI
-      parameters:
-      - description: 请求参数
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/request.OpenAPIWorkflowRunRequest'
       produces:
       - application/json
       responses:
