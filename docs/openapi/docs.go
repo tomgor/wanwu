@@ -192,17 +192,6 @@ const docTemplate = `{
                     "openapi"
                 ],
                 "summary": "工作流OpenAPI",
-                "parameters": [
-                    {
-                        "description": "请求参数",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.OpenAPIWorkflowRunRequest"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -252,15 +241,6 @@ const docTemplate = `{
                 },
                 "stream": {
                     "type": "boolean"
-                }
-            }
-        },
-        "request.OpenAPIWorkflowRunRequest": {
-            "type": "object",
-            "properties": {
-                "input": {
-                    "type": "object",
-                    "additionalProperties": {}
                 }
             }
         },

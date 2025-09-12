@@ -179,15 +179,16 @@ func ChatRag(ctx *gin.Context) {
 //	@Description	工作流OpenAPI
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.OpenAPIWorkflowRunRequest	true	"请求参数"
-//	@Success		200		{object}	response.Response
+//	@Success		200	{object}	response.Response
 //	@Router			/workflow/run [post]
 func WorkflowRun(ctx *gin.Context) {
-	var req request.OpenAPIWorkflowRunRequest
-	if !gin_util.Bind(ctx, &req) {
-		return
+	var body []byte
+	if cb, ok := ctx.Get(gin.BodyBytesKey); ok {
+		if cbb, ok := cb.([]byte); ok {
+			body = cbb
+		}
 	}
-	resp, err := service.OpenAPIWorkflowRun(ctx, getAppID(ctx), req.Input)
+	resp, err := service.OpenAPIWorkflowRun(ctx, getAppID(ctx), body)
 	if err != nil {
 		gin_util.Response(ctx, nil, err)
 		return
