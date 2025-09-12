@@ -27,6 +27,7 @@
             v-if="type === 'create'"
             v-model="item.metaKey"
             @blur="metakeyBlur(item,index)"
+            :disabled="item.option === 'data'"
           ></el-input>
           <el-select
               v-else
@@ -51,6 +52,7 @@
             v-model="item.metaValueType"
             placeholder="请选择"
             @change="typeChange(item)"
+            :disabled="item.option === 'data'"
           >
             <el-option
               v-for="item in typeOptions"
@@ -197,7 +199,10 @@ export default {
           if(res.code === 0){
               this.keyOptions = res.data.knowledgeMetaList || []
               if(this.type === 'create'){
-                this.docMetaData = res.data.knowledgeMetaList || []
+                this.docMetaData = (res.data.knowledgeMetaList || []).map(item => ({
+                  ...item,
+                  option: 'data'
+                }));
               }
               
           }
@@ -207,9 +212,17 @@ export default {
       item.metaValueType = this.docMetaData[index]['metaValueType'];
     },
     createMetaData() {
-      if (this.docMetaData.length > 0 && !this.validateMetaData()) {
-        return;
+      if(this.type === 'create' && this.docMetaData.length > 0  ){
+        if (this.docMetaData.some(item => item.metaKey === '' || item.metaValue === '')) {
+            this.$message.error("元数据管理存在未填写的必填字段");
+            return;
+        }
+      }else{
+          if (this.docMetaData.length > 0 && !this.validateMetaData()) {
+            return;
+        }
       }
+
       this.docMetaData.push({
         metaId:"",
         metaKey: "",

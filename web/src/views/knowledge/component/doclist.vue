@@ -401,7 +401,8 @@ export default {
         query: {
           id: row.docId,
           type: row.docType,
-          name:row.docName
+          name:row.docName,
+          knowledgeId:row.knowledgeId
         },
       });
     },

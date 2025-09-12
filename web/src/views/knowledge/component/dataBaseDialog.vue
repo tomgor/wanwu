@@ -49,9 +49,9 @@
             >
                 <el-option
                 v-for="item in keyOptions"
-                :key="item.key"
-                :label="item.key"
-                :value="item.key"
+                :key="item.metaKey"
+                :label="item.metaKey"
+                :value="item.metaKey"
                 >
                 </el-option>
               </el-select>
@@ -140,8 +140,9 @@
   </el-dialog>
 </template>
 <script>
-import { updateDocMeta} from "@/api/knowledge";
+import { updateDocMeta,metaSelect} from "@/api/knowledge";
 export default {
+  props:['knowledgeId'],
   computed: {
     filteredTableData() {
       return this.tableData.filter(item => item.option !== "delete");
@@ -158,9 +159,19 @@ export default {
       keyOptions:[]
     };
   },
+  created(){
+    this.getList()
+  },
   methods: {
-    keyChange(e,row){
-      row.metaValueType = e
+    getList(){
+        metaSelect({knowledgeId:this.knowledgeId}).then(res =>{
+            if(res.code === 0){
+                this.keyOptions = res.data.knowledgeMetaList || []
+            }
+        }).catch(() =>{})
+    },
+    keyChange(val,row){
+      row.metaValueType = this.keyOptions.filter(i => i.metaKey === val).map(e => e.metaValueType)[0];
     },
     goCreate(){
       this.$route.push({path:'/knowledge/doclist'})
