@@ -52,7 +52,6 @@
             v-if="type === 'create'"
             v-model="item.metaValueType"
             placeholder="请选择"
-            @change="typeChange(item)"
             :disabled="item.hasMetaId"
           >
             <el-option
@@ -120,9 +119,9 @@
           @click="editMataItem(item)"
           ></span> -->
           <span
-            v-if="type !== 'create'"
             class="el-icon-delete setBtn"
-            @click="delMataItem(index)"
+            @click="delMataItem(index,item)"
+            :style="{color:item.hasMetaId?'#ccc':'#384BF7'}"
           ></span>
         </div>
       </div>
@@ -254,7 +253,10 @@ export default {
       }
       return true;
     },
-    delMataItem(i) {
+    delMataItem(i,item) {
+      if(this.type === 'create' && item.hasMetaId){
+        return;
+      }
       this.docMetaData.splice(i, 1);
     },
     valueChange(item) {

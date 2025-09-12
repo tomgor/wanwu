@@ -221,8 +221,8 @@ export default {
   },
   methods: {
     createMeta(){
-      this.scrollToBottom();
       this.$refs.mataData.createMetaData();
+      this.scrollToBottom();
     },
     scrollToBottom() {
       this.$nextTick(() => {
