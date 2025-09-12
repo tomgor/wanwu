@@ -30,7 +30,7 @@
         </div>
          <div class="hitTest_input meta_box">
           <h3>元数据过滤配置</h3>
-          <metaSet ref="metaSet" @getMetaData="getMetaData" class="metaSet" :knowledgeId="knowledgeId" />
+          <metaSet ref="metaSet" class="metaSet" :knowledgeId="knowledgeId" />
         </div>
         <div class="test_form">
           <searchConfig ref="searchConfig" @sendConfigInfo="sendConfigInfo" />
@@ -101,13 +101,6 @@ export default {
     };
   },
   methods: {
-    getMetaData(data){
-      this.knowledgeIdList = {
-        ...data,
-        id:this.knowledgeId,
-        name:this.name
-      }
-    },
     goBack() {
       this.$router.go(-1);
     },
@@ -115,6 +108,13 @@ export default {
       this.formInline = data;
     },
     startTest() {
+      const metaData  = this.$refs.metaSet.getMetaData();
+      this.knowledgeIdList = {
+        ...metaData,
+        id:this.knowledgeId,
+        name:this.name
+      }
+
       if (this.question === "") {
         this.$message.warning("请输入问题");
         return;
@@ -135,6 +135,7 @@ export default {
         this.$message.warning('存在未填信息,请补充')
         return
       }
+      
       const data = {
         ...this.formInline,
         knowledgeList:[this.knowledgeIdList],
@@ -167,22 +168,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-// /deep/ {
-//   .vertical-form-item {
-//     display: flex;
-//     flex-direction: column;
-//     align-items: flex-start;
-//   }
-//   .vertical-form-item .el-form-item__label {
-//     line-height: unset;
-//     font-size: 14px;
-//     font-weight: bold;
-//   }
-//   .el-form-item__content {
-//     width: 100%;
-//   }
-// }
-
 .full-content {
   display: flex;
   flex-direction: column;

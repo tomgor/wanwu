@@ -160,7 +160,7 @@
           <span>[ 通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]</span>
          </div>
       </template>
-      <metaSet ref="metaSet" @getMetaData="getMetaData" :knowledgeId="currentKnowledgeId" :currentMetaData="currentMetaData"/>
+      <metaSet ref="metaSet"  :knowledgeId="currentKnowledgeId" :currentMetaData="currentMetaData"/>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleMetaClose">取 消</el-button>
         <el-button type="primary" @click="submitMeta">确 定</el-button>
@@ -171,7 +171,6 @@
 
 <script>
 import {getApiKeyRoot,appPublish} from "@/api/appspace";
-import { getKnowledgeList } from "@/api/knowledge";
 import CreateTxtQues from "@/components/createApp/createRag.vue"
 import ModelSet from "./modelSetDialog.vue";
 import metaSet from "@/components/metaSet";
@@ -201,7 +200,6 @@ export default {
     return {
       knowledgeIndex:-1,
       currentKnowledgeId:'',
-      metaData:[],
       currentMetaData:{},
       metaSetVisible:false,
       rerankOptions:[],
@@ -251,7 +249,6 @@ export default {
       isPublish: false,
       modleOptions: [],
       selectKnowledge: [],
-      // knowledgeData: [],
       loadingPercent: 10,
       nameStatus: "",
       saved: false, //按钮
@@ -298,7 +295,6 @@ export default {
   created() {
     this.getModelData(); //获取模型列表
     this.getRerankData(); //获取rerank模型
-    // this.getKnowledgeList();//获取知识库列表
     if (this.$route.query.id) {
       this.editForm.appId = this.$route.query.id;
       setTimeout(() => {
@@ -313,7 +309,8 @@ export default {
   },
   methods: {
     submitMeta(){
-      this.$set(this.editForm.knowledgebases, this.knowledgeIndex, { ...this.editForm.knowledgebases[this.knowledgeIndex], ...this.metaData });
+      const metaData  = this.$refs.metaSet.getMetaData();
+      this.$set(this.editForm.knowledgebases, this.knowledgeIndex, { ...this.editForm.knowledgebases[this.knowledgeIndex], ...metaData });
       this.metaSetVisible = false;
     },
     delKnowledge(index){
@@ -326,14 +323,10 @@ export default {
     getKnowledgeData(data){
       this.editForm.knowledgebases = data
     },
-    getMetaData(data){
-      this.metaData = data;
-    },
     showMetaSet(e,index){
       this.currentKnowledgeId = e.id;
       this.knowledgeIndex = index;
       this.currentMetaData = e.metaDataFilterParams;
-      console.log(this.currentMetaData,e.metaDataFilterParams)
       this.metaSetVisible = true;
     },
     showKnowledgeDiglog(){
@@ -461,15 +454,6 @@ export default {
       }
       this.modelLoading = false;
     },
-    // async getKnowledgeList() {
-    //   //获取文档知识分类
-    //   const res = await getKnowledgeList({});
-    //   if (res.code === 0) {
-    //     this.knowledgeData = res.data.knowledgeList || [];
-    //   } else {
-    //     this.$message.error(res.message);
-    //   }
-    // },
     async updateInfo() {
       if (this.isUpdating) return; // 防止重复调用
       

@@ -369,7 +369,7 @@
           <span>[ 通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]</span>
          </div>
       </template>
-      <metaSet ref="metaSet" @getMetaData="getMetaData" :knowledgeId="currentKnowledgeId" :currentMetaData="currentMetaData"/>
+      <metaSet ref="metaSet" :knowledgeId="currentKnowledgeId" :currentMetaData="currentMetaData"/>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleMetaClose">取 消</el-button>
         <el-button type="primary" @click="submitMeta">确 定</el-button>
@@ -469,7 +469,6 @@ export default {
     return {
       knowledgeIndex:-1,
       currentKnowledgeId:'',
-      metaData:[],
       currentMetaData:{},
       metaSetVisible:false,
       knowledgeCheckData:[],
@@ -599,14 +598,12 @@ export default {
   },
   methods: {
     submitMeta(){
-      this.$set(this.editForm.knowledgebases, this.knowledgeIndex, { ...this.editForm.knowledgebases[this.knowledgeIndex], ...this.metaData });
+      const metaData  = this.$refs.metaSet.getMetaData();
+      this.$set(this.editForm.knowledgebases, this.knowledgeIndex, { ...this.editForm.knowledgebases[this.knowledgeIndex], ...metaData });
       this.metaSetVisible = false;
     },
     delKnowledge(index){
       this.editForm.knowledgebases.splice(index,1)
-    },
-    getMetaData(data){
-      this.metaData = data;
     },
     getKnowledgeData(data){
       this.editForm.knowledgebases = data

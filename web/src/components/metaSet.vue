@@ -117,7 +117,7 @@ export default {
         },
         currentMetaData:{
             type:Object,
-            default:{}
+            default: () => ({})
         }
     },
     data(){
@@ -233,22 +233,10 @@ export default {
         }
     },
     watch:{
-       'metaDataFilterParams':{
-         handler: function (val) {
-            if(val){
-                const data = {
-                    metaDataFilterParams:val,
-                }
-                this.$emit('getMetaData',data)
-            }
-         },
-         immediate: true,
-         deep:true
-       },
        currentMetaData:{
           handler: function (val){
             if(val){
-                this.metaDataFilterParams = val
+                this.metaDataFilterParams = JSON.parse(JSON.stringify(val))
             }
           },
           deep:true
@@ -258,6 +246,18 @@ export default {
         this.getList()
     },
     methods:{
+        getMetaData(){
+            this.metaDataFilterParams.metaFilterParams = this.metaDataFilterParams.metaFilterParams.map(item => {
+                if (item.type === 'time') {
+                    return {
+                        ...item,
+                        value: String(item.value)
+                    };
+                }
+                return item;
+            });
+            return  { 'metaDataFilterParams':this.metaDataFilterParams}
+        },
         getList(){
             metaSelect({knowledgeId:this.knowledgeId}).then(res =>{
                 if(res.code === 0){
@@ -303,7 +303,8 @@ export default {
             this.metaDataFilterParams.filterLogicType = 'and';
             this.metaDataFilterParams.filterEnable = false
         },
-        keyChange(val,item,index){
+        keyChange(val,item){
+           item.value = '';
            item.type = this.keyOptions.filter(i => i.metaKey === val).map(e => e.metaValueType)[0];
         },
         delMataItem(index){
