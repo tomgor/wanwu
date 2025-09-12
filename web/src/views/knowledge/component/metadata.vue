@@ -5,6 +5,7 @@
       type="primary"
       size="mini"
       @click="createMetaData"
+      v-if="type !== 'create'"
     >创建</el-button>
     <div class="docMetaData">
       <div
@@ -27,13 +28,13 @@
             v-if="type === 'create'"
             v-model="item.metaKey"
             @blur="metakeyBlur(item,index)"
-            :disabled="item.option === 'data'"
+            :disabled="item.hasMetaId"
           ></el-input>
           <el-select
               v-else
               v-model="item.metaKey"
               placeholder="请选择"
-              @change="keyChange($event,item,index)"
+              @change="keyChange($event,item)"
           >
               <el-option
               v-for="meta in keyOptions"
@@ -52,7 +53,7 @@
             v-model="item.metaValueType"
             placeholder="请选择"
             @change="typeChange(item)"
-            :disabled="item.option === 'data'"
+            :disabled="item.hasMetaId"
           >
             <el-option
               v-for="item in typeOptions"
@@ -71,7 +72,7 @@
             v-model="item.metadataType"
             placeholder="请选择"
             style="margin-right:5px;"
-            @change="typeChange(item)"
+            @change="valueChange(item)"
           >
             <el-option
               v-for="item in valueOptions"
@@ -201,24 +202,25 @@ export default {
               if(this.type === 'create'){
                 this.docMetaData = (res.data.knowledgeMetaList || []).map(item => ({
                   ...item,
-                  option: 'data'
+                  hasMetaId:true,
+                  option: 'add'
                 }));
               }
               
           }
       }).catch(() =>{})
     },
-    keyChange(e,item,index){
-      item.metaValueType = this.docMetaData[index]['metaValueType'];
+    keyChange(val,item){
+      item.metaValueType = this.keyOptions.filter(i => i.metaKey === val).map(e => e.metaValueType)[0];
     },
     createMetaData() {
       if(this.type === 'create' && this.docMetaData.length > 0  ){
-        if (this.docMetaData.some(item => item.metaKey === '' || item.metaValue === '')) {
+        if (this.docMetaData.some(item => item.metaKey === '' || item.metaValueType === '')) {
             this.$message.error("元数据管理存在未填写的必填字段");
             return;
         }
       }else{
-          if (this.docMetaData.length > 0 && !this.validateMetaData()) {
+          if (this.docMetaData.length > 0 && !this.validateMetaData(this.docMetaData)) {
             return;
         }
       }
@@ -254,7 +256,7 @@ export default {
     delMataItem(i) {
       this.docMetaData.splice(i, 1);
     },
-    typeChange(item) {
+    valueChange(item) {
       item.metaValue = "";
       item.metaRule = "";
     },

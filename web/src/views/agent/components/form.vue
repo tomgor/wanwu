@@ -369,7 +369,7 @@
           <span>[ 通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]</span>
          </div>
       </template>
-      <metaSet ref="metaSet" @getMetaData="getMetaData" :knowledgeId="currentKnowledgeId" />
+      <metaSet ref="metaSet" @getMetaData="getMetaData" :knowledgeId="currentKnowledgeId" :currentMetaData="currentMetaData"/>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleMetaClose">取 消</el-button>
         <el-button type="primary" @click="submitMeta">确 定</el-button>
@@ -470,6 +470,7 @@ export default {
       knowledgeIndex:-1,
       currentKnowledgeId:'',
       metaData:[],
+      currentMetaData:{},
       metaSetVisible:false,
       knowledgeCheckData:[],
       activeIndex:-1,
@@ -616,6 +617,7 @@ export default {
     },
     showMetaSet(e,index){
       this.currentKnowledgeId = e.id;
+      this.currentMetaData = e.metaDataFilterParams;
       this.knowledgeIndex = index;
       this.metaSetVisible = true;
     },

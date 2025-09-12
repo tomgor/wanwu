@@ -151,10 +151,11 @@
       :visible.sync="metaVisible"
       width="550px"
       :before-close="handleClose">
-      <mataData ref="mataData" @updateMeata="updateMeata" type="create" :knowledgeId="docQuery.knowledgeId"/>
+      <mataData ref="mataData" @updateMeata="updateMeata" type="create" :knowledgeId="docQuery.knowledgeId" class="mataData"/>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose">取 消</el-button>
-        <el-button type="primary" @click="submitMeta">确 定</el-button>
+        <el-button type="primary" @click="createMeta">创 建</el-button>
+        <el-button type="primary" @click="submitMeta" :disabled="isDisabled">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -189,7 +190,8 @@ export default {
       refreshCount:0,
       tagList:[],
       metaVisible:false,
-      metaData:[]
+      metaData:[],
+      isDisabled:false
     };
   },
   watch:{
@@ -200,6 +202,15 @@ export default {
         }
       },
       immediate:true
+    },
+    metaData:{
+      handler(val){
+        if(val.some(item => item.metaKey === '' || item.metaValueType === '') || val.length === 0){
+          this.isDisabled = true
+        }else{
+          this.isDisabled = false
+        }
+      }
     }
   },
   mounted(){
@@ -209,15 +220,32 @@ export default {
     this.clearTimer()
   },
   methods: {
+    createMeta(){
+      this.scrollToBottom();
+      this.$refs.mataData.createMetaData();
+    },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const container = this.$refs.mataData;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      });
+     },
     submitMeta(){
       const data = {
         docId:'',
         knowledgeId:this.docQuery.knowledgeId,
-        metaDataList:this.metaData
+        metaDataList:this.metaData.map(({metaKey,metaValueType,option}) =>({
+          metaKey,
+          metaValueType,
+          option
+        }))
       }
       updateDocMeta(data).then(res =>{
         if(res.code === 0){
           this.$message.success('操作成功');
+          this.$refs.mataData.getList();
           this.metaVisible = false;
         }
       }).catch(() =>{})
@@ -425,6 +453,10 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.mataData{
+  max-height:400px;
+  overflow-y: auto;
+}
 .edit-icon{
   color: #384BF7;
   cursor: pointer;
@@ -479,6 +511,9 @@ export default {
   .el-upload-list {
     max-height: 200px;
     overflow-y: auto;
+  }
+  .el-dialog__body{
+    padding:10px 20px;
   }
 }
 .fileNumber {

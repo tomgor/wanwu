@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="dialogVisible"
-    width="40%"
+    width="55%"
     :before-close="handleClose"
   >
   <template #title>

@@ -114,6 +114,10 @@ export default {
             type:String,
             required: true,
             default:''
+        },
+        currentMetaData:{
+            type:Object,
+            default:{}
         }
     },
     data(){
@@ -241,6 +245,15 @@ export default {
          },
          immediate: true,
          deep:true
+       },
+       currentMetaData:{
+          handler: function (val){
+            if(val){
+                this.metaDataFilterParams = val
+            }
+          },
+          immediate:true,
+          deep:true
        }
     },
     created(){
