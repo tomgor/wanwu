@@ -35,7 +35,7 @@ export const PROVIDER_IMG_OBJ = {
     [OLLAMA]: require('@/assets/imgs/ollama.png'),
     [QWEN]: require('@/assets/imgs/qwen.png'),
     [HUOSHAN]: require('@/assets/imgs/volcano.png'),
-    [INFINI]: require('@/assets/imgs/openAI.png'),
+    [INFINI]: require('@/assets/imgs/infini.png'),
 }
 
 export const PROVIDER_TYPE = Object.keys(PROVIDER_OBJ)
