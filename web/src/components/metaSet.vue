@@ -322,7 +322,7 @@ export default {
         delMataItem(index){
             this.metaDataFilterParams.metaFilterParams.splice(index,1)
             if(this.metaDataFilterParams.metaFilterParams.length === 0){
-                this.metaDataFilterParams.filterLogicType = '';
+                this.metaDataFilterParams.filterLogicType = 'and';
             }
         }
     }
