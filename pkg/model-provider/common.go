@@ -16,6 +16,7 @@ const (
 	ProviderHuoshan          = "Huoshan"
 	ProviderOllama           = "Ollama"
 	ProviderQwen             = "Qwen"
+	ProviderInfini           = "Infini"
 )
 
 var (

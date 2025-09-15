@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	mp_infini "github.com/UnicomAI/wanwu/pkg/model-provider/mp-infini"
 
 	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	mp_huoshan "github.com/UnicomAI/wanwu/pkg/model-provider/mp-huoshan"
@@ -101,6 +102,17 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 		default:
 			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
 		}
+	case ProviderInfini:
+		switch modelType {
+		case ModelTypeLLM:
+			ret = &mp_infini.LLM{}
+		case ModelTypeRerank:
+			ret = &mp_infini.Rerank{}
+		case ModelTypeEmbedding:
+			ret = &mp_infini.Embedding{}
+		default:
+			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
+		}
 	default:
 		return nil, fmt.Errorf("invalid provider: %v", modelType)
 	}
@@ -117,6 +129,7 @@ type ProviderModelConfig struct {
 	ProviderHuoshan          ProviderModelByHuoshan          `json:"providerHuoshan"`
 	ProviderQwen             ProviderModelByQwen             `json:"providerQwen"`
 	ProviderOllama           ProviderModelByOllama           `json:"providerOllama"`
+	ProviderInfini           ProviderModelByInfini           `json:"providerModelByInfini"`
 }
 
 type ProviderModelByOpenAICompatible struct {
@@ -146,4 +159,10 @@ type ProviderModelByQwen struct {
 type ProviderModelByOllama struct {
 	Llm       mp_ollama.LLM       `json:"llm"`
 	Embedding mp_ollama.Embedding `json:"embedding"`
+}
+
+type ProviderModelByInfini struct {
+	Llm       mp_infini.LLM       `json:"llm"`
+	Rerank    mp_infini.Rerank    `json:"rerank"`
+	Embedding mp_infini.Embedding `json:"embedding"`
 }
