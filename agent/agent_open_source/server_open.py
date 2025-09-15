@@ -67,7 +67,7 @@ def agent_start():
             stream = data.get("stream",True)
             history = data.get("history",[])
             userId = request.headers.get('X-Uid')
-            function_call = data.get("function_call",False)
+            #function_call = data.get("function_call",False)
             logger.info('user_id是:'+userId)
 
 
@@ -122,10 +122,15 @@ def agent_start():
             if response.status_code == 200:
                 data = response.json()
                 result = data.get("data", {}).get("config").get("functionCalling")
-                logger.info(f"functioncall result{result}")
-                if result != "noSupport":
-                    function_call = True
-                    logger.info(f"func_is {function_call}")
+                logger.info(f"support result{result}")
+                if result == "noSupport":
+                    function_call = False
+                    logger.info(f"不支持function_call {function_call}")
+                else:
+                    function_call = False
+                    logger.info(f"支持function_call {function_call}")
+
+
 
 
 
@@ -335,7 +340,8 @@ def agent_start():
             used_rag = False
             #如果传参有知识库 则先走rag
             if use_know:
-                print('-----------先走知识库回答')
+                print('进入rag问题是:',question)
+                
                 url = "http://172.17.0.1:10891/rag/knowledge/stream/search" 
 
                 payload = {
@@ -377,9 +383,10 @@ def agent_start():
                                 if not first_line_checked:
                                     first_line_checked = True
                                     if data["data"]["searchList"]:
-                                        print('知识库可回答')
+                                        logger.info(f"知识库有召回")
                                         used_rag = True
-                                    print('知识库无法回答')
+                                    else:
+                                        logger.info(f"知识库无召回")
                                 if used_rag:
                                     answer = {
                 "code": 0,
@@ -408,10 +415,9 @@ def agent_start():
                                     yield f"data: {json.dumps(answer, ensure_ascii=False)}\n\n"
                             except Exception as e:
                                 yield f"data: {json.dumps({'error': str(e)}, ensure_ascii=False)}\n\n"
-            if not used_rag:
-                print('------------走搜索search')               
+            if not used_rag:               
                 if use_search == True:
-                    print('------------走搜索search')
+                    logger.info(f"走搜索")
                     #调用网络搜索 透传搜索出来的search_list和回答 结果直接返回                
                     loop = asyncio.new_event_loop()
                     asyncio.set_event_loop(loop)
@@ -533,7 +539,7 @@ def agent_start():
                         question = '问题是:'+question+'\n'+'以下是chatdoc工具可能用到的参数：'+'upload_file_url:'+upload_file_url
                     else:
                         question = '问题是:' + question
-                    print('送入action问题是:',question)
+                    logger.info("送入action问题是:{question}")
                     print('plugin_list是什么:',plugin_list)
                     if function_call:
                         payload = {
@@ -578,7 +584,7 @@ def agent_start():
                         assistant_reply = ""
 
                         for line in response.iter_lines(decode_unicode=True):
-                            print('action输出是什么:',line)
+                            logger.info(f"action输出是什么:{line}")
                             if line.startswith("data:"):
                                 line = line[5:]
                                 datajson = json.loads(line)
