@@ -239,6 +239,7 @@ export default {
                 this.metaDataFilterParams = JSON.parse(JSON.stringify(val))
             }
           },
+          immediate:true,
           deep:true
        }
     },
@@ -266,19 +267,29 @@ export default {
             }).catch(() =>{})
         },
         metaValueBlur(item){
-            if (!item.value) {
-                this.$message.warning("请输入value值");
-                return;
+            if(item.condition === 'empty'){
+                 return true;
+            }else{
+                if (!item.value) {
+                    this.$message.warning("请输入value值");
+                    return;
+                }
             }
+            
         },
         isEmpty(value){
             if (value === null || value === undefined || value === '') return true;
             return false;
         },
         validateRequiredFields(data){
-            return data.some(obj => 
-                Object.values(obj).some(val => this.isEmpty(val))
-            );
+             return data.some(obj => 
+                Object.values(obj).some(val => {
+                    if (val && typeof val === 'object' && val.condition === 'empty') {
+                        return false;
+                    }
+                    return this.isEmpty(val);
+                })
+            )
         },
         addMataItem(){
             if(this.metaDataFilterParams.filterEnable === false){
@@ -305,6 +316,7 @@ export default {
         },
         keyChange(val,item){
            item.value = '';
+           item.condition = '';
            item.type = this.keyOptions.filter(i => i.metaKey === val).map(e => e.metaValueType)[0];
         },
         delMataItem(index){

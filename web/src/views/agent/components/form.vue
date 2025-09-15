@@ -609,7 +609,7 @@ export default {
       this.editForm.knowledgebases = data
     },
     handleMetaClose(){
-      this.$refs.metaSet.clearData();
+      // this.$refs.metaSet.clearData();
       this.metaSetVisible = false;
     },
     showMetaSet(e,index){

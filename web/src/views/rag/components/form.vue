@@ -317,7 +317,7 @@ export default {
       this.editForm.knowledgebases.splice(index,1)
     },
     handleMetaClose(){
-      this.$refs.metaSet.clearData();
+      // this.$refs.metaSet.clearData();
       this.metaSetVisible = false;
     },
     getKnowledgeData(data){
