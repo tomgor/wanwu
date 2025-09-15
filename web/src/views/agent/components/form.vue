@@ -450,7 +450,7 @@ export default {
               JSON.stringify((this.initialEditForm || {})[prop])
             );
           })
-          
+
           if (changed) {
             if (newVal["modelParams"] !== "" && newVal["prologue"] !== "") {
               this.updateInfo();

@@ -61,7 +61,7 @@ export default {
         },
         showDialog(data){
             this.dialogVisible = true;
-            this.setKnowledge(data);
+            this.setKnowledge(data || []);
             this.knowledgeList = data || [];
         },
         setKnowledge(data){
