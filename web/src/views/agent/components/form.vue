@@ -599,6 +599,10 @@ export default {
   methods: {
     submitMeta(){
       const metaData  = this.$refs.metaSet.getMetaData();
+      if(this.$refs.metaSet.validateRequiredFields(metaData['metaDataFilterParams']['metaFilterParams'])){
+        this.$message.warning('存在未填信息,请补充')
+        return
+      }
       this.$set(this.editForm.knowledgebases, this.knowledgeIndex, { ...this.editForm.knowledgebases[this.knowledgeIndex], ...metaData });
       this.metaSetVisible = false;
     },

@@ -53,6 +53,7 @@
                             v-if="item.type === 'string' || item.type === ''"
                             @blur="metaValueBlur(item)"
                             placeholder="请输入value"
+                            :disabled="item.condition === 'empty'"
                         >
                         <template #prefix>
                             <img class="prefix" src="@/assets/imgs/value.png" style="width:16px;"/>
@@ -64,6 +65,7 @@
                             @blur="metaValueBlur(item)"
                             type="number"
                             placeholder="number"
+                            :disabled="item.condition === 'empty'"
                         >
                         <template #prefix>
                             <img class="prefix" src="@/assets/imgs/number.png" style="width:16px;"/>
@@ -77,6 +79,7 @@
                             value-format="timestamp"
                             type="datetime"
                             placeholder="选择日期时间"
+                            :disabled="item.condition === 'empty'"
                         >
                         </el-date-picker>
                     </div>
@@ -282,14 +285,14 @@ export default {
             return false;
         },
         validateRequiredFields(data){
-             return data.some(obj => 
-                Object.values(obj).some(val => {
-                    if (val && typeof val === 'object' && val.condition === 'empty') {
-                        return false;
-                    }
-                    return this.isEmpty(val);
-                })
-            )
+            return data.some(field => {
+               if (field && typeof field === 'object' && field.condition === 'empty') {
+                    return false;
+                }
+                if (field && typeof field === 'object' && 'value' in field) {
+                    return this.isEmpty(field.value);
+                }
+         });
         },
         addMataItem(){
             if(this.metaDataFilterParams.filterEnable === false){
@@ -322,7 +325,7 @@ export default {
         delMataItem(index){
             this.metaDataFilterParams.metaFilterParams.splice(index,1)
             if(this.metaDataFilterParams.metaFilterParams.length === 0){
-                this.metaDataFilterParams.filterLogicType = '';
+                this.metaDataFilterParams.filterLogicType = 'and';
             }
         }
     }
