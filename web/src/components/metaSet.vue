@@ -33,6 +33,7 @@
                         <el-select
                             v-model="item.condition"
                             placeholder="请选择条件"
+                            @change="conditionChange($event,item)"
                         >
                             <template #prefix>
                               <img class="prefix" src="@/assets/imgs/condition.png" style="width:18px;"/>
@@ -250,6 +251,9 @@ export default {
         this.getList()
     },
     methods:{
+        conditionChange(e,item){
+            item.value = '';
+        },
         getMetaData(){
             this.metaDataFilterParams.metaFilterParams = this.metaDataFilterParams.metaFilterParams.map(item => {
                 if (item.type === 'time') {
