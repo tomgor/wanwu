@@ -54,7 +54,7 @@
                             v-if="item.type === 'string' || item.type === ''"
                             @blur="metaValueBlur(item)"
                             placeholder="请输入value"
-                            :disabled="item.condition === 'empty'"
+                            :disabled="item.condition === 'empty' || item.condition === 'not empty'"
                         >
                         <template #prefix>
                             <img class="prefix" src="@/assets/imgs/value.png" style="width:16px;"/>
@@ -66,7 +66,7 @@
                             @blur="metaValueBlur(item)"
                             type="number"
                             placeholder="number"
-                            :disabled="item.condition === 'empty'"
+                            :disabled="item.condition === 'empty'|| item.condition === 'not empty'"
                         >
                         <template #prefix>
                             <img class="prefix" src="@/assets/imgs/number.png" style="width:16px;"/>
@@ -80,7 +80,7 @@
                             value-format="timestamp"
                             type="datetime"
                             placeholder="选择日期时间"
-                            :disabled="item.condition === 'empty'"
+                            :disabled="item.condition === 'empty' || item.condition === 'not empty'"
                         >
                         </el-date-picker>
                     </div>
@@ -274,7 +274,7 @@ export default {
             }).catch(() =>{})
         },
         metaValueBlur(item){
-            if(item.condition === 'empty'){
+            if(item.condition === 'empty' || item.condition ==='not empty'){
                  return true;
             }else{
                 if (!item.value) {
@@ -290,7 +290,7 @@ export default {
         },
         validateRequiredFields(data){
             return data.some(field => {
-               if (field && typeof field === 'object' && field.condition === 'empty') {
+               if (field && typeof field === 'object' && (field.condition === 'empty' || field.condition === 'not empty') ) {
                     return false;
                 }
                 if (field && typeof field === 'object' && 'value' in field) {
