@@ -21,7 +21,7 @@
         @mouseenter="mouseEnter(n)"
         @mouseleave="mouseLeave(n)"
       >
-        <img v-if="n.avatar && n.avatar.path" class="logo" :src="basePath + '/user/api/' + n.avatar.path" />
+        <el-image v-if="n.avatar && n.avatar.path" class="logo" lazy :src="basePath + '/user/api/' + n.avatar.path" ></el-image>
         <span :class="['tag-app', `${n.appType}-tag`]">{{apptype[n.appType] || ''}}</span>
         <img
           v-if="apptype[n.appType]"
