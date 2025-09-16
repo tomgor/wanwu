@@ -1,6 +1,10 @@
 package service
 
 import (
+	"path/filepath"
+	"regexp"
+	"strings"
+
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_doc_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-doc-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -12,9 +16,6 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
-	"path/filepath"
-	"regexp"
-	"strings"
 )
 
 const (

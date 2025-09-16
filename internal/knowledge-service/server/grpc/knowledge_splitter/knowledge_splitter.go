@@ -3,7 +3,6 @@ package knowledge_splitter
 import (
 	"context"
 	"fmt"
-	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/config"
 	"strings"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	knowledgebase_splitter_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-splitter-service"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm"
+	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/config"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/generator"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/util"
 	"github.com/UnicomAI/wanwu/pkg/log"
