@@ -16,10 +16,12 @@
     <img alt="Release Notes" src="https://img.shields.io/github/v/release/UnicomAI/wanwu?label=Release&logo=github&color=green">
   </a>
 </p>
+<p align="center">
+    English |
+    <a href="https://github.com/UnicomAI/wanwu/blob/main/README_CN.md">中文</a> |
+    <a href="https://github.com/UnicomAI/wanwu/blob/main/README_繁體.md">繁體中文</a>
+</p>
 </div>
-
-
-​                                                                                English | [中文](README_CN.md)| [繁體中文](README_繁體.md)
 
 **Wanwu AI Agent Platform** is an **enterprise-grade** **one-stop** **commercially friendly** AI agent development platform designed for business scenarios. It is committed to providing enterprises with a safe, efficient, and compliant one-stop AI solution. With the core philosophy of "technology openness and ecological co-construction", we integrate cutting-edge technologies such as large language models and business process automation to build an AI engineering platform with a complete functional system covering model full life-cycle management, MCP, web search, AI agent rapid development, enterprise knowledge base construction, and complex workflow orchestration. The platform adopts a modular architecture design, supports flexible functional expansion and secondary development, and greatly reduces the application threshold of AI technology while ensuring the security and privacy protection of enterprise data. Whether it is for small and medium-sized enterprises to quickly build intelligent applications or for large enterprises to achieve intelligent transformation of complex business scenarios, the Wanwu AI Agent Platform can provide strong technical support to help enterprises accelerate the process of digital transformation, achieve cost reduction and efficiency improvement, and business innovation.
 

@@ -16,8 +16,12 @@
     <img alt="Release Notes" src="https://img.shields.io/github/v/release/UnicomAI/wanwu?label=Release&logo=github&color=green">
   </a>
 </p>
+<p align="center">
+    <a href="https://github.com/UnicomAI/wanwu/blob/main/README.md">English</a> |
+    <a href="https://github.com/UnicomAI/wanwu/blob/main/README_CN.md">中文</a> |
+    繁體中文
+</p>
 </div>
-​                                                                            [English](README.md) | [中文](README_CN.md) | 繁體中文                                                               
 
 &emsp;&emsp;**元景萬悟智能體平台**是一款面向**企業級**場景的**一站式**、**商用license友好**的**智能體開發平台**，致力於為企業提供安全、高效、合規的一站式AI解決方案。我們以「技術開放、生態共建」為核心理念，透過整合大語言模型、業務流程自動化等前沿技術，構建了覆蓋模型全生命週期管理、MCP、聯網檢索、智能體快速開發、企業知識庫建設、複雜工作流編排等完整功能體系的AI工程化平台。平台採用模組化架構設計，支援靈活的功能擴展和二次開發，在確保企業數據安全和隱私保護的同時，大幅降低了AI技術的應用門檻。無論是中小型企業快速構建智能化應用，還是大型企業實現複雜業務場景的智能化改造，元景萬悟智能體平台都能提供強有力的技術支撐，助力企業加速數字化轉型進程，實現降本增效和業務創新。
 
