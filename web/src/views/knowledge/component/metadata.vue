@@ -5,6 +5,7 @@
       type="primary"
       size="mini"
       @click="createMetaData"
+      v-if="type !== 'create'"
     >创建</el-button>
     <div class="docMetaData">
       <div
@@ -13,28 +14,45 @@
       >
         <div class="docItem_data">
           <span class="docItem_data_label">
-            <span>Key:</span>
+            <span class="label">Key:</span>
             <el-tooltip
               class="item"
               effect="dark"
               content="只能包含小写字母、数字和下划线，并且必须以小写字母开头"
               placement="top-start"
             >
-              <span class="el-icon-question question"></span>
+              <span class="el-icon-question question" v-if="type === 'create'"></span>
             </el-tooltip>
           </span>
           <el-input
+            v-if="type === 'create'"
             v-model="item.metaKey"
-            @blur="metakeyBlur(item)"
+            @blur="metakeyBlur(item,index)"
+            :disabled="item.hasMetaId"
           ></el-input>
+          <el-select
+              v-else
+              v-model="item.metaKey"
+              placeholder="请选择"
+              @change="keyChange($event,item)"
+          >
+              <el-option
+              v-for="meta in keyOptions"
+              :key="meta.metaKey"
+              :label="meta.metaKey"
+              :value="meta.metaKey"
+              >
+              </el-option>
+          </el-select>
         </div>
         <el-divider direction="vertical"></el-divider>
         <div class="docItem_data">
-          <span class="docItem_data_label">type:</span>
+          <span class="docItem_data_label label">type:</span>
           <el-select
+            v-if="type === 'create'"
             v-model="item.metaValueType"
             placeholder="请选择"
-            @change="typeChange(item)"
+            :disabled="item.hasMetaId"
           >
             <el-option
               v-for="item in typeOptions"
@@ -44,15 +62,16 @@
             >
             </el-option>
           </el-select>
+          <span v-else class="metaValueType">[{{item.metaValueType}}]</span>
         </div>
-        <el-divider direction="vertical"></el-divider>
-        <div class="docItem_data">
-          <span class="docItem_data_label">value:</span>
+        <el-divider direction="vertical" v-if="type !== 'create'"></el-divider>
+        <div class="docItem_data" v-if="type !== 'create'">
+          <span class="docItem_data_label label">value:</span>
           <el-select
             v-model="item.metadataType"
             placeholder="请选择"
             style="margin-right:5px;"
-            @change="typeChange(item)"
+            @change="valueChange(item)"
           >
             <el-option
               v-for="item in valueOptions"
@@ -64,7 +83,7 @@
           </el-select>
           <el-input
             v-model="item.metaValue"
-            v-if="item.metadataType ==='value' && item.metaValueType === 'string'"
+            v-if="(item.metadataType ==='value' && item.metaValueType === 'string') || item.metaValueType === ''"
             @blur="metaValueBlur(item)"
             placeholder="string"
           ></el-input>
@@ -92,11 +111,17 @@
           >
           </el-date-picker>
         </div>
-        <el-divider direction="vertical"></el-divider>
+        <el-divider direction="vertical" v-if="type !== 'create'"></el-divider>
         <div class="docItem_data docItem_data_btn">
+          <!-- <span
+          v-if="type === 'create'"
+          class="el-icon-edit-outline setBtn"
+          @click="editMataItem(item)"
+          ></span> -->
           <span
             class="el-icon-delete setBtn"
-            @click="delMataItem(index)"
+            @click="delMataItem(index,item)"
+            :style="{color:item.hasMetaId?'#ccc':'#384BF7'}"
           ></span>
         </div>
       </div>
@@ -104,8 +129,9 @@
   </div>
 </template>
 <script>
+import {metaSelect} from "@/api/knowledge"
 export default {
-  props:['metaData'],
+  props:['metaData','type','knowledgeId'],
   watch: {
     metaData:{
         handler(val) {
@@ -161,19 +187,52 @@ export default {
           name: "正则表达式",
         },
       ],
+      keyOptions:[]
     };
   },
+  created(){
+    this.getList()
+  },
   methods: {
+    getList(){
+      metaSelect({knowledgeId:this.knowledgeId}).then(res =>{
+          if(res.code === 0){
+              this.keyOptions = res.data.knowledgeMetaList || []
+              if(this.type === 'create'){
+                this.docMetaData = (res.data.knowledgeMetaList || []).map(item => ({
+                  ...item,
+                  hasMetaId:true,
+                  option: 'add'
+                }));
+              }
+              
+          }
+      }).catch(() =>{})
+    },
+    keyChange(val,item){
+      item.metaValue = '';
+      item.metaValueType = this.keyOptions.filter(i => i.metaKey === val).map(e => e.metaValueType)[0];
+    },
     createMetaData() {
-      if (this.docMetaData.length > 0 && !this.validateMetaData()) {
-        return;
+      if(this.type === 'create' && this.docMetaData.length > 0  ){
+        if (this.docMetaData.some(item => item.metaKey === '' || item.metaValueType === '')) {
+            this.$message.error("元数据管理存在未填写的必填字段");
+            return;
+        }
+      }else{
+          if (this.docMetaData.length > 0 && !this.validateMetaData(this.docMetaData)) {
+            return;
+        }
       }
+
       this.docMetaData.push({
+        metaId:"",
         metaKey: "",
         metaRule: "",
         metaValue: "",
-        metaValueType: "string",
+        metaValueType: "",
         metadataType: "value",
+        option:"add"
       });
     },
     validateMetaData() {
@@ -194,14 +253,17 @@ export default {
       }
       return true;
     },
-    delMataItem(i) {
+    delMataItem(i,item) {
+      if(this.type === 'create' && item.hasMetaId){
+        return;
+      }
       this.docMetaData.splice(i, 1);
     },
-    typeChange(item) {
+    valueChange(item) {
       item.metaValue = "";
       item.metaRule = "";
     },
-    metakeyBlur(item) {
+    metakeyBlur(item,index) {
       const regex = /^[a-z][a-z0-9_]*$/;
       if (!item.metaKey) {
         this.$message.warning("请输入key值");
@@ -210,6 +272,13 @@ export default {
       if (!regex.test(item.metaKey)) {
         this.$message.warning("请输入符合标准的key值");
         item.metaKey = "";
+        return;
+      }
+      const list  = this.docMetaData.slice(0,-1)//不与最新数据进行比较
+      const found = list.find(i => i.metaKey === item.metaKey )
+      if(found){
+        this.$message.warning("存在相同key值");
+        this.docMetaData.splice(index,1);
         return;
       }
     },
@@ -264,12 +333,17 @@ export default {
     .docItem_data {
       display: flex;
       align-items: center;
-      margin-bottom: 5px;
-      padding: 0 10px;
+      padding:5px 10px;
       .el-input,
       .el-select,
       .el-date-picker {
         min-width: 160px;
+      }
+      .label{
+        min-width: fit-content;
+      }
+      .metaValueType{
+        color:#384BF7 ;
       }
       .docItem_data_label {
         margin-right: 5px;
@@ -277,7 +351,7 @@ export default {
         align-items: center;
         .question {
           color: #aaadcc;
-          margin-left: 2px;
+          margin:2px 5px 0 2px;
           cursor: pointer;
         }
       }

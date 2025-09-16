@@ -158,7 +158,6 @@ export default {
       box-shadow: 1px 2px 2px #ddd;
       background-color: #fff;
       border-radius: 6px;
-      width:450px;
       .root-url {
         background-color: #eceefe;
         color: #384bf7;

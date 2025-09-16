@@ -19,13 +19,14 @@ export const OPENAI_API = 'OpenAI-API-compatible'
 export const OLLAMA = 'Ollama'
 export const QWEN = 'Qwen'
 export const HUOSHAN = 'Huoshan'
-
+export const INFINI = 'Infini'
 export const PROVIDER_OBJ = {
     [OPENAI_API]: 'OpenAI-API-compatible',
     [YUAN_JING]: '联通元景',
     [OLLAMA]: 'Ollama',
     [QWEN]: '通义千问',
     [HUOSHAN]: '火山引擎',
+    [INFINI]: '无问芯穹'
 }
 
 export const PROVIDER_IMG_OBJ = {
@@ -34,6 +35,7 @@ export const PROVIDER_IMG_OBJ = {
     [OLLAMA]: require('@/assets/imgs/ollama.png'),
     [QWEN]: require('@/assets/imgs/qwen.png'),
     [HUOSHAN]: require('@/assets/imgs/volcano.png'),
+    [INFINI]: require('@/assets/imgs/infini.png'),
 }
 
 export const PROVIDER_TYPE = Object.keys(PROVIDER_OBJ)
@@ -43,11 +45,9 @@ export const PROVIDER_TYPE = Object.keys(PROVIDER_OBJ)
             name: PROVIDER_OBJ[key],
             children: key === YUAN_JING
                 ? MODEL_TYPE
-                : key === OLLAMA
+                : [OLLAMA, HUOSHAN].includes(key)
                     ? MODEL_TYPE.filter(item => [LLM, EMBEDDING].includes(item.key))
-                    : key === HUOSHAN
-                        ? MODEL_TYPE.filter(item => [LLM, EMBEDDING].includes(item.key))
-                        : MODEL_TYPE.filter(item => ![OCR, GUI].includes(item.key))
+                    : MODEL_TYPE.filter(item => ![OCR, GUI].includes(item.key))
         })
     })
 

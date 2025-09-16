@@ -48,11 +48,11 @@ export default {
                 frequencyPenalty:0,
                 presencePenalty:0,
                 maxTokens:512,
-                temperatureEnable:true,
-                topPEnable:true,
-                presencePenaltyEnable:true,
-                maxTokensEnable:true,
-                frequencyPenaltyEnable:true
+                temperatureEnable:false,
+                topPEnable:false,
+                presencePenaltyEnable:false,
+                maxTokensEnable:false,
+                frequencyPenaltyEnable:false
             },
             modelSet: [
                 {

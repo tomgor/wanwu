@@ -2,7 +2,7 @@
     <div class="weburl-container">
         <div class="weburl-title">
             <span class="el-icon-arrow-left goback" @click="goback"></span>
-            <span class="weburl-title-text">发布配置</span>
+            <span class="weburl-title-text">{{name}} - 发布配置</span>
         </div>
         <CommonLayout
         :showAside="true"
@@ -11,7 +11,12 @@
         class="weburl-content"
         >
         <template #aside>
-            <div v-for="item in toolList" :class="['toolList',item.type === active ? 'activeItem':'' ]" @click="checkTool(item)">
+            <div
+                v-for="item in toolList"
+                v-if="(appType !== agent && item.type !== 'url') || appType === agent"
+                :class="['toolList', item.type === active ? 'activeItem' : '']"
+                @click="checkTool(item)"
+            >
                 <h3>{{item.name}}</h3>
                 <p>{{item.desc}}</p>
             </div>
@@ -31,8 +36,10 @@ export default {
     components: {CommonLayout,CreateApi,CreateUrl},
     data(){
         return{
+            name: '',
             appId:'',
             appType:'',
+            agent: 'agent',
             active:'url',
             asideWidth:'260px',
             toolList:[
@@ -50,8 +57,11 @@ export default {
         }
     },
     created(){
-        this.appId = this.$route.query.appId;
-        this.appType = this.$route.query.appType;
+        const {appId, appType, name} = this.$route.query
+        this.appId = appId
+        this.appType = appType
+        this.name = name
+        this.active = appType === this.agent ? 'url' : 'api'
     },  
     methods:{
         checkTool(item){

@@ -49,7 +49,10 @@ export default {
                 this.$message.error('请选择模型');
                 return;
             }
-
+            
+            if(matchType === 'mix' && priorityMatch === 1){
+                this.formInline.knowledgeMatchParams.rerankModelId = '';
+            }
             this.dialogVisible = false;
             this.$emit('setKnowledgeSet',this.knowledgeConfig)
         }

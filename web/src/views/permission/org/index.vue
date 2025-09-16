@@ -16,17 +16,19 @@
           <el-table-column prop="name" :label="$t('org.table.name')" align="left" />
           <el-table-column prop="creator.name" :label="$t('org.table.creator')" align="left" />
           <el-table-column prop="createdAt" :label="$t('org.table.createAt')" align="left" />
-          <!--<el-table-column align="left" :label="$t('org.table.status')">
+          <el-table-column align="left" :label="$t('org.table.status')">
             <template slot-scope="scope">
-              <el-switch
-                @change="(val)=>{changeStatus(scope.row,val)}"
-                style="display: block; height: 22px; line-height: 22px"
-                v-model="scope.row.status"
-                :active-text="$t('common.switch.start')"
-                :inactive-text="$t('common.switch.stop')"
-              />
+              <div style="height: 26px">
+                <el-switch
+                  @change="(val)=>{changeStatus(scope.row,val)}"
+                  style="display: block; height: 22px; line-height: 22px"
+                  v-model="scope.row.status"
+                  :active-text="$t('common.switch.start')"
+                  :inactive-text="$t('common.switch.stop')"
+                />
+              </div>
             </template>
-          </el-table-column>-->
+          </el-table-column>
           <el-table-column align="left" :label="$t('common.table.operation')" width="240">
             <template slot-scope="scope">
               <el-button class="operation" type="text" @click="preUpdate(scope.row)">{{$t('common.button.edit')}}</el-button>
@@ -215,6 +217,9 @@ export default {
       display: inline-block;
       vertical-align: middle;
     }
+  }
+  /deep/ .el-switch__label * {
+    font-size: 13px;
   }
 }
 .mark-textArea /deep/ {
