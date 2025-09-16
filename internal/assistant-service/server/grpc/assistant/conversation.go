@@ -33,6 +33,11 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+const (
+	metaTypeNumber = "number"
+	metaTypeTime   = "time"
+)
+
 // ConversationCreate 创建对话
 func (s *Service) ConversationCreate(ctx context.Context, req *assistant_service.ConversationCreateReq) (*assistant_service.ConversationCreateResp, error) {
 	// 组装model参数
@@ -494,19 +499,26 @@ func (s *Service) setKnowledgebaseParams(ctx context.Context, sseReq *config.Age
 			knowNames = append(knowNames, v.Name)
 		}
 
+		params, err := buildMetaDataFilterParams(knowledgebaseConfig.AppKnowledgeBaseList)
+		if err != nil {
+			log.Errorf("Assistant buildMetaDataFilterParams, err: %v", err)
+			return err
+		}
 		sseReq.KnParams = &config.KnParams{
-			KnowledgeBase:  knowNames,
-			RerankId:       rerankEndpoint["model_id"],
-			Model:          rerankEndpoint["model"],
-			ModelUrl:       rerankEndpoint["model_url"],
-			RerankMod:      buildRerankMod(knowledgebaseConfig.PriorityMatch),
-			RetrieveMethod: buildRetrieveMethod(knowledgebaseConfig.MatchType),
-			Weights:        buildWeight(knowledgebaseConfig),
-			MaxHistory:     knowledgebaseConfig.MaxHistory,
-			Threshold:      knowledgebaseConfig.Threshold,
-			TopK:           knowledgebaseConfig.TopK,
-			RewriteQuery:   true,
-			TermWeight:     buildTermWeight(knowledgebaseConfig),
+			KnowledgeBase:        knowNames,
+			RerankId:             rerankEndpoint["model_id"],
+			Model:                rerankEndpoint["model"],
+			ModelUrl:             rerankEndpoint["model_url"],
+			RerankMod:            buildRerankMod(knowledgebaseConfig.PriorityMatch),
+			RetrieveMethod:       buildRetrieveMethod(knowledgebaseConfig.MatchType),
+			Weights:              buildWeight(knowledgebaseConfig),
+			MaxHistory:           knowledgebaseConfig.MaxHistory,
+			Threshold:            knowledgebaseConfig.Threshold,
+			TopK:                 knowledgebaseConfig.TopK,
+			RewriteQuery:         true,
+			TermWeight:           buildTermWeight(knowledgebaseConfig),
+			MetaFilter:           len(params) > 0,
+			MetaFilterConditions: params,
 		}
 		sseReq.UseKnow = true
 	}
@@ -723,16 +735,36 @@ type AppKnowledgebaseParams struct {
 
 // RAGKnowledgeBaseConfig 知识库配置结构体
 type RAGKnowledgeBaseConfig struct {
-	KnowledgeBaseIds  []string `json:"knowledgeBaseIds"`  // 知识库信息
-	MaxHistory        int32    `json:"maxHistory"`        // 最长上下文
-	Threshold         float32  `json:"threshold"`         // 过滤阈值
-	TopK              int32    `json:"topK"`              // topK
-	MatchType         string   `json:"matchType"`         // 检索类型：vector（向量检索）、text（文本检索）、mix（混合检索）
-	KeywordPriority   float32  `json:"keywordPriority"`   // 关键词权重
-	PriorityMatch     int32    `json:"priorityMatch"`     // 权重匹配，仅混合检索模式下有效，1 表示启用
-	SemanticsPriority float32  `json:"semanticsPriority"` // 语义权重
-	TermWeight        float32  `json:"termWeight"`        // 关键词系数, 默认为1
-	TermWeightEnable  bool     `json:"termWeightEnable"`  // 关键词系数开关
+	KnowledgeBaseIds     []string                `json:"knowledgeBaseIds"`  // 知识库信息
+	MaxHistory           int32                   `json:"maxHistory"`        // 最长上下文
+	Threshold            float32                 `json:"threshold"`         // 过滤阈值
+	TopK                 int32                   `json:"topK"`              // topK
+	MatchType            string                  `json:"matchType"`         // 检索类型：vector（向量检索）、text（文本检索）、mix（混合检索）
+	KeywordPriority      float32                 `json:"keywordPriority"`   // 关键词权重
+	PriorityMatch        int32                   `json:"priorityMatch"`     // 权重匹配，仅混合检索模式下有效，1 表示启用
+	SemanticsPriority    float32                 `json:"semanticsPriority"` // 语义权重
+	TermWeight           float32                 `json:"termWeight"`        // 关键词系数, 默认为1
+	TermWeightEnable     bool                    `json:"termWeightEnable"`  // 关键词系数开关
+	AppKnowledgeBaseList []*AppKnowledgeBaseInfo `json:"AppKnowledgeBaseList"`
+}
+
+type AppKnowledgeBaseInfo struct {
+	KnowledgeBaseId      string                `json:"knowledgeBaseId"`
+	KnowledgeBaseName    string                `json:"knowledgeBaseName"`
+	MetaDataFilterParams *MetaDataFilterParams `json:"metaDataFilterParams"`
+}
+
+type MetaDataFilterParams struct {
+	FilterEnable     bool                `json:"filterEnable"`     // 元数据过滤开关
+	FilterLogicType  string              `json:"filterLogicType"`  // 元数据逻辑条件：and/or
+	MetaFilterParams []*MetaFilterParams `json:"metaFilterParams"` // 元数据过滤参数列表
+}
+
+type MetaFilterParams struct {
+	Condition string `json:"condition"`
+	Key       string `json:"key"`
+	Type      string `json:"type"`
+	Value     string `json:"value"`
 }
 
 type AppOnlineSearchConfig struct {
@@ -965,4 +997,59 @@ func extractCodeFromStreamData(streamData map[string]interface{}) (int, bool) {
 	default:
 		return 0, false
 	}
+}
+
+// buildMetaDataFilterParams 构造元数据过滤参数
+func buildMetaDataFilterParams(knowledgeInfos []*AppKnowledgeBaseInfo) ([]*config.MetadataFilterParam, error) {
+	if len(knowledgeInfos) == 0 {
+		return nil, nil
+	}
+	var ragMetaDataFilterParams []*config.MetadataFilterParam
+	for _, k := range knowledgeInfos {
+		if k.MetaDataFilterParams == nil || !k.MetaDataFilterParams.FilterEnable ||
+			len(k.MetaDataFilterParams.MetaFilterParams) == 0 {
+			continue
+		}
+		item, err := buildMetadataFilterItem(k.MetaDataFilterParams.MetaFilterParams)
+		if err != nil {
+			log.Errorf("buildMetaDataFilterParams error %v", err)
+			return nil, err
+		}
+		ragMetaDataFilterParams = append(ragMetaDataFilterParams, &config.MetadataFilterParam{
+			FilterKnowledgeName: k.KnowledgeBaseName,
+			LogicalOperator:     k.MetaDataFilterParams.FilterLogicType,
+			MetaList:            item,
+		})
+	}
+	return ragMetaDataFilterParams, nil
+}
+
+func buildMetadataFilterItem(metaFilterParams []*MetaFilterParams) ([]*config.MetadataFilterItem, error) {
+	var ragMetaDataFilterItem []*config.MetadataFilterItem
+	for _, k := range metaFilterParams {
+		data, err := buildValueData(k.Type, k.Value, k.Condition)
+		if err != nil {
+			log.Errorf("buildMetadataFilterItem error %v", err)
+			return nil, err
+		}
+		ragMetaDataFilterItem = append(ragMetaDataFilterItem, &config.MetadataFilterItem{
+			ComparisonOperator: k.Condition,
+			MetaName:           k.Key,
+			MetaType:           k.Type,
+			Value:              data,
+		})
+	}
+	return ragMetaDataFilterItem, nil
+}
+
+func buildValueData(valueType string, value string, condition string) (interface{}, error) {
+	if condition == "empty" || condition == "not empty" {
+		return nil, nil
+	}
+	switch valueType {
+	case metaTypeNumber:
+	case metaTypeTime:
+		return strconv.ParseInt(value, 10, 64)
+	}
+	return value, nil
 }

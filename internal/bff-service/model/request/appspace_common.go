@@ -63,8 +63,9 @@ type AppKnowledgebaseConfig struct {
 }
 
 type AppKnowledgeBase struct {
-	ID   string `json:"id" validate:"required"` // 知识库id
-	Name string `json:"name"`                   // 知识库名称(请求非必填)
+	ID                   string                `json:"id" validate:"required"` // 知识库id
+	Name                 string                `json:"name"`
+	MetaDataFilterParams *MetaDataFilterParams `json:"metaDataFilterParams"`
 }
 
 type AppKnowledgebaseParams struct {
@@ -78,6 +79,19 @@ type AppKnowledgebaseParams struct {
 	KeywordPriority   float32 `json:"keywordPriority"`   // 关键词权重
 	TermWeight        float32 `json:"termWeight"`        // 关键词系数，默认为1
 	TermWeightEnable  bool    `json:"termWeightEnable"`  // 关键词系数开关
+}
+
+type MetaDataFilterParams struct {
+	FilterEnable     bool                `json:"filterEnable"`     // 元数据过滤开关
+	MetaFilterParams []*MetaFilterParams `json:"metaFilterParams"` // 元数据过滤参数列表
+	FilterLogicType  string              `json:"filterLogicType"`  // 元数据逻辑条件：and/or
+}
+
+type MetaFilterParams struct {
+	Key       string `json:"key"`       // Key
+	Type      string `json:"type"`      // 类型（Time, String, Number）
+	Condition string `json:"condition"` // 条件
+	Value     string `json:"value"`     // value
 }
 
 type AppSafetyConfig struct {

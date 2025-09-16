@@ -1,7 +1,7 @@
 package service
 
 import (
-	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
+	knowledgeBase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	rag_service "github.com/UnicomAI/wanwu/api/proto/rag-service"
 	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
@@ -67,24 +67,60 @@ func ragSensitiveConfigToProto(req request.AppSafetyConfig) *rag_service.RagSens
 }
 
 func ragKBConfigToProto(knowledgeConfig request.AppKnowledgebaseConfig) *rag_service.RagKnowledgeBaseConfig {
-	var knowledgeBaseIds []string
-	for _, v := range knowledgeConfig.Knowledgebases {
-		knowledgeBaseIds = append(knowledgeBaseIds, v.ID)
+	result := &rag_service.RagKnowledgeBaseConfig{
+		PerKnowledgeConfigs: make([]*rag_service.RagPerKnowledgeConfig, 0, len(knowledgeConfig.Knowledgebases)),
 	}
-	configParams := knowledgeConfig.Config
-	knowledgeBaseConfig := &rag_service.RagKnowledgeBaseConfig{
-		KnowledgeBaseIds:  knowledgeBaseIds,
-		MaxHistory:        configParams.MaxHistory,
-		Threshold:         configParams.Threshold,
-		TopK:              configParams.TopK,
-		MatchType:         configParams.MatchType,
-		PriorityMatch:     configParams.PriorityMatch,
-		SemanticsPriority: configParams.SemanticsPriority,
-		KeywordPriority:   configParams.KeywordPriority,
-		TermWeight:        configParams.TermWeight,
-		TermWeightEnable:  configParams.TermWeightEnable,
+	for _, knowledge := range knowledgeConfig.Knowledgebases {
+		// 初始化单个知识库配置
+		perConfig := &rag_service.RagPerKnowledgeConfig{
+			KnowledgeId: knowledge.ID,
+		}
+		// 构建元数据过滤条件（如果启用）
+		if metaFilter := buildRagMetaFilter(knowledge.MetaDataFilterParams); metaFilter != nil {
+			perConfig.RagMetaFilter = metaFilter
+		}
+		// 单个知识库配置添加到result
+		result.PerKnowledgeConfigs = append(result.PerKnowledgeConfigs, perConfig)
 	}
-	return knowledgeBaseConfig
+	result.GlobalConfig = buildRagGlobalConfig(knowledgeConfig.Config)
+	return result
+}
+
+// 构建单个知识库的元数据过滤条件
+func buildRagMetaFilter(params *request.MetaDataFilterParams) *rag_service.RagMetaFilter {
+	// 检查过滤参数是否有效（未启用或无具体条件则返回nil）
+	if params == nil || !params.FilterEnable || params.MetaFilterParams == nil || len(params.MetaFilterParams) == 0 {
+		return nil
+	}
+	// 转换过滤条件项
+	filterItems := make([]*rag_service.RagMetaFilterItem, 0, len(params.MetaFilterParams))
+	for _, metaParam := range params.MetaFilterParams {
+		filterItems = append(filterItems, &rag_service.RagMetaFilterItem{
+			Key:       metaParam.Key,
+			Type:      metaParam.Type,
+			Value:     metaParam.Value,
+			Condition: metaParam.Condition,
+		})
+	}
+	return &rag_service.RagMetaFilter{
+		FilterEnable:    params.FilterEnable,
+		FilterLogicType: params.FilterLogicType,
+		FilterItems:     filterItems,
+	}
+}
+
+func buildRagGlobalConfig(kbConfig request.AppKnowledgebaseParams) *rag_service.RagGlobalConfig {
+	return &rag_service.RagGlobalConfig{
+		MaxHistory:        kbConfig.MaxHistory,
+		Threshold:         kbConfig.Threshold,
+		TopK:              kbConfig.TopK,
+		MatchType:         kbConfig.MatchType,
+		KeywordPriority:   kbConfig.KeywordPriority,
+		PriorityMatch:     kbConfig.PriorityMatch,
+		SemanticsPriority: kbConfig.SemanticsPriority,
+		TermWeight:        kbConfig.TermWeight,
+		TermWeightEnable:  kbConfig.TermWeightEnable,
+	}
 }
 
 func DeleteRag(ctx *gin.Context, req request.RagReq) error {
@@ -161,32 +197,74 @@ func ragSafetyConfigProto2Model(ctx *gin.Context, sensitiveCfg *rag_service.RagS
 }
 
 func ragKBConfigProto2Model(ctx *gin.Context, kbConfig *rag_service.RagKnowledgeBaseConfig) request.AppKnowledgebaseConfig {
-	var knowledgeBases []request.AppKnowledgeBase
-	if len(kbConfig.KnowledgeBaseIds) > 0 {
-		knowledgeInfoList, _ := knowledgeBase.SelectKnowledgeDetailByIdList(ctx, &knowledgebase_service.KnowledgeDetailSelectListReq{
-			KnowledgeIds: kbConfig.KnowledgeBaseIds,
-		})
-		if knowledgeInfoList != nil {
-			for _, v := range knowledgeInfoList.List {
-				kb := request.AppKnowledgeBase{
-					ID:   v.KnowledgeId,
-					Name: v.Name,
-				}
-				knowledgeBases = append(knowledgeBases, kb)
-			}
+	if kbConfig == nil {
+		return request.AppKnowledgebaseConfig{
+			Knowledgebases: make([]request.AppKnowledgeBase, 0),
+			Config:         request.AppKnowledgebaseParams{},
 		}
 	}
-	knowledgeBaseConfig := request.AppKnowledgebaseConfig{
-		Knowledgebases: knowledgeBases,
-		Config: request.AppKnowledgebaseParams{
-			MaxHistory:        kbConfig.MaxHistory,
-			Threshold:         kbConfig.Threshold,
-			TopK:              kbConfig.TopK,
-			MatchType:         kbConfig.MatchType,
-			KeywordPriority:   kbConfig.KeywordPriority,
-			PriorityMatch:     kbConfig.PriorityMatch,
-			SemanticsPriority: kbConfig.SemanticsPriority,
-		},
+	knowledgeList := make([]request.AppKnowledgeBase, 0, len(kbConfig.PerKnowledgeConfigs))
+
+	// 转换每个知识库的单独配置
+	for _, perConfig := range kbConfig.PerKnowledgeConfigs {
+		kbInfo, err := knowledgeBase.SelectKnowledgeDetailById(ctx, &knowledgeBase_service.KnowledgeDetailSelectReq{
+			KnowledgeId: perConfig.KnowledgeId,
+		})
+		if err != nil {
+			log.Errorf("select knowledge detail error: %v", err)
+			return request.AppKnowledgebaseConfig{
+				Knowledgebases: make([]request.AppKnowledgeBase, 0),
+				Config:         request.AppKnowledgebaseParams{},
+			}
+		}
+		// 基础信息映射
+		knowledge := request.AppKnowledgeBase{
+			ID:   perConfig.KnowledgeId,
+			Name: kbInfo.Name,
+		}
+		// 转换元数据过滤配置
+		metaFilter := perConfig.RagMetaFilter
+		knowledge.MetaDataFilterParams = convertRagMetaFilterToParams(metaFilter)
+
+		knowledgeList = append(knowledgeList, knowledge)
 	}
-	return knowledgeBaseConfig
+	globalConfig := kbConfig.GlobalConfig
+	if globalConfig == nil {
+		globalConfig = &rag_service.RagGlobalConfig{}
+	}
+	appConfig := request.AppKnowledgebaseParams{
+		MaxHistory:        globalConfig.MaxHistory,
+		Threshold:         globalConfig.Threshold,
+		TopK:              globalConfig.TopK,
+		MatchType:         globalConfig.MatchType,
+		KeywordPriority:   globalConfig.KeywordPriority,
+		PriorityMatch:     globalConfig.PriorityMatch,
+		SemanticsPriority: globalConfig.SemanticsPriority,
+		TermWeight:        globalConfig.TermWeight,
+		TermWeightEnable:  globalConfig.TermWeightEnable,
+	}
+	return request.AppKnowledgebaseConfig{
+		Knowledgebases: knowledgeList,
+		Config:         appConfig,
+	}
+}
+func convertRagMetaFilterToParams(metaFilter *rag_service.RagMetaFilter) *request.MetaDataFilterParams {
+	if metaFilter == nil {
+		return nil
+	}
+	// 转换过滤条件项
+	filterParams := make([]*request.MetaFilterParams, 0, len(metaFilter.FilterItems))
+	for _, item := range metaFilter.FilterItems {
+		filterParams = append(filterParams, &request.MetaFilterParams{
+			Key:       item.Key,
+			Type:      item.Type,
+			Value:     item.Value,
+			Condition: item.Condition,
+		})
+	}
+	return &request.MetaDataFilterParams{
+		FilterEnable:     metaFilter.FilterEnable,
+		FilterLogicType:  metaFilter.FilterLogicType,
+		MetaFilterParams: filterParams, // 映射过滤条件列表
+	}
 }

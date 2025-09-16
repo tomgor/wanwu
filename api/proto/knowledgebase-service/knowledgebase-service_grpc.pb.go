@@ -28,6 +28,7 @@ const (
 	KnowledgeBaseService_UpdateKnowledge_FullMethodName               = "/knowledgebase_service.KnowledgeBaseService/UpdateKnowledge"
 	KnowledgeBaseService_DeleteKnowledge_FullMethodName               = "/knowledgebase_service.KnowledgeBaseService/DeleteKnowledge"
 	KnowledgeBaseService_KnowledgeHit_FullMethodName                  = "/knowledgebase_service.KnowledgeBaseService/KnowledgeHit"
+	KnowledgeBaseService_GetKnowledgeMetaSelect_FullMethodName        = "/knowledgebase_service.KnowledgeBaseService/GetKnowledgeMetaSelect"
 )
 
 // KnowledgeBaseServiceClient is the client API for KnowledgeBaseService service.
@@ -50,6 +51,8 @@ type KnowledgeBaseServiceClient interface {
 	DeleteKnowledge(ctx context.Context, in *DeleteKnowledgeReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 知识库命中测试
 	KnowledgeHit(ctx context.Context, in *KnowledgeHitReq, opts ...grpc.CallOption) (*KnowledgeHitResp, error)
+	// 获取知识库元数据（key + type）
+	GetKnowledgeMetaSelect(ctx context.Context, in *SelectKnowledgeMetaReq, opts ...grpc.CallOption) (*SelectKnowledgeMetaResp, error)
 }
 
 type knowledgeBaseServiceClient struct {
@@ -140,6 +143,16 @@ func (c *knowledgeBaseServiceClient) KnowledgeHit(ctx context.Context, in *Knowl
 	return out, nil
 }
 
+func (c *knowledgeBaseServiceClient) GetKnowledgeMetaSelect(ctx context.Context, in *SelectKnowledgeMetaReq, opts ...grpc.CallOption) (*SelectKnowledgeMetaResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SelectKnowledgeMetaResp)
+	err := c.cc.Invoke(ctx, KnowledgeBaseService_GetKnowledgeMetaSelect_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KnowledgeBaseServiceServer is the server API for KnowledgeBaseService service.
 // All implementations must embed UnimplementedKnowledgeBaseServiceServer
 // for forward compatibility.
@@ -160,6 +173,8 @@ type KnowledgeBaseServiceServer interface {
 	DeleteKnowledge(context.Context, *DeleteKnowledgeReq) (*emptypb.Empty, error)
 	// 知识库命中测试
 	KnowledgeHit(context.Context, *KnowledgeHitReq) (*KnowledgeHitResp, error)
+	// 获取知识库元数据（key + type）
+	GetKnowledgeMetaSelect(context.Context, *SelectKnowledgeMetaReq) (*SelectKnowledgeMetaResp, error)
 	mustEmbedUnimplementedKnowledgeBaseServiceServer()
 }
 
@@ -193,6 +208,9 @@ func (UnimplementedKnowledgeBaseServiceServer) DeleteKnowledge(context.Context, 
 }
 func (UnimplementedKnowledgeBaseServiceServer) KnowledgeHit(context.Context, *KnowledgeHitReq) (*KnowledgeHitResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method KnowledgeHit not implemented")
+}
+func (UnimplementedKnowledgeBaseServiceServer) GetKnowledgeMetaSelect(context.Context, *SelectKnowledgeMetaReq) (*SelectKnowledgeMetaResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetKnowledgeMetaSelect not implemented")
 }
 func (UnimplementedKnowledgeBaseServiceServer) mustEmbedUnimplementedKnowledgeBaseServiceServer() {}
 func (UnimplementedKnowledgeBaseServiceServer) testEmbeddedByValue()                              {}
@@ -359,6 +377,24 @@ func _KnowledgeBaseService_KnowledgeHit_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _KnowledgeBaseService_GetKnowledgeMetaSelect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SelectKnowledgeMetaReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KnowledgeBaseServiceServer).GetKnowledgeMetaSelect(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KnowledgeBaseService_GetKnowledgeMetaSelect_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KnowledgeBaseServiceServer).GetKnowledgeMetaSelect(ctx, req.(*SelectKnowledgeMetaReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // KnowledgeBaseService_ServiceDesc is the grpc.ServiceDesc for KnowledgeBaseService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -397,6 +433,10 @@ var KnowledgeBaseService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "KnowledgeHit",
 			Handler:    _KnowledgeBaseService_KnowledgeHit_Handler,
+		},
+		{
+			MethodName: "GetKnowledgeMetaSelect",
+			Handler:    _KnowledgeBaseService_GetKnowledgeMetaSelect_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

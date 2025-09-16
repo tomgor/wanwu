@@ -484,8 +484,9 @@ definitions:
       id:
         description: 知识库id
         type: string
+      metaDataFilterParams:
+        $ref: '#/definitions/request.MetaDataFilterParams'
       name:
-        description: 知识库名称(请求非必填)
         type: string
     required:
     - id
@@ -1356,13 +1357,13 @@ definitions:
     properties:
       docId:
         type: string
+      knowledgeId:
+        type: string
       metaDataList:
         description: 文档元数据
         items:
           $ref: '#/definitions/request.DocMetaData'
         type: array
-    required:
-    - docId
     type: object
   request.DocSegment:
     properties:
@@ -1434,6 +1435,13 @@ definitions:
       id:
         type: integer
     type: object
+  request.GetKnowledgeMetaSelectReq:
+    properties:
+      knowledgeId:
+        type: string
+      knowledgeName:
+        type: string
+    type: object
   request.GetKnowledgeSplitterReq:
     properties:
       splitterName:
@@ -1489,16 +1497,15 @@ definitions:
     type: object
   request.KnowledgeHitReq:
     properties:
-      knowledgeIdList:
+      knowledgeList:
         items:
-          type: string
+          $ref: '#/definitions/request.AppKnowledgeBase'
         type: array
       knowledgeMatchParams:
         $ref: '#/definitions/request.KnowledgeMatchParams'
       question:
         type: string
     required:
-    - knowledgeIdList
     - knowledgeMatchParams
     - question
     type: object
@@ -1630,6 +1637,35 @@ definitions:
     required:
     - chunkName
     - fileName
+    type: object
+  request.MetaDataFilterParams:
+    properties:
+      filterEnable:
+        description: 元数据过滤开关
+        type: boolean
+      filterLogicType:
+        description: 元数据逻辑条件：and/or
+        type: string
+      metaFilterParams:
+        description: 元数据过滤参数列表
+        items:
+          $ref: '#/definitions/request.MetaFilterParams'
+        type: array
+    type: object
+  request.MetaFilterParams:
+    properties:
+      condition:
+        description: 条件
+        type: string
+      key:
+        description: Key
+        type: string
+      type:
+        description: 类型（Time, String, Number）
+        type: string
+      value:
+        description: value
+        type: string
     type: object
   request.ModelStatusRequest:
     properties:
@@ -2834,6 +2870,13 @@ definitions:
       total:
         type: integer
     type: object
+  response.GetKnowledgeMetaSelectResp:
+    properties:
+      knowledgeMetaList:
+        items:
+          $ref: '#/definitions/response.KnowledgeMetaItem'
+        type: array
+    type: object
   response.IDName:
     properties:
       id:
@@ -2894,6 +2937,11 @@ definitions:
       knowledgeId:
         description: 知识库id
         type: string
+      knowledgeMetaDataList:
+        description: 知识库元数据列表（key和type）
+        items:
+          $ref: '#/definitions/response.KnowledgeMetaData'
+        type: array
       knowledgeTagList:
         description: 知识库标签列表
         items:
@@ -2909,6 +2957,22 @@ definitions:
         items:
           $ref: '#/definitions/response.KnowledgeInfo'
         type: array
+    type: object
+  response.KnowledgeMetaData:
+    properties:
+      key:
+        description: key
+        type: string
+      type:
+        description: type(time, string, number)
+        type: string
+    type: object
+  response.KnowledgeMetaItem:
+    properties:
+      metaKey:
+        type: string
+      metaValueType:
+        type: string
     type: object
   response.KnowledgeSplitter:
     properties:
@@ -6031,6 +6095,35 @@ paths:
       summary: 查询知识库关键词详情
       tags:
       - knowledge.keywords
+  /knowledge/meta/select:
+    get:
+      consumes:
+      - application/json
+      description: 获取知识库元数据
+      parameters:
+      - description: 获取知识库元数据请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.GetKnowledgeMetaSelectReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.GetKnowledgeMetaSelectResp'
+              type: object
+      security:
+      - JWT: []
+      summary: 获取知识库元数据
+      tags:
+      - knowledge
   /knowledge/select:
     post:
       consumes:

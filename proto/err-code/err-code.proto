@@ -56,6 +56,7 @@ enum Code {
   KnowledgeDocUpdateMetaFailed = 142008; // 更新文档元数据失败，请稍后重试
   KnowledgeDocUpdateMetaStatusFailed = 142009; // 非处理完成文档无法更新元数据，请稍后重试
   KnowledgeDocSegmentFileCSVTypeFail = 142010; // 上传文档必须是csv，请修改后重试
+  KnowledgeDocUpdateMetaSameKeyFailed = 142011; // 更新文档元数据失败，已存在重复key，请稍后重试
   KnowledgeTagCreateFailed = 143001; // 新建知识库标签失败，请稍后重试
   KnowledgeTagDeleteFailed = 143002; // 删除知识库标签失败，请稍后重试
   KnowledgeTagUpdateFailed = 143003; // 修改知识库标签失败，请稍后重试
@@ -81,6 +82,13 @@ enum Code {
   KnowledgeDocSegmentExceedMaxSize = 145011; // 分段长度超过最大值
   KnowledgeDocSegmentUpdateFailed = 145012; // 更新文档分段失败，请稍后重试
   KnowledgeDocSegmentDeleteFailed = 145013; // 删除文档分段失败，请稍后重试
+  KnowledgeMetaFetchFailed = 145014; // 查询知识库元数据失败，请稍后重试
+  KnowledgeMetaCreateFailed = 145015; // 新增知识库元数据失败，请稍后重试
+  KnowledgeMetaUpdateFailed = 145016; // 更新知识库元数据失败，请稍后重试
+  KnowledgeMetaDeleteFailed = 145017; // 删除知识库元数据失败，请稍后重试
+  KnowledgeMetaDuplicateKey = 145018; // 已存在同名元数据key
+  KnowledgeInvalidArguments = 145019; // 非法参数
+  KnowledgeDocSegmentEmpty = 145020; // 文档分段内容为空
 
   // --- rag-service ---
   // [150000, 159999]

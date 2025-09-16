@@ -70,11 +70,21 @@ func CallRagChatStream(ctx *gin.Context, userId, orgId string, req request.ChatR
 		return nil, err
 	}
 
+	firstResp, err := stream.Recv()
+	if err != nil {
+		if err == io.EOF {
+			// 流已经结束，没有数据
+			return nil, err
+		}
+		return nil, err
+	}
+
 	rawCh := make(chan string, 128)
 	go func() {
 		defer util.PrintPanicStack()
 		defer close(rawCh)
 		log.Infof("[RAG] %v user %v org %v start, query: %s", req.RagID, userId, orgId, req.Question)
+		rawCh <- firstResp.Content
 		for {
 			s, err := stream.Recv()
 			if err == io.EOF {

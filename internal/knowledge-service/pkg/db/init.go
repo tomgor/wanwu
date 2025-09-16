@@ -14,6 +14,7 @@ import (
 
 const (
 	knowledgeDBName = "knowledge_base_service"
+	timestampOld    = "1757692799000" //2025-09-12 23:59:59
 )
 
 var dbClient = DataBaseClient{}
@@ -51,6 +52,11 @@ func (c DataBaseClient) Load() error {
 	}
 	//注册表配置
 	err = registerTables(dbHandle)
+	if err != nil {
+		return err
+	}
+	//初始化数据
+	err = Init(dbHandle)
 	if err != nil {
 		return err
 	}
@@ -103,5 +109,34 @@ func registerTables(dbClient *gorm.DB) error {
 		return err
 	}
 	fmt.Printf("register knowledge tables table success")
+	return nil
+}
+
+func Init(dbClient *gorm.DB) error {
+	var knowledgeDocMetaList []model.KnowledgeDocMeta
+	//数据量不会太大直接getAll
+	err := dbClient.Model(&model.KnowledgeDocMeta{}).Where("create_at <= ?", timestampOld).Find(&knowledgeDocMetaList).Error
+	if err != nil {
+		return err
+	}
+	if len(knowledgeDocMetaList) > 0 {
+		for _, meta := range knowledgeDocMetaList {
+			if len(meta.KnowledgeId) > 0 {
+				continue
+			}
+			if len(meta.DocId) > 0 {
+				var knowledgeDocList []model.KnowledgeDoc
+				_ = dbClient.Model(&model.KnowledgeDoc{}).Where("doc_id = ?", meta.DocId).Find(&knowledgeDocList).Error
+				if len(knowledgeDocList) > 0 {
+					err = dbClient.Model(&model.KnowledgeDocMeta{}).Where("id = ?", meta.Id).
+						Updates(map[string]interface{}{"knowledge_id": knowledgeDocList[0].KnowledgeId}).Error
+					if err != nil {
+						log.Errorf("update knowledge_doc_meta error: %v", err)
+					}
+				}
+			}
+
+		}
+	}
 	return nil
 }

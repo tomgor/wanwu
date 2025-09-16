@@ -3,6 +3,7 @@ package knowledge
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -19,23 +20,28 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+const (
+	MetaValueTypeNumber   = "number"
+	MetaValueTypeTime     = "time"
+	MetaConditionEmpty    = "empty"
+	MetaConditionNotEmpty = "not empty"
+)
+
 func (s *Service) SelectKnowledgeList(ctx context.Context, req *knowledgebase_service.KnowledgeSelectReq) (*knowledgebase_service.KnowledgeSelectListResp, error) {
 	list, err := orm.SelectKnowledgeList(ctx, req.UserId, req.OrgId, req.Name, req.TagIdList)
 	if err != nil {
 		log.Errorf(fmt.Sprintf("获取知识库列表失败(%v)  参数(%v)", err, req))
 		return nil, util.ErrCode(errs.Code_KnowledgeBaseSelectFailed)
 	}
-
 	var tagMap = make(map[string][]*orm.TagRelationDetail)
+	var knowledgeIdList []string
 	if len(list) > 0 {
-		var knowledgeList []string
 		for _, k := range list {
-			knowledgeList = append(knowledgeList, k.KnowledgeId)
+			knowledgeIdList = append(knowledgeIdList, k.KnowledgeId)
 		}
-		relation := orm.SelectKnowledgeTagListWithRelation(ctx, req.UserId, req.OrgId, "", knowledgeList)
+		relation := orm.SelectKnowledgeTagListWithRelation(ctx, req.UserId, req.OrgId, "", knowledgeIdList)
 		tagMap = buildKnowledgeTagMap(relation)
 	}
-
 	return buildKnowledgeListResp(list, tagMap), nil
 }
 
@@ -134,29 +140,189 @@ func (s *Service) DeleteKnowledge(ctx context.Context, req *knowledgebase_servic
 
 // KnowledgeHit 知识库命中测试
 func (s *Service) KnowledgeHit(ctx context.Context, req *knowledgebase_service.KnowledgeHitReq) (*knowledgebase_service.KnowledgeHitResp, error) {
-	list, err := orm.SelectKnowledgeByIdList(ctx, req.KnowledgeIdList, req.UserId, req.OrgId)
+	// 1.获取知识库信息列表
+	if len(req.KnowledgeList) == 0 || req.Question == "" || req.KnowledgeMatchParams == nil {
+		return nil, util.ErrCode(errs.Code_KnowledgeInvalidArguments)
+	}
+	var knowledgeIdList []string
+	for _, k := range req.KnowledgeList {
+		knowledgeIdList = append(knowledgeIdList, k.KnowledgeId)
+	}
+	list, err := orm.SelectKnowledgeByIdList(ctx, knowledgeIdList, req.UserId, req.OrgId)
 	if err != nil {
 		return nil, err
 	}
-	matchParams := req.KnowledgeMatchParams
-	priorityMatch := matchParams.PriorityMatch
-	hitResp, err := rag_service.RagKnowledgeHit(ctx, &rag_service.KnowledgeHitParams{
-		UserId:         req.UserId,
-		Question:       req.Question,
-		KnowledgeBase:  buildKnowledgeNameList(list),
-		TopK:           matchParams.TopK,
-		Threshold:      float64(matchParams.Score),
-		RerankModelId:  buildRerankId(priorityMatch, matchParams.RerankModelId),
-		RetrieveMethod: buildRetrieveMethod(matchParams.MatchType),
-		RerankMod:      buildRerankMod(priorityMatch),
-		Weight:         buildWeight(priorityMatch, matchParams.SemanticsPriority, matchParams.KeywordPriority),
-		TermWeight:     buildTermWeight(matchParams.TermWeight, matchParams.TermWeightEnable),
-	})
+	knowledgeIDToName := make(map[string]string)
+	for _, k := range list {
+		if _, exists := knowledgeIDToName[k.KnowledgeId]; !exists {
+			knowledgeIDToName[k.KnowledgeId] = k.Name
+		}
+	}
+	// 2.RAG请求
+	ragHitParams, err := buildRagHitParams(req, list, knowledgeIDToName)
+	if err != nil {
+		return nil, util.ErrCode(errs.Code_KnowledgeBaseHitFailed)
+	}
+	hitResp, err := rag_service.RagKnowledgeHit(ctx, ragHitParams)
 	if err != nil {
 		log.Errorf("RagKnowledgeHit error %s", err)
 		return nil, util.ErrCode(errs.Code_KnowledgeBaseHitFailed)
 	}
 	return buildKnowledgeBaseHitResp(hitResp), nil
+}
+
+func (s *Service) GetKnowledgeMetaSelect(ctx context.Context, req *knowledgebase_service.SelectKnowledgeMetaReq) (*knowledgebase_service.SelectKnowledgeMetaResp, error) {
+	metaList, err := orm.SelectMetaByKnowledgeId(ctx, req.UserId, req.OrgId, req.KnowledgeId)
+	if err != nil {
+		log.Errorf("获取知识库元数据列表失败(%v)  参数(%v)", err, req)
+		return nil, util.ErrCode(errs.Code_KnowledgeMetaFetchFailed)
+	}
+	return buildKnowledgeMetaSelectResp(metaList), nil
+}
+
+func buildRagHitParams(req *knowledgebase_service.KnowledgeHitReq, list []*model.KnowledgeBase, knowledgeIDToName map[string]string) (*rag_service.KnowledgeHitParams, error) {
+	matchParams := req.KnowledgeMatchParams
+	priorityMatch := matchParams.PriorityMatch
+	filterEnable, metaParams, err := buildRagHitMetaParams(req, knowledgeIDToName)
+	if err != nil {
+		return nil, err
+	}
+	ret := &rag_service.KnowledgeHitParams{
+		UserId:               req.UserId,
+		Question:             req.Question,
+		KnowledgeBase:        buildKnowledgeNameList(list),
+		TopK:                 matchParams.TopK,
+		Threshold:            float64(matchParams.Score),
+		RerankModelId:        buildRerankId(priorityMatch, matchParams.RerankModelId),
+		RetrieveMethod:       buildRetrieveMethod(matchParams.MatchType),
+		RerankMod:            buildRerankMod(priorityMatch),
+		Weight:               buildWeight(priorityMatch, matchParams.SemanticsPriority, matchParams.KeywordPriority),
+		TermWeight:           buildTermWeight(matchParams.TermWeight, matchParams.TermWeightEnable),
+		MetaFilter:           filterEnable,
+		MetaFilterConditions: metaParams,
+	}
+	return ret, nil
+}
+
+func buildRagHitMetaParams(req *knowledgebase_service.KnowledgeHitReq, knowledgeIDToName map[string]string) (bool, []*rag_service.MetadataFilterItem, error) {
+	filterEnable := false // 标记是否有启用的元数据过滤
+	var metaFilterConditions []*rag_service.MetadataFilterItem
+	for _, k := range req.KnowledgeList {
+		// 检查元数据过滤参数是否有效
+		filterParams := k.MetaDataFilterParams
+		if !isValidFilterParams(k.MetaDataFilterParams) {
+			continue
+		}
+		// 校验合法值
+		if k.MetaDataFilterParams.FilterLogicType == "" {
+			return false, nil, errors.New("FilterLogicType is empty")
+		}
+		// 标记元数据过滤生效
+		filterEnable = true
+		// 构建元数据过滤条件
+		metaItems, err := buildRagHitMetaItems(k.KnowledgeId, filterParams.MetaFilterParams)
+		if err != nil {
+			return false, nil, err
+		}
+		// 添加过滤项到结果
+		metaFilterConditions = append(metaFilterConditions, &rag_service.MetadataFilterItem{
+			FilterKnowledgeName: knowledgeIDToName[k.KnowledgeId],
+			LogicalOperator:     filterParams.FilterLogicType,
+			Conditions:          metaItems,
+		})
+	}
+	return filterEnable, metaFilterConditions, nil
+}
+
+// 构建元数据项列表
+func buildRagHitMetaItems(knowledgeID string, params []*knowledgebase_service.MetaFilterParams) ([]*rag_service.MetaItem, error) {
+	var metaItems []*rag_service.MetaItem
+	for _, param := range params {
+		// 基础参数校验
+		if err := validateMetaFilterParam(knowledgeID, param); err != nil {
+			return nil, err
+		}
+		// 转换参数值
+		ragValue, err := convertValue(param.Value, param.Type)
+		if err != nil {
+			log.Errorf("kbId: %s, convert value failed: %v", knowledgeID, err)
+			return nil, fmt.Errorf("convert value for key %s: %s", param.Key, err.Error())
+		}
+		metaItems = append(metaItems, &rag_service.MetaItem{
+			MetaName:           param.Key,
+			MetaType:           param.Type,
+			ComparisonOperator: param.Condition,
+			Value:              ragValue,
+		})
+	}
+	return metaItems, nil
+}
+
+// 校验元数据过滤参数
+func validateMetaFilterParam(knowledgeID string, param *knowledgebase_service.MetaFilterParams) error {
+	// 检查关键参数是否为空
+	if param.Key == "" || param.Type == "" || param.Condition == "" {
+		errMsg := "key/type/condition cannot be empty"
+		log.Errorf("kbId: %s, %s", knowledgeID, errMsg)
+		return errors.New(errMsg)
+	}
+
+	// 检查空条件与值的匹配性
+	if param.Condition == MetaConditionEmpty || param.Condition == MetaConditionNotEmpty {
+		if param.Value != "" {
+			errMsg := "condition is empty/non-empty, value should be empty"
+			log.Errorf("kbId: %s, %s", knowledgeID, errMsg)
+			return errors.New(errMsg)
+		}
+	} else {
+		if param.Value == "" {
+			errMsg := "value is empty"
+			log.Errorf("kbId: %s, %s", knowledgeID, errMsg)
+			return errors.New(errMsg)
+		}
+	}
+
+	return nil
+}
+
+func isValidFilterParams(params *knowledgebase_service.MetaDataFilterParams) bool {
+	return params != nil &&
+		params.FilterEnable &&
+		params.MetaFilterParams != nil &&
+		len(params.MetaFilterParams) > 0
+}
+
+func convertValue(value, valueType string) (interface{}, error) {
+	if len(value) == 0 {
+		return nil, nil
+	}
+	// 根据类型转换value
+	if valueType == MetaValueTypeNumber || valueType == MetaValueTypeTime {
+		ragValue, err := pkg_util.I64(value)
+		if err != nil {
+			log.Errorf("convertMetaValue fail %v", err)
+			return nil, err
+		}
+		return ragValue, nil
+	}
+	return value, nil
+}
+
+func buildKnowledgeMetaSelectResp(metaList []*model.KnowledgeDocMeta) *knowledgebase_service.SelectKnowledgeMetaResp {
+	if len(metaList) == 0 {
+		return &knowledgebase_service.SelectKnowledgeMetaResp{}
+	}
+	var retMetaList []*knowledgebase_service.KnowledgeMetaData
+	keyValueMap := checkRepeatedKeyType(metaList)
+	for key, valueType := range keyValueMap {
+		retMetaList = append(retMetaList, &knowledgebase_service.KnowledgeMetaData{
+			Key:  key,
+			Type: valueType,
+		})
+	}
+	return &knowledgebase_service.SelectKnowledgeMetaResp{
+		MetaList: retMetaList,
+	}
 }
 
 // buildKnowledgeListResp 构造知识库列表返回结果
@@ -214,6 +380,23 @@ func buildKnowledgeTagList(knowledgeId string, knowledgeTagMap map[string][]*orm
 		})
 	}
 	return retList
+}
+
+func checkRepeatedKeyType(metaList []*model.KnowledgeDocMeta) map[string]string {
+	var keyValueMap = make(map[string]string)
+	for _, meta := range metaList {
+		if meta.Key == "" || meta.ValueType == "" {
+			continue
+		}
+		if _, exists := keyValueMap[meta.Key]; !exists {
+			keyValueMap[meta.Key] = meta.ValueType
+		} else {
+			if meta.ValueType != keyValueMap[meta.Key] {
+				log.Errorf("key %s already exists, type = %s", meta.Key, meta.ValueType)
+			}
+		}
+	}
+	return keyValueMap
 }
 
 // buildKnowledgeInfo 构造知识库信息
