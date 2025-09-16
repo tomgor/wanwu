@@ -92,21 +92,7 @@ func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.Assist
 	if err != nil {
 		return nil, err
 	}
-	// 查询该用户所有权限的所有 MCP
-	accessedMCPList, err := AssistantMCPList(ctx, req.AssistantId, userId, orgId)
-	if err != nil {
-		return nil, err
-	}
-	// 查询该用户所有权限的 Custom
-	accessedCustomList, err := AssistantCustomList(ctx, req.AssistantId, userId, orgId)
-	if err != nil {
-		return nil, err
-	}
-	assistant, err := transAssistantResp2Model(ctx, resp, accessedMCPList, accessedCustomList)
-	if err != nil {
-		return nil, err
-	}
-	return assistant, nil
+	return transAssistantResp2Model(ctx, resp)
 }
 
 func AssistantWorkFlowCreate(ctx *gin.Context, userId, orgId string, req request.AssistantWorkFlowAddRequest) error {
@@ -220,27 +206,15 @@ func AssistantCustomToolEnableSwitch(ctx *gin.Context, userId, orgId string, req
 	return err
 }
 
-func AssistantMCPList(ctx *gin.Context, assistantId, userId, orgId string) ([]*response.MCPInfos, error) {
-	// 获取该用户的所有 MCP 列表
-	resp, err := assistant.AssistantMCPGetList(ctx.Request.Context(), &assistant_service.AssistantMCPGetListReq{
-		AssistantId: assistantId,
-		Identity: &assistant_service.Identity{
-			UserId: userId,
-			OrgId:  orgId,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
+func assistantMCPConvert(ctx *gin.Context, assistantMCPInfos []*assistant_service.AssistantMCPInfos) ([]*response.MCPInfos, error) {
 	// 若查询结果为空，返回空列表
-	if len(resp.AssistantMCPInfos) == 0 {
+	if len(assistantMCPInfos) == 0 {
 		return nil, nil
 	}
 
 	// 提取MCP ID列表
 	var mcpIds []string
-	for _, m := range resp.AssistantMCPInfos {
+	for _, m := range assistantMCPInfos {
 		mcpIds = append(mcpIds, m.McpId)
 	}
 
@@ -259,7 +233,7 @@ func AssistantMCPList(ctx *gin.Context, assistantId, userId, orgId string) ([]*r
 
 	// 构建返回结果
 	var retMCPInfos []*response.MCPInfos
-	for _, m := range resp.AssistantMCPInfos {
+	for _, m := range assistantMCPInfos {
 		item, exists := mcpDetailMap[m.McpId]
 		if exists {
 			// 有效MCP
@@ -280,23 +254,15 @@ func AssistantMCPList(ctx *gin.Context, assistantId, userId, orgId string) ([]*r
 	return retMCPInfos, nil
 }
 
-func AssistantCustomList(ctx *gin.Context, assistantId, userId, orgId string) ([]*response.CustomInfos, error) {
-	// 获取该用户的所有 Custom 列表
-	resp, err := assistant.AssistantCustomToolGetList(ctx.Request.Context(), &assistant_service.AssistantCustomToolGetListReq{
-		AssistantId: assistantId,
-	})
-	if err != nil {
-		return nil, err
-	}
-
+func assistantCustomConvert(ctx *gin.Context, assistantCustomInfos []*assistant_service.AssistantCustomToolInfos) ([]*response.CustomInfos, error) {
 	// 若查询为空，返回空列表
-	if len(resp.AssistantCustomToolInfos) == 0 {
+	if len(assistantCustomInfos) == 0 {
 		return nil, nil
 	}
 
 	// 提取自定义工具ID列表
 	var customToolIds []string
-	for _, c := range resp.AssistantCustomToolInfos {
+	for _, c := range assistantCustomInfos {
 		customToolIds = append(customToolIds, c.CustomToolId)
 	}
 
@@ -315,7 +281,7 @@ func AssistantCustomList(ctx *gin.Context, assistantId, userId, orgId string) ([
 
 	// 组装返回结果
 	var retCustomInfos []*response.CustomInfos
-	for _, c := range resp.AssistantCustomToolInfos {
+	for _, c := range assistantCustomInfos {
 		item, exists := customToolMap[c.CustomToolId]
 		if exists {
 			// 有效工具
@@ -444,17 +410,59 @@ func transKnowledgebases2Proto(kbConfig request.AppKnowledgebaseConfig) *assista
 		}
 	}
 	return &assistant_service.AssistantKnowledgeBaseConfig{
-		KnowledgeBaseIds:  knowIds,
-		MaxHistory:        kbConfig.Config.MaxHistory,
-		Threshold:         kbConfig.Config.Threshold,
-		TopK:              kbConfig.Config.TopK,
-		MatchType:         kbConfig.Config.MatchType,
-		KeywordPriority:   kbConfig.Config.KeywordPriority,
-		PriorityMatch:     kbConfig.Config.PriorityMatch,
-		SemanticsPriority: kbConfig.Config.SemanticsPriority,
+		KnowledgeBaseIds:     knowIds,
+		MaxHistory:           kbConfig.Config.MaxHistory,
+		Threshold:            kbConfig.Config.Threshold,
+		TopK:                 kbConfig.Config.TopK,
+		MatchType:            kbConfig.Config.MatchType,
+		KeywordPriority:      kbConfig.Config.KeywordPriority,
+		PriorityMatch:        kbConfig.Config.PriorityMatch,
+		SemanticsPriority:    kbConfig.Config.SemanticsPriority,
+		AppKnowledgeBaseList: transKnowledgeParams(kbConfig.Knowledgebases),
 	}
 }
 
+func transKnowledgeParams(paramsList []request.AppKnowledgeBase) []*assistant_service.AppKnowledgeBase {
+	if len(paramsList) == 0 {
+		return nil
+	}
+	var retList []*assistant_service.AppKnowledgeBase
+	for _, base := range paramsList {
+		retList = append(retList, &assistant_service.AppKnowledgeBase{
+			KnowledgeBaseId:      base.ID,
+			KnowledgeBaseName:    base.Name,
+			MetaDataFilterParams: transKnowledgeMetaParams(base.MetaDataFilterParams),
+		})
+	}
+	return retList
+}
+
+func transKnowledgeMetaParams(baseInfo *request.MetaDataFilterParams) *assistant_service.MetaDataFilterParams {
+	if baseInfo == nil {
+		return nil
+	}
+	return &assistant_service.MetaDataFilterParams{
+		FilterEnable:     baseInfo.FilterEnable,
+		FilterLogicType:  baseInfo.FilterLogicType,
+		MetaFilterParams: transMetaFilterParams(baseInfo.MetaFilterParams),
+	}
+}
+
+func transMetaFilterParams(metaFilterList []*request.MetaFilterParams) []*assistant_service.MetaFilterParams {
+	if metaFilterList == nil {
+		return nil
+	}
+	var metaList []*assistant_service.MetaFilterParams
+	for _, m := range metaFilterList {
+		metaList = append(metaList, &assistant_service.MetaFilterParams{
+			Condition: m.Condition,
+			Key:       m.Key,
+			Type:      m.Type,
+			Value:     m.Value,
+		})
+	}
+	return metaList
+}
 func transSafetyConfig2Proto(tables []request.SensitiveTable) []*assistant_service.SensitiveTable {
 	if tables == nil {
 		return nil
@@ -469,7 +477,7 @@ func transSafetyConfig2Proto(tables []request.SensitiveTable) []*assistant_servi
 	return result
 }
 
-func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.AssistantInfo, mcpInfos []*response.MCPInfos, customInfos []*response.CustomInfos) (*response.Assistant, error) {
+func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.AssistantInfo) (*response.Assistant, error) {
 	log.Debugf("开始转换Assistant响应到模型，响应内容: %+v", resp)
 	if resp == nil {
 		log.Debugf("Assistant响应为空，返回空Assistant模型")
@@ -511,7 +519,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		log.Debugf("Rerank配置为空或模型ID为空")
 	}
 
-	var workFlowInfos []*response.WorkFlowInfos
+	var assistantWorkFlowInfos []*response.WorkFlowInfos
 	if len(resp.WorkFlowInfos) > 0 {
 		var workflowIds []string
 		for _, wf := range resp.WorkFlowInfos {
@@ -537,12 +545,23 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 				}
 			}
 
-			workFlowInfos = append(workFlowInfos, workFlowInfo)
+			assistantWorkFlowInfos = append(assistantWorkFlowInfos, workFlowInfo)
 			log.Debugf("添加工作流信息: WorkFlowId=%s, ApiName=%s", wf.WorkFlowId, wf.ApiName)
 		}
-		log.Debugf("总共添加 %d 个工作流信息", len(workFlowInfos))
+		log.Debugf("总共添加 %d 个工作流信息", len(assistantWorkFlowInfos))
 	} else {
 		log.Debugf("工作流信息为空")
+	}
+
+	// 查询该用户所有权限的所有 MCP
+	assistantMCPInfos, err := assistantMCPConvert(ctx, resp.McpInfos)
+	if err != nil {
+		return nil, err
+	}
+	// 查询该用户所有权限的 Custom
+	assistantCustomInfos, err := assistantCustomConvert(ctx, resp.CustomToolInfos)
+	if err != nil {
+		return nil, err
 	}
 
 	var onlineSearchConfig request.OnlineSearchConfig
@@ -578,9 +597,9 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		OnlineSearchConfig:  onlineSearchConfig,
 		SafetyConfig:        request.AppSafetyConfig{Enable: resp.SafetyConfig.GetEnable()},
 		Scope:               resp.Scope,
-		WorkFlowInfos:       workFlowInfos,
-		MCPInfos:            mcpInfos,
-		CustomInfos:         customInfos,
+		WorkFlowInfos:       assistantWorkFlowInfos,
+		MCPInfos:            assistantMCPInfos,
+		CustomInfos:         assistantCustomInfos,
 		CreatedAt:           util.Time2Str(resp.CreatTime),
 		UpdatedAt:           util.Time2Str(resp.UpdateTime),
 	}
@@ -616,13 +635,8 @@ func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.Ass
 		return request.AppKnowledgebaseConfig{}, err
 	}
 
-	var knowledgeBases []request.AppKnowledgeBase
-	for _, kbInfo := range kbInfoList.List {
-		knowledgeBases = append(knowledgeBases, request.AppKnowledgeBase{
-			ID:   kbInfo.KnowledgeId,
-			Name: kbInfo.Name,
-		})
-	}
+	knowledgeBases := buildKnowledgeBases(kbInfoList, kbConfig.AppKnowledgeBaseList)
+
 	return request.AppKnowledgebaseConfig{
 		Knowledgebases: knowledgeBases,
 		Config: request.AppKnowledgebaseParams{
@@ -636,4 +650,52 @@ func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.Ass
 		},
 	}, nil
 
+}
+
+func buildKnowledgeBases(kbInfoList *knowledgeBase_service.KnowledgeDetailSelectListResp, kbConfigList []*assistant_service.AppKnowledgeBase) []request.AppKnowledgeBase {
+	if len(kbInfoList.List) == 0 {
+		return nil
+	}
+	var knowledgeMap = make(map[string]*knowledgeBase_service.KnowledgeInfo)
+	for _, kbInfo := range kbInfoList.List {
+		knowledgeMap[kbInfo.KnowledgeId] = kbInfo
+	}
+	var knowledgeBases []request.AppKnowledgeBase
+	for _, kbConfig := range kbConfigList {
+		params := buildAssistantMetaDataFilterParams(kbConfig)
+		knowledgeBases = append(knowledgeBases, request.AppKnowledgeBase{
+			ID:                   kbConfig.KnowledgeBaseId,
+			Name:                 knowledgeMap[kbConfig.KnowledgeBaseId].Name,
+			MetaDataFilterParams: params,
+		})
+	}
+	return knowledgeBases
+}
+
+func buildAssistantMetaDataFilterParams(kbConfig *assistant_service.AppKnowledgeBase) *request.MetaDataFilterParams {
+	params := kbConfig.MetaDataFilterParams
+	if params == nil {
+		return nil
+	}
+	return &request.MetaDataFilterParams{
+		FilterEnable:     params.FilterEnable,
+		FilterLogicType:  params.FilterLogicType,
+		MetaFilterParams: buildAssistantMetaFilterParams(params.MetaFilterParams),
+	}
+}
+
+func buildAssistantMetaFilterParams(metaFilterList []*assistant_service.MetaFilterParams) []*request.MetaFilterParams {
+	if metaFilterList == nil {
+		return nil
+	}
+	var metaList []*request.MetaFilterParams
+	for _, m := range metaFilterList {
+		metaList = append(metaList, &request.MetaFilterParams{
+			Condition: m.Condition,
+			Key:       m.Key,
+			Type:      m.Type,
+			Value:     m.Value,
+		})
+	}
+	return metaList
 }

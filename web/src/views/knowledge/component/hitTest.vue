@@ -28,6 +28,10 @@
             >开始测试<span class="el-icon-caret-right"></span></el-button>
           </div>
         </div>
+         <div class="hitTest_input meta_box">
+          <h3>元数据过滤配置</h3>
+          <metaSet ref="metaSet" class="metaSet" :knowledgeId="knowledgeId" />
+        </div>
         <div class="test_form">
           <searchConfig ref="searchConfig" @sendConfigInfo="sendConfigInfo" />
         </div>
@@ -80,17 +84,20 @@ import { hitTest } from "@/api/knowledge";
 import { md } from "@/mixins/marksown-it";
 import searchConfig from '@/components/searchConfig.vue';
 import LinkIcon from "@/components/linkIcon.vue";
+import metaSet from "@/components/metaSet";
 export default {
-  components:{LinkIcon, searchConfig},
+  components:{LinkIcon, searchConfig,metaSet},
   data() {
     return {
       md: md,
       question: "",
       resultLoading: false,
-      knowledgeIdList:[this.$route.query.knowledgeId],
+      knowledgeIdList:{},
       searchList: [],
       score: [],
-      formInline:null
+      formInline:null,
+      knowledgeId:this.$route.query.knowledgeId,
+      name:this.$route.query.name
     };
   },
   methods: {
@@ -101,6 +108,13 @@ export default {
       this.formInline = data;
     },
     startTest() {
+      const metaData  = this.$refs.metaSet.getMetaData();
+      this.knowledgeIdList = {
+        ...metaData,
+        id:this.knowledgeId,
+        name:this.name
+      }
+
       if (this.question === "") {
         this.$message.warning("请输入问题");
         return;
@@ -114,9 +128,17 @@ export default {
         this.$message.warning("请选择Rerank模型");
         return;
       }
+      if(matchType === 'mix' && priorityMatch === 1){
+        this.formInline.knowledgeMatchParams.rerankModelId = '';
+      }
+      if(this.$refs.metaSet.validateRequiredFields(this.knowledgeIdList['metaDataFilterParams']['metaFilterParams'])){
+        this.$message.warning('存在未填信息,请补充')
+        return
+      }
+      
       const data = {
         ...this.formInline,
-        knowledgeIdList:this.knowledgeIdList,
+        knowledgeList:[this.knowledgeIdList],
         question: this.question,
       };
       this.test(data);
@@ -146,22 +168,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-// /deep/ {
-//   .vertical-form-item {
-//     display: flex;
-//     flex-direction: column;
-//     align-items: flex-start;
-//   }
-//   .vertical-form-item .el-form-item__label {
-//     line-height: unset;
-//     font-size: 14px;
-//     font-weight: bold;
-//   }
-//   .el-form-item__content {
-//     width: 100%;
-//   }
-// }
-
 .full-content {
   display: flex;
   flex-direction: column;
@@ -284,6 +290,13 @@ export default {
             color: #595959;
           }
         }
+      }
+    }
+    .meta_box{
+      margin-top:20px;
+      padding: 0 20px 20px 20px !important;
+      .metaSet{
+        width:100%;
       }
     }
   }

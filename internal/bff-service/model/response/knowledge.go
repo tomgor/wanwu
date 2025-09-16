@@ -28,8 +28,22 @@ type KnowledgeInfo struct {
 	CreateAt           string              `json:"createAt"`           //创建时间
 }
 
+type KnowledgeMetaData struct {
+	Key  string `json:"key"`  // key
+	Type string `json:"type"` // type(time, string, number)
+}
+
 type ChunkSearchList struct {
 	Title         string `json:"title"`
 	Snippet       string `json:"snippet"`
 	KnowledgeName string `json:"knowledgeName"`
+}
+
+type GetKnowledgeMetaSelectResp struct {
+	MetaList []*KnowledgeMetaItem `json:"knowledgeMetaList"`
+}
+
+type KnowledgeMetaItem struct {
+	MetaKey       string `json:"metaKey"`
+	MetaValueType string `json:"metaValueType"`
 }

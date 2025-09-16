@@ -1,5 +1,5 @@
 <template>
-  <div class="agent-from-content">
+  <div class="agent-from-content" :class="{ 'isDisabled': isPublish }">
     <div class="form-header">
       <div class="header-left">
         <span class="el-icon-arrow-left btn" @click="goBack"></span>
@@ -80,22 +80,29 @@
                 <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
                 关联知识库
               </span>
+              <span>
+                <span class="common-add" @click="showKnowledgeDiglog">
+                  <span class="el-icon-plus"></span>
+                  <span class="handleBtn">添加</span>
+                </span>
+              </span>
             </p>
-            <div class="rl">
-              <el-select 
-              v-model="editForm.knowledgeBaseIds" 
-              placeholder="可输入知识库名称搜索" 
-              class="model-select" 
-              clearable 
-              filterable
-              multiple>
-                <el-option
-                  v-for="item in knowledgeData"
-                  :key="item.knowledgeId"
-                  :label="item.name"
-                  :value="item.knowledgeId">
-                </el-option>
-              </el-select>
+            <div class="rl knowledge-conent">
+              <div class="tool-right tool">
+                  <div class="action-list">
+                    <div v-for="(n,i) in editForm.knowledgebases" class="action-item" :key="'knowledge'+ i">
+                       <div class="name" style="color: #333">
+                        <span>{{n.name}}</span>
+                       </div>
+                        <div class="bt">
+                          <el-tooltip class="item" effect="dark" content="元数据过滤" placement="top-start">
+                            <span class="el-icon-setting del" @click="showMetaSet(n,i)" style="margin-right:10px;"></span>
+                          </el-tooltip>
+                          <span class="el-icon-delete del" @click="delKnowledge(i)"></span>
+                      </div>
+                    </div>
+                  </div>
+              </div>
             </div>
           </div>
         </div>
@@ -139,14 +146,34 @@
     <!-- apikey -->
     <ApiKeyDialog ref="apiKeyDialog" :appId="editForm.appId" :appType="'rag'" />
     <setSafety ref="setSafety" @sendSafety="sendSafety" />
+    <!-- 知识库选择 -->
+    <knowledgeSelect ref="knowledgeSelect" @getKnowledgeData="getKnowledgeData" />
+    <!-- 元数据设置 -->
+    <el-dialog
+      :visible.sync="metaSetVisible"
+      width="1050px"
+      class="metaSetVisible"
+      :before-close="handleMetaClose">
+      <template #title>
+         <div class="metaHeader">
+          <h3>配置元数据过滤</h3>
+          <span>[ 通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]</span>
+         </div>
+      </template>
+      <metaSet ref="metaSet"  :knowledgeId="currentKnowledgeId" :currentMetaData="currentMetaData"/>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleMetaClose">取 消</el-button>
+        <el-button type="primary" @click="submitMeta">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {getApiKeyRoot,appPublish} from "@/api/appspace";
-import { getKnowledgeList } from "@/api/knowledge";
 import CreateTxtQues from "@/components/createApp/createRag.vue"
 import ModelSet from "./modelSetDialog.vue";
+import metaSet from "@/components/metaSet";
 import knowledgeSet from "./knowledgeSetDialog.vue"
 import ApiKeyDialog from "./ApiKeyDialog";
 import setSafety from "@/components/setSafety";
@@ -155,6 +182,7 @@ import { getRagInfo,updateRagConfig } from "@/api/rag";
 import Chat from "./chat";
 import searchConfig from '@/components/searchConfig.vue';
 import LinkIcon from "@/components/linkIcon.vue";
+import knowledgeSelect from "@/components/knowledgeSelect.vue"
 export default {
   components: {
     LinkIcon,
@@ -164,10 +192,16 @@ export default {
     knowledgeSet,
     ApiKeyDialog,
     setSafety,
-    searchConfig
+    searchConfig,
+    knowledgeSelect,
+    metaSet
   },
   data() {
     return {
+      knowledgeIndex:-1,
+      currentKnowledgeId:'',
+      currentMetaData:{},
+      metaSetVisible:false,
       rerankOptions:[],
       showOperation:false,
       scope:'public',
@@ -187,7 +221,7 @@ export default {
           frequencyPenaltyEnable:true
         },
         rerankParams:'',
-        knowledgeBaseIds:[],
+        knowledgebases:[],
         knowledgeConfig:{
           keywordPriority: 0.8, //关键词权重
           matchType: "", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
@@ -215,7 +249,6 @@ export default {
       isPublish: false,
       modleOptions: [],
       selectKnowledge: [],
-      knowledgeData: [],
       loadingPercent: 10,
       nameStatus: "",
       saved: false, //按钮
@@ -239,15 +272,15 @@ export default {
         clearTimeout(this.debounceTimer)
       }
       this.debounceTimer = setTimeout(() =>{
-          const props = ['modelParams', 'modelConfig', 'knowledgeBaseIds', 'knowledgeConfig','safetyConfig'];
+          const props = ['modelParams', 'modelConfig', 'knowledgebases', 'knowledgeConfig','safetyConfig'];
           const changed = props.some(prop => {
           return JSON.stringify(newVal[prop]) !== JSON.stringify(
               (this.initialEditForm || {})[prop]
             );
           });
           if (changed && !this.isUpdating) {
-            const isMixPriorityMatch = newVal['knowledgeConfig']['matchType'] === 'mix' && newVal['knowledgeConfig']['priorityMatch']
-            if(newVal['modelParams']!== '' && newVal['knowledgeBaseIds'].length > 0 || (!isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
+            const isMixPriorityMatch = newVal['knowledgeConfig']['matchType'] === 'mix' && newVal['knowledgeConfig']['priorityMatch'];
+            if(newVal['modelParams']!== '' &&  newVal['knowledgebases'].length > 0 || (isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
               this.updateInfo();
             }
           }
@@ -262,7 +295,6 @@ export default {
   created() {
     this.getModelData(); //获取模型列表
     this.getRerankData(); //获取rerank模型
-    this.getKnowledgeList();//获取知识库列表
     if (this.$route.query.id) {
       this.editForm.appId = this.$route.query.id;
       setTimeout(() => {
@@ -270,8 +302,44 @@ export default {
         this.apiKeyRootUrl(); //获取api跟地址
       }, 500);
     }
+        //判断是否发布
+    if (this.$route.query.publish) {
+      this.isPublish = true;
+    }
   },
   methods: {
+    submitMeta(){
+      const metaData  = this.$refs.metaSet.getMetaData();
+      if(this.$refs.metaSet.validateRequiredFields(metaData['metaDataFilterParams']['metaFilterParams'])){
+        this.$message.warning('存在未填信息,请补充')
+        return
+      }
+      this.$set(this.editForm.knowledgebases, this.knowledgeIndex, { ...this.editForm.knowledgebases[this.knowledgeIndex], ...metaData });
+      this.metaSetVisible = false;
+    },
+    delKnowledge(index){
+      this.editForm.knowledgebases.splice(index,1)
+    },
+    handleMetaClose(){
+      this.metaSetVisible = false;
+    },
+    getKnowledgeData(data){
+      const originalIds = new Set(this.editForm.knowledgebases.map(item => item.id));
+      const newItems = data.filter(item => !originalIds.has(item.id));
+      this.editForm.knowledgebases.push(...newItems);
+    },
+    showMetaSet(e,index){
+      this.currentKnowledgeId = e.id;
+      this.knowledgeIndex = index;
+      this.currentMetaData = {}
+      this.$nextTick(() =>{
+         this.currentMetaData = e.metaDataFilterParams;
+      })
+      this.metaSetVisible = true;
+    },
+    showKnowledgeDiglog(){
+      this.$refs.knowledgeSelect.showDialog(this.editForm.knowledgebases)
+    },
     sendConfigInfo(data){
       this.editForm.knowledgeConfig = { ...data.knowledgeMatchParams };
     },
@@ -302,7 +370,7 @@ export default {
             this.editForm.rerankParams = res.data.rerankConfig.modelId;
             const knowledgeData = res.data.knowledgeBaseConfig.knowledgebases;
             if(knowledgeData && knowledgeData.length > 0){
-              this.editForm.knowledgeBaseIds = knowledgeData.map(item => item.id);
+              this.editForm.knowledgebases = knowledgeData;
             }
             this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;//需要后端修改
             this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
@@ -338,7 +406,7 @@ export default {
         this.$message.warning('请选rerank择模型！')
         return false
       }
-      if(this.editForm.knowledgeBaseIds.length === 0){
+      if(this.editForm.knowledgebases.length === 0){
         this.$message.warning('请选择关联知识库！')
         return false
       }
@@ -394,33 +462,22 @@ export default {
       }
       this.modelLoading = false;
     },
-    async getKnowledgeList() {
-      //获取文档知识分类
-      const res = await getKnowledgeList({});
-      if (res.code === 0) {
-        this.knowledgeData = res.data.knowledgeList || [];
-      } else {
-        this.$message.error(res.message);
-      }
-    },
     async updateInfo() {
       if (this.isUpdating) return; // 防止重复调用
       
       this.isUpdating = true;
       try {
         //知识库数据
-        const knowledgeMap = new Map(this.knowledgeData.map(item => [item.knowledgeId, item]));
-        const knowledgeData = this.editForm.knowledgeBaseIds.map(id => {
-          const found = knowledgeMap.get(id);
-          return found ? { id: found.knowledgeId, name: found.name } : null;
-        }).filter(Boolean);
         //模型数据
         const modeInfo = this.modleOptions.find(item => item.modelId === this.editForm.modelParams)
+        if(this.editForm.knowledgeConfig.matchType === 'mix' && this.editForm.knowledgeConfig.priorityMatch === 1){
+          this.editForm.knowledgeConfig.rerankModelId = ''
+        }
         const rerankInfo = this.rerankOptions.find(item => item.modelId === this.editForm.knowledgeConfig.rerankModelId)
         let fromParams = {
           ragId:this.editForm.appId,
           knowledgeBaseConfig:{
-            knowledgebases:knowledgeData,
+            knowledgebases:this.editForm.knowledgebases,
             config:this.editForm.knowledgeConfig
           },
           modelConfig:{
@@ -445,6 +502,7 @@ export default {
         // 更新成功后，更新 initialEditForm 避免重复触发
         if (res.code === 0) {
           this.initialEditForm = JSON.parse(JSON.stringify(this.editForm));
+          this.getDetail();//获取详情
         }
       } catch (error) {
         console.error('更新配置失败:', error);
@@ -457,6 +515,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.isDisabled .header-right,.isDisabled .drawer-form > div{
+  user-select: none;
+  pointer-events: none !important;      
+}
 /deep/{
   .apikeyBtn{
     padding: 12px 10px;
@@ -468,7 +530,31 @@ export default {
       height:14px;
     }
   }
+  .metaSetVisible{
+    .el-dialog__header{
+      border-bottom:1px solid #dbdbdb;
+    }
+    .el-dialog__body{
+      max-height:400px;
+      overflow-y: auto;
+    }
+  }
 }
+
+.metaHeader{
+  display:flex;
+  justify-content: flex-start;
+  h3{
+    font-size:18px;
+  }
+  span{
+    margin-left:10px;
+    color:#666;
+    display:inline-block;
+    padding-top:5px;
+  }
+}
+
 .question {
   cursor: pointer;
   color: #999;
@@ -666,6 +752,21 @@ export default {
         max-height:300px;
       }
     }
+    .knowledge-conent{
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      .tool {
+        width: 100%;
+        max-height: 300px;
+        .action-list {
+          width: 100%;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        }
+      }
+    }
     .model-select{
       width:100%;
     }
@@ -674,6 +775,9 @@ export default {
       cursor:pointer;
       font-size: 16px;
       padding-right:10px;
+    }
+    .common-add{
+      cursor: pointer;
     }
     .operation:hover{
       color:#384BF7;
@@ -851,24 +955,37 @@ export default {
 }
 .action-list {
   margin: 10px 0 15px 0;
-  border: 1px solid #ddd;
+  width: 100%;
   .action-item {
     display: flex;
     justify-content: space-between;
-    border-top: 1px solid #ddd;
-    margin-top: -1px;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 5px;
+    width: 100%;
     .name {
-      border-right: 1px solid #ddd;
-      flex: 4;
+      width: 60%;
+      box-sizing: border-box;
       padding: 10px 20px;
       cursor: pointer;
       color: #2c7eea;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .bt {
       text-align: center;
-      flex: 1;
+      width: 40%;
+      display: flex;
+      justify-content: flex-end;
+      padding-right: 10px;
+      box-sizing: border-box;
       cursor: pointer;
-      padding: 10px 20px;
+      .del {
+        color: #384bf7;
+        font-size: 16px;
+      }
     }
   }
 }

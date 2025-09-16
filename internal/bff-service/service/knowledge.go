@@ -95,10 +95,10 @@ func DeleteKnowledge(ctx *gin.Context, userId, orgId string, r *request.DeleteKn
 func KnowledgeHit(ctx *gin.Context, userId, orgId string, r *request.KnowledgeHitReq) (*response.KnowledgeHitResp, error) {
 	matchParams := r.KnowledgeMatchParams
 	resp, err := knowledgeBase.KnowledgeHit(ctx.Request.Context(), &knowledgebase_service.KnowledgeHitReq{
-		Question:        r.Question,
-		UserId:          userId,
-		OrgId:           orgId,
-		KnowledgeIdList: r.KnowledgeIdList,
+		Question:      r.Question,
+		UserId:        userId,
+		OrgId:         orgId,
+		KnowledgeList: buildKnowledgeListReq(r),
 		KnowledgeMatchParams: &knowledgebase_service.KnowledgeMatchParams{
 			MatchType:         matchParams.MatchType,
 			RerankModelId:     matchParams.RerankModelId,
@@ -115,6 +115,46 @@ func KnowledgeHit(ctx *gin.Context, userId, orgId string, r *request.KnowledgeHi
 		return nil, err
 	}
 	return buildKnowledgeHitResp(resp), nil
+}
+
+func GetKnowledgeMetaSelect(ctx *gin.Context, userId, orgId string, r *request.GetKnowledgeMetaSelectReq) (*response.GetKnowledgeMetaSelectResp, error) {
+	metaList, err := knowledgeBase.GetKnowledgeMetaSelect(ctx.Request.Context(), &knowledgebase_service.SelectKnowledgeMetaReq{
+		UserId:      userId,
+		OrgId:       orgId,
+		KnowledgeId: r.KnowledgeId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return buildKnowledgeMetaList(metaList.MetaList), nil
+}
+
+// buildKnowledgeMetaList 构造知识库元数据列表
+func buildKnowledgeMetaList(metaList []*knowledgebase_service.KnowledgeMetaData) *response.GetKnowledgeMetaSelectResp {
+	var retMetaList []*response.KnowledgeMetaItem
+	for _, meta := range metaList {
+		retMetaList = append(retMetaList, &response.KnowledgeMetaItem{
+			MetaKey:       meta.Key,
+			MetaValueType: meta.Type,
+		})
+	}
+	return &response.GetKnowledgeMetaSelectResp{MetaList: retMetaList}
+}
+
+// buildKnowledgeListReq 构造命中测试 - 知识库列表参数
+func buildKnowledgeListReq(r *request.KnowledgeHitReq) []*knowledgebase_service.KnowledgeParams {
+	var knowledgeList []*knowledgebase_service.KnowledgeParams
+	for _, k := range r.KnowledgeList {
+		knowledgeList = append(knowledgeList, &knowledgebase_service.KnowledgeParams{
+			KnowledgeId: k.ID,
+			MetaDataFilterParams: &knowledgebase_service.MetaDataFilterParams{
+				FilterEnable:     k.MetaDataFilterParams.FilterEnable,
+				FilterLogicType:  k.MetaDataFilterParams.FilterLogicType,
+				MetaFilterParams: buildMetaFilterParams(k.MetaDataFilterParams.MetaFilterParams),
+			},
+		})
+	}
+	return knowledgeList
 }
 
 // buildKnowledgeInfoList 构造知识库列表结果
@@ -172,4 +212,17 @@ func buildKnowledgeHitResp(resp *knowledgebase_service.KnowledgeHitResp) *respon
 		Score:      resp.Score,
 		SearchList: searchList,
 	}
+}
+
+func buildMetaFilterParams(meta []*request.MetaFilterParams) []*knowledgebase_service.MetaFilterParams {
+	var metaList []*knowledgebase_service.MetaFilterParams
+	for _, m := range meta {
+		metaList = append(metaList, &knowledgebase_service.MetaFilterParams{
+			Key:       m.Key,
+			Value:     m.Value,
+			Type:      m.Type,
+			Condition: m.Condition,
+		})
+	}
+	return metaList
 }

@@ -2,11 +2,11 @@ package orm
 
 import (
 	"context"
-	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/config"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm/sqlopt"
+	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/config"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/db"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/util"
 	"github.com/UnicomAI/wanwu/pkg/log"

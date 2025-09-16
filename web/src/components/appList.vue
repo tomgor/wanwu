@@ -21,7 +21,7 @@
         @mouseenter="mouseEnter(n)"
         @mouseleave="mouseLeave(n)"
       >
-        <img v-if="n.avatar && n.avatar.path" class="logo" :src="basePath + '/user/api/' + n.avatar.path" />
+        <el-image v-if="n.avatar && n.avatar.path" class="logo" lazy :src="basePath + '/user/api/' + n.avatar.path" ></el-image>
         <span :class="['tag-app', `${n.appType}-tag`]">{{apptype[n.appType] || ''}}</span>
         <img
           v-if="apptype[n.appType]"
@@ -126,7 +126,6 @@
               </el-dropdown-item>
                <el-dropdown-item
                 command="publishSet"
-                v-if="n.appType === 'agent'"
               >
                 发布配置
               </el-dropdown-item>
@@ -237,7 +236,7 @@ export default {
       this.dialogVisible = false
     },
     isCanClick(n) {
-      return this.isShowTool ? (!n.publishType && n.appId !== 'example') : true
+      return this.isShowTool ? ((n.appType === 'workflow' && !n.publishType && n.appId !== 'example') || n.appType !== 'workflow') : true
     },
     // 公用删除方法
     async handleDelete() {
@@ -357,12 +356,18 @@ export default {
         case "cancelPublish":
           this.cancelPublish(row);
           break;
+        case "publishSet":
+          this.$router.push({path:`/workflow/publishSet`, query: {appId: row.appId, appType: row.appType, name: row.name}})
+          break;
       }
     },
     intelligentEdit(row) {
       this.$router.push({
           path: "/agent/test",
-          query: { id: row.appId }
+          query: { 
+            id: row.appId,
+            ...(row.publishType !== '' && {publish:true})
+          }
       });
     },
     intelligentDelete(row) {
@@ -384,14 +389,17 @@ export default {
           break;
         case "publishSet":
           //发布设置
-          this.$router.push({path:`/agent/publishSet`,query:{appId:row.appId,appType:'agent'}})
+          this.$router.push({path:`/agent/publishSet`, query: {appId: row.appId, appType: row.appType, name: row.name}})
           break;
       }
     },
     txtQuesEdit(row) {
       this.$router.push({
           path: "/rag/test",
-          query: { id: row.appId }
+          query: { 
+            id: row.appId,
+            ...(row.publishType !== '' && {publish:true})
+          }
       });
     },
     txtQuesDelete(row) {
@@ -410,6 +418,9 @@ export default {
           break;
         case "cancelPublish":
           this.cancelPublish(row);
+          break;
+        case "publishSet":
+          this.$router.push({path:`/rag/publishSet`, query: {appId: row.appId, appType: row.appType, name: row.name}})
           break;
       }
     },

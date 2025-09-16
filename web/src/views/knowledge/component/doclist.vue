@@ -34,7 +34,8 @@
 
               <div class="content_title">
                 <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload">{{$t('common.gpuDialog.reload')}}</el-button>
-                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/hitTest?knowledgeId=${docQuery.knowledgeId}`)">命中测试</el-button>
+                <el-button size="mini" type="primary" @click="showMeta">元数据管理</el-button>
+                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/hitTest?knowledgeId=${docQuery.knowledgeId}&name=${knowledgeName}`)">命中测试</el-button>
                 <el-button
                   size="mini"
                   type="primary"
@@ -144,15 +145,29 @@
         </el-main>
       </el-container>
     </div>
+    <!-- 元数据管理 -->
+    <el-dialog
+      title="元数据管理"
+      :visible.sync="metaVisible"
+      width="550px"
+      :before-close="handleClose">
+      <mataData ref="mataData" @updateMeata="updateMeata" type="create" :knowledgeId="docQuery.knowledgeId" class="mataData"/>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleClose">取 消</el-button>
+        <el-button type="primary" @click="createMeta">创 建</el-button>
+        <el-button type="primary" @click="submitMeta" :disabled="isDisabled">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import Pagination from "@/components/pagination.vue";
 import SearchInput from "@/components/searchInput.vue";
-import {getDocList,delDocItem,uploadFileTips} from "@/api/knowledge";
+import mataData from './metadata.vue'
+import {getDocList,delDocItem,uploadFileTips,updateDocMeta} from "@/api/knowledge";
 export default {
-  components: { Pagination,SearchInput},
+  components: { Pagination,SearchInput,mataData},
   data() {
     return {
       knowledgeName:this.$route.query.name || '',
@@ -173,7 +188,10 @@ export default {
       currentKnowValue:null,
       timer:null,
       refreshCount:0,
-      tagList:[]
+      tagList:[],
+      metaVisible:false,
+      metaData:[],
+      isDisabled:false
     };
   },
   watch:{
@@ -184,6 +202,15 @@ export default {
         }
       },
       immediate:true
+    },
+    metaData:{
+      handler(val){
+        if(val.some(item => item.metaKey === '' || item.metaValueType === '') || val.length === 0){
+          this.isDisabled = true
+        }else{
+          this.isDisabled = false
+        }
+      }
     }
   },
   mounted(){
@@ -193,6 +220,45 @@ export default {
     this.clearTimer()
   },
   methods: {
+    createMeta(){
+      this.$refs.mataData.createMetaData();
+      this.scrollToBottom();
+    },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const container = this.$refs.mataData;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      });
+     },
+    submitMeta(){
+      const data = {
+        docId:'',
+        knowledgeId:this.docQuery.knowledgeId,
+        metaDataList:this.metaData.map(({metaKey,metaValueType,option}) =>({
+          metaKey,
+          metaValueType,
+          option
+        }))
+      }
+      updateDocMeta(data).then(res =>{
+        if(res.code === 0){
+          this.$message.success('操作成功');
+          this.$refs.mataData.getList();
+          this.metaVisible = false;
+        }
+      }).catch(() =>{})
+    },
+    showMeta(){
+      this.metaVisible = true;
+    },
+    updateMeata(data){
+      this.metaData = data
+    },
+    handleClose(){
+      this.metaVisible = false;
+    },
     startTimer(){
       this.clearTimer();
       if (this.refreshCount >= 2) {
@@ -363,7 +429,8 @@ export default {
         query: {
           id: row.docId,
           type: row.docType,
-          name:row.docName
+          name:row.docName,
+          knowledgeId:row.knowledgeId
         },
       });
     },
@@ -386,6 +453,10 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.mataData{
+  max-height:400px;
+  overflow-y: auto;
+}
 .edit-icon{
   color: #384BF7;
   cursor: pointer;
@@ -440,6 +511,9 @@ export default {
   .el-upload-list {
     max-height: 200px;
     overflow-y: auto;
+  }
+  .el-dialog__body{
+    padding:10px 20px;
   }
 }
 .fileNumber {

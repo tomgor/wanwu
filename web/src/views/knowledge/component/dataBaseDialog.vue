@@ -1,15 +1,20 @@
 <template>
   <el-dialog
-    title="元数据管理"
     :visible.sync="dialogVisible"
-    width="40%"
+    width="60%"
     :before-close="handleClose"
   >
-    <el-button
-        @click="addItem"
+  <template #title>
+    <span class="dialog-title">元数据管理</span>
+    <!-- <el-popover
+    placement="right"
+    width="220"
+    trigger="hover"
     >
-      + 创建元数据
-    </el-button>
+    <p>元数据key为空时，去<span class="link" @click="goCreate">创建元数据</span></p>
+    <span class="el-icon-question question" slot="reference"></span>
+    </el-popover> -->
+  </template>
     <div>
         <el-table
         :data="filteredTableData"
@@ -17,26 +22,25 @@
           <el-table-column
               prop="metaKey"
               align="center">
-            <!-- 自定义表头（label + tooltip） -->
             <template #header>
               <div style="display: inline-flex; align-items: center;">
                 <span>Key</span>
-                <el-tooltip
-                    effect="dark"
-                    content="只能包含小写字母、数字和下划线，并且必须以小写字母开头"
-                    placement="top-start"
-                >
-                  <i class="el-icon-question" style="margin-left: 5px; cursor: pointer;"></i>
-                </el-tooltip>
               </div>
             </template>
             <template #default="{ row }">
-              <el-input
-                  v-model="row.metaKey"
-                  @input="row.metaKey = row.metaKey.replace(/[^a-z0-9_]/g, '').replace(/^[^a-z]*/, '')"
-                  clearable
-                  :disabled="!row.editable || !row.created"
-              />
+              <el-select
+                v-model="row.metaKey"
+                placeholder="请选择key"
+                @change="keyChange($event,row)"
+            >
+                <el-option
+                v-for="item in keyOptions"
+                :key="item.metaKey"
+                :label="item.metaKey"
+                :value="item.metaKey"
+                >
+                </el-option>
+              </el-select>
             </template>
           </el-table-column>
           <el-table-column
@@ -44,15 +48,7 @@
               label="类型"
               align="center">
             <template #default="{ row }">
-              <el-select
-                  v-model="row.metaValueType"
-                  clearable
-                  :disabled="!row.editable || !row.created"
-              >
-                <el-option value="string" label="String"></el-option>
-                <el-option value="number" label="Number"></el-option>
-                <el-option value="time" label="Time"></el-option>
-              </el-select>
+              <span class="metaValueType">[{{row.metaValueType}}]</span>
             </template>
           </el-table-column>
           <el-table-column
@@ -62,7 +58,7 @@
               min-width="90">
             <template #default="{ row }">
               <el-input
-                  v-if="row.metaValueType === 'string'"
+                  v-if="row.metaValueType === 'string' || row.metaValueType === ''"
                   v-model="row.metaValue"
                   @blur="handleBlur(row)"
                   clearable
@@ -111,6 +107,7 @@
       class="dialog-footer"
     >
       <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button @click="addItem" type="primary">+ 创建元数据</el-button>
       <el-button
         type="primary"
         @click="submitDialog"
@@ -120,8 +117,9 @@
   </el-dialog>
 </template>
 <script>
-import { updateDocMeta} from "@/api/knowledge";
+import { updateDocMeta,metaSelect} from "@/api/knowledge";
 export default {
+  props:['knowledgeId'],
   computed: {
     filteredTableData() {
       return this.tableData.filter(item => item.option !== "delete");
@@ -135,9 +133,27 @@ export default {
       dialogVisible: false,
       tableData: [],
       docId: "",
+      keyOptions:[]
     };
   },
+  created(){
+    this.getList()
+  },
   methods: {
+    getList(){
+        metaSelect({knowledgeId:this.knowledgeId}).then(res =>{
+            if(res.code === 0){
+                this.keyOptions = res.data.knowledgeMetaList || []
+            }
+        }).catch(() =>{})
+    },
+    keyChange(val,row){
+      row.metaValueType = this.keyOptions.filter(i => i.metaKey === val).map(e => e.metaValueType)[0];
+    },
+    goCreate(){
+      this.$route.push({path:'/knowledge/doclist'})
+      this.dialogVisible = false;
+    },
     submitDialog() {
       this.tableData.forEach(i => {
         delete i.editable
@@ -160,7 +176,7 @@ export default {
     addItem(){
       this.tableData.push({
         metaKey: '',
-        metaValueType: 'string',
+        metaValueType: '',
         metaValue: '',
         metaRule: '',
         metaId: '',
@@ -202,5 +218,23 @@ export default {
 }
 .table-opera-icon{
   font-size: 18px;
+  cursor: pointer;
+  color:#384BF7;
+}
+.metaValueType,.link{
+  color:#384BF7;
+}
+.dialog-title{
+  font-weight:bold;
+  line-height:24px;
+  font-size: 18px;
+  color: #434C6C;
+}
+.question{
+  color: #aaadcc;
+  margin-left: 5px;
+}
+.link{
+  cursor: pointer;
 }
 </style>

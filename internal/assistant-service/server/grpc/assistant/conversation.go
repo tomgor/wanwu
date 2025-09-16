@@ -23,6 +23,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/assistant-service/config"
 	"github.com/UnicomAI/wanwu/internal/assistant-service/pkg/util"
 	"github.com/UnicomAI/wanwu/pkg/es"
+	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
@@ -30,6 +31,11 @@ import (
 
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/emptypb"
+)
+
+const (
+	metaTypeNumber = "number"
+	metaTypeTime   = "time"
 )
 
 // ConversationCreate 创建对话
@@ -182,19 +188,21 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	defer func() {
 		// 只有在上下文被手动取消且还未保存过对话时，才保存"已被终止"消息
 		if ctx.Err() != nil && !req.Trial && !conversationSaved {
+			var terminationMessage string
+
 			if !streamStarted {
 				// 流式响应还未开始，保存基本终止消息
-				saveConversation(ctx, req, "本次回答已被终止", "")
+				terminationMessage = "本次回答已被终止"
+			} else if !hasReadFirstMessage || fullResponse.Len() == 0 {
+				// 流式响应已开始但没有有效内容
+				terminationMessage = "本次回答已被终止"
 			} else {
-				// 流式响应已开始
-				if !hasReadFirstMessage {
-					// 如果还没有读取到第一条消息，保存终止消息
-					saveConversation(ctx, req, "本次回答已被终止", searchList)
-				} else {
-					// 如果已经读取到消息，保存已经收到的消息
-					saveConversation(ctx, req, fullResponse.String()+"\n本次回答已被终止", searchList)
-				}
+				// 已经有部分响应内容，保存已收到的内容
+				terminationMessage = fullResponse.String() + "\n本次回答已被终止"
 			}
+
+			saveConversation(ctx, req, terminationMessage, searchList)
+			log.Infof("因上下文取消保存终止消息，assistantId: %s, conversationId: %s", req.AssistantId, req.ConversationId)
 		}
 	}()
 
@@ -209,6 +217,7 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	if status != nil {
 		log.Errorf("Assistant服务获取智能体信息失败，assistantId: %s, error: %v", req.AssistantId, status)
 		SSEError(stream, "智能体信息获取失败")
+		saveConversation(ctx, req, "智能体信息获取失败", "")
 		return errStatus(errs.Code_AssistantConversationErr, status)
 	}
 
@@ -219,8 +228,9 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	assistantConfig := config.Cfg().Assistant
 	if assistantConfig.SseUrl == "" {
 		log.Errorf("Assistant服务SSE URL配置为空，assistantId: %s", req.AssistantId)
-		SSEError(stream, "智能体配置错误")
-		return fmt.Errorf("智能体配置错误")
+		SSEError(stream, "智能体SSE URL配置错误")
+		saveConversation(ctx, req, "智能体SSE URL配置错误", "")
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "SSE URL配置错误")
 	}
 
 	// 组装智能体能力接口请求体
@@ -243,31 +253,36 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	modelConfig, err := s.setModelConfigParams(sseReq, assistant)
 	if err != nil {
 		SSEError(stream, "智能体模型配置解析失败")
-		return err
+		saveConversation(ctx, req, "智能体模型配置解析失败", "")
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "模型配置解析失败")
 	}
 
 	// 知识库参数配置
 	if err := s.setKnowledgebaseParams(ctx, sseReq, req, assistant, modelConfig); err != nil {
 		SSEError(stream, "智能体知识库配置解析失败")
-		return err
+		saveConversation(ctx, req, "智能体知识库配置解析失败", "")
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "知识库配置解析失败")
 	}
 
 	// plugin参数配置
 	if err := s.setCustomAndWorkflowParams(ctx, sseReq, req.AssistantId); err != nil {
 		SSEError(stream, "智能体plugin配置错误")
-		return err
+		saveConversation(ctx, req, "智能体plugin配置错误", "")
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "plugin配置错误")
 	}
 
 	// 在线搜索参数配置
 	if err := s.setOnlineSearchParams(sseReq, assistant); err != nil {
 		SSEError(stream, "智能体在线搜索配置解析失败")
-		return err
+		saveConversation(ctx, req, "智能体在线搜索配置解析失败", "")
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "在线搜索配置解析失败")
 	}
 
 	// MCP 信息参数配置
 	if err := s.setMCPParams(ctx, sseReq, assistant); err != nil {
 		SSEError(stream, "智能体MCP配置解析失败")
-		return err
+		saveConversation(ctx, req, "智能体MCP配置解析失败", "")
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "MCP配置解析失败")
 	}
 
 	// 历史聊天记录配置
@@ -281,12 +296,14 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	if err != nil {
 		log.Errorf("Assistant服务序列化请求体失败，assistantId: %s, error: %v", req.AssistantId, err)
 		SSEError(stream, "请求参数错误")
-		return err
+		saveConversation(ctx, req, "请求参数错误", "")
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "请求参数错误")
 	}
 	if err := json.Unmarshal(reqBytes, &requestBody); err != nil {
 		log.Errorf("Assistant服务反序列化请求体到map失败，assistantId: %s, error: %v", req.AssistantId, err)
 		SSEError(stream, "请求参数错误")
-		return err
+		saveConversation(ctx, req, "请求参数错误", "")
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "请求参数错误")
 	}
 
 	// 合并动态模型参数
@@ -298,7 +315,8 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	if err != nil {
 		log.Errorf("Assistant服务序列化最终请求体失败，assistantId: %s, error: %v", req.AssistantId, err)
 		SSEError(stream, "请求参数错误")
-		return err
+		saveConversation(ctx, req, "请求参数错误", "")
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "请求参数错误")
 	}
 
 	timeout := 300 * time.Second
@@ -313,8 +331,11 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	sseResp, err := HttpRequestLlmStream(ctx, assistantConfig.SseUrl, reqUserId, xuid, bytes.NewReader(requestBodyBytes), timeout)
 	if err != nil {
 		log.Errorf("Assistant服务调用智能体能力接口失败，assistantId: %s, uuid: %s, error: %v", req.AssistantId, id, err)
-		SSEError(stream, "智能体服务异常")
-		return err
+		if ctx.Err() == nil { //非上下文被取消
+			SSEError(stream, "agent服务异常")
+			saveConversation(ctx, req, "agent服务异常", "")
+		}
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "agent服务异常")
 	}
 	defer sseResp.Body.Close()
 	log.Infof("Assistant服务成功连接智能体能力接口，uuid: %s, assistantId: %s, statusCode: %d, time: %v毫秒", id, req.AssistantId, sseResp.StatusCode, time.Since(startTime).Milliseconds())
@@ -322,99 +343,98 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 	// SSE 请求返回Code大于400
 	if sseResp.StatusCode > http.StatusBadRequest {
 		log.Errorf("Assistant服务智能体能力接口返回错误状态码，assistantId: %s, statusCode: %d", req.AssistantId, sseResp.StatusCode)
-		SSEError(stream, "智能体服务异常")
-		return fmt.Errorf("智能体服务返回错误状态码: %d", sseResp.StatusCode)
+		SSEError(stream, "agent服务异常")
+		saveConversation(ctx, req, "agent服务异常", "")
+		return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "agent服务异常")
 	}
 
 	// 读取智能体接口返回，并写入流式响应
 	reader := bufio.NewReader(sseResp.Body)
 	lineCount := 0
-
-	// 标记流式响应已开始
 	streamStarted = true
 	searchListExtracted := false
-
 	for {
-
-		line, err := reader.ReadBytes('\n')
-		if err != nil && err != io.ErrUnexpectedEOF && err != io.EOF {
-			log.Errorf("Assistant服务读取流式响应失败，assistantId: %s, error: %v, 已处理行数: %d", req.AssistantId, err, lineCount)
-
-			// 检查是否是上下文取消导致的错误
-			if ctx.Err() != nil {
-				// 用户手动取消请求，让defer函数处理"已被终止"消息，这里不保存
-				log.Debugf("Assistant服务检测到上下文取消，assistantId: %s", req.AssistantId)
-			} else {
-				// 真正的SSE读取错误，保存"已中断"消息
-				if !req.Trial {
-					if !hasReadFirstMessage {
-						// 如果还没有读取到第一条消息，保存中断消息
-						saveConversation(ctx, req, "本次回答已中断", searchList)
-					} else {
-						// 如果已经读取到消息，保存已经收到的消息
-						saveConversation(ctx, req, fullResponse.String()+"\n本次回答已中断", searchList)
-					}
-					conversationSaved = true // 标记已保存，避免defer中重复保存
-				}
-				SSEError(stream, "本次回答已中断")
-			}
-			return err
+		// 检查上下文
+		if ctx.Err() != nil {
+			log.Infof("Assistant服务检测到上下文取消，assistantId: %s", req.AssistantId)
+			return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "智能体问答上下文异常")
 		}
-
+		line, err := reader.ReadBytes('\n')
+		if err != nil && err == io.EOF { //正常結束
+			// 问答调试不保存
+			if !req.Trial {
+				// 只有在上下文未被取消的情况下才保存并标记为已保存
+				if ctx.Err() == nil {
+					saveConversation(ctx, req, fullResponse.String(), searchList)
+					conversationSaved = true // 标记已保存
+				}
+				// 如果上下文被取消，不设置conversationSaved，让defer函数处理终止消息
+			}
+			log.Debugf("Assistant服务流式响应正常结束，assistantId: %s, 总处理行数: %d", req.AssistantId, lineCount)
+			return nil
+		}
+		if err != nil && err == io.ErrUnexpectedEOF { //异常結束
+			// 真正的SSE读取错误，保存"已中断"消息
+			log.Errorf("Assistant服务读取流式响应失败，assistantId: %s, error: %v, 已处理行数: %d", req.AssistantId, err, lineCount)
+			if !req.Trial {
+				errorMessage := "本次回答已中断"
+				if hasReadFirstMessage && fullResponse.Len() > 0 {
+					errorMessage = fullResponse.String() + "\n" + errorMessage
+				}
+				saveConversation(ctx, req, errorMessage, searchList)
+				conversationSaved = true // 标记已保存，避免defer中重复保存
+				log.Debugf("Assistant服务保存了中断消息，assistantId: %s, errorMessage: %s", req.AssistantId, errorMessage)
+			}
+			SSEError(stream, "本次回答已中断")
+			return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "本次回答已中断")
+		}
 		strLine := string(line)
 		lineCount++
-
 		if len(strLine) >= 5 && strLine[:5] == "data:" {
-
 			jsonStrData := strLine[5:]
-
 			// 解析流式数据，提取response字段和search_list
 			var streamData map[string]interface{}
 			if err := json.Unmarshal([]byte(jsonStrData), &streamData); err == nil {
-				if response, ok := streamData["response"].(string); ok && response != "" {
-					fullResponse.WriteString(response)
+				log.Debugf("Assistant服务解析流式数据，assistantId: %s, streamData: %+v", req.AssistantId, streamData)
+				code, ok := extractCodeFromStreamData(streamData)
+				if !ok {
+					log.Errorf("Assistant服务无法提取code字段，assistantId: %s, streamData: %+v", req.AssistantId, streamData)
+					continue
 				}
-
-				// 提取第一个search_list
-				if !searchListExtracted {
-					if searchListData, ok := streamData["search_list"]; ok {
-						searchListBytes, err := json.Marshal(searchListData)
-						if err == nil {
-							searchList = string(searchListBytes)
-							searchListExtracted = true
-							log.Debugf("Assistant服务提取到search_list，assistantId: %s, searchList: %s", req.AssistantId, searchList)
+				switch code {
+				case 0:
+					if response, ok := streamData["response"].(string); ok && response != "" {
+						fullResponse.WriteString(response)
+					}
+					// 提取第一个search_list
+					if !searchListExtracted {
+						if searchListData, ok := streamData["search_list"]; ok {
+							searchListBytes, err := json.Marshal(searchListData)
+							if err == nil {
+								searchList = string(searchListBytes)
+								searchListExtracted = true
+								log.Debugf("Assistant服务提取到search_list，assistantId: %s, searchList: %s", req.AssistantId, searchList)
+							}
 						}
+					}
+				case 1:
+					if message, ok := streamData["message"].(string); ok && message != "" {
+						fullResponse.WriteString(message)
 					}
 				}
 			}
-
 			if err := stream.Send(&assistant_service.AssistantConversionStreamResp{
 				Content: jsonStrData,
 			}); err != nil {
 				log.Errorf("Assistant服务发送流式响应失败，assistantId: %s, error: %v", req.AssistantId, err)
-				return err
+				return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "assistant服务异常")
 			}
-
 			// 标记已读取到并返回了第一条有效消息
 			if !hasReadFirstMessage {
 				hasReadFirstMessage = true
 			}
-
-		}
-
-		if err != nil && (err == io.ErrUnexpectedEOF || err == io.EOF) {
-			log.Debugf("Assistant服务流式响应结束，assistantId: %s, 总处理行数: %d", req.AssistantId, lineCount)
-			break
 		}
 	}
-
-	// 问答调试不保存
-	if !req.Trial {
-		saveConversation(ctx, req, fullResponse.String(), searchList)
-		conversationSaved = true // 标记已保存
-	}
-
-	return nil
 }
 
 // 设置模型配置参数
@@ -479,19 +499,26 @@ func (s *Service) setKnowledgebaseParams(ctx context.Context, sseReq *config.Age
 			knowNames = append(knowNames, v.Name)
 		}
 
+		params, err := buildMetaDataFilterParams(knowledgebaseConfig.AppKnowledgeBaseList)
+		if err != nil {
+			log.Errorf("Assistant buildMetaDataFilterParams, err: %v", err)
+			return err
+		}
 		sseReq.KnParams = &config.KnParams{
-			KnowledgeBase:  knowNames,
-			RerankId:       rerankEndpoint["model_id"],
-			Model:          rerankEndpoint["model"],
-			ModelUrl:       rerankEndpoint["model_url"],
-			RerankMod:      buildRerankMod(knowledgebaseConfig.PriorityMatch),
-			RetrieveMethod: buildRetrieveMethod(knowledgebaseConfig.MatchType),
-			Weights:        buildWeight(knowledgebaseConfig),
-			MaxHistory:     knowledgebaseConfig.MaxHistory,
-			Threshold:      knowledgebaseConfig.Threshold,
-			TopK:           knowledgebaseConfig.TopK,
-			RewriteQuery:   true,
-			TermWeight:     buildTermWeight(knowledgebaseConfig),
+			KnowledgeBase:        knowNames,
+			RerankId:             rerankEndpoint["model_id"],
+			Model:                rerankEndpoint["model"],
+			ModelUrl:             rerankEndpoint["model_url"],
+			RerankMod:            buildRerankMod(knowledgebaseConfig.PriorityMatch),
+			RetrieveMethod:       buildRetrieveMethod(knowledgebaseConfig.MatchType),
+			Weights:              buildWeight(knowledgebaseConfig),
+			MaxHistory:           knowledgebaseConfig.MaxHistory,
+			Threshold:            knowledgebaseConfig.Threshold,
+			TopK:                 knowledgebaseConfig.TopK,
+			RewriteQuery:         true,
+			TermWeight:           buildTermWeight(knowledgebaseConfig),
+			MetaFilter:           len(params) > 0,
+			MetaFilterConditions: params,
 		}
 		sseReq.UseKnow = true
 	}
@@ -708,16 +735,36 @@ type AppKnowledgebaseParams struct {
 
 // RAGKnowledgeBaseConfig 知识库配置结构体
 type RAGKnowledgeBaseConfig struct {
-	KnowledgeBaseIds  []string `json:"knowledgeBaseIds"`  // 知识库信息
-	MaxHistory        int32    `json:"maxHistory"`        // 最长上下文
-	Threshold         float32  `json:"threshold"`         // 过滤阈值
-	TopK              int32    `json:"topK"`              // topK
-	MatchType         string   `json:"matchType"`         // 检索类型：vector（向量检索）、text（文本检索）、mix（混合检索）
-	KeywordPriority   float32  `json:"keywordPriority"`   // 关键词权重
-	PriorityMatch     int32    `json:"priorityMatch"`     // 权重匹配，仅混合检索模式下有效，1 表示启用
-	SemanticsPriority float32  `json:"semanticsPriority"` // 语义权重
-	TermWeight        float32  `json:"termWeight"`        // 关键词系数, 默认为1
-	TermWeightEnable  bool     `json:"termWeightEnable"`  // 关键词系数开关
+	KnowledgeBaseIds     []string                `json:"knowledgeBaseIds"`  // 知识库信息
+	MaxHistory           int32                   `json:"maxHistory"`        // 最长上下文
+	Threshold            float32                 `json:"threshold"`         // 过滤阈值
+	TopK                 int32                   `json:"topK"`              // topK
+	MatchType            string                  `json:"matchType"`         // 检索类型：vector（向量检索）、text（文本检索）、mix（混合检索）
+	KeywordPriority      float32                 `json:"keywordPriority"`   // 关键词权重
+	PriorityMatch        int32                   `json:"priorityMatch"`     // 权重匹配，仅混合检索模式下有效，1 表示启用
+	SemanticsPriority    float32                 `json:"semanticsPriority"` // 语义权重
+	TermWeight           float32                 `json:"termWeight"`        // 关键词系数, 默认为1
+	TermWeightEnable     bool                    `json:"termWeightEnable"`  // 关键词系数开关
+	AppKnowledgeBaseList []*AppKnowledgeBaseInfo `json:"AppKnowledgeBaseList"`
+}
+
+type AppKnowledgeBaseInfo struct {
+	KnowledgeBaseId      string                `json:"knowledgeBaseId"`
+	KnowledgeBaseName    string                `json:"knowledgeBaseName"`
+	MetaDataFilterParams *MetaDataFilterParams `json:"metaDataFilterParams"`
+}
+
+type MetaDataFilterParams struct {
+	FilterEnable     bool                `json:"filterEnable"`     // 元数据过滤开关
+	FilterLogicType  string              `json:"filterLogicType"`  // 元数据逻辑条件：and/or
+	MetaFilterParams []*MetaFilterParams `json:"metaFilterParams"` // 元数据过滤参数列表
+}
+
+type MetaFilterParams struct {
+	Condition string `json:"condition"`
+	Key       string `json:"key"`
+	Type      string `json:"type"`
+	Value     string `json:"value"`
 }
 
 type AppOnlineSearchConfig struct {
@@ -932,4 +979,77 @@ func (s *Service) ConversationDeleteByAssistantId(ctx context.Context, req *assi
 		return nil, errStatus(errs.Code_AssistantConversationErr, status)
 	}
 	return &emptypb.Empty{}, nil
+}
+
+// extractCodeFromStreamData 从流式数据中安全提取code字段
+// JSON解析后数字类型为float64，需要安全转换为int
+func extractCodeFromStreamData(streamData map[string]interface{}) (int, bool) {
+	codeVal, exists := streamData["code"]
+	if !exists {
+		return 0, false
+	}
+
+	switch v := codeVal.(type) {
+	case float64:
+		return int(v), true
+	case int:
+		return v, true
+	default:
+		return 0, false
+	}
+}
+
+// buildMetaDataFilterParams 构造元数据过滤参数
+func buildMetaDataFilterParams(knowledgeInfos []*AppKnowledgeBaseInfo) ([]*config.MetadataFilterParam, error) {
+	if len(knowledgeInfos) == 0 {
+		return nil, nil
+	}
+	var ragMetaDataFilterParams []*config.MetadataFilterParam
+	for _, k := range knowledgeInfos {
+		if k.MetaDataFilterParams == nil || !k.MetaDataFilterParams.FilterEnable ||
+			len(k.MetaDataFilterParams.MetaFilterParams) == 0 {
+			continue
+		}
+		item, err := buildMetadataFilterItem(k.MetaDataFilterParams.MetaFilterParams)
+		if err != nil {
+			log.Errorf("buildMetaDataFilterParams error %v", err)
+			return nil, err
+		}
+		ragMetaDataFilterParams = append(ragMetaDataFilterParams, &config.MetadataFilterParam{
+			FilterKnowledgeName: k.KnowledgeBaseName,
+			LogicalOperator:     k.MetaDataFilterParams.FilterLogicType,
+			MetaList:            item,
+		})
+	}
+	return ragMetaDataFilterParams, nil
+}
+
+func buildMetadataFilterItem(metaFilterParams []*MetaFilterParams) ([]*config.MetadataFilterItem, error) {
+	var ragMetaDataFilterItem []*config.MetadataFilterItem
+	for _, k := range metaFilterParams {
+		data, err := buildValueData(k.Type, k.Value, k.Condition)
+		if err != nil {
+			log.Errorf("buildMetadataFilterItem error %v", err)
+			return nil, err
+		}
+		ragMetaDataFilterItem = append(ragMetaDataFilterItem, &config.MetadataFilterItem{
+			ComparisonOperator: k.Condition,
+			MetaName:           k.Key,
+			MetaType:           k.Type,
+			Value:              data,
+		})
+	}
+	return ragMetaDataFilterItem, nil
+}
+
+func buildValueData(valueType string, value string, condition string) (interface{}, error) {
+	if condition == "empty" || condition == "not empty" {
+		return nil, nil
+	}
+	switch valueType {
+	case metaTypeNumber:
+	case metaTypeTime:
+		return strconv.ParseInt(value, 10, 64)
+	}
+	return value, nil
 }

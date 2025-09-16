@@ -2160,6 +2160,72 @@ const docTemplate = `{
                 }
             }
         },
+        "/base/register/email": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "guest"
+                ],
+                "summary": "用户邮箱注册",
+                "parameters": [
+                    {
+                        "description": "邮箱注册信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.RegisterByEmail"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/base/register/email/code": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "guest"
+                ],
+                "summary": "邮箱注册验证码发送",
+                "parameters": [
+                    {
+                        "description": "邮箱地址",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.RegisterSendEmailCode"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/custom/home": {
             "post": {
                 "security": [
@@ -3756,6 +3822,57 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/response.KeywordsInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/knowledge/meta/select": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "获取知识库元数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge"
+                ],
+                "summary": "获取知识库元数据",
+                "parameters": [
+                    {
+                        "description": "获取知识库元数据请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GetKnowledgeMetaSelectReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.GetKnowledgeMetaSelectResp"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -7992,8 +8109,10 @@ const docTemplate = `{
                     "description": "知识库id",
                     "type": "string"
                 },
+                "metaDataFilterParams": {
+                    "$ref": "#/definitions/request.MetaDataFilterParams"
+                },
                 "name": {
-                    "description": "知识库名称(请求非必填)",
                     "type": "string"
                 }
             }
@@ -9278,11 +9397,11 @@ const docTemplate = `{
         },
         "request.DocMetaDataReq": {
             "type": "object",
-            "required": [
-                "docId"
-            ],
             "properties": {
                 "docId": {
+                    "type": "string"
+                },
+                "knowledgeId": {
                     "type": "string"
                 },
                 "metaDataList": {
@@ -9397,6 +9516,17 @@ const docTemplate = `{
                 }
             }
         },
+        "request.GetKnowledgeMetaSelectReq": {
+            "type": "object",
+            "properties": {
+                "knowledgeId": {
+                    "type": "string"
+                },
+                "knowledgeName": {
+                    "type": "string"
+                }
+            }
+        },
         "request.GetKnowledgeSplitterReq": {
             "type": "object",
             "properties": {
@@ -9479,15 +9609,14 @@ const docTemplate = `{
         "request.KnowledgeHitReq": {
             "type": "object",
             "required": [
-                "knowledgeIdList",
                 "knowledgeMatchParams",
                 "question"
             ],
             "properties": {
-                "knowledgeIdList": {
+                "knowledgeList": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/request.AppKnowledgeBase"
                     }
                 },
                 "knowledgeMatchParams": {
@@ -9677,6 +9806,47 @@ const docTemplate = `{
                 "isExpired": {
                     "description": "minio存储文件是否过期 0:过期，1:不过期",
                     "type": "boolean"
+                }
+            }
+        },
+        "request.MetaDataFilterParams": {
+            "type": "object",
+            "properties": {
+                "filterEnable": {
+                    "description": "元数据过滤开关",
+                    "type": "boolean"
+                },
+                "filterLogicType": {
+                    "description": "元数据逻辑条件：and/or",
+                    "type": "string"
+                },
+                "metaFilterParams": {
+                    "description": "元数据过滤参数列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.MetaFilterParams"
+                    }
+                }
+            }
+        },
+        "request.MetaFilterParams": {
+            "type": "object",
+            "properties": {
+                "condition": {
+                    "description": "条件",
+                    "type": "string"
+                },
+                "key": {
+                    "description": "Key",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "类型（Time, String, Number）",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "value",
+                    "type": "string"
                 }
             }
         },
@@ -9900,6 +10070,40 @@ const docTemplate = `{
             ],
             "properties": {
                 "ragId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.RegisterByEmail": {
+            "type": "object",
+            "required": [
+                "code",
+                "email",
+                "username"
+            ],
+            "properties": {
+                "code": {
+                    "description": "邮箱验证码",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "邮箱",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "用户名",
+                    "type": "string"
+                }
+            }
+        },
+        "request.RegisterSendEmailCode": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "description": "邮箱",
                     "type": "string"
                 }
             }
@@ -10963,6 +11167,14 @@ const docTemplate = `{
                 }
             }
         },
+        "response.CustomEmail": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "boolean"
+                }
+            }
+        },
         "response.CustomHome": {
             "type": "object",
             "properties": {
@@ -11037,6 +11249,19 @@ const docTemplate = `{
                 "welcomeText": {
                     "description": "登录页欢迎标词",
                     "type": "string"
+                }
+            }
+        },
+        "response.CustomRegister": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "description": "注册邮箱",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.CustomEmail"
+                        }
+                    ]
                 }
             }
         },
@@ -11401,6 +11626,17 @@ const docTemplate = `{
                 }
             }
         },
+        "response.GetKnowledgeMetaSelectResp": {
+            "type": "object",
+            "properties": {
+                "knowledgeMetaList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.KnowledgeMetaItem"
+                    }
+                }
+            }
+        },
         "response.IDName": {
             "type": "object",
             "properties": {
@@ -11491,6 +11727,13 @@ const docTemplate = `{
                     "description": "知识库id",
                     "type": "string"
                 },
+                "knowledgeMetaDataList": {
+                    "description": "知识库元数据列表（key和type）",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.KnowledgeMetaData"
+                    }
+                },
                 "knowledgeTagList": {
                     "description": "知识库标签列表",
                     "type": "array",
@@ -11512,6 +11755,30 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/response.KnowledgeInfo"
                     }
+                }
+            }
+        },
+        "response.KnowledgeMetaData": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "description": "key",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "type(time, string, number)",
+                    "type": "string"
+                }
+            }
+        },
+        "response.KnowledgeMetaItem": {
+            "type": "object",
+            "properties": {
+                "metaKey": {
+                    "type": "string"
+                },
+                "metaValueType": {
+                    "type": "string"
                 }
             }
         },
@@ -11728,6 +11995,14 @@ const docTemplate = `{
                     "allOf": [
                         {
                             "$ref": "#/definitions/response.CustomLogin"
+                        }
+                    ]
+                },
+                "register": {
+                    "description": "注册信息",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/response.CustomRegister"
                         }
                     ]
                 },

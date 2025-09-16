@@ -172,6 +172,16 @@ const constantRoutes = [
                 meta:{perm: [PERMS.AGENT]},
             },
             {
+                path:'/workflow/publishSet',
+                component:resolve =>require(['@/views/agent/web-URL'],resolve),
+                meta:{perm: [PERMS.WORKFLOW]},
+            },
+            {
+                path:'/rag/publishSet',
+                component:resolve =>require(['@/views/agent/web-URL'],resolve),
+                meta:{perm: [PERMS.RAG]},
+            },
+            {
                 path: '/userCenter/*',
                 name:'userCenter',
                 component:resolve =>require(['@/views/userCenter'],resolve),
@@ -191,6 +201,10 @@ const constantRoutes = [
     {
         path: '/login',
         component:resolve =>require(['@/views/login'],resolve),
+    },
+    {
+        path: '/register',
+        component: () => import('@/views/register'),
     },
     {
         path: '/:catchAll(.*)',

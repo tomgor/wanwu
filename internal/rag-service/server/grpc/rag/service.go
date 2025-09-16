@@ -46,7 +46,7 @@ func (s *Service) ChatRag(req *rag_service.ChatRagReq, stream grpc.ServerStreami
 	var knowledgeIds []string
 	errU := json.Unmarshal([]byte(rag.KnowledgeBaseConfig.KnowId), &knowledgeIds)
 	if errU != nil {
-		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", "unmarshal knowIds err:", errU.Error())
+		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", errU.Error())
 	}
 	knowledgeInfoList, errk := Knowledge.SelectKnowledgeDetailByIdList(ctx, &knowledgebase_service.KnowledgeDetailSelectListReq{
 		UserId:       rag.UserID,
@@ -55,7 +55,7 @@ func (s *Service) ChatRag(req *rag_service.ChatRagReq, stream grpc.ServerStreami
 	})
 	if errk != nil {
 		log.Errorf("errk = %s", errk.Error())
-		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", "check knowledgeInfoList err:", errk.Error())
+		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", errk.Error())
 	}
 	if knowledgeInfoList == nil {
 		log.Errorf("knowledgeInfoList = nil")
@@ -63,7 +63,11 @@ func (s *Service) ChatRag(req *rag_service.ChatRagReq, stream grpc.ServerStreami
 	}
 
 	//  请求rag
-	buildParams := service.BuildChatConsultParams(req, rag, knowledgeInfoList)
+	buildParams, errk := service.BuildChatConsultParams(req, rag, knowledgeInfoList)
+	if errk != nil {
+		log.Errorf("errk = %s", errk.Error())
+		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", errk.Error())
+	}
 	chatChan, errg := service.RagStreamChat(ctx, rag.UserID, buildParams)
 	if errg != nil {
 		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", errg.Error())
@@ -123,13 +127,29 @@ func (s *Service) UpdateRagConfig(ctx context.Context, in *rag_service.UpdateRag
 		}
 		sensitiveIds = string(sensitiveIdBytes)
 	}
-	if len(in.KnowledgeBaseConfig.KnowledgeBaseIds) > 0 {
-		knowledgeIdBytes, err := json.Marshal(in.KnowledgeBaseConfig.KnowledgeBaseIds)
+
+	var knowledgeIdList []string
+	for _, perKbConfig := range in.KnowledgeBaseConfig.PerKnowledgeConfigs {
+		knowledgeIdList = append(knowledgeIdList, perKbConfig.KnowledgeId)
+	}
+	if len(knowledgeIdList) > 0 {
+		knowledgeIdBytes, err := json.Marshal(knowledgeIdList)
 		if err != nil {
 			return nil, grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_update_err", "marshal err:", err.Error())
 		}
 		knowledgeIds = string(knowledgeIdBytes)
 	}
+
+	var metaParams string
+	perConfig := in.KnowledgeBaseConfig.PerKnowledgeConfigs
+	if perConfig != nil {
+		kbConfigBytes, err := json.Marshal(perConfig)
+		if err != nil {
+			return nil, grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_update_err", "marshal err:", err.Error())
+		}
+		metaParams = string(kbConfigBytes)
+	}
+	kbGlobalConfig := in.KnowledgeBaseConfig.GlobalConfig
 	if err := s.cli.UpdateRagConfig(ctx, &model.RagInfo{
 		RagID: in.RagId,
 		ModelConfig: model.AppModelConfig{
@@ -148,15 +168,16 @@ func (s *Service) UpdateRagConfig(ctx context.Context, in *rag_service.UpdateRag
 		},
 		KnowledgeBaseConfig: model.KnowledgeBaseConfig{
 			KnowId:            knowledgeIds,
-			MaxHistory:        int64(in.KnowledgeBaseConfig.MaxHistory),
-			Threshold:         float64(in.KnowledgeBaseConfig.Threshold),
-			TopK:              int64(in.KnowledgeBaseConfig.TopK),
-			MatchType:         in.KnowledgeBaseConfig.MatchType,
-			PriorityMatch:     in.KnowledgeBaseConfig.PriorityMatch,
-			SemanticsPriority: float64(in.KnowledgeBaseConfig.SemanticsPriority),
-			KeywordPriority:   float64(in.KnowledgeBaseConfig.KeywordPriority),
-			TermWeight:        float64(in.KnowledgeBaseConfig.TermWeight),
-			TermWeightEnable:  in.KnowledgeBaseConfig.TermWeightEnable,
+			MaxHistory:        int64(kbGlobalConfig.MaxHistory),
+			Threshold:         float64(kbGlobalConfig.Threshold),
+			TopK:              int64(kbGlobalConfig.TopK),
+			MatchType:         kbGlobalConfig.MatchType,
+			PriorityMatch:     kbGlobalConfig.PriorityMatch,
+			SemanticsPriority: float64(kbGlobalConfig.SemanticsPriority),
+			KeywordPriority:   float64(kbGlobalConfig.KeywordPriority),
+			TermWeight:        float64(kbGlobalConfig.TermWeight),
+			TermWeightEnable:  kbGlobalConfig.TermWeightEnable,
+			MetaParams:        metaParams,
 		},
 		SensitiveConfig: model.SensitiveConfig{
 			Enable:   in.SensitiveConfig.Enable,

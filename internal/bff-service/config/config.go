@@ -75,12 +75,16 @@ type ServiceConfig struct {
 }
 
 type WorkflowServiceConfig struct {
-	Endpoint    string               `json:"endpoint" mapstructure:"endpoint"`
-	ListUri     string               `json:"list_uri" mapstructure:"list_uri"`
-	CreateUri   string               `json:"create_uri" mapstructure:"create_uri"`
-	DeleteUri   string               `json:"delete_uri" mapstructure:"delete_uri"`
-	CopyUri     string               `json:"copy_uri" mapstructure:"copy_uri"`
-	ModelParams []WorkflowModelParam `json:"model_params" mapstructure:"model_params"`
+	Endpoint        string               `json:"endpoint" mapstructure:"endpoint"`
+	ListUri         string               `json:"list_uri" mapstructure:"list_uri"`
+	CreateUri       string               `json:"create_uri" mapstructure:"create_uri"`
+	DeleteUri       string               `json:"delete_uri" mapstructure:"delete_uri"`
+	CopyUri         string               `json:"copy_uri" mapstructure:"copy_uri"`
+	TestRunUri      string               `json:"test_run_uri" mapstructure:"test_run_uri"`
+	UploadActionUri string               `json:"upload_action_uri" mapstructure:"upload_action_uri"`
+	UploadCommonUri string               `json:"upload_common_uri" mapstructure:"upload_common_uri"`
+	SignImgUri      string               `json:"sign_img_uri" mapstructure:"sign_img_uri"`
+	ModelParams     []WorkflowModelParam `json:"model_params" mapstructure:"model_params"`
 }
 
 type WorkflowModelParam struct {
@@ -143,9 +147,10 @@ type DocLinkConfig struct {
 }
 
 type CustomInfoConfig struct {
-	DefaultMode string        `json:"default_mode" mapstructure:"default_mode"`
-	Modes       []CustomTheme `json:"modes" mapstructure:"modes"`
-	Version     string        `json:"version" mapstructure:"version"`
+	DefaultMode     string        `json:"default_mode" mapstructure:"default_mode"`
+	Modes           []CustomTheme `json:"modes" mapstructure:"modes"`
+	Version         string        `json:"version" mapstructure:"version"`
+	RegisterByEmail int           `json:"register_by_email" mapstructure:"register_by_email"`
 }
 
 type CustomTheme struct {

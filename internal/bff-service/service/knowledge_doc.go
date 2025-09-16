@@ -1,6 +1,10 @@
 package service
 
 import (
+	"path/filepath"
+	"regexp"
+	"strings"
+
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_doc_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-doc-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -12,9 +16,6 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
-	"path/filepath"
-	"regexp"
-	"strings"
 )
 
 const (
@@ -36,7 +37,7 @@ func GetDocList(ctx *gin.Context, userId, orgId string, r *request.DocListReq) (
 		return nil, err
 	}
 	return &response.PageResult{
-		List:     buildDocRespList(ctx, resp.Docs),
+		List:     buildDocRespList(ctx, resp.Docs, r.KnowledgeId),
 		Total:    resp.Total,
 		PageNo:   int(resp.PageNum),
 		PageSize: int(resp.PageSize),
@@ -80,19 +81,12 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 	var metaList []*knowledgebase_doc_service.DocMetaData
 	seenKeys := make(map[string]bool)
 	for _, meta := range req.DocMetaData {
-		if meta.MetaKey == "" {
-			return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "key为空")
-		}
 		// 检查Key是否重复
 		if seenKeys[meta.MetaKey] {
 			return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "key重复")
 		}
 		seenKeys[meta.MetaKey] = true
 		if meta.MetaRule != "" {
-			// 检查rule和key传参
-			if meta.MetaValue != "" {
-				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "常量和正则表达式重复")
-			}
 			// 检查正则合法性
 			_, err := regexp.Compile(meta.MetaRule)
 			if err != nil {
@@ -146,6 +140,7 @@ func UpdateDocMetaData(ctx *gin.Context, userId, orgId string, r *request.DocMet
 		OrgId:        orgId,
 		DocId:        r.DocId,
 		MetaDataList: buildMetaDataList(r.MetaDataList),
+		KnowledgeId:  r.KnowledgeId,
 	})
 	return err
 }
@@ -247,17 +242,18 @@ func AnalysisDocUrl(ctx *gin.Context, userId, orgId string, r *request.AnalysisU
 }
 
 // buildDocRespList 构造文档返回列表
-func buildDocRespList(ctx *gin.Context, dataList []*knowledgebase_doc_service.DocInfo) []*response.ListDocResp {
+func buildDocRespList(ctx *gin.Context, dataList []*knowledgebase_doc_service.DocInfo, knowledgeId string) []*response.ListDocResp {
 	var retList []*response.ListDocResp
 	for _, data := range dataList {
 		retList = append(retList, &response.ListDocResp{
-			DocId:      data.DocId,
-			DocName:    data.DocName,
-			DocType:    data.DocType,
-			UploadTime: data.UploadTime,
-			Status:     int(data.Status),
-			ErrorMsg:   gin_util.I18nKey(ctx, data.ErrorMsg),
-			FileSize:   util.ToFileSizeStr(data.DocSize),
+			DocId:       data.DocId,
+			DocName:     data.DocName,
+			DocType:     data.DocType,
+			UploadTime:  data.UploadTime,
+			Status:      int(data.Status),
+			ErrorMsg:    gin_util.I18nKey(ctx, data.ErrorMsg),
+			FileSize:    util.ToFileSizeStr(data.DocSize),
+			KnowledgeId: knowledgeId,
 		})
 	}
 	return retList

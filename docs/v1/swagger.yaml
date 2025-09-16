@@ -484,8 +484,9 @@ definitions:
       id:
         description: 知识库id
         type: string
+      metaDataFilterParams:
+        $ref: '#/definitions/request.MetaDataFilterParams'
       name:
-        description: 知识库名称(请求非必填)
         type: string
     required:
     - id
@@ -1356,13 +1357,13 @@ definitions:
     properties:
       docId:
         type: string
+      knowledgeId:
+        type: string
       metaDataList:
         description: 文档元数据
         items:
           $ref: '#/definitions/request.DocMetaData'
         type: array
-    required:
-    - docId
     type: object
   request.DocSegment:
     properties:
@@ -1434,6 +1435,13 @@ definitions:
       id:
         type: integer
     type: object
+  request.GetKnowledgeMetaSelectReq:
+    properties:
+      knowledgeId:
+        type: string
+      knowledgeName:
+        type: string
+    type: object
   request.GetKnowledgeSplitterReq:
     properties:
       splitterName:
@@ -1489,16 +1497,15 @@ definitions:
     type: object
   request.KnowledgeHitReq:
     properties:
-      knowledgeIdList:
+      knowledgeList:
         items:
-          type: string
+          $ref: '#/definitions/request.AppKnowledgeBase'
         type: array
       knowledgeMatchParams:
         $ref: '#/definitions/request.KnowledgeMatchParams'
       question:
         type: string
     required:
-    - knowledgeIdList
     - knowledgeMatchParams
     - question
     type: object
@@ -1630,6 +1637,35 @@ definitions:
     required:
     - chunkName
     - fileName
+    type: object
+  request.MetaDataFilterParams:
+    properties:
+      filterEnable:
+        description: 元数据过滤开关
+        type: boolean
+      filterLogicType:
+        description: 元数据逻辑条件：and/or
+        type: string
+      metaFilterParams:
+        description: 元数据过滤参数列表
+        items:
+          $ref: '#/definitions/request.MetaFilterParams'
+        type: array
+    type: object
+  request.MetaFilterParams:
+    properties:
+      condition:
+        description: 条件
+        type: string
+      key:
+        description: Key
+        type: string
+      type:
+        description: 类型（Time, String, Number）
+        type: string
+      value:
+        description: value
+        type: string
     type: object
   request.ModelStatusRequest:
     properties:
@@ -1775,6 +1811,30 @@ definitions:
         type: string
     required:
     - ragId
+    type: object
+  request.RegisterByEmail:
+    properties:
+      code:
+        description: 邮箱验证码
+        type: string
+      email:
+        description: 邮箱
+        type: string
+      username:
+        description: 用户名
+        type: string
+    required:
+    - code
+    - email
+    - username
+    type: object
+  request.RegisterSendEmailCode:
+    properties:
+      email:
+        description: 邮箱
+        type: string
+    required:
+    - email
     type: object
   request.RoleCreate:
     properties:
@@ -2502,6 +2562,11 @@ definitions:
       version:
         type: string
     type: object
+  response.CustomEmail:
+    properties:
+      status:
+        type: boolean
+    type: object
   response.CustomHome:
     properties:
       backgroundColor:
@@ -2549,6 +2614,13 @@ definitions:
       welcomeText:
         description: 登录页欢迎标词
         type: string
+    type: object
+  response.CustomRegister:
+    properties:
+      email:
+        allOf:
+        - $ref: '#/definitions/response.CustomEmail'
+        description: 注册邮箱
     type: object
   response.CustomTab:
     properties:
@@ -2798,6 +2870,13 @@ definitions:
       total:
         type: integer
     type: object
+  response.GetKnowledgeMetaSelectResp:
+    properties:
+      knowledgeMetaList:
+        items:
+          $ref: '#/definitions/response.KnowledgeMetaItem'
+        type: array
+    type: object
   response.IDName:
     properties:
       id:
@@ -2858,6 +2937,11 @@ definitions:
       knowledgeId:
         description: 知识库id
         type: string
+      knowledgeMetaDataList:
+        description: 知识库元数据列表（key和type）
+        items:
+          $ref: '#/definitions/response.KnowledgeMetaData'
+        type: array
       knowledgeTagList:
         description: 知识库标签列表
         items:
@@ -2873,6 +2957,22 @@ definitions:
         items:
           $ref: '#/definitions/response.KnowledgeInfo'
         type: array
+    type: object
+  response.KnowledgeMetaData:
+    properties:
+      key:
+        description: key
+        type: string
+      type:
+        description: type(time, string, number)
+        type: string
+    type: object
+  response.KnowledgeMetaItem:
+    properties:
+      metaKey:
+        type: string
+      metaValueType:
+        type: string
     type: object
   response.KnowledgeSplitter:
     properties:
@@ -3015,6 +3115,10 @@ definitions:
         allOf:
         - $ref: '#/definitions/response.CustomLogin'
         description: 登录页标题信息
+      register:
+        allOf:
+        - $ref: '#/definitions/response.CustomRegister'
+        description: 注册信息
       tab:
         allOf:
         - $ref: '#/definitions/response.CustomTab'
@@ -4996,6 +5100,48 @@ paths:
       summary: 用户登录
       tags:
       - guest
+  /base/register/email:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 邮箱注册信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.RegisterByEmail'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 用户邮箱注册
+      tags:
+      - guest
+  /base/register/email/code:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 邮箱地址
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.RegisterSendEmailCode'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 邮箱注册验证码发送
+      tags:
+      - guest
   /custom/home:
     post:
       consumes:
@@ -5949,6 +6095,35 @@ paths:
       summary: 查询知识库关键词详情
       tags:
       - knowledge.keywords
+  /knowledge/meta/select:
+    get:
+      consumes:
+      - application/json
+      description: 获取知识库元数据
+      parameters:
+      - description: 获取知识库元数据请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.GetKnowledgeMetaSelectReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.GetKnowledgeMetaSelectResp'
+              type: object
+      security:
+      - JWT: []
+      summary: 获取知识库元数据
+      tags:
+      - knowledge
   /knowledge/select:
     post:
       consumes:

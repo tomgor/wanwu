@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	mp_huoshan "github.com/UnicomAI/wanwu/pkg/model-provider/mp-huoshan"
+	mp_infini "github.com/UnicomAI/wanwu/pkg/model-provider/mp-infini"
 	mp_ollama "github.com/UnicomAI/wanwu/pkg/model-provider/mp-ollama"
 	mp_openai_compatible "github.com/UnicomAI/wanwu/pkg/model-provider/mp-openai-compatible"
 	mp_qwen "github.com/UnicomAI/wanwu/pkg/model-provider/mp-qwen"
@@ -93,6 +94,19 @@ func ToModelParams(provider, modelType, cfg string) (interface{}, map[string]int
 		switch modelType {
 		case ModelTypeLLM:
 			llm := &mp_qwen.LLMParams{}
+			if err = json.Unmarshal([]byte(cfg), llm); err == nil {
+				ret = llm
+				params = llm.GetParams()
+			}
+		case ModelTypeRerank:
+		case ModelTypeEmbedding:
+		default:
+			return nil, nil, fmt.Errorf("invalid model type: %v", modelType)
+		}
+	case ProviderInfini:
+		switch modelType {
+		case ModelTypeLLM:
+			llm := &mp_infini.LLMParams{}
 			if err = json.Unmarshal([]byte(cfg), llm); err == nil {
 				ret = llm
 				params = llm.GetParams()

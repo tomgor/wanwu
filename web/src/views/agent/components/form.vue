@@ -1,5 +1,5 @@
 <template>
-  <div class="agent-from-content">
+  <div class="agent-from-content" :class="{ 'isDisabled': isPublish }">
     <div class="form-header">
       <div class="header-left">
         <span
@@ -179,31 +179,36 @@
           <div class="block recommend-box">
             <p class="block-title tool-title">
               <span>关联知识库</span>
-              <span
-                class="common-add"
-                @click="showKnowledgeSet"
-              >
-                <span class="el-icon-s-operation"></span>
-                <span class="handleBtn set">配置</span>
+              <span>
+                <span class="common-add" @click="showKnowledgeDiglog">
+                  <span class="el-icon-plus"></span>
+                  <span class="handleBtn">添加</span>
+                </span>
+                <span
+                  class="common-add"
+                  @click="showKnowledgeSet"
+                >
+                  <span class="el-icon-s-operation"></span>
+                  <span class="handleBtn set">配置</span>
+                </span>
               </span>
             </p>
-            <div class="rl">
-              <el-select
-                v-model="editForm.knowledgeBaseIds"
-                placeholder="可输入知识库名称搜索"
-                style="width:100%;"
-                multiple
-                filterable
-                clearable
-              >
-                <el-option
-                  v-for="item in knowledgeData"
-                  :key="item.knowledgeId"
-                  :label="item.name"
-                  :value="item.knowledgeId"
-                >
-                </el-option>
-              </el-select>
+            <div class="rl tool-conent">
+              <div class="tool-right tool">
+                  <div class="action-list">
+                    <div v-for="(n,i) in editForm.knowledgebases" class="action-item" :key="'knowledge'+ i">
+                       <div class="name" style="color: #333">
+                        <span>{{n.name || n.knowledgeName}}</span>
+                       </div>
+                        <div class="bt">
+                          <el-tooltip class="item" effect="dark" content="元数据过滤" placement="top-start">
+                            <span class="el-icon-setting del" @click="showMetaSet(n,i)" style="margin-right:10px;"></span>
+                          </el-tooltip>
+                          <span class="el-icon-delete del" @click="delKnowledge(i)"></span>
+                      </div>
+                    </div>
+                  </div>
+              </div>
             </div>
           </div>
         </div>
@@ -347,12 +352,29 @@
       :linkform="editForm.onlineSearchConfig"
     />
     <!-- 敏感词设置 -->
-    <setSafety
-      ref="setSafety"
-      @sendSafety="sendSafety"
-    />
+    <setSafety ref="setSafety" @sendSafety="sendSafety" />
     <!-- 知识库召回参数配置 -->
     <knowledgeSetDialog ref="knowledgeSetDialog" @setKnowledgeSet="setKnowledgeSet" />
+    <!-- 知识库选择 -->
+    <knowledgeSelect ref="knowledgeSelect" @getKnowledgeData="getKnowledgeData"/>
+    <!-- 元数据设置 -->
+    <el-dialog
+      :visible.sync="metaSetVisible"
+      width="1050px"
+      class="metaSetVisible"
+      :before-close="handleMetaClose">
+      <template #title>
+         <div class="metaHeader">
+          <h3>配置元数据过滤</h3>
+          <span>[ 通过设置的元数据，对知识库内信息进行更加细化的筛选与检索控制。]</span>
+         </div>
+      </template>
+      <metaSet ref="metaSet" :knowledgeId="currentKnowledgeId" :currentMetaData="currentMetaData"/>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleMetaClose">取 消</el-button>
+        <el-button type="primary" @click="submitMeta">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -360,9 +382,9 @@
 import { appPublish } from "@/api/appspace";
 import { store } from "@/store/index";
 import { mapGetters } from "vuex";
-import { getKnowledgeList } from "@/api/knowledge";
 import CreateIntelligent from "@/components/createApp/createIntelligent";
 import setSafety from "@/components/setSafety";
+import metaSet from "@/components/metaSet";
 import ModelSet from "./modelSetDialog";
 import { selectModelList, getRerankList } from "@/api/modelAccess";
 import {
@@ -386,6 +408,7 @@ import {
 } from "@/api/workflow";
 import Chat from "./chat";
 import LinkIcon from "@/components/linkIcon.vue";
+import knowledgeSelect from "@/components/knowledgeSelect.vue"
 export default {
   components: {
     LinkIcon,
@@ -397,6 +420,8 @@ export default {
     LinkDialog,
     setSafety,
     knowledgeSetDialog,
+    knowledgeSelect,
+    metaSet
   },
   watch: {
     editForm: {
@@ -412,7 +437,7 @@ export default {
             "modelParams",
             "modelConfig",
             "prologue",
-            "knowledgeBaseIds",
+            "knowledgebases",
             "instructions",
             "onlineSearchConfig",
             "safetyConfig",
@@ -425,7 +450,7 @@ export default {
               JSON.stringify((this.initialEditForm || {})[prop])
             );
           })
-          
+
           if (changed) {
             if (newVal["modelParams"] !== "" && newVal["prologue"] !== "") {
               this.updateInfo();
@@ -442,6 +467,11 @@ export default {
   },
   data() {
     return {
+      knowledgeIndex:-1,
+      currentKnowledgeId:'',
+      currentMetaData:{},
+      metaSetVisible:false,
+      knowledgeCheckData:[],
       activeIndex:-1,
       showOperation: false,
       appId: "",
@@ -458,7 +488,7 @@ export default {
         modelParams: "",
         prologue: "", //开场白
         instructions: "", //系统提示词
-        knowledgeBaseIds: [],
+        knowledgebases:[],
         knowledgeConfig: {
           keywordPriority: 0.8, //关键词权重
           matchType: "mix", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
@@ -543,7 +573,6 @@ export default {
     this.initialEditForm = JSON.parse(JSON.stringify(this.editForm));
   },
   created() {
-    this.getKnowledgeList();
     this.getModelData(); //获取模型列表
     this.getRerankData(); //获取rerank模型
     if (this.$route.query.id) {
@@ -568,8 +597,40 @@ export default {
     store.dispatch("app/initState");
   },
   methods: {
+    submitMeta(){
+      const metaData  = this.$refs.metaSet.getMetaData();
+      if(this.$refs.metaSet.validateRequiredFields(metaData['metaDataFilterParams']['metaFilterParams'])){
+        this.$message.warning('存在未填信息,请补充')
+        return
+      }
+      this.$set(this.editForm.knowledgebases, this.knowledgeIndex, { ...this.editForm.knowledgebases[this.knowledgeIndex], ...metaData });
+      this.metaSetVisible = false;
+    },
+    delKnowledge(index){
+      this.editForm.knowledgebases.splice(index,1)
+    },
+    getKnowledgeData(data){
+      const originalIds = new Set(this.editForm.knowledgebases.map(item => item.id));
+      const newItems = data.filter(item => !originalIds.has(item.id));
+      this.editForm.knowledgebases.push(...newItems);
+    },
+    handleMetaClose(){
+      this.metaSetVisible = false;
+    },
+    showMetaSet(e,index){
+      this.currentKnowledgeId = e.id; 
+      this.currentMetaData = {}
+      this.$nextTick(() =>{
+         this.currentMetaData = e.metaDataFilterParams;
+      })
+      this.knowledgeIndex = index;
+      this.metaSetVisible = true;
+    },
+    showKnowledgeDiglog(){
+      this.$refs.knowledgeSelect.showDialog(this.editForm.knowledgebases)
+    },
     handlePublishSet(){
-      this.$router.push({path:`/agent/publishSet`,query:{appId:this.editForm.assistantId,appType:'agent'}})
+      this.$router.push({path:`/agent/publishSet`,query:{appId:this.editForm.assistantId,appType:'agent',name:this.editForm.name}})
     },
     setKnowledgeSet(data){
       this.editForm.knowledgeConfig = data;
@@ -582,7 +643,7 @@ export default {
       this.getAppDetail();
     },
     showKnowledgeSet() {
-      if(!this.editForm.knowledgeBaseIds.length) return;
+      if(!this.editForm.knowledgebases.length) return;
       this.$refs.knowledgeSetDialog.showDialog(this.editForm.knowledgeConfig);
     },
     //获取模型列表
@@ -750,7 +811,6 @@ export default {
       }
     },
     customRemove(customToolId){
-      console.log(customToolId)
       deleteCustom({assistantId:this.editForm.assistantId,customToolId}).then((res) =>{
           if (res.code === 0) {
           this.$message.success("删除成功");
@@ -781,26 +841,7 @@ export default {
       }
       this.modelLoading = false;
     },
-    async getKnowledgeList() {
-      //获取文档知识分类
-      const res = await getKnowledgeList({});
-      if (res.code === 0) {
-        this.knowledgeData = res.data.knowledgeList || [];
-      } else {
-        this.$message.error(res.message);
-      }
-    },
     async updateInfo() {
-      //知识库数据
-      const knowledgeMap = new Map(
-        this.knowledgeData.map((item) => [item.knowledgeId, item])
-      );
-      const knowledgeData = this.editForm.knowledgeBaseIds
-        .map((id) => {
-          const found = knowledgeMap.get(id);
-          return found ? { id: found.knowledgeId, name: found.name } : null;
-        })
-        .filter(Boolean);
       //模型数据
       const modeInfo = this.modleOptions.find(
         (item) => item.modelId === this.editForm.modelParams
@@ -820,8 +861,8 @@ export default {
             : [],
         instructions: this.editForm.instructions,
         knowledgeBaseConfig: {
-          knowledgebases: !knowledgeData.length ? [] : knowledgeData,
           config: this.editForm.knowledgeConfig,
+          knowledgebases:this.editForm.knowledgebases
         },
         modelConfig: {
           config: this.editForm.modelConfig,
@@ -844,6 +885,9 @@ export default {
           : {},
       };
       let res = await putAgentInfo(params);
+      if(res.code === 0){
+        this.getAppDetail();
+      }
     },
     startLoading(val) {
       this.loadingPercent = val;
@@ -858,17 +902,14 @@ export default {
     },
     async getAppDetail() {
       this.startLoading(0);
-      this.isSettingFromDetail = true; // 设置标志位，防止触发更新逻辑
+      this.isSettingFromDetail = true;
       let res = await getAgentInfo({ assistantId: this.editForm.assistantId });
       if (res.code === 0) {
         this.startLoading(100);
         let data = res.data;
         this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config.matchType === '' ? this.editForm.knowledgeConfig : res.data.knowledgeBaseConfig.config;
         this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
-        const knowledgeData = res.data.knowledgeBaseConfig.knowledgebases;
-        if (knowledgeData && knowledgeData.length > 0) {
-          this.editForm.knowledgeBaseIds = knowledgeData.map((item) => item.id);
-        }
+        this.editForm.knowledgebases = res.data.knowledgeBaseConfig.knowledgebases;
         this.editForm = {
           ...this.editForm,
           avatar: data.avatar || {},
@@ -973,6 +1014,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.isDisabled .header-right,.isDisabled .drawer-form > div{
+  user-select: none;
+  pointer-events: none !important;      
+}
 /deep/ {
   .apikeyBtn {
     border: 1px solid #384bf7;
@@ -984,11 +1029,34 @@ export default {
       height: 14px;
     }
   }
+  .metaSetVisible{
+    .el-dialog__header{
+      border-bottom:1px solid #dbdbdb;
+    }
+    .el-dialog__body{
+      max-height:400px;
+      overflow-y: auto;
+    }
+  }
+}
+.metaHeader{
+  display:flex;
+  justify-content: flex-start;
+  h3{
+    font-size:18px;
+  }
+  span{
+    margin-left:10px;
+    color:#666;
+    display:inline-block;
+    padding-top:5px;
+  }
 }
 //通用添加按钮
 .common-add {
   color: #595959;
   cursor: pointer;
+  margin-left: 10px;
   .handleBtn,
   .el-icon-plus {
     font-size: 13px !important;
@@ -1064,18 +1132,6 @@ export default {
   .header-right {
     display: flex;
     align-items: center;
-    // .header-api {
-    //   padding: 6px 10px;
-    //   box-shadow: 1px 2px 2px #ddd;
-    //   background-color: #fff;
-    //   margin: 0 10px;
-    //   border-radius: 6px;
-    //   .root-url {
-    //     background-color: #eceefe;
-    //     color: #384bf7;
-    //     border: none;
-    //   }
-    // }
   }
 }
 .agent-from-content {

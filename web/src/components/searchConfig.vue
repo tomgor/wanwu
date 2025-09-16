@@ -9,7 +9,7 @@
       class="vertical-form-item"
     >
     <template #label>
-        <span v-if="!setType">检索方式配置</span>
+        <span v-if="!setType" class="vertical-form-title">检索方式配置</span>
     </template>
       <div
         v-for="item in searchTypeData"
@@ -312,9 +312,9 @@ export default {
       item.mixTypeValue = n.value;
       const { knowledgeMatchParams } = this.formInline;
       knowledgeMatchParams.priorityMatch = n.value === "weight" ? 1 : 0;
-      if(n.value === 'weight'){
-        knowledgeMatchParams.rerankModelId = '';
-      }
+      // if(n.value === 'weight'){
+      //   knowledgeMatchParams.rerankModelId = '';
+      // }
     },
     showRerank(n) {
       return (
@@ -382,6 +382,10 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    .vertical-form-title{
+      color:#000;
+      font-size:14px;
+    }
   }
   .vertical-form-item .el-form-item__label {
     line-height: unset;

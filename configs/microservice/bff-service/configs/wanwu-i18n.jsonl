@@ -12,6 +12,7 @@
 {"code":0,"key":"bff_role_org_admin_name","langs":{"en":"Organization Administrator","zh":"组织管理员"}}
 {"code":0,"key":"bff_avatar_type_error","langs":{"zh":"自定义图标文件类型错误"}}
 {"code":0,"key":"bff_avatar_upload_error","langs":{"zh":"自定义图标上传错误: %v"}}
+{"code":110006,"key":"","langs":{"zh":"注册已禁用"}}
 {"code":0,"key":"------ auth ------","langs":{}}
 {"code":110004,"key":"bff_auth_server_authorized","langs":{"en":"authorized","zh":"已授权"}}
 {"code":110004,"key":"bff_auth_server_error","langs":{"en":"auth-service err","zh":"授权服务异常"}}
@@ -42,6 +43,8 @@
 {"code":110000,"key":"bff_workflow_app_delete","langs":{"en":"delete workflow app err: %v","zh":"删除工作流应用错误：%v"}}
 {"code":110000,"key":"bff_workflow_apps_unpublish","langs":{"en":"unpublish workflow err: %v","zh":"取消发布工作流错误: %v"}}
 {"code":110000,"key":"bff_workflow_apps_list_internal","langs":{"en":"get unauthenticated workflow app list err: %v","zh":"获取无鉴权工作流应用列表错误：%v"}}
+{"code":110000,"key":"bff_workflow_test_run","langs":{"zh":"工作流试运行错误: %v"}}
+{"code":110000,"key":"bff_workflow_file_upload","langs":{"zh":"工作流上传文件错误: %v"}}
 {"code":0,"key":"------ doc ------","langs":{}}
 {"code":110000,"key":"bff_doc_center_file_unescape","langs":{"en":"path unescape error: %v","zh":"路径去除转义错误: %v"}}
 {"code":110000,"key":"bff_doc_center_file_md","langs":{"en":"no markdown files found: %v","zh":"未含有md文件: %v"}}
@@ -67,6 +70,11 @@
 {"code":120003,"key":"iam_login_err","langs":{"en":"user login err: %v","zh":"用户登录错误: %v"}}
 {"code":120003,"key":"iam_login_invalid_name_pwd","langs":{"en":"username or password is incorrect","zh":"用户名或密码错误"}}
 {"code":120003,"key":"iam_login_user_disable","langs":{"en":"user disable","zh":"账号已被停用"}}
+{"code":120004,"key":"iam_register_by_email_send_code","langs":{"en":"email register send code err: %v","zh":"邮箱注册发送验证码错误: %v"}}
+{"code":120004,"key":"iam_register_by_email_send_code_frequent","langs":{"en":"send email code too frequent, please try later","zh":"发送邮箱验证码太频繁，请稍后再试"}}
+{"code":120004,"key":"iam_register_by_email","langs":{"en":"email register err: %v","zh":"邮箱注册错误: %v"}}
+{"code":120004,"key":"iam_register_by_email_not_found","langs":{"en":"email invalid or code expired, please try again","zh":"邮箱错误或验证码已失效，请重新发送验证码"}}
+{"code":120004,"key":"iam_register_by_email_invalid_code","langs":{"en":"email code invalid","zh":"邮箱验证码错误"}}
 {"code":120011,"key":"iam_org_get","langs":{"en":"get org err: %v","zh":"获取组织错误: %v"}}
 {"code":120011,"key":"iam_orgs_get","langs":{"en":"get orgs err: %v","zh":"获取组织列表错误: %v"}}
 {"code":120011,"key":"iam_orgs_select","langs":{"en":"select orgs err: %v","zh":"获取组织列表错误: %v"}}
@@ -132,7 +140,13 @@
 {"code":140001,"key":"know_doc_last_failure_info","langs":{"zh":"最近一次失败信息：%v"}}
 {"code":140001,"key":"know_doc_parsing_service_error","langs":{"zh":"文件解析服务异常"}}
 {"code":140001,"key":"know_doc_file_unusable","langs":{"zh":"文件不可用，需确保文件格式正确、无加密情况、文件能正常打开"}}
-{"code":140001,"key":"know_doc_empty_file_content","langs":{"zh":"文件不可用，文档内容为空"}}
+{"code":140001,"key":"know_doc_empty_file_content","langs":{"zh":"文档切分失败（切分结果为空）"}}
+{"code":140001,"key":"know_doc_vector_duplicate_error","langs":{"zh":"文档向量库重复查询校验失败"}}
+{"code":140001,"key":"know_doc_duplicate_error","langs":{"zh":"文档已存在该知识库"}}
+{"code":140001,"key":"know_doc_download_error","langs":{"zh":"文档下载失败"}}
+{"code":140001,"key":"know_doc_split_error","langs":{"zh":"文档切分失败（通用错误）"}}
+{"code":140001,"key":"know_doc_embedding_error","langs":{"zh":"向量导入失败"}}
+{"code":140001,"key":"know_doc_text_error","langs":{"zh":"文本导入失败"}}
 {"code":141001,"key":"","langs":{"zh":"新建知识库失败，请稍后重试"}}
 {"code":141002,"key":"","langs":{"zh":"删除知识库失败，请稍后重试"}}
 {"code":141003,"key":"","langs":{"zh":"修改知识库失败，请稍后重试"}}
@@ -152,6 +166,8 @@
 {"code":142007,"key":"","langs":{"zh":"获取上传文档失败，请稍后重试"}}
 {"code":142008,"key":"","langs":{"zh":"更新文档元数据失败，请稍后重试"}}
 {"code":142009,"key":"","langs":{"zh":"非处理完成文档无法更新元数据，请稍后重试"}}
+{"code":142010,"key":"","langs":{"zh":"上传文档必须是csv，请修改后重试"}}
+{"code":142011,"key":"","langs":{"zh":"更新文档元数据失败，已存在重复key，请稍后重试"}}
 {"code":143001,"key":"","langs":{"zh":"新建知识库标签失败，请稍后重试"}}
 {"code":143002,"key":"","langs":{"zh":"删除知识库标签失败，请稍后重试"}}
 {"code":143003,"key":"","langs":{"zh":"修改知识库标签失败，请稍后重试"}}
@@ -177,6 +193,13 @@
 {"code":145011,"key":"","langs":{"zh":"分段长度超过最大值"}}
 {"code":145012,"key":"","langs":{"zh":"更新文档分段失败，请稍后重试"}}
 {"code":145013,"key":"","langs":{"zh":"删除文档分段失败，请稍后重试"}}
+{"code":145014,"key":"","langs":{"zh":"查询知识库元数据失败，请稍后重试"}}
+{"code":145015,"key":"","langs":{"zh":"新增知识库元数据失败，请稍后重试"}}
+{"code":145016,"key":"","langs":{"zh":"更新知识库元数据失败，请稍后重试"}}
+{"code":145017,"key":"","langs":{"zh":"删除知识库元数据失败，请稍后重试"}}
+{"code":145018,"key":"","langs":{"zh":"已存在同名元数据key"}}
+{"code":145019,"key":"","langs":{"zh":"非法参数"}}
+{"code":145020,"key":"","langs":{"zh":"文档分段内容为空"}}
 {"code":310001,"key":"mcp_get_square_err","langs":{"zh":"广场MCP不存在"}}
 {"code":310001,"key":"mcp_check_exist_err","langs":{"zh":"检查MCP是否存在来自广场异常: %v"}}
 {"code":310002,"key":"mcp_create_duplicate_square","langs":{"zh":"创建MCP异常: 已存在来自广场"}}
@@ -209,6 +232,11 @@
 {"code":160001,"key":"assistants_get_list","langs":{"zh":"获取智能体列表错误: %v"}}
 {"code":160001,"key":"assistant_get_by_name","langs":{"zh":"获取智能体错误: %v"}}
 {"code":160001,"key":"assistant_same_name","langs":{"zh":"智能体名称重复: %v"}}
+{"code":160001,"key":"assistant_modelConfig_unmarshal","langs":{"zh":"智能体model配置解析失败: %v"}}
+{"code":160001,"key":"assistant_rerankConfig_unmarshal","langs":{"zh":"智能体rerank配置解析失败: %v"}}
+{"code":160001,"key":"assistant_knowledgeBaseConfig_unmarshal","langs":{"zh":"智能体knowledgeBase配置解析失败: %v"}}
+{"code":160001,"key":"assistant_onlineSearchConfig_unmarshal","langs":{"zh":"智能体onlineSearch配置解析失败: %v"}}
+{"code":160001,"key":"assistant_safetyConfig_unmarshal","langs":{"zh":"智能体safety配置解析失败: %v"}}
 {"code":160002,"key":"assistant_action_update","langs":{"zh":"更新action错误: %v"}}
 {"code":160002,"key":"assistant_action_get","langs":{"zh":"获取action错误: %v"}}
 {"code":160002,"key":"assistant_actions_get_by_assistant_id","langs":{"zh":"获取action错误: %v"}}
@@ -226,6 +254,7 @@
 {"code":160004,"key":"assistant_conversation_delete","langs":{"zh":"删除对话错误"}}
 {"code":160004,"key":"assistant_conversation_get","langs":{"zh":"获取对话错误"}}
 {"code":160004,"key":"assistant_conversation_get_list","langs":{"zh":"获取对话列表错误"}}
+{"code":160004,"key":"assistant_conversation","langs":{"zh":"智能体对话错误: %v"}}
 {"code":160005,"key":"assistant_mcp_create","langs":{"zh":"创建mcp错误: %v"}}
 {"code":160005,"key":"assistant_mcp_delete","langs":{"zh":"删除mcp错误: %v"}}
 {"code":160005,"key":"assistant_mcp_count","langs":{"zh":"获取mcp错误: %v"}}

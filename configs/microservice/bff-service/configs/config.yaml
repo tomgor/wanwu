@@ -78,6 +78,7 @@ custom-info:
         copyright: bff_custom_about_copyright
     - mode: dark
   version: v0.1.0
+  register_by_email: 0
 
 doc-center:
   frontend_prefix: /aibase/docCenter/pages
@@ -132,11 +133,13 @@ doc-center:
       val: 6.工作流/文档解析.md
     - key: workflow-1009
       val: 6.工作流/MCP.md
+    - key: workflow-1010
+      val: 6.工作流/GUI.md
     - key: workflow-1022
       val: 6.工作流/意图识别.md
     - key: workflow-1059
       val: 6.工作流/JSON反序列化.md
-
+      
 # --- middleware ---
 
 minio:
@@ -183,6 +186,11 @@ workflow:
   create_uri: /api/workflow_api/create
   delete_uri: /api/workflow_api/delete
   copy_uri: /api/workflow_api/copy
+  test_run_uri: /v1/workflow/%v/run_by_wanwu
+  upload_action_uri: /api/common/upload/apply_upload_action
+  upload_common_uri: /api/common/upload
+  sign_img_uri: /api/workflow_api/sign_image_url
+
   model_params:
     - name: temperature
       desc: "- **temperature**: 调高温度会使得模型的输出更多样性和创新性，反之，降低温度会使输出内容更加遵循指令要求但减少多样性。建议不要与“Top p”同时调整。"

@@ -1,12 +1,12 @@
 <div align="center">
   <img src="https://github.com/user-attachments/assets/6ceb4269-a861-4545-84db-bad322592156" style="width:45%; height:auto;" />
 <p>
-  <a href="#-核心功能模块">核心功能模块</a> •
-  <a href="#-典型应用场景">典型应用场景</a> •
-  <a href="#-快速开始">快速开始</a> •
-  <a href="#-使用万悟">使用万悟</a> •
+  <a href="#-Using Wanwu">Feature List</a> •
+  <a href="#-Typical Application Scenarios">Typical Application Scenarios</a> •
+  <a href="#-Quick Start">Quick Start</a> •
+  <a href="#-Using Wanwu">Using Wanwu</a> •
   <a href="#-q--a">Q & A</a> •
-  <a href="#-联系我们">联系我们</a> 
+  <a href="#-Contact Us">Contact Us</a> 
 </p>
 <p>
   <img alt="License" src="https://img.shields.io/badge/license-apache2.0-blue.svg">
@@ -16,317 +16,246 @@
     <img alt="Release Notes" src="https://img.shields.io/github/v/release/UnicomAI/wanwu?label=Release&logo=github&color=green">
   </a>
 </p>
-  
 </div>
 
 
-&emsp;&emsp;**元景万悟智能体平台**是一款面向**企业级**场景的**一站式**、**商用license友好**的**智能体开发平台**，致力于为企业提供安全、高效、合规的一站式AI解决方案。我们以"技术开放、生态共建"为核心理念，通过整合大语言模型、业务流程自动化等前沿技术，构建了覆盖模型全生命周期管理、MCP、联网检索、智能体快速开发、企业知识库建设、复杂工作流编排等完整功能体系的AI工程化平台。平台采用模块化架构设计，支持灵活的功能扩展和二次开发，在确保企业数据安全和隐私保护的同时，大幅降低了AI技术的应用门槛。无论是中小型企业快速构建智能化应用，还是大型企业实现复杂业务场景的智能化改造，元景万悟智能体平台都能提供强有力的技术支撑，助力企业加速数字化转型进程，实现降本增效和业务创新。
+​                                                                                English | [中文](README_CN.md)| [繁體中文](README_繁體.md)
 
-### 📢 新闻
+**Wanwu AI Agent Platform** is an **enterprise-grade** **one-stop** **commercially friendly** AI agent development platform designed for business scenarios. It is committed to providing enterprises with a safe, efficient, and compliant one-stop AI solution. With the core philosophy of "technology openness and ecological co-construction", we integrate cutting-edge technologies such as large language models and business process automation to build an AI engineering platform with a complete functional system covering model full life-cycle management, MCP, web search, AI agent rapid development, enterprise knowledge base construction, and complex workflow orchestration. The platform adopts a modular architecture design, supports flexible functional expansion and secondary development, and greatly reduces the application threshold of AI technology while ensuring the security and privacy protection of enterprise data. Whether it is for small and medium-sized enterprises to quickly build intelligent applications or for large enterprises to achieve intelligent transformation of complex business scenarios, the Wanwu AI Agent Platform can provide strong technical support to help enterprises accelerate the process of digital transformation, achieve cost reduction and efficiency improvement, and business innovation.
 
-- **[2025-09-05]** 
-  - 模型管理新增：联通元景供应商-GUI模型导入
-  - 知识库分段支持新增、编辑、删除
-  - 工作流新增GUI节点
-  - 应用广场新增应用作者显示
+------
+### &#x1F525; Adopt a permissive and friendly Apache 2.0 License, supporting developers to freely expand and develop secondary
+✔ **Enterprise-level engineering**: Provides a complete toolchain from model management to application landing, solving the "last mile" problem of LLM technology landing
+
+✔ **Open-source ecological**: Adopt a permissive and friendly **Apache 2.0 License**, supporting developers to freely expand and develop
+
+✔ **Full-stack technology support**: Equipped with a professional team to provide **architecture consulting, performance optimization** and full-cycle empowerment for ecological partners
+
+✔ **Multi-tenant architecture**: Provides a multi-tenant account system to meet the core needs of users in cost control, data security isolation, business elasticity expansion, industry customization, rapid online and ecological collaboration
+
+✔ **XinChuang adaptation**: Already adapted to domestic XinChuang databases TiDB and OceanBase
 
 ------
 
-### &#x1F525; 采用宽松友好的 Apache 2.0 License，支持开发者自由扩展与二次开发
+### 🚩 Core Function Modules
+**1. Model Management (Model Hub**)
+▸ Supports the unified access and lifecycle management of **hundreds of proprietary/open-source large models** (including GPT, Claude, Llama, etc.)
 
-✔ **企业级工程化**：提供从模型纳管到应用落地的完整工具链，解决LLM技术落地"最后一公里"问题  
+▸ Deeply adapts to **OpenAI API standards** and **Unicom Yuanjing** ecological models, realizing seamless switching of heterogeneous models
 
-✔ **开放开源生态**：采用宽松友好的 **Apache 2.0 License**，支持开发者自由扩展与二次开发  
-
-✔ **全栈技术支持**：配备专业团队为生态伙伴提供 **架构咨询、性能优化** 全周期赋能  
-
-✔ **多租户架构**：提供多租户账号体系，满足用户成本控制、数据安全隔离、业务弹性扩展、行业定制化、快速上线及生态协同等核心需求
-
-✔ **信创适配**：已适配国产信创数据库TiDB和OceanBase
-
-------
-
-### 🚩 核心功能模块
-
-**1. 模型纳管（Model Hub）**
-
-▸ 支持 **数百种专有/开源大模型**（包括GPT、Claude、Llama等系列）的统一接入与生命周期管理
-
-▸ 深度适配 **OpenAI API 标准** 及 **联通元景** 生态模型，实现异构模型的无缝切换
-
-▸ 提供 **多推理后端支持**（vLLM、TGI等）与 **自托管解决方案**，满足不同规模企业的算力需求
+▸ Provides **multi-inference backend support** (vLLM, TGI, etc.) and **self-hosted solutions** to meet the computing power needs of enterprises of different scales
 
 #### **2. MCP**
+▸ **Standardized interfaces**: Enable AI models to seamlessly connect to various external tools (such as GitHub, Slack, databases, etc.) without the need to develop adapters for each data source separately
 
-▸ **标准化接口**：使 AI 模型能够无缝连接各种外部工具（如 GitHub、Slack、数据库等），而无需为每个数据源单独开发适配器
+▸ **Built-in rich and selected recommendations**: Integrates 100+ industry MCP interfaces, making it easy for users to call up quickly and easily
 
-▸ **内置丰富精选推荐**：整合100+行业MCP接口，让用户方便快捷，轻松调用
+#### **3. Web Search**
+▸ **Real-time information acquisition**: Possesses powerful web search capabilities, capable of obtaining the latest information from the Internet in real-time. In question and answer scenarios, when a user's question requires the latest news, data, and other information, the platform can quickly search and return accurate results, enhancing the timeliness and accuracy of the answers
 
-#### **3. 联网检索**（Web Search）
+▸ **Multi-source data integration**: Integrates various Internet data sources, including news websites, academic databases, industry reports, etc. Through the integration and analysis of multi-source data, it provides users with more comprehensive and in-depth information. For example, in market research scenarios, relevant data can be obtained from multiple data sources at the same time for comprehensive analysis and evaluation
 
-▸ **实时信息获取**：具备强大的联网检索能力，能够实时从互联网获取最新的信息。在问答场景中，当用户的问题需要最新的新闻、数据等信息时，平台可以快速检索并返回准确的结果，提升回答的时效性和准确性
+▸ **Intelligent search strategy**: Adopt intelligent search algorithms, automatically optimize search strategies based on user questions to improve search efficiency and accuracy. Support keyword search, semantic search and other search methods to meet the needs of different users. At the same time, intelligently sort and filter search results, prioritize the display of the most relevant and valuable information
 
-▸ **多源数据整合**：整合了多种互联网数据源，包括新闻网站、学术数据库、行业报告等。通过对多源数据的整合和分析，为用户提供更全面、更深入的信息。例如，在市场调研场景中，可以同时从多个数据源获取相关数据，进行综合分析和评估
+#### **4. Visual Workflow (Workflow Studio**)
+▸ Quickly build complex AI business processes through **low-code drag-and-drop canvas**
 
-▸ **智能检索策略**：采用智能检索算法，根据用户的问题自动优化检索策略，提高检索效率和准确性。支持关键词检索、语义检索等多种检索方式，满足不同用户的需求。同时，对检索结果进行智能排序和筛选，优先展示最相关、最有价值的信息
+▸ Built-in **conditional branching, API, large model, knowledge base, code, MCP** and other nodes, support end-to-end process debugging and performance analysis
 
-#### **4. 可视化工作流（Workflow Studio）**
+#### **5. Enterprise-level Knowledge Base, RAG Pipeline**
+▸ Provides the whole process knowledge management capabilities of **knowledge base creation → document parsing → vectorization → retrieval → fine sorting**, supports **multiple formats** such as pdf/docx/txt/xlsx/csv/pptx documents, and also supports the capture and access of web resources
 
-▸ 通过 **低代码拖拽画布** 快速构建复杂AI业务流程
+▸ Integrates **multi-modal retrieval**, **cascading segmentation** and **adaptive segmentation**, significantly improves the accuracy of Q&A
 
-▸ 内置 **条件分支、API、大模型、知识库、代码、MCP** 等多种节点，支持端到端流程调试与性能分析
+#### **6. AI Agent Development Framework (Agent Framework**)
+▸ Can be based on the **function call (Function Calling**) agent construction paradigm, supports tool expansion, private knowledge base association and multi-round dialogue
 
-#### **5. 企业级知识库、RAG Pipeline**
+▸ Support **online debugging**
 
-▸ 提供**知识库创建**→ **文档解析→向量化→检索→精排** 的全流程知识管理能力，支持pdf/docx/txt/xlsx/csv/pptx等 **多种格式** 文档，还支持网页资源的抓取和接入
+#### **7. Backend as a Service (BaaS**)
+▸ Provides **RESTful API**, supports deep integration with existing enterprise systems (OA/CRM/ERP, etc.)
 
-▸ 集成 **多模态检索** 、**级联切分** 与 **自适应切分**，显著提升问答准确率
-
-#### **6. 智能体开发框架（Agent Framework）**
-
-▸ 可基于 **函数调用（Function Calling）** 的Agent构建范式，支持工具扩展、私域知识库关联与多轮对话
-
-▸ 支持**在线调试**
-
-#### **7. 后端即服务（BaaS）**
-
-▸ 提供 **RESTful API** ，支持与企业现有系统（OA/CRM/ERP等）深度集成
-
-▸ 提供 **细粒度权限控制**，保障生产环境稳定运行
+▸ Provides **fine-grained permission control** to ensure stable operation in production environments
 
 ------
 
-### &#x1F4E2; 功能比较
-
-|    功能     |  元景万悟智能体平台  |       Dify.AI        |       Fastgpt        |      Ragflow       |      Coze开源版      |
-| :---------: | :----------------: | :------------------: | :------------------: | :----------------: | :----------------: |
-| 模型导入    |         ✅          |          ✅           |        ❌(内置模型)        |         ✅          | ❌(内置模型) |
-|   RAG引擎   |         ✅          |          ✅           |          ✅           |         ✅          | ✅ |
-|    MCP     |         ✅          |          ✅           |          ✅           |  ✅（需安装工具使用） | ❌ |
-| 直接导入OCR |         ✅          |          ❌           |          ❌           |         ❌          | ❌ |
-|  搜索增强   |         ✅          |  ✅（需安装工具使用）   |          ✅           |  ✅（需安装工具使用） | ✅ |
-|    Agent    |         ✅          |          ✅           |          ✅           |         ✅          | ✅ |
-|   工作流    |         ✅          |          ✅           |          ✅           |         ✅          | ✅ |
-|  本地部署   |         ✅          |          ✅           |          ✅           |         ✅          | ✅ |
-| license友好 |         ✅          |   ❌（商用有限制）    |   ❌（商用有限制）    |     未完全开源     | ✅ |
-|   多租户    |         ✅          |   ❌（商用有限制）    |   ❌（商用有限制）    |         ✅          | ✅（但用户间不互通） |
-
-> 截止2025年8月1日对比。
-
+### &#x1F4E2; Function Comparison
+|      Function      | Wanwu |             Dify.AI             |          Fastgpt           |             Ragflow             |    Coze open source version     |
+| :----------------: | :---: | :-----------------------------: | :------------------------: | :-----------------------------: | :-----------------------------: |
+|    Model import    |   ✅   |                ✅                |     ❌(Built-in models)     |                ✅                |       ❌(Built-in models)        |
+|     RAG engine     |   ✅   |                ✅                |             ✅              |                ✅                |                ✅                |
+|        MCP         |   ✅   |                ✅                |             ✅              | ✅(Need to install tools to use) |                ❌                |
+| Direct OCR import  |   ✅   |                ❌                |             ❌              |                ❌                |                ❌                |
+| Search enhancement |   ✅   | ✅(Need to install tools to use) |             ✅              | ✅(Need to install tools to use) |                ✅                |
+|       Agent        |   ✅   |                ✅                |             ✅              |                ✅                |                ✅                |
+|      Workflow      |   ✅   |                ✅                |             ✅              |                ✅                |                ✅                |
+|  Local deployment  |   ✅   |                ✅                |             ✅              |                ✅                |                ✅                |
+|  license friendly  |   ✅   |   ❌(Commercially restricted)    | ❌(Commercially restricted) |      Not fully open source      |                ✅                |
+|    Multi-tenant    |   ✅   |   ❌(Commercially restricted)    | ❌(Commercially restricted) |                ✅                | ✅(Users are not interconnected) |
+> As of August 1, 2025.
 ------
-
-### &#x1F3AF; 典型应用场景
-
-- **智能客服**：基于RAG+Agent实现高准确率的业务咨询与工单处理  
-- **知识管理**：构建企业专属知识库，支持语义搜索与智能摘要生成  
-- **流程自动化**：通过工作流引擎实现合同审核、报销审批等业务的AI辅助决策  
-
-平台已成功应用于 **金融、工业、政务** 等多个行业，助力企业将LLM技术的理论价值转化为实际业务收益。我们诚邀开发者加入开源社区，共同推动AI技术的民主化进程。  
-
+### &#x1F3AF; Typical Application Scenarios
+- **Intelligent Customer Service**: Realize high-accuracy business consultation and ticket processing based on RAG + Agent
+- **Knowledge Management**: Build an exclusive enterprise knowledge base, support semantic search and intelligent summary generation
+- **Process Automation**: Realize AI-assisted decision-making for business processes such as contract review and reimbursement approval through the workflow engine
+The platform has been successfully applied in multiple industries such as **finance, industry, and government**, helping enterprises transform the theoretical value of LLM technology into actual business benefits. We sincerely invite developers to join the open source community and jointly promote the democratization of AI technology.  
 ------
-
-### 🚀 快速开始
-
-- 元景万悟智能体平台的工作流模块使用的是以下项目，可到其仓库查看详情。
-
-  - v0.1.8及以前：[wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git) 项目
-
-  - v0.2.0开始：[wanwu-workflow](https://github.com/UnicomAI/wanwu-workflow/tree/dev/wanwu-backend) 项目
-
-- **Docker安装（推荐）**
-
-1. 首次运行前
-
-    1.1 拷贝环境变量文件
+### 🚀 Quick Start
+- The workflow module of the Wanwu AI Agent Platform uses the following project, you can go to its warehouse to view the details.
+  - v0.1.8 and earlier: [wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git) project
+  - v0.2.0 and later: [wanwu-workflow](https://github.com/UnicomAI/wanwu-workflow/tree/dev/wanwu-backend) project
+- **Docker Installation (Recommended**)
+1. Before the first run
+    1.1 Copy the environment variable file
 
     ```bash
     cp .env.bak .env
     ```
-
-    1.2 根据系统修改.env文件中的`WANWU_ARCH`、`WANWU_EXTERNAL_IP`变量
-
+    1.2 Modify the `WANWU_ARCH` and `WANWU_EXTERNAL_IP` variables in the `.env` file according to the system
     ```
     # amd64 / arm64
     WANWU_ARCH=amd64
     
-    # external ip port（注意localhost要换成本机局域网或对外IP，例如192.168.0.xx，不能是localhost或127.0.0.1）
+    # external ip port (Note: localhost should be replaced with the local area network or external IP of the machine, such as 192.168.0.xx, and cannot be localhost or 127.0.0.1)
     WANWU_EXTERNAL_IP=localhost
     ```
-
-    1.3 创建docker运行网络
+    1.3 Create a Docker running network
     ```
     docker network create wanwu-net
     ```
 
-2. 启动服务（首次运行会自动从Docker Hub拉取镜像）
+2. Start the service (the image will be automatically pulled from Docker Hub during the first run)
     ```bash
-    # amd64系统执行:
+    # For amd64 system:
     docker compose --env-file .env --env-file .env.image.amd64 up -d
-    # arm64系统执行:
+    # For arm64 system:
     docker compose --env-file .env --env-file .env.image.arm64 up -d
     ```
 
-3. 登录系统：http://localhost:8081
+3. Log in to the system: http://localhost:8081
+
     ```
-    默认用户：admin
-    默认密码：Wanwu123456
+    Default user: admin
+    Default password: Wanwu123456
     ```
 
-4. 关闭服务
+4. Stop the service
+
     ```bash
-    # amd64系统执行:
+    # For amd64 system:
     docker compose --env-file .env --env-file .env.image.amd64 down
-    # arm64系统执行:
+    # For arm64 system:
     docker compose --env-file .env --env-file .env.image.arm64 down
     ```
 
-- **源码启动（开发）**
-
-1. 基于上述Docker安装步骤，将系统服务完整启动
-
-2. 以后端bff-service服务为例
-
-    2.1 停止bff-service
+- **Source Code Start (Development**)
+1. Based on the above Docker installation steps, start the system service completely
+2. Take the backend bff-service service as an example
+    2.1 Stop bff-service
     ```
     make -f Makefile.develop stop-bff
     ```
-
-    2.2 编译bff-service可执行文件
+    2.2 Compile the bff-service executable file
     ```
-    # amd64系统执行:
+    # For amd64 system:
     make build-bff-amd64
-    # arm64系统执行:
+    # For arm64 system:
     make build-bff-arm64
     ```
-
-    2.3 启动bff-service
+    2.3 Start bff-service
     ```
     make -f Makefile.develop run-bff
     ```
-
 ------
-
-### ⬆️ 版本升级
-
-1. 基于上述Docker安装步骤，将系统服务完整停止
-
-2. 更新至最新版本代码
-
-    2.1 wanwu仓库目录内，更新代码
+### ⬆️ Version Upgrade
+1. Based on the above Docker installation steps, completely stop the system service
+2. Update to the latest version of the code
+    2.1 In the wanwu repository directory, update the code
     ```bash
-    # 切换到main分支
+    # Switch to the main branch
     git checkout main
-    # 拉取最新代码
+    # Pull the latest code
     git pull
     ```
-
-    2.2 重新拷贝环境变量文件（如果有环境变量修改，请自行重新修改）
+    2.2 Recopy the environment variable file (if there are changes to the environment variables, please modify them again)
     ```bash
-    # 备份当前.env文件
+    # Backup the current .env file
     cp .env .env.old
-    # 拷贝.env文件
+    # Copy the .env file
     cp .env.bak .env
     ```
-
-3. 基于上述Docker安装步骤，将系统服务完整启动
-
+3. Based on the above Docker installation steps, completely start the system service
 ------
-
-### &#x1F4D1; 使用万悟
-
-为了帮助您快速上手本项目，我们强烈推荐先查看[ 文档操作手册](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual)。我们为用户提供了交互式、结构化的操作指南，您可以直接在其中查看操作说明、接口文档等，极大地降低了学习和使用的门槛。详细功能清单如下：
-
-|                             功能                             | 详细描述                                                     |
+### &#x1F4D1; Using Wanwu
+To help you quickly get started with this project, we strongly recommend that you first check out the [ Documentation Operation Manual](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual). We provide users with interactive and structured operation guides, where you can directly view operation instructions, interface documents, etc., greatly reducing the threshold for learning and use. The detailed function list is as follows:
+|                           Function                           | Detailed Description                                         |
 | :----------------------------------------------------------: | :----------------------------------------------------------- |
-| [模型管理](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/1.%E6%A8%A1%E5%9E%8B%E7%AE%A1%E7%90%86.md) | 支持用户导入包括联通元景、OpenAI-API-compatible、Ollama、通义千问、火山引擎等模型供应商的LLM、Embedding、Rerank模型。[ 模型导入方式-详细版](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/%E6%A8%A1%E5%9E%8B%E5%AF%BC%E5%85%A5%E6%96%B9%E5%BC%8F-%E8%AF%A6%E7%BB%86%E7%89%88.md) |
-| [知识库](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/2.%E7%9F%A5%E8%AF%86%E5%BA%93) | 文档解析（支持OCR）、命中测试、关键词管理                    |
-| [工具广场](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/3.%E5%B7%A5%E5%85%B7%E5%B9%BF%E5%9C%BA.md) | 内置100+优选行业MCP server，同时支持导入自己的MCP服务或自定义工具，并在工作流和智能体中使用 |
-| [安全护栏](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/4.%E5%AE%89%E5%85%A8%E6%8A%A4%E6%A0%8F.md) | 用户可以创建敏感词表，控制模型反馈结果的安全性               |
-| [文本问答](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/5.%E6%96%87%E6%9C%AC%E9%97%AE%E7%AD%94.md) | 基于私人知识库的专属知识顾问，支持知识库管理、知识问答、知识总结、个性参数配置、安全护栏、检索配置等功能，提高知识管理与学习的效率。支持公开或私密发布文本问答应用 |
-| [工作流](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/6.%E5%B7%A5%E4%BD%9C%E6%B5%81) | 可以扩展智能体能力边界，由节点组成，提供可视化工作流编辑能力，用户可以编排多个不同的工作流节点，实现复杂且稳定的业务流程。支持公开或私密发布工作流应用 |
-| [智能体](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/7.%E6%99%BA%E8%83%BD%E4%BD%93.md) | 基于用户使用场景和业务需求创建智能体，支持选模型、设置提示词、联网检索、知识库选择、MCP、工作流、自定义工具等。支持公开或私密发布智能体应用 |
-| [应用广场](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/8.%E5%BA%94%E7%94%A8%E5%B9%BF%E5%9C%BA.md) | 支持用户体验已发布的应用，包括文本问答、工作流和智能体       |
-| [设置](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/9.%E8%AE%BE%E7%BD%AE.md) | 平台支持多租户，允许用户进行组织、角色、用户管理、平台基础配置 |
-
+| [Model Management](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/1.%E6%A8%A1%E5%9E%8B%E7%AE%A1%E7%90%86.md) | Supports users to import LLM, Embedding, and Rerank models from model suppliers such as Unicom Yujing, OpenAI-API-compatible, Ollama, Tongyi Qianwen, and Volcano Engine. [ Model Import Method-Detailed Version](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/%E6%A8%A1%E5%9E%8B%E5%AF%BC%E5%85%A5%E6%96%B9%E5%BC%8F-%E8%AF%A6%E7%BB%86%E7%89%88.md) |
+| [Knowledge Base](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/2.%E7%9F%A5%E8%AF%86%E5%BA%93) | Document parsing (supports OCR), hit testing, and keyword management |
+| [Tool Square](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/3.%E5%B7%A5%E5%85%B7%E5%B9%BF%E5%9C%BA.md) | Built-in 100+ selected industry MCP servers, while also supporting importing your own MCP services or custom tools and using them in workflows and agents |
+| [Safety Barrier](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/4.%E5%AE%89%E5%85%A8%E6%8A%A4%E6%A0%8F.md) | Users can create a list of sensitive words to control the security of model feedback results |
+| [Text Q&A](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/5.%E6%96%87%E6%9C%AC%E9%97%AE%E7%AD%94.md) | Exclusive knowledge consultant based on a private knowledge base, supporting knowledge base management, knowledge Q&A, knowledge summary, personalized parameter configuration, safety barrier, search configuration, and other functions to improve the efficiency of knowledge management and learning. Supports public or private release of text Q&A applications |
+| [Workflow](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/6.%E5%B7%A5%E4%BD%9C%E6%B5%81) | Can expand the ability boundary of agents, composed of nodes, providing visual workflow editing capabilities, users can orchestrate multiple different workflow nodes to achieve complex and stable business processes. Supports public or private release of workflow applications |
+| [Agent](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/7.%E6%99%BA%E8%83%BD%E4%BD%93.md) | Create agents based on user usage scenarios and business needs, support selecting models, setting prompts, online search, knowledge base selection, MCP, workflow, custom tools, etc. Supports public or private release of agent applications |
+| [Application Square](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/8.%E5%BA%94%E7%94%A8%E5%B9%BF%E5%9C%BA.md) | Supports users to experience the applications that have been released, including text Q&A, workflow, and agents |
+| [Settings](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/9.%E8%AE%BE%E7%BD%AE.md) | The platform supports multi-tenancy, allowing users to manage organizations, roles, users, and platform basic configurations |
 ------
-
-### &#x1F4F0; TODO LIST
-
-- [ ] 多模态模型接入
-- [ ] 支持自定义MCP Server，即可以把工作流、智能体、或者符合OpenAPI规范的API作为tools添加到MCP Server里进行发布
-- [ ] 工作流发布为API
-- [ ] 增加工作流节点类型
-- [ ] 支持工作流的导入导出
-- [ ] 知识库共享
-- [ ] 智能体和模型测评
-- [ ] 知识库支持分段内容添加
-- [ ] 智能体监控统计
-- [ ] 模型体验
-- [ ] 提示词工程
-
+### &#x1F4F0; TO DO LIST
+- [ ] Multi-modal model access
+- [ ] Support custom MCP Server, which means that workflows, agents, or APIs that conform to the OpenAPI specification can be added to the MCP Server for release
+- [ ] Workflow published as API
+- [ ] Increase workflow node types
+- [ ] Support import and export of workflows
+- [ ] Knowledge base sharing
+- [ ] Agent and model evaluation
+- [ ] Knowledge base supports segmented content addition
+- [ ] Agent monitoring statistics
+- [ ] Model experience
+- [ ] Prompt engineering
 ------
-
 ### &#128172; Q & A
-
-- **【Q】Linux系统Elastic(elastic-wanwu)启动报错：Memory limited without swap.**
-
-    【A】关闭服务，执行 `sudo sysctl -w vm.max_map_count=262144` 后，重启服务
-
-- **【Q】Windows系统Agent(agent-wanwu)启动报错：bash: ./start_all.sh: /bin/bash^M: bad interpreter**
-
-    【A】git配置关闭自动回车换行(CRLF)，执行 `git config --global core.autocrlf false` 后，关闭服务，重新clone wanwu仓库，重启服务
-
-- **【Q】系统服务正常启动后，mysql-wanwu-worker和elastic-wanwu-setup容器退出：状态码为Exited (0)**
-
-    【A】正常，这两个容器用于完成一些初始化任务，执行完成后会自动退出
-
-- **【Q】模型导入相关**
-
-    【A】以导入联通元景LLM为例（导入OpenAI-API-compatible或导入Embedding、Rerank类型类似）：
-    ```
-    1. 联通元景MaaS云LLM的Open API接口例如：https://maas.ai-yuanjing.com/openapi/compatible-mode/v1/chat/completions
-    
-    2. 用户在联通元景MaaS云上申请到的API Key形如：sk-abc********************xyz
-    
-    3. 确认API与Key可正确请求LLM，以请求yuanjing-70b-chat为例：
-        curl --location 'https://maas.ai-yuanjing.com/openapi/compatible-mode/v1/chat/completions' \
-        --header 'Content-Type: application/json' \
-        --header 'Accept: application/json' \
-        --header 'Authorization: Bearer sk-abc********************xyz' \
-        --data '{
-                "model": "yuanjing-70b-chat",
-                "messages": [{
-                        "role": "user",
-                        "content": "你好"
-                }]
-        }'
-    
-    4. 导入模型：
-    4.1【模型名称】必须为上述curl中可以正确请求的model；例如 yuanjing-70b-chat
-    4.2【API Key】必须为上述curl中可以正确请求的key；例如 sk-abc********************xyz（注意不填Bearer前缀）
-    4.3【推理URL】必须为上述curl中可以正确请求的url；例如 https://maas.ai-yuanjing.com/openapi/compatible-mode/v1（注意不带 /chat/completions 后缀）
-    
-    5. 导入Embedding模型同上述导入LLM，注意推理URL不带 /embeddings 后缀
-    
-    6. 导入Rerank模型同上述导入LLM，注意推理URL不带 /rerank 后缀
-    ```
-
-------
-
-### &#x1F517; 致谢
-
+- **[Q] Error when starting Elastic (elastic-wanwu) on Linux system: Memory limited without swap.**
+  **[A]** Stop the service, run `sudo sysctl -w vm.max_map_count=262144`, and then restart the service.
+- **[Q] Error when starting Agent (agent-wanwu) on Windows system: bash: ./start_all.sh: /bin/bash^M: bad interpreter**
+  **[A]** Disable automatic CRLF line endings in Git by running `git config --global core.autocrlf false`. Then stop the service, re-clone the wanwu repository, and restart the service.
+- **[Q] After the system services start normally, the mysql-wanwu-worker and elastic-wanwu-setup containers exit with status code Exited (0).**
+  **[A]** This is normal. These two containers are used to complete some initialization tasks and will automatically exit after execution.
+- **[Q] Regarding model import**
+  **[A]** Taking the import of Unicom Yuanjing LLM as an example (the process is similar for importing OpenAI-API-compatible models, Embedding, or Rerank types):
+  ```
+  1. The Open API interface for Unicom Yuanjing MaaS Cloud LLM is, for example: https://maas.ai-yuanjing.com/openapi/compatible-mode/v1/chat/completions
+  2. The API Key applied for by the user on Unicom Yuanjing MaaS Cloud looks like: sk-abc********************xyz
+  3. Confirm that the API and Key can correctly request the LLM. Taking a request to yuanjing-70b-chat as an example:
+      curl --location 'https://maas.ai-yuanjing.com/openapi/compatible-mode/v1/chat/completions' \
+      --header 'Content-Type: application/json' \
+      --header 'Accept: application/json' \
+      --header 'Authorization: Bearer sk-abc********************xyz' \
+      --data '{
+              "model": "yuanjing-70b-chat",
+              "messages": [{
+                      "role": "user",
+                      "content": "你好"
+              }]
+      }'
+  4. Import the model:
+  4.1 [Model Name] must be the model that can be correctly requested in the curl command above; for example, yuanjing-70b-chat.
+  4.2 [API Key] must be the key that can be correctly requested in the curl command above; for example, sk-abc********************xyz (note: do not include the 'Bearer' prefix).
+  4.3 [Inference URL] must be the URL that can be correctly requested in the curl command above; for example, https://maas.ai-yuanjing.com/openapi/compatible-mode/v1 (note: do not include the /chat/completions suffix).
+  5. Importing an Embedding model is the same as importing an LLM as described above. Note that the inference URL should not include the /embeddings suffix.
+  6. Importing a Rerank model is the same as importing an LLM as described above. Note that the inference URL should not include the /rerank suffix.
+  ```
+---
+### &#x1F517; Acknowledgments
 - [Coze](https://github.com/coze-dev)
 - [LangChain](https://github.com/langchain-ai/langchain)
 - [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent)
+---
+### ⚖️ License
+The Yuanjing Wanwu AI Agent Platform is released under the Apache License 2.0.
 
 ------
 
-### ⚖️ 许可证
-元景万悟智能体平台根据Apache License 2.0发布。
-
-------
-
-### &#x1F4E9; 联系我们
-| QQ群 |
-| ---  |
+### &#x1F4E9; Contact Us
+| QQ Group:490071123                                           |
+| ------------------------------------------------------------ |
 | <img width="183" height="258" alt="image" src="https://github.com/user-attachments/assets/010f1d68-78e9-446d-baf1-0a7339efb48e" /> |

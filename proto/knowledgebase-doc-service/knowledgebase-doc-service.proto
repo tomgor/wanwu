@@ -89,6 +89,7 @@ message UpdateDocMetaDataReq {
   string userId = 2;
   string docId = 3; //文档id
   repeated MetaData metaDataList = 4;//文档元数据信息
+  string knowledgeId = 5;//知识库id
 }
 
 message MetaData {

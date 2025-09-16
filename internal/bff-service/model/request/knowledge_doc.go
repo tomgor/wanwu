@@ -1,5 +1,7 @@
 package request
 
+import "errors"
+
 type DocListReq struct {
 	KnowledgeId string `json:"knowledgeId" form:"knowledgeId" validate:"required"`
 	DocName     string `json:"docName" form:"docName"`
@@ -17,13 +19,12 @@ type DocImportReq struct {
 	OcrModelId    string         `json:"ocrModelId"`                      //ocr模型id
 	DocPreprocess []string       `json:"docPreprocess"`                   // 文本预处理规则 replaceSymbols / deleteLinks
 	DocMetaData   []*DocMetaData `json:"docMetaData"`                     // 元数据
-	CommonCheck
 }
 
 type DocMetaDataReq struct {
-	DocId        string         `json:"docId" validate:"required"`
+	KnowledgeId  string         `json:"knowledgeId"`
+	DocId        string         `json:"docId"`
 	MetaDataList []*DocMetaData `json:"metaDataList"` //文档元数据
-	CommonCheck
 }
 
 type DocInfo struct {
@@ -102,4 +103,37 @@ type UpdateDocSegmentReq struct {
 	ContentId string `json:"contentId"  validate:"required"`
 	Content   string `json:"content"  validate:"required"`
 	CommonCheck
+}
+
+func (c *DocImportReq) Check() error {
+	if len(c.DocMetaData) > 0 {
+		for _, meta := range c.DocMetaData {
+			if meta.MetaKey == "" {
+				return errors.New("key不能为空")
+			}
+			if meta.MetaValueType == "" {
+				return errors.New("type不能为空")
+			}
+		}
+	}
+	return nil
+}
+
+func (c *DocMetaDataReq) Check() error {
+	if len(c.KnowledgeId) == 0 && len(c.DocId) == 0 {
+		return errors.New("knowledgeId and docId can not all empty")
+	}
+	if len(c.MetaDataList) > 0 {
+		keyMap := make(map[string]bool)
+		for _, meta := range c.MetaDataList {
+			if meta.MetaKey == "" || meta.MetaValueType == "" {
+				return errors.New("key or value type can not be empty")
+			}
+			if keyMap[meta.MetaKey] {
+				return errors.New("key can not be repeated")
+			}
+			keyMap[meta.MetaKey] = true
+		}
+	}
+	return nil
 }

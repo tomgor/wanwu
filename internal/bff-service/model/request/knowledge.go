@@ -27,7 +27,7 @@ type UpdateKnowledgeReq struct {
 }
 
 type KnowledgeHitReq struct {
-	KnowledgeIdList      []string              `json:"knowledgeIdList"   validate:"required"`
+	KnowledgeList        []*AppKnowledgeBase   `json:"knowledgeList"`
 	Question             string                `json:"question"   validate:"required"`
 	KnowledgeMatchParams *KnowledgeMatchParams `json:"knowledgeMatchParams"   validate:"required"`
 	CommonCheck
@@ -51,6 +51,11 @@ type EmbeddingModel struct {
 }
 
 type DeleteKnowledge struct {
+	KnowledgeId string `json:"knowledgeId" validate:"required"`
+	CommonCheck
+}
+
+type GetKnowledgeReq struct {
 	KnowledgeId string `json:"knowledgeId" validate:"required"`
 	CommonCheck
 }
@@ -81,6 +86,11 @@ type SearchKnowledgeInfoReq struct {
 	KnowledgeName string `json:"categoryName" form:"categoryName" validate:"required"`
 	UserId        string `json:"userId" form:"userId" validate:"required"`
 	OrgId         string `json:"orgId"`
+	CommonCheck
+}
+
+type GetKnowledgeMetaSelectReq struct {
+	KnowledgeId string `json:"knowledgeId"  form:"knowledgeId" validate:"required"`
 	CommonCheck
 }
 

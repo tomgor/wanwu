@@ -2,6 +2,7 @@ package orm
 
 import (
 	"context"
+
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm/sqlopt"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/db"
@@ -9,10 +10,24 @@ import (
 	"gorm.io/gorm"
 )
 
-// SelectDocMetaList 查询知识库列表
+// SelectDocMetaList 获取文档元数据列表
 func SelectDocMetaList(ctx context.Context, userId, orgId, docId string) ([]*model.KnowledgeDocMeta, error) {
 	var docMetaList []*model.KnowledgeDocMeta
 	err := sqlopt.SQLOptions(sqlopt.WithDocID(docId), sqlopt.WithPermit(orgId, userId)).
+		Apply(db.GetHandle(ctx), &model.KnowledgeDocMeta{}).
+		Order("create_at desc").
+		Find(&docMetaList).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return docMetaList, nil
+}
+
+// SelectMetaByKnowledgeId 获取单个知识库的元数据列表
+func SelectMetaByKnowledgeId(ctx context.Context, userId, orgId string, knowledgeId string) ([]*model.KnowledgeDocMeta, error) {
+	var docMetaList []*model.KnowledgeDocMeta
+	err := sqlopt.SQLOptions(sqlopt.WithKnowledgeID(knowledgeId), sqlopt.WithPermit(orgId, userId)).
 		Apply(db.GetHandle(ctx), &model.KnowledgeDocMeta{}).
 		Order("create_at desc").
 		Find(&docMetaList).
@@ -53,8 +68,11 @@ func UpdateDocStatusDocMeta(ctx context.Context, docId string, addList []*model.
 				}
 			}
 		}
-		//调用rag
-		return service.RagDocMeta(ctx, ragDocMetaParams)
+		if ragDocMetaParams != nil {
+			//调用rag
+			return service.RagDocMeta(ctx, ragDocMetaParams)
+		}
+		return nil
 	})
 }
 

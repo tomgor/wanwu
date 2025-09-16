@@ -209,7 +209,7 @@
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
     </el-dialog>
-    <dataBaseDialog ref="dataBase" @updateData="updateData" />
+    <dataBaseDialog ref="dataBase" @updateData="updateData" :knowledgeId="obj.knowledgeId"/>
     <tagDialog ref="tagDialog" type="section" :title="title" :currentList="currentList" @sendList="sendList" />
     <createChunk ref="createChunk"  @updateDataBatch="updateDataBatch" @updateData="updateData"/>
   </div>
