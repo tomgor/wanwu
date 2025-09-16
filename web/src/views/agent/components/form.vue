@@ -610,15 +610,19 @@ export default {
       this.editForm.knowledgebases.splice(index,1)
     },
     getKnowledgeData(data){
-      this.editForm.knowledgebases = data
+      const originalIds = new Set(this.editForm.knowledgebases.map(item => item.id));
+      const newItems = data.filter(item => !originalIds.has(item.id));
+      this.editForm.knowledgebases.push(...newItems);
     },
     handleMetaClose(){
-      // this.$refs.metaSet.clearData();
       this.metaSetVisible = false;
     },
     showMetaSet(e,index){
-      this.currentKnowledgeId = e.id;
-      this.currentMetaData = e.metaDataFilterParams;
+      this.currentKnowledgeId = e.id; 
+      this.currentMetaData = {}
+      this.$nextTick(() =>{
+         this.currentMetaData = e.metaDataFilterParams;
+      })
       this.knowledgeIndex = index;
       this.metaSetVisible = true;
     },
