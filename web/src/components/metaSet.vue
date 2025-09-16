@@ -239,9 +239,16 @@ export default {
     watch:{
        currentMetaData:{
           handler: function (val){
-            if(val === null ) return
+            if(val === null ){
+                this.metaDataFilterParams = {
+                     filterEnable:false,
+                    filterLogicType:'and',
+                    metaFilterParams:[]
+                }
+                return;
+            }
+
             if(Object.keys(val).length > 0){
-                this.metaDataFilterParams.metaFilterParams = [];
                 this.metaDataFilterParams = JSON.parse(JSON.stringify(val))
             }
           },
