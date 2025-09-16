@@ -498,6 +498,7 @@ export default {
         // 更新成功后，更新 initialEditForm 避免重复触发
         if (res.code === 0) {
           this.initialEditForm = JSON.parse(JSON.stringify(this.editForm));
+          this.getDetail();//获取详情
         }
       } catch (error) {
         console.error('更新配置失败:', error);

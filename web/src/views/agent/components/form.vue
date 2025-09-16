@@ -881,6 +881,9 @@ export default {
           : {},
       };
       let res = await putAgentInfo(params);
+      if(res.code === 0){
+        this.getAppDetail();
+      }
     },
     startLoading(val) {
       this.loadingPercent = val;
