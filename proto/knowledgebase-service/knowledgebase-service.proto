@@ -23,6 +23,8 @@ service KnowledgeBaseService {
   rpc DeleteKnowledge(DeleteKnowledgeReq) returns (google.protobuf.Empty) {}
   // 知识库命中测试
   rpc KnowledgeHit(KnowledgeHitReq) returns (KnowledgeHitResp) {}
+  // 获取知识库元数据（key + type）
+  rpc GetKnowledgeMetaSelect(SelectKnowledgeMetaReq) returns (SelectKnowledgeMetaResp) {}
 }
 
 message DeleteKnowledgeReq{
@@ -43,7 +45,7 @@ message KnowledgeHitReq{
   string orgId = 1;
   string userId = 2;
   string question = 3; //问题
-  repeated string knowledgeIdList = 4;//知识库id 列表
+  repeated KnowledgeParams knowledgeList = 4;//知识库参数列表
   KnowledgeMatchParams knowledgeMatchParams = 5; //模型匹配方式
 }
 
@@ -58,6 +60,24 @@ message KnowledgeMatchParams{
   float score = 7;//score 过滤分数阈值
   float termWeight = 8; // 关键词系数
   bool termWeightEnable = 9; // 关键词系数开关
+}
+
+message KnowledgeParams{
+  string knowledgeId = 1; // 知识库id
+  MetaDataFilterParams metaDataFilterParams = 2; // 元数据过滤参数
+}
+
+message MetaDataFilterParams{
+  bool filterEnable = 1; // 元数据过滤开关
+  string filterLogicType = 2; // 元数据过滤逻辑类型
+  repeated MetaFilterParams metaFilterParams = 3; // 元数据过滤参数
+}
+
+message MetaFilterParams{
+  string key = 1; // 元数据key
+  string type = 2; // 元数据类型
+  string value = 3; // 元数据值
+  string condition = 4; // 元数据过滤条件
 }
 
 message CreateKnowledgeReq{
@@ -121,6 +141,11 @@ message KnowledgeTagInfo {
   string tagName = 2; //知识库标签名称
 }
 
+message KnowledgeMetaData{
+  string key = 1;// key
+  string type = 2; // type(time, string, number)
+}
+
 message KnowledgeHitResp{
   string prompt = 1;
   repeated double score = 2;
@@ -131,4 +156,14 @@ message KnowledgeSearchInfo{
   string title = 1;
   string snippet = 2;
   string knowledgeName = 3;
+}
+
+message SelectKnowledgeMetaReq{
+  string userId = 1;
+  string orgId = 2;
+  string knowledgeId = 3;
+}
+
+message SelectKnowledgeMetaResp{
+  repeated KnowledgeMetaData metaList = 1;
 }

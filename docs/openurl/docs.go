@@ -538,8 +538,10 @@ const docTemplate = `{
                     "description": "知识库id",
                     "type": "string"
                 },
+                "metaDataFilterParams": {
+                    "$ref": "#/definitions/request.MetaDataFilterParams"
+                },
                 "name": {
-                    "description": "知识库名称(请求非必填)",
                     "type": "string"
                 }
             }
@@ -676,6 +678,47 @@ const docTemplate = `{
             ],
             "properties": {
                 "conversationId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.MetaDataFilterParams": {
+            "type": "object",
+            "properties": {
+                "filterEnable": {
+                    "description": "元数据过滤开关",
+                    "type": "boolean"
+                },
+                "filterLogicType": {
+                    "description": "元数据逻辑条件：and/or",
+                    "type": "string"
+                },
+                "metaFilterParams": {
+                    "description": "元数据过滤参数列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.MetaFilterParams"
+                    }
+                }
+            }
+        },
+        "request.MetaFilterParams": {
+            "type": "object",
+            "properties": {
+                "condition": {
+                    "description": "条件",
+                    "type": "string"
+                },
+                "key": {
+                    "description": "Key",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "类型（Time, String, Number）",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "value",
                     "type": "string"
                 }
             }

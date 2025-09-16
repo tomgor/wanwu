@@ -96,8 +96,9 @@ definitions:
       id:
         description: 知识库id
         type: string
+      metaDataFilterParams:
+        $ref: '#/definitions/request.MetaDataFilterParams'
       name:
-        description: 知识库名称(请求非必填)
         type: string
     required:
     - id
@@ -193,6 +194,35 @@ definitions:
         type: string
     required:
     - conversationId
+    type: object
+  request.MetaDataFilterParams:
+    properties:
+      filterEnable:
+        description: 元数据过滤开关
+        type: boolean
+      filterLogicType:
+        description: 元数据逻辑条件：and/or
+        type: string
+      metaFilterParams:
+        description: 元数据过滤参数列表
+        items:
+          $ref: '#/definitions/request.MetaFilterParams'
+        type: array
+    type: object
+  request.MetaFilterParams:
+    properties:
+      condition:
+        description: 条件
+        type: string
+      key:
+        description: Key
+        type: string
+      type:
+        description: 类型（Time, String, Number）
+        type: string
+      value:
+        description: value
+        type: string
     type: object
   request.OnlineSearchConfig:
     properties:

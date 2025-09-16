@@ -14,18 +14,33 @@ type AssistantConversionHistory struct {
 }
 
 type KnParams struct {
-	KnowledgeBase  []string      `json:"knowledgeBase"`
-	RerankId       interface{}   `json:"rerank_id"`
-	Model          interface{}   `json:"model"`
-	ModelUrl       interface{}   `json:"model_url"`
-	RerankMod      string        `json:"rerank_mod"`
-	RetrieveMethod string        `json:"retrieve_method"`
-	Weights        *WeightParams `json:"weights,omitempty"`
-	MaxHistory     int32         `json:"max_history"`
-	Threshold      float32       `json:"threshold"`
-	TopK           int32         `json:"topK"`
-	RewriteQuery   bool          `json:"rewrite_query"`
-	TermWeight     float32       `json:"term_weight_coefficient"` // 关键词系数, 默认为1
+	KnowledgeBase        []string               `json:"knowledgeBase"`
+	RerankId             interface{}            `json:"rerank_id"`
+	Model                interface{}            `json:"model"`
+	ModelUrl             interface{}            `json:"model_url"`
+	RerankMod            string                 `json:"rerank_mod"`
+	RetrieveMethod       string                 `json:"retrieve_method"`
+	Weights              *WeightParams          `json:"weights,omitempty"`
+	MaxHistory           int32                  `json:"max_history"`
+	Threshold            float32                `json:"threshold"`
+	TopK                 int32                  `json:"topK"`
+	RewriteQuery         bool                   `json:"rewrite_query"`
+	TermWeight           float32                `json:"term_weight_coefficient"`       // 关键词系数, 默认为1
+	MetaFilter           bool                   `json:"metadata_filtering"`            // 元数据过滤开关
+	MetaFilterConditions []*MetadataFilterParam `json:"metadata_filtering_conditions"` // 元数据过滤条件
+}
+
+type MetadataFilterParam struct {
+	FilterKnowledgeName string                `json:"filtering_kb_name"`
+	LogicalOperator     string                `json:"logical_operator"`
+	MetaList            []*MetadataFilterItem `json:"conditions"` // 元数据过滤列表
+}
+
+type MetadataFilterItem struct {
+	MetaName           string      `json:"meta_name"`           // 元数据名称
+	MetaType           string      `json:"meta_type"`           // 元数据类型
+	ComparisonOperator string      `json:"comparison_operator"` // 比较运算符
+	Value              interface{} `json:"value,omitempty"`     // 用于过滤的条件值
 }
 
 type WeightParams struct {

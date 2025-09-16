@@ -410,17 +410,59 @@ func transKnowledgebases2Proto(kbConfig request.AppKnowledgebaseConfig) *assista
 		}
 	}
 	return &assistant_service.AssistantKnowledgeBaseConfig{
-		KnowledgeBaseIds:  knowIds,
-		MaxHistory:        kbConfig.Config.MaxHistory,
-		Threshold:         kbConfig.Config.Threshold,
-		TopK:              kbConfig.Config.TopK,
-		MatchType:         kbConfig.Config.MatchType,
-		KeywordPriority:   kbConfig.Config.KeywordPriority,
-		PriorityMatch:     kbConfig.Config.PriorityMatch,
-		SemanticsPriority: kbConfig.Config.SemanticsPriority,
+		KnowledgeBaseIds:     knowIds,
+		MaxHistory:           kbConfig.Config.MaxHistory,
+		Threshold:            kbConfig.Config.Threshold,
+		TopK:                 kbConfig.Config.TopK,
+		MatchType:            kbConfig.Config.MatchType,
+		KeywordPriority:      kbConfig.Config.KeywordPriority,
+		PriorityMatch:        kbConfig.Config.PriorityMatch,
+		SemanticsPriority:    kbConfig.Config.SemanticsPriority,
+		AppKnowledgeBaseList: transKnowledgeParams(kbConfig.Knowledgebases),
 	}
 }
 
+func transKnowledgeParams(paramsList []request.AppKnowledgeBase) []*assistant_service.AppKnowledgeBase {
+	if len(paramsList) == 0 {
+		return nil
+	}
+	var retList []*assistant_service.AppKnowledgeBase
+	for _, base := range paramsList {
+		retList = append(retList, &assistant_service.AppKnowledgeBase{
+			KnowledgeBaseId:      base.ID,
+			KnowledgeBaseName:    base.Name,
+			MetaDataFilterParams: transKnowledgeMetaParams(base.MetaDataFilterParams),
+		})
+	}
+	return retList
+}
+
+func transKnowledgeMetaParams(baseInfo *request.MetaDataFilterParams) *assistant_service.MetaDataFilterParams {
+	if baseInfo == nil {
+		return nil
+	}
+	return &assistant_service.MetaDataFilterParams{
+		FilterEnable:     baseInfo.FilterEnable,
+		FilterLogicType:  baseInfo.FilterLogicType,
+		MetaFilterParams: transMetaFilterParams(baseInfo.MetaFilterParams),
+	}
+}
+
+func transMetaFilterParams(metaFilterList []*request.MetaFilterParams) []*assistant_service.MetaFilterParams {
+	if metaFilterList == nil {
+		return nil
+	}
+	var metaList []*assistant_service.MetaFilterParams
+	for _, m := range metaFilterList {
+		metaList = append(metaList, &assistant_service.MetaFilterParams{
+			Condition: m.Condition,
+			Key:       m.Key,
+			Type:      m.Type,
+			Value:     m.Value,
+		})
+	}
+	return metaList
+}
 func transSafetyConfig2Proto(tables []request.SensitiveTable) []*assistant_service.SensitiveTable {
 	if tables == nil {
 		return nil
@@ -593,13 +635,8 @@ func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.Ass
 		return request.AppKnowledgebaseConfig{}, err
 	}
 
-	var knowledgeBases []request.AppKnowledgeBase
-	for _, kbInfo := range kbInfoList.List {
-		knowledgeBases = append(knowledgeBases, request.AppKnowledgeBase{
-			ID:   kbInfo.KnowledgeId,
-			Name: kbInfo.Name,
-		})
-	}
+	knowledgeBases := buildKnowledgeBases(kbInfoList, kbConfig.AppKnowledgeBaseList)
+
 	return request.AppKnowledgebaseConfig{
 		Knowledgebases: knowledgeBases,
 		Config: request.AppKnowledgebaseParams{
@@ -613,4 +650,52 @@ func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.Ass
 		},
 	}, nil
 
+}
+
+func buildKnowledgeBases(kbInfoList *knowledgeBase_service.KnowledgeDetailSelectListResp, kbConfigList []*assistant_service.AppKnowledgeBase) []request.AppKnowledgeBase {
+	if len(kbInfoList.List) == 0 {
+		return nil
+	}
+	var knowledgeMap = make(map[string]*knowledgeBase_service.KnowledgeInfo)
+	for _, kbInfo := range kbInfoList.List {
+		knowledgeMap[kbInfo.KnowledgeId] = kbInfo
+	}
+	var knowledgeBases []request.AppKnowledgeBase
+	for _, kbConfig := range kbConfigList {
+		params := buildAssistantMetaDataFilterParams(kbConfig)
+		knowledgeBases = append(knowledgeBases, request.AppKnowledgeBase{
+			ID:                   kbConfig.KnowledgeBaseId,
+			Name:                 knowledgeMap[kbConfig.KnowledgeBaseId].Name,
+			MetaDataFilterParams: params,
+		})
+	}
+	return knowledgeBases
+}
+
+func buildAssistantMetaDataFilterParams(kbConfig *assistant_service.AppKnowledgeBase) *request.MetaDataFilterParams {
+	params := kbConfig.MetaDataFilterParams
+	if params == nil {
+		return nil
+	}
+	return &request.MetaDataFilterParams{
+		FilterEnable:     params.FilterEnable,
+		FilterLogicType:  params.FilterLogicType,
+		MetaFilterParams: buildAssistantMetaFilterParams(params.MetaFilterParams),
+	}
+}
+
+func buildAssistantMetaFilterParams(metaFilterList []*assistant_service.MetaFilterParams) []*request.MetaFilterParams {
+	if metaFilterList == nil {
+		return nil
+	}
+	var metaList []*request.MetaFilterParams
+	for _, m := range metaFilterList {
+		metaList = append(metaList, &request.MetaFilterParams{
+			Condition: m.Condition,
+			Key:       m.Key,
+			Type:      m.Type,
+			Value:     m.Value,
+		})
+	}
+	return metaList
 }

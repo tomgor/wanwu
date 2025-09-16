@@ -81,16 +81,38 @@ message RagDetailReq {
 }
 
 message RagKnowledgeBaseConfig {
-  repeated string knowledgeBaseIds = 1;                     // 知识库id列表
-  int32 maxHistory = 2;                           // 最长上下文
-  float threshold = 3;                            // 过滤阈值
-  int32 topK = 4;                                 // topK
-  string matchType = 5; //matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
-  float keywordPriority = 6;// 关键词权重
-  int32 priorityMatch = 7;// 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
-  float semanticsPriority = 8;// 语义权重
-  float termWeight = 9; // 关键词系数，默认为1
-  bool termWeightEnable = 10; // 关键词系数开关
+  repeated RagPerKnowledgeConfig perKnowledgeConfigs = 1;
+  RagGlobalConfig globalConfig = 2;
+}
+
+message RagPerKnowledgeConfig{
+  string knowledgeId = 1;
+  RagMetaFilter ragMetaFilter = 2;
+}
+
+message RagMetaFilter{
+  bool filterEnable = 1;
+  string filterLogicType = 2;
+  repeated RagMetaFilterItem filterItems = 3;
+}
+
+message RagMetaFilterItem{
+  string key = 1;
+  string type = 2;
+  string value = 3;
+  string condition = 4;
+}
+
+message RagGlobalConfig{
+  int32 maxHistory = 1;                           // 最长上下文
+  float threshold = 2;                            // 过滤阈值
+  int32 topK = 3;                                 // topK
+  string matchType = 4; //matchType：vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+  float keywordPriority = 5;// 关键词权重
+  int32 priorityMatch = 6;// 权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
+  float semanticsPriority = 7;// 语义权重
+  float termWeight = 8; // 关键词系数，默认为1
+  bool termWeightEnable = 9; // 关键词系数开关
 }
 
 message RagSensitiveConfig{

@@ -45,7 +45,7 @@ service AssistantService {
   rpc AssistantConversionStream(AssistantConversionStreamReq) returns (stream AssistantConversionStreamResp) {}
   rpc ConversationDeleteByAssistantId(ConversationDeleteByAssistantIdReq) returns (google.protobuf.Empty) {}
 }
-  
+
 message AssistantConversionStreamResp {
   string content = 1;
 }
@@ -118,6 +118,27 @@ message AssistantKnowledgeBaseConfig {
   float semanticsPriority = 8;// 语义权重
   float termWeight = 9; // 关键词系数
   bool termWeightEnable = 10; // 关键词系数开关
+  repeated AppKnowledgeBase appKnowledgeBaseList = 11;
+
+}
+
+message AppKnowledgeBase {
+  string knowledgeBaseId = 1;
+  string knowledgeBaseName = 2;
+  MetaDataFilterParams metaDataFilterParams = 3;
+}
+
+message MetaDataFilterParams {
+  bool filterEnable = 1; // 元数据过滤开关
+  string filterLogicType = 2;// 元数据逻辑条件：and/or
+  repeated MetaFilterParams metaFilterParams = 3;// 元数据过滤参数列表
+}
+
+message MetaFilterParams {
+  string key = 1;
+  string type = 2;
+  string value = 3;
+  string condition = 4;
 }
 
 message AssistantOnlineSearchConfig {

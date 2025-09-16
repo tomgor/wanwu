@@ -111,3 +111,24 @@ func KnowledgeHit(ctx *gin.Context) {
 	resp, err := service.KnowledgeHit(ctx, userId, orgId, &req)
 	gin_util.Response(ctx, resp, err)
 }
+
+// GetKnowledgeMetaSelect
+//
+//	@Tags			knowledge
+//	@Summary		获取知识库元数据
+//	@Description	获取知识库元数据
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.GetKnowledgeMetaSelectReq	true	"获取知识库元数据请求参数"
+//	@Success		200		{object}	response.Response{data=response.GetKnowledgeMetaSelectResp}
+//	@Router			/knowledge/meta/select [get]
+func GetKnowledgeMetaSelect(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.GetKnowledgeMetaSelectReq
+	if !gin_util.BindQuery(ctx, &req) {
+		return
+	}
+	resp, err := service.GetKnowledgeMetaSelect(ctx, userId, orgId, &req)
+	gin_util.Response(ctx, resp, err)
+}
