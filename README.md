@@ -26,8 +26,11 @@
 ------
 ### &#x1F525; Adopt a permissive and friendly Apache 2.0 License, supporting developers to freely expand and develop secondary
 ✔ **Enterprise-level engineering**: Provides a complete toolchain from model management to application landing, solving the "last mile" problem of LLM technology landing
+
 ✔ **Open-source ecological**: Adopt a permissive and friendly **Apache 2.0 License**, supporting developers to freely expand and develop
+
 ✔ **Full-stack technology support**: Equipped with a professional team to provide **architecture consulting, performance optimization** and full-cycle empowerment for ecological partners
+
 ✔ **Multi-tenant architecture**: Provides a multi-tenant account system to meet the core needs of users in cost control, data security isolation, business elasticity expansion, industry customization, rapid online and ecological collaboration
 
 ✔ **XinChuang adaptation**: Already adapted to domestic XinChuang databases TiDB and OceanBase
@@ -37,24 +40,38 @@
 ### 🚩 Core Function Modules
 **1. Model Management (Model Hub**)
 ▸ Supports the unified access and lifecycle management of **hundreds of proprietary/open-source large models** (including GPT, Claude, Llama, etc.)
+
 ▸ Deeply adapts to **OpenAI API standards** and **Unicom Yuanjing** ecological models, realizing seamless switching of heterogeneous models
+
 ▸ Provides **multi-inference backend support** (vLLM, TGI, etc.) and **self-hosted solutions** to meet the computing power needs of enterprises of different scales
+
 #### **2. MCP**
 ▸ **Standardized interfaces**: Enable AI models to seamlessly connect to various external tools (such as GitHub, Slack, databases, etc.) without the need to develop adapters for each data source separately
+
 ▸ **Built-in rich and selected recommendations**: Integrates 100+ industry MCP interfaces, making it easy for users to call up quickly and easily
+
 #### **3. Web Search**
 ▸ **Real-time information acquisition**: Possesses powerful web search capabilities, capable of obtaining the latest information from the Internet in real-time. In question and answer scenarios, when a user's question requires the latest news, data, and other information, the platform can quickly search and return accurate results, enhancing the timeliness and accuracy of the answers
+
 ▸ **Multi-source data integration**: Integrates various Internet data sources, including news websites, academic databases, industry reports, etc. Through the integration and analysis of multi-source data, it provides users with more comprehensive and in-depth information. For example, in market research scenarios, relevant data can be obtained from multiple data sources at the same time for comprehensive analysis and evaluation
+
 ▸ **Intelligent search strategy**: Adopt intelligent search algorithms, automatically optimize search strategies based on user questions to improve search efficiency and accuracy. Support keyword search, semantic search and other search methods to meet the needs of different users. At the same time, intelligently sort and filter search results, prioritize the display of the most relevant and valuable information
+
 #### **4. Visual Workflow (Workflow Studio**)
 ▸ Quickly build complex AI business processes through **low-code drag-and-drop canvas**
+
 ▸ Built-in **conditional branching, API, large model, knowledge base, code, MCP** and other nodes, support end-to-end process debugging and performance analysis
+
 #### **5. Enterprise-level Knowledge Base, RAG Pipeline**
 ▸ Provides the whole process knowledge management capabilities of **knowledge base creation → document parsing → vectorization → retrieval → fine sorting**, supports **multiple formats** such as pdf/docx/txt/xlsx/csv/pptx documents, and also supports the capture and access of web resources
+
 ▸ Integrates **multi-modal retrieval**, **cascading segmentation** and **adaptive segmentation**, significantly improves the accuracy of Q&A
+
 #### **6. AI Agent Development Framework (Agent Framework**)
 ▸ Can be based on the **function call (Function Calling**) agent construction paradigm, supports tool expansion, private knowledge base association and multi-round dialogue
+
 ▸ Support **online debugging**
+
 #### **7. Backend as a Service (BaaS**)
 ▸ Provides **RESTful API**, supports deep integration with existing enterprise systems (OA/CRM/ERP, etc.)
 
@@ -90,7 +107,7 @@ The platform has been successfully applied in multiple industries such as **fina
 - **Docker Installation (Recommended**)
 1. Before the first run
     1.1 Copy the environment variable file
-    
+
     ```bash
     cp .env.bak .env
     ```
@@ -106,6 +123,7 @@ The platform has been successfully applied in multiple industries such as **fina
     ```
     docker network create wanwu-net
     ```
+
 2. Start the service (the image will be automatically pulled from Docker Hub during the first run)
     ```bash
     # For amd64 system:
@@ -113,22 +131,22 @@ The platform has been successfully applied in multiple industries such as **fina
     # For arm64 system:
     docker compose --env-file .env --env-file .env.image.arm64 up -d
     ```
-    
+
 3. Log in to the system: http://localhost:8081
 
-```
-Default user: admin
-Default password: Wanwu123456
-```
+    ```
+    Default user: admin
+    Default password: Wanwu123456
+    ```
 
 4. Stop the service
 
-```bash
-# For amd64 system:
-docker compose --env-file .env --env-file .env.image.amd64 down
-# For arm64 system:
-docker compose --env-file .env --env-file .env.image.arm64 down
-```
+    ```bash
+    # For amd64 system:
+    docker compose --env-file .env --env-file .env.image.amd64 down
+    # For arm64 system:
+    docker compose --env-file .env --env-file .env.image.arm64 down
+    ```
 
 - **Source Code Start (Development**)
 1. Based on the above Docker installation steps, start the system service completely
