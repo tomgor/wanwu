@@ -254,10 +254,20 @@ export default {
           },
           immediate:true,
           deep:true
+       },
+       knowledgeId:{
+        handler(val,old){
+            if(val){
+                if(val !== old){
+                    this.getList()
+                }
+            }
+        },
+        immediate:true,
        }
     },
     created(){
-        this.getList()
+        // this.getList()
     },
     methods:{
         conditionChange(e,item){
