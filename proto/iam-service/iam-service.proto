@@ -401,4 +401,5 @@ message RegisterByEmailReq{
 
 message RegisterSendEmailCodeReq {
   string email = 1;
+  string userName = 2;
 }

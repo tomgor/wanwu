@@ -16,7 +16,7 @@ func (s *Service) RegisterByEmail(ctx context.Context, req *iam_service.Register
 }
 
 func (s *Service) RegisterSendEmailCode(ctx context.Context, req *iam_service.RegisterSendEmailCodeReq) (*emptypb.Empty, error) {
-	if err := s.cli.RegisterSendEmailCode(ctx, req.Email); err != nil {
+	if err := s.cli.RegisterSendEmailCode(ctx, req.UserName, req.Email); err != nil {
 		return nil, errStatus(errs.Code_IAMRegister, err)
 	}
 	return &emptypb.Empty{}, nil

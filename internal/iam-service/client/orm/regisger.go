@@ -22,10 +22,21 @@ const (
 	redisUserRegisterByEmailExpire = 5 * time.Minute
 )
 
-func (c *Client) RegisterSendEmailCode(ctx context.Context, email string) *errs.Status {
+func (c *Client) RegisterSendEmailCode(ctx context.Context, username, email string) *errs.Status {
 	if email == "" {
 		return toErrStatus("iam_register_by_email_send_code", "email empty")
 	}
+	if username == "" {
+		return toErrStatus("iam_register_by_email_send_code", "username empty")
+	}
+	// check user
+	if err := sqlopt.WithName(username).Apply(c.db).WithContext(ctx).First(&model.User{}).Error; err != gorm.ErrRecordNotFound {
+		if err == nil {
+			return toErrStatus("iam_user_create_name") // 用户名已存在
+		}
+		return toErrStatus("iam_register_by_email_send_code", err.Error())
+	}
+
 	// check email
 	if err := sqlopt.WithEmail(email).Apply(c.db).WithContext(ctx).First(&model.User{}).Error; err != gorm.ErrRecordNotFound {
 		if err == nil {
@@ -111,11 +122,12 @@ func (c *Client) RegisterByEmail(ctx context.Context, username, email, code stri
 			return err
 		}
 		// create org
+		code := iam_util.RandText(config.Cfg().Register.Email.CodeLength)
 		if err := createOrgTx(tx, &model.Org{
 			Status:    true,
 			CreatorID: user.ID,
 			ParentID:  config.TopOrgID(),
-			Name:      fmt.Sprintf("%v-Space", username),
+			Name:      fmt.Sprintf("%v-Space-%v", username, code),
 		}); err != nil {
 			return err
 		}

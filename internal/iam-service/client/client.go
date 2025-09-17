@@ -78,6 +78,6 @@ type IClient interface {
 
 	// --- register ---
 
-	RegisterSendEmailCode(ctx context.Context, email string) *errs.Status
+	RegisterSendEmailCode(ctx context.Context, username, email string) *errs.Status
 	RegisterByEmail(ctx context.Context, username, email, code string) *errs.Status
 }
