@@ -109,6 +109,6 @@ func ResgisterSendEmailCode(ctx *gin.Context) {
 	if !gin_util.Bind(ctx, &req) {
 		return
 	}
-	err := service.RegisterSendEmailCode(ctx, req.Email)
+	err := service.RegisterSendEmailCode(ctx, req.Username, req.Email)
 	gin_util.Response(ctx, nil, err)
 }

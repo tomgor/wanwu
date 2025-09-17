@@ -178,12 +178,13 @@ func RegisterByEmail(ctx *gin.Context, register *request.RegisterByEmail) error 
 	return err
 }
 
-func RegisterSendEmailCode(ctx *gin.Context, email string) error {
+func RegisterSendEmailCode(ctx *gin.Context, username, email string) error {
 	if config.Cfg().CustomInfo.RegisterByEmail == 0 {
 		return grpc_util.ErrorStatus(errs.Code_BFFRegisterDisable)
 	}
 	_, err := iam.RegisterSendEmailCode(ctx.Request.Context(), &iam_service.RegisterSendEmailCodeReq{
-		Email: email,
+		Email:    email,
+		UserName: username,
 	})
 	return err
 }

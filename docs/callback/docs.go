@@ -383,6 +383,20 @@ const docTemplate = `{
                 }
             }
         },
+        "mp.ProviderModelByInfini": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_infini.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_infini.LLM"
+                },
+                "rerank": {
+                    "$ref": "#/definitions/mp_infini.Rerank"
+                }
+            }
+        },
         "mp.ProviderModelByOllama": {
             "type": "object",
             "properties": {
@@ -444,6 +458,9 @@ const docTemplate = `{
             "properties": {
                 "providerHuoshan": {
                     "$ref": "#/definitions/mp.ProviderModelByHuoshan"
+                },
+                "providerModelByInfini": {
+                    "$ref": "#/definitions/mp.ProviderModelByInfini"
                 },
                 "providerOllama": {
                     "$ref": "#/definitions/mp.ProviderModelByOllama"
@@ -1234,6 +1251,54 @@ const docTemplate = `{
                         "toolCall",
                         "functionCall"
                     ]
+                }
+            }
+        },
+        "mp_infini.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_infini.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
+                }
+            }
+        },
+        "mp_infini.Rerank": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
                 }
             }
         },

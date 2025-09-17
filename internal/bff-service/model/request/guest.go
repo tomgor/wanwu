@@ -15,7 +15,8 @@ type RegisterByEmail struct {
 }
 
 type RegisterSendEmailCode struct {
-	Email string `json:"email" validate:"required"` // 邮箱
+	Username string `json:"username" validate:"required"` // 用户名
+	Email    string `json:"email" validate:"required"`    // 邮箱
 }
 
 func (l *Login) Check() error {

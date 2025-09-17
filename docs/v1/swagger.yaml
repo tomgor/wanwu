@@ -71,6 +71,15 @@ definitions:
       llm:
         $ref: '#/definitions/mp_huoshan.LLM'
     type: object
+  mp.ProviderModelByInfini:
+    properties:
+      embedding:
+        $ref: '#/definitions/mp_infini.Embedding'
+      llm:
+        $ref: '#/definitions/mp_infini.LLM'
+      rerank:
+        $ref: '#/definitions/mp_infini.Rerank'
+    type: object
   mp.ProviderModelByOllama:
     properties:
       embedding:
@@ -111,6 +120,8 @@ definitions:
     properties:
       providerHuoshan:
         $ref: '#/definitions/mp.ProviderModelByHuoshan'
+      providerModelByInfini:
+        $ref: '#/definitions/mp.ProviderModelByInfini'
       providerOllama:
         $ref: '#/definitions/mp.ProviderModelByOllama'
       providerOpenAICompatible:
@@ -143,6 +154,40 @@ definitions:
         - noSupport
         - toolCall
         - functionCall
+        type: string
+    type: object
+  mp_infini.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_infini.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        - functionCall
+        type: string
+    type: object
+  mp_infini.Rerank:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
         type: string
     type: object
   mp_ollama.Embedding:
@@ -1439,8 +1484,8 @@ definitions:
     properties:
       knowledgeId:
         type: string
-      knowledgeName:
-        type: string
+    required:
+    - knowledgeId
     type: object
   request.GetKnowledgeSplitterReq:
     properties:
@@ -1832,6 +1877,9 @@ definitions:
     properties:
       email:
         description: 邮箱
+        type: string
+      username:
+        description: 用户名
         type: string
     required:
     - email
@@ -2937,11 +2985,6 @@ definitions:
       knowledgeId:
         description: 知识库id
         type: string
-      knowledgeMetaDataList:
-        description: 知识库元数据列表（key和type）
-        items:
-          $ref: '#/definitions/response.KnowledgeMetaData'
-        type: array
       knowledgeTagList:
         description: 知识库标签列表
         items:
@@ -2957,15 +3000,6 @@ definitions:
         items:
           $ref: '#/definitions/response.KnowledgeInfo'
         type: array
-    type: object
-  response.KnowledgeMetaData:
-    properties:
-      key:
-        description: key
-        type: string
-      type:
-        description: type(time, string, number)
-        type: string
     type: object
   response.KnowledgeMetaItem:
     properties:
