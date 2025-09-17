@@ -11,11 +11,20 @@
     >
       <el-form :model="{...createForm}" :rules="rules" ref="createForm" label-width="110px" class="createForm form">
         <el-form-item :label="$t('modelAccess.table.modelType')" prop="modelType">
-          <el-radio-group :disabled="isEdit" v-model="createForm.modelType">
-            <el-radio v-for="item in modelType" :label="item.key" :key="item.key">
-              {{item.name}}
-            </el-radio>
-          </el-radio-group>
+          <el-select
+            v-model="createForm.modelType"
+            :placeholder="$t('common.select.placeholder')"
+            :disabled="isEdit"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in modelType"
+              :key="item.key"
+              :label="item.name"
+              :value="item.key"
+            >
+            </el-option>
+          </el-select>
           <div v-if="createForm.modelType === embedding && provider.key === yuanjing" class="embedding-tip">
             {{$t('modelAccess.table.embeddingTip')}}
           </div>
@@ -74,7 +83,7 @@
         <el-form-item :label="$t('modelAccess.table.inferUrl')" prop="endpointUrl">
           <el-input
             v-model="createForm.endpointUrl"
-            :placeholder="$t('common.hint.inferUrl') + typeObj.inferUrl[provider.key]"
+            :placeholder="$t('common.hint.inferUrl') + (typeObj.inferUrl[createForm.modelType] || typeObj.inferUrl[provider.key])"
           >
           </el-input>
         </el-form-item>
