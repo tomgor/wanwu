@@ -47,6 +47,7 @@
               >
                 {{ isCooldown ? `${cooldownTime}s` : $t('register.action') + $t('register.form.code') }}
               </el-button>
+              <p class="message" v-if="codeSentMessage">{{ codeSentMessage }}</p>
             </el-form-item>
           </el-form>
           <div class="register-bt">
@@ -94,6 +95,7 @@ export default {
       isCooldown: false,
       cooldownTime: 60,
       cooldownTimer: '',
+      codeSentMessage: '',
       loginButtonColor: '',
       basePath: this.$basePath
     }
@@ -133,6 +135,7 @@ export default {
     requestEmailCode(data) {
       this.$refs.form.validateField(['email'], err => {
         if (err) return
+        this.codeSentMessage = this.$t('common.hint.codeSent')
         this.isCooldown = true
         this.cooldownTimer = setInterval(() => {
           if (this.cooldownTime > 1) {
@@ -149,6 +152,7 @@ export default {
   },
   beforeDestroy() {
     clearInterval(this.cooldownTimer)
+    this.codeSentMessage = ''
   }
 }
 </script>
@@ -276,6 +280,18 @@ export default {
         top: 13.5px;
         right: 17px;
         cursor: pointer;
+      }
+      .message{
+        position: absolute;
+        bottom: -45px;
+        left: 0;
+        color: red;
+        font-size: 12px;
+        width: 100%;
+        text-align: left;
+        margin: 0;
+        padding: 0;
+        z-index: 10;
       }
       .register-bt{
         width: 100%;
