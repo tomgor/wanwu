@@ -909,7 +909,10 @@ export default {
         let data = res.data;
         this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config.matchType === '' ? this.editForm.knowledgeConfig : res.data.knowledgeBaseConfig.config;
         this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
-        this.editForm.knowledgebases = res.data.knowledgeBaseConfig.knowledgebases;
+        const knowledgeData = res.data.knowledgeBaseConfig.knowledgebases;
+        if(knowledgeData && knowledgeData.length > 0){
+          this.editForm.knowledgebases = knowledgeData;
+        }
         this.editForm = {
           ...this.editForm,
           avatar: data.avatar || {},

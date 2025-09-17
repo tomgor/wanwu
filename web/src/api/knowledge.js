@@ -400,3 +400,9 @@ export const metaSelect = (params)=>{
         params
     })
 };
+export const parserSelect = ()=>{
+    return service({
+        url: `${BASE_URL}/model/select/pdf-parser`,
+        method: 'get'
+    })
+};
