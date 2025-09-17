@@ -635,7 +635,7 @@ func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.Ass
 		return request.AppKnowledgebaseConfig{}, err
 	}
 
-	knowledgeBases := buildKnowledgeBases(kbInfoList, kbConfig.AppKnowledgeBaseList)
+	knowledgeBases := buildKnowledgeBases(kbInfoList, kbConfig.KnowledgeBaseIds, kbConfig.AppKnowledgeBaseList)
 
 	return request.AppKnowledgebaseConfig{
 		Knowledgebases: knowledgeBases,
@@ -652,7 +652,7 @@ func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.Ass
 
 }
 
-func buildKnowledgeBases(kbInfoList *knowledgeBase_service.KnowledgeDetailSelectListResp, kbConfigList []*assistant_service.AppKnowledgeBase) []request.AppKnowledgeBase {
+func buildKnowledgeBases(kbInfoList *knowledgeBase_service.KnowledgeDetailSelectListResp, kbIdList []string, kbConfigList []*assistant_service.AppKnowledgeBase) []request.AppKnowledgeBase {
 	if len(kbInfoList.List) == 0 {
 		return nil
 	}
@@ -661,14 +661,24 @@ func buildKnowledgeBases(kbInfoList *knowledgeBase_service.KnowledgeDetailSelect
 		knowledgeMap[kbInfo.KnowledgeId] = kbInfo
 	}
 	var knowledgeBases []request.AppKnowledgeBase
-	for _, kbConfig := range kbConfigList {
-		params := buildAssistantMetaDataFilterParams(kbConfig)
-		knowledgeBases = append(knowledgeBases, request.AppKnowledgeBase{
-			ID:                   kbConfig.KnowledgeBaseId,
-			Name:                 knowledgeMap[kbConfig.KnowledgeBaseId].Name,
-			MetaDataFilterParams: params,
-		})
+	if len(kbConfigList) > 0 {
+		for _, kbConfig := range kbConfigList {
+			params := buildAssistantMetaDataFilterParams(kbConfig)
+			knowledgeBases = append(knowledgeBases, request.AppKnowledgeBase{
+				ID:                   kbConfig.KnowledgeBaseId,
+				Name:                 knowledgeMap[kbConfig.KnowledgeBaseId].Name,
+				MetaDataFilterParams: params,
+			})
+		}
+	} else {
+		for _, kbId := range kbIdList {
+			knowledgeBases = append(knowledgeBases, request.AppKnowledgeBase{
+				ID:   kbId,
+				Name: knowledgeMap[kbId].Name,
+			})
+		}
 	}
+
 	return knowledgeBases
 }
 
