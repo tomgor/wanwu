@@ -71,6 +71,18 @@
             class="demo-ruleForm"
             @submit.native.prevent
           >
+            <el-form-item label="分段设置:">
+              <el-radio-group v-model="ruleForm.docSegment.segmentType">
+                <div>
+                    <el-radio label="0">通用分段</el-radio>
+                    <h3>检索和召回的分段内容相同</h3>
+                </div>
+                <div>
+                    <el-radio label="1">父子分段</el-radio>
+                    <h3>父分段用作上下文，子分段用于检索</h3>
+                </div>
+              </el-radio-group>
+            </el-form-item>
             <el-form-item :label="$t('knowledgeManage.chunkTypeSet')+'：'">
               <el-radio-group v-model="ruleForm.docSegment.segmentType">
                 <el-radio label="0">自动分段</el-radio>
@@ -152,19 +164,38 @@
               prop="docAnalyzer"
             >
             <el-checkbox-group v-model="ruleForm.docAnalyzer">
-                <el-checkbox label="text" disabled>文本提取</el-checkbox>
-                <el-checkbox label="ocr">启用ocr解析</el-checkbox>
+                <div v-for="analyzerItem in docAnalyzerList" :class="['docAnalyzerList',ruleForm.docAnalyzer.includes(analyzerItem.label) ? 'activeAnalyzer' : '']" >
+                  <el-checkbox :label="analyzerItem.label" :disabled="analyzerDisabled(analyzerItem.label,ruleForm.docAnalyzer)">{{analyzerItem.text}}</el-checkbox>
+                  <h3 class="analyzerItem_desc">{{analyzerItem.desc}}</h3>
+                </div>
             </el-checkbox-group>
             </el-form-item>
             <el-form-item
-              label="OCR模型："
-              prop="ocrModelId"
+              label="pdf_parser模型:"
+              prop="parserModelId"
+              v-if="ruleForm.docAnalyzer.includes('model')"
+              :rules="[
+                  { required: true, message:'请选择pdf_parser模型',trigger:'blur'}
+              ]"
+            >
+            <el-select v-model="ruleForm.parserModelId" placeholder="请选择" >
+               <el-option
+                v-for="item in parserOptions"
+                :key="item.modelId"
+                :label="item.displayName"
+                :value="item.modelId">
+              </el-option>
+            </el-select>
+            </el-form-item>
+            <el-form-item
+              label="OCR模型:"
+              prop="parserModelId"
               v-if="ruleForm.docAnalyzer.includes('ocr')"
               :rules="[
                   { required: true, message:'请选择ocr模型',trigger:'blur'}
               ]"
             >
-            <el-select v-model="ruleForm.ocrModelId" placeholder="请选择" >
+            <el-select v-model="ruleForm.parserModelId" placeholder="请选择" >
                <el-option
                 v-for="item in ocrOptions"
                 :key="item.modelId"
@@ -259,6 +290,7 @@ export default {
       splitterValue:'',
       tableData:[],
       ocrOptions:[],
+      parserOptions:[],
       urlValidate: false,
       active: 1,
       fileType:'file',
@@ -274,17 +306,35 @@ export default {
         docSegment:{
           segmentType:'0',
           splitter:["！","。","？","?","!",".","......"],
-          maxSplitter:200,
+          maxSplitter:1024,
           overlap:0.2,
         },
         docInfoList:[],
         docImportType:0,
         knowledgeId:this.$route.query.id,
-        ocrModelId:''
+        // ocrModelId:'',
+        parserModelId:'',
       },
       checkSplitter:[],
       splitOptions: [],
-      urlLoading:false
+      urlLoading:false,
+      docAnalyzerList:[
+        {
+          label:'text',
+          text:'文本提取',
+          desc:'提取文档文本信息时开启'
+        },
+        {
+          label:'ocr',
+          text:'启用ocr解析',
+          desc:'解析图片、扫描件文档时开启，仅适用于PDF文件'
+        },
+        {
+          label:'model',
+          text:'模型解析',
+          desc:'提取标题、图表、公式时开启，仅适用于PDF文件'
+        }
+      ]
     };
   },
   async  created(){
@@ -293,6 +343,15 @@ export default {
     await this.custom()
   },
   methods:{
+  analyzerDisabled(label,data){
+     if(label === 'text') return true;
+     const conflictMap = {
+        ocr: 'model',
+        model: 'ocr'
+      };
+      const conflictKeyword = conflictMap[label];
+      return conflictKeyword ? data.includes(conflictKeyword) : false;
+      },
   overlapChange(val){
     if (val > 0.25) {
       this.ruleForm.docSegment.overlap = 0.25;
@@ -726,6 +785,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 .red{color:red;}
+.activeAnalyzer{
+  border-color: #384BF7 !important;
+}
 .splitterTag{
   margin-right:10px;
   border:none;
@@ -875,47 +937,25 @@ export default {
   border-radius:6px;
   .el-form{
     padding:10px;
-    // .docMetaData{
-    //   .docItem{
-    //     display:flex;
-    //     align-items:center;
-    //     border-radius:8px;
-    //     background:#f7f8fa;
-    //     margin-top:10px;
-    //     width: fit-content;
-    //     .docItem_data{
-    //       display:flex;
-    //       align-items:center;
-    //       margin-bottom:5px;
-    //       padding:0 10px;
-    //       .el-input,.el-select,.el-date-picker{
-    //         min-width:160px;
-    //       }
-    //       .docItem_data_label{
-    //         margin-right:5px;
-    //         display:flex;
-    //         align-items:center;
-    //         .question{
-    //           color: #aaadcc;
-    //           margin-left:2px;
-    //           cursor: pointer;
-    //         }
-    //       }
-    //       .setBtn{
-    //         font-size:16px;
-    //         cursor: pointer;
-    //         color: #384BF7;
-    //       }
-    //     }
-    //     .docItem_data_btn{
-    //       display:flex;
-    //       justify-content:center;
-    //       .el-icon-delete{
-    //         margin-left:5px;
-    //       }
-    //     }
-    //   }
-    // }
+    .el-checkbox-group{
+      display: flex;
+      justify-content: flex-start;
+      gap:15px;
+      .docAnalyzerList{
+        width: fit-content;
+        border:1px solid #ddd;
+        padding:0 10px 10px 10px;
+        border-radius:4px;
+        cursor:pointer;
+        .analyzerItem_desc{
+          display:block;
+          color:#999;
+          font-size:12px;
+          font-weight: unset;
+          line-height: 1;
+        }
+      }
+    }
   }
 }
 .page-title{
