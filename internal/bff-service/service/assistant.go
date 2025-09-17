@@ -620,11 +620,15 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.AssistantKnowledgeBaseConfig) (request.AppKnowledgebaseConfig, error) {
 	if kbConfig == nil {
 		log.Debugf("知识库配置为空")
-		return request.AppKnowledgebaseConfig{}, nil
+		return request.AppKnowledgebaseConfig{
+			Knowledgebases: make([]request.AppKnowledgeBase, 0),
+		}, nil
 	}
 	if len(kbConfig.KnowledgeBaseIds) == 0 {
 		log.Debugf("知识库配置为空")
-		return request.AppKnowledgebaseConfig{}, nil
+		return request.AppKnowledgebaseConfig{
+			Knowledgebases: make([]request.AppKnowledgeBase, 0),
+		}, nil
 	}
 
 	// 获取知识库详情列表
@@ -632,7 +636,9 @@ func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.Ass
 		KnowledgeIds: kbConfig.KnowledgeBaseIds,
 	})
 	if err != nil {
-		return request.AppKnowledgebaseConfig{}, err
+		return request.AppKnowledgebaseConfig{
+			Knowledgebases: make([]request.AppKnowledgeBase, 0),
+		}, err
 	}
 
 	knowledgeBases := buildKnowledgeBases(kbInfoList, kbConfig.KnowledgeBaseIds, kbConfig.AppKnowledgeBaseList)
@@ -654,13 +660,13 @@ func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.Ass
 
 func buildKnowledgeBases(kbInfoList *knowledgeBase_service.KnowledgeDetailSelectListResp, kbIdList []string, kbConfigList []*assistant_service.AppKnowledgeBase) []request.AppKnowledgeBase {
 	if len(kbInfoList.List) == 0 {
-		return nil
+		return make([]request.AppKnowledgeBase, 0)
 	}
 	var knowledgeMap = make(map[string]*knowledgeBase_service.KnowledgeInfo)
 	for _, kbInfo := range kbInfoList.List {
 		knowledgeMap[kbInfo.KnowledgeId] = kbInfo
 	}
-	var knowledgeBases []request.AppKnowledgeBase
+	var knowledgeBases = make([]request.AppKnowledgeBase, 0)
 	if len(kbConfigList) > 0 {
 		for _, kbConfig := range kbConfigList {
 			params := buildAssistantMetaDataFilterParams(kbConfig)
