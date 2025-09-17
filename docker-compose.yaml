@@ -641,6 +641,10 @@ services:
       MINIO_ADDRESS: ${WANWU_MINIO_ENDPOINT}
       MINIO_ACCESS_KEY: ${WANWU_MINIO_USER}
       MINIO_SECRET_KEY: ${WANWU_MINIO_PASSWORD}
+      # 用于agent调用外部接口的API前缀
+      URL_MODEL: http://bff-service
+      URL_MINIO: http://bff-service
+      URL_RAG: http://rag-wanwu
     working_dir: /agent/agent_open_source
     command: bash -c "./start_all.sh && tail -f /dev/null"
 
