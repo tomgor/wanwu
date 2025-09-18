@@ -271,9 +271,10 @@ services:
       MINIO_USER: ${WANWU_MINIO_USER}
       MINIO_PASSWORD: ${WANWU_MINIO_PASSWORD}
       # --- 以下env用于workflow-wanwu适配 ---
-      WANWU_EXTERNAL_IP: ${WANWU_EXTERNAL_IP}
-      WANWU_EXTERNAL_PORT: ${WANWU_EXTERNAL_PORT}
+      WANWU_EXTERNAL_ENDPOINT: ${WANWU_EXTERNAL_ENDPOINT}
+      WANWU_EXTERNAL_SCHEME: ${WANWU_EXTERNAL_SCHEME}
       WANWU_CALLBACK_LLM_BASE_URL: http://bff-service:6668/callback/v1/model
+      WANWU_CALLBACK_WORKFLOW_LIST_URL: http://bff-service:6668/callback/v1/workflow/list
       WANWU_KNOWLEDGE_SEARCH_URL: http://rag-wanwu:8681/rag/search-knowledge-base
       WANWU_FILE_GENERATOR_URL: http://agent-wanwu:15002/upload
       WANWU_FILE_PARSER_URL: http://agent-wanwu:15003/doc_pra

@@ -7,6 +7,7 @@ import (
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
+	"github.com/UnicomAI/wanwu/pkg/constant"
 	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
@@ -212,5 +213,25 @@ func SelectKnowledgeInfoByName(ctx *gin.Context) {
 		return
 	}
 	resp, err := service.SelectKnowledgeInfoByName(ctx, req.UserId, req.OrgId, &req)
+	gin_util.Response(ctx, resp, err)
+}
+
+// GetWorkflowList
+//
+//	@Tags			callback
+//	@Summary		根据userId和spaceId获取Workflow
+//	@Description	根据userId和spaceId获取Workflow
+//	@Accept			json
+//	@Produce		json
+//	@Param			userId	query		string	true	"获取工作流参数userId"
+//	@Param			orgId	query		string	true	"获取工作流参数orgId"
+//	@Success		200		{object}	response.Response
+//	@Router			/workflow/list [get]
+func GetWorkflowList(ctx *gin.Context) {
+	var req request.GetWorkflowListReq
+	if !gin_util.BindQuery(ctx, &req) {
+		return
+	}
+	resp, err := service.GetAppList(ctx, req.UserId, req.OrgId, constant.AppTypeWorkflow)
 	gin_util.Response(ctx, resp, err)
 }

@@ -173,3 +173,18 @@ func UnPublishApp(ctx *gin.Context, userId, orgId string, req request.UnPublishA
 	// }
 	return nil
 }
+
+func GetAppList(ctx *gin.Context, userId, orgId, appType string) (*response.ListResult, error) {
+	resp, err := app.GetAppList(ctx.Request.Context(), &app_service.GetAppListReq{
+		OrgId:   orgId,
+		AppType: appType,
+		UserId:  userId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &response.ListResult{
+		List:  resp.Infos,
+		Total: int64(len(resp.Infos)),
+	}, nil
+}
