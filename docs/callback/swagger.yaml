@@ -45,10 +45,14 @@ definitions:
     properties:
       embedding:
         $ref: '#/definitions/mp_yuanjing.Embedding'
+      gui:
+        $ref: '#/definitions/mp_yuanjing.Gui'
       llm:
         $ref: '#/definitions/mp_yuanjing.LLM'
       ocr:
         $ref: '#/definitions/mp_yuanjing.Ocr'
+      pdf-parser:
+        $ref: '#/definitions/mp_yuanjing.PdfParser'
       rerank:
         $ref: '#/definitions/mp_yuanjing.Rerank'
     type: object
@@ -119,6 +123,12 @@ definitions:
     required:
     - data
     - model
+    type: object
+  mp_common.ExtraBody:
+    properties:
+      api_option:
+        description: 选择指定功能。 1）math：拍照答题；2）ocr：多模态OCR；3）general：通用场景。   默认会根据prompt进行意图判断
+        type: string
     type: object
   mp_common.FunctionCall:
     properties:
@@ -205,6 +215,10 @@ definitions:
         type: boolean
       enable_thinking:
         type: boolean
+      extra_body:
+        allOf:
+        - $ref: '#/definitions/mp_common.ExtraBody'
+        description: 扩展参数
       frequency_penalty:
         description: 频率惩罚系数
         type: number
@@ -223,7 +237,7 @@ definitions:
         type: integer
       messages:
         items:
-          $ref: '#/definitions/mp_common.OpenAIMsg'
+          $ref: '#/definitions/mp_common.OpenAIReqMsg'
         type: array
       min_p:
         type: number
@@ -239,10 +253,12 @@ definitions:
         description: 控制模型生成文本时的内容重复度
         type: number
       repetition_penalty:
+        description: 模型生成时连续序列中的重复度
         type: number
       response_format:
         $ref: '#/definitions/mp_common.OpenAIResponseFormat'
       seed:
+        description: 种子
         type: integer
       stop:
         type: string
@@ -291,11 +307,16 @@ definitions:
         items:
           $ref: '#/definitions/mp_common.OpenAIRespChoice'
         type: array
+      code:
+        type: integer
       created:
         description: 时间戳（秒）
         type: integer
       id:
         description: 唯一标识
+        type: string
+      img_id:
+        description: 视觉模型返回图片id
         type: string
       model:
         description: 使用的模型
@@ -343,7 +364,6 @@ definitions:
         type: string
     required:
     - page_num
-    - text
     - type
     type: object
   mp_common.OcrResp:
@@ -420,6 +440,26 @@ definitions:
           $ref: '#/definitions/mp_common.ToolCall'
         type: array
     type: object
+  mp_common.OpenAIReqMsg:
+    properties:
+      content: {}
+      function_call:
+        $ref: '#/definitions/mp_common.FunctionCall'
+      name:
+        type: string
+      reasoning_content:
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/mp_common.MsgRole'
+        description: '"system" | "user" | "assistant" | "function(已弃用)"'
+      tool_call_id:
+        type: string
+      tool_calls:
+        items:
+          $ref: '#/definitions/mp_common.ToolCall'
+        type: array
+    type: object
   mp_common.OpenAIRespChoice:
     properties:
       delta:
@@ -465,6 +505,23 @@ definitions:
     required:
     - function
     - type
+    type: object
+  mp_common.PdfParserResp:
+    properties:
+      code:
+        type: string
+      content:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+      trace_id:
+        type: string
+    required:
+    - code
+    - content
+    - message
     type: object
   mp_common.RerankReq:
     properties:
@@ -724,6 +781,15 @@ definitions:
         description: 推理url
         type: string
     type: object
+  mp_yuanjing.Gui:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
   mp_yuanjing.LLM:
     properties:
       apiKey:
@@ -739,8 +805,23 @@ definitions:
         - toolCall
         - functionCall
         type: string
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
+        type: string
     type: object
   mp_yuanjing.Ocr:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_yuanjing.PdfParser:
     properties:
       apiKey:
         description: ApiKey
@@ -1070,6 +1151,36 @@ paths:
       summary: Model Ocr
       tags:
       - callback
+  /model/{modelId}/pdf-parser:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 模型ID
+        in: path
+        name: modelId
+        required: true
+        type: string
+      - description: 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: 文件名
+        in: formData
+        name: file_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mp_common.PdfParserResp'
+      summary: Model PdfParser
+      tags:
+      - callback
   /model/{modelId}/rerank:
     post:
       consumes:
@@ -1107,9 +1218,9 @@ paths:
         name: userId
         required: true
         type: string
-      - description: 获取工作流参数spaceId
+      - description: 获取工作流参数orgId
         in: query
-        name: spaceId
+        name: orgId
         required: true
         type: string
       produces:

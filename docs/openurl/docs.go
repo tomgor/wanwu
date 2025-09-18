@@ -394,6 +394,15 @@ const docTemplate = `{
         "mp.AppModelParams": {
             "type": "object",
             "properties": {
+                "providerHuoshan": {
+                    "$ref": "#/definitions/mp.AppModelParamsHuoshan"
+                },
+                "providerModelByInfini": {
+                    "$ref": "#/definitions/mp.AppModelParamsInfini"
+                },
+                "providerOllama": {
+                    "$ref": "#/definitions/mp.AppModelParamsOllama"
+                },
                 "providerOpenAICompatible": {
                     "description": "OpenAI-API-compatible模型配置",
                     "allOf": [
@@ -402,11 +411,53 @@ const docTemplate = `{
                         }
                     ]
                 },
+                "providerQwen": {
+                    "$ref": "#/definitions/mp.AppModelParamsQwen"
+                },
                 "providerYuanjing": {
                     "description": "YuanJing模型配置",
                     "allOf": [
                         {
                             "$ref": "#/definitions/mp.AppModelParamsYuanjing"
+                        }
+                    ]
+                }
+            }
+        },
+        "mp.AppModelParamsHuoshan": {
+            "type": "object",
+            "properties": {
+                "llm": {
+                    "description": "大语言模型配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_huoshan.LLMParams"
+                        }
+                    ]
+                }
+            }
+        },
+        "mp.AppModelParamsInfini": {
+            "type": "object",
+            "properties": {
+                "llm": {
+                    "description": "大语言模型配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_infini.LLMParams"
+                        }
+                    ]
+                }
+            }
+        },
+        "mp.AppModelParamsOllama": {
+            "type": "object",
+            "properties": {
+                "llm": {
+                    "description": "大语言模型配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_ollama.LLMParams"
                         }
                     ]
                 }
@@ -425,6 +476,19 @@ const docTemplate = `{
                 }
             }
         },
+        "mp.AppModelParamsQwen": {
+            "type": "object",
+            "properties": {
+                "llm": {
+                    "description": "大语言模型配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_qwen.LLMParams"
+                        }
+                    ]
+                }
+            }
+        },
         "mp.AppModelParamsYuanjing": {
             "type": "object",
             "properties": {
@@ -438,7 +502,187 @@ const docTemplate = `{
                 }
             }
         },
+        "mp_huoshan.LLMParams": {
+            "type": "object",
+            "properties": {
+                "frequencyPenalty": {
+                    "description": "频率惩罚",
+                    "type": "number"
+                },
+                "frequencyPenaltyEnable": {
+                    "description": "频率惩罚(开关)",
+                    "type": "boolean"
+                },
+                "maxTokens": {
+                    "description": "最大标记",
+                    "type": "integer"
+                },
+                "maxTokensEnable": {
+                    "description": "最大标记(开关)",
+                    "type": "boolean"
+                },
+                "presencePenalty": {
+                    "description": "存在惩罚",
+                    "type": "number"
+                },
+                "presencePenaltyEnable": {
+                    "description": "存在惩罚(开关)",
+                    "type": "boolean"
+                },
+                "temperature": {
+                    "description": "温度",
+                    "type": "number"
+                },
+                "temperatureEnable": {
+                    "description": "温度(开关)",
+                    "type": "boolean"
+                },
+                "topP": {
+                    "description": "Top P",
+                    "type": "number"
+                },
+                "topPEnable": {
+                    "description": "Top P(开关)",
+                    "type": "boolean"
+                }
+            }
+        },
+        "mp_infini.LLMParams": {
+            "type": "object",
+            "properties": {
+                "frequencyPenalty": {
+                    "description": "频率惩罚",
+                    "type": "number"
+                },
+                "frequencyPenaltyEnable": {
+                    "description": "频率惩罚(开关)",
+                    "type": "boolean"
+                },
+                "maxTokens": {
+                    "description": "最大标记",
+                    "type": "integer"
+                },
+                "maxTokensEnable": {
+                    "description": "最大标记(开关)",
+                    "type": "boolean"
+                },
+                "presencePenalty": {
+                    "description": "存在惩罚",
+                    "type": "number"
+                },
+                "presencePenaltyEnable": {
+                    "description": "存在惩罚(开关)",
+                    "type": "boolean"
+                },
+                "temperature": {
+                    "description": "温度",
+                    "type": "number"
+                },
+                "temperatureEnable": {
+                    "description": "温度(开关)",
+                    "type": "boolean"
+                },
+                "topP": {
+                    "description": "Top P",
+                    "type": "number"
+                },
+                "topPEnable": {
+                    "description": "Top P(开关)",
+                    "type": "boolean"
+                }
+            }
+        },
+        "mp_ollama.LLMParams": {
+            "type": "object",
+            "properties": {
+                "frequencyPenalty": {
+                    "description": "频率惩罚",
+                    "type": "number"
+                },
+                "frequencyPenaltyEnable": {
+                    "description": "频率惩罚(开关)",
+                    "type": "boolean"
+                },
+                "maxTokens": {
+                    "description": "最大标记",
+                    "type": "integer"
+                },
+                "maxTokensEnable": {
+                    "description": "最大标记(开关)",
+                    "type": "boolean"
+                },
+                "presencePenalty": {
+                    "description": "存在惩罚",
+                    "type": "number"
+                },
+                "presencePenaltyEnable": {
+                    "description": "存在惩罚(开关)",
+                    "type": "boolean"
+                },
+                "temperature": {
+                    "description": "温度",
+                    "type": "number"
+                },
+                "temperatureEnable": {
+                    "description": "温度(开关)",
+                    "type": "boolean"
+                },
+                "topP": {
+                    "description": "Top P",
+                    "type": "number"
+                },
+                "topPEnable": {
+                    "description": "Top P(开关)",
+                    "type": "boolean"
+                }
+            }
+        },
         "mp_openai_compatible.LLMParams": {
+            "type": "object",
+            "properties": {
+                "frequencyPenalty": {
+                    "description": "频率惩罚",
+                    "type": "number"
+                },
+                "frequencyPenaltyEnable": {
+                    "description": "频率惩罚(开关)",
+                    "type": "boolean"
+                },
+                "maxTokens": {
+                    "description": "最大标记",
+                    "type": "integer"
+                },
+                "maxTokensEnable": {
+                    "description": "最大标记(开关)",
+                    "type": "boolean"
+                },
+                "presencePenalty": {
+                    "description": "存在惩罚",
+                    "type": "number"
+                },
+                "presencePenaltyEnable": {
+                    "description": "存在惩罚(开关)",
+                    "type": "boolean"
+                },
+                "temperature": {
+                    "description": "温度",
+                    "type": "number"
+                },
+                "temperatureEnable": {
+                    "description": "温度(开关)",
+                    "type": "boolean"
+                },
+                "topP": {
+                    "description": "Top P",
+                    "type": "number"
+                },
+                "topPEnable": {
+                    "description": "Top P(开关)",
+                    "type": "boolean"
+                }
+            }
+        },
+        "mp_qwen.LLMParams": {
             "type": "object",
             "properties": {
                 "frequencyPenalty": {

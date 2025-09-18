@@ -16,6 +16,7 @@ func Register(openAPI *gin.RouterGroup) {
 	mid.Sub("callback").Reg(openAPI, "/model/:modelId/rerank", http.MethodPost, callback.ModelRerank, "Model rerank")
 	mid.Sub("callback").Reg(openAPI, "/model/:modelId/ocr", http.MethodPost, callback.ModelOcr, "Model ocr")
 	mid.Sub("callback").Reg(openAPI, "/model/:modelId/gui", http.MethodPost, callback.ModelGui, "Model gui")
+	mid.Sub("callback").Reg(openAPI, "/model/:modelId/pdf-parser", http.MethodPost, callback.ModelPdfParser, "Model pdf文档解析")
 	// workflow
 	mid.Sub("callback").Reg(openAPI, "/workflow/list", http.MethodGet, callback.GetWorkflowList, "根据userId和spaceId获取Workflow")
 }

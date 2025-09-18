@@ -41,20 +41,56 @@ definitions:
     type: object
   mp.AppModelParams:
     properties:
+      providerHuoshan:
+        $ref: '#/definitions/mp.AppModelParamsHuoshan'
+      providerModelByInfini:
+        $ref: '#/definitions/mp.AppModelParamsInfini'
+      providerOllama:
+        $ref: '#/definitions/mp.AppModelParamsOllama'
       providerOpenAICompatible:
         allOf:
         - $ref: '#/definitions/mp.AppModelParamsOpenAICompatible'
         description: OpenAI-API-compatible模型配置
+      providerQwen:
+        $ref: '#/definitions/mp.AppModelParamsQwen'
       providerYuanjing:
         allOf:
         - $ref: '#/definitions/mp.AppModelParamsYuanjing'
         description: YuanJing模型配置
+    type: object
+  mp.AppModelParamsHuoshan:
+    properties:
+      llm:
+        allOf:
+        - $ref: '#/definitions/mp_huoshan.LLMParams'
+        description: 大语言模型配置
+    type: object
+  mp.AppModelParamsInfini:
+    properties:
+      llm:
+        allOf:
+        - $ref: '#/definitions/mp_infini.LLMParams'
+        description: 大语言模型配置
+    type: object
+  mp.AppModelParamsOllama:
+    properties:
+      llm:
+        allOf:
+        - $ref: '#/definitions/mp_ollama.LLMParams'
+        description: 大语言模型配置
     type: object
   mp.AppModelParamsOpenAICompatible:
     properties:
       llm:
         allOf:
         - $ref: '#/definitions/mp_openai_compatible.LLMParams'
+        description: 大语言模型配置
+    type: object
+  mp.AppModelParamsQwen:
+    properties:
+      llm:
+        allOf:
+        - $ref: '#/definitions/mp_qwen.LLMParams'
         description: 大语言模型配置
     type: object
   mp.AppModelParamsYuanjing:
@@ -109,10 +145,14 @@ definitions:
     properties:
       embedding:
         $ref: '#/definitions/mp_yuanjing.Embedding'
+      gui:
+        $ref: '#/definitions/mp_yuanjing.Gui'
       llm:
         $ref: '#/definitions/mp_yuanjing.LLM'
       ocr:
         $ref: '#/definitions/mp_yuanjing.Ocr'
+      pdf-parser:
+        $ref: '#/definitions/mp_yuanjing.PdfParser'
       rerank:
         $ref: '#/definitions/mp_yuanjing.Rerank'
     type: object
@@ -156,6 +196,39 @@ definitions:
         - functionCall
         type: string
     type: object
+  mp_huoshan.LLMParams:
+    properties:
+      frequencyPenalty:
+        description: 频率惩罚
+        type: number
+      frequencyPenaltyEnable:
+        description: 频率惩罚(开关)
+        type: boolean
+      maxTokens:
+        description: 最大标记
+        type: integer
+      maxTokensEnable:
+        description: 最大标记(开关)
+        type: boolean
+      presencePenalty:
+        description: 存在惩罚
+        type: number
+      presencePenaltyEnable:
+        description: 存在惩罚(开关)
+        type: boolean
+      temperature:
+        description: 温度
+        type: number
+      temperatureEnable:
+        description: 温度(开关)
+        type: boolean
+      topP:
+        description: Top P
+        type: number
+      topPEnable:
+        description: Top P(开关)
+        type: boolean
+    type: object
   mp_infini.Embedding:
     properties:
       apiKey:
@@ -180,6 +253,39 @@ definitions:
         - toolCall
         - functionCall
         type: string
+    type: object
+  mp_infini.LLMParams:
+    properties:
+      frequencyPenalty:
+        description: 频率惩罚
+        type: number
+      frequencyPenaltyEnable:
+        description: 频率惩罚(开关)
+        type: boolean
+      maxTokens:
+        description: 最大标记
+        type: integer
+      maxTokensEnable:
+        description: 最大标记(开关)
+        type: boolean
+      presencePenalty:
+        description: 存在惩罚
+        type: number
+      presencePenaltyEnable:
+        description: 存在惩罚(开关)
+        type: boolean
+      temperature:
+        description: 温度
+        type: number
+      temperatureEnable:
+        description: 温度(开关)
+        type: boolean
+      topP:
+        description: Top P
+        type: number
+      topPEnable:
+        description: Top P(开关)
+        type: boolean
     type: object
   mp_infini.Rerank:
     properties:
@@ -214,6 +320,39 @@ definitions:
         - toolCall
         - functionCall
         type: string
+    type: object
+  mp_ollama.LLMParams:
+    properties:
+      frequencyPenalty:
+        description: 频率惩罚
+        type: number
+      frequencyPenaltyEnable:
+        description: 频率惩罚(开关)
+        type: boolean
+      maxTokens:
+        description: 最大标记
+        type: integer
+      maxTokensEnable:
+        description: 最大标记(开关)
+        type: boolean
+      presencePenalty:
+        description: 存在惩罚
+        type: number
+      presencePenaltyEnable:
+        description: 存在惩罚(开关)
+        type: boolean
+      temperature:
+        description: 温度
+        type: number
+      temperatureEnable:
+        description: 温度(开关)
+        type: boolean
+      topP:
+        description: Top P
+        type: number
+      topPEnable:
+        description: Top P(开关)
+        type: boolean
     type: object
   mp_openai_compatible.Embedding:
     properties:
@@ -307,6 +446,39 @@ definitions:
         - functionCall
         type: string
     type: object
+  mp_qwen.LLMParams:
+    properties:
+      frequencyPenalty:
+        description: 频率惩罚
+        type: number
+      frequencyPenaltyEnable:
+        description: 频率惩罚(开关)
+        type: boolean
+      maxTokens:
+        description: 最大标记
+        type: integer
+      maxTokensEnable:
+        description: 最大标记(开关)
+        type: boolean
+      presencePenalty:
+        description: 存在惩罚
+        type: number
+      presencePenaltyEnable:
+        description: 存在惩罚(开关)
+        type: boolean
+      temperature:
+        description: 温度
+        type: number
+      temperatureEnable:
+        description: 温度(开关)
+        type: boolean
+      topP:
+        description: Top P
+        type: number
+      topPEnable:
+        description: Top P(开关)
+        type: boolean
+    type: object
   mp_qwen.Rerank:
     properties:
       apiKey:
@@ -317,6 +489,15 @@ definitions:
         type: string
     type: object
   mp_yuanjing.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_yuanjing.Gui:
     properties:
       apiKey:
         description: ApiKey
@@ -339,6 +520,12 @@ definitions:
         - noSupport
         - toolCall
         - functionCall
+        type: string
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
         type: string
     type: object
   mp_yuanjing.LLMParams:
@@ -375,6 +562,15 @@ definitions:
         type: boolean
     type: object
   mp_yuanjing.Ocr:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_yuanjing.PdfParser:
     properties:
       apiKey:
         description: ApiKey
@@ -1896,6 +2092,7 @@ definitions:
         type: string
     required:
     - email
+    - username
     type: object
   request.RoleCreate:
     properties:
@@ -6985,6 +7182,32 @@ paths:
       security:
       - JWT: []
       summary: ocr模型列表
+      tags:
+      - model
+  /model/select/pdf-parser:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        $ref: '#/definitions/response.ModelBrief'
+                    type: object
+              type: object
+      security:
+      - JWT: []
+      summary: pdf文档解析模型列表
       tags:
       - model
   /model/select/rerank:

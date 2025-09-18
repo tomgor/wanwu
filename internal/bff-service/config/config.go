@@ -51,8 +51,9 @@ type ServerConfig struct {
 }
 
 type ModelConfig struct {
-	Host        string `json:"host" mapstructure:"host"`
-	OcrFilePath string `json:"ocr_test_file_path" mapstructure:"ocr_test_file_path"`
+	Host            string `json:"host" mapstructure:"host"`
+	PngTestFilePath string `json:"png_test_file_path" mapstructure:"png_test_file_path"`
+	PdfTestFilePath string `json:"pdf_test_file_path" mapstructure:"pdf_test_file_path"`
 }
 
 type LogConfig struct {

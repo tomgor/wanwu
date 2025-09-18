@@ -157,7 +157,8 @@ app:
 
 model:
   host: model-service:8989
-  ocr_test_file_path: "configs/microservice/bff-service/static/model/ocr.png"
+  png_test_file_path: "configs/microservice/bff-service/static/model/test.png"
+  pdf_test_file_path: "configs/microservice/bff-service/static/model/test.pdf"
 
 mcp:
   host: mcp-service:9898

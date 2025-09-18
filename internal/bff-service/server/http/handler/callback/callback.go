@@ -132,6 +132,25 @@ func ModelOcr(ctx *gin.Context) {
 	service.ModelOcr(ctx, ctx.Param("modelId"), &data)
 }
 
+// ModelPdfParser
+//
+//	@Tags		callback
+//	@Summary	Model PdfParser
+//	@Accept		multipart/form-data
+//	@Produce	json
+//	@Param		modelId		path		string	true	"模型ID"
+//	@Param		file		formData	file	true	"文件"
+//	@Param		file_name	formData	string	true	"文件名"
+//	@Success	200			{object}	mp_common.PdfParserResp{}
+//	@Router		/model/{modelId}/pdf-parser [post]
+func ModelPdfParser(ctx *gin.Context) {
+	var data mp_common.PdfParserReq
+	if !gin_util.BindForm(ctx, &data) {
+		return
+	}
+	service.ModelPdfParser(ctx, ctx.Param("modelId"), &data)
+}
+
 // ModelGui
 //
 //	@Tags		callback

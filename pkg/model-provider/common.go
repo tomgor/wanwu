@@ -7,6 +7,7 @@ const (
 	ModelTypeRerank    = "rerank"
 	ModelTypeOcr       = "ocr"
 	ModelTypeGui       = "gui"
+	ModelTypePdfParser = "pdf-parser"
 )
 
 // model provider
