@@ -7,3 +7,12 @@ type WorkflowIDReq struct {
 func (r *WorkflowIDReq) Check() error {
 	return nil
 }
+
+type GetWorkflowListReq struct {
+	UserId string `form:"userId" json:"userId" validate:"required" `
+	OrgId  string `form:"orgId" json:"orgId" validate:"required" `
+}
+
+func (g *GetWorkflowListReq) Check() error {
+	return nil
+}

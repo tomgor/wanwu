@@ -7,6 +7,15 @@ definitions:
       llm:
         $ref: '#/definitions/mp_huoshan.LLM'
     type: object
+  mp.ProviderModelByInfini:
+    properties:
+      embedding:
+        $ref: '#/definitions/mp_infini.Embedding'
+      llm:
+        $ref: '#/definitions/mp_infini.LLM'
+      rerank:
+        $ref: '#/definitions/mp_infini.Rerank'
+    type: object
   mp.ProviderModelByOllama:
     properties:
       embedding:
@@ -47,6 +56,8 @@ definitions:
     properties:
       providerHuoshan:
         $ref: '#/definitions/mp.ProviderModelByHuoshan'
+      providerModelByInfini:
+        $ref: '#/definitions/mp.ProviderModelByInfini'
       providerOllama:
         $ref: '#/definitions/mp.ProviderModelByOllama'
       providerOpenAICompatible:
@@ -577,6 +588,40 @@ definitions:
         - functionCall
         type: string
     type: object
+  mp_infini.Embedding:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
+  mp_infini.LLM:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+      functionCalling:
+        description: 函数调用是否支持
+        enum:
+        - noSupport
+        - toolCall
+        - functionCall
+        type: string
+    type: object
+  mp_infini.Rerank:
+    properties:
+      apiKey:
+        description: ApiKey
+        type: string
+      endpointUrl:
+        description: 推理url
+        type: string
+    type: object
   mp_ollama.Embedding:
     properties:
       apiKey:
@@ -1049,6 +1094,32 @@ paths:
           schema:
             $ref: '#/definitions/mp_common.RerankResp'
       summary: Model Rerank
+      tags:
+      - callback
+  /workflow/list:
+    get:
+      consumes:
+      - application/json
+      description: 根据userId和spaceId获取Workflow
+      parameters:
+      - description: 获取工作流参数userId
+        in: query
+        name: userId
+        required: true
+        type: string
+      - description: 获取工作流参数spaceId
+        in: query
+        name: spaceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 根据userId和spaceId获取Workflow
       tags:
       - callback
 swagger: "2.0"

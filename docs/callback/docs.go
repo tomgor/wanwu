@@ -369,6 +369,45 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/workflow/list": {
+            "get": {
+                "description": "根据userId和spaceId获取Workflow",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callback"
+                ],
+                "summary": "根据userId和spaceId获取Workflow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "获取工作流参数userId",
+                        "name": "userId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "获取工作流参数spaceId",
+                        "name": "spaceId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -380,6 +419,20 @@ const docTemplate = `{
                 },
                 "llm": {
                     "$ref": "#/definitions/mp_huoshan.LLM"
+                }
+            }
+        },
+        "mp.ProviderModelByInfini": {
+            "type": "object",
+            "properties": {
+                "embedding": {
+                    "$ref": "#/definitions/mp_infini.Embedding"
+                },
+                "llm": {
+                    "$ref": "#/definitions/mp_infini.LLM"
+                },
+                "rerank": {
+                    "$ref": "#/definitions/mp_infini.Rerank"
                 }
             }
         },
@@ -444,6 +497,9 @@ const docTemplate = `{
             "properties": {
                 "providerHuoshan": {
                     "$ref": "#/definitions/mp.ProviderModelByHuoshan"
+                },
+                "providerModelByInfini": {
+                    "$ref": "#/definitions/mp.ProviderModelByInfini"
                 },
                 "providerOllama": {
                     "$ref": "#/definitions/mp.ProviderModelByOllama"
@@ -1234,6 +1290,54 @@ const docTemplate = `{
                         "toolCall",
                         "functionCall"
                     ]
+                }
+            }
+        },
+        "mp_infini.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_infini.LLM": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                },
+                "functionCalling": {
+                    "description": "函数调用是否支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "toolCall",
+                        "functionCall"
+                    ]
+                }
+            }
+        },
+        "mp_infini.Rerank": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
                 }
             }
         },
