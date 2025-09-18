@@ -669,18 +669,26 @@ func buildKnowledgeBases(kbInfoList *knowledgeBase_service.KnowledgeDetailSelect
 	var knowledgeBases = make([]request.AppKnowledgeBase, 0)
 	if len(kbConfigList) > 0 {
 		for _, kbConfig := range kbConfigList {
+			info := knowledgeMap[kbConfig.KnowledgeBaseId]
+			if info == nil {
+				continue
+			}
 			params := buildAssistantMetaDataFilterParams(kbConfig)
 			knowledgeBases = append(knowledgeBases, request.AppKnowledgeBase{
 				ID:                   kbConfig.KnowledgeBaseId,
-				Name:                 knowledgeMap[kbConfig.KnowledgeBaseId].Name,
+				Name:                 info.Name,
 				MetaDataFilterParams: params,
 			})
 		}
 	} else {
 		for _, kbId := range kbIdList {
+			info := knowledgeMap[kbId]
+			if info == nil {
+				continue
+			}
 			knowledgeBases = append(knowledgeBases, request.AppKnowledgeBase{
 				ID:   kbId,
-				Name: knowledgeMap[kbId].Name,
+				Name: info.Name,
 			})
 		}
 	}
