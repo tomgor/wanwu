@@ -11,7 +11,9 @@
       <div
         v-for="(item,index) in docMetaData"
         class="docItem"
+        :key="item.metaKey + index"
       >
+      <template v-if="item.option !== 'delete'">
         <div class="docItem_data">
           <span class="docItem_data_label">
             <span class="label">Key:</span>
@@ -24,12 +26,15 @@
               <span class="el-icon-question question" v-if="type === 'create'"></span>
             </el-tooltip>
           </span>
-          <el-input
-            v-if="type === 'create'"
-            v-model="item.metaKey"
-            @blur="metakeyBlur(item,index)"
-            :disabled="item.hasMetaId"
-          ></el-input>
+          <template v-if="type === 'create'">
+            <el-input
+              v-if="item.showEdit"
+              v-model="item.metaKey"
+              @blur="metakeyBlur(item,index)"
+              @input="metakeyChange(item)"
+            ></el-input>
+            <span v-else class="metaItemKey">{{item.metaKey}}</span>
+          </template>
           <el-select
               v-else
               v-model="item.metaKey"
@@ -52,7 +57,7 @@
             v-if="type === 'create'"
             v-model="item.metaValueType"
             placeholder="请选择"
-            :disabled="item.hasMetaId"
+            :disabled="item.metaId && item.metaId!== '' ? true : false"
           >
             <el-option
               v-for="item in typeOptions"
@@ -113,17 +118,17 @@
         </div>
         <el-divider direction="vertical" v-if="type !== 'create'"></el-divider>
         <div class="docItem_data docItem_data_btn">
-          <!-- <span
+          <span
           v-if="type === 'create'"
           class="el-icon-edit-outline setBtn"
           @click="editMataItem(item)"
-          ></span> -->
+          ></span>
           <span
             class="el-icon-delete setBtn"
             @click="delMataItem(index,item)"
-            :style="{color:item.hasMetaId?'#ccc':'#384BF7'}"
           ></span>
         </div>
+      </template>
       </div>
     </div>
   </div>
@@ -201,8 +206,8 @@ export default {
               if(this.type === 'create'){
                 this.docMetaData = (res.data.knowledgeMetaList || []).map(item => ({
                   ...item,
-                  hasMetaId:true,
-                  option: 'add'
+                  showEdit:false,
+                  option: ''
                 }));
               }
               
@@ -231,6 +236,7 @@ export default {
         metaRule: "",
         metaValue: "",
         metaValueType: "",
+        showEdit:true,
         metadataType: "value",
         option:"add"
       });
@@ -253,15 +259,24 @@ export default {
       }
       return true;
     },
+    editMataItem(item){
+      item.showEdit = true;
+    },
     delMataItem(i,item) {
-      if(this.type === 'create' && item.hasMetaId){
-        return;
+      if(item.metaId){
+        item.option = 'delete'
+      }else{
+        this.docMetaData.splice(i, 1);
       }
-      this.docMetaData.splice(i, 1);
     },
     valueChange(item) {
       item.metaValue = "";
       item.metaRule = "";
+    },
+    metakeyChange(item){
+      if(item.metaId){
+        item.option = 'update';
+      }
     },
     metakeyBlur(item,index) {
       const regex = /^[a-z][a-z0-9_]*$/;
@@ -274,13 +289,18 @@ export default {
         item.metaKey = "";
         return;
       }
-      const list  = this.docMetaData.slice(0,-1)//不与最新数据进行比较
-      const found = list.find(i => i.metaKey === item.metaKey )
-      if(found){
+
+      if(this.isFound()){
         this.$message.warning("存在相同key值");
-        this.docMetaData.splice(index,1);
+        item.metaKey = "";
         return;
       }
+      item.showEdit = false;
+    },
+    isFound(){
+      const metaKeys = this.docMetaData.map(item => item.metaKey);
+      const uniqueKeys = new Set(metaKeys);
+      return uniqueKeys.size !== metaKeys.length;
     },
     metaValueBlur(item) {
       if (!item.metaValue) {
@@ -323,20 +343,27 @@ export default {
 </script>
 <style lang="scss" scoped>
 .docMetaData {
+  display:flex;
+  gap:10px;
+  flex-direction: column;
   .docItem {
     display: flex;
     align-items: center;
     border-radius: 8px;
     background: #f7f8fa;
-    margin-top: 10px;
+
     width: fit-content;
     .docItem_data {
       display: flex;
       align-items: center;
       padding:5px 10px;
+      .metaItemKey{
+        padding:0 15px;
+      }
       .el-input,
       .el-select,
-      .el-date-picker {
+      .el-date-picker,
+      .metaItemKey {
         min-width: 160px;
       }
       .label{

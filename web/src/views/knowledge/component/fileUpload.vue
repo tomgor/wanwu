@@ -18,6 +18,8 @@
           <el-step title="文件上传"></el-step>
           <el-step title="参数设置"></el-step>
         </el-steps>
+
+        <!-- 文件上传 -->
         <div v-if="active === 1">
           <div class="fileBtn">
             <el-radio-group
@@ -82,6 +84,8 @@
             </div>
           </div>
         </div>
+
+        <!-- 参数设置 -->
         <div
           v-else
           class="params_form"
@@ -94,12 +98,12 @@
             @submit.native.prevent
             label-position="left"
           >
-            <el-form-item>
+            <el-form-item label="分段设置">
               <div class="segmentList">
                 <div
                   v-for="segmentItem in segmentList"
                   :key="segmentItem.text"
-                  :class="['segmentItem',setType === segmentItem.label ? 'activeAnalyzer' : '']"
+                  :class="['segmentItem',ruleForm.docSegment.segmentMethod === segmentItem.label ? 'activeAnalyzer' : '']"
                   style="width:50%;"
                   @click="segmentSetClick(segmentItem.label)"
                 >
@@ -113,29 +117,27 @@
                 </div>
               </div>
             </el-form-item>
-            <div>
-              <template v-if="setType === 'common'">
+              <template v-if="this.ruleForm.docSegment.segmentMethod === '0'">
                 <el-form-item :label="$t('knowledgeManage.chunkTypeSet')">
-                  <el-row class="segmentList">
-                    <el-col
+                  <div class="segmentList">
+                    <div
                       v-for="segmentCommon in segmentCommonList"
                       :key="segmentCommon.text"
                       :class="['segmentItem',ruleForm.docSegment.segmentType === segmentCommon.label ? 'activeAnalyzer' : '']"
-                      :span="12"
-                      @click.native="segmentClick(segmentCommon.label)"
+                      @click="segmentClick(segmentCommon.label)"
                     >
                       <div>
                         <p class="analyzerItem_text">{{segmentCommon.text}}</p>
                         <h3 class="analyzerItem_desc">{{segmentCommon.desc}}</h3>
                       </div>
-                    </el-col>
-                  </el-row>
+                    </div>
+                  </div>
                 </el-form-item>
                 <el-form-item
                   v-if="ruleForm.docSegment.segmentType == '1'"
                   prop="docSegment.splitter"
                   :rules="ruleForm.docSegment.segmentType === '1' 
-                  ? [{ required: true,validator: validateSplitter, message: $t('knowledgeManage.markTips'), trigger: 'blur' }] 
+                  ? [{ required: true,validator: validateSplitter('splitter'), message: $t('knowledgeManage.markTips'), trigger: 'blur' }] 
                   : []"
                 >
                   <template #label>
@@ -148,7 +150,7 @@
                     </el-tooltip>
                   </template>
                   <el-tag
-                    v-for="(tag,index) in checkSplitter"
+                    v-for="(tag,index) in checkSplitter['splitter']"
                     :key="'tag'+index"
                     :disable-transitions="false"
                     class="splitterTag"
@@ -158,25 +160,28 @@
                   <el-button
                     class="button-new-tag"
                     size="small"
-                    @click="showSplitterSet"
+                    @click="showSplitterSet('splitter')"
                   > + 分段标识设置</el-button>
                 </el-form-item>
                 <el-form-item
                   v-if="ruleForm.docSegment.segmentType == '1'"
-                  :label="$t('knowledgeManage.splitMax')"
                   prop="docSegment.maxSplitter"
-                  :rules="[{ required: true, message: $t('knowledgeManage.splitMax'),trigger:'blur'}]"
+                  :rules="[
+                  { required: true, message: $t('knowledgeManage.splitMax'),trigger:'blur'},
+                  { type:'number',min:200,max:4000,message:'请输入有效范围内的数值',trigger: 'blur'}
+                  ]"
                 >
+                  <template #label>
+                      <span>{{$t('knowledgeManage.splitMax')}}</span>
+                      <el-tooltip
+                        :content="$t('knowledgeManage.splitMaxTips')"
+                        placement="right"
+                      >
+                        <span class="el-icon-question question"></span>
+                      </el-tooltip>
+                  </template>
                   <div :class="[['0','1','3','4'].includes(ruleForm.docSegment.segmentType)?'':'set']">
-                    <el-input-number
-                      v-model="ruleForm.docSegment.maxSplitter"
-                      :min="200"
-                      :max="4000"
-                      :placeholder="$t('knowledgeManage.splitMax')"
-                    ></el-input-number>
-                    <p class="tips">
-                      {{$t('knowledgeManage.splitMaxTips')}}
-                    </p>
+                    <el-input type="number" v-model.number="ruleForm.docSegment.maxSplitter" :placeholder="$t('knowledgeManage.splitMax')"></el-input>
                   </div>
                 </el-form-item>
                 <el-form-item
@@ -184,31 +189,33 @@
                   :label="$t('knowledgeManage.overLapNum')"
                   prop="docSegment.overlap"
                   :rules="[
-                            { required: true, message:$t('knowledgeManage.overLapNumTips'),trigger:'blur'}
-                        ]"
+                    { required: true, message:$t('knowledgeManage.overLapNumTips'),trigger:'blur'},
+                    { type:'number',min:0,max:1,message:'请输入有效范围内的数值',trigger: 'blur'}
+                  ]"
                 >
-                  <div class="elSliderItem">
-                    <el-slider
-                      :min="0"
-                      :max="1"
-                      :step="0.01"
-                      style="width:70%;margin-left:15px;"
-                      v-model="ruleForm.docSegment.overlap"
-                      @change="overlapChange"
-                      show-input
-                    >
-                    </el-slider>
-                  </div>
+                  <el-input
+                    :min="0"
+                    :max="1"
+                    :step="0.01"
+                    type="number" 
+                    v-model.number="ruleForm.docSegment.overlap" 
+                    placeholder="数值范围0-1" 
+                    @change="overlapChange"></el-input>
                 </el-form-item>
               </template>
-              <template v-if="setType === 'fatherSon'">
+              <template v-if="this.ruleForm.docSegment.segmentMethod === '1'">
                 <div
                   v-for="item in fatSonBlock"
                   :key="item.level"
                   class="commonSet"
                 >
                   <h3 class="title"><span class="bar"></span>{{item.title}}</h3>
-                  <el-form-item>
+                  <el-form-item
+                    :prop="item.splitterProp"
+                    :rules="[
+                    { required: true,validator: validateSplitter(item.key), message: $t('knowledgeManage.markTips'), trigger: 'blur' }
+                    ]"
+                  >
                     <template #label>
                       <span>分段标识</span>
                       <el-tooltip
@@ -219,7 +226,7 @@
                       </el-tooltip>
                     </template>
                     <el-tag
-                      v-for="(tag,index) in checkSplitter"
+                      v-for="(tag,index) in checkSplitter[item.key]"
                       :key="'tag'+index"
                       :disable-transitions="false"
                       class="splitterTag"
@@ -229,20 +236,26 @@
                     <el-button
                       class="button-new-tag"
                       size="small"
-                      @click="showSplitterSet"
+                      @click="showSplitterSet(item.key)"
                     > + 分段标识设置</el-button>
                   </el-form-item>
-                  <el-form-item label="可分割最大值">
-                    <!-- <el-input-number
-                      v-model="ruleForm.docSegment.maxSplitter"
-                      :min="200"
-                      :max="4000"
-                      :placeholder="$t('knowledgeManage.splitMax')"
-                    ></el-input-number> -->
-                    <el-input type="number" :min="200" :max="4000" v-model="ruleForm.docSegment.maxSplitter" :placeholder="$t('knowledgeManage.splitMax')"></el-input>
-                    <p class="tips">
-                      {{$t('knowledgeManage.splitMaxTips')}}
-                    </p>
+                  <el-form-item
+                    :prop="item.maxSplitterProp"
+                    :rules="[
+                    { required: true, message: $t('knowledgeManage.splitMax'),trigger:'blur'},
+                    { type:'number',min:200,max:4000,message:'请输入有效范围内的数值',trigger: 'blur'}
+                    ]"
+                  >
+                    <template #label>
+                      <span>可分割最大值</span>
+                      <el-tooltip
+                        :content="$t('knowledgeManage.splitMaxTips')"
+                        placement="right"
+                      >
+                        <span class="el-icon-question question"></span>
+                      </el-tooltip>
+                    </template>
+                    <el-input type="number" :min="200" :max="4000" v-model.number="ruleForm.docSegment[item.maxSplitter]" :placeholder="$t('knowledgeManage.splitMax')"></el-input>
                   </el-form-item>
                 </div>
               </template>
@@ -270,7 +283,7 @@
                   >
                     <el-checkbox
                       :label="analyzerItem.label"
-                      :disabled="analyzerDisabled(analyzerItem.label,ruleForm.docAnalyzer)"
+                      :disabled="analyzerDisabled(analyzerItem.label)"
                     >{{analyzerItem.text}}</el-checkbox>
                     <h3 class="analyzerItem_desc">{{analyzerItem.desc}}</h3>
                   </div>
@@ -287,6 +300,7 @@
                 <el-select
                   v-model="ruleForm.parserModelId"
                   placeholder="请选择"
+                  class="width100"
                 >
                   <el-option
                     v-for="item in modelOptions"
@@ -307,7 +321,6 @@
                   :knowledgeId="knowledgeId"
                 />
               </el-form-item>
-            </div>
           </el-form>
         </div>
         <!-- 上传文件的列表 -->
@@ -407,7 +420,6 @@
       @delItem="delSplitterItem"
       @relodData="relodData"
       @checkData="checkData"
-      :selectData="checkSplitter"
     />
   </div>
 </template>
@@ -437,17 +449,18 @@ export default {
   components: { LinkIcon, urlAnalysis, splitterDialog, mataData },
   mixins: [uploadChunk],
   data() {
-    const validateSplitter = (rule, value, callback) => {
-      if (this.checkSplitter.length === 0) {
-        callback(new Error(this.$t("knowledgeManage.splitterRequired")));
-      } else {
-        callback();
+    const validateSplitter = (type) => {
+      return (rule, value, callback) =>{
+        if (this.checkSplitter[type].length === 0) {
+          callback(new Error(this.$t("knowledgeManage.splitterRequired")));
+        } else {
+          callback();
+        }
       }
     };
     return {
       validateSplitter: validateSplitter,
       modelLabel: "",
-      setType: "common",
       placeholderText: "搜索分隔符",
       titleText: "创建分隔符",
       splitterValue: "",
@@ -461,6 +474,7 @@ export default {
       fileList: [],
       fileUrl: "",
       docInfoList: [],
+      segmentType:'',
       ruleForm: {
         docAnalyzer: ["text"],
         docMetaData: [], //元数据管理数据
@@ -470,14 +484,19 @@ export default {
           splitter: ["！", "。", "？", "?", "!", ".", "......"],
           maxSplitter: 1024,
           overlap: 0.2,
+          segmentMethod:"0",//0是通用分段，1是父子分段
+          subMaxSplitter:1024,//父子分段必填
+          subSplitter:["！", "。", "？", "?", "!", ".", "......"]//父子分段必填
         },
         docInfoList: [],
         docImportType: 0,
         knowledgeId: this.$route.query.id,
-        // ocrModelId:'',
         parserModelId: "",
       },
-      checkSplitter: [],
+      checkSplitter:{
+        splitter:[],
+        subSplitter:[]
+      },
       splitOptions: [],
       urlLoading: false,
       segmentCommonList: SEGMENT_COMMON_LIST,
@@ -487,7 +506,6 @@ export default {
     };
   },
   async created() {
-    // this.getOcrList()
     await this.getSplitterList("");
     await this.custom();
   },
@@ -504,6 +522,9 @@ export default {
     docAnalyzerChange(val) {
       this.ruleForm.parserModelId = "";
       this.modelOptions = [];
+      if(val.length === 3){
+        this.ruleForm.docAnalyzer = [val[0],val[2]]
+      }
       if (val.includes("ocr")) {
         this.modelLabel = "OCR模型";
         this.getOcrList();
@@ -512,23 +533,16 @@ export default {
         this.getParserList();
       } else {
         this.modelLabel = "";
-        // this.modelOptions = []
       }
     },
     segmentClick(label) {
       this.ruleForm.docSegment.segmentType = label;
     },
     segmentSetClick(label) {
-      this.setType = label;
+      this.ruleForm.docSegment.segmentMethod = label;
     },
-    analyzerDisabled(label, data) {
+    analyzerDisabled(label) {
       if (label === "text") return true;
-      const conflictMap = {
-        ocr: "model",
-        model: "ocr",
-      };
-      const conflictKeyword = conflictMap[label];
-      return conflictKeyword ? data.includes(conflictKeyword) : false;
     },
     overlapChange(val) {
       if (val > 0.25) {
@@ -538,9 +552,11 @@ export default {
     },
     custom() {
       const splitter = this.ruleForm.docSegment.splitter;
-      this.checkSplitter = this.splitOptions.filter((item) => {
+      const data = this.splitOptions.filter((item) => {
         return splitter.includes(item.splitterValue) && item.type === "preset";
       });
+      this.checkSplitter['splitter'] = data;
+      this.checkSplitter['subSplitter'] = data;
     },
     updateMeata(data) {
       this.ruleForm.docMetaData = data;
@@ -564,8 +580,8 @@ export default {
       return true;
     },
     checkData(data) {
-      this.checkSplitter = data;
-      this.ruleForm.docSegment.splitter = data.map(
+      this.checkSplitter[this.segmentType] = data;
+      this.ruleForm.docSegment[this.segmentType] = data.map(
         (item) => item.splitterValue
       );
     },
@@ -627,8 +643,9 @@ export default {
           this.getSplitterList("");
         });
     },
-    showSplitterSet() {
-      this.$refs.splitterDialog.showDiaglog();
+    showSplitterSet(type) {
+      this.segmentType = type;
+      this.$refs.splitterDialog.showDiaglog(this.checkSplitter[this.segmentType]);
     },
     goBack() {
       this.$router.go(-1);
@@ -713,6 +730,11 @@ export default {
     },
     // 删除已上传文件
     handleRemove(item, index) {
+      if(item.percentage < 100){
+        this.fileList.splice(index,1);
+        this.cancelAllRequests();//取消所有请求
+        return;
+      }
       this.delfile({
         fileList: [this.resList[index]["name"]],
         isExpired: true,
@@ -724,7 +746,7 @@ export default {
         this.fileIndex--;
       }
       if (this.docInfoList.length > 0) {
-        this.docInfoList.splice(1, index);
+        this.docInfoList.splice(index,1);
       }
     },
     delfile(data) {
@@ -750,12 +772,15 @@ export default {
       this.fileList = [];
     },
     submitInfo() {
-      const { segmentType, splitter } = this.ruleForm.docSegment;
-      if (segmentType === "1" && splitter.length === 0) {
+      const { segmentMethod,segmentType, splitter,subSplitter } = this.ruleForm.docSegment;
+      if (
+        (segmentMethod === '1' && (splitter.length === 0 || subSplitter.length === 0)) ||
+        (segmentMethod !== '1' && segmentType === '1' && splitter.length === 0)
+      ) {
         this.$refs.ruleForm.validate();
         return false;
       }
-      this.$refs.ruleForm.clearValidate(["docSegment.splitter"]);
+      this.$refs.ruleForm.clearValidate(["docSegment.splitter","docSegment.subSplitter"]);
 
       if (!this.validateMetaData()) {
         return;
@@ -774,7 +799,7 @@ export default {
       }
       this.ruleForm.docInfoList = this.docInfoList;
       let data = null;
-      if (this.ruleForm.docSegment.segmentType == "0") {
+      if (this.ruleForm.docSegment.segmentType == "0" && this.ruleForm.docSegment.segmentMethod !== "1") {
         data = this.ruleForm;
         delete data.docSegment.splitter;
         delete data.docSegment.maxSplitter;
@@ -807,7 +832,10 @@ export default {
         knowledgeId: this.$route.query.id,
         ocrModelId: "",
       };
-      this.checkSplitter = [];
+      this.checkSplitter = {
+        splitter:[],
+        subSplitter:[]
+      };
       this.splitOptions = this.splitOptions.map((item) => ({
         ...item,
         checked: false,
@@ -1026,10 +1054,14 @@ export default {
 .red {
   color: red;
 }
+.width100{
+  width:100%;
+}
 .activeAnalyzer {
   border-color: #384bf7 !important;
 }
 .question {
+  cursor: pointer;
   color: #aaadcc;
   margin-left: 5px;
 }
@@ -1184,6 +1216,8 @@ export default {
   background: #fff;
   border: 1px solid #d4d6d9;
   border-radius: 6px;
+  max-height: 65vh;
+  overflow-y: auto;
   .el-form {
     padding:30px;
     .commonSet {
@@ -1194,6 +1228,8 @@ export default {
         font-size:14px;
         border-bottom: 1px solid #dee1fe ;
         padding-bottom:10px;
+        display: flex;
+        align-items: center;
         .bar{
           display:inline-block;
           width:4px;
@@ -1221,7 +1257,7 @@ export default {
       justify-content: flex-start;
       gap: 15px;
       .docAnalyzerList {
-        width: fit-content;
+        flex: 1;
         border: 1px solid #ddd;
         padding: 0 10px 10px 10px;
         border-radius: 6px;
@@ -1246,6 +1282,7 @@ export default {
         padding: 10px;
         border-radius: 6px;
         gap: 15px;
+        width:50%;
         .itemImg {
           width: 45px;
           height: 45px;
