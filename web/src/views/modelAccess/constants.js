@@ -60,6 +60,12 @@ export const FUNC_CALLING = [
     {key: 'functionCall', name: 'Function call'},
 ]
 
+export const DEFAULT_SUPPORT = 'noSupport'
+export const SUPPORT_LIST = [
+    {key: 'noSupport', name: '不支持'},
+    {key: 'support', name: '支持'},
+]
+
 export const TYPE_OBJ = {
     apiKey: {
         [YUAN_JING]: 'sk-abc********************xyz',

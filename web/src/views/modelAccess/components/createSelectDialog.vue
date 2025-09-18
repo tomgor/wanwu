@@ -83,7 +83,7 @@ export default {
   .provider-card-img {
     width: 50px;
     height: 50px;
-    object-fit: cover;
+    object-fit: contain;
     padding: 10px 6px;
     background: #FFFFFF;
     box-shadow: 0 1px 4px 0 rgba(0,0,0,0.15);

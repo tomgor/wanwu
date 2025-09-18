@@ -392,7 +392,8 @@ export default {
             title: '供应商选择'
         },
         hint: {
-            urlError: 'URL格式不正确'
+            urlError: 'URL格式不正确',
+            yuanjing: '可前往 https://maas.ai-yuanjing.com/ 申请API Key',
         }
     },
 

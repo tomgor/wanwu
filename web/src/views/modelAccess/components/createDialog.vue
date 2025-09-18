@@ -2,13 +2,20 @@
   <div class="createDialog">
     <!--:title="isEdit ? $t('modelAccess.dialog.edit') : $t('modelAccess.dialog.create')"-->
     <el-dialog
-      :title="provider.name || ''"
       :visible.sync="dialogVisible"
       width="760px"
       append-to-body
       :close-on-click-modal="false"
       :before-close="handleClose"
     >
+      <template slot="title">
+        <div class="dialog-title-wrapper">
+          <span class="dialog-title">{{provider.name || ''}}</span>
+          <span class="dialog-desc" v-if="provider.key === yuanjing">
+            {{$t('modelAccess.hint.yuanjing')}}
+          </span>
+        </div>
+      </template>
       <el-form :model="{...createForm}" :rules="rules" ref="createForm" label-width="110px" class="createForm form">
         <el-form-item :label="$t('modelAccess.table.modelType')" prop="modelType">
           <el-select
@@ -72,6 +79,21 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item v-if="createForm.modelType === llm && provider.key === yuanjing" label="Vision" prop="visionSupport">
+          <el-select
+            v-model="createForm.visionSupport"
+            :placeholder="$t('common.select.placeholder')"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in supportList"
+              :key="item.key"
+              :label="item.name"
+              :value="item.key"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item v-if="provider.key !== ollama" :label="$t('modelAccess.table.apiKey')" prop="apiKey">
           <el-input
             type="password"
@@ -113,13 +135,17 @@ import {
   FUNC_CALLING,
   LLM,
   DEFAULT_CALLING,
+  DEFAULT_SUPPORT,
+  SUPPORT_LIST,
   TYPE_OBJ,
   OLLAMA,
   EMBEDDING,
   YUAN_JING
 } from "../constants"
+import LinkIcon from "@/components/linkIcon.vue";
 
 export default {
+  components: {LinkIcon},
   data() {
     const validateUrls = (rule, value, callback) => {
       const reg = /^(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?$/
@@ -136,6 +162,7 @@ export default {
       dialogVisible: false,
       modelType: [],
       functionCalling: FUNC_CALLING,
+      supportList: SUPPORT_LIST,
       typeObj: TYPE_OBJ,
       llm: LLM,
       ollama: OLLAMA,
@@ -152,7 +179,8 @@ export default {
           path: ''
         },
         publishDate: '',
-        functionCalling: DEFAULT_CALLING
+        functionCalling: DEFAULT_CALLING,
+        visionSupport: DEFAULT_SUPPORT
       },
       rules: {
         model: [
@@ -277,6 +305,19 @@ export default {
   .embedding-tip {
     color: #F56C6C;
     line-height: 16px;
+  }
+}
+.dialog-title-wrapper {
+  display: flex;
+  align-items: center;
+  .dialog-title {
+    color: $color_title;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .dialog-desc {
+    color: #888;
+    margin-left: 20px;
   }
 }
 </style>
