@@ -881,6 +881,19 @@ definitions:
     - docId
     - fileUploadId
     type: object
+  request.BatchDocMetaDataReq:
+    properties:
+      docMetaInfoList:
+        items:
+          $ref: '#/definitions/request.DocMetaDataReq'
+        type: array
+      knowledgeId:
+        description: 知识库id
+        type: string
+    required:
+    - docMetaInfoList
+    - knowledgeId
+    type: object
   request.BindKnowledgeTagReq:
     properties:
       knowledgeId:
@@ -1303,7 +1316,7 @@ definitions:
   request.DocImportReq:
     properties:
       docAnalyzer:
-        description: 文档解析类型 text / ocr
+        description: 文档解析类型 text / ocr  / model
         items:
           type: string
         type: array
@@ -1332,8 +1345,8 @@ definitions:
       knowledgeId:
         description: 知识库id
         type: string
-      ocrModelId:
-        description: ocr模型id
+      parserModelId:
+        description: 模型解析或ocr模型id
         type: string
     required:
     - docAnalyzer
@@ -5779,6 +5792,30 @@ paths:
       security:
       - JWT: []
       summary: 更新文档元数据
+      tags:
+      - knowledge
+  /knowledge/doc/meta/batch:
+    post:
+      consumes:
+      - application/json
+      description: 批量更新文档元数据
+      parameters:
+      - description: 批量文档更新元数据请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.BatchDocMetaDataReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 批量更新文档元数据
       tags:
       - knowledge
   /knowledge/doc/segment/batch/create:
