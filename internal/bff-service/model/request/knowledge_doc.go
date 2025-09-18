@@ -1,6 +1,16 @@
 package request
 
-import "errors"
+import (
+	"errors"
+	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
+	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
+	"regexp"
+)
+
+const (
+	DocAnalyzerOCR       = "ocr"
+	DocAnalyzerPdfParser = "model"
+)
 
 type DocListReq struct {
 	KnowledgeId string `json:"knowledgeId" form:"knowledgeId" validate:"required"`
@@ -15,8 +25,8 @@ type DocImportReq struct {
 	DocImportType int            `json:"docImportType"`                   //文档导入类型，0：文件上传，1：url上传，2.批量url上传
 	DocInfo       []*DocInfo     `json:"docInfoList" validate:"required"` //上传文档列表
 	DocSegment    *DocSegment    `json:"docSegment" validate:"required"`  //文档分段配置
-	DocAnalyzer   []string       `json:"docAnalyzer" validate:"required"` //文档解析类型 text / ocr
-	OcrModelId    string         `json:"ocrModelId"`                      //ocr模型id
+	DocAnalyzer   []string       `json:"docAnalyzer" validate:"required"` //文档解析类型 text / ocr  / model
+	ParserModelId string         `json:"parserModelId"`                   //模型解析或ocr模型id
 	DocPreprocess []string       `json:"docPreprocess"`                   // 文本预处理规则 replaceSymbols / deleteLinks
 	DocMetaData   []*DocMetaData `json:"docMetaData"`                     // 元数据
 }
@@ -25,6 +35,12 @@ type DocMetaDataReq struct {
 	KnowledgeId  string         `json:"knowledgeId"`
 	DocId        string         `json:"docId"`
 	MetaDataList []*DocMetaData `json:"metaDataList"` //文档元数据
+}
+
+type BatchDocMetaDataReq struct {
+	KnowledgeId     string            `json:"knowledgeId" validate:"required"` //知识库id
+	DocMetaInfoList []*DocMetaDataReq `json:"docMetaInfoList" validate:"required"`
+	CommonCheck
 }
 
 type DocInfo struct {
@@ -106,17 +122,50 @@ type UpdateDocSegmentReq struct {
 }
 
 func (c *DocImportReq) Check() error {
-	if len(c.DocMetaData) > 0 {
-		for _, meta := range c.DocMetaData {
-			if meta.MetaKey == "" {
-				return errors.New("key不能为空")
-			}
-			if meta.MetaValueType == "" {
-				return errors.New("type不能为空")
+	if len(c.DocAnalyzer) > 0 {
+		for _, v := range c.DocAnalyzer {
+			if v == DocAnalyzerOCR || v == DocAnalyzerPdfParser {
+				if c.ParserModelId == "" {
+					return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "ocrModelId can not be empty")
+				}
 			}
 		}
 	}
+	if len(c.DocMetaData) > 0 {
+		seenKeys := make(map[string]bool)
+		for _, meta := range c.DocMetaData {
+			if meta.MetaKey == "" {
+				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "key为空")
+			}
+			// 检查Key是否重复
+			if seenKeys[meta.MetaKey] {
+				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "key重复")
+			}
+			seenKeys[meta.MetaKey] = true
+			if meta.MetaRule != "" {
+				// 检查rule和key传参
+				if meta.MetaValue != "" {
+					return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "常量和正则表达式重复")
+				}
+				// 检查正则合法性
+				_, err := regexp.Compile(meta.MetaRule)
+				if err != nil {
+					return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "非法正则表达式")
+				}
+				// 检查key合法性
+				if !isValidKey(meta.MetaKey) {
+					return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "非法key")
+				}
+			}
+		}
+	}
+
 	return nil
+}
+
+func isValidKey(s string) bool {
+	re := regexp.MustCompile(`^[a-z][a-z0-9_]*$`) //只包含小写字母，数字和下划线，并且以小写字母开头
+	return re.MatchString(s)
 }
 
 func (c *DocMetaDataReq) Check() error {

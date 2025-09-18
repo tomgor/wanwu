@@ -23,6 +23,7 @@ func registerKnowledge(apiV1 *gin.RouterGroup) {
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/import/tip", http.MethodGet, v1.GetDocImportTip, "获取知识库文档上传状态")
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc", http.MethodDelete, v1.DeleteDoc, "删除文档")
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/meta", http.MethodPost, v1.UpdateDocMetaData, "更新文档元数据")
+	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/meta/batch", http.MethodPost, v1.BatchUpdateDocMetaData, "批量更新文档元数据")
 
 	// 知识库元数据
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/meta/select", http.MethodGet, v1.GetKnowledgeMetaSelect, "获取知识库元数据")

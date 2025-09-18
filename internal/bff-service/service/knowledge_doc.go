@@ -2,7 +2,6 @@ package service
 
 import (
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
@@ -16,10 +15,6 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
-)
-
-const (
-	DocAnalyzerOCR = "ocr"
 )
 
 // GetDocList 查询知识库所属文档列表
@@ -47,64 +42,12 @@ func GetDocList(ctx *gin.Context, userId, orgId string, r *request.DocListReq) (
 // ImportDoc 导入文档
 func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq) error {
 	segment := req.DocSegment
-	var docInfoList []*knowledgebase_doc_service.DocFileInfo
-	for _, info := range req.DocInfo {
-		var docUrl = info.DocUrl
-		var docType = info.DocType
-		if len(docUrl) == 0 {
-			var err error
-			docUrl, err = minio.GetUploadFileWithExpire(ctx, info.DocId)
-			if err != nil {
-				log.Errorf("GetUploadFileWithNotExpire error %v", err)
-				return grpc_util.ErrorStatus(errs.Code_KnowledgeDocImportUrlFailed)
-			}
-			//特殊处理类型
-			if strings.HasSuffix(docUrl, ".tar.gz") {
-				docType = ".tar.gz"
-			}
-		}
-		docInfoList = append(docInfoList, &knowledgebase_doc_service.DocFileInfo{
-			DocName: info.DocName,
-			DocId:   info.DocId,
-			DocUrl:  docUrl,
-			DocType: docType,
-			DocSize: info.DocSize,
-		})
+	docInfoList, err := buildDocInfoList(ctx, req)
+	if err != nil {
+		log.Errorf("上传失败(构建文档信息列表失败(%v) ", err)
+		return err
 	}
-	for _, v := range req.DocAnalyzer {
-		if v == DocAnalyzerOCR {
-			if req.OcrModelId == "" {
-				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "ocr模型id为空")
-			}
-		}
-	}
-	var metaList []*knowledgebase_doc_service.DocMetaData
-	seenKeys := make(map[string]bool)
-	for _, meta := range req.DocMetaData {
-		// 检查Key是否重复
-		if seenKeys[meta.MetaKey] {
-			return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "key重复")
-		}
-		seenKeys[meta.MetaKey] = true
-		if meta.MetaRule != "" {
-			// 检查正则合法性
-			_, err := regexp.Compile(meta.MetaRule)
-			if err != nil {
-				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "非法正则表达式")
-			}
-			// 检查key合法性
-			if !isValidKey(meta.MetaKey) {
-				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "非法key")
-			}
-		}
-		metaList = append(metaList, &knowledgebase_doc_service.DocMetaData{
-			Key:       meta.MetaKey,
-			Value:     meta.MetaValue,
-			ValueType: meta.MetaValueType,
-			Rule:      meta.MetaRule,
-		})
-	}
-	_, err := knowledgeBaseDoc.ImportDoc(ctx.Request.Context(), &knowledgebase_doc_service.ImportDocReq{
+	_, err = knowledgeBaseDoc.ImportDoc(ctx.Request.Context(), &knowledgebase_doc_service.ImportDocReq{
 		UserId:        userId,
 		OrgId:         orgId,
 		KnowledgeId:   req.KnowledgeId,
@@ -117,20 +60,15 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 		},
 		DocAnalyzer:     req.DocAnalyzer,
 		DocInfoList:     docInfoList,
-		OcrModelId:      req.OcrModelId,
+		OcrModelId:      req.ParserModelId,
 		DocPreprocess:   req.DocPreprocess,
-		DocMetaDataList: metaList,
+		DocMetaDataList: buildMetaInfoList(req),
 	})
 	if err != nil {
 		log.Errorf("上传失败(保存上传任务 失败(%v) ", err)
 		return err
 	}
 	return nil
-}
-
-func isValidKey(s string) bool {
-	re := regexp.MustCompile(`^[a-z][a-z0-9_]*$`) //只包含小写字母，数字和下划线，并且以小写字母开头
-	return re.MatchString(s)
 }
 
 // UpdateDocMetaData 更新文档元数据
@@ -143,6 +81,11 @@ func UpdateDocMetaData(ctx *gin.Context, userId, orgId string, r *request.DocMet
 		KnowledgeId:  r.KnowledgeId,
 	})
 	return err
+}
+
+// BatchUpdateDocMetaData 批量文档元数据
+func BatchUpdateDocMetaData(ctx *gin.Context, userId, orgId string, r *request.BatchDocMetaDataReq) error {
+	return nil
 }
 
 func UpdateDocStatus(ctx *gin.Context, r *request.CallbackUpdateDocStatusReq) error {
@@ -395,4 +338,45 @@ func UpdateDocSegment(ctx *gin.Context, userId, orgId string, r *request.UpdateD
 		Content:   r.Content,
 	})
 	return err
+}
+
+func buildMetaInfoList(req *request.DocImportReq) []*knowledgebase_doc_service.DocMetaData {
+	var metaList []*knowledgebase_doc_service.DocMetaData
+	for _, meta := range req.DocMetaData {
+		metaList = append(metaList, &knowledgebase_doc_service.DocMetaData{
+			Key:       meta.MetaKey,
+			Value:     meta.MetaValue,
+			ValueType: meta.MetaValueType,
+			Rule:      meta.MetaRule,
+		})
+	}
+	return metaList
+}
+
+func buildDocInfoList(ctx *gin.Context, req *request.DocImportReq) ([]*knowledgebase_doc_service.DocFileInfo, error) {
+	var docInfoList []*knowledgebase_doc_service.DocFileInfo
+	for _, info := range req.DocInfo {
+		var docUrl = info.DocUrl
+		var docType = info.DocType
+		if len(docUrl) == 0 {
+			var err error
+			docUrl, err = minio.GetUploadFileWithExpire(ctx, info.DocId)
+			if err != nil {
+				log.Errorf("GetUploadFileWithNotExpire error %v", err)
+				return nil, grpc_util.ErrorStatus(errs.Code_KnowledgeDocImportUrlFailed)
+			}
+			//特殊处理类型
+			if strings.HasSuffix(docUrl, ".tar.gz") {
+				docType = ".tar.gz"
+			}
+		}
+		docInfoList = append(docInfoList, &knowledgebase_doc_service.DocFileInfo{
+			DocName: info.DocName,
+			DocId:   info.DocId,
+			DocUrl:  docUrl,
+			DocType: docType,
+			DocSize: info.DocSize,
+		})
+	}
+	return docInfoList, nil
 }

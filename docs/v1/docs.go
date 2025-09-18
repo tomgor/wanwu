@@ -3251,6 +3251,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/knowledge/doc/meta/batch": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "批量更新文档元数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "knowledge"
+                ],
+                "summary": "批量更新文档元数据",
+                "parameters": [
+                    {
+                        "description": "批量文档更新元数据请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.BatchDocMetaDataReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/knowledge/doc/segment/batch/create": {
             "post": {
                 "security": [
@@ -8696,6 +8735,25 @@ const docTemplate = `{
                 }
             }
         },
+        "request.BatchDocMetaDataReq": {
+            "type": "object",
+            "required": [
+                "docMetaInfoList",
+                "knowledgeId"
+            ],
+            "properties": {
+                "docMetaInfoList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.DocMetaDataReq"
+                    }
+                },
+                "knowledgeId": {
+                    "description": "知识库id",
+                    "type": "string"
+                }
+            }
+        },
         "request.BindKnowledgeTagReq": {
             "type": "object",
             "required": [
@@ -9332,7 +9390,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "docAnalyzer": {
-                    "description": "文档解析类型 text / ocr",
+                    "description": "文档解析类型 text / ocr  / model",
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -9375,8 +9433,8 @@ const docTemplate = `{
                     "description": "知识库id",
                     "type": "string"
                 },
-                "ocrModelId": {
-                    "description": "ocr模型id",
+                "parserModelId": {
+                    "description": "模型解析或ocr模型id",
                     "type": "string"
                 }
             }
