@@ -277,6 +277,7 @@ services:
       WANWU_KNOWLEDGE_SEARCH_URL: http://rag-wanwu:8681/rag/search-knowledge-base
       WANWU_FILE_GENERATOR_URL: http://agent-wanwu:15002/upload
       WANWU_FILE_PARSER_URL: http://agent-wanwu:15003/doc_pra
+      WANWU_WORKFLOW_DEFAULT_ICON: /api/static/icon/icon-default.png
       # 用于nginx 8081代理workflow-wanwu:8998 minio presign相关api
       WANWU_MINIO_PROXY_ENDPOINT: ${WANWU_EXTERNAL_IP}:${WANWU_EXTERNAL_PORT}
       WANWU_MINIO_PROXY_PREFIX: /workflow/minio/presign
