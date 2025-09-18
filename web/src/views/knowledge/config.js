@@ -1,0 +1,55 @@
+export const FAT_SON_BLOCK = [
+    {
+        title:'父块',
+        level:'parent',
+        key:"segmentParent",
+    },
+    {
+        title:'子块',
+        level:'son',
+        key:"segmentSon",
+    }
+]
+export const SEGMENT_COMMON_LIST = [
+    {
+        label:'0',
+        text:'自动分段',
+        desc:'您选择‘自动分段’，系统将按默认方式进行分段'
+    },
+    {
+        label:'1',
+        text:'自定义分段',
+        desc:'您选择‘自定义分段’，可进行分段方式配置'
+    },
+]
+export const SEGMENT_LIST = [
+    {
+        label:'common',
+        img:'setting-gear.png',
+        text:'通用分段',
+        desc:'检索和召回的分段内容相同'
+    },
+    {
+        label:'fatherSon',
+        img:'setting-effect.png',
+        text:'父子分段',
+        desc:'父分段用作上下文，子分段用于检索'
+    },
+]
+export const DOC_ANALYZER_LIST = [
+    {
+        label:'text',
+        text:'文本提取',
+        desc:'提取文档文本信息时开启'
+    },
+    {
+        label:'ocr',
+        text:'启用ocr解析',
+        desc:'解析图片、扫描件文档时开启，仅适用于PDF文件'
+    },
+    {
+        label:'model',
+        text:'模型解析',
+        desc:'提取标题、图表、公式时开启，仅适用于PDF文件'
+    }
+]

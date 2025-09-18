@@ -119,7 +119,8 @@ export default {
             modelId: '支持英文、数字、下划线(_)、中划线(-)、(.)，2-50个字符，不能以下划线为开头',
             version: '支持英文、数字、(.)',
             inferUrl: 'Base Url，例如：',
-            apiKey: '输入APIKey, 例如：'
+            apiKey: '输入APIKey, 例如：',
+            codeSent: '已向邮箱发送验证码及初始密码，首次登录请修改密码。',
         },
         select: {
             placeholder: '请选择'
