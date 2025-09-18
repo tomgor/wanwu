@@ -242,27 +242,35 @@ export default {
     },
     handleClose(){
       this.dialogVisible = false
-      this.formatValue({modelType: LLM, functionCalling: DEFAULT_CALLING, avatar: { key: '', path: ''}})
+      this.formatValue({
+        modelType: LLM,
+        functionCalling: DEFAULT_CALLING,
+        visionSupport: DEFAULT_SUPPORT,
+        avatar: { key: '', path: ''}
+      })
       this.$refs.createForm.resetFields()
       this.$refs.createForm.clearValidate()
     },
     handleSubmit() {
       this.$refs.createForm.validate(async (valid) => {
         if (valid) {
-          const {apiKey, endpointUrl, functionCalling, modelType} = this.createForm
+          const {apiKey, endpointUrl, functionCalling, modelType, visionSupport} = this.createForm
           const functionCallingObj = modelType === LLM ? {functionCalling} : {}
+          const visionSupportObj = modelType === LLM && this.provider.key === YUAN_JING ? {visionSupport} : {}
           const form = {
             ...this.createForm,
             provider: this.provider.key || '',
             config: {
               apiKey,
               endpointUrl,
-              ...functionCallingObj
+              ...functionCallingObj,
+              ...visionSupportObj
             }
           }
           delete form.apiKey
           delete form.endpointUrl
           delete form.functionCalling
+          delete form.visionSupport
 
           try {
             this.loading = true
