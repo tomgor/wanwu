@@ -35,6 +35,11 @@ type IOcr interface {
 	Ocr(ctx *gin.Context, req mp_common.IOcrReq, headers ...mp_common.Header) (mp_common.IOcrResp, error)
 }
 
+type IPdfParser interface {
+	NewReq(req *mp_common.PdfParserReq) (mp_common.IPdfParserReq, error)
+	PdfParser(ctx *gin.Context, req mp_common.IPdfParserReq, headers ...mp_common.Header) (mp_common.IPdfParserResp, error)
+}
+
 type IGui interface {
 	NewReq(req *mp_common.GuiReq) (mp_common.IGuiReq, error)
 	Gui(ctx context.Context, req mp_common.IGuiReq, headers ...mp_common.Header) (mp_common.IGuiResp, error)
@@ -70,6 +75,8 @@ func ToModelConfig(provider, modelType, cfg string) (interface{}, error) {
 			ret = &mp_yuanjing.Ocr{}
 		case ModelTypeGui:
 			ret = &mp_yuanjing.Gui{}
+		case ModelTypePdfParser:
+			ret = &mp_yuanjing.PdfParser{}
 		default:
 			return nil, fmt.Errorf("invalid provider %v model type %v", provider, modelType)
 		}
@@ -143,6 +150,8 @@ type ProviderModelByYuanjing struct {
 	Rerank    mp_yuanjing.Rerank    `json:"rerank"`
 	Embedding mp_yuanjing.Embedding `json:"embedding"`
 	Ocr       mp_yuanjing.Ocr       `json:"ocr"`
+	Gui       mp_yuanjing.Gui       `json:"gui"`
+	PdfParser mp_yuanjing.PdfParser `json:"pdf-parser"`
 }
 
 type ProviderModelByHuoshan struct {

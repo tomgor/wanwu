@@ -5289,6 +5289,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/model/select/pdf-parser": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "model"
+                ],
+                "summary": "pdf文档解析模型列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/response.ListResult"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "list": {
+                                                            "$ref": "#/definitions/response.ModelBrief"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/model/select/rerank": {
             "get": {
                 "security": [
@@ -7505,6 +7556,15 @@ const docTemplate = `{
         "mp.AppModelParams": {
             "type": "object",
             "properties": {
+                "providerHuoshan": {
+                    "$ref": "#/definitions/mp.AppModelParamsHuoshan"
+                },
+                "providerModelByInfini": {
+                    "$ref": "#/definitions/mp.AppModelParamsInfini"
+                },
+                "providerOllama": {
+                    "$ref": "#/definitions/mp.AppModelParamsOllama"
+                },
                 "providerOpenAICompatible": {
                     "description": "OpenAI-API-compatible模型配置",
                     "allOf": [
@@ -7513,11 +7573,53 @@ const docTemplate = `{
                         }
                     ]
                 },
+                "providerQwen": {
+                    "$ref": "#/definitions/mp.AppModelParamsQwen"
+                },
                 "providerYuanjing": {
                     "description": "YuanJing模型配置",
                     "allOf": [
                         {
                             "$ref": "#/definitions/mp.AppModelParamsYuanjing"
+                        }
+                    ]
+                }
+            }
+        },
+        "mp.AppModelParamsHuoshan": {
+            "type": "object",
+            "properties": {
+                "llm": {
+                    "description": "大语言模型配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_huoshan.LLMParams"
+                        }
+                    ]
+                }
+            }
+        },
+        "mp.AppModelParamsInfini": {
+            "type": "object",
+            "properties": {
+                "llm": {
+                    "description": "大语言模型配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_infini.LLMParams"
+                        }
+                    ]
+                }
+            }
+        },
+        "mp.AppModelParamsOllama": {
+            "type": "object",
+            "properties": {
+                "llm": {
+                    "description": "大语言模型配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_ollama.LLMParams"
                         }
                     ]
                 }
@@ -7531,6 +7633,19 @@ const docTemplate = `{
                     "allOf": [
                         {
                             "$ref": "#/definitions/mp_openai_compatible.LLMParams"
+                        }
+                    ]
+                }
+            }
+        },
+        "mp.AppModelParamsQwen": {
+            "type": "object",
+            "properties": {
+                "llm": {
+                    "description": "大语言模型配置",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_qwen.LLMParams"
                         }
                     ]
                 }
@@ -7619,11 +7734,17 @@ const docTemplate = `{
                 "embedding": {
                     "$ref": "#/definitions/mp_yuanjing.Embedding"
                 },
+                "gui": {
+                    "$ref": "#/definitions/mp_yuanjing.Gui"
+                },
                 "llm": {
                     "$ref": "#/definitions/mp_yuanjing.LLM"
                 },
                 "ocr": {
                     "$ref": "#/definitions/mp_yuanjing.Ocr"
+                },
+                "pdf-parser": {
+                    "$ref": "#/definitions/mp_yuanjing.PdfParser"
                 },
                 "rerank": {
                     "$ref": "#/definitions/mp_yuanjing.Rerank"
@@ -7688,6 +7809,51 @@ const docTemplate = `{
                 }
             }
         },
+        "mp_huoshan.LLMParams": {
+            "type": "object",
+            "properties": {
+                "frequencyPenalty": {
+                    "description": "频率惩罚",
+                    "type": "number"
+                },
+                "frequencyPenaltyEnable": {
+                    "description": "频率惩罚(开关)",
+                    "type": "boolean"
+                },
+                "maxTokens": {
+                    "description": "最大标记",
+                    "type": "integer"
+                },
+                "maxTokensEnable": {
+                    "description": "最大标记(开关)",
+                    "type": "boolean"
+                },
+                "presencePenalty": {
+                    "description": "存在惩罚",
+                    "type": "number"
+                },
+                "presencePenaltyEnable": {
+                    "description": "存在惩罚(开关)",
+                    "type": "boolean"
+                },
+                "temperature": {
+                    "description": "温度",
+                    "type": "number"
+                },
+                "temperatureEnable": {
+                    "description": "温度(开关)",
+                    "type": "boolean"
+                },
+                "topP": {
+                    "description": "Top P",
+                    "type": "number"
+                },
+                "topPEnable": {
+                    "description": "Top P(开关)",
+                    "type": "boolean"
+                }
+            }
+        },
         "mp_infini.Embedding": {
             "type": "object",
             "properties": {
@@ -7720,6 +7886,51 @@ const docTemplate = `{
                         "toolCall",
                         "functionCall"
                     ]
+                }
+            }
+        },
+        "mp_infini.LLMParams": {
+            "type": "object",
+            "properties": {
+                "frequencyPenalty": {
+                    "description": "频率惩罚",
+                    "type": "number"
+                },
+                "frequencyPenaltyEnable": {
+                    "description": "频率惩罚(开关)",
+                    "type": "boolean"
+                },
+                "maxTokens": {
+                    "description": "最大标记",
+                    "type": "integer"
+                },
+                "maxTokensEnable": {
+                    "description": "最大标记(开关)",
+                    "type": "boolean"
+                },
+                "presencePenalty": {
+                    "description": "存在惩罚",
+                    "type": "number"
+                },
+                "presencePenaltyEnable": {
+                    "description": "存在惩罚(开关)",
+                    "type": "boolean"
+                },
+                "temperature": {
+                    "description": "温度",
+                    "type": "number"
+                },
+                "temperatureEnable": {
+                    "description": "温度(开关)",
+                    "type": "boolean"
+                },
+                "topP": {
+                    "description": "Top P",
+                    "type": "number"
+                },
+                "topPEnable": {
+                    "description": "Top P(开关)",
+                    "type": "boolean"
                 }
             }
         },
@@ -7768,6 +7979,51 @@ const docTemplate = `{
                         "toolCall",
                         "functionCall"
                     ]
+                }
+            }
+        },
+        "mp_ollama.LLMParams": {
+            "type": "object",
+            "properties": {
+                "frequencyPenalty": {
+                    "description": "频率惩罚",
+                    "type": "number"
+                },
+                "frequencyPenaltyEnable": {
+                    "description": "频率惩罚(开关)",
+                    "type": "boolean"
+                },
+                "maxTokens": {
+                    "description": "最大标记",
+                    "type": "integer"
+                },
+                "maxTokensEnable": {
+                    "description": "最大标记(开关)",
+                    "type": "boolean"
+                },
+                "presencePenalty": {
+                    "description": "存在惩罚",
+                    "type": "number"
+                },
+                "presencePenaltyEnable": {
+                    "description": "存在惩罚(开关)",
+                    "type": "boolean"
+                },
+                "temperature": {
+                    "description": "温度",
+                    "type": "number"
+                },
+                "temperatureEnable": {
+                    "description": "温度(开关)",
+                    "type": "boolean"
+                },
+                "topP": {
+                    "description": "Top P",
+                    "type": "number"
+                },
+                "topPEnable": {
+                    "description": "Top P(开关)",
+                    "type": "boolean"
                 }
             }
         },
@@ -7899,6 +8155,51 @@ const docTemplate = `{
                 }
             }
         },
+        "mp_qwen.LLMParams": {
+            "type": "object",
+            "properties": {
+                "frequencyPenalty": {
+                    "description": "频率惩罚",
+                    "type": "number"
+                },
+                "frequencyPenaltyEnable": {
+                    "description": "频率惩罚(开关)",
+                    "type": "boolean"
+                },
+                "maxTokens": {
+                    "description": "最大标记",
+                    "type": "integer"
+                },
+                "maxTokensEnable": {
+                    "description": "最大标记(开关)",
+                    "type": "boolean"
+                },
+                "presencePenalty": {
+                    "description": "存在惩罚",
+                    "type": "number"
+                },
+                "presencePenaltyEnable": {
+                    "description": "存在惩罚(开关)",
+                    "type": "boolean"
+                },
+                "temperature": {
+                    "description": "温度",
+                    "type": "number"
+                },
+                "temperatureEnable": {
+                    "description": "温度(开关)",
+                    "type": "boolean"
+                },
+                "topP": {
+                    "description": "Top P",
+                    "type": "number"
+                },
+                "topPEnable": {
+                    "description": "Top P(开关)",
+                    "type": "boolean"
+                }
+            }
+        },
         "mp_qwen.Rerank": {
             "type": "object",
             "properties": {
@@ -7913,6 +8214,19 @@ const docTemplate = `{
             }
         },
         "mp_yuanjing.Embedding": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_yuanjing.Gui": {
             "type": "object",
             "properties": {
                 "apiKey": {
@@ -7943,6 +8257,14 @@ const docTemplate = `{
                         "noSupport",
                         "toolCall",
                         "functionCall"
+                    ]
+                },
+                "visionSupport": {
+                    "description": "视觉支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "support"
                     ]
                 }
             }
@@ -7993,6 +8315,19 @@ const docTemplate = `{
             }
         },
         "mp_yuanjing.Ocr": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_yuanjing.PdfParser": {
             "type": "object",
             "properties": {
                 "apiKey": {
@@ -10222,7 +10557,8 @@ const docTemplate = `{
         "request.RegisterSendEmailCode": {
             "type": "object",
             "required": [
-                "email"
+                "email",
+                "username"
             ],
             "properties": {
                 "email": {

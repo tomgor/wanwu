@@ -199,6 +199,23 @@ func ListOcrModels(ctx *gin.Context) {
 	gin_util.Response(ctx, resp, err)
 }
 
+// ListPdfParserModels
+//
+//	@Tags		model
+//	@Summary	pdf文档解析模型列表
+//	@Description
+//	@Security	JWT
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelBrief}}
+//	@Router		/model/select/pdf-parser [get]
+func ListPdfParserModels(ctx *gin.Context) {
+	resp, err := service.ListTypeModels(ctx, getUserID(ctx), getOrgID(ctx), &request.ListTypeModelsRequest{
+		ModelType: mp.ModelTypePdfParser,
+	})
+	gin_util.Response(ctx, resp, err)
+}
+
 // ListGuiModels
 //
 //	@Tags		model

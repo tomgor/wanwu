@@ -11,6 +11,7 @@ type LLM struct {
 	ApiKey          string `json:"apiKey"`                                                           // ApiKey
 	EndpointUrl     string `json:"endpointUrl"`                                                      // 推理url
 	FunctionCalling string `json:"functionCalling" validate:"oneof=noSupport toolCall functionCall"` // 函数调用是否支持
+	VisionSupport   string `json:"visionSupport" validate:"oneof=noSupport support"`                 // 视觉支持
 }
 
 func (cfg *LLM) NewReq(req *mp_common.LLMReq) (mp_common.ILLMReq, error) {

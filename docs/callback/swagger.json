@@ -322,6 +322,51 @@
                 }
             }
         },
+        "/model/{modelId}/pdf-parser": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "callback"
+                ],
+                "summary": "Model PdfParser",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "模型ID",
+                        "name": "modelId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "文件",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "文件名",
+                        "name": "file_name",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/mp_common.PdfParserResp"
+                        }
+                    }
+                }
+            }
+        },
         "/model/{modelId}/rerank": {
             "post": {
                 "consumes": [
@@ -385,8 +430,8 @@
                     },
                     {
                         "type": "string",
-                        "description": "获取工作流参数spaceId",
-                        "name": "spaceId",
+                        "description": "获取工作流参数orgId",
+                        "name": "orgId",
                         "in": "query",
                         "required": true
                     }
@@ -473,11 +518,17 @@
                 "embedding": {
                     "$ref": "#/definitions/mp_yuanjing.Embedding"
                 },
+                "gui": {
+                    "$ref": "#/definitions/mp_yuanjing.Gui"
+                },
                 "llm": {
                     "$ref": "#/definitions/mp_yuanjing.LLM"
                 },
                 "ocr": {
                     "$ref": "#/definitions/mp_yuanjing.Ocr"
+                },
+                "pdf-parser": {
+                    "$ref": "#/definitions/mp_yuanjing.PdfParser"
                 },
                 "rerank": {
                     "$ref": "#/definitions/mp_yuanjing.Rerank"
@@ -584,6 +635,15 @@
                 },
                 "usage": {
                     "$ref": "#/definitions/mp_common.Usage"
+                }
+            }
+        },
+        "mp_common.ExtraBody": {
+            "type": "object",
+            "properties": {
+                "api_option": {
+                    "description": "选择指定功能。 1）math：拍照答题；2）ocr：多模态OCR；3）general：通用场景。   默认会根据prompt进行意图判断",
+                    "type": "string"
                 }
             }
         },
@@ -712,6 +772,14 @@
                 "enable_thinking": {
                     "type": "boolean"
                 },
+                "extra_body": {
+                    "description": "扩展参数",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_common.ExtraBody"
+                        }
+                    ]
+                },
                 "frequency_penalty": {
                     "description": "频率惩罚系数",
                     "type": "number"
@@ -737,7 +805,7 @@
                 "messages": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/mp_common.OpenAIMsg"
+                        "$ref": "#/definitions/mp_common.OpenAIReqMsg"
                     }
                 },
                 "min_p": {
@@ -759,12 +827,14 @@
                     "type": "number"
                 },
                 "repetition_penalty": {
+                    "description": "模型生成时连续序列中的重复度",
                     "type": "number"
                 },
                 "response_format": {
                     "$ref": "#/definitions/mp_common.OpenAIResponseFormat"
                 },
                 "seed": {
+                    "description": "种子",
                     "type": "integer"
                 },
                 "stop": {
@@ -842,12 +912,19 @@
                         "$ref": "#/definitions/mp_common.OpenAIRespChoice"
                     }
                 },
+                "code": {
+                    "type": "integer"
+                },
                 "created": {
                     "description": "时间戳（秒）",
                     "type": "integer"
                 },
                 "id": {
                     "description": "唯一标识",
+                    "type": "string"
+                },
+                "img_id": {
+                    "description": "视觉模型返回图片id",
                     "type": "string"
                 },
                 "model": {
@@ -894,7 +971,6 @@
             "type": "object",
             "required": [
                 "page_num",
-                "text",
                 "type"
             ],
             "properties": {
@@ -1031,6 +1107,38 @@
                 }
             }
         },
+        "mp_common.OpenAIReqMsg": {
+            "type": "object",
+            "properties": {
+                "content": {},
+                "function_call": {
+                    "$ref": "#/definitions/mp_common.FunctionCall"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reasoning_content": {
+                    "type": "string"
+                },
+                "role": {
+                    "description": "\"system\" | \"user\" | \"assistant\" | \"function(已弃用)\"",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/mp_common.MsgRole"
+                        }
+                    ]
+                },
+                "tool_call_id": {
+                    "type": "string"
+                },
+                "tool_calls": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mp_common.ToolCall"
+                    }
+                }
+            }
+        },
         "mp_common.OpenAIRespChoice": {
             "type": "object",
             "properties": {
@@ -1099,6 +1207,31 @@
                 },
                 "type": {
                     "$ref": "#/definitions/mp_common.ToolType"
+                }
+            }
+        },
+        "mp_common.PdfParserResp": {
+            "type": "object",
+            "required": [
+                "code",
+                "content",
+                "message"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "trace_id": {
+                    "type": "string"
                 }
             }
         },
@@ -1477,6 +1610,19 @@
                 }
             }
         },
+        "mp_yuanjing.Gui": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
         "mp_yuanjing.LLM": {
             "type": "object",
             "properties": {
@@ -1496,10 +1642,31 @@
                         "toolCall",
                         "functionCall"
                     ]
+                },
+                "visionSupport": {
+                    "description": "视觉支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "support"
+                    ]
                 }
             }
         },
         "mp_yuanjing.Ocr": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "description": "ApiKey",
+                    "type": "string"
+                },
+                "endpointUrl": {
+                    "description": "推理url",
+                    "type": "string"
+                }
+            }
+        },
+        "mp_yuanjing.PdfParser": {
             "type": "object",
             "properties": {
                 "apiKey": {
