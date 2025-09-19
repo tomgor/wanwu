@@ -47,7 +47,8 @@ export default {
         org: '组织管理',
         modelAccess: '模型管理',
         about: '关于',
-        helpDoc: '帮助文档'
+        helpDoc: '帮助文档',
+        back: '返回',
     },
     header: {
         title: '智能体平台',
