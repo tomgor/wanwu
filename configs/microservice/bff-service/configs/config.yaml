@@ -109,6 +109,8 @@ doc-center:
       val: 6.工作流/代码.md
     - key: workflow-8
       val: 6.工作流/选择器.md
+    - key: workflow-9
+      val: 6.工作流/工作流.md
     - key: workflow-13
       val: 6.工作流/输出.md
     - key: workflow-15
