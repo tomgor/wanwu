@@ -6,9 +6,14 @@
     </div>
     <div class="hide-loading-bg" style="padding: 20px" v-loading="loading">
       <search-input :placeholder="$t('appSpace.search')" ref="searchInput" @handleSearch="handleSearch" />
-      <el-button class="add-button" size="mini" type="primary" @click="showCreate" icon="el-icon-plus" v-if="validateAgent()">
-        {{$t('common.button.create')}}
-      </el-button>
+      <div class="header-right">
+        <el-button size="mini" type="primary" @click="showImport" v-if="type === 'workflow'">
+          {{$t('common.button.import')}}
+        </el-button>
+        <el-button size="mini" type="primary" @click="showCreate" icon="el-icon-plus" v-if="validateAgent()">
+          {{$t('common.button.create')}}
+        </el-button>
+      </div>
       <!-- <div v-if="type === 'agent'" class="agent_type_switch">
           <div v-for="item in agentSwitch" :class="{'agentActive':item.type === agnet_type }" class="agent_type_item" @click="agentType_change(item)" :key="item.type">{{item.name}}</div>
       </div> -->
@@ -22,6 +27,7 @@
         @reloadData="getTableData"
       />
       <CreateTotalDialog ref="createTotalDialog" />
+      <UploadFileDialog :title="$t('appSpace.workflowExport')" ref="uploadFileDialog" />
     </div>
   </div>
 </template>
@@ -30,11 +36,12 @@
 import SearchInput from "@/components/searchInput.vue"
 import AppList from "@/components/appList.vue"
 import CreateTotalDialog from "@/components/createTotalDialog.vue"
+import UploadFileDialog from "@/components/uploadFileDialog.vue"
 import { getAppSpaceList,agnetTemplateList } from "@/api/appspace"
 import { mapGetters} from 'vuex'
 
 export default {
-  components: { SearchInput, CreateTotalDialog, AppList },
+  components: { SearchInput, CreateTotalDialog, UploadFileDialog, AppList },
   data() {
     return {
       type: '',
@@ -162,6 +169,9 @@ export default {
         this.listData = []
       })
     },
+    showImport() {
+      this.$refs.uploadFileDialog.openDialog()
+    },
     showCreate() {
       switch (this.type) {
         case 'agent':
@@ -182,8 +192,9 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.add-button {
- float: right;
+.header-right {
+  display: inline-block;
+  float: right;
 }
 .agent_type_switch{
   margin-top:20px;

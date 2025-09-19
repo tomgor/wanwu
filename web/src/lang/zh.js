@@ -198,7 +198,15 @@ export default {
     },
     appSpace: {
         title: '应用空间',
-        search: '按照应用名称搜索'
+        search: '按照应用名称搜索',
+        workflowExport: '文件导入'
+    },
+    uploadDialog: {
+        title: '文件上传',
+        file: '文件上传: ',
+        hint: '文件格式：json文件',
+        noUpload: '请上传文件',
+        uploadError: '上传失败，请重新上传'
     },
     userInfo: {
         title: '个人信息',
