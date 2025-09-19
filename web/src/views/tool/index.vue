@@ -2,25 +2,22 @@
   <div class="page-wrapper mcp-management">
     <div class="common_bg">
       <div class="page-title">
-        <img class="page-title-img" src="@/assets/imgs/mcp.png" alt="" />
-        <span class="page-title-name">工具广场</span>
+        <img class="page-title-img" src="@/assets/imgs/mcp_menu.png" alt="" />
+        <span class="page-title-name">{{$t('menu.mcp')}}</span>
       </div>
       <!-- tabs -->
       <div class="mcp-tabs">
-        <div :class="['mcp-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">精选推荐</div>
-        <div :class="['mcp-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">导入MCP服务</div>
-        <div :class="['mcp-tab',{ 'active': tabActive === 3 }]" @click="tabClick(3)">自定义工具</div>
+        <div :class="['mcp-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">MCP服务</div>
+        <div :class="['mcp-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">自定义工具</div>
       </div>
 
-      <square ref="square" v-if="tabActive === 0"/>
-      <customize ref="customize" v-if="tabActive === 1"/>
-      <autoTools ref="autoTools" v-if="tabActive === 3"/>
+      <mcpIndex ref="mcpIndex" v-if="tabActive === 0"/>
+      <autoTools ref="autoTools" v-if="tabActive === 1"/>
     </div>
   </div>
 </template>
 <script>
-import square from '../mcpManagementPublic/square'
-import customize from './customize'
+import mcpIndex from './mcpIndex'
 import autoTools from './autoTools'
 export default {
   data() {
@@ -32,21 +29,10 @@ export default {
   methods: {
     tabClick(status){
       this.tabActive = status
-      /*if(status === 0){
-          this.$nextTick(() => {
-              this.$refs['square'].init()
-          })
-      }
-      if(status === 1){
-          this.$nextTick(() => {
-              this.$refs['customize'].init()
-          })
-      }*/
     },
   },
   components: {
-      square,
-      customize,
+      mcpIndex,
       autoTools
   },
 };
