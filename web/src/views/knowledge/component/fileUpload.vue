@@ -290,13 +290,21 @@
                 </el-checkbox-group>
               </el-form-item>
               <el-form-item
-                :label="modelLabel"
                 prop="parserModelId"
                 v-if="ruleForm.docAnalyzer.includes('ocr')||ruleForm.docAnalyzer.includes('model')"
                 :rules="[
                     { required: true, message:'请选择模型',trigger:'blur'}
                 ]"
               >
+              <template #label>
+                <span>{{modelTypeTip[ruleForm.docAnalyzer[1]]['label']}}</span>
+                <el-tooltip
+                  :content="modelTypeTip[ruleForm.docAnalyzer[1]]['desc']"
+                  placement="right"
+                >
+                  <span class="el-icon-question question"></span>
+                </el-tooltip>
+              </template>
                 <el-select
                   v-model="ruleForm.parserModelId"
                   placeholder="请选择"
@@ -443,7 +451,8 @@ import {
   SEGMENT_COMMON_LIST,
   SEGMENT_LIST,
   DOC_ANALYZER_LIST,
-  FAT_SON_BLOCK
+  FAT_SON_BLOCK,
+  MODEL_TYPE_TIP
 } from "../config";
 export default {
   components: { LinkIcon, urlAnalysis, splitterDialog, mataData },
@@ -460,7 +469,6 @@ export default {
     };
     return {
       validateSplitter: validateSplitter,
-      modelLabel: "",
       placeholderText: "搜索分隔符",
       titleText: "创建分隔符",
       splitterValue: "",
@@ -502,7 +510,8 @@ export default {
       segmentCommonList: SEGMENT_COMMON_LIST,
       segmentList: SEGMENT_LIST,
       docAnalyzerList: DOC_ANALYZER_LIST,
-      fatSonBlock:FAT_SON_BLOCK
+      fatSonBlock:FAT_SON_BLOCK,
+      modelTypeTip:MODEL_TYPE_TIP
     };
   },
   async created() {
@@ -526,13 +535,9 @@ export default {
         this.ruleForm.docAnalyzer = [val[0],val[2]]
       }
       if (val.includes("ocr")) {
-        this.modelLabel = "OCR模型";
         this.getOcrList();
       } else if (val.includes("model")) {
-        this.modelLabel = "pdf_parser模型";
         this.getParserList();
-      } else {
-        this.modelLabel = "";
       }
     },
     segmentClick(label) {

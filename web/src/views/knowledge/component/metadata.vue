@@ -11,7 +11,7 @@
       <div
         v-for="(item,index) in docMetaData"
         class="docItem"
-        :key="item.metaKey + index"
+        :key="'meta'+index"
       >
         <div class="docItem_data">
           <span class="docItem_data_label">
@@ -55,7 +55,7 @@
             v-if="type === 'create'"
             v-model="item.metaValueType"
             placeholder="请选择"
-            :disabled="item.metaId && item.metaId!== '' ? true : false"
+            :disabled="Boolean(item.metaId)"
           >
             <el-option
               v-for="item in typeOptions"
@@ -286,29 +286,26 @@ export default {
     },
     metakeyBlur(item,index) {
       const regex = /^[a-z][a-z0-9_]*$/;
-      if(item.showEdit){
-        if (!item.metaKey) {
-          this.$message.warning("请输入key值");
-          return;
-        }
-        if (!regex.test(item.metaKey)) {
-          this.$message.warning("请输入符合标准的key值");
-          item.metaKey = "";
-          return;
-        }
-
-        if(this.isFound()){
-          this.$message.warning("存在相同key值");
-          item.metaKey = "";
-          return;
-        }
+      if (!item.metaKey) {
+        this.$message.warning("请输入key值");
+        return;
+      }
+      if (!regex.test(item.metaKey)) {
+        this.$message.warning("请输入符合标准的key值");
+        item.metaKey = "";
+        return;
       }
 
+      if(this.isFound()){
+        this.$message.warning("存在相同key值");
+        item.metaKey = "";
+        return;
+      }
 
-      // if(item.metaId){
-      //   item.option = 'update';
-      // }
-      // item.showEdit = false;
+      if(item.metaId){
+        item.option = 'update';
+      }
+      item.showEdit = false;
     },
     isFound(){
       const metaKeys = this.docMetaData.map(item => item.metaKey);
