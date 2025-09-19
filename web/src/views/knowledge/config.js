@@ -63,7 +63,7 @@ export const DOC_ANALYZER_LIST = [
 ]
 export const MODEL_TYPE_TIP = {
     ocr:{
-        label:'OCRO型',
+        label:'OCR模型',
         desc:'若需使用，请前往模型管理-联通元景-添加ocr模型'
     },
     model:{
