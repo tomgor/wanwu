@@ -13,7 +13,6 @@
         class="docItem"
         :key="item.metaKey + index"
       >
-      <template v-if="item.option !== 'delete'">
         <div class="docItem_data">
           <span class="docItem_data_label">
             <span class="label">Key:</span>
@@ -31,7 +30,6 @@
               v-if="item.showEdit"
               v-model="item.metaKey"
               @blur="metakeyBlur(item,index)"
-              @input="metakeyChange(item)"
             ></el-input>
             <span v-else class="metaItemKey">{{item.metaKey}}</span>
           </template>
@@ -128,13 +126,12 @@
             @click="delMataItem(index,item)"
           ></span>
         </div>
-      </template>
       </div>
     </div>
   </div>
 </template>
 <script>
-import {metaSelect} from "@/api/knowledge"
+import {metaSelect,updateDocMeta} from "@/api/knowledge"
 export default {
   props:['metaData','type','knowledgeId'],
   watch: {
@@ -265,37 +262,53 @@ export default {
     delMataItem(i,item) {
       if(item.metaId){
         item.option = 'delete'
+        this.delMetaData(item)
       }else{
         this.docMetaData.splice(i, 1);
       }
+    },
+    delMetaData(item){
+      const data = {
+        docId:'',
+        knowledgeId:this.knowledgeId,
+        metaDataList:[item]
+      }
+      updateDocMeta(data).then(res =>{
+        if(res.code === 0){
+            this.$message.success('操作成功')
+            this.getList();
+        }
+      })
     },
     valueChange(item) {
       item.metaValue = "";
       item.metaRule = "";
     },
-    metakeyChange(item){
-      if(item.metaId){
-        item.option = 'update';
-      }
-    },
     metakeyBlur(item,index) {
       const regex = /^[a-z][a-z0-9_]*$/;
-      if (!item.metaKey) {
-        this.$message.warning("请输入key值");
-        return;
-      }
-      if (!regex.test(item.metaKey)) {
-        this.$message.warning("请输入符合标准的key值");
-        item.metaKey = "";
-        return;
+      if(item.showEdit){
+        if (!item.metaKey) {
+          this.$message.warning("请输入key值");
+          return;
+        }
+        if (!regex.test(item.metaKey)) {
+          this.$message.warning("请输入符合标准的key值");
+          item.metaKey = "";
+          return;
+        }
+
+        if(this.isFound()){
+          this.$message.warning("存在相同key值");
+          item.metaKey = "";
+          return;
+        }
       }
 
-      if(this.isFound()){
-        this.$message.warning("存在相同key值");
-        item.metaKey = "";
-        return;
-      }
-      item.showEdit = false;
+
+      // if(item.metaId){
+      //   item.option = 'update';
+      // }
+      // item.showEdit = false;
     },
     isFound(){
       const metaKeys = this.docMetaData.map(item => item.metaKey);
