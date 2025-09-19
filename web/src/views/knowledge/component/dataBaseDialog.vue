@@ -132,14 +132,16 @@ export default {
       isDisabled:false
     };
   },
-  watch:{
-    tableData:{
-      handler(val){
-        if(val.some(item => !item.metaKey || !item.metaValueType) || !val.length){
-          this.isDisabled = true
-        }else{
-          this.isDisabled = false
-        }
+  watch: {
+    tableData: {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        const hasAnyValue =
+          val &&
+          typeof val === 'object' &&
+          Object.values(val).some(v => v !== null && v !== undefined && String(v).trim() !== '')
+        this.isDisabled = !hasAnyValue
       }
     }
   },

@@ -86,7 +86,7 @@
           </el-select>
           <el-input
             v-model="item.metaValue"
-            v-if="(item.metadataType ==='value' && item.metaValueType === 'string') || item.metaValueType === ''"
+            v-if="item.metadataType ==='value' && item.metaValueType === 'string'"
             @blur="metaValueBlur(item)"
             placeholder="string"
           ></el-input>
@@ -232,7 +232,7 @@ export default {
         metaKey: "",
         metaRule: "",
         metaValue: "",
-        metaValueType: "",
+        metaValueType: "string",
         showEdit:true,
         metadataType: "value",
         option:"add"
@@ -288,6 +288,7 @@ export default {
       })
     },
     valueChange(item) {
+      console.log(item)
       item.metaValue = "";
       item.metaRule = "";
     },
