@@ -236,10 +236,11 @@ export default {
       const data = {
         docId:'',
         knowledgeId:this.docQuery.knowledgeId,
-        metaDataList:this.metaData.filter(item => item.option !== '').map(({metaKey,metaValueType,option}) =>({
+        metaDataList:this.metaData.filter(item => item.option !== '').map(({metaId,metaKey,metaValueType,option}) =>({
           metaKey,
-          metaValueType,
-          option
+          ...(option === 'add' ? {metaValueType } : {}),
+          option,
+          ...(option === 'update'||option === 'delete' ? {metaId } : {})
         }))
       }
       updateDocMeta(data).then(res =>{

@@ -165,7 +165,8 @@ export default {
       }
       const data = {
         metaDataList:metaData,
-        docId:this.docId
+        docId:this.docId,
+        knowledgeId:this.knowledgeId
       }
       updateDocMeta(data).then(res =>{
         if(res.code === 0){

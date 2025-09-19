@@ -268,10 +268,14 @@ export default {
       }
     },
     delMetaData(item){
+      const dataItem = [item]
       const data = {
         docId:'',
         knowledgeId:this.knowledgeId,
-        metaDataList:[item]
+        metaDataList:dataItem.map(({metaId,option}) =>({
+          metaId,
+          option
+        }))
       }
       updateDocMeta(data).then(res =>{
         if(res.code === 0){
