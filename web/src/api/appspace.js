@@ -62,6 +62,16 @@ export const appCancelPublish = (data)=>{
     })
 };
 
+// 导入文件
+export const importFile = (data, config) => {
+    return service({
+        url: `${BASE_URL}/appspace/app/workflow/import`,
+        method: 'post',
+        data,
+        config
+    });
+};
+
 //统一删除工作室应用接口
 export const deleteApp = (data)=>{
     return request({

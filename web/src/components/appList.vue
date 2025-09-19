@@ -129,6 +129,12 @@
               >
                 发布配置
               </el-dropdown-item>
+              <el-dropdown-item
+                command="export"
+                v-if="n.appType === 'workflow'"
+              >
+                {{$t('common.button.export')}}
+              </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -291,6 +297,7 @@ export default {
         });
       }
     },
+
     workflowPublish(row) {
       this.row = row
       this.dialogVisible = true
@@ -329,15 +336,8 @@ export default {
         }
       }
     },
-    async showDeleteConfirm(tips){
-      try{
-        await this.$alert(tips, this.$t("list.tips"), {
-          confirmButtonText: this.$t("list.confirm"),
-        });
-        return true;
-      }catch(err){
-        return false;
-      }
+    workflowExport(row) {
+      console.log(row, '---------------------------workflowExport')
     },
     workflowOperation(method, row) {
       switch (method) {
@@ -359,6 +359,18 @@ export default {
         case "publishSet":
           this.$router.push({path:`/workflow/publishSet`, query: {appId: row.appId, appType: row.appType, name: row.name}})
           break;
+        case 'export':
+          this.workflowExport(row)
+      }
+    },
+    async showDeleteConfirm(tips){
+      try{
+        await this.$alert(tips, this.$t("list.tips"), {
+          confirmButtonText: this.$t("list.confirm"),
+        });
+        return true;
+      }catch(err){
+        return false;
       }
     },
     intelligentEdit(row) {

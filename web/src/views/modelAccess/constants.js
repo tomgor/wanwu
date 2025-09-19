@@ -57,7 +57,7 @@ export const DEFAULT_CALLING = 'noSupport'
 export const FUNC_CALLING = [
     {key: 'noSupport', name: '不支持'},
     {key: 'toolCall', name: 'Tool call'},
-    {key: 'functionCall', name: 'Function call'},
+    /*{key: 'functionCall', name: 'Function call'},*/
 ]
 
 export const DEFAULT_SUPPORT = 'noSupport'
