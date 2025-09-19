@@ -23,6 +23,9 @@ func Register(apiV1 *gin.RouterGroup) {
 	// mcp
 	registerMCP(apiV1)
 
+	// tool
+	registerTool(apiV1)
+
 	// safety
 	registerSafety(apiV1)
 
