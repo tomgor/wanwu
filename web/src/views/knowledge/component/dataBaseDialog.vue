@@ -109,7 +109,7 @@
       <el-button
         type="primary"
         @click="submitDialog('submit')"
-        :disabled="rule"
+        :disabled="isDisabled"
       >确 定</el-button>
     </span>
   </el-dialog>
@@ -121,9 +121,6 @@ export default {
   computed: {
     filteredTableData() {
       return this.tableData.filter(item => item.option !== "delete");
-    },
-    rule() {
-      return this.tableData.some(item => !item.metaValue || !item.metaKey)
     }
   },
   data() {
@@ -131,8 +128,20 @@ export default {
       dialogVisible: false,
       tableData: [],
       docId: "",
-      keyOptions:[]
+      keyOptions:[],
+      isDisabled:false
     };
+  },
+  watch:{
+    tableData:{
+      handler(val){
+        if(val.some(item => !item.metaKey || !item.metaValueType) || !val.length){
+          this.isDisabled = true
+        }else{
+          this.isDisabled = false
+        }
+      }
+    }
   },
   created(){
     this.getList()
@@ -153,6 +162,7 @@ export default {
       this.$router.push({path:`/knowledge/doclist/${this.knowledgeId}`,query:{name:this.name}})
     },
     submitDialog(type) {
+      this.isDisabled = true;
       this.tableData.forEach(i => {
         delete i.editable
         delete i.created
@@ -172,9 +182,12 @@ export default {
         if(res.code === 0){
             this.$message.success('操作成功成功');
             this.$emit('updateData')
+            this.isDisabled = true;
             if(type === 'del') return false;
             this.dialogVisible = false;
         }
+      }).catch(() =>{
+        this.isDisabled = true;
       })
       
     },

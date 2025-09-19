@@ -308,10 +308,7 @@ export default {
         item.metaKey = "";
         return;
       }
-
-      if(item.metaId){
-        item.option = 'update';
-      }
+      
       item.showEdit = false;
     },
     isFound(){

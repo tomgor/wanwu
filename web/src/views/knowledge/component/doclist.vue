@@ -205,7 +205,7 @@ export default {
     },
     metaData:{
       handler(val){
-        if(val.some(item => item.metaKey === '' || item.metaValueType === '') || val.length === 0){
+        if(val.some(item => !item.metaKey || !item.metaValueType) || !val.length){
           this.isDisabled = true
         }else{
           this.isDisabled = false
@@ -233,6 +233,7 @@ export default {
       });
      },
     submitMeta(){
+      this.isDisabled = true;
       const metaList = this.metaData.filter(item => item.option !== '').map(({metaId,metaKey,metaValueType,option}) =>({
           metaKey,
           ...(option === 'add' ? {metaValueType } : {}),
@@ -249,8 +250,11 @@ export default {
           this.$message.success('操作成功');
           this.$refs.mataData.getList();
           this.metaVisible = false;
+          this.isDisabled = false;
         }
-      }).catch(() =>{})
+      }).catch(() =>{
+          this.isDisabled = false;
+      })
     },
     showMeta(){
       this.metaVisible = true;
