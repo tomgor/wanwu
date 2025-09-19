@@ -2,12 +2,20 @@ export const FAT_SON_BLOCK = [
     {
         title:'父块',
         level:'parent',
-        key:"segmentParent",
+        key:"splitter",
+        splitter:'splitter',
+        maxSplitter:'maxSplitter',
+        splitterProp:'docSegment.splitter',
+        maxSplitterProp:'docSegment.maxSplitter',
     },
     {
         title:'子块',
         level:'son',
-        key:"segmentSon",
+        key:"subSplitter",
+        splitter:'subSplitter',
+        maxSplitter:'subMaxSplitter',
+        splitterProp:'docSegment.subSplitter',
+        maxSplitterProp:'docSegment.subMaxSplitter'
     }
 ]
 export const SEGMENT_COMMON_LIST = [
@@ -24,13 +32,13 @@ export const SEGMENT_COMMON_LIST = [
 ]
 export const SEGMENT_LIST = [
     {
-        label:'common',
+        label:'0',
         img:'setting-gear.png',
         text:'通用分段',
         desc:'检索和召回的分段内容相同'
     },
     {
-        label:'fatherSon',
+        label:'1',
         img:'setting-effect.png',
         text:'父子分段',
         desc:'父分段用作上下文，子分段用于检索'
@@ -40,16 +48,16 @@ export const DOC_ANALYZER_LIST = [
     {
         label:'text',
         text:'文本提取',
-        desc:'提取文档文本信息时开启'
+        desc:'提取文档文本信息时开启，适用于所有文件'
     },
     {
         label:'ocr',
-        text:'启用ocr解析',
+        text:'启用OCR解析',
         desc:'解析图片、扫描件文档时开启，仅适用于PDF文件'
     },
     {
         label:'model',
         text:'模型解析',
-        desc:'提取标题、图表、公式时开启，仅适用于PDF文件'
+        desc:'提取标题、图表、公式时开启，适用于pdf/word/ppt文件'
     }
 ]

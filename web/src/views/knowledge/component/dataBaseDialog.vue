@@ -85,6 +85,7 @@
                   value-format="timestamp"
                   type="datetime"
                   placeholder="请选择日期时间"
+                  style="width:100%;"
               />
             </template>
           </el-table-column>

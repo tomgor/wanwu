@@ -236,7 +236,7 @@ export default {
       const data = {
         docId:'',
         knowledgeId:this.docQuery.knowledgeId,
-        metaDataList:this.metaData.map(({metaKey,metaValueType,option}) =>({
+        metaDataList:this.metaData.filter(item => item.opyion !== '').map(({metaKey,metaValueType,option}) =>({
           metaKey,
           metaValueType,
           option
