@@ -56,7 +56,7 @@ func GetMCPSquareRecommends(ctx *gin.Context) {
 
 // CreateMCP
 //
-//	@Tags			mcp
+//	@Tags			tool
 //	@Summary		创建自定义MCP
 //	@Description	创建自定义MCP
 //	@Accept			json
@@ -74,7 +74,7 @@ func CreateMCP(ctx *gin.Context) {
 
 // GetMCP
 //
-//	@Tags			mcp
+//	@Tags			tool
 //	@Summary		获取自定义MCP详情
 //	@Description	获取自定义MCP详情
 //	@Accept			json
@@ -89,7 +89,7 @@ func GetMCP(ctx *gin.Context) {
 
 // DeleteMCP
 //
-//	@Tags			mcp
+//	@Tags			tool
 //	@Summary		删除自定义MCP
 //	@Description	删除自定义MCP
 //	@Accept			json
@@ -107,7 +107,7 @@ func DeleteMCP(ctx *gin.Context) {
 
 // GetMCPList
 //
-//	@Tags			mcp
+//	@Tags			tool
 //	@Summary		获取自定义MCP列表
 //	@Description	获取自定义MCP列表
 //	@Accept			json
@@ -137,7 +137,7 @@ func GetMCPSelect(ctx *gin.Context) {
 
 // GetMCPTools
 //
-//	@Tags			mcp
+//	@Tags			tool
 //	@Summary		获取MCP Tool列表
 //	@Description	获取MCP Tool列表
 //	@Accept			json
