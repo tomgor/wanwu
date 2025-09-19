@@ -258,6 +258,9 @@ export default {
     },
     editMataItem(item){
       item.showEdit = true;
+      if(item.metaId){
+        item.option = 'update';
+      }
     },
     delMataItem(i,item) {
       if(item.metaId){

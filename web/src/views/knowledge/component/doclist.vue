@@ -233,15 +233,16 @@ export default {
       });
      },
     submitMeta(){
-      const data = {
-        docId:'',
-        knowledgeId:this.docQuery.knowledgeId,
-        metaDataList:this.metaData.filter(item => item.option !== '').map(({metaId,metaKey,metaValueType,option}) =>({
+      const metaList = this.metaData.filter(item => item.option !== '').map(({metaId,metaKey,metaValueType,option}) =>({
           metaKey,
           ...(option === 'add' ? {metaValueType } : {}),
           option,
           ...(option === 'update'||option === 'delete' ? {metaId } : {})
         }))
+      const data = {
+        docId:'',
+        knowledgeId:this.docQuery.knowledgeId,
+        metaDataList:metaList
       }
       updateDocMeta(data).then(res =>{
         if(res.code === 0){
