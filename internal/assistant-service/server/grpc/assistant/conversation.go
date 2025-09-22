@@ -871,7 +871,7 @@ func buildCustomToolListAlgParam(ctx context.Context, s *Service, assistantId st
 			return pluginList, err
 		}
 
-		if info.ApiAuth.Type == "apiKey" {
+		if info.ApiAuth.Type == "API Key" {
 			apiAuth := config.APIAuth{
 				Type:  "apiKey",
 				In:    "query",
