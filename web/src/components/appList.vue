@@ -171,7 +171,7 @@
 
 <script>
 import { AppType } from "@/utils/commonSet";
-import { deleteApp, appCancelPublish,copyAgnetTemplate, appPublish } from "@/api/appspace";
+import { deleteApp, appCancelPublish, copyAgnetTemplate, appPublish } from "@/api/appspace";
 import { copyWorkFlow, publishWorkFlow, copyExample } from "@/api/workflow";
 import { setFavorite } from "@/api/explore";
 export default {

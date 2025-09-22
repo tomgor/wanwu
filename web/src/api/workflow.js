@@ -175,3 +175,12 @@ export const getList = (data)=>{
         params: data
     })
 };
+
+// 工作流图片上传
+export const uploadFile = (data) => {
+    return request({
+        url: `/api/bot/upload_file`,
+        method: "post",
+        data
+    })
+}

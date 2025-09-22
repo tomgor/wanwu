@@ -60,6 +60,11 @@
         border-radius: 8px;
         cursor: pointer;
         height: 150px;
+        .logo /deep/ {
+            img {
+                object-fit: contain;
+            }
+        }
         .tags{
             position: absolute;
             bottom: 10px;
