@@ -167,6 +167,14 @@ func RemoveOrgUser(ctx *gin.Context, orgID, userID string) error {
 	return err
 }
 
+func UpdateUserAvatar(ctx *gin.Context, userID, key string) error {
+	_, err := iam.UpdateUserAvatar(ctx.Request.Context(), &iam_service.UpdateUserAvatarReq{
+		UserId:     userID,
+		AvatarPath: key,
+	})
+	return err
+}
+
 // --- internal ---
 
 func toUserInfo(ctx *gin.Context, user *iam_service.UserInfo) *response.UserInfo {
@@ -183,6 +191,7 @@ func toUserInfo(ctx *gin.Context, user *iam_service.UserInfo) *response.UserInfo
 		Creator:   toIDName(user.Creator),
 		Status:    user.Status,
 		Language:  getLanguageByCode(user.Language),
+		Avatar:    cacheUserAvatar(ctx, user.AvatarPath),
 	}
 	for _, userOrg := range user.Orgs {
 		ret.Orgs = append(ret.Orgs, toOrgRole(ctx, userOrg))

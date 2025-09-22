@@ -72,6 +72,11 @@ func GetLogoCustomInfo(ctx *gin.Context, mode string) (response.LogoCustomInfo, 
 			},
 			LinkList: config.Cfg().DocCenter.GetDocs(),
 			Register: response.CustomRegister{Email: response.CustomEmail{Status: config.Cfg().CustomInfo.RegisterByEmail != 0}},
+			DefaultIcon: response.CustomDefaultIcon{
+				RagIcon:      config.Cfg().DefaultIcon.RagIcon,
+				AgentIcon:    config.Cfg().DefaultIcon.AgentIcon,
+				WorkflowIcon: config.Cfg().DefaultIcon.WorkflowIcon,
+			},
 		}
 		break
 	}

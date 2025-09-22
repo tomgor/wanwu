@@ -104,7 +104,7 @@ func ListWorkflowByIDs(ctx *gin.Context, name string, workflowIDs []string) (*re
 	return ret.Data, nil
 }
 
-func CreateWorkflow(ctx *gin.Context, orgID, name, desc string) (*response.CozeWorkflowIDData, error) {
+func CreateWorkflow(ctx *gin.Context, orgID, name, desc, iconUri string) (*response.CozeWorkflowIDData, error) {
 	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.CreateUri)
 	ret := &response.CozeWorkflowIDResp{}
 	if resp, err := resty.New().
@@ -117,7 +117,7 @@ func CreateWorkflow(ctx *gin.Context, orgID, name, desc string) (*response.CozeW
 			"space_id": orgID,
 			"name":     name,
 			"desc":     desc,
-			"icon_uri": "default_icon/default_workflow_icon.png",
+			"icon_uri": iconUri,
 		}).
 		SetResult(ret).
 		Post(url); err != nil {
@@ -195,6 +195,7 @@ func cozeWorkflowInfo2Model(workflowInfo *response.CozeWorkflowListDataWorkflow)
 		AppType:   constant.AppTypeWorkflow,
 		Name:      workflowInfo.Name,
 		Desc:      workflowInfo.Desc,
+		Avatar:    cacheWorkflowAvatar(workflowInfo.URL),
 		CreatedAt: util.Time2Str(workflowInfo.CreateTime * 1000),
 		UpdatedAt: util.Time2Str(workflowInfo.UpdateTime * 1000),
 	}

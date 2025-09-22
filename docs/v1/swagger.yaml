@@ -2338,6 +2338,11 @@ definitions:
     - importType
     - tableId
     type: object
+  request.UserAvatarUpdate:
+    properties:
+      avatar:
+        $ref: '#/definitions/request.Avatar'
+    type: object
   request.UserCreate:
     properties:
       company:
@@ -2853,6 +2858,15 @@ definitions:
         description: 关于图标路径
         type: string
       version:
+        type: string
+    type: object
+  response.CustomDefaultIcon:
+    properties:
+      agentIcon:
+        type: string
+      ragIcon:
+        type: string
+      workflowIcon:
         type: string
     type: object
   response.CustomEmail:
@@ -3384,6 +3398,10 @@ definitions:
         allOf:
         - $ref: '#/definitions/response.CustomAbout'
         description: 关于信息
+      defaultIcon:
+        allOf:
+        - $ref: '#/definitions/response.CustomDefaultIcon'
+        description: 应用默认图片
       home:
         allOf:
         - $ref: '#/definitions/response.CustomHome'
@@ -3983,6 +4001,8 @@ definitions:
     type: object
   response.UserInfo:
     properties:
+      avatar:
+        $ref: '#/definitions/request.Avatar'
       company:
         type: string
       createdAt:
@@ -4040,6 +4060,10 @@ definitions:
     type: object
   response.UserPermission:
     properties:
+      avatar:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 用户头像信息
       isUpdatePassword:
         description: 是否已更新密码
         type: boolean
@@ -8410,6 +8434,30 @@ paths:
       summary: 重置用户密码（by 管理员）
       tags:
       - permission.user
+  /user/avatar:
+    put:
+      consumes:
+      - application/json
+      description: 更新用户的头像信息
+      parameters:
+      - description: 用户头像信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.UserAvatarUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - JWT: []
+      summary: 编辑用户头像
+      tags:
+      - common
   /user/info:
     get:
       consumes:

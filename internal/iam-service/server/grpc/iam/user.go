@@ -142,22 +142,30 @@ func (s *Service) ChangeUserLanguage(ctx context.Context, req *iam_service.Chang
 	return &emptypb.Empty{}, nil
 }
 
+func (s *Service) UpdateUserAvatar(ctx context.Context, req *iam_service.UpdateUserAvatarReq) (*emptypb.Empty, error) {
+	if err := s.cli.UpdateUserAvatar(ctx, util.MustU32(req.UserId), req.AvatarPath); err != nil {
+		return nil, errStatus(errs.Code_IAMUser, err)
+	}
+	return &emptypb.Empty{}, nil
+}
+
 // --- internal function ---
 
 func toUserInfo(user *orm.UserInfo) *iam_service.UserInfo {
 	ret := &iam_service.UserInfo{
-		UserId:    strconv.Itoa(int(user.ID)),
-		Status:    user.Status,
-		UserName:  user.Name,
-		NickName:  user.Nick,
-		Gender:    user.Gender,
-		Phone:     user.Phone,
-		Email:     user.Email,
-		Company:   user.Company,
-		Remark:    user.Remark,
-		CreatedAt: user.CreatedAt,
-		Creator:   toIDName(user.Creator),
-		Language:  user.Language,
+		UserId:     strconv.Itoa(int(user.ID)),
+		Status:     user.Status,
+		UserName:   user.Name,
+		NickName:   user.Nick,
+		Gender:     user.Gender,
+		Phone:      user.Phone,
+		Email:      user.Email,
+		Company:    user.Company,
+		Remark:     user.Remark,
+		CreatedAt:  user.CreatedAt,
+		Creator:    toIDName(user.Creator),
+		Language:   user.Language,
+		AvatarPath: user.AvatarPath,
 	}
 	for _, userOrg := range user.Orgs {
 		ret.Orgs = append(ret.Orgs, &iam_service.UserOrg{

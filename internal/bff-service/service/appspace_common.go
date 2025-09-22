@@ -21,7 +21,7 @@ func appBriefProto2Model(ctx *gin.Context, appBrief *common.AppBrief) response.A
 		AppId:     appBrief.AppId,
 		AppType:   appBrief.AppType,
 		UniqueId:  bff_util.ConcatAssistantToolUniqueId(appBrief.AppType, appBrief.AppId),
-		Avatar:    CacheAvatar(ctx, appBrief.AvatarPath),
+		Avatar:    cacheAppAvatar(ctx, appBrief.AvatarPath, appBrief.AppType),
 		Name:      appBrief.Name,
 		Desc:      appBrief.Desc,
 		CreatedAt: util.Time2Str(appBrief.CreatedAt),
@@ -31,9 +31,9 @@ func appBriefProto2Model(ctx *gin.Context, appBrief *common.AppBrief) response.A
 
 // --- app brief config ---
 
-func appBriefConfigProto2Model(ctx *gin.Context, appBrief *common.AppBriefConfig) request.AppBriefConfig {
+func appBriefConfigProto2Model(ctx *gin.Context, appBrief *common.AppBriefConfig, appType string) request.AppBriefConfig {
 	return request.AppBriefConfig{
-		Avatar: CacheAvatar(ctx, appBrief.AvatarPath),
+		Avatar: cacheAppAvatar(ctx, appBrief.AvatarPath, appType),
 		Name:   appBrief.Name,
 		Desc:   appBrief.Desc,
 	}

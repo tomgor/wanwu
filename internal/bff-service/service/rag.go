@@ -7,6 +7,7 @@ import (
 	safety_service "github.com/UnicomAI/wanwu/api/proto/safety-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
+	"github.com/UnicomAI/wanwu/pkg/constant"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/gin-gonic/gin"
 )
@@ -141,7 +142,7 @@ func GetRag(ctx *gin.Context, req request.RagReq) (*response.RagInfo, error) {
 	}
 	ragInfo := &response.RagInfo{
 		RagID:               resp.RagId,
-		AppBriefConfig:      appBriefConfigProto2Model(ctx, resp.BriefConfig),
+		AppBriefConfig:      appBriefConfigProto2Model(ctx, resp.BriefConfig, constant.AppTypeRag),
 		ModelConfig:         modelConfig,
 		RerankConfig:        rerankConfig,
 		KnowledgeBaseConfig: ragKBConfigProto2Model(ctx, resp.KnowledgeBaseConfig),

@@ -2,6 +2,7 @@ package v1
 
 import (
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
+	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
 	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	"github.com/UnicomAI/wanwu/pkg/util"
@@ -116,6 +117,26 @@ func GetDocCenterMenu(ctx *gin.Context) {
 func GetDocCenterMarkdown(ctx *gin.Context) {
 	resp, err := service.GetDocCenterMarkdown(ctx, ctx.Query("path"))
 	gin_util.Response(ctx, resp, err)
+}
+
+// UpdateUserAvatar
+//
+//	@Tags			common
+//	@Summary		编辑用户头像
+//	@Description	更新用户的头像信息
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.UserAvatarUpdate	true	"用户头像信息"
+//	@Success		200		{object}	response.Response
+//	@Router			/user/avatar [put]
+func UpdateUserAvatar(ctx *gin.Context) {
+	var req request.UserAvatarUpdate
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.UpdateUserAvatar(ctx, getUserID(ctx), req.Avatar.Key)
+	gin_util.Response(ctx, nil, err)
 }
 
 // --- internal ---
