@@ -3,7 +3,7 @@
     <div class="common_bg">
       <div class="page-title">
         <img class="page-title-img" src="@/assets/imgs/mcp_menu.png" alt="" />
-        <span class="page-title-name">{{$t('menu.mcp')}}</span>
+        <span class="page-title-name">{{$t('menu.tool')}}</span>
       </div>
       <!-- tabs -->
       <div class="mcp-tabs">
@@ -55,11 +55,6 @@ export default {
       vertical-align: -0.25em;
     }
   }
-  .des {
-    color: $txt_color;
-    margin-bottom: 20px;
-    text-align: center;
-  }
   .mcp-tabs{
     margin: 20px;
     .mcp-tab{
@@ -95,28 +90,10 @@ export default {
   .el-tabs__nav-wrap::after {
     display: none;
   }
-  .edit {
+  .action-icon {
     display: none;
     position: absolute;
     top: 10px;
-    right: 30px;
-    color: #777;
-
-    &:hover {
-      color: $color;
-    }
-  }
-  .del {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    // color: $color;
-    color: #777;
-
-    &:hover {
-      color: $color;
-    }
   }
   .card-box {
     display: flex;
@@ -141,11 +118,7 @@ export default {
         box-shadow: 0 2px 8px #171a220d, 0 4px 16px #0000000f;
         border: 1px solid $border_color;
 
-        .del {
-          display: block;
-        }
-
-        .edit {
+        .action-icon {
           display: block;
         }
       }
@@ -285,9 +258,6 @@ export default {
     text-align: right;
     padding: 10px 0;
   }
-  .input-with-select {
-    width: 300px;
-  }
   .el-tabs__content {
     max-width: 1500px;
     margin: 0 auto;
@@ -315,11 +285,6 @@ export default {
   .el-radio__input.is-checked .el-radio__inner {
     border-color: $color;
     background: $color;
-  }
-  .empty{
-    width: 200px;
-    height: 100px;
-    margin: 50px auto;
   }
 }
 </style>
