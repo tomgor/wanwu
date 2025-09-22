@@ -28,6 +28,10 @@ from mcp_client import *
 import logging
 
 
+URL_MODEL = os.getenv("URL_MODEL")
+URL_RAG = os.getenv("URL_RAG")
+
+
 log_dir = "./logs"
 os.makedirs(log_dir, exist_ok=True)
 
@@ -116,7 +120,8 @@ def agent_start():
             plugin_list = data.get("plugin_list",[])
             
             
-            url = f"http://bff-service:6668/callback/v1/model/{model_id}"
+            #url = f"http://bff-service:6668/callback/v1/model/{model_id}"
+            url = URL_MODEL+f":6668/callback/v1/model/{model_id}"
             response = requests.get(url)
             function_call = False
             if response.status_code == 200:
@@ -194,7 +199,7 @@ def agent_start():
         },
         "servers": [
             {
-                "url": "http://172.17.0.1:1991"
+                "url": "http://localhost:1991"
             }
         ]
     }
@@ -215,6 +220,8 @@ def agent_start():
                 max_history = kn_params.get('max_history')
                 rewrite_query = kn_params.get('rewrite_query')
                 term_weight_coefficient = kn_params.get('term_weight_coefficient',1.0)
+                metadata_filtering = kn_params.get('metadata_filtering',True)
+                metadata_filtering_conditions = kn_params.get('metadata_filtering_conditions',[])
 
 
 
@@ -342,7 +349,9 @@ def agent_start():
             if use_know:
                 print('进入rag问题是:',question)
                 
-                url = "http://172.17.0.1:10891/rag/knowledge/stream/search" 
+                #url = "http://172.17.0.1:10891/rag/knowledge/stream/search"
+                url = URL_RAG+":10891/rag/knowledge/stream/search"
+                logger.info(f"rag_url是:{url}")
 
                 payload = {
                     "knowledgeBase": knowledgebase_name,
@@ -360,7 +369,10 @@ def agent_start():
                     "weights":weights,
                     "max_history":max_history,
                     "rewrite_query":rewrite_query,
-                    "term_weight_coefficient":term_weight_coefficient
+                    "term_weight_coefficient":term_weight_coefficient,
+                    "metadata_filtering":metadata_filtering,
+                    "metadata_filtering_conditions":metadata_filtering_conditions
+
                 }
 
 
@@ -531,7 +543,7 @@ def agent_start():
 
                 #如果配置工具则action直接回答
                 if plugin_list:
-                    action_url = "http://172.17.0.1:1992/agent/action"
+                    action_url = "http://localhost:1992/agent/action"
                     headers = {
                         "Content-Type": "application/json"
                     }
