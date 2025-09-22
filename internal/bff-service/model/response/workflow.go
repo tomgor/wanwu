@@ -3,7 +3,7 @@ package response
 import "github.com/UnicomAI/wanwu/internal/bff-service/config"
 
 type CozeWorkflowModelInfo struct {
-	ModelBrief
+	ModelInfo
 	ModelParams []config.WorkflowModelParam `json:"model_params"`
 }
 

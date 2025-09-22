@@ -141,8 +141,7 @@ func (c *Client) GetModel(ctx context.Context, tab *model_client.ModelImported) 
 	return info, nil
 }
 
-func (c *Client) ListModels(ctx context.Context, tab *model_client.ModelImported) ([]*model_client.ModelImported, int64, *errs.Status) {
-	var count int64
+func (c *Client) ListModels(ctx context.Context, tab *model_client.ModelImported) ([]*model_client.ModelImported, *errs.Status) {
 	var modelInfos []*model_client.ModelImported
 	db := sqlopt.SQLOptions(
 		sqlopt.WithOrgID(tab.OrgID),
@@ -150,35 +149,26 @@ func (c *Client) ListModels(ctx context.Context, tab *model_client.ModelImported
 		sqlopt.WithProvider(tab.Provider),
 		sqlopt.WithModelType(tab.ModelType),
 		sqlopt.LikeDisplayNameOrModel(tab.DisplayName),
+		sqlopt.WithIsActive(tab.IsActive),
 	).Apply(c.db.WithContext(ctx))
 	if tab.IsActive {
-		db = db.Where("is_active = ?", true)
+		db = sqlopt.WithIsActive(true).Apply(db)
 	}
-
 	if err := db.Order("created_at DESC").Find(&modelInfos).Error; err != nil {
-		return nil, 0, toErrStatus("model_list_models_err", err.Error())
+		return nil, toErrStatus("model_list_models_err", err.Error())
 	}
-	if err := db.Count(&count).Error; err != nil {
-		return nil, 0, toErrStatus("model_list_models_err", err.Error())
-	}
-	return modelInfos, count, nil
+	return modelInfos, nil
 }
 
-func (c *Client) ListTypeModels(ctx context.Context, tab *model_client.ModelImported) ([]*model_client.ModelImported, int64, *errs.Status) {
-	var count int64
+func (c *Client) ListTypeModels(ctx context.Context, tab *model_client.ModelImported) ([]*model_client.ModelImported, *errs.Status) {
 	var modelInfos []*model_client.ModelImported
-	db := sqlopt.SQLOptions(
+	if err := sqlopt.SQLOptions(
 		sqlopt.WithOrgID(tab.OrgID),
 		sqlopt.WithUserID(tab.UserID),
 		sqlopt.WithModelType(tab.ModelType),
 		sqlopt.WithIsActive(true),
-	).Apply(c.db.WithContext(ctx))
-
-	if err := db.Order("provider DESC").Find(&modelInfos).Error; err != nil {
-		return nil, 0, toErrStatus("model_list_type_models_err", err.Error())
+	).Apply(c.db.WithContext(ctx)).Order("provider DESC").Find(&modelInfos).Error; err != nil {
+		return nil, toErrStatus("model_list_type_models_err", err.Error())
 	}
-	if err := db.Count(&count).Error; err != nil {
-		return nil, 0, toErrStatus("model_list_type_models_err", err.Error())
-	}
-	return modelInfos, count, nil
+	return modelInfos, nil
 }

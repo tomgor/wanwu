@@ -82,8 +82,12 @@ func ListModels(ctx *gin.Context, userId, orgId string, req *request.ListModelsR
 	if err != nil {
 		return nil, err
 	}
+	list, err := toModelInfos(ctx, resp.Models)
+	if err != nil {
+		return nil, err
+	}
 	return &response.ListResult{
-		List:  toModelBriefs(ctx, resp.Models),
+		List:  list,
 		Total: resp.Total,
 	}, nil
 }
@@ -120,8 +124,12 @@ func ListTypeModels(ctx *gin.Context, userId, orgId string, req *request.ListTyp
 	if err != nil {
 		return nil, err
 	}
+	list, err := toModelInfos(ctx, resp.Models)
+	if err != nil {
+		return nil, err
+	}
 	return &response.ListResult{
-		List:  toModelBriefs(ctx, resp.Models),
+		List:  list,
 		Total: resp.Total,
 	}, nil
 }
@@ -147,49 +155,36 @@ func parseImportAndUpdateClientReq(userId, orgId string, req *request.ImportOrUp
 	return clientReq, nil
 }
 
+func toModelInfos(ctx *gin.Context, models []*model_service.ModelInfo) ([]*response.ModelInfo, error) {
+	var ret []*response.ModelInfo
+	for _, m := range models {
+		info, err := toModelInfo(ctx, m)
+		if err != nil {
+			return nil, err
+		}
+		ret = append(ret, info)
+	}
+	return ret, nil
+}
+
 func toModelInfo(ctx *gin.Context, modelInfo *model_service.ModelInfo) (*response.ModelInfo, error) {
 	modelConfig, err := mp.ToModelConfig(modelInfo.Provider, modelInfo.ModelType, modelInfo.ProviderConfig)
 	if err != nil {
 		return nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v get model config err: %v", modelInfo.ModelId, err))
 	}
 	return &response.ModelInfo{
-		ModelBrief: response.ModelBrief{
-			ModelId:     modelInfo.ModelId,
-			Provider:    modelInfo.Provider,
-			Model:       modelInfo.Model,
-			ModelType:   modelInfo.ModelType,
-			DisplayName: modelInfo.DisplayName,
-			Avatar:      CacheAvatar(ctx, modelInfo.ModelIconPath),
-			PublishDate: modelInfo.PublishDate,
-			IsActive:    modelInfo.IsActive,
-			UserId:      modelInfo.UserId,
-			OrgId:       modelInfo.OrgId,
-			CreatedAt:   util.Time2Str(modelInfo.CreatedAt),
-			UpdatedAt:   util.Time2Str(modelInfo.UpdatedAt),
-		},
-		Config: modelConfig,
+		ModelId:     modelInfo.ModelId,
+		Provider:    modelInfo.Provider,
+		Model:       modelInfo.Model,
+		ModelType:   modelInfo.ModelType,
+		DisplayName: modelInfo.DisplayName,
+		Avatar:      CacheAvatar(ctx, modelInfo.ModelIconPath),
+		PublishDate: modelInfo.PublishDate,
+		IsActive:    modelInfo.IsActive,
+		UserId:      modelInfo.UserId,
+		OrgId:       modelInfo.OrgId,
+		CreatedAt:   util.Time2Str(modelInfo.CreatedAt),
+		UpdatedAt:   util.Time2Str(modelInfo.UpdatedAt),
+		Config:      modelConfig,
 	}, nil
-}
-
-func toModelBriefs(ctx *gin.Context, models []*model_service.ModelBrief) []*response.ModelBrief {
-	result := make([]*response.ModelBrief, 0, len(models))
-	for _, m := range models {
-		modelBrief := &response.ModelBrief{
-			ModelId:     m.ModelId,
-			Provider:    m.Provider,
-			Model:       m.Model,
-			ModelType:   m.ModelType,
-			DisplayName: m.DisplayName,
-			Avatar:      CacheAvatar(ctx, m.ModelIconPath),
-			PublishDate: m.PublishDate,
-			IsActive:    m.IsActive,
-			UserId:      m.UserId,
-			OrgId:       m.OrgId,
-		}
-		if modelBrief.DisplayName == "" {
-			modelBrief.DisplayName = modelBrief.Model
-		}
-		result = append(result, modelBrief)
-	}
-	return result
 }

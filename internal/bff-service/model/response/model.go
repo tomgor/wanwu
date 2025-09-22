@@ -5,7 +5,7 @@ import (
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 )
 
-type ModelBrief struct {
+type ModelInfo struct {
 	ModelId     string         `json:"modelId"`
 	Provider    string         `json:"provider" validate:"required" enums:"OpenAI-API-compatible,YuanJing"` // 模型供应商
 	Model       string         `json:"model" validate:"required"`                                           // 模型名称
@@ -18,11 +18,7 @@ type ModelBrief struct {
 	OrgId       string         `json:"orgId"`
 	CreatedAt   string         `json:"createdAt"`
 	UpdatedAt   string         `json:"updatedAt"`
-}
-
-type ModelInfo struct {
-	ModelBrief
-	Config interface{} `json:"config"`
+	Config      interface{}    `json:"config"`
 
 	Examples *mp.ProviderModelConfig `json:"examples,omitempty"` // 仅用于swagger展示；模型对应供应商中的对应llm、embedding或rerank结构是config实际的参数
 }

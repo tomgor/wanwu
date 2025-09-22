@@ -100,7 +100,7 @@ func GetModel(ctx *gin.Context) {
 //	@Param		provider	query		string	false	"模型供应商"
 //	@Param		displayName	query		string	false	"模型显示名称"
 //	@Param		isActive	query		string	false	"启用状态（true: 启用）"
-//	@Success	200			{object}	response.Response{data=response.ListResult{list=response.ModelBrief}}
+//	@Success	200			{object}	response.Response{data=response.ListResult{list=response.ModelInfo}}
 //	@Router		/model/list [get]
 func ListModels(ctx *gin.Context) {
 	var req request.ListModelsRequest
@@ -139,7 +139,7 @@ func ChangeModelStatus(ctx *gin.Context) {
 //	@Security	JWT
 //	@Accept		json
 //	@Produce	json
-//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelBrief}}
+//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelInfo}}
 //	@Router		/model/select/llm [get]
 func ListLlmModels(ctx *gin.Context) {
 	resp, err := service.ListTypeModels(ctx, getUserID(ctx), getOrgID(ctx), &request.ListTypeModelsRequest{
@@ -156,7 +156,7 @@ func ListLlmModels(ctx *gin.Context) {
 //	@Security	JWT
 //	@Accept		json
 //	@Produce	json
-//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelBrief}}
+//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelInfo}}
 //	@Router		/model/select/rerank [get]
 func ListRerankModels(ctx *gin.Context) {
 	resp, err := service.ListTypeModels(ctx, getUserID(ctx), getOrgID(ctx), &request.ListTypeModelsRequest{
@@ -173,7 +173,7 @@ func ListRerankModels(ctx *gin.Context) {
 //	@Security	JWT
 //	@Accept		json
 //	@Produce	json
-//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelBrief}}
+//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelInfo}}
 //	@Router		/model/select/embedding [get]
 func ListEmbeddingModels(ctx *gin.Context) {
 	resp, err := service.ListTypeModels(ctx, getUserID(ctx), getOrgID(ctx), &request.ListTypeModelsRequest{
@@ -190,7 +190,7 @@ func ListEmbeddingModels(ctx *gin.Context) {
 //	@Security	JWT
 //	@Accept		json
 //	@Produce	json
-//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelBrief}}
+//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelInfo}}
 //	@Router		/model/select/ocr [get]
 func ListOcrModels(ctx *gin.Context) {
 	resp, err := service.ListTypeModels(ctx, getUserID(ctx), getOrgID(ctx), &request.ListTypeModelsRequest{
@@ -207,7 +207,7 @@ func ListOcrModels(ctx *gin.Context) {
 //	@Security	JWT
 //	@Accept		json
 //	@Produce	json
-//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelBrief}}
+//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelInfo}}
 //	@Router		/model/select/pdf-parser [get]
 func ListPdfParserModels(ctx *gin.Context) {
 	resp, err := service.ListTypeModels(ctx, getUserID(ctx), getOrgID(ctx), &request.ListTypeModelsRequest{
@@ -224,7 +224,7 @@ func ListPdfParserModels(ctx *gin.Context) {
 //	@Security	JWT
 //	@Accept		json
 //	@Produce	json
-//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelBrief}}
+//	@Success	200	{object}	response.Response{data=response.ListResult{list=response.ModelInfo}}
 //	@Router		/model/select/gui [get]
 func ListGuiModels(ctx *gin.Context) {
 	resp, err := service.ListTypeModels(ctx, getUserID(ctx), getOrgID(ctx), &request.ListTypeModelsRequest{

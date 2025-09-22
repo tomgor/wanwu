@@ -23,8 +23,8 @@ func ListLlmModelsByWorkflow(ctx *gin.Context, userId, orgId, modelT string) (*r
 		return nil, err
 	}
 	var rets []response.CozeWorkflowModelInfo
-	for _, modelBrief := range modelResp.List.([]*response.ModelBrief) {
-		rets = append(rets, toModelBriefByWorkflow(modelBrief))
+	for _, modelInfo := range modelResp.List.([]*response.ModelInfo) {
+		rets = append(rets, toModelInfoByWorkflow(modelInfo))
 	}
 	return &response.ListResult{
 		List:  rets,
@@ -32,9 +32,9 @@ func ListLlmModelsByWorkflow(ctx *gin.Context, userId, orgId, modelT string) (*r
 	}, nil
 }
 
-func toModelBriefByWorkflow(modelBrief *response.ModelBrief) response.CozeWorkflowModelInfo {
+func toModelInfoByWorkflow(modelInfo *response.ModelInfo) response.CozeWorkflowModelInfo {
 	return response.CozeWorkflowModelInfo{
-		ModelBrief:  *modelBrief,
+		ModelInfo:   *modelInfo,
 		ModelParams: config.Cfg().Workflow.ModelParams,
 	}
 }
