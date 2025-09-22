@@ -83,10 +83,13 @@
                 >
                 </el-table-column>
                 <el-table-column
-                  prop="docType"
+                  prop="segmentMethod"
                   label="分段模式"
                   width="200"
                 >
+                <template slot-scope="scope">
+                  <span>{{ getSegmentMethodText(scope.row.segmentMethod) }}</span>
+                </template>
                 </el-table-column>
                 <el-table-column
                   prop="uploadTime"
@@ -226,6 +229,16 @@ export default {
     this.clearTimer()
   },
   methods: {
+    getSegmentMethodText(value){
+      switch (value) {
+        case '0':
+          return '通用分段';
+        case '1':
+          return '父子分段';
+        default:
+          return '未知';
+      }
+    },
     createMeta(){
       this.$refs.mataData.createMetaData();
       this.scrollToBottom();
@@ -442,7 +455,8 @@ export default {
           id: row.docId,
           type: row.docType,
           name:row.docName,
-          knowledgeId:row.knowledgeId
+          knowledgeId:row.knowledgeId,
+          knowledgeName:this.knowledgeName
         },
       });
     },
