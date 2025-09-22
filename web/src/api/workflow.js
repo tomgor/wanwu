@@ -1,5 +1,4 @@
 import request from "@/utils/request";
-import service from "@/utils/request";
 
 export const getWorkFlow = (data)=>{
     return request({
@@ -179,7 +178,7 @@ export const getList = (data)=>{
 
 // 工作流图片上传
 export const uploadFile = (data) => {
-    return service({
+    return request({
         url: `/api/bot/upload_file`,
         method: "post",
         data

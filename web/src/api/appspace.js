@@ -1,5 +1,4 @@
 import request from "@/utils/request";
-import service from "@/utils/request";
 const BASE_URL = '/user/api/v1'
 
 // 生成apikey
@@ -37,7 +36,7 @@ export const getApiKeyRoot = (params)=>{
 
 // 获取智能体/文本问答/工作流列表
 export const getAppSpaceList = (params)=>{
-    return service({
+    return request({
         url: '/user/api/v1/appspace/app/list',
         method: 'get',
         params
@@ -64,7 +63,7 @@ export const appCancelPublish = (data)=>{
 
 // 导入文件
 export const importFile = (data, config) => {
-    return service({
+    return request({
         url: `${BASE_URL}/appspace/app/workflow/import`,
         method: 'post',
         data,
