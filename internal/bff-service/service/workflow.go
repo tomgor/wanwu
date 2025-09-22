@@ -1,9 +1,11 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	net_url "net/url"
 
+	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -12,6 +14,7 @@ import (
 	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
+	mp_common "github.com/UnicomAI/wanwu/pkg/model-provider/mp-common"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
@@ -22,21 +25,18 @@ func ListLlmModelsByWorkflow(ctx *gin.Context, userId, orgId, modelT string) (*r
 	if err != nil {
 		return nil, err
 	}
-	var rets []response.CozeWorkflowModelInfo
+	var rets []*response.CozeWorkflowModelInfo
 	for _, modelInfo := range modelResp.List.([]*response.ModelInfo) {
-		rets = append(rets, toModelInfoByWorkflow(modelInfo))
+		ret, err := toModelInfoByWorkflow(modelInfo)
+		if err != nil {
+			return nil, err
+		}
+		rets = append(rets, ret)
 	}
 	return &response.ListResult{
 		List:  rets,
 		Total: modelResp.Total,
 	}, nil
-}
-
-func toModelInfoByWorkflow(modelInfo *response.ModelInfo) response.CozeWorkflowModelInfo {
-	return response.CozeWorkflowModelInfo{
-		ModelInfo:   *modelInfo,
-		ModelParams: config.Cfg().Workflow.ModelParams,
-	}
 }
 
 // ListWorkflow userID/orgID数据隔离，用于【工作流】
@@ -199,4 +199,35 @@ func cozeWorkflowInfo2Model(workflowInfo *response.CozeWorkflowListDataWorkflow)
 		CreatedAt: util.Time2Str(workflowInfo.CreateTime * 1000),
 		UpdatedAt: util.Time2Str(workflowInfo.UpdateTime * 1000),
 	}
+}
+
+func toModelInfoByWorkflow(modelInfo *response.ModelInfo) (*response.CozeWorkflowModelInfo, error) {
+	ret := &response.CozeWorkflowModelInfo{
+		ModelInfo:   *modelInfo,
+		ModelParams: config.Cfg().Workflow.ModelParams,
+	}
+	if modelInfo.Config != nil {
+		cfg := make(map[string]interface{})
+		b, err := json.Marshal(modelInfo.Config)
+		if err != nil {
+			return nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v marshal config err: %v", modelInfo.ModelId, err))
+		}
+		if err = json.Unmarshal(b, &cfg); err != nil {
+			return nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v unmarshal config err: %v", modelInfo.ModelId, err))
+		}
+		for k, v := range cfg {
+			switch k {
+			case "functionCalling":
+				if fc, ok := v.(string); ok && mp_common.FCType(fc) == mp_common.FCTypeToolCall {
+					ret.ModelAbility.FunctionCall = true
+				}
+			case "visionSupport":
+				if vs, ok := v.(string); ok && mp_common.VSType(vs) == mp_common.VSTypeSupport {
+					ret.ModelAbility.ImageUnderstanding = true
+				}
+
+			}
+		}
+	}
+	return ret, nil
 }
