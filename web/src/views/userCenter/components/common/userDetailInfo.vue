@@ -1,15 +1,39 @@
 <template>
   <div class="detail-ul">
-    <div class="flex"><label>{{$t('userInfo.username')}}</label><span>{{form.username}}</span></div>
-    <div class="flex">
+    <div class="avatar">
+      <el-upload
+          class="avatar-uploader"
+          action=""
+          name="files"
+          :show-file-list="false"
+          :multiple="false"
+          :http-request="handleUploadAvatar"
+          :on-error="handleUploadError"
+          accept=".png,.jpg,.jpeg"
+      >
+        <div class="echo-img">
+          <img :src="form.avatar || defaultAvatar" alt=""/>
+          <p class="echo-img-tip" v-if="isLoading">
+            图片上传中
+            <span class="el-icon-loading"></span>
+          </p>
+          <p class="echo-img-tip" v-else>点击上传图片</p>
+        </div>
+      </el-upload>
+      <div class="row">
+        <label>{{$t('userInfo.username')}}</label>
+        <span>{{form.username}}</span>
+      </div>
+    </div>
+    <div class="row">
       <label>{{$t('userInfo.password')}}</label>
       <span class="pwd-span">{{form.password || '--'}}</span>
       <el-button type="primary" size="mini" style="margin-left: 30px;" @click="showPwd">修改密码</el-button>
     </div>
-    <div class="flex"><label>{{$t('userInfo.company')}}</label><span>{{form.company || '--'}}</span></div>
-    <div class="flex"><label>{{$t('userInfo.phone')}}</label><span>{{form.phone || '--'}}</span></div>
-    <div class="flex"><label>{{$t('userInfo.email')}}</label><span>{{form.email || '--'}}</span></div>
-    <div class="flex"><label>{{$t('userInfo.remark')}}</label><span>{{form.remark || '--'}}</span></div>
+    <div class="row"><label>{{$t('userInfo.company')}}</label><span>{{form.company || '--'}}</span></div>
+    <div class="row"><label>{{$t('userInfo.phone')}}</label><span>{{form.phone || '--'}}</span></div>
+    <div class="row"><label>{{$t('userInfo.email')}}</label><span>{{form.email || '--'}}</span></div>
+    <div class="row"><label>{{$t('userInfo.remark')}}</label><span>{{form.remark || '--'}}</span></div>
     <el-dialog
       :title="$t('resetPwd.title')"
       :visible.sync="pwdVisible"
@@ -25,11 +49,15 @@
 
 <script>
 import Pwd from "../pwd/index.vue"
+import {uploadAvatar, restAvatar} from "@/api/user";
 export default {
   components: {Pwd},
   data(){
     return{
+      defaultAvatar:require("@/assets/imgs/avatar_default.png"),
+      isLoading: false,
       form:{
+        avatar:'',
         userId:'',
         username:'',
         password: '',
@@ -53,6 +81,29 @@ export default {
     this.justifyShowPwd()
   },
   methods:{
+    handleUploadAvatar(data) {
+      if (data.file) {
+        this.isLoading = true
+        const formData = new FormData()
+        const config = {headers: {"Content-Type": "multipart/form-data"}}
+        formData.append('avatar', data.file)
+        this.isLoading = true;
+        uploadAvatar(formData, config).then(res => {
+          if (res.code === 0) {
+            const avatar = this.$basePath + '/user/api' + res.data.path || {}
+            restAvatar({avatar: res.data}).then(res => {
+              if (res.code === 0) {
+                this.form.avatar = avatar
+                this.$forceUpdate()
+              }
+            })
+          }
+        }).finally(() => this.isLoading = false)
+      }
+    },
+    handleUploadError() {
+      this.$message.error(this.$t('common.message.uploadError'))
+    },
     justifyShowPwd() {
       const {showPwd} = this.$route.query || {}
       if (showPwd === '1') {
@@ -60,8 +111,9 @@ export default {
       }
     },
     setData(data){
-      const {userId, username, company, phone, email, remark} = data || {}
+      const {avatar, userId, username, company, phone, email, remark} = data || {}
       this.form = {userId, username, company, phone, email, remark, password: '***'}
+      this.form.avatar = this.$basePath + '/user/api' + avatar.path || {}
     },
     showPwd() {
       this.pwdVisible = true
@@ -77,23 +129,24 @@ export default {
 .detail-ul{
   width: 500px;
   margin: 26px auto;
-  .flex{
-    display: block;
+
+  .row{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
     line-height: 26px;
     padding: 14px 0;
     label{
-      display: block;
-      width: 100%;
       color: $color_title;
       font-size: 15px;
       font-weight: bold;
-      min-width: 150px;
+      width: 50px;
     }
     span{
-      display: inline-block;
       color: #425466;
-      width: 420px;
-      background: #fff;
+      flex: 1;
+      //background: #fff;
       border-radius: 4px;
       margin-top: 5px;
       padding: 3px 20px;
@@ -101,6 +154,49 @@ export default {
     }
     .pwd-span {
       width: 306px;
+    }
+  }
+  .avatar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .avatar-uploader {
+      width: 128px;
+      height: 128px;
+      flex-shrink: 0;
+      /deep/ {
+        .el-upload {
+          width: 100%;
+          height: 100%;
+          border-radius:6px;
+          border:1px solid #DCDFE6;
+          overflow:hidden;
+        }
+        .echo-img {
+          width: 100%;
+          height: 100%;
+          position:relative;
+          img {
+            object-fit: cover;
+            height: 100%;
+          }
+          .echo-img-tip {
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+            background: #E8EAFD;
+            color: #384BF7  !important;
+            font-size: 12px;
+            line-height: 26px;
+            z-index: 10;
+          }
+        }
+      }
+    }
+
+    .row {
+      flex: 1;
     }
   }
 }
