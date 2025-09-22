@@ -83,6 +83,12 @@
                 >
                 </el-table-column>
                 <el-table-column
+                  prop="docType"
+                  label="分段模式"
+                  width="200"
+                >
+                </el-table-column>
+                <el-table-column
                   prop="uploadTime"
                   :label="$t('knowledgeManage.importTime')"
                   width="200"
