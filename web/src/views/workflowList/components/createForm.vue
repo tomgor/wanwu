@@ -21,7 +21,7 @@
               class="upload-img"
               :src="form.avatar && form.avatar.path ? form.avatar.path : (defaultIcon || defaultLogo)"
             />
-            <p class="upload-hint" v-if="!(form.avatar && form.avatar.path)">
+            <p class="upload-hint">
               {{this.$t('common.fileUpload.clickUploadImg')}}
             </p>
           </el-upload>
@@ -280,11 +280,10 @@ export default {
 .avatar-uploader {
   position: relative;
   width: 98px;
-  height: 98px;
   .upload-img {
     object-fit: cover;
     width: 100%;
-    height: 100%;
+    height: 98px;
     background: #eee;
     border-radius: 8px;
     border: 1px solid #DCDFE6;
