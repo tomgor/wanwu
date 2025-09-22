@@ -123,6 +123,7 @@
 {"code":120031,"key":"iam_user_password_reset","langs":{"en":"reset user %v password err: %v","zh":"重置用户(%v) 密码错误: %v"}}
 {"code":120031,"key":"iam_user_permission_get","langs":{"en":"get user %v org %v permission err: %v","zh":"获取用户(%v) 组织(%v) 许可错误: %v"}}
 {"code":120031,"key":"iam_user_language_change","langs":{"en":"change user %v language err: %v","zh":"转换用户(%v) 语言错误: %v"}}
+{"code":120031,"key":"iam_user_avatar_upload","langs":{"en":"uploaded user %v avatar error: %v","zh":"上传用户(%v) 头像错误: %v"}}
 {"code":0,"key":"iam_user_deleted","langs":{"en":"the user has been deleted","zh":"用户已被删除"}}
 {"code":120002,"key":"iam_login_captcha","langs":{"en":"refresh captcha err:  %v","zh":"刷新验证码错误: %v"}}
 {"code":120021,"key":"iam_role_create","langs":{"en":"create role err: %v","zh":"创建角色错误: %v"}}

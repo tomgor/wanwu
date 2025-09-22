@@ -75,19 +75,20 @@ type RoleInfo struct {
 }
 
 type UserInfo struct {
-	ID        uint32
-	Status    bool
-	Name      string
-	Nick      string
-	Gender    string
-	Phone     string
-	Email     string
-	Company   string
-	Remark    string
-	CreatedAt int64
-	Creator   IDName
-	Orgs      []*UserOrg
-	Language  string
+	ID         uint32
+	Status     bool
+	Name       string
+	Nick       string
+	Gender     string
+	Phone      string
+	Email      string
+	Company    string
+	Remark     string
+	CreatedAt  int64
+	Creator    IDName
+	Orgs       []*UserOrg
+	Language   string
+	AvatarPath string
 }
 
 type UserOrg struct {

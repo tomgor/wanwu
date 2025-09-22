@@ -401,6 +401,14 @@ func (c *Client) DeleteUser(ctx context.Context, userID uint32) *errs.Status {
 	})
 
 }
+func (c *Client) UpdateUserAvatar(ctx context.Context, userID uint32, avatarPath string) *errs.Status {
+	if err := sqlopt.WithID(userID).Apply(c.db.WithContext(ctx)).Model(&model.User{}).Updates(map[string]interface{}{
+		"avatar_path": avatarPath,
+	}).Error; err != nil {
+		return toErrStatus("iam_user_avatar_upload", util.Int2Str(userID), err.Error())
+	}
+	return nil
+}
 
 func (c *Client) ChangeUserStatus(ctx context.Context, userID uint32, status bool) *errs.Status {
 	return c.transaction(ctx, func(tx *gorm.DB) *errs.Status {
@@ -494,32 +502,35 @@ func (c *Client) ChangeUserLanguage(ctx context.Context, userID uint32, language
 
 func toUserInfo(user *model.User) *UserInfo {
 	return &UserInfo{
-		ID:        user.ID,
-		Status:    user.Status,
-		Name:      user.Name,
-		Nick:      user.Nick,
-		Gender:    user.Gender,
-		Phone:     user.Phone,
-		Email:     user.Email,
-		Company:   user.Company,
-		Remark:    user.Remark,
-		CreatedAt: user.CreatedAt,
-		Language:  user.Language,
+		ID:         user.ID,
+		Status:     user.Status,
+		Name:       user.Name,
+		Nick:       user.Nick,
+		Gender:     user.Gender,
+		Phone:      user.Phone,
+		Email:      user.Email,
+		Company:    user.Company,
+		Remark:     user.Remark,
+		CreatedAt:  user.CreatedAt,
+		Language:   user.Language,
+		AvatarPath: user.AvatarPath,
 	}
 }
 
 func toUserInfoTx(tx *gorm.DB, user *model.User, orgTree *model.OrgNode, allOrg bool, orgID ...uint32) (*UserInfo, error) {
 	ret := &UserInfo{
-		ID:        user.ID,
-		Status:    user.Status,
-		Name:      user.Name,
-		Nick:      user.Nick,
-		Gender:    user.Gender,
-		Phone:     user.Phone,
-		Email:     user.Email,
-		Company:   user.Company,
-		Remark:    user.Remark,
-		CreatedAt: user.CreatedAt,
+		ID:         user.ID,
+		Status:     user.Status,
+		Name:       user.Name,
+		Nick:       user.Nick,
+		Gender:     user.Gender,
+		Phone:      user.Phone,
+		Email:      user.Email,
+		Company:    user.Company,
+		Remark:     user.Remark,
+		CreatedAt:  user.CreatedAt,
+		Language:   user.Language,
+		AvatarPath: user.AvatarPath,
 	}
 	// user org
 	orgs, err := getUserOrgsTx(tx, user.ID, orgTree)

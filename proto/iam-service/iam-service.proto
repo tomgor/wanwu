@@ -35,6 +35,8 @@ service IAMService {
   rpc GetUserPermission(GetUserPermissionReq) returns (UserPermission) {}
   // 修改用户语言
   rpc ChangeUserLanguage(ChangeUserLanguageReq) returns (google.protobuf.Empty){}
+  // 上传用户头像
+  rpc UpdateUserAvatar(UpdateUserAvatarReq) returns (google.protobuf.Empty){}
 
   // --- org ---
 
@@ -125,6 +127,7 @@ message UserInfo {
   IDName creator = 11;
   repeated UserOrg orgs = 12;
   string language = 13;
+  string avatarPath = 14;
 }
 
 message UserOrg {
@@ -224,6 +227,11 @@ message UserPermission {
 message ChangeUserLanguageReq{
   string userId = 1;
   string language = 2;
+}
+
+message  UpdateUserAvatarReq{
+  string userId =1;
+  string avatarPath = 2;
 }
 
 // --- org ---

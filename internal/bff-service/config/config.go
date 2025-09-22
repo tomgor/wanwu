@@ -22,6 +22,7 @@ type Config struct {
 	AssistantTemplate AssistantTemplateConfig `json:"assistant-template" mapstructure:"assistant-template"`
 	CustomInfo        CustomInfoConfig        `json:"custom-info" mapstructure:"custom-info"`
 	DocCenter         DocCenterConfig         `json:"doc-center" mapstructure:"doc-center"`
+	DefaultIcon       DefaultIconConfig       `json:"default-icon" mapstructure:"default-icon"`
 	// middleware
 	Minio minio.Config `json:"minio" mapstructure:"minio"`
 	// microservice
@@ -184,6 +185,13 @@ type CustomTab struct {
 type CustomAbout struct {
 	LogoPath  string `json:"logo_path" mapstructure:"logo_path"`
 	Copyright string `json:"copyright" mapstructure:"copyright"`
+}
+
+type DefaultIconConfig struct {
+	UserIcon     string `json:"user" mapstructure:"user"`
+	RagIcon      string `json:"rag" mapstructure:"rag"`
+	AgentIcon    string `json:"agent" mapstructure:"agent"`
+	WorkflowIcon string `json:"workflow" mapstructure:"workflow"`
 }
 
 func LoadConfig(in string) error {

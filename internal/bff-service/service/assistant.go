@@ -12,6 +12,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	bff_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/util"
+	"github.com/UnicomAI/wanwu/pkg/constant"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"github.com/gin-gonic/gin"
@@ -587,7 +588,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	}
 	assistantModel := response.Assistant{
 		AssistantId:         resp.AssistantId,
-		AppBriefConfig:      appBriefConfigProto2Model(ctx, resp.AssistantBrief),
+		AppBriefConfig:      appBriefConfigProto2Model(ctx, resp.AssistantBrief, constant.AppTypeAgent),
 		Prologue:            resp.Prologue,
 		Instructions:        resp.Instructions,
 		RecommendQuestion:   resp.RecommendQuestion,

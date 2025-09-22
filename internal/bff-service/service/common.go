@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -16,6 +17,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
+	"github.com/UnicomAI/wanwu/pkg/constant"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/minio"
@@ -48,6 +50,7 @@ func GetUserPermission(ctx *gin.Context, userID, orgID string) (*response.UserPe
 		OrgPermission:    toOrgPermission(ctx, resp),
 		Language:         getLanguageByCode(user.Language),
 		IsUpdatePassword: resp.LastUpdatePasswordAt != 0,
+		Avatar:           cacheUserAvatar(ctx, user.AvatarPath),
 	}, nil
 }
 
@@ -141,6 +144,86 @@ func CacheAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
 	// 3.3 写入文件
 	if err := os.WriteFile(filePath, b, 0644); err != nil {
 		log.Errorf("cache avatar %v write file %v err: %v", avatarObjectPath, filePath, err)
+		return avatar
+	}
+	avatar.Path = filepath.Join("/v1", filePath)
+	return avatar
+}
+
+func cacheAppAvatar(ctx *gin.Context, avatarObjectPath, appType string) request.Avatar {
+	avatar := request.Avatar{}
+	if avatarObjectPath == "" && appType == constant.AppTypeRag {
+		avatar.Path = config.Cfg().DefaultIcon.RagIcon
+		return avatar
+	}
+	if avatarObjectPath == "" && appType == constant.AppTypeAgent {
+		avatar.Path = config.Cfg().DefaultIcon.AgentIcon
+		return avatar
+	}
+	return CacheAvatar(ctx, avatarObjectPath)
+}
+
+func cacheUserAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
+	avatar := request.Avatar{}
+	if avatarObjectPath == "" {
+		avatar.Path = config.Cfg().DefaultIcon.UserIcon
+		return avatar
+	}
+	return CacheAvatar(ctx, avatarObjectPath)
+}
+
+// cacheWorkflowAvatar 将avatar http请求地址转为前端统一访问的格式，同时在本地缓存avatar
+// 例如 http://api/static/abc/def.jpg => /v1/static/avatar/abc/def.png
+func cacheWorkflowAvatar(avatarURL string) request.Avatar {
+	avatar := request.Avatar{}
+	avatarCacheMu.Lock()
+	defer avatarCacheMu.Unlock()
+
+	avatar.Key = avatarURL
+
+	// 提取文件名：先去掉查询参数，再取最后一部分
+	baseURL := avatarURL
+	if idx := strings.Index(avatarURL, "?"); idx != -1 {
+		baseURL = avatarURL[:idx]
+	}
+	// 从路径中提取文件名
+	lastSlash := strings.LastIndex(baseURL, "/")
+	fileName := baseURL[lastSlash+1:]
+	filePath := filepath.Join(avatarCacheLocalDir, fileName)
+	// 检查文件是否已缓存
+	if _, err := os.Stat(filePath); err == nil {
+		avatar.Path = filepath.Join("/v1", filePath)
+		return avatar
+	}
+	// 从HTTP URL下载文件
+	resp, err := http.Get(avatarURL)
+	if err != nil {
+		log.Errorf("cache avatar %v download err: %v", avatarURL, err)
+		avatar.Path = avatarURL
+		return avatar
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		log.Errorf("cache avatar %v HTTP error: %v", avatarURL, resp.Status)
+		avatar.Path = avatarURL
+		return avatar
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Errorf("cache avatar %v read response err: %v", avatarURL, err)
+		avatar.Path = avatarURL
+		return avatar
+	}
+	// 创建目录
+	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+		log.Errorf("cache avatar %v mkdir %v err: %v", avatarURL, filepath.Dir(filePath), err)
+		avatar.Path = avatarURL
+		return avatar
+	}
+	// 写入文件
+	if err := os.WriteFile(filePath, body, 0644); err != nil {
+		log.Errorf("cache avatar %v write file %v err: %v", avatarURL, filePath, err)
+		avatar.Path = avatarURL
 		return avatar
 	}
 	avatar.Path = filepath.Join("/v1", filePath)

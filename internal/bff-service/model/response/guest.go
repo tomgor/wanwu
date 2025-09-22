@@ -21,12 +21,13 @@ type Captcha struct {
 }
 
 type LogoCustomInfo struct {
-	Login    CustomLogin       `json:"login"`    // 登录页标题信息
-	Home     CustomHome        `json:"home"`     // 首页标题信息
-	Tab      CustomTab         `json:"tab"`      // 标签页信息
-	About    CustomAbout       `json:"about"`    // 关于信息
-	LinkList map[string]string `json:"linkList"` // 跳转链接列表,key为链接名称,value为URL
-	Register CustomRegister    `json:"register"` // 注册信息
+	Login       CustomLogin       `json:"login"`       // 登录页标题信息
+	Home        CustomHome        `json:"home"`        // 首页标题信息
+	Tab         CustomTab         `json:"tab"`         // 标签页信息
+	About       CustomAbout       `json:"about"`       // 关于信息
+	LinkList    map[string]string `json:"linkList"`    // 跳转链接列表,key为链接名称,value为URL
+	Register    CustomRegister    `json:"register"`    // 注册信息
+	DefaultIcon CustomDefaultIcon `json:"defaultIcon"` // 应用默认图片
 }
 
 type CustomLogin struct {
@@ -56,6 +57,12 @@ type CustomAbout struct {
 
 type CustomRegister struct {
 	Email CustomEmail `json:"email"` // 注册邮箱
+}
+
+type CustomDefaultIcon struct {
+	RagIcon      string `json:"ragIcon"`
+	AgentIcon    string `json:"agentIcon"`
+	WorkflowIcon string `json:"workflowIcon"`
 }
 
 type CustomEmail struct {

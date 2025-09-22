@@ -21,6 +21,7 @@ type CozeWorkflowListDataWorkflow struct {
 	WorkflowId string `json:"workflow_id"`
 	Name       string `json:"name"`
 	Desc       string `json:"desc"`
+	URL        string `json:"url"`
 	CreateTime int64  `json:"create_time"`
 	UpdateTime int64  `json:"update_time"`
 }

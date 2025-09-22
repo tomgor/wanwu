@@ -272,3 +272,11 @@ agentscope-workflow:
   delete_workflow_uri: "/workflow/delete"
   publish_workflow_uri: "/plugin/api/publish"
   unpublish_workflow_uri: "/plugin/api/unpublish"
+
+default-icon:
+  user: "/v1/static/icon/user-default-icon.png"
+  rag: "/v1/static/icon/rag-default-icon.png"
+  agent: "/v1/static/icon/agent-default-icon.png"
+  workflow: "/v1/static/icon/workflow-default-icon.png"
+
+
