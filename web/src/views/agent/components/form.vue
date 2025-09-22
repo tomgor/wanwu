@@ -103,11 +103,21 @@
                 filterable
               >
                 <el-option
-                  v-for="(item,index) in modleOptions"
-                  :key="item.modelId"
-                  :label="item.displayName"
+                  style="padding: 20px 10px; display: flex; align-items: center;"
+                  v-for="(item, index) in modleOptions"
+                  :key="'model'+index"
                   :value="item.modelId"
                 >
+                  <div class="model-option-content">
+                    <span class="model-name">{{ item.displayName }}</span>
+                    <div v-if="modeltags.length > 0" class="model-select-tags">
+                      <span
+                        v-for="(tag, tagIdx) in modeltags"
+                        :key="tagIdx"
+                        class="model-select-tag"
+                      >{{ tag.text }}</span>
+                    </div>
+                  </div>
                 </el-option>
               </el-select>
             </div>
@@ -467,6 +477,20 @@ export default {
   },
   data() {
     return {
+      modeltags:[
+        {
+          text:'chat',
+        },
+        {
+          text:'图文问答',
+        },
+        {
+          text:'4k',
+        },
+        {
+          text:'Tool call',
+        }
+      ],
       knowledgeIndex:-1,
       currentKnowledgeId:'',
       currentMetaData:{},
@@ -1020,6 +1044,30 @@ export default {
 .isDisabled .header-right,.isDisabled .drawer-form > div{
   user-select: none;
   pointer-events: none !important;      
+}
+.model-select-tags {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    flex-shrink: 0;
+    .model-select-tag {
+      background-color: #f0f2ff;
+      color: #384bf7;
+      border-radius: 4px;
+      padding:0 10px;
+      font-size: 12px;
+    }
+ }
+
+.model-option-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.model-name {
+  flex-shrink: 0;
 }
 /deep/ {
   .apikeyBtn {

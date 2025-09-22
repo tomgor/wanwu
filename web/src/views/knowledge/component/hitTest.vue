@@ -58,11 +58,15 @@
               class="resultItem"
             >
               <div class="resultTitle">
-                <span class="tag">{{$t('knowledgeManage.section')}}{{index+1}}</span>
+                <span>
+                  <span class="tag">{{$t('knowledgeManage.section')}}#{{index+1}}</span>
+                  <span class="checkDetail" @click="showSectionDetail(index)">查看详情</span>
+                </span>
                 <span class="score">{{$t('knowledgeManage.hitScore')}}: {{score[index]}}</span>
               </div>
               <div>
                 <div v-html="md.render(item.snippet)" class="resultContent"></div>
+                
                 <div class="file_name">文件名称：{{item.title}}</div>
               </div>
             </div>
@@ -75,6 +79,8 @@
             <p class="nodata_tip">暂无数据</p>
           </div>
         </div>
+        <!-- 分段详情区域 -->
+        <sectionShow ref="sectionShow" />
       </div>
     </div>
   </div>
@@ -85,8 +91,9 @@ import { md } from "@/mixins/marksown-it";
 import searchConfig from '@/components/searchConfig.vue';
 import LinkIcon from "@/components/linkIcon.vue";
 import metaSet from "@/components/metaSet";
+import sectionShow from "./sectionShow.vue";
 export default {
-  components:{LinkIcon, searchConfig,metaSet},
+  components:{LinkIcon, searchConfig, metaSet, sectionShow}, 
   data() {
     return {
       md: md,
@@ -163,6 +170,42 @@ export default {
       }).catch(() =>{
         this.resultLoading = false;
       })
+    },
+    
+    // 显示分段详情弹框
+    showSectionDetail(index) {
+      const currentItem = this.searchList[index];
+      const currentScore = parseFloat(this.score[index]) || 0;
+      
+      // 构造弹框需要的数据
+      const dialogData = {
+        parentSegment: {
+          score: currentScore,
+          content: [
+            (currentItem && currentItem.snippet) || '暂无内容',
+            'xxxxxxxxxxxxx ......'
+          ]
+        },
+        segmentList: [
+          {
+            content: (currentItem && currentItem.snippet) || '暂无内容',
+            autoSave: true,
+            score: currentScore
+          },
+          {
+            content: 'xxxxxxxxxx ....',
+            autoSave: false,
+            score: currentScore
+          },
+          {
+            content: 'xxxxxxxxxx ....',
+            autoSave: false,
+            score: currentScore
+          }
+        ]
+      };
+      
+      this.$refs.sectionShow.showDiaglog(dialogData);
     },
   },
 };
@@ -262,7 +305,13 @@ export default {
                 display: inline-block;
                 background: #d2d7ff;
                 padding: 0 10px;
-                border-radius: 6px;
+                border-radius: 4px;
+              }
+              .checkDetail{
+                color: #384bf7;
+                cursor: pointer;
+                margin-left: 10px;
+                font-size:12px;
               }
               .score {
                 color: #384bf7;

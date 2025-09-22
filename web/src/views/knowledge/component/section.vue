@@ -197,8 +197,27 @@
                 type="textarea"
                 v-model="scope.row.content"
                 :autosize="{ minRows: 3, maxRows: 5}"
+                class="full-width-textarea"
                 >
               </el-input>
+              <div class="segment-list">
+                <div 
+                  v-for="(segment, index) in getSegmentsForRow(scope.row)" 
+                  :key="index"
+                  class="segment-item"
+                >
+                  <span class="segment-badge">C{{ index + 1 }}</span>
+                  <span class="segment-content">
+                    {{ index + 1 }}、{{ segment.content }}
+                    <span class="segment-action">(展示完整分段内容)</span>
+                    <span v-if="segment.autoSave" class="auto-save">--失去焦点自动保存</span>
+                  </span>
+                  <div class="segment-actions">
+                    <i class="el-icon-edit-outline edit-icon" @click="editSegment(scope.row, index)"></i>
+                    <i class="el-icon-delete delete-icon" @click="deleteSegment(scope.row, index)"></i>
+                  </div>
+                </div>
+              </div>
           </template>
           </el-table-column>
         </el-table>
@@ -269,6 +288,24 @@ export default {
     this.clearTimer()
   },
   methods: {
+     getSegmentsForRow(row) {
+      return row.segments || [];
+    },
+     editSegment(row, index) {
+    // 编辑分段的逻辑
+    console.log('编辑分段:', row, index);
+  },
+    deleteSegment(row, index) {
+      // 删除分段的逻辑
+      this.$confirm('确定要删除这个分段吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        row.segments.splice(index, 1);
+        this.$message.success('删除成功');
+      });
+    },
     updateDataBatch(){
       this.startTimer();
     },
@@ -512,6 +549,69 @@ export default {
 };
 </script>
 <style lang="scss">
+.segment-list {
+  margin-top: 10px;
+  .segment-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    .segment-badge {
+      background-color: #f5f5f5;
+      color: #666;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-right: 10px;
+      min-width: 30px;
+      text-align: center;
+    }
+    
+    .segment-content {
+      flex: 1;
+      font-size: 14px;
+      color: #333;
+      
+      .segment-action {
+        color: #999;
+        font-size: 12px;
+        margin-left: 5px;
+      }
+      
+      .auto-save {
+        color: #666;
+        font-size: 12px;
+        margin-left: 5px;
+      }
+    }
+    
+    .segment-actions {
+      display: flex;
+      gap: 10px;
+      
+      .edit-icon,
+      .delete-icon {
+        font-size: 16px;
+        color: #666;
+        cursor: pointer;
+        
+        &:hover {
+          color: #409eff;
+        }
+      }
+      
+      .delete-icon:hover {
+        color: #f56c6c;
+      }
+    }
+  }
+}
+
   .smartDate{
       padding-top:3px;
       color:#888888;
