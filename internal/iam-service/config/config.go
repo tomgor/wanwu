@@ -19,6 +19,7 @@ type Config struct {
 	Redis    redis.Config     `json:"redis" mapstructure:"redis"`
 	SMTP     smtp_util.Config `json:"smtp" mapstructure:"smtp"`
 	Register RegisterConfig   `json:"register" mapstructure:"register"`
+	Password PasswordConfig   `json:"password" mapstructure:"password"`
 }
 
 type ServerConfig struct {
@@ -44,6 +45,15 @@ type RegisterByEmail struct {
 	CodeLength     int                     `json:"code_length" mapstructure:"code_length"`
 	PasswordLength int                     `json:"password_length" mapstructure:"password_length"`
 	Template       RegisterByEmailTemplate `json:"template" mapstructure:"template"`
+}
+
+type PasswordConfig struct {
+	Email RegisterByEmail `json:"email" mapstructure:"email"`
+}
+
+type PasswordByEmail struct {
+	CodeLength int                     `json:"code_length" mapstructure:"code_length"`
+	Template   RegisterByEmailTemplate `json:"template" mapstructure:"template"`
 }
 
 type RegisterByEmailTemplate struct {

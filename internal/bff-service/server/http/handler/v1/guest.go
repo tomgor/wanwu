@@ -112,3 +112,38 @@ func ResgisterSendEmailCode(ctx *gin.Context) {
 	err := service.RegisterSendEmailCode(ctx, req.Username, req.Email)
 	gin_util.Response(ctx, nil, err)
 }
+
+// ResetPasswordSendEmailCode
+//
+//	@Tags		guest
+//	@Summary	重置密码邮箱验证码发送
+//	@Accept		json
+//	@Produce	application/json
+//	@Param		data	body		request.ResetPasswordSendEmailCode	true	"邮箱地址"
+//	@Success	200		{object}	response.Response
+//	@Router		/base/password/email/code [post]
+func ResetPasswordSendEmailCode(ctx *gin.Context) {
+	var req request.ResetPasswordSendEmailCode
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.ResetPasswordSendEmailCode(ctx, req.Email)
+	gin_util.Response(ctx, nil, err)
+}
+
+// ResetPasswordByEmail
+//
+//	@Tags		guest
+//	@Summary	邮箱重置密码
+//	@Accept		json
+//	@Produce	json
+//	@Param		data	body		request.ResetPasswordByEmail	true	"重置密码信息"
+//	@Success	200		{object}	response.Response
+//	@Router		/base/password/email [post]
+func ResetPasswordByEmail(ctx *gin.Context) {
+	var req request.ResetPasswordByEmail
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	gin_util.Response(ctx, nil, service.ResetPasswordByEmail(ctx, &req))
+}

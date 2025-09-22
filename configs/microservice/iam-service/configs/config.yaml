@@ -87,3 +87,18 @@ register:
         如有任何问题欢迎加入QQ群：490071123<br /><br />
         感谢您的使用！<br />
         元景万悟团队
+
+password:
+  email:
+    code_length: 4
+    template:
+      subject: "【元景万悟】欢迎使用联通元景万悟智能体平台"
+      content_type: "text/html"
+      body: |
+        您好，<br /><br />
+        您的邮箱验证码是：%s<br />
+        验证码有效期为5分钟，请勿向他人透露。<br /><br />
+        若非您本人发起，请忽略该邮件。<br /><br />
+        如有任何问题欢迎加入QQ群：490071123<br /><br />
+        感谢您的使用！<br />
+        元景万悟团队

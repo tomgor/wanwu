@@ -189,6 +189,27 @@ func RegisterSendEmailCode(ctx *gin.Context, username, email string) error {
 	return err
 }
 
+// --- reset password---
+func ResetPasswordSendEmailCode(ctx *gin.Context, email string) error {
+	_, err := iam.ResetPasswordSendEmailCode(ctx.Request.Context(), &iam_service.ResetPasswordSendEmailCodeReq{
+		Email: email,
+	})
+	return err
+}
+
+func ResetPasswordByEmail(ctx *gin.Context, reset *request.ResetPasswordByEmail) error {
+	password, err := decryptPD(reset.Password)
+	if err != nil {
+		return fmt.Errorf("decrypt password err: %v", err)
+	}
+	_, err = iam.ResetPasswordByEmail(ctx.Request.Context(), &iam_service.ResetPasswordByEmailReq{
+		Email:    reset.Email,
+		Password: password,
+		Code:     reset.Code,
+	})
+	return err
+}
+
 // --- internal ---
 
 func getLanguageByCode(languageCode string) response.Language {
