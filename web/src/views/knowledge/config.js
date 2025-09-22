@@ -61,3 +61,13 @@ export const DOC_ANALYZER_LIST = [
         desc:'提取标题、图表、公式时开启，适用于pdf/word/ppt文件'
     }
 ]
+export const MODEL_TYPE_TIP = {
+    ocr:{
+        label:'OCR模型',
+        desc:'若需使用，请前往模型管理-联通元景-添加ocr模型'
+    },
+    model:{
+        label:'pdf_parser模型',
+        desc:'若需使用，请前往模型管理-联通元景-添加pdf文档解析模型'
+    }
+}

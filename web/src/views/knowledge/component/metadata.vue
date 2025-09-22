@@ -11,7 +11,7 @@
       <div
         v-for="(item,index) in docMetaData"
         class="docItem"
-        :key="item.metaKey + index"
+        :key="'meta'+index"
       >
         <div class="docItem_data">
           <span class="docItem_data_label">
@@ -55,7 +55,7 @@
             v-if="type === 'create'"
             v-model="item.metaValueType"
             placeholder="请选择"
-            :disabled="item.metaId && item.metaId!== '' ? true : false"
+            :disabled="Boolean(item.metaId)"
           >
             <el-option
               v-for="item in typeOptions"
@@ -86,7 +86,7 @@
           </el-select>
           <el-input
             v-model="item.metaValue"
-            v-if="(item.metadataType ==='value' && item.metaValueType === 'string') || item.metaValueType === ''"
+            v-if="item.metadataType ==='value' && item.metaValueType === 'string'"
             @blur="metaValueBlur(item)"
             placeholder="string"
           ></el-input>
@@ -146,15 +146,19 @@ export default {
     },
     docMetaData: {
       handler(val) {
-        if (this.debounceTimer) {
-          clearTimeout(this.debounceTimer);
-        }
+        if (this.debounceTimer) clearTimeout(this.debounceTimer);
+        const metaList = Array.isArray(val) ? val : []
+
+        const payload = metaList.map(item => ({
+          ...item,
+          metaValue:
+            item && item.metaValueType === 'time'
+              ? item.metaValue
+              : (item && item.metaValue != null ? String(item.metaValue) : ''),
+        }))
+
         this.debounceTimer = setTimeout(() => {
-          val = val.map(item => ({
-            ...item,
-            metaValue:String(item.metaValue)
-          }))
-          this.$emit("updateMeata", val);
+          this.$emit("updateMeata",payload);
         }, 500);
       },
       deep: true,
@@ -182,11 +186,11 @@ export default {
       valueOptions: [
         {
           value: "value",
-          name: "确认值",
+          label: "确认值",
         },
         {
           value: "regExp",
-          name: "正则表达式",
+          label: "正则表达式",
         },
       ],
       keyOptions:[]
@@ -212,8 +216,11 @@ export default {
       }).catch(() =>{})
     },
     keyChange(val,item){
-      item.metaValue = '';
-      item.metaValueType = this.keyOptions.filter(i => i.metaKey === val).map(e => e.metaValueType)[0];
+      item.metaValue = ''
+      const opt = Array.isArray(this.keyOptions)
+        ? this.keyOptions.find(i => i.metaKey === val)
+        : null
+      item.metaValueType = opt ? opt.metaValueType : ''
     },
     createMetaData() {
       if(this.type === 'create' && this.docMetaData.length > 0  ){
@@ -232,7 +239,7 @@ export default {
         metaKey: "",
         metaRule: "",
         metaValue: "",
-        metaValueType: "",
+        metaValueType: "string",
         showEdit:true,
         metadataType: "value",
         option:"add"
@@ -258,6 +265,9 @@ export default {
     },
     editMataItem(item){
       item.showEdit = true;
+      if(item.metaId){
+        item.option = 'update';
+      }
     },
     delMataItem(i,item) {
       if(item.metaId){
@@ -268,10 +278,14 @@ export default {
       }
     },
     delMetaData(item){
+      const dataItem = [item]
       const data = {
         docId:'',
         knowledgeId:this.knowledgeId,
-        metaDataList:[item]
+        metaDataList:dataItem.map(({metaId,option}) =>({
+          metaId,
+          option
+        }))
       }
       updateDocMeta(data).then(res =>{
         if(res.code === 0){
@@ -286,29 +300,21 @@ export default {
     },
     metakeyBlur(item,index) {
       const regex = /^[a-z][a-z0-9_]*$/;
-      if(item.showEdit){
-        if (!item.metaKey) {
-          this.$message.warning("请输入key值");
-          return;
-        }
-        if (!regex.test(item.metaKey)) {
-          this.$message.warning("请输入符合标准的key值");
-          item.metaKey = "";
-          return;
-        }
-
-        if(this.isFound()){
-          this.$message.warning("存在相同key值");
-          item.metaKey = "";
-          return;
-        }
+      if (!item.metaKey || typeof item.metaKey !== 'string' || item.metaKey.trim() === '') {
+        this.$message.warning('请输入key值')
+        return
+      }
+      if (!regex.test(item.metaKey)) {
+        this.$message.warning("请输入符合标准的key值");
+        return;
       }
 
-
-      // if(item.metaId){
-      //   item.option = 'update';
-      // }
-      // item.showEdit = false;
+      if(this.isFound()){
+        this.$message.warning("存在相同key值");
+        return;
+      }
+      
+      item.showEdit = false;
     },
     isFound(){
       const metaKeys = this.docMetaData.map(item => item.metaKey);

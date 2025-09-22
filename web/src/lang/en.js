@@ -29,7 +29,8 @@ export default {
     menu: {
         explore: '应用广场',
         workspace: '工作室',
-        mcp: '工具广场',
+        tool: '资源库',
+        mcp: 'MCP广场',
         app: {
             index: '应用空间',
             all: '全部',
@@ -45,7 +46,8 @@ export default {
         org: '组织管理',
         modelAccess: '模型管理',
         about: '关于',
-        helpDoc: '帮助文档'
+        helpDoc: '帮助文档',
+        back: '返回',
     },
     header: {
         title: '智能体平台',
