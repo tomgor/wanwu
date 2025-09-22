@@ -15,6 +15,8 @@ service KnowledgeBaseDocService {
   rpc UpdateDocStatus(UpdateDocStatusReq) returns (google.protobuf.Empty) {}
   // 更新文档元数据
   rpc UpdateDocMetaData(UpdateDocMetaDataReq) returns (google.protobuf.Empty) {}
+  // 批量更新文档元数据
+  rpc BatchUpdateDocMetaData(BatchUpdateDocMetaDataReq) returns (google.protobuf.Empty) {}
   // 初始化文档状态
   rpc InitDocStatus(InitDocStatusReq) returns (google.protobuf.Empty) {}
   // 删除文档
@@ -92,6 +94,15 @@ message UpdateDocMetaDataReq {
   string knowledgeId = 5;//知识库id
 }
 
+message BatchUpdateDocMetaDataReq {
+  string orgId = 1;
+  string userId = 2;
+  string docId = 3; //文档id
+  repeated MetaData metaDataList = 4;//文档元数据信息
+  string knowledgeId = 5;//知识库id
+  bool createMeta = 6;//文档没设置过对应key则创建元数据
+}
+
 message MetaData {
   string metaId = 1; // 元数据id
   string key = 2; // key
@@ -126,6 +137,9 @@ message DocSegment {
   repeated string Splitter = 2;     // 分隔符（只有自定义分段必填）
   int32 MaxSplitter = 3;   // 可分隔最大值（只有自定义分段必填）
   float Overlap = 4;       // 可重叠值（只有自定义分段必填）
+  string segmentMethod = 5;  //分段方法 0：通用分段；1：父子分段
+  repeated string subSplitter = 6;     // 分隔符（只有父子分段必填）
+  int32 subMaxSplitter = 7;   // 可分隔最大值（只有父子分段必填）
 }
 
 message DocImportTipReq {
@@ -172,6 +186,7 @@ message DocInfo{
   string uploadTime = 6;
   int32 status = 7;
   string errorMsg = 8;
+  string segmentMethod = 9;//分段方式 0：通用分段，1：父子分段
 }
 
 message DocSegmentListReq{

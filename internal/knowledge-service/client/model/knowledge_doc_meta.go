@@ -11,7 +11,7 @@ type KnowledgeDocMeta struct {
 	KnowledgeId string `gorm:"index:idx_knowledge_id;column:knowledge_id;type:varchar(64);not null;default:''" json:"knowledgeId"`
 	MetaId      string `gorm:"uniqueIndex:idx_unique_meta_id;column:meta_id;type:varchar(64)" json:"metaId"` // Business Primary Key
 	DocId       string `gorm:"index:idx_doc_id;column:doc_id;type:varchar(64)" json:"docId"`                 // Business Primary Key
-	Key         string `gorm:"column:key;type:varchar(64);not null;default:''" json:"key"`
+	Key         string `gorm:"index:idx_meta_key;column:key;type:varchar(64);not null;default:''" json:"key"`
 	Value       string `gorm:"column:value;type:text;not null;" json:"value"`
 	ValueType   string `gorm:"column:value_type;type:varchar(64);not null;default:'string';comment:'string,number,time'" json:"valueType"`
 	Rule        string `gorm:"column:rule;type:text;not null;" json:"rule"`

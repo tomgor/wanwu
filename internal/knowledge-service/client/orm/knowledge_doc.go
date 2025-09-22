@@ -62,6 +62,17 @@ func GetDocListByKnowledgeIdNoDeleteCheck(ctx context.Context, userId, orgId str
 	return docList, nil
 }
 
+// GetDocListByKnowledgeId 根据知识库id查询知识库文件列表
+func GetDocListByKnowledgeId(ctx context.Context, userId, orgId string, knowledgeId string) ([]*model.KnowledgeDoc, error) {
+	var docList []*model.KnowledgeDoc
+	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.WithKnowledgeID(knowledgeId), sqlopt.WithDelete(0)).
+		Apply(db.GetHandle(ctx), &model.KnowledgeDoc{}).Find(&docList).Error
+	if err != nil {
+		return nil, err
+	}
+	return docList, nil
+}
+
 // GetDocListByIdListNoDeleteCheck 查询知识库文件列表
 func GetDocListByIdListNoDeleteCheck(ctx context.Context, userId, orgId string, idList []uint32) ([]*model.KnowledgeDoc, error) {
 	var docList []*model.KnowledgeDoc
@@ -173,23 +184,35 @@ func CreateKnowledgeDoc(ctx context.Context, doc *model.KnowledgeDoc, importTask
 		}
 		//2.rag文档导入
 		return service.RagImportDoc(ctx, &service.RagImportDocParams{
-			DocId:             doc.DocId,
-			KnowledgeName:     knowledge.Name,
-			CategoryId:        knowledge.KnowledgeId,
-			UserId:            doc.UserId,
-			Overlap:           config.Overlap,
-			SegmentSize:       config.MaxSplitter,
-			SegmentType:       service.RebuildSegmentType(config.SegmentType),
-			Separators:        config.Splitter,
-			ParserChoices:     analyzer.AnalyzerList,
-			ObjectName:        objectName,
-			OriginalName:      doc.Name,
-			IsEnhanced:        "false",
-			OcrModelId:        importTask.OcrModelId,
-			PreProcess:        preProcess.PreProcessList,
-			RagMetaDataParams: ragMetaList,
+			DocId:               doc.DocId,
+			KnowledgeName:       knowledge.Name,
+			CategoryId:          knowledge.KnowledgeId,
+			UserId:              doc.UserId,
+			Overlap:             config.Overlap,
+			SegmentSize:         config.MaxSplitter,
+			SegmentType:         service.RebuildSegmentType(config.SegmentType),
+			Separators:          config.Splitter,
+			ParserChoices:       analyzer.AnalyzerList,
+			ObjectName:          objectName,
+			OriginalName:        doc.Name,
+			IsEnhanced:          "false",
+			OcrModelId:          importTask.OcrModelId,
+			PreProcess:          preProcess.PreProcessList,
+			RagMetaDataParams:   ragMetaList,
+			RagChildChunkConfig: buildSubRagChunkConfig(config),
 		})
 	})
+}
+
+// 子rag chunk的配置
+func buildSubRagChunkConfig(config *model.SegmentConfig) *service.RagChunkConfig {
+	if config.SegmentMethod == model.ParentSegmentMethod {
+		return &service.RagChunkConfig{
+			SegmentSize: config.SubMaxSplitter,
+			Separators:  config.SubSplitter,
+		}
+	}
+	return nil
 }
 
 func normalizeList(list []string) []string {

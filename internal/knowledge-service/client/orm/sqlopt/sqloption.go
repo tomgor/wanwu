@@ -78,6 +78,12 @@ func WithImportID(id string) SQLOption {
 	})
 }
 
+func WithImportIDs(idList []string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("import_id in ?", idList)
+	})
+}
+
 func WithDocIDs(ids []string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		return db.Where("doc_id in ?", ids)

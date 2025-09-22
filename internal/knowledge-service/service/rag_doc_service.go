@@ -42,22 +42,28 @@ type RagMetaDataParams struct {
 	Rule      string      `json:"rule"`       // 正则表达式
 }
 
+type RagChunkConfig struct {
+	SegmentSize int      `json:"chunk_size"`
+	Separators  []string `json:"separators"`
+}
+
 type RagImportDocParams struct {
-	DocId             string               `json:"id"`         //文档id
-	KnowledgeName     string               `json:"categoryId"` //知识库名称
-	CategoryId        string               `json:"kb_id"`      //知识库id
-	IsEnhanced        string               `json:"is_enhanced"`
-	UserId            string               `json:"userId"`
-	Overlap           float32              `json:"overlap" `
-	ObjectName        string               `json:"objectName"`
-	SegmentSize       int                  `json:"chunk_size"`
-	OriginalName      string               `json:"originalName"`
-	SegmentType       string               `json:"chunk_type"`
-	Separators        []string             `json:"separators"`
-	ParserChoices     []string             `json:"parser_choices"`
-	OcrModelId        string               `json:"ocr_model_id"`
-	PreProcess        []string             `json:"pre_process"`
-	RagMetaDataParams []*RagMetaDataParams `json:"meta_data"`
+	DocId               string               `json:"id"`         //文档id
+	KnowledgeName       string               `json:"categoryId"` //知识库名称
+	CategoryId          string               `json:"kb_id"`      //知识库id
+	IsEnhanced          string               `json:"is_enhanced"`
+	UserId              string               `json:"userId"`
+	Overlap             float32              `json:"overlap" `
+	ObjectName          string               `json:"objectName"`
+	SegmentSize         int                  `json:"chunk_size"`
+	OriginalName        string               `json:"originalName"`
+	SegmentType         string               `json:"chunk_type"`
+	Separators          []string             `json:"separators"`
+	ParserChoices       []string             `json:"parser_choices"`
+	OcrModelId          string               `json:"ocr_model_id"`
+	PreProcess          []string             `json:"pre_process"`
+	RagMetaDataParams   []*RagMetaDataParams `json:"meta_data"`
+	RagChildChunkConfig *RagChunkConfig      `json:"child_chunk_config"`
 }
 
 type RagImportUrlDocParams struct {
@@ -87,6 +93,18 @@ type RagDocMetaParams struct {
 	KnowledgeBase string      `json:"knowledgeBase"`
 	FileName      string      `json:"fileName"`
 	MetaList      []*MetaData `json:"tags"`
+}
+
+type BatchRagDocMetaParams struct {
+	UserId        string         `json:"userId"`
+	KnowledgeBase string         `json:"knowledgeBase"`
+	KnowledgeId   string         `json:"kb_id"`
+	MetaList      []*DocMetaInfo `json:"metas"`
+}
+
+type DocMetaInfo struct {
+	FileName     string      `json:"file_name"`
+	MetaDataList []*MetaData `json:"metadata_list"`
 }
 
 type MetaData struct {
@@ -307,6 +325,35 @@ func RagDocMeta(ctx context.Context, ragDocTagParams *RagDocMetaParams) error {
 		Body:       paramsByte,
 		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
 		MonitorKey: "rag_doc_tag",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return err
+	}
+	var resp RagCommonResp
+	if err := json.Unmarshal(result, &resp); err != nil {
+		log.Errorf(err.Error())
+		return err
+	}
+	if resp.Code != successCode {
+		return errors.New(resp.Message)
+	}
+	return nil
+}
+
+// BatchRagDocMeta 更新文档元数据
+func BatchRagDocMeta(ctx context.Context, batchRagDocTagParams *BatchRagDocMetaParams) error {
+	ragServer := config.GetConfig().RagServer
+	url := ragServer.Endpoint + ragServer.UpdateFileMetasUri
+	paramsByte, err := json.Marshal(batchRagDocTagParams)
+	if err != nil {
+		return err
+	}
+	result, err := http.GetClient().PostJson(ctx, &http_client.HttpRequestParams{
+		Url:        url,
+		Body:       paramsByte,
+		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
+		MonitorKey: "batch_rag_doc_meta",
 		LogLevel:   http_client.LogAll,
 	})
 	if err != nil {
