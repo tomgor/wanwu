@@ -80,4 +80,9 @@ type IClient interface {
 
 	RegisterSendEmailCode(ctx context.Context, username, email string) *errs.Status
 	RegisterByEmail(ctx context.Context, username, email, code string) *errs.Status
+
+	// --- reset password ---
+
+	ResetPasswordSendEmailCode(ctx context.Context, email string) *errs.Status
+	ResetPasswordByEmail(ctx context.Context, email, password, code string) *errs.Status
 }

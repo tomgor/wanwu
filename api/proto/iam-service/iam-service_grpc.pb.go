@@ -20,38 +20,40 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	IAMService_GetUserSelectNotInOrg_FullMethodName  = "/iam_service.IAMService/GetUserSelectNotInOrg"
-	IAMService_GetUserSelectByUserIDs_FullMethodName = "/iam_service.IAMService/GetUserSelectByUserIDs"
-	IAMService_GetUserList_FullMethodName            = "/iam_service.IAMService/GetUserList"
-	IAMService_GetUserInfo_FullMethodName            = "/iam_service.IAMService/GetUserInfo"
-	IAMService_CreateUser_FullMethodName             = "/iam_service.IAMService/CreateUser"
-	IAMService_UpdateUser_FullMethodName             = "/iam_service.IAMService/UpdateUser"
-	IAMService_DeleteUser_FullMethodName             = "/iam_service.IAMService/DeleteUser"
-	IAMService_ChangeUserStatus_FullMethodName       = "/iam_service.IAMService/ChangeUserStatus"
-	IAMService_UpdateUserPassword_FullMethodName     = "/iam_service.IAMService/UpdateUserPassword"
-	IAMService_ResetUserPassword_FullMethodName      = "/iam_service.IAMService/ResetUserPassword"
-	IAMService_GetUserPermission_FullMethodName      = "/iam_service.IAMService/GetUserPermission"
-	IAMService_ChangeUserLanguage_FullMethodName     = "/iam_service.IAMService/ChangeUserLanguage"
-	IAMService_GetOrgSelect_FullMethodName           = "/iam_service.IAMService/GetOrgSelect"
-	IAMService_GetOrgList_FullMethodName             = "/iam_service.IAMService/GetOrgList"
-	IAMService_GetOrgInfo_FullMethodName             = "/iam_service.IAMService/GetOrgInfo"
-	IAMService_CreateOrg_FullMethodName              = "/iam_service.IAMService/CreateOrg"
-	IAMService_UpdateOrg_FullMethodName              = "/iam_service.IAMService/UpdateOrg"
-	IAMService_DeleteOrg_FullMethodName              = "/iam_service.IAMService/DeleteOrg"
-	IAMService_ChangeOrgStatus_FullMethodName        = "/iam_service.IAMService/ChangeOrgStatus"
-	IAMService_AddOrgUser_FullMethodName             = "/iam_service.IAMService/AddOrgUser"
-	IAMService_RemoveOrgUser_FullMethodName          = "/iam_service.IAMService/RemoveOrgUser"
-	IAMService_GetRoleSelect_FullMethodName          = "/iam_service.IAMService/GetRoleSelect"
-	IAMService_GetRoleList_FullMethodName            = "/iam_service.IAMService/GetRoleList"
-	IAMService_GetRoleInfo_FullMethodName            = "/iam_service.IAMService/GetRoleInfo"
-	IAMService_CreateRole_FullMethodName             = "/iam_service.IAMService/CreateRole"
-	IAMService_UpdateRole_FullMethodName             = "/iam_service.IAMService/UpdateRole"
-	IAMService_DeleteRole_FullMethodName             = "/iam_service.IAMService/DeleteRole"
-	IAMService_ChangeRoleStatus_FullMethodName       = "/iam_service.IAMService/ChangeRoleStatus"
-	IAMService_GetCaptcha_FullMethodName             = "/iam_service.IAMService/GetCaptcha"
-	IAMService_Login_FullMethodName                  = "/iam_service.IAMService/Login"
-	IAMService_RegisterByEmail_FullMethodName        = "/iam_service.IAMService/RegisterByEmail"
-	IAMService_RegisterSendEmailCode_FullMethodName  = "/iam_service.IAMService/RegisterSendEmailCode"
+	IAMService_GetUserSelectNotInOrg_FullMethodName      = "/iam_service.IAMService/GetUserSelectNotInOrg"
+	IAMService_GetUserSelectByUserIDs_FullMethodName     = "/iam_service.IAMService/GetUserSelectByUserIDs"
+	IAMService_GetUserList_FullMethodName                = "/iam_service.IAMService/GetUserList"
+	IAMService_GetUserInfo_FullMethodName                = "/iam_service.IAMService/GetUserInfo"
+	IAMService_CreateUser_FullMethodName                 = "/iam_service.IAMService/CreateUser"
+	IAMService_UpdateUser_FullMethodName                 = "/iam_service.IAMService/UpdateUser"
+	IAMService_DeleteUser_FullMethodName                 = "/iam_service.IAMService/DeleteUser"
+	IAMService_ChangeUserStatus_FullMethodName           = "/iam_service.IAMService/ChangeUserStatus"
+	IAMService_UpdateUserPassword_FullMethodName         = "/iam_service.IAMService/UpdateUserPassword"
+	IAMService_ResetUserPassword_FullMethodName          = "/iam_service.IAMService/ResetUserPassword"
+	IAMService_GetUserPermission_FullMethodName          = "/iam_service.IAMService/GetUserPermission"
+	IAMService_ChangeUserLanguage_FullMethodName         = "/iam_service.IAMService/ChangeUserLanguage"
+	IAMService_GetOrgSelect_FullMethodName               = "/iam_service.IAMService/GetOrgSelect"
+	IAMService_GetOrgList_FullMethodName                 = "/iam_service.IAMService/GetOrgList"
+	IAMService_GetOrgInfo_FullMethodName                 = "/iam_service.IAMService/GetOrgInfo"
+	IAMService_CreateOrg_FullMethodName                  = "/iam_service.IAMService/CreateOrg"
+	IAMService_UpdateOrg_FullMethodName                  = "/iam_service.IAMService/UpdateOrg"
+	IAMService_DeleteOrg_FullMethodName                  = "/iam_service.IAMService/DeleteOrg"
+	IAMService_ChangeOrgStatus_FullMethodName            = "/iam_service.IAMService/ChangeOrgStatus"
+	IAMService_AddOrgUser_FullMethodName                 = "/iam_service.IAMService/AddOrgUser"
+	IAMService_RemoveOrgUser_FullMethodName              = "/iam_service.IAMService/RemoveOrgUser"
+	IAMService_GetRoleSelect_FullMethodName              = "/iam_service.IAMService/GetRoleSelect"
+	IAMService_GetRoleList_FullMethodName                = "/iam_service.IAMService/GetRoleList"
+	IAMService_GetRoleInfo_FullMethodName                = "/iam_service.IAMService/GetRoleInfo"
+	IAMService_CreateRole_FullMethodName                 = "/iam_service.IAMService/CreateRole"
+	IAMService_UpdateRole_FullMethodName                 = "/iam_service.IAMService/UpdateRole"
+	IAMService_DeleteRole_FullMethodName                 = "/iam_service.IAMService/DeleteRole"
+	IAMService_ChangeRoleStatus_FullMethodName           = "/iam_service.IAMService/ChangeRoleStatus"
+	IAMService_GetCaptcha_FullMethodName                 = "/iam_service.IAMService/GetCaptcha"
+	IAMService_Login_FullMethodName                      = "/iam_service.IAMService/Login"
+	IAMService_RegisterByEmail_FullMethodName            = "/iam_service.IAMService/RegisterByEmail"
+	IAMService_RegisterSendEmailCode_FullMethodName      = "/iam_service.IAMService/RegisterSendEmailCode"
+	IAMService_ResetPasswordSendEmailCode_FullMethodName = "/iam_service.IAMService/ResetPasswordSendEmailCode"
+	IAMService_ResetPasswordByEmail_FullMethodName       = "/iam_service.IAMService/ResetPasswordByEmail"
 )
 
 // IAMServiceClient is the client API for IAMService service.
@@ -123,6 +125,11 @@ type IAMServiceClient interface {
 	RegisterByEmail(ctx context.Context, in *RegisterByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 邮箱注册发送邮件
 	RegisterSendEmailCode(ctx context.Context, in *RegisterSendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// --- reset password ---
+	// 邮箱注册用户
+	ResetPasswordSendEmailCode(ctx context.Context, in *ResetPasswordSendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 邮箱注册发送邮件
+	ResetPasswordByEmail(ctx context.Context, in *ResetPasswordByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type iAMServiceClient struct {
@@ -453,6 +460,26 @@ func (c *iAMServiceClient) RegisterSendEmailCode(ctx context.Context, in *Regist
 	return out, nil
 }
 
+func (c *iAMServiceClient) ResetPasswordSendEmailCode(ctx context.Context, in *ResetPasswordSendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, IAMService_ResetPasswordSendEmailCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) ResetPasswordByEmail(ctx context.Context, in *ResetPasswordByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, IAMService_ResetPasswordByEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IAMServiceServer is the server API for IAMService service.
 // All implementations must embed UnimplementedIAMServiceServer
 // for forward compatibility.
@@ -522,6 +549,11 @@ type IAMServiceServer interface {
 	RegisterByEmail(context.Context, *RegisterByEmailReq) (*emptypb.Empty, error)
 	// 邮箱注册发送邮件
 	RegisterSendEmailCode(context.Context, *RegisterSendEmailCodeReq) (*emptypb.Empty, error)
+	// --- reset password ---
+	// 邮箱注册用户
+	ResetPasswordSendEmailCode(context.Context, *ResetPasswordSendEmailCodeReq) (*emptypb.Empty, error)
+	// 邮箱注册发送邮件
+	ResetPasswordByEmail(context.Context, *ResetPasswordByEmailReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedIAMServiceServer()
 }
 
@@ -627,6 +659,12 @@ func (UnimplementedIAMServiceServer) RegisterByEmail(context.Context, *RegisterB
 }
 func (UnimplementedIAMServiceServer) RegisterSendEmailCode(context.Context, *RegisterSendEmailCodeReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterSendEmailCode not implemented")
+}
+func (UnimplementedIAMServiceServer) ResetPasswordSendEmailCode(context.Context, *ResetPasswordSendEmailCodeReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetPasswordSendEmailCode not implemented")
+}
+func (UnimplementedIAMServiceServer) ResetPasswordByEmail(context.Context, *ResetPasswordByEmailReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetPasswordByEmail not implemented")
 }
 func (UnimplementedIAMServiceServer) mustEmbedUnimplementedIAMServiceServer() {}
 func (UnimplementedIAMServiceServer) testEmbeddedByValue()                    {}
@@ -1225,6 +1263,42 @@ func _IAMService_RegisterSendEmailCode_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IAMService_ResetPasswordSendEmailCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordSendEmailCodeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).ResetPasswordSendEmailCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_ResetPasswordSendEmailCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).ResetPasswordSendEmailCode(ctx, req.(*ResetPasswordSendEmailCodeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_ResetPasswordByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordByEmailReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).ResetPasswordByEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_ResetPasswordByEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).ResetPasswordByEmail(ctx, req.(*ResetPasswordByEmailReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // IAMService_ServiceDesc is the grpc.ServiceDesc for IAMService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1359,6 +1433,14 @@ var IAMService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterSendEmailCode",
 			Handler:    _IAMService_RegisterSendEmailCode_Handler,
+		},
+		{
+			MethodName: "ResetPasswordSendEmailCode",
+			Handler:    _IAMService_ResetPasswordSendEmailCode_Handler,
+		},
+		{
+			MethodName: "ResetPasswordByEmail",
+			Handler:    _IAMService_ResetPasswordByEmail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

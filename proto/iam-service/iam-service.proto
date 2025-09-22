@@ -87,6 +87,12 @@ service IAMService {
   rpc RegisterByEmail(RegisterByEmailReq) returns (google.protobuf.Empty) {}
   // 邮箱注册发送邮件
   rpc RegisterSendEmailCode(RegisterSendEmailCodeReq) returns (google.protobuf.Empty) {}
+
+  // --- reset password ---
+  // 邮箱注册用户
+  rpc ResetPasswordSendEmailCode(ResetPasswordSendEmailCodeReq) returns (google.protobuf.Empty) {}
+  // 邮箱注册发送邮件
+  rpc ResetPasswordByEmail(ResetPasswordByEmailReq) returns (google.protobuf.Empty) {}
 }
 
 message Perm {
@@ -402,4 +408,15 @@ message RegisterByEmailReq{
 message RegisterSendEmailCodeReq {
   string email = 1;
   string userName = 2;
+}
+
+// --- reset password ---
+message ResetPasswordSendEmailCodeReq{
+  string email = 1;
+}
+
+message ResetPasswordByEmailReq{
+  string email = 1;
+  string password = 2;
+  string code = 3;
 }
