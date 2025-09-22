@@ -217,6 +217,7 @@ export default {
     },
     keyChange(val,item){
       item.metaValue = ''
+      item.metadataType = 'value'
       const opt = Array.isArray(this.keyOptions)
         ? this.keyOptions.find(i => i.metaKey === val)
         : null
@@ -306,11 +307,13 @@ export default {
       }
       if (!regex.test(item.metaKey)) {
         this.$message.warning("请输入符合标准的key值");
+        item.metaKey = '';
         return;
       }
 
       if(this.isFound()){
         this.$message.warning("存在相同key值");
+        item.metaKey = ''
         return;
       }
       

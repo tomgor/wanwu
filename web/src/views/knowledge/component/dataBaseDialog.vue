@@ -137,11 +137,23 @@ export default {
       deep: true,
       immediate: true,
       handler(val) {
-        const hasAnyValue =
-          val &&
-          typeof val === 'object' &&
-          Object.values(val).some(v => v !== null && v !== undefined && String(v).trim() !== '')
-        this.isDisabled = !hasAnyValue
+        const hasEmptyField = Array.isArray(val) && val.some(item => {
+        if (item.option === 'delete') return false;
+        const isMetaKeyEmpty = !item.metaKey || 
+          (typeof item.metaKey === 'string' && item.metaKey.trim() === '');
+        
+        const isMetaValueEmpty = item.metaValue === null || 
+          item.metaValue === undefined || 
+          (typeof item.metaValue === 'string' && item.metaValue.trim() === '') ||
+          item.metaValue === '';
+        
+        return isMetaKeyEmpty || isMetaValueEmpty;
+      });
+      
+        const hasValidData = Array.isArray(val) && val.length > 0 && 
+          val.some(item => item.option !== 'delete');
+        
+        this.isDisabled = !hasValidData || hasEmptyField;
       }
     }
   },
@@ -170,7 +182,7 @@ export default {
         delete i.created
         i.metaValue = i.metaValue.toString()
       });
-      const metaData = this.tableData.filter(item => item.option !== '' && item.option !== 'delete');
+      const metaData = this.tableData.filter(item => item.option !== '');
       if(type === 'submit' && !metaData.length){
          this.dialogVisible = false;
          return false;
@@ -185,7 +197,6 @@ export default {
             this.$message.success('操作成功成功');
             this.$emit('updateData')
             this.isDisabled = true;
-            if(type === 'del') return false;
             this.dialogVisible = false;
         }
       }).catch(() =>{
@@ -218,7 +229,6 @@ export default {
     },
     delItem(index){
       index.option = "delete";
-      this.submitDialog('del');
     },
     showDiglog(data,id) {
       this.dialogVisible = true;
