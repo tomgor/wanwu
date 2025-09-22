@@ -8,6 +8,24 @@
       :close-on-click-modal="false"
     >
       <el-form ref="form" :model="form" label-width="120px" :rules="rules">
+        <el-form-item :label="$t('list.pluginPic') + ':'" prop="avatar">
+          <el-upload
+            class="avatar-uploader"
+            action=""
+            name="files"
+            :show-file-list="false"
+            :http-request="handleUploadImage"
+            accept=".png,.jpg,.jpeg"
+          ><!--:on-error="handleUploadError"-->
+            <img
+              class="upload-img"
+              :src="form.avatar && form.avatar.path ? form.avatar.path : (defaultIcon || defaultLogo)"
+            />
+            <p class="upload-hint" v-if="!(form.avatar && form.avatar.path)">
+              {{this.$t('common.fileUpload.clickUploadImg')}}
+            </p>
+          </el-upload>
+        </el-form-item>
         <el-form-item :label="$t('list.pluginName')+':'" prop="configName">
           <el-input
             :placeholder="$t('list.nameplaceholder')"
@@ -49,7 +67,8 @@
 </template>
 
 <script>
-import { createWorkFlow,copyExample} from "@/api/workflow";
+import { createWorkFlow, copyExample, uploadFile } from "@/api/workflow";
+import { mapGetters } from "vuex"
 
 export default {
   props: {
@@ -64,11 +83,17 @@ export default {
   data() {
     return {
       dialogVisible: false,
+      defaultLogo: require("@/assets/imgs/bg-logo.png"),
+      defaultIcon: '',
       form: {
         configName: "",
         configENName: "",
         configDesc: "",
-        isStream: false
+        isStream: false,
+        avatar: {
+          key: '',
+          path: ''
+        },
       },
       titleMap: {
         edit: this.$t('list.editplugin'),
@@ -123,7 +148,59 @@ export default {
       },
     };
   },
+  watch: {
+    commonInfo:{
+      handler(val) {
+        const { defaultIcon = {} } = val.data || {}
+        this.defaultIcon = defaultIcon.workflowIcon ? this.$basePath + '/user/api/' + defaultIcon.workflowIcon :  ''
+      },
+      deep: true
+    },
+  },
+  computed: {
+    ...mapGetters('user', ['commonInfo']),
+  },
   methods: {
+    getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const fileReader = new FileReader()
+        fileReader.onload = event => {
+          const result = event.target ? event.target.result : ''
+          if (!result || typeof result !== 'string') {
+            reject('file read fail')
+            return
+          }
+          resolve(result.replace(/^.*?,/, ''))
+        }
+        fileReader.readAsDataURL(file)
+      })
+    },
+    getFileExtension(name) {
+      const index = name.lastIndexOf('.');
+      return name.slice(index + 1).toLowerCase();
+    },
+    async handleUploadImage(data) {
+      if (data.file) {
+        const base64 = await this.getBase64(data.file).catch(() => '')
+
+        if (!base64) {
+          this.handleUploadError()
+          return
+        }
+        const res = await uploadFile({
+          file_head: {
+            file_type: this.getFileExtension(data.file.name),
+            biz_type: 6,
+          },
+          data: base64,
+        })
+        const {upload_uri, upload_url} = res.data || {}
+        this.form.avatar = {key: upload_uri || '', path: upload_url || ''}
+      }
+    },
+    handleUploadError() {
+      this.$message.error(this.$t('common.message.uploadError'))
+    },
     openDialog(row) {
       if (this.type === "edit" && this.editForm) {
         this.form = this.editForm;
@@ -143,6 +220,10 @@ export default {
         configName: "",
         configENName: "",
         configDesc: "",
+        avatar: {
+          key: '',
+          path: ''
+        },
         isStream:false
       };
     },
@@ -170,9 +251,11 @@ export default {
         }
         return;
       }
-      let res = await createWorkFlow({
-        name: this.form.configName,
-        desc: this.form.configDesc
+      const { configName, configDesc, avatar } = this.form || {}
+      const res = await createWorkFlow({
+        name: configName,
+        desc: configDesc,
+        avatar,
       });
       if (res.code === 0) {
         this.$message.success(this.$t('list.createSuccess'));
@@ -193,5 +276,31 @@ export default {
 @import "../../../style/workflow.scss";
 .workflow-list {
   position: absolute;
+}
+.avatar-uploader {
+  position: relative;
+  width: 98px;
+  height: 98px;
+  .upload-img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    background: #eee;
+    border-radius: 8px;
+    border: 1px solid #DCDFE6;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .upload-hint {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    background: $color_opacity;
+    color: $color;
+    font-size: 12px;
+    line-height: 26px;
+    z-index: 10;
+    border-radius: 0 0 8px 8px;
+  }
 }
 </style>

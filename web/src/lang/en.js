@@ -389,6 +389,7 @@ export default {
 
     // 工作流
     list:{
+        pluginPic: '工作流图标',
         pluginName: '工作流名称',
         pluginNameRules:' 工作流名称须在30字符以内',
         pluginEnName: '工作流英文名',
