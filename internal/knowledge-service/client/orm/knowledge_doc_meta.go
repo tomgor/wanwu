@@ -2,6 +2,8 @@ package orm
 
 import (
 	"context"
+	"github.com/UnicomAI/wanwu/pkg/log"
+	"strconv"
 
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm/sqlopt"
@@ -74,6 +76,92 @@ func UpdateDocStatusDocMeta(ctx context.Context, docId string, addList []*model.
 		}
 		return nil
 	})
+}
+
+// UpdateBatchStatusDocMeta 批量更新文档tag
+func UpdateBatchStatusDocMeta(ctx context.Context, knowledgeId string, docNameMap map[string]string, addList []*model.KnowledgeDocMeta,
+	updateList []*model.KnowledgeDocMeta, ragDocMetaParams *service.BatchRagDocMetaParams) error {
+	return db.GetHandle(ctx).Transaction(func(tx *gorm.DB) error {
+		if len(addList) > 0 {
+			//插入数据
+			err := tx.Model(&model.KnowledgeDocMeta{}).CreateInBatches(addList, len(addList)).Error
+			if err != nil {
+				return err
+			}
+		}
+		if len(updateList) > 0 {
+			for _, meta := range updateList {
+				//更新数据
+				updateMap := map[string]interface{}{
+					"value": meta.Value,
+				}
+				err := tx.Model(&model.KnowledgeDocMeta{}).Where("meta_id = ?", meta.MetaId).Updates(updateMap).Error
+				if err != nil {
+					return err
+				}
+			}
+		}
+		//查询目前全量数据
+		var docMetaList []*model.KnowledgeDocMeta
+		err := sqlopt.SQLOptions(sqlopt.WithKnowledgeID(knowledgeId)).
+			Apply(tx, &model.KnowledgeDocMeta{}).
+			Order("create_at desc").
+			Find(&docMetaList).
+			Error
+		if err != nil {
+			return err
+		}
+		list, err := buildMetaParamsList(docMetaList, docNameMap)
+		if err != nil {
+			return err
+		}
+		ragDocMetaParams.MetaList = list
+		//调用rag
+		return service.BatchRagDocMeta(ctx, ragDocMetaParams)
+	})
+}
+
+// buildMetaParamsList 构建rag元数据参数
+func buildMetaParamsList(docMetaList []*model.KnowledgeDocMeta, docNameMap map[string]string) ([]*service.DocMetaInfo, error) {
+	var docMetaMap = make(map[string][]*model.KnowledgeDocMeta)
+	for _, meta := range docMetaList {
+		metas := docMetaMap[meta.DocId]
+		if len(metas) == 0 {
+			metas = make([]*model.KnowledgeDocMeta, 0)
+		}
+		metas = append(metas, meta)
+		docMetaMap[meta.DocId] = metas
+	}
+	var dataList []*service.DocMetaInfo
+	for docId, metas := range docMetaMap {
+		var retList = make([]*service.MetaData, 0)
+		for _, meta := range metas {
+			valueData, err := buildValueData(meta.ValueType, meta.Value)
+			if err != nil {
+				log.Errorf("buildValueData error %s", err.Error())
+				return nil, err
+			}
+			retList = append(retList, &service.MetaData{
+				Key:       meta.Key,
+				Value:     valueData,
+				ValueType: meta.ValueType,
+			})
+		}
+		dataList = append(dataList, &service.DocMetaInfo{
+			FileName:     docNameMap[docId],
+			MetaDataList: retList,
+		})
+	}
+	return dataList, nil
+}
+
+func buildValueData(valueType string, value string) (interface{}, error) {
+	switch valueType {
+	case model.MetaTypeNumber:
+	case model.MetaTypeTime:
+		return strconv.ParseInt(value, 10, 64)
+	}
+	return value, nil
 }
 
 // UpdateDocStatusMetaData 根据metaId更新元数据

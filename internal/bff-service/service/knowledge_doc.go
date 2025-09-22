@@ -53,10 +53,13 @@ func ImportDoc(ctx *gin.Context, userId, orgId string, req *request.DocImportReq
 		KnowledgeId:   req.KnowledgeId,
 		DocImportType: int32(req.DocImportType),
 		DocSegment: &knowledgebase_doc_service.DocSegment{
-			SegmentType: segment.SegmentType,
-			Splitter:    segment.Splitter,
-			MaxSplitter: int32(segment.MaxSplitter),
-			Overlap:     segment.Overlap,
+			SegmentType:    segment.SegmentType,
+			Splitter:       segment.Splitter,
+			MaxSplitter:    int32(segment.MaxSplitter),
+			Overlap:        segment.Overlap,
+			SegmentMethod:  segment.SegmentMethod,
+			SubMaxSplitter: int32(segment.SubMaxSplitter),
+			SubSplitter:    segment.SubSplitter,
 		},
 		DocAnalyzer:     req.DocAnalyzer,
 		DocInfoList:     docInfoList,
@@ -85,7 +88,13 @@ func UpdateDocMetaData(ctx *gin.Context, userId, orgId string, r *request.DocMet
 
 // BatchUpdateDocMetaData 批量文档元数据
 func BatchUpdateDocMetaData(ctx *gin.Context, userId, orgId string, r *request.BatchDocMetaDataReq) error {
-	return nil
+	_, err := knowledgeBaseDoc.BatchUpdateDocMetaData(ctx.Request.Context(), &knowledgebase_doc_service.BatchUpdateDocMetaDataReq{
+		UserId:       userId,
+		OrgId:        orgId,
+		MetaDataList: buildMetaDataList(r.MetaDataList),
+		KnowledgeId:  r.KnowledgeId,
+	})
+	return err
 }
 
 func UpdateDocStatus(ctx *gin.Context, r *request.CallbackUpdateDocStatusReq) error {
@@ -189,14 +198,15 @@ func buildDocRespList(ctx *gin.Context, dataList []*knowledgebase_doc_service.Do
 	var retList []*response.ListDocResp
 	for _, data := range dataList {
 		retList = append(retList, &response.ListDocResp{
-			DocId:       data.DocId,
-			DocName:     data.DocName,
-			DocType:     data.DocType,
-			UploadTime:  data.UploadTime,
-			Status:      int(data.Status),
-			ErrorMsg:    gin_util.I18nKey(ctx, data.ErrorMsg),
-			FileSize:    util.ToFileSizeStr(data.DocSize),
-			KnowledgeId: knowledgeId,
+			DocId:         data.DocId,
+			DocName:       data.DocName,
+			DocType:       data.DocType,
+			UploadTime:    data.UploadTime,
+			Status:        int(data.Status),
+			ErrorMsg:      gin_util.I18nKey(ctx, data.ErrorMsg),
+			FileSize:      util.ToFileSizeStr(data.DocSize),
+			KnowledgeId:   knowledgeId,
+			SegmentMethod: data.SegmentMethod,
 		})
 	}
 	return retList

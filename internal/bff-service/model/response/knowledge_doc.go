@@ -1,14 +1,15 @@
 package response
 
 type ListDocResp struct {
-	DocId       string `json:"docId"`
-	DocName     string `json:"docName"`     //文档名称
-	DocType     string `json:"docType"`     //文档类型
-	KnowledgeId string `json:"knowledgeId"` //知识库id
-	UploadTime  string `json:"uploadTime"`  //上传时间
-	Status      int    `json:"status"`      //处理状态
-	ErrorMsg    string `json:"errorMsg"`    //解析错误信息，预留
-	FileSize    string `json:"fileSize"`    //文件大小，预留
+	DocId         string `json:"docId"`
+	DocName       string `json:"docName"`       //文档名称
+	DocType       string `json:"docType"`       //文档类型
+	KnowledgeId   string `json:"knowledgeId"`   //知识库id
+	UploadTime    string `json:"uploadTime"`    //上传时间
+	Status        int    `json:"status"`        //处理状态
+	ErrorMsg      string `json:"errorMsg"`      //解析错误信息，预留
+	FileSize      string `json:"fileSize"`      //文件大小，预留
+	SegmentMethod string `json:"segmentMethod"` //分段模式0:通用分段，1：父子分段
 }
 
 type DocImportTipResp struct {

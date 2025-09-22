@@ -10,6 +10,8 @@ import (
 const (
 	DocAnalyzerOCR       = "ocr"
 	DocAnalyzerPdfParser = "model"
+	CommonSplitMethod    = "0" //通用分段
+	ParentSplitMethod    = "1" //父子分段
 )
 
 type DocListReq struct {
@@ -38,9 +40,9 @@ type DocMetaDataReq struct {
 }
 
 type BatchDocMetaDataReq struct {
-	KnowledgeId     string            `json:"knowledgeId" validate:"required"` //知识库id
-	DocMetaInfoList []*DocMetaDataReq `json:"docMetaInfoList" validate:"required"`
-	CommonCheck
+	KnowledgeId  string         `json:"knowledgeId"`
+	MetaDataList []*DocMetaData `json:"metaDataList"` //文档元数据
+	CreateMeta   bool           `json:"createMeta"`   //文档没设置过对应key则创建元数据
 }
 
 type DocInfo struct {
@@ -52,10 +54,13 @@ type DocInfo struct {
 }
 
 type DocSegment struct {
-	SegmentType string   `json:"segmentType" validate:"required"` //分段方式 0：自动分段；1：自定义分段
-	Splitter    []string `json:"splitter"`                        // 分隔符（只有自定义分段必填）
-	MaxSplitter int      `json:"maxSplitter"`                     // 可分隔最大值（只有自定义分段必填）
-	Overlap     float32  `json:"overlap"`                         // 可重叠值（只有自定义分段必填）
+	SegmentMethod  string   `json:"segmentMethod" validate:"required"` //分段方法 0：通用分段；1：父子分段
+	SegmentType    string   `json:"segmentType"`                       //分段方式，只有通用分段必填 0：自动分段；1：自定义分段
+	Splitter       []string `json:"splitter"`                          // 分隔符（只有自定义分段必填）
+	MaxSplitter    int      `json:"maxSplitter"`                       // 可分隔最大值（只有自定义分段必填）
+	Overlap        float32  `json:"overlap"`                           // 可重叠值（只有自定义分段必填）
+	SubSplitter    []string `json:"subSplitter"`                       // 分隔符（只有父子分段必填）
+	SubMaxSplitter int      `json:"subMaxSplitter"`                    // 可分隔最大值（只有父子分段必填）
 }
 
 type QueryKnowledgeReq struct {
@@ -160,6 +165,17 @@ func (c *DocImportReq) Check() error {
 		}
 	}
 
+	if c.DocSegment != nil {
+		if c.DocSegment.SegmentMethod != CommonSplitMethod && c.DocSegment.SegmentMethod != ParentSplitMethod {
+			return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "segmentMethod error")
+		}
+		if c.DocSegment.SegmentMethod == CommonSplitMethod {
+			if c.DocSegment.SegmentType != "" {
+				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "segmentType error")
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -171,6 +187,25 @@ func isValidKey(s string) bool {
 func (c *DocMetaDataReq) Check() error {
 	if len(c.KnowledgeId) == 0 && len(c.DocId) == 0 {
 		return errors.New("knowledgeId and docId can not all empty")
+	}
+	if len(c.MetaDataList) > 0 {
+		keyMap := make(map[string]bool)
+		for _, meta := range c.MetaDataList {
+			if meta.MetaKey == "" || meta.MetaValueType == "" {
+				return errors.New("key or value type can not be empty")
+			}
+			if keyMap[meta.MetaKey] {
+				return errors.New("key can not be repeated")
+			}
+			keyMap[meta.MetaKey] = true
+		}
+	}
+	return nil
+}
+
+func (c *BatchDocMetaDataReq) Check() error {
+	if len(c.KnowledgeId) == 0 {
+		return errors.New("knowledgeId can not all empty")
 	}
 	if len(c.MetaDataList) > 0 {
 		keyMap := make(map[string]bool)

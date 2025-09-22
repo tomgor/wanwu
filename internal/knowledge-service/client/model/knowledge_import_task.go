@@ -1,20 +1,25 @@
 package model
 
 const (
-	KnowledgeImportAnalyze = 1 //知识库任务解析中
-	KnowledgeImportSubmit  = 2 //知识库任务已提交
-	KnowledgeImportFinish  = 3 //知识库任务导入完成
-	KnowledgeImportError   = 4 //知识库任务导入失败
-	FileImportType         = 0 //文件上传
-	UrlImportType          = 1 //url上传
-	UrlFileImportType      = 2 //2.批量url上传
+	KnowledgeImportAnalyze = 1   //知识库任务解析中
+	KnowledgeImportSubmit  = 2   //知识库任务已提交
+	KnowledgeImportFinish  = 3   //知识库任务导入完成
+	KnowledgeImportError   = 4   //知识库任务导入失败
+	FileImportType         = 0   //文件上传
+	UrlImportType          = 1   //url上传
+	UrlFileImportType      = 2   //2.批量url上传
+	ParentSegmentMethod    = "1" //父子分段
+	CommonSegmentMethod    = "0" //通用分段
 )
 
 type SegmentConfig struct {
-	SegmentType string   `json:"segmentType" validate:"required"` //分段方式 0：自定分段；1：自定义分段
-	Splitter    []string `json:"splitter"`                        // 分隔符（只有自定义分段必填）
-	MaxSplitter int      `json:"maxSplitter"`                     // 可分隔最大值（只有自定义分段必填）
-	Overlap     float32  `json:"overlap"`                         // 可重叠值（只有自定义分段必填）
+	SegmentMethod  string   `json:"segmentMethod"`                   ////分段方法 0：通用分段；1：父子分段,字符串为空则认为是通用分段
+	SegmentType    string   `json:"segmentType" validate:"required"` //分段方式 0：自定分段；1：自定义分段
+	Splitter       []string `json:"splitter"`                        // 分隔符（只有自定义分段必填）
+	MaxSplitter    int      `json:"maxSplitter"`                     // 可分隔最大值（只有自定义分段必填）
+	Overlap        float32  `json:"overlap"`                         // 可重叠值（只有自定义分段必填）
+	SubSplitter    []string `json:"subSplitter"`                     // 分隔符（只有父子分段必填）
+	SubMaxSplitter int      `json:"subMaxSplitter"`                  // 可分隔最大值（只有父子分段必填）
 }
 
 type DocAnalyzer struct {
