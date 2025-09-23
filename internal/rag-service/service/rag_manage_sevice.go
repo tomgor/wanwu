@@ -237,9 +237,26 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	}
 	ragChatParams.MetaFilter = filterEnable
 	ragChatParams.MetaFilterConditions = metaParams
+	ragChatParams.History = buildHistory(req.History)
 
 	log.Infof("ragparams = %+v", http_client.Convert2LogString(ragChatParams))
 	return ragChatParams, nil
+}
+
+// 构建历史参数
+func buildHistory(historyList []*rag_service.HistoryItem) []*HistoryItem {
+	if len(historyList) == 0 {
+		return nil
+	}
+	var retList []*HistoryItem
+	for _, item := range historyList {
+		retList = append(retList, &HistoryItem{
+			NeedHistory: item.NeedHistory,
+			Query:       item.Query,
+			Response:    item.Response,
+		})
+	}
+	return retList
 }
 
 func buildRagMetaParams(rag *model.RagInfo, knowledgeIDToName map[string]string) (bool, []*MetadataFilterItem, error) {

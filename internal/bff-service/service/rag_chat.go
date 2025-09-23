@@ -58,9 +58,20 @@ func CallRagChatStream(ctx *gin.Context, userId, orgId string, req request.ChatR
 			return nil, grpc_util.ErrorStatusWithKey(err_code.Code_BFFSensitiveWordCheck, "bff_sensitive_check_req_default_reply")
 		}
 	}
+	var ragHistory []*rag_service.HistoryItem
+	if len(req.History) > 0 {
+		for _, history := range req.History {
+			ragHistory = append(ragHistory, &rag_service.HistoryItem{
+				Query:       history.Query,
+				Response:    history.Response,
+				NeedHistory: history.NeedHistory,
+			})
+		}
+	}
 	stream, err := rag.ChatRag(ctx, &rag_service.ChatRagReq{
 		RagId:    req.RagID,
 		Question: req.Question,
+		History:  ragHistory,
 		Identity: &rag_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,

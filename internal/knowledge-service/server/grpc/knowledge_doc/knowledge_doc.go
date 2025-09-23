@@ -46,7 +46,9 @@ func (s *Service) GetDocList(ctx context.Context, req *knowledgebase_doc_service
 	var importTaskList []*model.KnowledgeImportTask
 	if len(list) > 0 {
 		importTaskList, err = orm.SelectKnowledgeImportTaskByIdList(ctx, buildImportTaskIdList(list))
-		log.Errorf("获取知识库列表失败(%v)  参数(%v)", err, req)
+		if err != nil {
+			log.Errorf("获取知识库列表失败(%v)  参数(%v)", err, req)
+		}
 	}
 
 	return buildDocListResp(list, importTaskList, total, req.PageSize, req.PageNum), nil

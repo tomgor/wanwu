@@ -9243,6 +9243,12 @@ const docTemplate = `{
                 "ragId"
             ],
             "properties": {
+                "history": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/request.History"
+                    }
+                },
                 "question": {
                     "type": "string"
                 },
@@ -10120,6 +10126,20 @@ const docTemplate = `{
             ],
             "properties": {
                 "modelId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.History": {
+            "type": "object",
+            "properties": {
+                "needHistory": {
+                    "type": "boolean"
+                },
+                "query": {
+                    "type": "string"
+                },
+                "response": {
                     "type": "string"
                 }
             }

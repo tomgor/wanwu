@@ -1121,6 +1121,10 @@ definitions:
     type: object
   request.ChatRagRequest:
     properties:
+      history:
+        items:
+          $ref: '#/definitions/request.History'
+        type: array
       question:
         type: string
       ragId:
@@ -1718,6 +1722,15 @@ definitions:
         type: string
     required:
     - modelId
+    type: object
+  request.History:
+    properties:
+      needHistory:
+        type: boolean
+      query:
+        type: string
+      response:
+        type: string
     type: object
   request.ImportOrUpdateModelRequest:
     properties:
