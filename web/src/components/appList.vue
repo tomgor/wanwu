@@ -172,7 +172,7 @@
 <script>
 import { AppType } from "@/utils/commonSet";
 import { deleteApp, appCancelPublish, copyAgnetTemplate, appPublish } from "@/api/appspace";
-import { copyWorkFlow, publishWorkFlow, copyExample } from "@/api/workflow";
+import { copyWorkFlow, publishWorkFlow, copyExample, exportWorkflow } from "@/api/workflow";
 import { setFavorite } from "@/api/explore";
 export default {
   props:{
@@ -338,6 +338,15 @@ export default {
     },
     workflowExport(row) {
       console.log(row, '---------------------------workflowExport')
+      exportWorkflow({workflowId: row.appId}).then(response => {
+        const blob = new Blob([response], { type: response.type })
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a")
+        link.href = url
+        link.download = row.name + '.json'
+        link.click()
+        window.URL.revokeObjectURL(link.href)
+      })
     },
     workflowOperation(method, row) {
       switch (method) {

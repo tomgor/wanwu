@@ -184,3 +184,23 @@ export const uploadFile = (data) => {
         data
     })
 }
+
+// 导入工作流
+export const importWorkflow = (data, config) => {
+    return request({
+        url: `/user/api/v1/appspace/workflow/import`,
+        method: 'post',
+        data,
+        config
+    });
+};
+
+// 导出工作流
+export const exportWorkflow = (params) => {
+    return request({
+        url: `/user/api/v1/appspace/workflow/export`,
+        method: "get",
+        params,
+        responseType: 'blob'
+    });
+};
