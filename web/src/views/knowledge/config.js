@@ -53,7 +53,7 @@ export const DOC_ANALYZER_LIST = [
     {
         label:'ocr',
         text:'启用OCR解析',
-        desc:'解析图片、扫描件文档时开启，仅适用于PDF文件'
+        desc:'解析图片、扫描件文档时开启，仅适用于pdf文件'
     },
     {
         label:'model',

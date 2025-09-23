@@ -37,6 +37,10 @@ export default {
         modelform:{
             type:Object,
             default:null
+        },
+        limitMaxTokens:{
+            type:Number,
+            default:4096
         }
     },
     data(){
@@ -97,7 +101,7 @@ export default {
                     props: "maxTokens",
                     btnProps:'maxTokensEnable',
                     min: 1,
-                    max: 4096,
+                    max: this.limitMaxTokens,
                     step: 1,
                 }
             ]

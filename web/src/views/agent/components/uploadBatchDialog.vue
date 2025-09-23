@@ -22,7 +22,8 @@
                                 >
                                 <div v-if="fileUrl" class="echo-img-box">
                                     <div class="echo-img">
-                                        <img v-if="fileType === 'image/*'"  :src="'/user/api'+fileUrl" />
+                                        <!-- '/user/api'+fileUrl -->
+                                        <img v-if="fileType === 'image/*'"  :src="imgUrl || fileUrl" />
                                         <video v-if="fileType === 'video/*'" id="video" muted loop playsinline>
                                             <source :src = 'fileUrl' type="video/mp4">
                                             {{$t('common.fileUpload.videoTips')}}
@@ -91,24 +92,28 @@
                 audioConfig:['mp3','wav'],
                 tipsArr:'',
                 tipsObj:{
-                    'image/*':['.jpg', '.jpeg', '.png','.webp'],
+                    'image/*':['.jpg', '.jpeg', '.png'],//'.webp'
                     'audio/*':['.wav', '.mp3'],
                     'doc/*':['.txt','.csv','.xlsx','.docx','.html','.pptx','.pdf']
                 },
                 chunkFileName:'',
-                fileInfo:null
+                fileInfo:null,
+                imgUrl:''
             }
         },
         watch:{
-            fileTypeArr(val,oldVal) {
-                this.setFileType(val)
+            fileTypeArr:{
+                handler(val,oldVal) {
+                    this.setFileType(val)
+                },
+                immediate:true
             }
         },
         created(){
             this.sessionId = this.sessionId || this.$route.query.sessionId
-            if(this.fileTypeArr.length){
-                this.setFileType(this.fileTypeArr)
-            }
+            // if(this.fileTypeArr.length){
+            //     this.setFileType(this.fileTypeArr)
+            // }
         },
         methods:{
             setFileType(fileTypeArr){
@@ -129,7 +134,7 @@
                 this.fileList = []
                 this.fileType = ''
                 this.fileUrl = ''
-
+                this.imgUrl = ''
             },
             handleClose(){
                 this.clearFile()
@@ -139,8 +144,18 @@
                 let filename= file.name
                 //通过上传的文件名判断文件类型，用于回显
                 let fileType = filename.split('.')[filename.split('.').length-1]
+                
+                // 重置图片URL
+                this.imgUrl = '';
+                
                 if(["jpeg", "PNG", "png", "JPG", "jpg",'bmp','webp'].includes(fileType)){
                     this.fileType = 'image/*'
+                    // 获取图片预览URL
+                    if (file.url) {
+                        this.imgUrl = file.url;
+                    } else if (file.raw) {
+                        this.imgUrl = URL.createObjectURL(file.raw);
+                    }
                 }
                 if(["mp3", "wav"].includes(fileType)){
                     this.fileType = 'audio/*'
@@ -148,9 +163,12 @@
                 if(['txt','csv','xlsx','docx','html','pptx','pdf'].includes(fileType)){
                     this.fileType = 'doc/*'
                 }
+                
+                // 创建文件预览URL
                 this.fileUrl = URL.createObjectURL(file.raw);
                 this.fileList = [];
                 this.fileList.push(file);
+                
                 if(this.fileList.length > 0){
                     this.maxSizeBytes = 0;
                     this.isExpire = true;
@@ -165,6 +183,10 @@
                 }
             },
             doBatchUpload(){
+                this.fileInfo = {
+                    ...this.fileInfo,
+                    imgUrl:this.imgUrl
+                }
                 this.$emit('setFileId',this.fileInfo)
                 this.$emit('setFile',this.fileList)
                 this.handleClose();

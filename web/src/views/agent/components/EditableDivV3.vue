@@ -3,7 +3,7 @@
     <div class="rl">
         <div class="editable-box">
             <div  v-if="fileType === 'image/*'" class="echo-img-box">
-                <el-image class="echo-img" :src="fileUrl" @click="showBigImg(fileUrl)"  :preview-src-list="[fileUrl]"></el-image>
+                <el-image class="echo-img" :src="imgUrl" @click="showBigImg(imgUrl)"  :preview-src-list="[imgUrl]"></el-image>
                 <i class="el-icon-close echo-close" @click="clearFile"></i>
             </div>
             <div v-if="fileType === 'audio/*'" class="echo-audio-box">
@@ -102,6 +102,7 @@
                 fileType:'',
                 fileList:[],
                 fileUrl:'',
+                imgUrl:'',
                 modelType:''
             }
         },
@@ -164,6 +165,7 @@
                 this.fileList = []
                 this.fileType = ''
                 this.fileUrl = ''
+                this.imgUrl = ''
                 this.hasFile = false
             },
             /*showFileUpload(status){
@@ -176,9 +178,10 @@
                 this.fileIdList = fileIdList;
                 // this.fileUrl = fileIdList[0].downloadUrl;
                 this.fileUrl = fileIdList.fileUrl;
+                this.imgUrl = fileIdList.imgUrl;
 
                 let fileType = this.fileUrl.split('.')[this.fileUrl.split('.').length-1]
-                if(["jpeg", "PNG", "png", "JPG", "jpg",'bmp','webp'].includes(fileType)){
+                if(["jpeg", "PNG", "png", "JPG", "jpg"].includes(fileType)){//'bmp','webp'
                     this.fileType = 'image/*'
                 }
                 if(["mp3", "wav"].includes(fileType)){

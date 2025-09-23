@@ -101,18 +101,21 @@
                 :loading="modelLoading"
                 clearable
                 filterable
+                value-key="modelId"
+                @change="handleModelChange($event)"
               >
                 <el-option
-                  style="padding: 20px 10px; display: flex; align-items: center;"
+                  class="model-option-item"
                   v-for="(item, index) in modleOptions"
-                  :key="'model'+index"
+                  :key="item.modelId"
                   :value="item.modelId"
+                  :label="item.displayName"
                 >
                   <div class="model-option-content">
                     <span class="model-name">{{ item.displayName }}</span>
-                    <div v-if="modeltags.length > 0" class="model-select-tags">
+                    <div class="model-select-tags" v-if="item.tags && item.tags.length > 0">
                       <span
-                        v-for="(tag, tagIdx) in modeltags"
+                        v-for="(tag, tagIdx) in item.tags"
                         :key="tagIdx"
                         class="model-select-tag"
                       >{{ tag.text }}</span>
@@ -347,6 +350,7 @@
       @setModelSet="setModelSet"
       ref="modelSetDialog"
       :modelform="editForm.modelConfig"
+      :limitMaxTokens="limitMaxTokens"
     />
     <!-- 选择工作类型 -->
     <ToolDiaglog
@@ -477,20 +481,7 @@ export default {
   },
   data() {
     return {
-      modeltags:[
-        {
-          text:'chat',
-        },
-        {
-          text:'图文问答',
-        },
-        {
-          text:'4k',
-        },
-        {
-          text:'Tool call',
-        }
-      ],
+      limitMaxTokens:4096,
       knowledgeIndex:-1,
       currentKnowledgeId:'',
       currentMetaData:{},
@@ -503,8 +494,9 @@ export default {
       showActionConfig: false,
       rerankOptions: [],
       initialEditForm: null,
-      editForm: {
-        assistantId: "",
+        editForm: {
+          visionsupport:'',
+          assistantId: "",
         avatar: {},
         name: "",
         desc: "",
@@ -621,6 +613,16 @@ export default {
     store.dispatch("app/initState");
   },
   methods: {
+    handleModelChange(val){
+      this.setModelInfo(val);
+    },
+    setModelInfo(val){
+       const selectedModel = this.modleOptions.find(item => item.modelId === val);
+        if (selectedModel) {
+          this.editForm.visionsupport = selectedModel.config.visionSupport;
+          this.limitMaxTokens = selectedModel.config.maxTokens?selectedModel.config.maxTokens:this.limitMaxTokens;
+        }
+    },
     submitMeta(){
       const metaData  = this.$refs.metaSet.getMetaData();
       if(this.$refs.metaSet.validateRequiredFields(metaData['metaDataFilterParams']['metaFilterParams'])){
@@ -671,18 +673,6 @@ export default {
       this.$refs.knowledgeSetDialog.showDialog(this.editForm.knowledgeConfig);
     },
     //获取模型列表
-    getModelData() {
-      selectModelList().then((res) => {
-        if (res.code === 0) {
-          this.modleOptions = res.data.map((item) => {
-            return {
-              label: item.name,
-              value: item.id,
-            };
-          });
-        }
-      });
-    },
     //获取rerank模型
     getRerankData() {
       getRerankList().then((res) => {
@@ -867,9 +857,14 @@ export default {
     },
     async updateInfo() {
       //模型数据
-      const modeInfo = this.modleOptions.find(
-        (item) => item.modelId === this.editForm.modelParams
-      );
+      let modeInfo;
+      if (typeof this.editForm.modelParams === 'object' && this.editForm.modelParams) {
+        modeInfo = this.editForm.modelParams;
+      } else {
+        modeInfo = this.modleOptions.find(
+          (item) => item.modelId === this.editForm.modelParams
+        );
+      }
       const rerankInfo = this.rerankOptions.find(
         (item) => item.modelId === this.editForm.knowledgeConfig.rerankModelId
       );
@@ -965,6 +960,9 @@ export default {
               : this.editForm.safetyConfig,
         };
 
+        //设置模型信息
+        this.setModelInfo(data.modelConfig.modelId);
+
         //回显自定义插件
         this.workFlowInfos = data.workFlowInfos || [];
         this.mcpInfos = data.mcpInfos || [];
@@ -1041,33 +1039,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.model-select-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+  .model-select-tag {
+    background-color: #f0f2ff;
+    color: #384bf7;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+}
 .isDisabled .header-right,.isDisabled .drawer-form > div{
   user-select: none;
   pointer-events: none !important;      
-}
-.model-select-tags {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 4px;
-    flex-shrink: 0;
-    .model-select-tag {
-      background-color: #f0f2ff;
-      color: #384bf7;
-      border-radius: 4px;
-      padding:0 10px;
-      font-size: 12px;
-    }
- }
-
-.model-option-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.model-name {
-  flex-shrink: 0;
 }
 /deep/ {
   .apikeyBtn {
@@ -1647,6 +1635,60 @@ export default {
 }
 .custom-tooltip.el-tooltip__popper.is-light[x-placement^="top"] .popper__arrow {
   border-top-color: #ccc !important;
+}
+
+.model-selected-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.model-selected-name {
+  flex-shrink: 0;
+}
+
+.model-selected-tags {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  flex-shrink: 0;
+  .model-selected-tag {
+    background-color: #f0f2ff;
+    color: #384bf7;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+}
+
+.model-option-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  
+  .model-name {
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+  
+  .model-select-tags {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    flex-shrink: 0;
+    
+    .model-select-tag {
+      background-color: #f0f2ff;
+      color: #384bf7;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+  }
 }
 </style>
 

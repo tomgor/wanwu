@@ -105,7 +105,7 @@ export default {
             if(this.activeValue === 'auto'){
                 return '创建自定义工具'
             }else if(this.activeValue === 'mcp'){
-                return '创建MCP'
+                return '导入MCP'
             }else{
                 return '创建工作流'
             }
