@@ -107,7 +107,7 @@
                 {{formatContextSize(item.config.contextSize)}}
               </div>
               <div class="card-type" v-if="item.config.functionCalling && item.config.functionCalling !== 'noSupport'">
-                {{item.config.functionCalling}}
+                {{item.config.functionCalling === 'toolCall' ? 'ToolCall' : 'FunctionCall'}}
               </div>
             </div>
             <div class="card-bottom">
