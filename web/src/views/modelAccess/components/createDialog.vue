@@ -16,7 +16,7 @@
           </span>
         </div>
       </template>
-      <el-form :model="{...createForm}" :rules="rules" ref="createForm" label-width="110px" class="createForm form">
+      <el-form :model="{...createForm}" :rules="rules" ref="createForm" label-width="130px" class="createForm form">
         <el-form-item :label="$t('modelAccess.table.modelType')" prop="modelType">
           <el-select
             v-model="createForm.modelType"
@@ -64,6 +64,9 @@
             </span>
           </el-upload>
         </el-form-item>
+        <el-form-item :label="$t('modelAccess.table.modelDesc')" prop="modelDesc">
+          <el-input v-model="createForm.modelDesc" :placeholder="$t('common.input.placeholder')"></el-input>
+        </el-form-item>
         <el-form-item v-if="createForm.modelType === llm" label="Function Call" prop="functionCalling">
           <el-select
             v-model="createForm.functionCalling"
@@ -93,6 +96,24 @@
             >
             </el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item
+          v-if="[llm, embedding, rerank].includes(createForm.modelType)"
+          :label="$t('modelAccess.table.contextSize')"
+          prop="contextSize"
+        >
+          <el-input-number
+            v-model="createForm.contextSize"
+            :placeholder="$t('common.input.placeholder')"
+            :min="0"
+          ></el-input-number>
+        </el-form-item>
+        <el-form-item v-if="createForm.modelType === llm" label="Max_token" prop="maxTokens">
+          <el-input-number
+            v-model="createForm.maxTokens"
+            :placeholder="$t('common.input.placeholder')"
+            :min="0"
+          ></el-input-number>
         </el-form-item>
         <el-form-item v-if="provider.key !== ollama" :label="$t('modelAccess.table.apiKey')" prop="apiKey">
           <el-input
@@ -140,6 +161,7 @@ import {
   TYPE_OBJ,
   OLLAMA,
   EMBEDDING,
+  RERANK,
   YUAN_JING
 } from "../constants"
 import LinkIcon from "@/components/linkIcon.vue";
@@ -167,6 +189,7 @@ export default {
       llm: LLM,
       ollama: OLLAMA,
       embedding: EMBEDDING,
+      rerank: RERANK,
       yuanjing: YUAN_JING,
       createForm: {
         model: '',
@@ -174,6 +197,9 @@ export default {
         endpointUrl: '',
         apiKey: '',
         modelType: LLM,
+        modelDesc: '',
+        contextSize: 0,
+        maxTokens: 4096,
         avatar: {
           key: '',
           path: ''
@@ -187,6 +213,12 @@ export default {
           { required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'},
           // { min: 2, max: 50, message: this.$t('common.hint.modelNameLimit'), trigger: 'blur'},
           // { pattern: /^(?!_)[a-zA-Z0-9-_.\u4e00-\u9fa5]+$/, message: this.$t('common.hint.modelName'), trigger: "blur"}
+        ],
+        contextSize: [
+          { required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'},
+        ],
+        maxTokens: [
+          { required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'},
         ],
         displayName: [
           { pattern: /^(?!_)[a-zA-Z0-9-_.\u4e00-\u9fa5]+$/, message: this.$t('common.hint.modelName'), trigger: "blur"},
@@ -246,6 +278,8 @@ export default {
         modelType: LLM,
         functionCalling: DEFAULT_CALLING,
         visionSupport: DEFAULT_SUPPORT,
+        contextSize: 0,
+        maxTokens: 4096,
         avatar: { key: '', path: ''}
       })
       this.$refs.createForm.resetFields()
@@ -254,9 +288,10 @@ export default {
     handleSubmit() {
       this.$refs.createForm.validate(async (valid) => {
         if (valid) {
-          const {apiKey, endpointUrl, functionCalling, modelType, visionSupport} = this.createForm
-          const functionCallingObj = modelType === LLM ? {functionCalling} : {}
+          const {apiKey, endpointUrl, functionCalling, modelType, visionSupport, contextSize, maxTokens} = this.createForm
+          const functionCallingObj = modelType === LLM ? {functionCalling, maxTokens} : {}
           const visionSupportObj = modelType === LLM && this.provider.key === YUAN_JING ? {visionSupport} : {}
+          const contextSizeObj = [LLM, EMBEDDING, RERANK].includes(modelType) ? {contextSize} : {}
           const form = {
             ...this.createForm,
             provider: this.provider.key || '',
@@ -264,13 +299,16 @@ export default {
               apiKey,
               endpointUrl,
               ...functionCallingObj,
-              ...visionSupportObj
+              ...visionSupportObj,
+              ...contextSizeObj
             }
           }
           delete form.apiKey
           delete form.endpointUrl
           delete form.functionCalling
           delete form.visionSupport
+          delete form.contextSize
+          delete form.maxTokens
 
           try {
             this.loading = true

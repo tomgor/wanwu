@@ -13,7 +13,7 @@ export default {
         button: '登 录',
     },
     register: {
-        title: '注册',
+        title: '注 册',
         form: {
             username: '用户名',
             email: '邮箱',
@@ -21,6 +21,20 @@ export default {
         },
         action: '获取',
         button: '注 册',
+        back: '返回登录'
+    },
+    reset: {
+        title: '重置密码',
+        form: {
+            email: '邮箱',
+            code: '验证码',
+            password: '新密码',
+        },
+        pwd1Placeholder: '密码需包含字母，数字，特殊字符，长度8-20',
+        action1: '设置',
+        action2: '确认',
+        action: '获取',
+        button: '确 认',
         back: '返回登录'
     },
     about: {
@@ -354,6 +368,8 @@ export default {
         table: {
             modelName: '模型名称',
             modelDisplayName: '模型显示名称',
+            modelDesc: '模型描述',
+            contextSize: '模型上下文长度',
             modelId: '模型ID',
             version: '版本号',
             detailInfo: '说明文档',
@@ -368,7 +384,8 @@ export default {
             publish: '发布',
             isStart: '是否启用',
             on: '上架',
-            off: '下架'
+            off: '下架',
+            vision: '图文问答'
         },
         confirm: {
             delete: '该模型删除后不可恢复，是否确认删除？',
