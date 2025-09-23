@@ -354,6 +354,8 @@ export default {
         table: {
             modelName: '模型名称',
             modelDisplayName: '模型显示名称',
+            modelDesc: '模型描述',
+            contextSize: '模型上下文长度',
             modelId: '模型ID',
             version: '版本号',
             detailInfo: '说明文档',
@@ -368,7 +370,8 @@ export default {
             publish: '发布',
             isStart: '是否启用',
             on: '上架',
-            off: '下架'
+            off: '下架',
+            vision: '图文问答'
         },
         confirm: {
             delete: '该模型删除后不可恢复，是否确认删除？',
