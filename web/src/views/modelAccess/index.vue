@@ -99,16 +99,7 @@
               </div>
             </div>
             <div class="card-middle">
-              <div class="card-type">{{modelTypeObj[item.modelType]}}</div>
-              <div class="card-type" v-if="item.config.visionSupport === 'support'">
-                {{$t('modelAccess.table.vision')}}
-              </div>
-              <div class="card-type" v-if="item.config.contextSize">
-                {{formatContextSize(item.config.contextSize)}}
-              </div>
-              <div class="card-type" v-if="item.config.functionCalling && item.config.functionCalling !== 'noSupport'">
-                {{item.config.functionCalling === 'toolCall' ? 'ToolCall' : 'FunctionCall'}}
-              </div>
+              <div v-if="item.tags" class="card-type" v-for="it in item.tags">{{it.text}}</div>
             </div>
             <div class="card-bottom">
               <div
@@ -159,13 +150,6 @@
       this.getTableData()
     },
     methods: {
-      formatContextSize(number) {
-        if (number >= 1000) {
-          return Math.floor(number / 1000) + 'K'
-        } else {
-          return (number / 1000) + 'K'
-        }
-      },
       async getTableData(params) {
         this.loading = true
         try {
