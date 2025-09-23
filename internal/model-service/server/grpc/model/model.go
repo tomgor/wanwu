@@ -2,7 +2,6 @@ package model
 
 import (
 	"context"
-
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	"github.com/UnicomAI/wanwu/internal/model-service/client/model"
@@ -24,6 +23,7 @@ func (s *Service) ImportModel(ctx context.Context, req *model_service.ModelInfo)
 			OrgID:  req.OrgId,
 			UserID: req.UserId,
 		},
+		ModelDesc: req.ModelDesc,
 	}); err != nil {
 		return nil, errStatus(errs.Code_ModelImportedModel, err)
 	}
@@ -100,6 +100,7 @@ func toModelInfo(modelInfo *model.ModelImported) *model_service.ModelInfo {
 		OrgId:          modelInfo.OrgID,
 		CreatedAt:      modelInfo.CreatedAt,
 		UpdatedAt:      modelInfo.UpdatedAt,
+		ModelDesc:      modelInfo.ModelDesc,
 	}
 }
 

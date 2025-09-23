@@ -577,6 +577,11 @@ definitions:
       include_usage:
         type: boolean
     type: object
+  mp_common.Tag:
+    properties:
+      text:
+        type: string
+    type: object
   mp_common.Thinking:
     properties:
       type:
@@ -634,6 +639,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -642,7 +650,15 @@ definitions:
         enum:
         - noSupport
         - toolCall
-        - functionCall
+        type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
         type: string
     type: object
   mp_infini.Embedding:
@@ -659,6 +675,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -667,7 +686,15 @@ definitions:
         enum:
         - noSupport
         - toolCall
-        - functionCall
+        type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
         type: string
     type: object
   mp_infini.Rerank:
@@ -693,6 +720,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -701,7 +731,15 @@ definitions:
         enum:
         - noSupport
         - toolCall
-        - functionCall
+        type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
         type: string
     type: object
   mp_openai_compatible.Embedding:
@@ -718,6 +756,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -726,7 +767,15 @@ definitions:
         enum:
         - noSupport
         - toolCall
-        - functionCall
+        type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
         type: string
     type: object
   mp_openai_compatible.Rerank:
@@ -752,6 +801,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -760,7 +812,15 @@ definitions:
         enum:
         - noSupport
         - toolCall
-        - functionCall
+        type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
         type: string
     type: object
   mp_qwen.Rerank:
@@ -795,6 +855,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -803,8 +866,10 @@ definitions:
         enum:
         - noSupport
         - toolCall
-        - functionCall
         type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
       visionSupport:
         description: 视觉支持
         enum:
@@ -908,6 +973,8 @@ definitions:
       model:
         description: 模型名称
         type: string
+      modelDesc:
+        type: string
       modelId:
         type: string
       modelType:
@@ -927,6 +994,10 @@ definitions:
       publishDate:
         description: 模型发布时间
         type: string
+      tags:
+        items:
+          $ref: '#/definitions/mp_common.Tag'
+        type: array
       updatedAt:
         type: string
       userId:

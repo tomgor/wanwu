@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -146,6 +145,7 @@ func parseImportAndUpdateClientReq(userId, orgId string, req *request.ImportOrUp
 		UserId:        userId,
 		OrgId:         orgId,
 		IsActive:      true,
+		ModelDesc:     req.ModelDesc,
 	}
 	configStr, err := req.ConfigString()
 	if err != nil {
@@ -172,6 +172,10 @@ func toModelInfo(ctx *gin.Context, modelInfo *model_service.ModelInfo) (*respons
 	if err != nil {
 		return nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v get model config err: %v", modelInfo.ModelId, err))
 	}
+	tags, err := mp.ToModelTags(modelInfo.Provider, modelInfo.ModelType, modelInfo.ProviderConfig)
+	if err != nil {
+		return nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v get model tags err: %v", modelInfo.ModelId, err))
+	}
 	return &response.ModelInfo{
 		ModelId:     modelInfo.ModelId,
 		Provider:    modelInfo.Provider,
@@ -185,6 +189,8 @@ func toModelInfo(ctx *gin.Context, modelInfo *model_service.ModelInfo) (*respons
 		OrgId:       modelInfo.OrgId,
 		CreatedAt:   util.Time2Str(modelInfo.CreatedAt),
 		UpdatedAt:   util.Time2Str(modelInfo.UpdatedAt),
+		ModelDesc:   modelInfo.ModelDesc,
 		Config:      modelConfig,
+		Tags:        tags,
 	}, nil
 }

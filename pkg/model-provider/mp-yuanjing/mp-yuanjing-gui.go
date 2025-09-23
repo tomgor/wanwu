@@ -12,6 +12,15 @@ type Gui struct {
 	EndpointUrl string `json:"endpointUrl"` // 推理url
 }
 
+func (cfg *Gui) Tags() []mp_common.Tag {
+	tags := []mp_common.Tag{
+		{
+			Text: mp_common.TagGui,
+		},
+	}
+	return tags
+}
+
 func (cfg *Gui) NewReq(req *mp_common.GuiReq) (mp_common.IGuiReq, error) {
 	return mp_common.NewGuiReq(req), nil
 }

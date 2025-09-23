@@ -41,6 +41,7 @@ message ModelInfo {
     string providerConfig = 11;
     int64 createdAt = 12;
     int64 updatedAt = 13;
+    string modelDesc = 14;
 }
 
 message ModelInfos {

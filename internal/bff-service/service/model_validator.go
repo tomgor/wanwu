@@ -95,8 +95,10 @@ func ValidateLLMModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) erro
 	}
 
 	// VisionSupport 支持校验
+	visionSupportFlag := false // VisionSupport 校验标识
 	vs, ok := result["visionSupport"].(string)
 	if ok && mp_common.VSType(vs) == mp_common.VSTypeSupport {
+		visionSupportFlag = true
 		content := []map[string]interface{}{
 			{
 				"type": "image_url",
@@ -128,6 +130,9 @@ func ValidateLLMModel(ctx *gin.Context, modelInfo *model_service.ModelInfo) erro
 
 	resp, _, err := iLLM.ChatCompletions(ctx.Request.Context(), llmReq)
 	if err != nil {
+		if visionSupportFlag {
+			return fmt.Errorf("model API call failed: %v, maybe model does not support vision functionality", err)
+		}
 		return fmt.Errorf("model API call failed: %v", err)
 	}
 

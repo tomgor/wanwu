@@ -12,6 +12,14 @@ type PdfParser struct {
 	EndpointUrl string `json:"endpointUrl"` // 推理url
 }
 
+func (cfg *PdfParser) Tags() []mp_common.Tag {
+	tags := []mp_common.Tag{
+		{
+			Text: mp_common.TagPdfParser,
+		},
+	}
+	return tags
+}
 func (cfg *PdfParser) NewReq(req *mp_common.PdfParserReq) (mp_common.IPdfParserReq, error) {
 	return mp_common.NewPdfParserReq(req), nil
 }

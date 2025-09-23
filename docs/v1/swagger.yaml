@@ -171,6 +171,11 @@ definitions:
       providerYuanJing:
         $ref: '#/definitions/mp.ProviderModelByYuanjing'
     type: object
+  mp_common.Tag:
+    properties:
+      text:
+        type: string
+    type: object
   mp_huoshan.Embedding:
     properties:
       apiKey:
@@ -185,6 +190,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -193,7 +201,15 @@ definitions:
         enum:
         - noSupport
         - toolCall
-        - functionCall
+        type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
         type: string
     type: object
   mp_huoshan.LLMParams:
@@ -243,6 +259,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -251,7 +270,15 @@ definitions:
         enum:
         - noSupport
         - toolCall
-        - functionCall
+        type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
         type: string
     type: object
   mp_infini.LLMParams:
@@ -310,6 +337,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -318,7 +348,15 @@ definitions:
         enum:
         - noSupport
         - toolCall
-        - functionCall
+        type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
         type: string
     type: object
   mp_ollama.LLMParams:
@@ -368,6 +406,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -376,7 +417,15 @@ definitions:
         enum:
         - noSupport
         - toolCall
-        - functionCall
+        type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
         type: string
     type: object
   mp_openai_compatible.LLMParams:
@@ -435,6 +484,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -443,7 +495,15 @@ definitions:
         enum:
         - noSupport
         - toolCall
-        - functionCall
+        type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
+      visionSupport:
+        description: 视觉支持
+        enum:
+        - noSupport
+        - support
         type: string
     type: object
   mp_qwen.LLMParams:
@@ -511,6 +571,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -519,8 +582,10 @@ definitions:
         enum:
         - noSupport
         - toolCall
-        - functionCall
         type: string
+      maxTokens:
+        description: 模型回答最大tokens
+        type: integer
       visionSupport:
         description: 视觉支持
         enum:
@@ -1749,6 +1814,9 @@ definitions:
       model:
         description: 模型名称
         type: string
+      modelDesc:
+        description: 模型描述
+        type: string
       modelId:
         type: string
       modelType:
@@ -2823,6 +2891,8 @@ definitions:
         items:
           $ref: '#/definitions/config.WorkflowModelParam'
         type: array
+      modelDesc:
+        type: string
       modelId:
         type: string
       modelType:
@@ -2842,6 +2912,10 @@ definitions:
       publishDate:
         description: 模型发布时间
         type: string
+      tags:
+        items:
+          $ref: '#/definitions/mp_common.Tag'
+        type: array
       updatedAt:
         type: string
       userId:
@@ -3704,6 +3778,8 @@ definitions:
       model:
         description: 模型名称
         type: string
+      modelDesc:
+        type: string
       modelId:
         type: string
       modelType:
@@ -3723,6 +3799,10 @@ definitions:
       publishDate:
         description: 模型发布时间
         type: string
+      tags:
+        items:
+          $ref: '#/definitions/mp_common.Tag'
+        type: array
       updatedAt:
         type: string
       userId:
