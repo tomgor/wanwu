@@ -10,6 +10,7 @@ var originalFetch = window.fetch;
 
 import {md} from './marksown-it'
 import $ from './jquery.min.js'
+import { file } from "jszip";
 
 
 export default {
@@ -359,6 +360,8 @@ export default {
                 requestFileUrls: this.queryFilePath?[this.queryFilePath]:[],
                 fileName:this.fileList.length > 0 ? this.fileList[0]['name'] : '',
                 fileSize:this.fileList.length > 0 ? this.fileList[0]['size'] : '',
+                fileUrl:this.fileList.length > 0 ? URL.createObjectURL(this.fileList[0].raw): '',
+                fileType:this.fileList.length > 0 ? this.fileList[0]['raw']['type'] : '',
                 pendingResponse:''
             }
             //正式环境传模型参数
@@ -442,6 +445,8 @@ export default {
                             "query": prompt,
                             "fileName":this.fileList.length > 0 ? this.fileList[0]['name'] : '',
                             "fileSize":this.fileList.length > 0 ? this.fileList[0]['size'] : '',
+                            "fileUrl":this.fileList.length > 0 ? URL.createObjectURL(this.fileList[0].raw): '',
+                            "fileType":this.fileList.length > 0 ? this.fileList[0]['raw']['type'] : '',
                             "response": '',
                             "filepath": data.file_url || '',
                             "requestFileUrls": this.queryFilePath?[this.queryFilePath] : data.requestFileUrls,

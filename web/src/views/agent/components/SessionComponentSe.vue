@@ -19,7 +19,8 @@
                 <div class="answer-content-query">
                   <span class="session-setting-id" v-if="$route.params && $route.params.id && (type && type !=='webChat')">智能体ID: {{$route.params.id}}</span>
                   <div class="echo-doc-box" v-if="n.fileName && n.fileName !== ''">
-                    <img :src="require('@/assets/imgs/fileicon.png')"  class="docIcon" />
+                    <img :src="n.fileUrl"  class="docIcon" style="width:auto!important;height:30px!important;" v-if="n.fileType.includes('image')" />
+                    <img :src="require('@/assets/imgs/fileicon.png')"  class="docIcon" style="width:30px!important;" v-else />
                     <div class="docInfo">
                       <p class="docInfo_name">文件名称：{{n.fileName||'...'}}</p>
                       <p class="docInfo_size">文件大小:{{getFileSizeDisplay(n.fileSize)}}</p>

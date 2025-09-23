@@ -99,6 +99,18 @@
             ...mapGetters('menu', ['basicInfo']),
             ...mapGetters('user', ['commonInfo']),
         },
+        watch: {
+            'editForm.visionsupport': {
+                handler(newVal) {
+                    if ( newVal === 'support') {
+                        this.fileTypeArr = ['doc/*','image/*'];
+                    } else {
+                        this.fileTypeArr = ['doc/*'];
+                    }
+                },
+                immediate: true
+            }
+        },
         data() {
             return {
                 amswerNum:0,
@@ -110,6 +122,7 @@
                 drawer: true,
             }
         },
+
         methods: {
             createConversion(){
                 if (this.echo) {
@@ -255,6 +268,7 @@
                 }
                 let fileId = this.$refs['editable'].getFileIdList() || this.fileId;
                 this.useSearch = this.$refs['editable'].sendUseSearch();
+                delete fileId.imgUrl;
                 this.setSseParams({conversationId: this.conversationId, fileInfo:fileId,assistantId:this.editForm.assistantId})
                 this.doSend()
                 this.echo = false
