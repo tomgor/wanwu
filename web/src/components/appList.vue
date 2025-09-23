@@ -337,8 +337,7 @@ export default {
       }
     },
     workflowExport(row) {
-      console.log(row, '---------------------------workflowExport')
-      exportWorkflow({workflowId: row.appId}).then(response => {
+      exportWorkflow({workflow_id: row.appId}).then(response => {
         const blob = new Blob([response], { type: response.type })
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a")
