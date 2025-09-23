@@ -7879,6 +7879,14 @@ const docTemplate = `{
                 }
             }
         },
+        "mp_common.Tag": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
         "mp_huoshan.Embedding": {
             "type": "object",
             "properties": {
@@ -7899,6 +7907,10 @@ const docTemplate = `{
                     "description": "ApiKey",
                     "type": "string"
                 },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
+                },
                 "endpointUrl": {
                     "description": "推理url",
                     "type": "string"
@@ -7908,8 +7920,19 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "noSupport",
-                        "toolCall",
-                        "functionCall"
+                        "toolCall"
+                    ]
+                },
+                "maxTokens": {
+                    "description": "模型回答最大tokens",
+                    "type": "integer"
+                },
+                "visionSupport": {
+                    "description": "视觉支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "support"
                     ]
                 }
             }
@@ -7979,6 +8002,10 @@ const docTemplate = `{
                     "description": "ApiKey",
                     "type": "string"
                 },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
+                },
                 "endpointUrl": {
                     "description": "推理url",
                     "type": "string"
@@ -7988,8 +8015,19 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "noSupport",
-                        "toolCall",
-                        "functionCall"
+                        "toolCall"
+                    ]
+                },
+                "maxTokens": {
+                    "description": "模型回答最大tokens",
+                    "type": "integer"
+                },
+                "visionSupport": {
+                    "description": "视觉支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "support"
                     ]
                 }
             }
@@ -8072,6 +8110,10 @@ const docTemplate = `{
                     "description": "ApiKey",
                     "type": "string"
                 },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
+                },
                 "endpointUrl": {
                     "description": "推理url",
                     "type": "string"
@@ -8081,8 +8123,19 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "noSupport",
-                        "toolCall",
-                        "functionCall"
+                        "toolCall"
+                    ]
+                },
+                "maxTokens": {
+                    "description": "模型回答最大tokens",
+                    "type": "integer"
+                },
+                "visionSupport": {
+                    "description": "视觉支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "support"
                     ]
                 }
             }
@@ -8152,6 +8205,10 @@ const docTemplate = `{
                     "description": "ApiKey",
                     "type": "string"
                 },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
+                },
                 "endpointUrl": {
                     "description": "推理url",
                     "type": "string"
@@ -8161,8 +8218,19 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "noSupport",
-                        "toolCall",
-                        "functionCall"
+                        "toolCall"
+                    ]
+                },
+                "maxTokens": {
+                    "description": "模型回答最大tokens",
+                    "type": "integer"
+                },
+                "visionSupport": {
+                    "description": "视觉支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "support"
                     ]
                 }
             }
@@ -8245,6 +8313,10 @@ const docTemplate = `{
                     "description": "ApiKey",
                     "type": "string"
                 },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
+                },
                 "endpointUrl": {
                     "description": "推理url",
                     "type": "string"
@@ -8254,8 +8326,19 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "noSupport",
-                        "toolCall",
-                        "functionCall"
+                        "toolCall"
+                    ]
+                },
+                "maxTokens": {
+                    "description": "模型回答最大tokens",
+                    "type": "integer"
+                },
+                "visionSupport": {
+                    "description": "视觉支持",
+                    "type": "string",
+                    "enum": [
+                        "noSupport",
+                        "support"
                     ]
                 }
             }
@@ -8351,6 +8434,10 @@ const docTemplate = `{
                     "description": "ApiKey",
                     "type": "string"
                 },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
+                },
                 "endpointUrl": {
                     "description": "推理url",
                     "type": "string"
@@ -8360,9 +8447,12 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "noSupport",
-                        "toolCall",
-                        "functionCall"
+                        "toolCall"
                     ]
+                },
+                "maxTokens": {
+                    "description": "模型回答最大tokens",
+                    "type": "integer"
                 },
                 "visionSupport": {
                     "description": "视觉支持",
@@ -10178,6 +10268,10 @@ const docTemplate = `{
                     "description": "模型名称",
                     "type": "string"
                 },
+                "modelDesc": {
+                    "description": "模型描述",
+                    "type": "string"
+                },
                 "modelId": {
                     "type": "string"
                 },
@@ -11740,6 +11834,9 @@ const docTemplate = `{
                     "description": "模型名称",
                     "type": "string"
                 },
+                "modelDesc": {
+                    "type": "string"
+                },
                 "modelId": {
                     "type": "string"
                 },
@@ -11771,6 +11868,12 @@ const docTemplate = `{
                 "publishDate": {
                     "description": "模型发布时间",
                     "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mp_common.Tag"
+                    }
                 },
                 "updatedAt": {
                     "type": "string"
@@ -13065,6 +13168,9 @@ const docTemplate = `{
                     "description": "模型名称",
                     "type": "string"
                 },
+                "modelDesc": {
+                    "type": "string"
+                },
                 "modelId": {
                     "type": "string"
                 },
@@ -13090,6 +13196,12 @@ const docTemplate = `{
                 "publishDate": {
                     "description": "模型发布时间",
                     "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/mp_common.Tag"
+                    }
                 },
                 "updatedAt": {
                     "type": "string"
