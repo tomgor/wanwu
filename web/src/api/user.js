@@ -87,6 +87,15 @@ export const restOwnPassword= (data) => {
     });
 };
 
+export const restAvatar= (data, config) => {
+    return service({
+        url: `${BASE_URL}/user/avatar`,
+        method: "put",
+        data,
+        config
+    });
+};
+
 export const docDownload = () => {
     return service({
         url: `${BASE_URL}/doc_center`,
