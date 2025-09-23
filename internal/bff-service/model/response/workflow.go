@@ -4,7 +4,16 @@ import "github.com/UnicomAI/wanwu/internal/bff-service/config"
 
 type CozeWorkflowModelInfo struct {
 	ModelInfo
-	ModelParams []config.WorkflowModelParam `json:"model_params"`
+	ModelAbility CozeWorkflowModelInfoAbility `json:"model_ability"`
+	ModelParams  []config.WorkflowModelParam  `json:"model_params"`
+}
+
+type CozeWorkflowModelInfoAbility struct {
+	CotDisplay         bool `json:"cot_display"`
+	FunctionCall       bool `json:"function_call"`
+	ImageUnderstanding bool `json:"image_understanding"`
+	AudioUnderstanding bool `json:"audio_understanding"`
+	VideoUnderstanding bool `json:"video_understanding"`
 }
 
 type CozeWorkflowListResp struct {
