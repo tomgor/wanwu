@@ -34,6 +34,13 @@ message ChatRagReq {
   string ragId = 1;
   string question = 2;
   Identity identity = 3;
+  repeated HistoryItem history = 4;
+}
+
+message HistoryItem {
+  string  query = 1;
+  string  response = 2;
+  bool  needHistory = 3;
 }
 
 message ChatRagResp {
