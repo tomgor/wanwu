@@ -17,10 +17,7 @@
           </div>
         </div>
         <div class="parent-content">
-          <div v-for="(item, index) in parentSegment.content" :key="index" class="parent-item">
-            {{ index + 1 }}、{{ item }}
-            <span class="segment-action">(展示完整分段内容)</span>
-          </div>
+          {{ parentSegment.content }}
         </div>
       </div>
 
@@ -65,28 +62,10 @@ export default {
       dialogVisible: false,
       activeNames: [],
       parentSegment: {
-        score: 0.85761,
-        content: [
-          '模型管理:支持用户导入包括联通元景、OpenAI-API-compatible、Ollama、通义千问、火山引擎等模型供应商的LLM、Embedding、Rerank模型',
-          'xxxxxxxxxxxxx ......'
-        ]
+        
       },
       segmentList: [
-        {
-          content: '模型管理:支持用户导入包括联通元景、OpenAI ....',
-          autoSave: true,
-          score: 0.85761
-        },
-        {
-          content: 'xxxxxxxxxx ....',
-          autoSave: false,
-          score: 0.85761
-        },
-        {
-          content: 'xxxxxxxxxx ....',
-          autoSave: false,
-          score: 0.85761
-        }
+       
       ]
     }
   },
@@ -104,44 +83,23 @@ export default {
     showDiaglog(data) {
       if (data) {
         // 更新父分段数据
-        if (data.parentSegment) {
+        if (data.searchList) {
           this.parentSegment = {
-            score: parseFloat(data.parentSegment.score) || 0,
-            content: Array.isArray(data.parentSegment.content) 
-              ? data.parentSegment.content 
-              : [data.parentSegment.content || '暂无内容']
+            score: parseFloat(data.score) || 0,
+            content: data.searchList.snippet||'暂无内容'
           };
         }
         
         // 更新子分段数据
-        if (data.segmentList && Array.isArray(data.segmentList)) {
-          this.segmentList = data.segmentList.map(segment => ({
-            content: segment.content || '',
+        if (data.searchList && Array.isArray(data.searchList.childContentList)) {
+          this.segmentList = data.searchList.childContentList.map(segment => ({
+            content: segment.childsnippet || '',
             autoSave: Boolean(segment.autoSave),
             score: parseFloat(segment.score) || 0
           }));
         }
         
-        // 如果传入的是单个分段数据，构造默认的子分段列表
-        if (data.content && !data.segmentList) {
-          this.segmentList = [
-            {
-              content: data.content,
-              autoSave: true,
-              score: parseFloat(data.score) || 0
-            },
-            {
-              content: 'xxxxxxxxxx ....',
-              autoSave: false,
-              score: parseFloat(data.score) || 0
-            },
-            {
-              content: 'xxxxxxxxxx ....',
-              autoSave: false,
-              score: parseFloat(data.score) || 0
-            }
-          ];
-        }
+        
       }
       this.dialogVisible = true;
     },
