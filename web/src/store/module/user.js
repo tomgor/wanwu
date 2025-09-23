@@ -1,6 +1,6 @@
 import { login,getPermission,getCommonInfo } from '@/api/user'
 import { fetchOrgs } from "@/api/permission/org"
-import { redirectUrl } from "@/utils/util"
+import {redirectUrl, replaceIcon, replaceTitle} from "@/utils/util"
 import { formatPerms } from "@/router/permission"
 import { replaceRouter } from "@/router"
 
@@ -11,7 +11,7 @@ export const user = {
       orgInfo: {orgs: []},
       token: '',
       permission:{},
-      commonInfo:{},
+      commonInfo:{login: {}, home: {}, tab: {}, register: {}},
       lang: ''
   },
 
@@ -117,7 +117,14 @@ export const user = {
       async getCommonInfo({commit}){
         const res = await getCommonInfo() || {}
         if(res.code === 0){
-            commit('setCommonInfo', {data: res.data || {}})
+            commit('setCommonInfo', {
+                login: res.data.login,
+                home: res.data.home,
+                tab: res.data.tab,
+                register: res.data.register
+            })
+            replaceTitle(res.data.tab.title)
+            replaceIcon(res.data.tab.logo ? res.data.tab.logo.path : '')
         }
       }
   },

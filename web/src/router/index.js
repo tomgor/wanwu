@@ -205,11 +205,15 @@ const constantRoutes = [
     },
     {
         path: '/login',
-        component:resolve =>require(['@/views/login'],resolve),
+        component: () => import('@/views/auth/login'),
     },
     {
         path: '/register',
-        component: () => import('@/views/register'),
+        component: () => import('@/views/auth/register'),
+    },
+    {
+        path: '/reset',
+        component: () => import('@/views/auth/reset'),
     },
     {
         path: '/:catchAll(.*)',

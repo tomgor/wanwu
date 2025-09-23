@@ -1,0 +1,143 @@
+<template>
+  <overview>
+    <div class="auth-box">
+      <p class="auth-header">
+        <span style="font-weight: bold">{{ $t('login.title') }}</span>
+      </p>
+      <div class="auth-form">
+        <el-form ref="form" :model="form" label-position="top">
+          <el-form-item :label="$t('login.form.username')" class="auth-form-item">
+            <img class="auth-icon" src="@/assets/imgs/user.png" alt=""/>
+            <el-input
+                v-model.trim="form.username"
+                :placeholder="$t('common.input.placeholder') + $t('login.form.username')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('login.form.password')" class="auth-form-item">
+            <img class="auth-icon" src="@/assets/imgs/pwd.png" alt=""/>
+            <el-input
+                :type="isShowPwd ? '' : 'password'"
+                class="auth-pwd-input"
+                v-model.trim="form.password"
+                :placeholder="$t('common.input.placeholder') + $t('login.form.password')"
+            />
+            <img v-if="!isShowPwd" class="pwd-icon" src="@/assets/imgs/showPwd.png" alt=""
+                 @click="() => this.isShowPwd = true"/>
+            <img v-else class="pwd-icon" src="@/assets/imgs/hidePwd.png" alt="" @click="() => this.isShowPwd = false"/>
+          </el-form-item>
+          <el-form-item :label="$t('login.form.code')" class="auth-form-item">
+            <img class="auth-icon" src="@/assets/imgs/code.png" alt=""/>
+            <el-input
+                style="width: calc(100% - 90px)"
+                v-model.trim="form.code"
+                @keyup.enter.native="addByEnterKey"
+                :placeholder="$t('common.input.placeholder') + $t('login.form.code')"
+            />
+            <span style="display: inline-block; height: 32px; width: 80px; margin-left: 10px; vertical-align: middle">
+                <img style="width: 100%; height: 100%" v-if="codeData.b64" :src="codeData.b64" @click="getImgCode"/>
+              </span>
+          </el-form-item>
+        </el-form>
+        <div class="register-bt">
+            <span v-if="commonInfo.register && commonInfo.register.email && commonInfo.register.email.status">
+              {{ $t('login.askAccount') }}
+              <span :style="{ color: '#384BF7', cursor: 'pointer' }" @click="$router.push({path: `/register`})">
+              {{ $t('login.register') }}
+              </span>
+            </span>
+          <span :style="{ color: '#384BF7', cursor: 'pointer', float: 'right' }"
+                @click="$router.push({path: `/reset`})">
+              {{ $t('login.forgetPassword') }}
+            </span>
+        </div>
+        <div class="auth-bt">
+          <p :class="['primary-bt', {'disabled': isDisabled()}]"
+             :style="`background: ${commonInfo.login.loginButtonColor || '#384BF7'} !important`"
+             @click="doLogin">
+            {{ $t('login.button') }}
+          </p>
+        </div>
+        <div class="bottom-text">{{ commonInfo.login.platformDesc }}</div>
+      </div>
+    </div>
+  </overview>
+</template>
+
+<script>
+import overview from '@/views/auth/layout'
+import {mapActions, mapState} from 'vuex'
+import {getImgVerCode} from "@/api/user"
+import {urlEncrypt} from "@/utils/crypto";
+
+export default {
+  components: {overview},
+  data() {
+    return {
+      form: {
+        username: '',
+        password: '',
+        code: '',
+      },
+      isShowPwd: false,
+      authButtonColor: '#384BF7',
+      codeData: {
+        key: '',
+        b64: ''
+      },
+      basePath: this.$basePath
+    }
+  },
+  computed: {
+    ...mapState('user', ['commonInfo'])
+  },
+  created() {
+    // 如果已登录，重定向到有权限的页面
+    // if (this.$store.state.user.token && localStorage.getItem("access_cert")) redirectUrl()
+
+    this.getImgCode()
+  },
+  methods: {
+    ...mapActions('user', ['LoginIn']),
+    isDisabled() {
+      const {username, password, code} = this.form
+      return !(username && password && code)
+    },
+    addByEnterKey(e) {
+      if (e.keyCode === 13) {
+        this.doLogin()
+      }
+    },
+    // 获取图片验证码
+    async getImgCode() {
+      const res = await getImgVerCode()
+      this.codeData = res.data || {}
+    },
+    async doLogin() {
+      if (this.isDisabled()) return
+
+      const data = {
+        username: this.form.username,
+        password: urlEncrypt(this.form.password),
+        key: this.codeData.key,
+        code: this.form.code
+      }
+
+      try {
+        await this.LoginIn(data)
+      } catch (e) {
+        await this.getImgCode()
+      }
+    },
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.register-bt {
+  width: 100%;
+  height: 1px;
+  line-height: 30px;
+  font-size: 14px;
+  margin-top: -20px;
+}
+</style>
