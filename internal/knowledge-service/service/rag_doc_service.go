@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"strings"
 	"sync"
 	"time"
@@ -16,8 +17,10 @@ import (
 )
 
 const (
-	SplitByDesign  string = "split_by_design"
-	SplitByDefault string = "split_by_default"
+	SplitByDesign   string = "split_by_design"
+	SplitByDefault  string = "split_by_default"
+	SplitTypeCommon string = "common"
+	SplitTypeParent string = "parent_child"
 )
 
 type RagOperationParams struct {
@@ -58,6 +61,7 @@ type RagImportDocParams struct {
 	SegmentSize         int                  `json:"chunk_size"`
 	OriginalName        string               `json:"originalName"`
 	SegmentType         string               `json:"chunk_type"`
+	SplitType           string               `json:"split_type"` //parent_child|common
 	Separators          []string             `json:"separators"`
 	ParserChoices       []string             `json:"parser_choices"`
 	OcrModelId          string               `json:"ocr_model_id"`
@@ -72,6 +76,7 @@ type RagImportUrlDocParams struct {
 	Overlap           float32              `json:"overlap_size" `
 	SegmentSize       int                  `json:"sentence_size"`
 	SegmentType       string               `json:"chunk_type"`
+	SplitType         string               `json:"split_type"` //parent_child|common
 	UserId            string               `json:"userId"`
 	KnowledgeBaseName string               `json:"knowledgeBase"`
 	IsEnhanced        bool                 `json:"is_enhanced"`
@@ -604,8 +609,19 @@ func RagDeleteDocSegment(ctx context.Context, ragDeleteDocSegmentParams *RagDele
 	return nil
 }
 
+// RebuildSplitType 转换分段方法
+func RebuildSplitType(segmentMethod string) string {
+	if segmentMethod == model.ParentSegmentMethod {
+		return SplitTypeParent
+	}
+	return SplitTypeCommon
+}
+
 // RebuildSegmentType 转换分段类型
-func RebuildSegmentType(segmentType string) string {
+func RebuildSegmentType(segmentType string, segmentMethod string) string {
+	if segmentMethod == model.ParentSegmentMethod {
+		return SplitByDesign
+	}
 	if segmentType == "0" {
 		return SplitByDefault
 	}
