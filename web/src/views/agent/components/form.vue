@@ -1039,20 +1039,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.model-select-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 4px;
-  .model-select-tag {
-    background-color: #f0f2ff;
-    color: #384bf7;
-    border-radius: 4px;
-    padding: 2px 8px;
-    font-size: 12px;
-    line-height: 1.2;
-  }
-}
 .isDisabled .header-right,.isDisabled .drawer-form > div{
   user-select: none;
   pointer-events: none !important;      
@@ -1637,31 +1623,6 @@ export default {
   border-top-color: #ccc !important;
 }
 
-.model-selected-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.model-selected-name {
-  flex-shrink: 0;
-}
-
-.model-selected-tags {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 4px;
-  flex-shrink: 0;
-  .model-selected-tag {
-    background-color: #f0f2ff;
-    color: #384bf7;
-    border-radius: 4px;
-    padding: 2px 8px;
-    font-size: 12px;
-    line-height: 1.2;
-  }
-}
 
 .model-option-content {
   display: flex;
@@ -1679,7 +1640,7 @@ export default {
     flex-wrap: nowrap;
     gap: 4px;
     flex-shrink: 0;
-    
+    margin-top: 4px;
     .model-select-tag {
       background-color: #f0f2ff;
       color: #384bf7;
