@@ -100,11 +100,11 @@
           >
             <el-card class="box-card">
               <div slot="header" class="clearfix">
-                <span
-                  >{{ $t('knowledgeManage.split')+":" + item.contentNum }}&nbsp;&nbsp;
-                  <span style="font-size: 12px"
-                    >{{$t('knowledgeManage.length')}}:{{ item.content.length }}{{$t('knowledgeManage.character')}}</span
-                  >
+                <span>
+                  {{ $t('knowledgeManage.split')+":" + item.contentNum }}
+                  <span class="segment-type">[ {{ item.isParent?"父子分段":"通用分段" }} ]</span>
+                  <span class="segment-length">[ {{ item.content.length }}{{$t('knowledgeManage.character')}} ]</span>
+
                 </span>
                 <div>
                   <el-switch
@@ -234,7 +234,7 @@
   </div>
 </template>
 <script>
-import { getSectionList,setSectionStatus,sectionLabels,delSegment,editSegment } from "@/api/knowledge";
+import { getSectionList,setSectionStatus,sectionLabels,delSegment,editSegment,getSegmentChild } from "@/api/knowledge";
 import dataBaseDialog from './dataBaseDialog';
 import tagDialog from './tagDialog.vue';
 import createChunk from './createChunk.vue'
@@ -729,6 +729,17 @@ export default {
             font-size: 16px;
             color: #8c8c8f;
           }
+        }
+        
+        .segment-type {
+          margin: 0 5px;
+          color: #999;
+          font-size: 12px;
+        }
+        
+        .segment-length {
+          color: #999;
+          font-size: 12px;
         }
       }
 

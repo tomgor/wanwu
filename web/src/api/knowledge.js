@@ -406,3 +406,10 @@ export const parserSelect = ()=>{
         method: 'get'
     })
 };
+export const getSegmentChild = (params)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/doc/segment/child/list`,
+        method: 'get',
+        params
+    })
+};

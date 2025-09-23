@@ -268,7 +268,9 @@
                 }
                 let fileId = this.$refs['editable'].getFileIdList() || this.fileId;
                 this.useSearch = this.$refs['editable'].sendUseSearch();
-                delete fileId.imgUrl;
+                if(fileId && fileId.imgUrl){
+                    delete fileId.imgUrl;
+                }
                 this.setSseParams({conversationId: this.conversationId, fileInfo:fileId,assistantId:this.editForm.assistantId})
                 this.doSend()
                 this.echo = false
