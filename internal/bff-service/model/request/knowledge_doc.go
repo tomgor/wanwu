@@ -169,10 +169,8 @@ func (c *DocImportReq) Check() error {
 		if c.DocSegment.SegmentMethod != CommonSplitMethod && c.DocSegment.SegmentMethod != ParentSplitMethod {
 			return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "segmentMethod error")
 		}
-		if c.DocSegment.SegmentMethod == CommonSplitMethod {
-			if c.DocSegment.SegmentType != "" {
-				return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "segmentType error")
-			}
+		if c.DocSegment.SegmentMethod == CommonSplitMethod && c.DocSegment.SegmentType == "" {
+			return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "segmentType error")
 		}
 	}
 

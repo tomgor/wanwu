@@ -149,7 +149,6 @@ func (c *Client) ListModels(ctx context.Context, tab *model_client.ModelImported
 		sqlopt.WithProvider(tab.Provider),
 		sqlopt.WithModelType(tab.ModelType),
 		sqlopt.LikeDisplayNameOrModel(tab.DisplayName),
-		sqlopt.WithIsActive(tab.IsActive),
 	).Apply(c.db.WithContext(ctx))
 	if tab.IsActive {
 		db = sqlopt.WithIsActive(true).Apply(db)
