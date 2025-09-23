@@ -49,6 +49,7 @@
               <span class="common-set-label">
                 <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
                 模型选择
+                <span class="model-tips">[ 暂不支持选择图文问答类模型 ]</span>
               </span>
               <span class="el-icon-s-operation operation" @click="showModelSet"></span>
             </p>
@@ -668,6 +669,11 @@ export default {
     margin-bottom:10px;
     .block{
       margin-bottom:10px;
+    }
+    .model-tips{
+      color: #999;
+      margin-left: 10px;
+      font-weight:normal!important;
     }
   }
   .safety-box{

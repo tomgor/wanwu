@@ -22,7 +22,7 @@ export const getImgVerCode = () => {
 };
 
 // 邮箱注册验证码发送
-export const requestEmailCode = (data) => {
+export const registerCode = (data) => {
     return service({
         url: `${BASE_URL}/base/register/email/code`,
         method: "post",
@@ -39,6 +39,23 @@ export const register = (data) => {
     });
 };
 
+// 重置密码邮箱验证码发送
+export const resetCode = (data) => {
+    return service({
+        url: `${BASE_URL}/base/password/email/code`,
+        method: "post",
+        data,
+    });
+};
+
+// 重置密码
+export const reset = (data) => {
+    return service({
+        url: `${BASE_URL}/base/password/email`,
+        method: "post",
+        data,
+    });
+};
 
 export const getLangList = () => {
     return service({
@@ -84,6 +101,15 @@ export const restOwnPassword= (data) => {
         url: `${BASE_URL}/user/password`,
         method: "put",
         data,
+    });
+};
+
+export const restAvatar= (data, config) => {
+    return service({
+        url: `${BASE_URL}/user/avatar`,
+        method: "put",
+        data,
+        config
     });
 };
 
