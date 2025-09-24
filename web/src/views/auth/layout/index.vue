@@ -6,40 +6,42 @@
     <div class="auth-modal">
       <div class="header__left">
         <img
-            v-if="commonInfo.data.login.logo && commonInfo.data.login.logo.path"
+            v-if="commonInfo.login.logo && commonInfo.login.logo.path"
             style="height: 60px; margin: 0 15px 0 22px"
-            :src="basePath + '/user/api' + commonInfo.data.login.logo.path"
+            :src="basePath + '/user/api' + commonInfo.login.logo.path"
             alt=""/>
-        <!--<span style="font-size: 16px;">{{commonInfo.data.home.title || ''}}</span>-->
+        <!--<span style="font-size: 16px;">{{commonInfo.home.title || ''}}</span>-->
         <!--<div style="margin-left: 10px">
           <ChangeLang :isLogin="true" />
         </div>-->
       </div>
       <div class="container__left">
-        {{ commonInfo.data.login.welcomeText }}
+        {{ commonInfo.login.welcomeText }}
       </div>
 
-      <slot/>
+      <slot :commonInfo="commonInfo"/>
 
     </div>
   </div>
 </template>
 
 <script>
-import {mapState, mapActions} from 'vuex'
+import {mapState} from 'vuex'
 import ChangeLang from "@/components/changeLang.vue"
 import {replaceTitle, replaceIcon} from "@/utils/util";
+import { getCommonInfo } from '@/api/user'
 
 export default {
   components: {ChangeLang},
   data() {
     return {
+      commonInfo: {},
       backgroundSrc: require('@/assets/imgs/auth_bg.png'),
       basePath: this.$basePath
     }
   },
   computed: {
-    ...mapState('user', ['commonInfo', 'lang'])
+    ...mapState('user', ['lang'])
   },
   watch: {
     'lang': {
@@ -53,15 +55,16 @@ export default {
     }
   },
   created() {
-    this.getCommonInfo().then(() => {
-      console.log(this.commonInfo)
-      this.setAuthBg(this.commonInfo.data.login.background.path)
-      replaceTitle(this.commonInfo.data.tab.title)
-      replaceIcon(this.commonInfo.data.tab.logo.path)
+    getCommonInfo().then(res => {
+      if(res.code === 0) {
+        this.commonInfo = res.data
+        this.setAuthBg(this.commonInfo.login.background.path)
+        replaceTitle(this.commonInfo.tab.title)
+        replaceIcon(this.commonInfo.tab.logo.path)
+      }
     })
   },
   methods: {
-    ...mapActions('user', ['getCommonInfo']),
     setDefaultImage() {
       this.backgroundSrc = require('@/assets/imgs/auth_bg.png')
     },

@@ -1,70 +1,74 @@
 <template>
   <overview>
-    <div class="auth-box">
-      <p class="auth-header">
-        <span style="font-weight: bold">{{ $t('reset.title') }}</span>
-      </p>
-      <div class="auth-form">
-        <el-form ref="form" :model="form" :rules="rules" label-position="top">
-          <el-form-item :label="$t('reset.form.email')" class="auth-form-item" prop="email">
-            <img class="auth-icon" src="@/assets/imgs/user.png" alt=""/>
-            <el-input
-                v-model.trim="form.email"
-                :placeholder="$t('common.input.placeholder') + $t('reset.form.email')" clearable
-            />
-          </el-form-item>
-          <el-form-item :label="$t('reset.form.code')" class="auth-form-item" prop="code">
-            <img class="auth-icon" src="@/assets/imgs/code.png" alt=""/>
-            <el-input
-                style="width: calc(100% - 90px)"
-                v-model.trim="form.code"
-                @keyup.enter.native="addByEnterKey"
-                :placeholder="$t('common.input.placeholder') + $t('reset.form.code')" clearable
-            />
-            <el-button
-                style="height: 32px; width: 80px; margin-left: 10px; vertical-align: middle; padding-left: 8px; padding-top: 8px"
-                @click="requestEmailCode({email: form.email})"
-                :disabled="isCooldown"
-            >
-              {{ isCooldown ? `${cooldownTime}s` : $t('reset.action') + $t('reset.form.code') }}
-            </el-button>
-          </el-form-item>
-          <el-form-item :label="$t('reset.action1') + $t('reset.form.password')" class="auth-form-item"
-                        prop="password1">
-            <img class="auth-icon" src="@/assets/imgs/pwd.png" alt=""/>
-            <el-input
-                :type="isShowPwd1 ? '' : 'password'"
-                class="auth-pwd-input"
-                v-model.trim="form.password1"
-                :placeholder="$t('reset.pwd1Placeholder')"
-            />
-            <img v-if="!isShowPwd1" class="pwd-icon" src="@/assets/imgs/showPwd.png" alt=""
-                 @click="() => this.isShowPwd1 = true"/>
-            <img v-else class="pwd-icon" src="@/assets/imgs/hidePwd.png" alt="" @click="() => this.isShowPwd1 = false"/>
-          </el-form-item>
-          <el-form-item :label="$t('reset.action2') + $t('reset.form.password')" class="auth-form-item"
-                        prop="password2">
-            <img class="auth-icon" src="@/assets/imgs/pwd.png" alt=""/>
-            <el-input
-                :type="isShowPwd2 ? '' : 'password'"
-                class="auth-pwd-input"
-                v-model.trim="form.password2"
-                :placeholder="$t('reset.action2') + $t('reset.form.password')"
-            />
-            <img v-if="!isShowPwd2" class="pwd-icon" src="@/assets/imgs/showPwd.png" alt=""
-                 @click="() => this.isShowPwd2 = true"/>
-            <img v-else class="pwd-icon" src="@/assets/imgs/hidePwd.png" alt="" @click="() => this.isShowPwd2 = false"/>
-          </el-form-item>
-        </el-form>
-        <div class="auth-bt">
-          <p class="primary-bt" :style="`background: ${commonInfo.data.login.loginButtonColor} !important`"
-             @click="doReset">
-            {{ $t('reset.button') }}
-          </p>
+    <template #default="{ commonInfo }">
+      <div class="auth-box">
+        <p class="auth-header">
+          <span style="font-weight: bold">{{ $t('reset.title') }}</span>
+        </p>
+        <div class="auth-form">
+          <el-form ref="form" :model="form" :rules="rules" label-position="top">
+            <el-form-item :label="$t('reset.form.email')" class="auth-form-item" prop="email">
+              <img class="auth-icon" src="@/assets/imgs/user.png" alt=""/>
+              <el-input
+                  v-model.trim="form.email"
+                  :placeholder="$t('common.input.placeholder') + $t('reset.form.email')" clearable
+              />
+            </el-form-item>
+            <el-form-item :label="$t('reset.form.code')" class="auth-form-item" prop="code">
+              <img class="auth-icon" src="@/assets/imgs/code.png" alt=""/>
+              <el-input
+                  style="width: calc(100% - 90px)"
+                  v-model.trim="form.code"
+                  @keyup.enter.native="addByEnterKey"
+                  :placeholder="$t('common.input.placeholder') + $t('reset.form.code')" clearable
+              />
+              <el-button
+                  style="height: 32px; width: 80px; margin-left: 10px; vertical-align: middle; padding-left: 8px; padding-top: 8px"
+                  @click="requestEmailCode({email: form.email})"
+                  :disabled="isCooldown"
+              >
+                {{ isCooldown ? `${cooldownTime}s` : $t('reset.action') + $t('reset.form.code') }}
+              </el-button>
+            </el-form-item>
+            <el-form-item :label="$t('reset.action1') + $t('reset.form.password')" class="auth-form-item"
+                          prop="password1">
+              <img class="auth-icon" src="@/assets/imgs/pwd.png" alt=""/>
+              <el-input
+                  :type="isShowPwd1 ? '' : 'password'"
+                  class="auth-pwd-input"
+                  v-model.trim="form.password1"
+                  :placeholder="$t('reset.pwd1Placeholder')"
+              />
+              <img v-if="!isShowPwd1" class="pwd-icon" src="@/assets/imgs/showPwd.png" alt=""
+                   @click="() => this.isShowPwd1 = true"/>
+              <img v-else class="pwd-icon" src="@/assets/imgs/hidePwd.png" alt=""
+                   @click="() => this.isShowPwd1 = false"/>
+            </el-form-item>
+            <el-form-item :label="$t('reset.action2') + $t('reset.form.password')" class="auth-form-item"
+                          prop="password2">
+              <img class="auth-icon" src="@/assets/imgs/pwd.png" alt=""/>
+              <el-input
+                  :type="isShowPwd2 ? '' : 'password'"
+                  class="auth-pwd-input"
+                  v-model.trim="form.password2"
+                  :placeholder="$t('reset.action2') + $t('reset.form.password')"
+              />
+              <img v-if="!isShowPwd2" class="pwd-icon" src="@/assets/imgs/showPwd.png" alt=""
+                   @click="() => this.isShowPwd2 = true"/>
+              <img v-else class="pwd-icon" src="@/assets/imgs/hidePwd.png" alt=""
+                   @click="() => this.isShowPwd2 = false"/>
+            </el-form-item>
+          </el-form>
+          <div class="auth-bt">
+            <p class="primary-bt" :style="`background: ${commonInfo.login.loginButtonColor} !important`"
+               @click="doReset">
+              {{ $t('reset.button') }}
+            </p>
+          </div>
+          <div class="bottom-text">{{ commonInfo.login.platformDesc }}</div>
         </div>
-        <div class="bottom-text">{{ commonInfo.data.login.platformDesc }}</div>
       </div>
-    </div>
+    </template>
   </overview>
 </template>
 
@@ -130,9 +134,6 @@ export default {
       },
       basePath: this.$basePath
     }
-  },
-  computed: {
-    ...mapState('user', ['commonInfo'])
   },
   methods: {
     addByEnterKey(e) {
