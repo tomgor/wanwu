@@ -68,7 +68,6 @@
 
 <script>
 import { createWorkFlow, copyExample, uploadFile } from "@/api/workflow";
-import { mapGetters } from "vuex"
 
 export default {
   props: {
@@ -148,17 +147,9 @@ export default {
       },
     };
   },
-  watch: {
-    commonInfo:{
-      handler(val) {
-        const { defaultIcon = {} } = val.data || {}
-        this.defaultIcon = defaultIcon.workflowIcon ? this.$basePath + '/user/api/' + defaultIcon.workflowIcon :  ''
-      },
-      deep: true
-    },
-  },
-  computed: {
-    ...mapGetters('user', ['commonInfo']),
+  created() {
+    const { defaultIcon = {} } = this.$store.state.user.commonInfo.data || {}
+    this.defaultIcon = defaultIcon.workflowIcon ? this.$basePath + '/user/api/' + defaultIcon.workflowIcon :  ''
   },
   methods: {
     getBase64(file) {
