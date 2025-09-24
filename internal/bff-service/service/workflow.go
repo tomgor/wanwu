@@ -178,6 +178,38 @@ func DeleteWorkflow(ctx *gin.Context, orgID, workflowID string) error {
 	return nil
 }
 
+func ExportWorkflow(ctx *gin.Context, orgID, workflowID string) ([]byte, error) {
+	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.ExportUri)
+	ret := &response.CozeWorkflowExportResp{}
+	if resp, err := resty.New().
+		R().
+		SetContext(ctx).
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Accept", "application/json").
+		SetHeaders(workflowHttpReqHeader(ctx)).
+		SetBody(map[string]string{
+			"space_id":    orgID,
+			"workflow_id": workflowID,
+		}).
+		SetResult(&ret).
+		Post(url); err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_export", err.Error())
+	} else if resp.StatusCode() >= 300 {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_export", fmt.Sprintf("[%v] %v", resp.StatusCode(), resp.String()))
+	}
+	exportData := response.CozeWorkflowExportData{
+		WorkflowName: ret.Data.WorkflowName,
+		WorkflowDesc: ret.Data.WorkflowDesc,
+		Schema:       ret.Data.Schema,
+	}
+	// 将结构体序列化为 JSON 字节
+	jsonData, err := json.Marshal(exportData)
+	if err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_export", fmt.Sprintf("export workflow unmarshal err:%v", err.Error()))
+	}
+	return jsonData, nil
+}
+
 // --- internal ---
 
 func workflowHttpReqHeader(ctx *gin.Context) map[string]string {

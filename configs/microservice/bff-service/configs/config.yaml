@@ -191,6 +191,7 @@ workflow:
   upload_action_uri: /api/common/upload/apply_upload_action
   upload_common_uri: /api/common/upload
   sign_img_uri: /api/workflow_api/sign_image_url
+  export_uri: /api/workflow_api/export
 
   model_params:
     - name: temperature

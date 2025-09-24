@@ -16,3 +16,11 @@ type GetWorkflowListReq struct {
 func (g *GetWorkflowListReq) Check() error {
 	return nil
 }
+
+type WorkflowImportReq struct {
+	FileName string `json:"fileName" validate:"required"`
+}
+
+func (w *WorkflowImportReq) Check() error {
+	return nil
+}

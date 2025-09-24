@@ -61,3 +61,15 @@ func (d *CozeWorkflowDeleteData) GetStatus() int64 {
 	}
 	return d.Status
 }
+
+type CozeWorkflowExportResp struct {
+	Code int                     `json:"code"`
+	Msg  string                  `json:"msg"`
+	Data *CozeWorkflowExportData `json:"data,omitempty"`
+}
+
+type CozeWorkflowExportData struct {
+	WorkflowName string `json:"name"`
+	WorkflowDesc string `json:"desc"`
+	Schema       string `json:"schema"`
+}
