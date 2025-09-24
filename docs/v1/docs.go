@@ -920,43 +920,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/appspace/workflow/export": {
-            "get": {
-                "security": [
-                    {
-                        "JWT": []
-                    }
-                ],
-                "description": "导出工作流的json文件",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/octet-stream"
-                ],
-                "tags": [
-                    "workflow"
-                ],
-                "summary": "导出Workflow",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "工作流ID",
-                        "name": "workflow_id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/appspace/workflow/import": {
             "post": {
                 "security": [

@@ -104,5 +104,6 @@ func ExportWorkflow(ctx *gin.Context) {
 //	@Success		200		{object}	response.Response{data=response.CozeWorkflowIDData}
 //	@Router			/appspace/workflow/import [post]
 func ImportWorkflow(ctx *gin.Context) {
-
+	resp, err := service.ImportWorkflow(ctx, getOrgID(ctx))
+	gin_util.Response(ctx, resp, err)
 }
