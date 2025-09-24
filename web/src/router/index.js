@@ -76,6 +76,11 @@ const constantRoutes = [
                 meta:{perm: [PERMS.TOOL]},
             },
             {
+                path: '/tool/detail/:type',
+                component:resolve =>require(['@/views/tool/toolDetail'],resolve),
+                meta:{perm: [PERMS.TOOL]},
+            },
+            {
                 path: '/mcp',
                 component:resolve => require(['@/views/mcpManagementPublic/square'],resolve),
                 meta:{perm: [PERMS.MCP]},

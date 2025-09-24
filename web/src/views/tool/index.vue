@@ -12,13 +12,13 @@
       </div>
 
       <mcpIndex ref="mcpIndex" v-if="tabActive === 0"/>
-      <autoTools ref="autoTools" v-if="tabActive === 1"/>
+      <toolIndex ref="autoTools" v-if="tabActive === 1"/>
     </div>
   </div>
 </template>
 <script>
 import mcpIndex from './mcpIndex'
-import autoTools from './autoTools'
+import toolIndex from './toolIndex'
 export default {
   data() {
     return {
@@ -32,8 +32,8 @@ export default {
     },
   },
   components: {
-      mcpIndex,
-      autoTools
+    mcpIndex,
+    toolIndex
   },
 };
 </script>
