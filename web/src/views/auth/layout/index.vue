@@ -15,9 +15,9 @@
           <ChangeLang :isLogin="true" />
         </div>-->
       </div>
-      <div class="container__left">
-        {{ commonInfo.login.welcomeText }}
-      </div>
+<!--      <div class="container__left">-->
+<!--        {{ commonInfo.login.welcomeText }}-->
+<!--      </div>-->
 
       <slot :commonInfo="commonInfo"/>
 
