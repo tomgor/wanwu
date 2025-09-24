@@ -7,17 +7,17 @@
       </div>
       <!-- tabs -->
       <div class="mcp-tabs">
-        <div :class="['mcp-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">MCP服务</div>
-        <div :class="['mcp-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">自定义工具</div>
+        <div :class="['mcp-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">导入MCP服务</div>
+        <div :class="['mcp-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">工具</div>
       </div>
 
-      <mcpIndex ref="mcpIndex" v-if="tabActive === 0"/>
+      <customize ref="customize" v-if="tabActive === 0"/>
       <toolIndex ref="autoTools" v-if="tabActive === 1"/>
     </div>
   </div>
 </template>
 <script>
-import mcpIndex from './mcpIndex'
+import customize from './customize'
 import toolIndex from './toolIndex'
 export default {
   data() {
@@ -32,7 +32,7 @@ export default {
     },
   },
   components: {
-    mcpIndex,
+    customize,
     toolIndex
   },
 };

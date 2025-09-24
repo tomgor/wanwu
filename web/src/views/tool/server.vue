@@ -85,7 +85,7 @@ export default {
           })
     },
     handleClick(mcpServerId) {
-      this.$router.push({path: `/tool/detail/server?mcpServerId=${mcpServerId}`})
+      this.$router.push({path: `/mcp/detail/server?mcpServerId=${mcpServerId}`})
     },
     handleAddServer(mcpServerId) {
       this.$refs.serverDialog.showDialog(mcpServerId)

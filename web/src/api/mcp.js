@@ -50,15 +50,6 @@ export const getSchema = (data)=>{
     })
 };
 
-/*----内置工具------*/
-export const getBuiltinList = (data)=>{
-    return request({
-        url: `${BASE_URL}/tool/square/list`,
-        method: 'get',
-        params: data
-    })
-};
-
 /*---创建mcp---*/
 export const getServerList = (data)=>{
     return request({
