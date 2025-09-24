@@ -420,6 +420,9 @@ export default {
         gropdownClick(){
             this.$emit('clearHistory')
         },
+        getSessionData(){
+            return this.session_data
+        },
         getList(){
           return JSON.parse(JSON.stringify(this.session_data.history.filter((item)=>{ delete item.operation ; return item})))
             // return JSON.parse(JSON.stringify(this.session_data.history.filter((item)=>{ delete item.operation ; return !item.pending})))
@@ -431,10 +434,22 @@ export default {
             this.session_data.history = this.session_data.history.filter((item)=>{ return !item.pending})
         },
        stopPending(){
-            this.session_data.history = this.session_data.history.filter(item =>{
+            // this.session_data.history = this.session_data.history.filter(item =>{
+            //   if(item.pending){
+            //     item.responseLoading = false
+            //     item.pendingResponse = '本次回答已被终止'
+            //   }
+            //   return item;
+            // })
+             this.session_data.history = this.session_data.history.map(item =>{
               if(item.pending){
-                item.responseLoading = false
-                item.pendingResponse = '本次回答已被终止'
+                return {
+                  ...item,
+                  responseLoading: false,
+                  pendingResponse: '本次回答已被终止',
+                  pending: false,  // 标记为已完成
+                  finish: 1   
+                }
               }
               return item;
             })
