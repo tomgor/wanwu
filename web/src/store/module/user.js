@@ -1,6 +1,6 @@
 import { login,getPermission,getCommonInfo } from '@/api/user'
 import { fetchOrgs } from "@/api/permission/org"
-import {redirectUrl, replaceIcon, replaceTitle} from "@/utils/util"
+import { redirectUrl } from "@/utils/util"
 import { formatPerms } from "@/router/permission"
 import { replaceRouter } from "@/router"
 
@@ -11,7 +11,7 @@ export const user = {
       orgInfo: {orgs: []},
       token: '',
       permission:{},
-      commonInfo:{login: {}, home: {}, tab: {}, register: {}},
+      commonInfo:{},
       lang: '',
       defaultIcons: {
         agentIcon: '',
@@ -124,20 +124,13 @@ export const user = {
       async getCommonInfo({commit}){
         const res = await getCommonInfo() || {}
         if(res.code === 0){
-            commit('setCommonInfo', {
-                login: res.data.login,
-                home: res.data.home,
-                tab: res.data.tab,
-                register: res.data.register
-            })
+            commit('setCommonInfo', {data: res.data || {}})
             // 存储默认图标信息
             const defaultIcons = {
               agentIcon: res.data.defaultIcon.agentIcon || '',
               ragIcon: res.data.defaultIcon.ragIcon || ''
             }
             commit('setDefaultIcons', defaultIcons)
-            replaceTitle(res.data.tab.title)
-            replaceIcon(res.data.tab.logo ? res.data.tab.logo.path : '')
         }
       }
   },
