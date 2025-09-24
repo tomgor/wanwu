@@ -236,7 +236,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="handleSubmit" :loading="submitLoading">确定</el-button>
-        <el-button type="primary" @click="handleParse">保存并重新解析子分段</el-button>
+        <el-button type="primary" @click="handleParse" v-if="cardObj[0]['isParent']">保存并重新解析子分段</el-button>
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
     </el-dialog>

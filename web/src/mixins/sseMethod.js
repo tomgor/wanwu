@@ -18,7 +18,6 @@ export default {
         return {
             isTestChat:false,
             defaultUrl: '/img/smart/logo.png',
-            //sessionStatus:-1,
             inputVal: '',
             eventSource: null,
             ctrlAbort: null,
@@ -202,7 +201,13 @@ export default {
             this.sseResponse = {}
             this.setStoreSessionStatus(0)
             this.clearInput()
-            let params = {query: prompt, pending: true, responseLoading: true, requestFileUrls:[],pendingResponse:''}
+            let params = {
+                query: prompt, 
+                pending: true, 
+                responseLoading: true, 
+                requestFileUrls:[],
+                pendingResponse:''
+            }
             this.$refs['session-com'].pushHistory(params)
             let endStr = ''
             this._print = new Print({
@@ -210,7 +215,9 @@ export default {
                     // this.setStoreSessionStatus(-1)
                 }
             })
-            
+
+            let history_list = this.$refs['session-com'].getSessionData();
+            const history = history_list['history'].length > 1 ? history_list['history'][history_list['history'].length - 2]['history'] : [];
             this.ctrlAbort = new AbortController();
             const userInfo = this.$store.state.user.userInfo || {};
             this.eventSource = new fetchEventSource(this.origin + this.rag_sseApi, {
@@ -222,7 +229,7 @@ export default {
                     "x-org-id": userInfo.orgId
                 },
                 signal: this.ctrlAbort.signal,
-                body: JSON.stringify(this.sseParams),
+                body: JSON.stringify({...this.sseParams,'history':history}),
                 openWhenHidden: true, //页面退至后台保持连接
                 onopen: async(e) => {
                     console.log("已建立SSE连接~",new Date().getTime());

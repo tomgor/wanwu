@@ -619,7 +619,7 @@ export default {
     setModelInfo(val){
        const selectedModel = this.modleOptions.find(item => item.modelId === val);
         if (selectedModel) {
-          this.editForm.visionsupport = selectedModel.config.visionSupport;
+          // this.editForm.visionsupport = selectedModel.config.visionSupport;
           this.limitMaxTokens = selectedModel.config.maxTokens?selectedModel.config.maxTokens:this.limitMaxTokens;
         }
     },
