@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	model_service "github.com/UnicomAI/wanwu/api/proto/model-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -182,7 +183,7 @@ func toModelInfo(ctx *gin.Context, modelInfo *model_service.ModelInfo) (*respons
 		Model:       modelInfo.Model,
 		ModelType:   modelInfo.ModelType,
 		DisplayName: modelInfo.DisplayName,
-		Avatar:      CacheAvatar(ctx, modelInfo.ModelIconPath),
+		Avatar:      CacheAvatar(ctx, modelInfo.ModelIconPath, true),
 		PublishDate: modelInfo.PublishDate,
 		IsActive:    modelInfo.IsActive,
 		UserId:      modelInfo.UserId,

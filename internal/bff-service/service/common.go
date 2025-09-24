@@ -101,7 +101,7 @@ func UploadAvatar(ctx *gin.Context, fileHeader *multipart.FileHeader) (string, e
 
 // CacheAvatar 将avatar在minio的objectPath转为前端可访问的地址，同时在本地缓存avatar
 // 例如 custom-upload/avatar/abc/def.png => /v1/static/avatar/abc/def.png
-func CacheAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
+func CacheAvatar(ctx *gin.Context, avatarObjectPath string, isResize bool) request.Avatar {
 	avatar := request.Avatar{}
 	if avatarObjectPath == "" {
 		return avatar
@@ -143,17 +143,23 @@ func CacheAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
 		log.Errorf("cache avatar %v minio download err: %v", avatarObjectPath, err)
 		return avatar
 	}
-
 	// 3.3 压缩图像
-	compressedData, err := resizeImage(b)
-	if err != nil {
-		log.Warnf("cache avatar %v compress failed, using original: %v", avatarObjectPath, err)
-		// 压缩失败时使用原始数据
-		compressedData = b
+	if isResize {
+		compressedData, err := resizeImage(b)
+		if err != nil {
+			log.Warnf("cache avatar %v compress failed, using original: %v", avatarObjectPath, err)
+			compressedData = b
+		}
+		// 3.3.1 写入压缩文件
+		if err := os.WriteFile(filePath, compressedData, 0644); err != nil {
+			log.Errorf("cache avatar %v write file %v err: %v", avatarObjectPath, filePath, err)
+			return avatar
+		}
+		avatar.Path = filepath.Join("/v1", filePath)
+		return avatar
 	}
-
-	// 3.4 写入文件
-	if err := os.WriteFile(filePath, compressedData, 0644); err != nil {
+	// 3.4 写入原文件
+	if err := os.WriteFile(filePath, b, 0644); err != nil {
 		log.Errorf("cache avatar %v write file %v err: %v", avatarObjectPath, filePath, err)
 		return avatar
 	}
@@ -171,7 +177,7 @@ func cacheAppAvatar(ctx *gin.Context, avatarObjectPath, appType string) request.
 		avatar.Path = config.Cfg().DefaultIcon.AgentIcon
 		return avatar
 	}
-	return CacheAvatar(ctx, avatarObjectPath)
+	return CacheAvatar(ctx, avatarObjectPath, true)
 }
 
 func cacheUserAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
@@ -180,7 +186,7 @@ func cacheUserAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
 		avatar.Path = config.Cfg().DefaultIcon.UserIcon
 		return avatar
 	}
-	return CacheAvatar(ctx, avatarObjectPath)
+	return CacheAvatar(ctx, avatarObjectPath, true)
 }
 
 // cacheWorkflowAvatar 将avatar http请求地址转为前端统一访问的格式，同时在本地缓存avatar
