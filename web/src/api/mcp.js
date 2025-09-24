@@ -22,7 +22,7 @@ export const editCustom = (data)=>{
     return request({
         url: `${BASE_URL}/tool/custom`,
         method: 'put',
-        data
+        data: data
     })
 };
 
@@ -30,7 +30,7 @@ export const addCustom = (data)=>{
     return request({
         url: `${BASE_URL}/tool/custom`,
         method: 'post',
-        data
+        data: data
     })
 };
 
@@ -38,7 +38,7 @@ export const deleteCustom = (data)=>{
     return request({
         url: `${BASE_URL}/tool/custom`,
         method: 'delete',
-        data
+        data: data
     })
 };
 
@@ -46,12 +46,93 @@ export const getSchema = (data)=>{
     return request({
         url: `${BASE_URL}/tool/custom/schema`,
         method: 'post',
-        data
+        data: data
     })
 };
 
+/*----内置工具------*/
+export const getBuiltinList = (data)=>{
+    return request({
+        url: `${BASE_URL}/tool/square/list`,
+        method: 'get',
+        params: data
+    })
+};
 
-/*---mcp列表---*/
+/*---创建mcp---*/
+export const getServerList = (data)=>{
+    return request({
+        url: `${BASE_URL}/mcp/server/list`,
+        method: 'get',
+        params: data
+    })
+};
+
+export const getServerBind = (data)=>{
+    return request({
+        url: `${BASE_URL}/mcp/server/bind/apps`,
+        method: 'get',
+        params: data
+    })
+};
+
+export const getAppList = (data)=>{
+    return request({
+        url: `${BASE_URL}/mcp/server/app/list`,
+        method: 'get',
+        params: data
+    })
+};
+
+export const getServerTools = (data)=>{
+    return request({
+        url: `${BASE_URL}/mcp/server/tool/list`,
+        method: 'get',
+        params: data
+    })
+};
+
+export const getServerUrl = (data)=>{
+    return request({
+        url: `${BASE_URL}/mcp/server/url`,
+        method: 'get',
+        params: data
+    })
+};
+
+export const getServer = (data)=>{
+    return request({
+        url: `${BASE_URL}/mcp/server`,
+        method: 'get',
+        params: data
+    })
+};
+
+export const addServer = (data)=>{
+    return request({
+        url: `${BASE_URL}/mcp/server`,
+        method: 'post',
+        data: data
+    })
+};
+
+export const editServer = (data)=>{
+    return request({
+        url: `${BASE_URL}/mcp/server`,
+        method: 'put',
+        data: data
+    })
+};
+
+export const deleteServer = (data)=>{
+    return request({
+        url: `${BASE_URL}/mcp/server`,
+        method: 'delete',
+        data: data
+    })
+};
+
+/*---导入mcp---*/
 export const getList = (data)=>{
     return request({
         url: `${BASE_URL}/mcp/list`,
@@ -92,7 +173,7 @@ export const setCreate = (data)=>{
     })
 };
 
-/*---第三方工具广场---*/
+/*---第三方MCP广场---*/
 export const getPublicMcpList = (data)=>{
     return request({
         url: `${BASE_URL}/mcp/square/list`,

@@ -743,5 +743,30 @@ export default {
         backAnalysis:'返回解析',
         saveIntoData:'保存成功结果入库',
         fileSizeTips:'上传文件不能超过15MB!'
-    }
+    },
+    tool:{
+        server:{
+            slogan:'可绑定已发布的应用，创建自己的MCP server，并对外提供服务。',
+            search:'请输入MCP名称进行搜索',
+            create:'创建MCP',
+            name:'服务名称',
+            desc:'服务描述',
+            bind: {
+                title:'绑定应用',
+                bind:'绑定应用',
+                hint:'已绑定的应用发布新版本之后，引用此工具所创建的MCP服务不会自动更新到该工具的最新版本，以免影响已线上业务的正常运行。若需绑定最新版应用，请手动删除原应用后，重新添加新版应用。',
+                action:'管理',
+                methodName:'显示名称',
+                placeholder:'仅英语',
+                name:'应用',
+                desc:'应用描述',
+                operate:'操作',
+                openapi:{
+                    action:'+导入openapi',
+                    hint:'导入的openapi不会保存至应用。若想永久保存，方便后续调用，可在资源库-自定义工具模块，将openapi添加为自定义工具。',
+                }
+            },
+
+        }
+    },
 }

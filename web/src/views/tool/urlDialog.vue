@@ -4,8 +4,7 @@
         title="MCP服务地址"
         :visible.sync="dialogVisible"
         width="50%"
-        :show-close="false"
-        :close-on-click-modal="false"
+        @close="dialogVisible = false"
     >
       <div>
         <el-form
@@ -13,65 +12,49 @@
             ref="ruleForm"
             label-width="130px"
         >
-          <el-form-item label="服务地址（SSE）" prop="name">
-            <el-input v-model="ruleForm.name" disabled="disabled"/>
-            <copyIcon :icon-class="ruleForm.name"/>
+          <el-form-item label="服务地址（SSE）">
+            <el-input v-model="ruleForm.sseUrl" disabled="disabled"/>
+            <copyIcon :icon-class="ruleForm.sseUrl"/>
           </el-form-item>
-          <el-form-item label="请求示例" prop="desc">
+          <el-form-item label="请求示例">
             <el-input
                 type="textarea"
                 rows="5"
-                v-model="ruleForm.desc"
+                v-model="ruleForm.example"
                 disabled="disabled"
             ></el-input>
-            <copyIcon :icon-class="ruleForm.desc"/>
+            <copyIcon :icon-class="ruleForm.example"/>
           </el-form-item>
         </el-form>
       </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="handleCancel" size="mini">取 消</el-button>
-        <el-button
-            type="primary"
-            size="mini"
-            :disabled="mcpList.length === 0"
-            @click="submitForm('ruleForm')"
-            :loading="publishLoading"
-        >
-          确定
-        </el-button>
-      </span>
     </el-dialog>
   </div>
 </template>
 <script>
-import {} from "@/api/mcp.js";
+import {getServerUrl} from "@/api/mcp.js";
 import CopyIcon from "@/components/copyIcon.vue";
 
 export default {
   components: {CopyIcon},
-  props: ["dialogVisible"],
   data() {
     return {
-      appList: [],
-      bindList: [],
-      mcpList: [],
+      dialogVisible: false,
       ruleForm: {
-        name: "",
-        from: "",
+        example: "",
+        sseUrl: ""
       },
-      publishLoading: false
     };
   },
   methods: {
-    fetchData() {
-
+    showDialog(mcpServerId) {
+      this.dialogVisible = true
+      const params = {
+        mcpServerId: mcpServerId,
+      }
+      getServerUrl(params).then((res) => {
+        this.ruleForm = res.data
+      })
     },
-    handleCancel() {
-      this.$emit("handleClose", false);
-    },
-    submitForm(formName) {
-
-    }
   },
 };
 </script>

@@ -14,48 +14,68 @@
             ref="ruleForm"
             label-width="130px"
         >
-          <el-form-item label="服务名称" prop="name">
+          <el-form-item :label="$t('tool.server.name')" prop="name">
             <el-input v-model="ruleForm.name"></el-input>
           </el-form-item>
-          <el-form-item label="服务描述" prop="desc">
+          <el-form-item :label="$t('tool.server.desc')" prop="desc">
             <el-input v-model="ruleForm.desc"></el-input>
           </el-form-item>
-          <el-form-item label="绑定应用" style="text-align: right">
+          <el-form-item :label="$t('tool.server.bind.bind')" prop="bindList" style="text-align: right">
+            <el-tooltip
+                effect="dark"
+                :content="$t('tool.server.bind.hint')"
+                placement="top-start"
+                style="position: absolute; left: -15px; top:15px"
+            >
+              <i class="el-icon-question" style="margin-left: 5px; cursor: pointer;"></i>
+            </el-tooltip>
             <el-button
                 size="mini"
                 @click="dialogBindVisible = true"
             >
-              管理
+              {{ $t('tool.server.bind.action') }}
             </el-button>
             <div class="api-list">
               <el-table
-                  :data="bindList"
+                  :data="ruleForm.bindList"
                   border
                   size="mini"
                   class="api-table"
                   :header-cell-style="{ textAlign: 'center' }"
+                  header-cell-class-name='required-label'
               >
                 <el-table-column
                     prop="methodName"
-                    label="显示名称">
-                  <template #default="{ row }">
-                    <el-input
-                        v-model="row.methodName"
-                        size="mini"
-                        @input="val => (row.methodName = val.replace(/[^a-zA-Z]/g, ''))"
-                        @blur="handleBlur(row)"
-                        :disabled="!row.editable"
-                        placeholder="仅英语"/>
+                    :label="$t('tool.server.bind.methodName')">
+                  <template #default="{ row, index }">
+                    <el-form-item
+                        :prop="'bindList.' + index + '.methodName'"
+                        :rules="{required: true, message: '请输入', trigger: 'blur'}">
+                      <el-input
+                          v-model="row.methodName"
+                          size="mini"
+                          @input="val => (row.methodName = val.replace(/[^a-zA-Z]/g, ''))"
+                          :disabled="!row.editable"
+                          :placeholder="$t('tool.server.bind.placeholder')"/>
+                    </el-form-item>
                   </template>
                 </el-table-column>
                 <el-table-column
                     prop="name"
-                    label="应用"/>
+                    :label="$t('tool.server.bind.name')"/>
                 <el-table-column
                     prop="desc"
-                    label="应用描述"/>
+                    :label="$t('tool.server.bind.desc')">
+                  <template #default="{ row }">
+                    <el-input
+                        v-model="row.desc"
+                        size="mini"
+                        :disabled="!row.editable"
+                        placeholder="请输入应用描述"/>
+                  </template>
+                </el-table-column>
                 <el-table-column
-                    label="操作"
+                    :label="$t('tool.server.bind.operate')"
                     align="center"
                 >
                   <template #default="{ row }">
@@ -72,18 +92,18 @@
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handleClose" size="mini">取 消</el-button>
+        <el-button @click="handleClose" size="mini">{{ $t('common.button.cancel') }}</el-button>
         <el-button
             type="primary"
             size="mini"
             @click="submitForm('ruleForm')"
             :loading="publishLoading"
         >
-          确定
+          {{ $t('common.button.confirm') }}
         </el-button>
       </span>
       <el-dialog
-          title="绑定应用"
+          :title="$t('tool.server.bind.title')"
           :visible.sync="dialogBindVisible"
           width="50%"
           :show-close="false"
@@ -105,10 +125,10 @@
           <el-button
               size="mini"
               @click="addTool">
-            +导入openapi
+            {{ $t('tool.server.bind.openapi.action') }}
             <el-tooltip
                 effect="dark"
-                content="导入的openapi不会保存至应用。若想永久保存，方便后续调用，可在工具广场-自定义工具模块，将openapi添加为自定义工具。"
+                :content="$t('tool.server.bind.openapi.hint')"
                 placement="top-start"
             >
               <i class="el-icon-question" style="margin-left: 5px; cursor: pointer;"></i>
@@ -116,13 +136,13 @@
           </el-button>
         </div>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="handleBindCancel" size="mini">取 消</el-button>
+          <el-button @click="handleBindCancel" size="mini">{{ $t('common.button.cancel') }}</el-button>
           <el-button
               type="primary"
               size="mini"
               @click="submitBindForm"
           >
-            确定
+            {{ $t('common.button.confirm') }}
           </el-button>
         </span>
       </el-dialog>
@@ -132,7 +152,7 @@
 </template>
 <script>
 import addToolDialog from './addToolDialog'
-import {editServer, addServer, getServerBind, getAppList} from "@/api/mcp.js";
+import {editServer, addServer, getServerBind, getAppList, addCustom} from "@/api/mcp.js";
 
 const appTypeMap = {
   agent: '智能体',
@@ -154,18 +174,17 @@ export default {
       appList: [],
       choices: [],
       choicesOrigin: [],
-      bindList: [],
       openapiList: [],
       ruleForm: {
         MCPServerId: "",
         name: "",
         desc: "",
+        bindList: []
       },
       rules: {
         name: [{required: true, message: "请输入服务名称", trigger: "blur"}],
-        desc: [
-          {required: true, message: "请输入服务描述", trigger: "blur"},
-        ],
+        desc: [{required: true, message: "请输入服务描述", trigger: "blur"}],
+        bindList: [{required: true, message: "请选择绑定应用", trigger: "blur"}]
       },
       publishLoading: false
     };
@@ -182,12 +201,7 @@ export default {
           flag: '0'
         }))
         if (mcpServerId) {
-          this.ruleForm = {
-            MCPServerId: mcpServerId,
-            name: name,
-            desc: desc
-          }
-          this.title = '修改自定义工具'
+          this.title = '修改MCP服务'
           const params = {
             mcpServerId: mcpServerId
           }
@@ -195,6 +209,7 @@ export default {
               .then((res) => {
                 const {apps, desc, name} = res.data
                 this.ruleForm = {
+                  ...this.ruleForm,
                   MCPServerId: mcpServerId,
                   name: name,
                   desc: desc
@@ -204,7 +219,7 @@ export default {
                   if (foundIndex !== -1) {
                     this.choicesOrigin.push(this.appList[foundIndex].key)
                   }
-                  this.bindList.push({
+                  this.ruleForm.bindList.push({
                     ...app,
                     editable: true,
                     flag: '0',
@@ -213,7 +228,7 @@ export default {
                 })
                 this.choices = [...this.choicesOrigin]
               })
-        } else this.title = '新增自定义工具'
+        } else this.title = '创建MCP服务'
       })
     },
     addTool() {
@@ -234,7 +249,7 @@ export default {
                 marginTop: '8px',
                 borderRadius: '50%'
               },
-              attrs: {src: `${this.basePath}/user/api/${option.avatar.path}`},
+              attrs: {src: `${this.$basePath}/user/api/${option.avatar.path}`},
             }) :
             h('img', {
               style: {
@@ -287,7 +302,6 @@ export default {
       this.$emit("handleClose", false)
       this.$refs.ruleForm.resetFields()
       this.$refs.ruleForm.clearValidate()
-      this.bindList = []
       this.choices = []
       this.choicesOrigin = []
       this.appList = []
@@ -296,45 +310,44 @@ export default {
         MCPServerId: "",
         name: "",
         desc: "",
+        bindList: []
       }
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.publishLoading = true
-          const params = {
-            ...this.ruleForm,
-            apps: this.bindList.apps
-          }
-          if (this.ruleForm.MCPServerId) {
-            editServer(params).then((res) => {
+          const requestCustom = this.openapiList.length > 0
+              ? () => Promise.all(this.openapiList.map(item => addCustom(item)))
+              : () => Promise.resolve();
+          const requestServer = this.ruleForm.MCPServerId ? editServer : addServer;
+          requestCustom().then((res) => {
+            if (res && res.every(item => item.code === 0)) {
+              this.ruleForm.bindList = this.ruleForm.bindList.map(item => {
+                return {
+                  ...item,
+                  appId: res.data.customToolId
+                }
+              })
+            }
+            const params = {
+              ...this.ruleForm,
+              apps: this.ruleForm.bindList
+            }
+            requestServer(params).then((res) => {
               if (res.code === 0) {
                 this.$message.success("发布成功")
-                this.publishLoading = false
                 this.$emit("handleFetch", false)
                 this.handleClose()
               }
-            }).catch(() => this.publishLoading = false)
-          } else {
-
-          }
+            })
+          }).finally(() => this.publishLoading = false)
         }
       });
     },
     editItem(n) {
       n.editable = !n.editable;
-      const index = this.bindList.indexOf(n);
-      if (index !== -1) {
-        this.appList.forEach((item) => {
-          if (item.key === n.key) {
-            item.methodName = n.methodName;
-          }
-        })
-      }
-    },
-    handleBlur(n) {
-      n.editable = false;
-      const index = this.bindList.indexOf(n);
+      const index = this.ruleForm.bindList.indexOf(n);
       if (index !== -1) {
         this.appList.forEach((item) => {
           if (item.key === n.key) {
@@ -344,9 +357,9 @@ export default {
       }
     },
     delItem(n) {
-      const index = this.bindList.indexOf(n);
+      const index = this.ruleForm.bindList.indexOf(n);
       if (index !== -1) {
-        this.bindList.splice(index, 1);
+        this.ruleForm.bindList.splice(index, 1);
         this.choices = this.choices.filter((key) => key !== n.key);
         this.appList = this.appList.filter((item) => !(item.key === n.key && item.flag === '1'));
       }
@@ -360,9 +373,8 @@ export default {
     submitBindForm() {
       this.dialogBindVisible = false;
       this.choicesOrigin = [...this.choices]
-      this.bindList = this.choices.map((key) => {
+      this.ruleForm.bindList = this.choices.map((key) => {
         const item = this.appList.find((app) => app.key === key);
-        console.log(item)
         return {
           ...item,
           editable: true
@@ -373,6 +385,13 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.required-label::after {
+  content: '*';
+  position: absolute;
+  color: #eb0a0b;
+  font-size: 20px;
+  margin-left: 4px;
+}
 .add-dialog {
   .el-button.is-disabled {
     &:active {

@@ -94,6 +94,12 @@ export default {
     display: none;
     position: absolute;
     top: 10px;
+    right: 10px;
+    color: #777;
+
+    &:hover {
+      color: $color;
+    }
   }
   .card-box {
     display: flex;
@@ -125,6 +131,7 @@ export default {
       .card-title {
         display: flex;
         width: 100%;
+        height: 58px;
         border-bottom: 1px solid #ddd;
         padding-bottom: 7px;
         .svg-icon {

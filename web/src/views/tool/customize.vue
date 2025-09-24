@@ -16,7 +16,7 @@
           </div>-->
         </div>
         <div>
-          <search-input placeholder="请输入MCP名称进行搜索" ref="searchInput" @handleSearch="handleSearch" />
+          <search-input placeholder="请输入MCP名称进行搜索" ref="searchInput" @handleSearch="fetchList" />
           <el-button size="mini" type="primary" @click="handleAddMCP">导入</el-button>
         </div>
       </div>
@@ -50,7 +50,7 @@
               </span>
             </div>
             <i
-              class="el-icon-delete-solid del"
+              class="el-icon-delete-solid action-icon"
               @click.stop="handleDelete(item)"
             ></i>
           </div>
@@ -66,7 +66,7 @@
       </div>-->
       <el-empty class="noData" v-if="!(list && list.length)" :description="$t('common.noData')"></el-empty>
     </div>
-    <addDialog :dialogVisible="addOpen" @handleClose="handleClose"></addDialog>
+    <addDialog :dialogVisible="addOpen" @handleFetch="fetchList()" @handleClose="addOpen=false"></addDialog>
   </div>
 </template>
 <script>
@@ -79,34 +79,15 @@ export default {
   data() {
     return {
       basePath: this.$basePath,
-      is: true, // 是否第一次进来
       addOpen: false, // 自定义添加mcp开关
       list: [],
     };
   },
   mounted() {
-    this.is = true;
-    this.fetchList((list) => {
-      if (list.length) {
-        this.is = false
-      }
-    })
+    this.fetchList()
   },
   methods: {
-    radioChange(val) {
-      this.handleSearch()
-    },
-    handleSearch() {
-      if (this.is !== false) {
-        if (this.list && this.list.length) {
-          this.is = false
-        } else {
-          this.is = true
-        }
-      }
-      this.fetchList()
-    },
-    fetchList(cb) {
+    fetchList() {
       const searchInput = this.$refs.searchInput
       const params = {
         name: searchInput.value,
@@ -114,27 +95,11 @@ export default {
       getList(params)
         .then((res) => {
           this.list = res.data.list || []
-          cb && cb(this.list)
         })
-        .catch(() => {})
-    },
-    init() {
-      this.fetchList((list) => {
-        if (!this.is) return
-        if (list.length > 0) {
-          this.is = false
-        } else {
-          this.is = true
-        }
-      })
-    },
-    handleClose(val) {
-      this.addOpen = val;
-      this.init();
     },
     handleClick(val) {
-      // smcpSquareId 有值 工具广场, 否则自定义
-      this.$router.push({path: `/mcp/detail/custom?mcpId=${val.mcpId}&mcpSquareId=${val.mcpSquareId}`})
+      // smcpSquareId 有值 MCP广场, 否则自定义
+      this.$router.push({path: `/tool/detail/custom?mcpId=${val.mcpId}&mcpSquareId=${val.mcpSquareId}`})
     },
     handleAddMCP() {
       this.addOpen = true;
@@ -156,7 +121,7 @@ export default {
         }).then((res) => {
           if (res.code === 0) {
             this.$message.success("删除成功")
-            this.init();
+            this.fetchList()
           } else {
             this.$message.error( res.msg || '删除失败')
           }

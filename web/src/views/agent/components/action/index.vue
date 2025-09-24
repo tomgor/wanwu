@@ -38,16 +38,15 @@
                                     border
                                     size="mini"
                                     class="api-table"
+                                    :header-cell-style="{ textAlign: 'center' }"
                                     >
                                 <el-table-column
                                         prop="name"
-                                        label="Name"
-                                        width="180">
+                                        label="Name">
                                 </el-table-column>
                                 <el-table-column
                                         prop="method"
-                                        label="Method"
-                                        width="180">
+                                        label="Method">
                                 </el-table-column>
                                 <el-table-column
                                         prop="path"
