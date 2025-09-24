@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"fmt"
+	"image"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
+	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/imaging"
 	"github.com/UnicomAI/wanwu/pkg/constant"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
@@ -111,7 +113,7 @@ func CacheAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
 
 	parts := strings.SplitN(avatarObjectPath, "/", 2)
 	if len(parts) <= 1 {
-		log.Errorf("cache avatar %v err: invalid objectPath")
+		log.Errorf("cache avatar %v err: invalid objectPath", avatarObjectPath)
 		return avatar
 	}
 	bucketName := parts[0]
@@ -132,7 +134,7 @@ func CacheAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
 	// 3 文件不存在
 	// 3.1 创建目录
 	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
-		log.Errorf("cache avatar %v mkdir %v err: %v", avatarObjectPath, filepath.Dir(filePath))
+		log.Errorf("cache avatar %v mkdir %v err: %v", avatarObjectPath, filepath.Dir(filePath), err)
 		return avatar
 	}
 	// 3.2 下载文件
@@ -141,8 +143,17 @@ func CacheAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
 		log.Errorf("cache avatar %v minio download err: %v", avatarObjectPath, err)
 		return avatar
 	}
-	// 3.3 写入文件
-	if err := os.WriteFile(filePath, b, 0644); err != nil {
+
+	// 3.3 压缩图像
+	compressedData, err := resizeImage(b)
+	if err != nil {
+		log.Warnf("cache avatar %v compress failed, using original: %v", avatarObjectPath, err)
+		// 压缩失败时使用原始数据
+		compressedData = b
+	}
+
+	// 3.4 写入文件
+	if err := os.WriteFile(filePath, compressedData, 0644); err != nil {
 		log.Errorf("cache avatar %v write file %v err: %v", avatarObjectPath, filePath, err)
 		return avatar
 	}
@@ -214,6 +225,13 @@ func cacheWorkflowAvatar(avatarURL string) request.Avatar {
 		avatar.Path = avatarURL
 		return avatar
 	}
+	// 压缩图像
+	compressedData, err := resizeImage(body)
+	if err != nil {
+		log.Warnf("cache avatar %v compress failed, using original: %v", avatarURL, err)
+		// 压缩失败时使用原始数据
+		compressedData = body
+	}
 	// 创建目录
 	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
 		log.Errorf("cache avatar %v mkdir %v err: %v", avatarURL, filepath.Dir(filePath), err)
@@ -221,11 +239,59 @@ func cacheWorkflowAvatar(avatarURL string) request.Avatar {
 		return avatar
 	}
 	// 写入文件
-	if err := os.WriteFile(filePath, body, 0644); err != nil {
+	if err := os.WriteFile(filePath, compressedData, 0644); err != nil {
 		log.Errorf("cache avatar %v write file %v err: %v", avatarURL, filePath, err)
 		avatar.Path = avatarURL
 		return avatar
 	}
 	avatar.Path = filepath.Join("/v1", filePath)
 	return avatar
+}
+
+// resizeImage 压缩图像
+func resizeImage(imageData []byte) ([]byte, error) {
+	// 先解码获取图像尺寸
+	img, _, err := image.Decode(bytes.NewReader(imageData))
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode image: %w", err)
+	}
+	bounds := img.Bounds()
+	originalWidth := bounds.Dx()
+	originalHeight := bounds.Dy()
+	// 计算等比例缩放后的尺寸
+	targetWidth, targetHeight := calculateResizeParameters(originalWidth, originalHeight, 200)
+	// 重新创建 reader（因为之前的读取位置已经改变）
+	reader := bytes.NewReader(imageData)
+	// 压缩图像到计算后的尺寸
+	compressedData, err := imaging.Resize(reader, targetWidth, targetHeight)
+	if err != nil {
+		return nil, fmt.Errorf("image resize failed: %w", err)
+	}
+	return compressedData, nil
+}
+
+// 计算等比例缩放尺寸
+func calculateResizeParameters(originalWidth, originalHeight, maxSize int) (int, int) {
+	if originalWidth <= maxSize && originalHeight <= maxSize {
+		// 如果原图已经小于目标尺寸，返回原尺寸
+		return originalWidth, originalHeight
+	}
+	var newWidth, newHeight int
+	if originalWidth > originalHeight {
+		// 宽图：以宽度为基准
+		newWidth = maxSize
+		newHeight = int(float64(originalHeight) * float64(maxSize) / float64(originalWidth))
+	} else {
+		// 高图或正方形：以高度为基准
+		newHeight = maxSize
+		newWidth = int(float64(originalWidth) * float64(maxSize) / float64(originalHeight))
+	}
+	// 确保最小尺寸为1
+	if newWidth < 1 {
+		newWidth = 1
+	}
+	if newHeight < 1 {
+		newHeight = 1
+	}
+	return newWidth, newHeight
 }
