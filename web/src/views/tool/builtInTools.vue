@@ -46,30 +46,7 @@ export default {
   data() {
     return {
       basePath: this.$basePath,
-      list: [
-        {
-          "toolSquareId": "seniverse",
-          "avatar": {
-            "key": "",
-            "path": "\\v1\\cache\\mcp\\seniverse\\logo.png"
-          },
-          "name": "心知天气",
-          "desc": "心知天气是北京心知科技有限公司旗下的国内领先商业气象服务平台，通过天气 API、BI、数据分析服务等为能源、交通、农业等多个行业提供天气和行业解决方案。",
-          "tags": [
-            "文生图"
-          ]
-        },
-        {
-          "toolSquareId": "texttoimage",
-          "avatar": {
-            "key": "",
-            "path": "\\v1\\cache\\mcp\\texttoimage\\logo.png"
-          },
-          "name": "文生图",
-          "desc": "文生图描述",
-          "tags": []
-        }
-      ],
+      list: [],
     };
   },
   mounted() {
