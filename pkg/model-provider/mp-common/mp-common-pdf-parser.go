@@ -103,7 +103,7 @@ func (resp *pdfParserResp) ConvertResp() (*PdfParserResp, bool) {
 	}
 
 	if err := util.Validate(ret); err != nil {
-		log.Errorf("pdfParser resp validate err: %v", err)
+		log.Errorf("pdfParser resp validate err: %v, resp : %v", err, resp.raw)
 		return nil, false
 	}
 	return ret, true
