@@ -236,7 +236,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="handleSubmit" :loading="submitLoading">确定</el-button>
-        <el-button type="primary" @click="handleParse" v-if="cardObj[0]['isParent']">保存并重新解析子分段</el-button>
+        <!-- <el-button type="primary" @click="handleParse" v-if="cardObj[0]['isParent']">保存并重新解析子分段</el-button> -->
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
     </el-dialog>
@@ -479,6 +479,7 @@ export default {
       this.$nextTick(() => {
         this.$set(obj,'childContent',[]);
         this.cardObj = [obj];
+        this.handleParse();
         this.activeStatus = obj.available;
       });
     },
