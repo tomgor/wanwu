@@ -48,8 +48,7 @@
                                             max="100"
                                             style="width:360px;margin:0 auto;"
                                         ></el-progress>
-                                        <p>{{$t('common.fileUpload.limitTips')}}<span style="color: red"> {{$t('common.fileUpload.click')}} </span>{{$t('common.fileUpload.refreshTips')}}</p>
-                                    </div>
+                                        <p>{{$t('common.fileUpload.limitTips')}}<span style="color: red"> {{$t('common.fileUpload.click')}} </span>{{$t('common.fileUpload.refreshTips')}}</p>                                    </div>
                                 </div>
                                 <div v-else>
                                     <i class="el-icon-upload"></i><p>{{$t('common.fileUpload.uploadClick')}}</p>

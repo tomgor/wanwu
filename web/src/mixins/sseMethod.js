@@ -202,7 +202,12 @@ export default {
             this.sseResponse = {}
             this.setStoreSessionStatus(0)
             this.clearInput()
-            let params = {query: prompt, pending: true, responseLoading: true, requestFileUrls:[],pendingResponse:''}
+            let params = {
+                query: prompt, 
+                pending: true, 
+                responseLoading: true, 
+                requestFileUrls:[],
+                pendingResponse:''}
             this.$refs['session-com'].pushHistory(params)
             let endStr = ''
             this._print = new Print({
@@ -264,6 +269,7 @@ export default {
                         let commonData = {
                             ...data,
                             ...this.sseParams,
+                            ...(data.finish === 1 && { "history": data.history }),
                             "query": prompt,
                             "fileName":'',
                             "fileSize":'',

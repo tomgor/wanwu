@@ -49,7 +49,7 @@
                                             max="100"
                                             style="width:360px;margin:0 auto;"
                                         ></el-progress>
-                                        <p>{{$t('common.fileUpload.limitTips')}}<span style="color: red"> {{$t('common.fileUpload.click')}} </span>{{$t('common.fileUpload.refreshTips')}}</p>
+                                        <p>{{$t('common.fileUpload.limitTips')}}<span style="color:#384BF7;"> {{$t('common.fileUpload.click')}} </span>{{$t('common.fileUpload.refreshTips')}}</p>
                                     </div>
                                 </div>
                                 <div v-else>
@@ -59,6 +59,7 @@
                                             <span>{{tipsArr}}</span>
                                             {{$t('common.fileUpload.typeFileTip')}}
                                         </p>
+                                        <p style="padding-top: 3px;">*若该智能体基于大语言模型创建，则上传图片暂时无法进行解析</p>
                                     </div>
                                 </div>
                         </el-upload>

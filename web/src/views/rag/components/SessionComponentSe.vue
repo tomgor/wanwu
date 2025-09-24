@@ -240,7 +240,6 @@ export default {
           document.body.addEventListener('error', this.imageErrorHandler, true); 
         },
         handleImageError(img){
-          console.log(img)
           // 防止重复处理
           if (img.classList.contains('failed')) {
             return;

@@ -100,16 +100,16 @@
             ...mapGetters('user', ['commonInfo']),
         },
         watch: {
-            'editForm.visionsupport': {
-                handler(newVal) {
-                    if ( newVal === 'support') {
-                        this.fileTypeArr = ['doc/*','image/*'];
-                    } else {
-                        this.fileTypeArr = ['doc/*'];
-                    }
-                },
-                immediate: true
-            }
+            // 'editForm.visionsupport': {
+            //     handler(newVal) {
+            //         if ( newVal === 'support') {
+            //             this.fileTypeArr = ['doc/*','image/*'];
+            //         } else {
+            //             this.fileTypeArr = ['doc/*'];
+            //         }
+            //     },
+            //     immediate: true
+            // }
         },
         data() {
             return {
@@ -117,7 +117,7 @@
                 isModelDisable:false,
                 currentModel:null,
                 echo: true,
-                fileTypeArr: ['doc/*'],
+                fileTypeArr: ['doc/*','image/*'],
                 hasDrawer: false,
                 drawer: true,
             }

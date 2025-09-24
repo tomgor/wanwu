@@ -21,7 +21,8 @@
                 :on-change="uploadOnChange"
                 >
             <div class="echo-img">
-                <img :src="imageUrl || defaultLogo || `/user/api/`+ form.avatar.path" /> 
+              
+                <img :src="getImageSrc()" /> 
                 <p class="echo-img-tip" v-if="isLoading">
                   图片上传中
                   <span class="el-icon-loading"></span>
@@ -59,7 +60,7 @@
 <script>
 import { uploadAvatar} from "@/api/user";
 import { createRag,updateRag} from "@/api/rag";
-import {mapActions} from 'vuex';
+import {mapActions,mapGetters} from 'vuex';
 export default {
   props: {
     type: {
@@ -73,7 +74,7 @@ export default {
   data() {
     return {
       isLoading:false,
-      defaultLogo:require("@/assets/imgs/bg-logo.png"),
+      defaultLogo:'',
       logoFileList:[],
       imageUrl:'',
       dialogVisible: false,
@@ -111,9 +112,6 @@ export default {
           { required: true, message: '请输入文本描述', trigger: "blur" },
           { max:600, message:'文本描述限制600字符以内',trigger: "blur"}
         ],
-        'avatar.path':[
-            { required: true, message: this.$t('ragDiglog.logoRules'), trigger: "blur" },
-        ]
       },
       titleMap: {
         edit: this.$t('ragDiglog.editApp'),
@@ -121,28 +119,30 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapGetters('user', ['defaultIcons'])
+  },
   watch:{
-    form:{
-       handler(newVal) {
-        Object.keys(newVal).forEach(key => {
-          if (newVal[key] && typeof newVal[key] !== 'object') {
-            this.$refs.form.clearValidate(key);
-          }
-        });
-      },
-      deep: true
-    },
-    'form.avatar': {
+    defaultIcons:{
       handler(newVal) {
-        if (newVal && newVal.path) {
-          this.$refs.form.clearValidate('avatar.path');
+        if(this.type === 'create'){
+          this.defaultLogo = newVal.ragIcon;
         }
       },
-      deep: true
+      deep: true,
+      immediate: true
     }
   },
   methods: {
     ...mapActions("app", ["setFromList"]),
+    getImageSrc(){
+      if (this.imageUrl) return this.imageUrl;
+      if (this.type === 'create') {
+        return this.defaultLogo ? `/user/api/${this.defaultLogo}` : '';
+      } else {
+        return this.form.avatar.path ? `/user/api/${this.form.avatar.path}` : '';
+      }
+    },
     openDialog() {
       if (this.type === "edit" && this.editForm) {
         this.defaultLogo = ''

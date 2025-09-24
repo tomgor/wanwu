@@ -12,10 +12,17 @@ export const user = {
       token: '',
       permission:{},
       commonInfo:{login: {}, home: {}, tab: {}, register: {}},
-      lang: ''
+      lang: '',
+      defaultIcons: {
+        agentIcon: '',
+        ragIcon: ''
+      }
   },
 
   mutations: {
+      setDefaultIcons(state, defaultIcons) {
+          state.defaultIcons = { ...state.defaultIcons, ...defaultIcons }
+      },
       setUserInfo(state, userInfo) {
           state.userInfo = { ...state.userInfo, ...userInfo }
       },
@@ -123,6 +130,12 @@ export const user = {
                 tab: res.data.tab,
                 register: res.data.register
             })
+            // 存储默认图标信息
+            const defaultIcons = {
+              agentIcon: res.data.defaultIcon.agentIcon || '',
+              ragIcon: res.data.defaultIcon.ragIcon || ''
+            }
+            commit('setDefaultIcons', defaultIcons)
             replaceTitle(res.data.tab.title)
             replaceIcon(res.data.tab.logo ? res.data.tab.logo.path : '')
         }
@@ -146,6 +159,9 @@ export const user = {
     },
     permission(state){
       return state.permission
+    },
+    defaultIcons(state){
+      return state.defaultIcons
     }
   }
 }
