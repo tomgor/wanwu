@@ -57,7 +57,7 @@ export default {
       console.log(this.commonInfo)
       this.setAuthBg(this.commonInfo.data.login.background.path)
       replaceTitle(this.commonInfo.data.tab.title)
-      replaceIcon(this.commonInfo.data.data.tab.logo.path)
+      replaceIcon(this.commonInfo.data.tab.logo.path)
     })
   },
   methods: {
