@@ -24,7 +24,7 @@
         </div>
 
         <div>
-          <div class="tool bg-border" v-if="!detail.needApiKeyInput">
+          <div class="tool bg-border" v-if="detail.needApiKeyInput">
             <div class="tool-item ">
               <p class="title">授权-API Key:</p>
               <div class="sse-url" style="display: flex">
