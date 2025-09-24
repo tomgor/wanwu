@@ -183,6 +183,8 @@ agent:
 
 workflow:
   endpoint: http://workflow-wanwu:8999
+  minio_proxy_endpoint: http://workflow-wanwu:8998
+  minio_proxy_prefix: /workflow/minio/presign
   list_uri: /api/workflow_api/workflow_list_by_wanwu
   create_uri: /api/workflow_api/create
   delete_uri: /api/workflow_api/delete
