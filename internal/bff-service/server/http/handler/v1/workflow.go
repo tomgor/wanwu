@@ -1,6 +1,9 @@
 package v1
 
 import (
+	"net/http"
+	"net/url"
+
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
 	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
@@ -60,5 +63,47 @@ func CopyWorkflow(ctx *gin.Context) {
 		return
 	}
 	resp, err := service.CopyWorkflow(ctx, getOrgID(ctx), req.WorkflowID)
+	gin_util.Response(ctx, resp, err)
+}
+
+// ExportWorkflow
+//
+//	@Tags			workflow
+//	@Summary		导出Workflow
+//	@Description	导出工作流的json文件
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		application/octet-stream
+//	@Param			workflow_id	query		string	true	"工作流ID"
+//	@Success		200			{object}	response.Response{}
+//	@Router			/appspace/workflow/export [get]
+func ExportWorkflow(ctx *gin.Context) {
+	fileName := "workflow_export.json"
+	resp, err := service.ExportWorkflow(ctx, getOrgID(ctx), ctx.Query("workflow_id"))
+	if err != nil {
+		gin_util.Response(ctx, nil, err)
+		return
+	}
+	// 设置响应头
+	ctx.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.QueryEscape(fileName))
+	ctx.Header("Content-Type", "application/octet-stream")
+	ctx.Header("Access-Control-Expose-Headers", "Content-Disposition")
+	// 直接写入字节数据
+	ctx.Data(http.StatusOK, "application/octet-stream", resp)
+}
+
+// ImportWorkflow
+//
+//	@Tags			workflow
+//	@Summary		导入Workflow
+//	@Description	通过JSON文件导入工作流
+//	@Security		JWT
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Param			file	formData	file	true	"工作流JSON文件"
+//	@Success		200		{object}	response.Response{data=response.CozeWorkflowIDData}
+//	@Router			/appspace/workflow/import [post]
+func ImportWorkflow(ctx *gin.Context) {
+	resp, err := service.ImportWorkflow(ctx, getOrgID(ctx))
 	gin_util.Response(ctx, resp, err)
 }

@@ -4730,6 +4730,34 @@ paths:
       summary: 拷贝Workflow
       tags:
       - workflow
+  /appspace/workflow/import:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 通过JSON文件导入工作流
+      parameters:
+      - description: 工作流JSON文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CozeWorkflowIDData'
+              type: object
+      security:
+      - JWT: []
+      summary: 导入Workflow
+      tags:
+      - workflow
   /appspace/workflow/model/select/llm:
     get:
       consumes:

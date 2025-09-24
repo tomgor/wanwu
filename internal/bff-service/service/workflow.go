@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	net_url "net/url"
 
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
@@ -178,7 +179,88 @@ func DeleteWorkflow(ctx *gin.Context, orgID, workflowID string) error {
 	return nil
 }
 
+func ExportWorkflow(ctx *gin.Context, orgID, workflowID string) ([]byte, error) {
+	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.ExportUri)
+	ret := &response.CozeWorkflowExportResp{}
+	if resp, err := resty.New().
+		R().
+		SetContext(ctx).
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Accept", "application/json").
+		SetHeaders(workflowHttpReqHeader(ctx)).
+		SetBody(map[string]string{
+			"space_id":    orgID,
+			"workflow_id": workflowID,
+		}).
+		SetResult(&ret).
+		Post(url); err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_export", err.Error())
+	} else if resp.StatusCode() >= 300 {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_export", fmt.Sprintf("[%v] %v", resp.StatusCode(), resp.String()))
+	}
+	exportData := response.CozeWorkflowExportData{
+		WorkflowName: ret.Data.WorkflowName,
+		WorkflowDesc: ret.Data.WorkflowDesc,
+		Schema:       ret.Data.Schema,
+	}
+	// 将结构体序列化为 JSON 字节
+	jsonData, err := json.Marshal(exportData)
+	if err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_export", fmt.Sprintf("export workflow unmarshal err:%v", err.Error()))
+	}
+	return jsonData, nil
+}
+
+func ImportWorkflow(ctx *gin.Context, orgID string) (*response.CozeWorkflowIDData, error) {
+	fileHeader, err := ctx.FormFile("file")
+	if err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_import_file", fmt.Sprintf("get file err: %v", err))
+	}
+	file, err := fileHeader.Open()
+	if err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_import_file", fmt.Sprintf("open file err: %v", err))
+	}
+	defer file.Close()
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_import_file", fmt.Sprintf("read file err: %v", err))
+	}
+	var rawData workflowImportData
+	if err := json.Unmarshal(fileBytes, &rawData); err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_import_file", fmt.Sprintf("schema unmarshal failed: %v", err))
+	}
+	url, _ := net_url.JoinPath(config.Cfg().Workflow.Endpoint, config.Cfg().Workflow.ImportUri)
+	ret := &response.CozeWorkflowIDResp{}
+	if resp, err := resty.New().
+		R().
+		SetContext(ctx).
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Accept", "application/json").
+		SetHeaders(workflowHttpReqHeader(ctx)).
+		SetQueryParams(map[string]string{
+			"space_id": orgID,
+			"name":     rawData.Name,
+			"desc":     rawData.Desc,
+			"schema":   rawData.Schema,
+		}).
+		SetResult(ret).
+		Post(url); err != nil {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_import_file", err.Error())
+	} else if resp.StatusCode() >= 300 {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_import_file", fmt.Sprintf("[%v] %v", resp.StatusCode(), resp.String()))
+	} else if ret.Code != 0 {
+		return nil, grpc_util.ErrorStatusWithKey(errs.Code_BFFGeneral, "bff_workflow_import_file", fmt.Sprintf("code %v msg %v", ret.Code, ret.Msg))
+	}
+	return ret.Data, nil
+}
+
 // --- internal ---
+
+type workflowImportData struct {
+	Name   string `json:"name"`
+	Desc   string `json:"desc"`
+	Schema string `json:"schema"` // 存储为JSON字符串
+}
 
 func workflowHttpReqHeader(ctx *gin.Context) map[string]string {
 	return map[string]string{
