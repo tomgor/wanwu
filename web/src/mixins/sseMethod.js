@@ -217,9 +217,7 @@ export default {
             })
 
             let history_list = this.$refs['session-com'].getSessionData();
-            console.log('history_list',history_list)
             const history = history_list['history'].length > 1 ? history_list['history'][history_list['history'].length - 2]['history'] : [];
-            console.log('history',history)
             this.ctrlAbort = new AbortController();
             const userInfo = this.$store.state.user.userInfo || {};
             this.eventSource = new fetchEventSource(this.origin + this.rag_sseApi, {

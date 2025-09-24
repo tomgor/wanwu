@@ -59,14 +59,14 @@
             >
               <div class="resultTitle">
                 <span>
-                  <span class="tag">{{$t('knowledgeManage.section')}}#{{index+1}}</span>
-                  <span class="checkDetail" @click="showSectionDetail(index)">查看详情</span>
+                  <span class="tag"  @click="showSectionDetail(index)">{{$t('knowledgeManage.section')}}#{{index+1}}</span>
+                  <span class="segment-type">{{item.childcontentList && item.childcontentList.length > 0 ? '#父子分段' : '#通用分段'}}</span>
+                  <span class="segment-length" v-if="item.childcontentList && item.childcontentList.length > 0">#{{item.childcontentList.length || 0}}个子分段</span>
                 </span>
                 <span class="score">{{$t('knowledgeManage.hitScore')}}: {{score[index]}}</span>
               </div>
               <div>
                 <div v-html="md.render(item.snippet)" class="resultContent"></div>
-                
                 <div class="file_name">文件名称：{{item.title}}</div>
               </div>
             </div>
@@ -281,6 +281,15 @@ export default {
                 background: #d2d7ff;
                 padding: 0 10px;
                 border-radius: 4px;
+                cursor: pointer;
+              }
+              .segment-type {
+                padding: 0 5px;
+              }
+              .segment-type,
+              .segment-length {
+                color: #999;
+                font-size: 12px;
               }
               .checkDetail{
                 color: #384bf7;

@@ -10,7 +10,7 @@
       <!-- 父分段区域 -->
       <div class="parent-segment" v-if="parentSegment">
         <div class="segment-header">
-          <span class="parent-badge">父分段</span>
+          <span class="parent-badge">{{segmentList.length > 0 ? '父分段' :'通用分段'}}</span>
           <div class="parent-score">
             <span class="score-label">命中得分:</span>
             <span class="score-value">{{ formatScore(parentSegment.score) }}</span>
@@ -41,7 +41,7 @@
               <span class="segment-badge">C#-{{ index + 1 }}</span>
               <span class="segment-score">
                 <span class="score-label">命中得分:</span>
-                <span class="score-value">{{ formatScore(segment.score) }}</span>
+                <span class="score-value">{{ formatScore(childscore[index]) }}</span>
               </span>
             </template>
             {{ index + 1 }}、{{ segment.content }}
@@ -61,12 +61,9 @@ export default {
     return {
       dialogVisible: false,
       activeNames: [],
-      parentSegment: {
-        
-      },
-      segmentList: [
-       
-      ]
+      parentSegment: {},
+      segmentList: [],
+      childscore:[]
     }
   },
   methods: {
@@ -92,6 +89,7 @@ export default {
         
         // 更新子分段数据
         if (data.searchList && Array.isArray(data.searchList.childContentList)) {
+          this.childscore = data.searchList.childscore;
           this.segmentList = data.searchList.childContentList.map(segment => ({
             content: segment.childsnippet || '',
             autoSave: Boolean(segment.autoSave),
