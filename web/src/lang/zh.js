@@ -13,7 +13,7 @@ export default {
         button: '登 录',
     },
     register: {
-        title: '注册',
+        title: '注 册',
         form: {
             username: '用户名',
             email: '邮箱',
@@ -21,6 +21,20 @@ export default {
         },
         action: '获取',
         button: '注 册',
+        back: '返回登录'
+    },
+    reset: {
+        title: '重置密码',
+        form: {
+            email: '邮箱',
+            code: '验证码',
+            password: '新密码',
+        },
+        pwd1Placeholder: '密码需包含字母，数字，特殊字符，长度8-20',
+        action1: '设置',
+        action2: '确认',
+        action: '获取',
+        button: '确 认',
         back: '返回登录'
     },
     about: {
