@@ -6,10 +6,10 @@
     <div class="auth-modal">
       <div class="header__left">
         <img
-            v-if="commonInfo.login.logo && commonInfo.login.logo.path"
-            style="height: 60px; margin: 0 15px 0 22px"
-            :src="basePath + '/user/api' + commonInfo.login.logo.path"
-            alt=""/>
+          v-if="commonInfo.login.logo && commonInfo.login.logo.path"
+          style="height: 60px; margin: 0 15px 0 22px"
+          :src="basePath + '/user/api' + commonInfo.login.logo.path"
+          alt=""/>
         <!--<span style="font-size: 16px;">{{commonInfo.home.title || ''}}</span>-->
         <!--<div style="margin-left: 10px">
           <ChangeLang :isLogin="true" />

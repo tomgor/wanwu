@@ -10,29 +10,27 @@
             <el-form-item :label="$t('register.form.username')" class="auth-form-item" prop="username">
               <img class="auth-icon" src="@/assets/imgs/user.png" alt=""/>
               <el-input
-                  v-model.trim="form.username"
-                  :placeholder="$t('common.input.placeholder') + $t('register.form.username')" clearable
+                v-model.trim="form.username"
+                :placeholder="$t('common.input.placeholder') + $t('register.form.username')" clearable
               />
             </el-form-item>
             <el-form-item :label="$t('register.form.email')" class="auth-form-item" prop="email">
               <img class="auth-icon" src="@/assets/imgs/user.png" alt=""/>
               <el-input
-                  v-model.trim="form.email"
-                  :placeholder="$t('common.input.placeholder') + $t('register.form.email')" clearable
-              />
+                v-model.trim="form.email"
+                :placeholder="$t('common.input.placeholder') + $t('register.form.email')" clearable/>
             </el-form-item>
             <el-form-item :label="$t('register.form.code')" class="auth-form-item" prop="code">
               <img class="auth-icon" src="@/assets/imgs/code.png" alt=""/>
               <el-input
-                  style="width: calc(100% - 90px)"
-                  v-model.trim="form.code"
-                  @keyup.enter.native="addByEnterKey"
-                  :placeholder="$t('common.input.placeholder') + $t('register.form.code')" clearable
-              />
+                style="width: calc(100% - 90px)"
+                v-model.trim="form.code"
+                @keyup.enter.native="addByEnterKey"
+                :placeholder="$t('common.input.placeholder') + $t('register.form.code')" clearable/>
               <el-button
-                  style="height: 32px; width: 80px; margin-left: 10px; vertical-align: middle; padding-left: 8px; padding-top: 8px"
-                  @click="requestEmailCode"
-                  :disabled="isCooldown"
+                style="height: 32px; width: 80px; margin-left: 10px; vertical-align: middle; padding-left: 8px; padding-top: 8px"
+                @click="requestEmailCode"
+                :disabled="isCooldown"
               >
                 {{ isCooldown ? `${cooldownTime}s` : $t('register.action') + $t('register.form.code') }}
               </el-button>
@@ -40,8 +38,9 @@
             </el-form-item>
           </el-form>
           <div class="auth-bt">
-            <p class="primary-bt" :style="`background: ${commonInfo.login.loginButtonColor} !important`"
-               @click="doRegister">
+            <p
+              class="primary-bt" :style="`background: ${commonInfo.login.loginButtonColor} !important`"
+              @click="doRegister">
               {{ $t('register.button') }}
             </p>
           </div>
