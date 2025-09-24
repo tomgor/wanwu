@@ -102,9 +102,9 @@
               <div slot="header" class="clearfix">
                 <span>
                   {{ $t('knowledgeManage.split')+":" + item.contentNum }}
-                  <span class="segment-type">[ {{ item.isParent?"父子分段":"通用分段" }} ]</span>
-                  <span class="segment-length">[ {{ item.content.length }}{{$t('knowledgeManage.character')}} ]</span>
-
+                  <span class="segment-type">#{{ item.isParent?"父子分段":"通用分段" }}</span>
+                  <span class="segment-length">#{{ item.content.length }}{{$t('knowledgeManage.character')}}</span>
+                  <span class="segment-child" v-if="item.childNum">#{{ item.childNum || 0 }}个子分段</span>
                 </span>
                 <div>
                   <el-switch
@@ -200,23 +200,34 @@
                 class="full-width-textarea"
                 >
               </el-input>
-              <div class="segment-list">
-                <div 
-                  v-for="(segment, index) in getSegmentsForRow(scope.row)" 
-                  :key="index"
-                  class="segment-item"
+              <div class="segment-list" v-if="scope.row.childContent.length > 0">
+                <el-collapse 
+                  v-model="activeNames" 
+                  class="section-collapse"
+                  accordion
                 >
-                  <span class="segment-badge">C{{ index + 1 }}</span>
-                  <span class="segment-content">
+                  <el-collapse-item 
+                    v-for="(segment, index) in scope.row.childContent" 
+                    :key="index"
+                    :name="index"
+                    class="segment-collapse-item"
+                  >
+                    <template slot="title">
+                      <span class="segment-badge">C#-{{ index + 1 }}</span>
+                      <span class="segment-score">
+                        <span class="score-label">命中得分:</span>
+                        <span class="score-value">{{ formatScore(segment.score || 0.85761) }}</span>
+                      </span>
+                    </template>
                     {{ index + 1 }}、{{ segment.content }}
                     <span class="segment-action">(展示完整分段内容)</span>
                     <span v-if="segment.autoSave" class="auto-save">--失去焦点自动保存</span>
-                  </span>
-                  <div class="segment-actions">
-                    <i class="el-icon-edit-outline edit-icon" @click="editSegment(scope.row, index)"></i>
-                    <i class="el-icon-delete delete-icon" @click="deleteSegment(scope.row, index)"></i>
-                  </div>
-                </div>
+                    <div class="segment-actions">
+                      <i class="el-icon-edit-outline edit-icon" @click="editSegment(scope.row, index)"></i>
+                      <i class="el-icon-delete delete-icon" @click="deleteSegment(scope.row, index)"></i>
+                    </div>
+                  </el-collapse-item>
+                </el-collapse>
               </div>
           </template>
           </el-table-column>
@@ -225,6 +236,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="handleSubmit" :loading="submitLoading">确定</el-button>
+        <el-button type="primary" @click="handleParse">保存并重新解析子分段</el-button>
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
     </el-dialog>
@@ -251,12 +263,14 @@ export default {
         {
           available: false,
           content: "",
+          childContent:[],
           contentId: "",
           len: 20,
         },
       ], // 单独卡片存储对象
       value: true,
       activeStatus: false,
+      activeNames: [], // 用于控制 el-collapse 的展开状态
       page: {
         pageNo: 1,
         pageSize: 8,
@@ -288,13 +302,25 @@ export default {
     this.clearTimer()
   },
   methods: {
-     getSegmentsForRow(row) {
-      return row.segments || [];
+    formatScore(score) {
+      // 格式化得分，保留5位小数
+      if (typeof score !== 'number') {
+        return '0.00000';
+      }
+      return score.toFixed(5);
     },
      editSegment(row, index) {
-    // 编辑分段的逻辑
-    console.log('编辑分段:', row, index);
-  },
+      // 编辑分段的逻辑
+      console.log('编辑分段:', row, index);
+    },
+    handleParse(){
+      getSegmentChild({contentId:this.cardObj[0]['contentId'],docId:this.obj.id}).then(res =>{
+        if(res.code === 0){
+          this.$message.success('解析成功');
+          this.cardObj[0].childContent = res.data.contentList || [];
+        }
+      }).catch(() =>{})
+    },
     deleteSegment(row, index) {
       // 删除分段的逻辑
       this.$confirm('确定要删除这个分段吗？', '提示', {
@@ -451,6 +477,7 @@ export default {
       this.oldContent = item.content;
       const obj = JSON.parse(JSON.stringify(item));
       this.$nextTick(() => {
+        this.$set(obj,'childContent',[]);
         this.cardObj = [obj];
         this.activeStatus = obj.available;
       });
@@ -551,62 +578,131 @@ export default {
 <style lang="scss">
 .segment-list {
   margin-top: 10px;
-  .segment-item {
-    display: flex;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid #f0f0f0;
+  
+  .section-collapse {
+    background-color: #f7f8fa;
+    border-radius: 6px;
+    border: 1px solid #384BF7;
+    overflow: hidden;
     
-    &:last-child {
+    /deep/ .el-collapse {
+      border: none;
+      border-radius: 6px;
+    }
+    
+    /deep/ .el-collapse-item__header {
+      background-color: #f7f8fa;
+      border-bottom: 1px solid #e4e7ed;
+      padding: 12px 20px;
+      font-weight: normal;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      
+      &:hover {
+        background-color: #f0f2f5;
+      }
+    }
+    
+    /deep/ .el-collapse-item__content {
+      padding: 15px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #e4e7ed;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+    }
+    
+    /deep/ .el-collapse-item:last-child .el-collapse-item__content {
       border-bottom: none;
     }
     
-    .segment-badge {
-      background-color: #f5f5f5;
-      color: #666;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      margin-right: 10px;
-      min-width: 30px;
-      text-align: center;
+    /deep/ .el-collapse-item__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 20px;
+      position: relative;
     }
     
-    .segment-content {
-      flex: 1;
+    /deep/ .el-collapse-item__arrow {
+      display: none !important;
+    }
+    
+    .segment-badge {
+      color: #384BF7;
+      font-size: 12px;
+      min-width: 40px;
+      text-align: center;
+      font-weight: 500;
+      margin-right: 120px; // 为右边的得分留出空间
+    }
+    
+    .segment-score {
+      display: flex;
+      align-items: center;
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      
+      .score-label {
+        font-size: 12px;
+        color: #384BF7;
+        font-weight: bold;
+        margin-right: 5px;
+      }
+      
+      .score-value {
+        font-size: 14px;
+        color: #384BF7;
+        font-weight: bold;
+        font-family: 'Courier New', monospace;
+      }
+    }
+    
+    /deep/ .el-collapse-item__content {
       font-size: 14px;
       color: #333;
+      line-height: 1.5;
+      text-align: left;
+      word-wrap: break-word;
+      word-break: break-all;
+      overflow-wrap: break-word;
       
       .segment-action {
         color: #999;
         font-size: 12px;
-        margin-left: 5px;
+        margin-left: 8px;
       }
       
       .auto-save {
         color: #666;
         font-size: 12px;
-        margin-left: 5px;
+        margin-left: 8px;
+        font-style: italic;
       }
-    }
-    
-    .segment-actions {
-      display: flex;
-      gap: 10px;
       
-      .edit-icon,
-      .delete-icon {
-        font-size: 16px;
-        color: #666;
-        cursor: pointer;
+      .segment-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
         
-        &:hover {
-          color: #409eff;
+        .edit-icon,
+        .delete-icon {
+          font-size: 16px;
+          color: #666;
+          cursor: pointer;
+          
+          &:hover {
+            color: #409eff;
+          }
         }
-      }
-      
-      .delete-icon:hover {
-        color: #f56c6c;
+        
+        .delete-icon:hover {
+          color: #f56c6c;
+        }
       }
     }
   }
@@ -740,6 +836,12 @@ export default {
         .segment-length {
           color: #999;
           font-size: 12px;
+        }
+        
+        .segment-child {
+          color: #999;
+          font-size: 12px;
+          padding-left: 5px;
         }
       }
 

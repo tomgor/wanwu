@@ -64,6 +64,7 @@
                 :loading="modelLoading"
                 clearable
                 filterable
+                value-key="modelId"
               >
                 <el-option
                   v-for="(item,index) in modleOptions"
@@ -71,6 +72,16 @@
                   :label="item.displayName"
                   :value="item.modelId"
                 >
+                  <div class="model-option-content">
+                    <span class="model-name">{{ item.displayName }}</span>
+                    <div class="model-select-tags" v-if="item.tags && item.tags.length > 0">
+                      <span
+                        v-for="(tag, tagIdx) in item.tags"
+                        :key="tagIdx"
+                        class="model-select-tag"
+                      >{{ tag.text }}</span>
+                    </div>
+                  </div>
                 </el-option>
               </el-select>
             </div>
@@ -519,6 +530,33 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.model-option-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  
+  .model-name {
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+  
+  .model-select-tags {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-top: 4px;
+    .model-select-tag {
+      background-color: #f0f2ff;
+      color: #384bf7;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+  }
+}
 .isDisabled .header-right,.isDisabled .drawer-form > div{
   user-select: none;
   pointer-events: none !important;      

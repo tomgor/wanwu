@@ -176,36 +176,11 @@ export default {
     showSectionDetail(index) {
       const currentItem = this.searchList[index];
       const currentScore = parseFloat(this.score[index]) || 0;
-      
-      // 构造弹框需要的数据
-      const dialogData = {
-        parentSegment: {
-          score: currentScore,
-          content: [
-            (currentItem && currentItem.snippet) || '暂无内容',
-            'xxxxxxxxxxxxx ......'
-          ]
-        },
-        segmentList: [
-          {
-            content: (currentItem && currentItem.snippet) || '暂无内容',
-            autoSave: true,
-            score: currentScore
-          },
-          {
-            content: 'xxxxxxxxxx ....',
-            autoSave: false,
-            score: currentScore
-          },
-          {
-            content: 'xxxxxxxxxx ....',
-            autoSave: false,
-            score: currentScore
-          }
-        ]
-      };
-      
-      this.$refs.sectionShow.showDiaglog(dialogData);
+      const data = {
+        searchList:currentItem,
+        score:currentScore,
+      }
+      this.$refs.sectionShow.showDiaglog(data);
     },
   },
 };
