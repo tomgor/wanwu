@@ -114,3 +114,28 @@ export const getRecommendsList = (data)=>{
         params: data
     })
 };
+
+/*----内置工具------*/
+export const getBuiltInList = (data)=>{
+    return request({
+        url: `${BASE_URL}/tool/square/list`,
+        method: 'get',
+        params: data
+    })
+};
+
+export const getToolDetail = (data)=>{
+    return request({
+        url: `${BASE_URL}/tool/square`,
+        method: 'get',
+        params: data
+    })
+};
+
+export const changeApiKey = (data)=>{
+    return request({
+        url: `${BASE_URL}/tool/builtin`,
+        method: 'post',
+        data
+    })
+};
