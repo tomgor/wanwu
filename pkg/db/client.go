@@ -30,6 +30,7 @@ type ConnConfig struct {
 func New(cfg Config) (*gorm.DB, error) {
 	var db *gorm.DB
 	var err error
+
 	switch cfg.DBName {
 	case "mysql", "tidb", "oceanbase":
 		var connCfg ConnConfig
@@ -48,9 +49,7 @@ func New(cfg Config) (*gorm.DB, error) {
 			connCfg.Database,
 			true,
 			// "Asia/Shanghai",
-			"Local")), &gorm.Config{
-			Logger: logger.Default.LogMode(logger.Info),
-		})
+			"Local")), buildGormConfig(connCfg))
 		if err != nil {
 			break
 		}
@@ -73,6 +72,23 @@ func New(cfg Config) (*gorm.DB, error) {
 		return nil, err
 	}
 	return db, err
+}
+
+// 构建gorm 日志配置
+func buildGormConfig(cfg ConnConfig) *gorm.Config {
+	var gormConfig *gorm.Config
+	if cfg.LogMode { //根据配置决定是否开启日志
+		gormConfig = &gorm.Config{
+			Logger:                                   logger.Default.LogMode(logger.Info),
+			DisableForeignKeyConstraintWhenMigrating: true,
+		}
+	} else {
+		gormConfig = &gorm.Config{
+			Logger:                                   logger.Default.LogMode(logger.Silent),
+			DisableForeignKeyConstraintWhenMigrating: true,
+		}
+	}
+	return gormConfig
 }
 
 func setPoolParam(db *gorm.DB, maxOpenConn, maxIdleConn int) error {
