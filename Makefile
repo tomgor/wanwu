@@ -94,7 +94,7 @@ docker-image-frontend:
 	docker build -f Dockerfile.frontend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/frontend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-${WANWU_ARCH} .
 
 docker-image-agent-base:
-	docker build -f Dockerfile.agent-base --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/agent-base:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-$(shell date +%Y%m%d)-${WANWU_ARCH} .
+	docker build -f Dockerfile.agent-base --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/agent-base:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-${WANWU_ARCH} .
 
 grpc-protoc:
 	protoc --proto_path=. --go_out=paths=source_relative:api --go-grpc_out=paths=source_relative:api proto/*/*.proto
@@ -122,18 +122,18 @@ stop-mysql:
 		--env-file .env \
 		down mysql
 
-# --- mysql-worker ---
-run-mysql-worker:
+# --- mysql-setup ---
+run-mysql-setup:
 	docker-compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
-		up mysql-worker
+		up mysql-setup
 
-stop-mysql-worker:
+stop-mysql-setup:
 	docker-compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
-		down mysql-worker
+		down mysql-setup
 
 # --- redis ---
 run-redis:

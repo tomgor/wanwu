@@ -1,8 +1,6 @@
 server:
   host: bff-service
   port: 6668
-  external_ip: localhost
-  external_port: 6668
   web_base_url: http://localhost:8081
   api_base_url: http://localhost:6668
   app_open_base_url: http://localhost:6668

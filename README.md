@@ -118,7 +118,7 @@ The platform has been successfully applied in multiple industries such as **fina
     # amd64 / arm64
     WANWU_ARCH=amd64
     
-    # external ip port (Note: localhost should be replaced with the local area network or external IP of the machine, such as 192.168.0.xx, and cannot be localhost or 127.0.0.1)
+    # external ip port (Note: if the browser accesses Wanwu deployed on a non-localhost server, you need to change localhost to the external IP, for example, 192.168.xx.xx.)
     WANWU_EXTERNAL_IP=localhost
     ```
     1.3 Create a Docker running network
@@ -220,7 +220,7 @@ To help you quickly get started with this project, we strongly recommend that yo
   **[A]** Stop the service, run `sudo sysctl -w vm.max_map_count=262144`, and then restart the service.
 - **[Q] Error when starting Agent (agent-wanwu) on Windows system: bash: ./start_all.sh: /bin/bash^M: bad interpreter**
   **[A]** Disable automatic CRLF line endings in Git by running `git config --global core.autocrlf false`. Then stop the service, re-clone the wanwu repository, and restart the service.
-- **[Q] After the system services start normally, the mysql-wanwu-worker and elastic-wanwu-setup containers exit with status code Exited (0).**
+- **[Q] After the system services start normally, the mysql-wanwu-setup and elastic-wanwu-setup containers exit with status code Exited (0).**
   **[A]** This is normal. These two containers are used to complete some initialization tasks and will automatically exit after execution.
 - **[Q] Regarding model import**
   **[A]** Taking the import of Unicom Yuanjing LLM as an example (the process is similar for importing OpenAI-API-compatible models, Embedding, or Rerank types):

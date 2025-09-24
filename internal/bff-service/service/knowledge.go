@@ -1,8 +1,6 @@
 package service
 
 import (
-	"strconv"
-
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
@@ -43,9 +41,7 @@ func SelectKnowledgeInfoByName(ctx *gin.Context, userId, orgId string, r *reques
 func GetDeployInfo(ctx *gin.Context) (interface{}, error) {
 	cfgServer := config.Cfg().Server
 	return map[string]string{
-		"massAccessIp":   cfgServer.ExternalIP,
-		"massAccessPort": strconv.Itoa(cfgServer.ExternalPort),
-		"webBaseUrl":     cfgServer.WebBaseUrl + "/minio/download/api/",
+		"webBaseUrl": cfgServer.WebBaseUrl + "/minio/download/api/",
 	}, nil
 }
 

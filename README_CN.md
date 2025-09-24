@@ -144,7 +144,7 @@
     # amd64 / arm64
     WANWU_ARCH=amd64
     
-    # external ip port（注意localhost要换成本机局域网或对外IP，例如192.168.0.xx，不能是localhost或127.0.0.1）
+    # external ip port（注意如果浏览器访问非localhost部署的万悟，则需要修改localhost为对外ip，例如192.168.xx.xx）
     WANWU_EXTERNAL_IP=localhost
     ```
 
@@ -271,7 +271,7 @@
 
     【A】git配置关闭自动回车换行(CRLF)，执行 `git config --global core.autocrlf false` 后，关闭服务，重新clone wanwu仓库，重启服务
 
-- **【Q】系统服务正常启动后，mysql-wanwu-worker和elastic-wanwu-setup容器退出：状态码为Exited (0)**
+- **【Q】系统服务正常启动后，mysql-wanwu-setup和elastic-wanwu-setup容器退出：状态码为Exited (0)**
 
     【A】正常，这两个容器用于完成一些初始化任务，执行完成后会自动退出
 

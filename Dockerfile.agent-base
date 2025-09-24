@@ -1,5 +1,5 @@
 # 阶段 1：构建环境
-FROM python:3.12.9-slim AS builder
+FROM python:3.12-slim AS builder
 
 # 设置工作目录
 WORKDIR /agent/agent_open_source
@@ -22,7 +22,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /root/.cache/pip
 
 # 阶段 2：最终镜像
-FROM python:3.12.9-slim
+FROM python:3.12-slim
 
 # 设置工作目录
 WORKDIR /agent/agent_open_source

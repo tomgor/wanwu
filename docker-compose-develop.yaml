@@ -31,8 +31,6 @@ services:
       - ${WANWU_PROJECT_DIR}/bff-service/tmp:/app/tmp
     environment:
       CUSTOM_INFO_VERSION: ${WANWU_VERSION}
-      SERVER_EXTERNAL_IP: ${WANWU_EXTERNAL_IP}
-      SERVER_EXTERNAL_PORT: ${WANWU_EXTERNAL_PORT}
       SERVER_WEB_BASE_URL: ${WANWU_WEB_BASE_URL}
       SERVER_API_BASE_URL: ${WANWU_API_BASE_URL}
       SERVER_APP_OPEN_BASE_URL: ${WANWU_APP_OPEN_BASE_URL}
@@ -279,7 +277,7 @@ services:
       WANWU_FILE_GENERATOR_URL: http://agent-wanwu:15002/upload
       WANWU_FILE_PARSER_URL: http://rag-wanwu:8681/rag/doc_parser
       # 用于nginx 8081代理workflow-wanwu:8998 minio presign相关api
-      WANWU_MINIO_PROXY_ENDPOINT: ${WANWU_EXTERNAL_IP}:${WANWU_EXTERNAL_PORT}
+      WANWU_MINIO_PROXY_ENDPOINT: ${WANWU_EXTERNAL_ENDPOINT}
       WANWU_MINIO_PROXY_PREFIX: /workflow/minio/presign
       # 用于workflow-wanwu:8998代理minio-wanwu:9000
       MINIO_API_HOST: http://${WANWU_MINIO_ENDPOINT}

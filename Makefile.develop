@@ -3,7 +3,7 @@ include .env.image.${WANWU_ARCH}
 
 run-all-middleware:
 	make run-mysql & sleep 10
-	make run-mysql-worker & sleep 10
+	make run-mysql-setup & sleep 10
 	make run-redis & sleep 10
 	make run-minio & sleep 10
 	make run-kafka & sleep 10
@@ -16,7 +16,7 @@ stop-all-middleware:
 	make stop-kafka
 	make stop-minio
 	make stop-redis
-	make stop-mysql-worker
+	make stop-mysql-setup
 	make stop-mysql
 
 # --- frontend ---

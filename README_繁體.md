@@ -119,7 +119,7 @@
     # amd64 / arm64
     WANWU_ARCH=amd64
     
-    # external ip port（注意localhost要換成本機局域網或對外IP，例如192.168.0.xx，不能是localhost或127.0.0.1）
+    # external ip port（注意如果瀏覽器訪問非localhost部署的萬悟，則需要修改localhost為對外ip，例如192.168.xx.xx）
     WANWU_EXTERNAL_IP=localhost
     ```
     1.3 創建docker運行網絡
@@ -218,7 +218,7 @@
     【A】關閉服務，執行 `sudo sysctl -w vm.max_map_count=262144` 後，重啟服務
 - **【Q】Windows系統Agent(agent-wanwu)啟動報錯：bash: ./start_all.sh: /bin/bash^M: bad interpreter**
     【A】git配置關閉自動回車換行(CRLF)，執行 `git config --global core.autocrlf false` 後，關閉服務，重新clone wanwu倉庫，重啟服務
-- **【Q】系統服務正常啟動後，mysql-wanwu-worker和elastic-wanwu-setup容器退出：狀態碼為Exited (0)**
+- **【Q】系統服務正常啟動後，mysql-wanwu-setup和elastic-wanwu-setup容器退出：狀態碼為Exited (0)**
     【A】正常，這兩個容器用於完成一些初始化任務，執行完成後會自動退出
 - **【Q】模型導入相關**
     【A】以導入聯通元景LLM為例（導入OpenAI-API-compatible或導入Embedding、Rerank類型類似）：
