@@ -7,6 +7,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -212,23 +213,46 @@ func cacheWorkflowAvatar(avatarURL string) request.Avatar {
 		avatar.Path = filepath.Join("/v1", filePath)
 		return avatar
 	}
+	var newAvatarURL string
+	if strings.Contains(avatarURL, config.Cfg().Workflow.MinioProxyPrefix) {
+		// 解析原始URL
+		parsedURL, err := url.Parse(avatarURL)
+		if err != nil {
+			log.Errorf("parse avatar URL %v failed: %v", avatarURL, err)
+			return avatar
+		}
+		// 去掉 /workflow/minio/presign/ 前缀
+		path := parsedURL.Path
+		path = strings.TrimPrefix(path, config.Cfg().Workflow.MinioProxyPrefix)
+		// 使用 url.JoinPath 构建新URL
+		newAvatarURL, err = url.JoinPath(config.Cfg().Workflow.MinioProxyEndpoint, path)
+		if err != nil {
+			log.Errorf("join path failed: %v", err)
+			avatar.Path = avatarURL
+			return avatar
+		}
+		// 添加查询参数
+		if parsedURL.RawQuery != "" {
+			newAvatarURL += "?" + parsedURL.RawQuery
+		}
+	} else {
+		// 直接使用原始URL（如 http:localhost:8081/api/static/icon/icon-HTTP.png）
+		newAvatarURL = avatarURL
+	}
 	// 从HTTP URL下载文件
-	resp, err := http.Get(avatarURL)
+	resp, err := http.Get(newAvatarURL)
 	if err != nil {
 		log.Errorf("cache avatar %v download err: %v", avatarURL, err)
-		avatar.Path = avatarURL
 		return avatar
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		log.Errorf("cache avatar %v HTTP error: %v", avatarURL, resp.Status)
-		avatar.Path = avatarURL
 		return avatar
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Errorf("cache avatar %v read response err: %v", avatarURL, err)
-		avatar.Path = avatarURL
 		return avatar
 	}
 	// 压缩图像
@@ -241,13 +265,11 @@ func cacheWorkflowAvatar(avatarURL string) request.Avatar {
 	// 创建目录
 	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
 		log.Errorf("cache avatar %v mkdir %v err: %v", avatarURL, filepath.Dir(filePath), err)
-		avatar.Path = avatarURL
 		return avatar
 	}
 	// 写入文件
 	if err := os.WriteFile(filePath, compressedData, 0644); err != nil {
 		log.Errorf("cache avatar %v write file %v err: %v", avatarURL, filePath, err)
-		avatar.Path = avatarURL
 		return avatar
 	}
 	avatar.Path = filepath.Join("/v1", filePath)
