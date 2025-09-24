@@ -25,7 +25,18 @@ export default {
       tabActive:0
     };
   },
-  created() {},
+  watch: {
+    $route: {
+      handler() {
+        this.tabActive = Number(this.$route.query.tabActive) || 0
+      },
+      // 深度观察监听
+      deep: true
+    }
+  },
+  mounted() {
+    this.tabActive = Number(this.$route.query.tabActive) || 0
+  },
   methods: {
     tabClick(status){
       this.tabActive = status

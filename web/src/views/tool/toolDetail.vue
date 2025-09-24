@@ -165,7 +165,7 @@ export default {
       })
     },
     back() {
-      this.$router.push({path: '/tool'})
+      this.$router.push({path: '/tool?tabActive=1'})
     },
   },
 };
