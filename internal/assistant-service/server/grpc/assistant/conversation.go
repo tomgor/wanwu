@@ -411,6 +411,12 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 				case 0:
 					if response, ok := streamData["response"].(string); ok && response != "" {
 						fullResponse.WriteString(response)
+						if err := stream.Send(&assistant_service.AssistantConversionStreamResp{
+							Content: jsonStrData,
+						}); err != nil {
+							log.Errorf("Assistant服务发送流式响应失败，assistantId: %s, error: %v", req.AssistantId, err)
+							return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "assistant服务异常")
+						}
 					}
 					// 提取第一个search_list
 					if !searchListExtracted {
@@ -425,15 +431,15 @@ func (s *Service) AssistantConversionStream(req *assistant_service.AssistantConv
 					}
 				case 1:
 					if message, ok := streamData["message"].(string); ok && message != "" {
-						fullResponse.WriteString(message)
+						fullResponse.WriteString("智能体无法回答：" + message)
+						if err := stream.Send(&assistant_service.AssistantConversionStreamResp{
+							Content: "{\"code\":1,\"message\":\"" + "智能体无法回答：" + message + "\",\"finish\":1}",
+						}); err != nil {
+							log.Errorf("Assistant服务发送流式响应失败，assistantId: %s, error: %v", req.AssistantId, err)
+							return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "assistant服务异常")
+						}
 					}
 				}
-			}
-			if err := stream.Send(&assistant_service.AssistantConversionStreamResp{
-				Content: jsonStrData,
-			}); err != nil {
-				log.Errorf("Assistant服务发送流式响应失败，assistantId: %s, error: %v", req.AssistantId, err)
-				return grpc_util.ErrorStatusWithKey(errs.Code_AssistantConversationErr, "assistant_conversation", "assistant服务异常")
 			}
 			// 标记已读取到并返回了第一条有效消息
 			if !hasReadFirstMessage {
