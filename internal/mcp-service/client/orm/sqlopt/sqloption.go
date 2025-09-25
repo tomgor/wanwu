@@ -30,7 +30,10 @@ func (f funcSQLOption) Apply(db *gorm.DB) *gorm.DB {
 
 func WithID(id uint32) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
-		return db.Where("id = ?", id)
+		if id > 0 {
+			return db.Where("id = ?", id)
+		}
+		return db
 	})
 }
 
@@ -99,5 +102,20 @@ func WithUpdateLock() SQLOption {
 		return db.Clauses(clause.Locking{
 			Strength: "UPDATE",
 		})
+	})
+}
+
+func WithToolSquareID(id string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if id != "" {
+			return db.Where("tool_square_id = ?", id)
+		}
+		return db
+	})
+}
+
+func WithToolSquareIDEmpty() SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("tool_square_id = '' or tool_square_id IS NULL")
 	})
 }

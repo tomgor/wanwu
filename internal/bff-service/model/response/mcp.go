@@ -101,6 +101,7 @@ type CustomToolDetail struct {
 	ApiAuth       CustomToolApiAuthWebRequest `json:"apiAuth"`       // apiAuth
 	ApiList       []CustomToolApiResponse     `json:"apiList"`       // api列表
 	PrivacyPolicy string                      `json:"privacyPolicy"` // 隐私政策
+	ToolSquareID  string                      `json:"toolSquareId"`  // 广场mcpId(非空表示来源于广场)
 }
 
 type CustomToolCell struct {
@@ -135,4 +136,25 @@ type PathItem struct {
 type Operation struct {
 	OperationID string `json:"operationId" yaml:"operationId"`
 	Summary     string `json:"summary" yaml:"summary"`
+}
+
+type ToolSquareInfo struct {
+	ToolSquareID string         `json:"toolSquareId"` // 广场mcpId(非空表示来源于广场)
+	Avatar       request.Avatar `json:"avatar"`       // 图标
+	Name         string         `json:"name"`         // 名称
+	Desc         string         `json:"desc"`         // 描述
+	Tags         []string       `json:"tags"`         // 标签
+}
+
+type BuiltInTools struct {
+	NeedApiKeyInput bool      `json:"needApiKeyInput"` // 是否需要apiKey输入
+	APIKey          string    `json:"apiKey"`          // apiKey
+	Tools           []MCPTool `json:"tools"`           // 工具列表
+	Detail          string    `json:"detail"`          // 详细描述
+	ActionSum       int64     `json:"actionSum"`       // action总数
+}
+
+type ToolSquareDetail struct {
+	ToolSquareInfo
+	BuiltInTools
 }

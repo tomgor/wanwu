@@ -61,3 +61,10 @@ type CustomToolSchemaReq struct {
 }
 
 func (req *CustomToolSchemaReq) Check() error { return nil }
+
+type BuiltInToolReq struct {
+	ToolSquareID string `json:"toolSquareId" validate:"required"` // 广场toolId
+	APIKey       string `json:"apiKey"`                           // apiKey
+}
+
+func (req *BuiltInToolReq) Check() error { return nil }

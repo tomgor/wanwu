@@ -35,6 +35,8 @@ const (
 	MCPService_GetCustomToolByCustomToolIdList_FullMethodName = "/mcp_service.MCPService/GetCustomToolByCustomToolIdList"
 	MCPService_UpdateCustomTool_FullMethodName                = "/mcp_service.MCPService/UpdateCustomTool"
 	MCPService_DeleteCustomTool_FullMethodName                = "/mcp_service.MCPService/DeleteCustomTool"
+	MCPService_GetSquareTool_FullMethodName                   = "/mcp_service.MCPService/GetSquareTool"
+	MCPService_GetSquareToolList_FullMethodName               = "/mcp_service.MCPService/GetSquareToolList"
 )
 
 // MCPServiceClient is the client API for MCPService service.
@@ -60,6 +62,9 @@ type MCPServiceClient interface {
 	GetCustomToolByCustomToolIdList(ctx context.Context, in *GetCustomToolByCustomToolIdListReq, opts ...grpc.CallOption) (*GetCustomToolListResp, error)
 	UpdateCustomTool(ctx context.Context, in *UpdateCustomToolReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCustomTool(ctx context.Context, in *DeleteCustomToolReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// --- square tool ---
+	GetSquareTool(ctx context.Context, in *GetSquareToolReq, opts ...grpc.CallOption) (*SquareToolDetail, error)
+	GetSquareToolList(ctx context.Context, in *GetSquareToolListReq, opts ...grpc.CallOption) (*SquareToolList, error)
 }
 
 type mCPServiceClient struct {
@@ -220,6 +225,26 @@ func (c *mCPServiceClient) DeleteCustomTool(ctx context.Context, in *DeleteCusto
 	return out, nil
 }
 
+func (c *mCPServiceClient) GetSquareTool(ctx context.Context, in *GetSquareToolReq, opts ...grpc.CallOption) (*SquareToolDetail, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SquareToolDetail)
+	err := c.cc.Invoke(ctx, MCPService_GetSquareTool_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mCPServiceClient) GetSquareToolList(ctx context.Context, in *GetSquareToolListReq, opts ...grpc.CallOption) (*SquareToolList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SquareToolList)
+	err := c.cc.Invoke(ctx, MCPService_GetSquareToolList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MCPServiceServer is the server API for MCPService service.
 // All implementations must embed UnimplementedMCPServiceServer
 // for forward compatibility.
@@ -243,6 +268,9 @@ type MCPServiceServer interface {
 	GetCustomToolByCustomToolIdList(context.Context, *GetCustomToolByCustomToolIdListReq) (*GetCustomToolListResp, error)
 	UpdateCustomTool(context.Context, *UpdateCustomToolReq) (*emptypb.Empty, error)
 	DeleteCustomTool(context.Context, *DeleteCustomToolReq) (*emptypb.Empty, error)
+	// --- square tool ---
+	GetSquareTool(context.Context, *GetSquareToolReq) (*SquareToolDetail, error)
+	GetSquareToolList(context.Context, *GetSquareToolListReq) (*SquareToolList, error)
 	mustEmbedUnimplementedMCPServiceServer()
 }
 
@@ -297,6 +325,12 @@ func (UnimplementedMCPServiceServer) UpdateCustomTool(context.Context, *UpdateCu
 }
 func (UnimplementedMCPServiceServer) DeleteCustomTool(context.Context, *DeleteCustomToolReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCustomTool not implemented")
+}
+func (UnimplementedMCPServiceServer) GetSquareTool(context.Context, *GetSquareToolReq) (*SquareToolDetail, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSquareTool not implemented")
+}
+func (UnimplementedMCPServiceServer) GetSquareToolList(context.Context, *GetSquareToolListReq) (*SquareToolList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSquareToolList not implemented")
 }
 func (UnimplementedMCPServiceServer) mustEmbedUnimplementedMCPServiceServer() {}
 func (UnimplementedMCPServiceServer) testEmbeddedByValue()                    {}
@@ -589,6 +623,42 @@ func _MCPService_DeleteCustomTool_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MCPService_GetSquareTool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSquareToolReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MCPServiceServer).GetSquareTool(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MCPService_GetSquareTool_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MCPServiceServer).GetSquareTool(ctx, req.(*GetSquareToolReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MCPService_GetSquareToolList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSquareToolListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MCPServiceServer).GetSquareToolList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MCPService_GetSquareToolList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MCPServiceServer).GetSquareToolList(ctx, req.(*GetSquareToolListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MCPService_ServiceDesc is the grpc.ServiceDesc for MCPService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -655,6 +725,14 @@ var MCPService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteCustomTool",
 			Handler:    _MCPService_DeleteCustomTool_Handler,
+		},
+		{
+			MethodName: "GetSquareTool",
+			Handler:    _MCPService_GetSquareTool_Handler,
+		},
+		{
+			MethodName: "GetSquareToolList",
+			Handler:    _MCPService_GetSquareToolList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

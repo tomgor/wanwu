@@ -11,10 +11,11 @@ var (
 )
 
 type Config struct {
-	Server ServerConfig `json:"server" mapstructure:"server"`
-	Log    LogConfig    `json:"log" mapstructure:"log"`
-	DB     db.Config    `json:"db" mapstructure:"db"`
-	Mcps   []*McpConfig `json:"mcps" mapstructure:"mcps"`
+	Server ServerConfig  `json:"server" mapstructure:"server"`
+	Log    LogConfig     `json:"log" mapstructure:"log"`
+	DB     db.Config     `json:"db" mapstructure:"db"`
+	Mcps   []*McpConfig  `json:"mcps" mapstructure:"mcps"`
+	Tools  []*ToolConfig `json:"tools" mapstructure:"tools"`
 }
 
 type ServerConfig struct {
@@ -38,6 +39,11 @@ func LoadConfig(in string) error {
 			return err
 		}
 	}
+	for _, tool := range _c.Tools {
+		if err := tool.load(); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -55,4 +61,13 @@ func (c *Config) MCP(mcpSquareID string) (McpConfig, bool) {
 		}
 	}
 	return McpConfig{}, false
+}
+
+func (c *Config) Tool(toolSquareID string) (ToolConfig, bool) {
+	for _, tool := range c.Tools {
+		if tool.ToolSquareId == toolSquareID {
+			return *tool, true
+		}
+	}
+	return ToolConfig{}, false
 }

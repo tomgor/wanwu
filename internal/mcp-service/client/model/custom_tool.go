@@ -2,6 +2,7 @@ package model
 
 type CustomTool struct {
 	ID               uint32 `gorm:"primary_key"`
+	ToolSquareId     string `gorm:"index:idx_custom_tool_square_id"`
 	Name             string `gorm:"column:name;type:varchar(255);comment:'自定义工具名称'"`
 	Description      string `gorm:"column:description;type:longtext;comment:'自定义工具描述'"`
 	Schema           string `gorm:"column:schema;type:longtext;comment:'schema配置'"`

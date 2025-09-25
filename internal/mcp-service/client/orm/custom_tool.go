@@ -15,6 +15,7 @@ func (c *Client) CreateCustomTool(ctx context.Context, customTool *model.CustomT
 		// 检查是否已存在相同的记录
 		if err := sqlopt.SQLOptions(
 			sqlopt.WithName(customTool.Name),
+			sqlopt.WithToolSquareID(customTool.ToolSquareId),
 			sqlopt.WithOrgID(customTool.OrgID),
 			sqlopt.WithUserID(customTool.UserID),
 		).Apply(tx).First(&model.CustomTool{}).Error; err == nil {
@@ -30,9 +31,14 @@ func (c *Client) CreateCustomTool(ctx context.Context, customTool *model.CustomT
 	})
 }
 
-func (c *Client) GetCustomTool(ctx context.Context, ID uint32) (*model.CustomTool, *err_code.Status) {
+func (c *Client) GetCustomTool(ctx context.Context, customTool *model.CustomTool) (*model.CustomTool, *err_code.Status) {
 	info := &model.CustomTool{}
-	if err := sqlopt.WithID(ID).Apply(c.db).WithContext(ctx).First(info).Error; err != nil {
+	if err := sqlopt.SQLOptions(
+		sqlopt.WithID(customTool.ID),
+		sqlopt.WithToolSquareID(customTool.ToolSquareId),
+		sqlopt.WithOrgID(customTool.OrgID),
+		sqlopt.WithUserID(customTool.UserID),
+	).Apply(c.db).WithContext(ctx).First(info).Error; err != nil {
 		return nil, toErrStatus("mcp_get_custom_tool_info_err", err.Error())
 	}
 	return info, nil
@@ -44,6 +50,7 @@ func (c *Client) ListCustomTools(ctx context.Context, orgID, userID, name string
 		sqlopt.WithOrgID(orgID),
 		sqlopt.WithUserID(userID),
 		sqlopt.LikeName(name),
+		sqlopt.WithToolSquareIDEmpty(),
 	).Apply(c.db).WithContext(ctx).Find(&customToolInfos).Error; err != nil {
 		return nil, toErrStatus("mcp_get_custom_tool_list_err", err.Error())
 	}
@@ -59,7 +66,9 @@ func (c *Client) ListCustomToolsByCustomToolIDs(ctx context.Context, ids []uint3
 }
 
 func (c *Client) UpdateCustomTool(ctx context.Context, customTool *model.CustomTool) *err_code.Status {
-	if err := sqlopt.WithID(customTool.ID).Apply(c.db).WithContext(ctx).Model(customTool).Updates(map[string]interface{}{
+	if err := sqlopt.SQLOptions(
+		sqlopt.WithID(customTool.ID),
+	).Apply(c.db).WithContext(ctx).Model(customTool).Updates(map[string]interface{}{
 		"name":               customTool.Name,
 		"description":        customTool.Description,
 		"schema":             customTool.Schema,

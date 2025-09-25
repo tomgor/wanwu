@@ -159,6 +159,7 @@ enum Code {
   MCPGetCustomToolListErr = 310009; // 获取自定义工具列表错误
   MCPUpdateCustomToolErr = 310010; // 更新自定义工具错误
   MCPDeleteCustomToolErr = 310011; // 删除自定义工具错误
+  MCPGetSquareToolErr = 310012; // 获取内置工具详情错误
 
   // --- operate-service ---
   // [320000, 329999]
