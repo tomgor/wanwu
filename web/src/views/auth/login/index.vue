@@ -22,10 +22,10 @@
                 :placeholder="$t('common.input.placeholder') + $t('login.form.password')"/>
               <img
                 v-if="!isShowPwd" class="pwd-icon" src="@/assets/imgs/showPwd.png" alt=""
-                @click="() => this.isShowPwd = true"/>
+                @click="isShowPwd = true"/>
               <img
                 v-else class="pwd-icon" src="@/assets/imgs/hidePwd.png" alt=""
-                @click="() => this.isShowPwd = false"/>
+                @click="isShowPwd = false"/>
             </el-form-item>
             <el-form-item :label="$t('login.form.code')" class="auth-form-item">
               <img class="auth-icon" src="@/assets/imgs/code.png" alt=""/>

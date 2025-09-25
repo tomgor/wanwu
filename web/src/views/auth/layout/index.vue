@@ -35,7 +35,19 @@ export default {
   components: {ChangeLang},
   data() {
     return {
-      commonInfo: {},
+      commonInfo: {
+        login: {
+          logo: {},
+          loginButtonColor: '#384BF7',
+        },
+        home: {},
+        tab: {},
+        register: {
+          email: {
+            status: false,
+          },
+        },
+      },
       backgroundSrc: require('@/assets/imgs/auth_bg.png'),
       basePath: this.$basePath
     }
