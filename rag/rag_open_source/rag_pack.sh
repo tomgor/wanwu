@@ -33,10 +33,10 @@ rm -r ./build/
 
 #config 文件copy
 START_CONFIG=$(date +%s)
-mkdir -p ./build/dist/langchain_rag-master/configs
-mkdir -p ./build/dist/rag-es-server-unify/config
-cp -r ./langchain_rag-master/configs/config.ini ./build/dist/langchain_rag-master/configs/
-cp -r ./rag-es-server-unify/config/config.ini ./build/dist/rag-es-server-unify/config/
+mkdir -p ./build/dist/rag_core/configs
+mkdir -p ./build/dist/rag_es_server_unify/config
+cp -r ./rag_core/configs/config.ini ./build/dist/rag_core/configs/
+cp -r ./rag_es_server_unify/config/config.ini ./build/dist/rag_es_server_unify/config/
 END_CONFIG=$(date +%s)
 echo "配置文件复制耗时: $((END_CONFIG - START_CONFIG)) 秒"
 
@@ -45,9 +45,9 @@ echo "配置文件复制耗时: $((END_CONFIG - START_CONFIG)) 秒"
 echo "正在打包run应用..."
 START_RUN=$(date +%s)
 pyinstaller --name run_app \
-            --distpath=./build/dist/langchain_rag-master \
+            --distpath=./build/dist/rag_core \
             --onefile \
-            --add-data "./langchain_rag-master/configs:configs" \
+            --add-data "./rag_core/configs:configs" \
             --add-data "../root/miniconda3/envs/rag-new/lib/python3.10/site-packages/pymilvus/model/sparse/bm25/lang.yaml:pymilvus/model/sparse/bm25" \
             --hidden-import="gunicorn" \
             --hidden-import="gunicorn.glogging" \
@@ -71,13 +71,13 @@ pyinstaller --name run_app \
             --hidden-import="langchain_community.document_loaders.csv_loader" \
             --hidden-import="tiktoken_ext.openai_public" \
             --hidden-import="tiktoken_ext" \
-            ./langchain_rag-master/run_entrypoint.py
+            ./rag_core/run_entrypoint.py
 
 # 检查打包是否成功
 if [ $? -eq 0 ]; then
     END_RUN=$(date +%s)
     echo "run_app打包成功！耗时: $((END_RUN - START_RUN)) 秒"
-    echo "可执行文件位于 ./build/dist/langchain_rag-master"
+    echo "可执行文件位于 ./build/dist/rag_core"
 else
     echo "run_app 打包失败，请检查错误信息"
     exit 1
@@ -89,9 +89,9 @@ fi
 echo "正在打包run_sse_app应用..."
 START_SSE=$(date +%s)
 pyinstaller --name sse_app \
-            --distpath=./build/dist/langchain_rag-master \
+            --distpath=./build/dist/rag_core \
             --onefile \
-            --add-data "./langchain_rag-master/configs:configs" \
+            --add-data "./rag_core/configs:configs" \
             --add-data "../root/miniconda3/envs/rag-new/lib/python3.10/site-packages/pymilvus/model/sparse/bm25/lang.yaml:pymilvus/model/sparse/bm25" \
             --hidden-import="uvicorn.logging" \
             --hidden-import="uvicorn.loops" \
@@ -128,13 +128,13 @@ pyinstaller --name sse_app \
             --hidden-import="gunicorn.workers.gthread" \
             --hidden-import="gunicorn.workers.sync" \
             --hidden-import="gunicorn.workers.geventlet" \
-            ./langchain_rag-master/sse_entrypoint.py
+            ./rag_core/sse_entrypoint.py
 
 # 检查打包是否成功
 if [ $? -eq 0 ]; then
     END_SSE=$(date +%s)
     echo "run_sse_app打包成功！耗时: $((END_SSE - START_SSE)) 秒"
-    echo "可执行文件位于./build/dist/langchain_rag-master"
+    echo "可执行文件位于./build/dist/rag_core"
 else
     echo "run_sse_app打包失败，请检查错误信息"
     exit 1
@@ -144,15 +144,15 @@ fi
 echo "正在打包初始化脚本 asyn_doc_status_init..."
 START_INIT=$(date +%s)
 pyinstaller --name asyn_doc_status_init \
-            --distpath=./build/dist/langchain_rag-master \
+            --distpath=./build/dist/rag_core \
             --onefile \
-            --add-data "./langchain_rag-master/configs/config.ini:configs" \
-            ./langchain_rag-master/asyn_doc_status_init.py
+            --add-data "./rag_core/configs/config.ini:configs" \
+            ./rag_core/asyn_doc_status_init.py
 # 检查打包是否成功
 if [ $? -eq 0 ]; then
     END_INIT=$(date +%s)
     echo "async_doc_status_init打包成功！耗时: $((END_INIT - START_INIT)) 秒"
-    echo "可执行文件位于 ./build/dist/langchain_rag-master 目录"
+    echo "可执行文件位于 ./build/dist/rag_core 目录"
 else
     echo "async_doc_status_init打包失败，请检查错误信息"
     exit 1
@@ -162,11 +162,11 @@ fi
 echo "正在打包主应用 asyn_add_file..."
 START_ADD=$(date +%s)
 pyinstaller --name asyn_add_file \
-            --distpath=./build/dist/langchain_rag-master \
+            --distpath=./build/dist/rag_core \
             --onefile \
-            --add-data "./langchain_rag-master/configs/config.ini:configs" \
-            --add-data "./langchain_rag-master/utils:utils" \
-            --add-data "./langchain_rag-master/logging_config.py:." \
+            --add-data "./rag_core/configs/config.ini:configs" \
+            --add-data "./rag_core/utils:utils" \
+            --add-data "./rag_core/logging_config.py:." \
             --add-data "../root/miniconda3/envs/rag-new/lib/python3.10/site-packages/pymilvus/model/sparse/bm25/lang.yaml:pymilvus/model/sparse/bm25" \
             --hidden-import="nltk" \
             --hidden-import="utils.milvus_utils" \
@@ -185,13 +185,13 @@ pyinstaller --name asyn_add_file \
             --hidden-import="langchain_community.document_loaders.csv_loader" \
             --hidden-import="tiktoken_ext.openai_public" \
             --hidden-import="tiktoken_ext" \
-            ./langchain_rag-master/asyn_add_file.py
+            ./rag_core/asyn_add_file.py
 
 # 检查打包是否成功
 if [ $? -eq 0 ]; then
     END_ADD=$(date +%s)
     echo "async_add_file打包成功！耗时: $((END_ADD - START_ADD)) 秒"
-    echo "可执行文件位于 ./build/dist/langchain_rag-master 目录"
+    echo "可执行文件位于 ./build/dist/rag_core 目录"
 else
     echo "async_add_file打包失败，请检查错误信息"
     exit 1
@@ -201,16 +201,16 @@ fi
 echo "正在打包guarding守护进程监控工具..."
 START_GUARD=$(date +%s)
 pyinstaller --name guarding_asyn_add_app \
-           --distpath=./build/dist/langchain_rag-master \
-           --add-data "./langchain_rag-master/asyn_add_file.sh:." \
+           --distpath=./build/dist/rag_core \
+           --add-data "./rag_core/asyn_add_file.sh:." \
            --onefile \
-           ./langchain_rag-master/guarding_file_asyn_add_process.py
+           ./rag_core/guarding_file_asyn_add_process.py
 
 # 检查打包是否成功
 if [ $? -eq 0 ]; then
     END_GUARD=$(date +%s)
     echo "guarding打包成功！耗时: $((END_GUARD - START_GUARD)) 秒"
-    echo "可执行文件位于 ./build/dist/langchain_rag-master 目录"
+    echo "可执行文件位于 ./build/dist/rag_core 目录"
 else
    echo "guarding打包失败，请检查错误信息"
    exit 1
@@ -222,9 +222,9 @@ fi
 echo "正在打包url single应用..."
 START_URL=$(date +%s)
 pyinstaller --name url_single_app \
-            --distpath=./build/dist/langchain_rag-master/url_parser \
+            --distpath=./build/dist/rag_core/url_parser \
             --onefile \
-            --add-data "./langchain_rag-master/configs:configs" \
+            --add-data "./rag_core/configs:configs" \
             --hidden-import="gunicorn" \
             --hidden-import="gunicorn.glogging" \
             --hidden-import="gunicorn.app" \
@@ -237,13 +237,13 @@ pyinstaller --name url_single_app \
             --hidden-import="gunicorn.workers.gthread" \
             --hidden-import="gunicorn.workers.sync" \
             --hidden-import="gunicorn.workers.geventlet" \
-            ./langchain_rag-master/url_entrypoint.py
+            ./rag_core/url_entrypoint.py
 
 # 检查打包是否成功
 if [ $? -eq 0 ]; then
     END_URL=$(date +%s)
     echo "url single打包成功！耗时: $((END_URL - START_URL)) 秒"
-    echo "可执行文件位于 ./build/dist/langchain_rag-master/url_parser"
+    echo "可执行文件位于 ./build/dist/rag_core/url_parser"
 else
     echo "url single打包失败，请检查错误信息"
     exit 1
@@ -287,8 +287,8 @@ echo "正在打包es应用..."
 START_ES=$(date +%s)
 pyinstaller --name es_app \
             --onefile \
-            --distpath=./build/dist/rag-es-server-unify \
-            --add-data "./rag-es-server-unify/config/config.ini:config" \
+            --distpath=./build/dist/rag_es_server_unify \
+            --add-data "./rag_es_server_unify/config/config.ini:config" \
             --hidden-import="gunicorn" \
             --hidden-import="gunicorn.glogging" \
             --hidden-import="gunicorn.app" \
@@ -301,13 +301,13 @@ pyinstaller --name es_app \
             --hidden-import="gunicorn.workers.gthread" \
             --hidden-import="gunicorn.workers.sync" \
             --hidden-import="gunicorn.workers.geventlet" \
-            ./rag-es-server-unify/es_entrypoint.py
+            ./rag_es_server_unify/es_entrypoint.py
 
 # 检查打包是否成功
 if [ $? -eq 0 ]; then
     END_ES=$(date +%s)
     echo "es打包成功！耗时: $((END_ES - START_ES)) 秒"
-    echo "可执行文件位于 ./build/dist/rag-es-server-unify"
+    echo "可执行文件位于 ./build/dist/rag_es_server_unify"
 else
     echo "es打包失败，请检查错误信息"
     exit 1

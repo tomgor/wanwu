@@ -35,10 +35,10 @@ stop_all: stop_es_server stop_minio stop_url_single stop_guarding stop_async_add
 start_run_app:
 	@echo "正在启动run应用..."
 	@echo "正在启动FlaskAPI应用，端口号为$(RUN_PORT)..."
-	@cd ./build/dist/langchain_rag-master/ && { \
+	@cd ./build/dist/rag_core/ && { \
 	    LOG_FILE=$(RUN_BASE_LOG_FILE)$(RUN_PORT) nohup ./run_app --port $(RUN_PORT) --workers $(RUN_NUM_WORKERS) --timeout $(RUN_TIMEOUT) >>$(RUN_START_LOG_FILE) 2>&1 & \
 	    if [ $$? -eq 0 ]; then \
-	        echo "应用启动成功，日志文件为./build/dist/langchain_rag-master/logs/$(RUN_BASE_LOG_FILE)$(RUN_PORT).log。"; \
+	        echo "应用启动成功，日志文件为./build/dist/rag_core/logs/$(RUN_BASE_LOG_FILE)$(RUN_PORT).log。"; \
 	    else \
 	        echo "应用启动失败"; \
 	        exit 1; \
@@ -53,32 +53,32 @@ start_run_app:
 start_sse_app:
 	@echo "正在启动sse应用..."
 	@echo "正在启动FastAPI应用，端口号为$(SSE_PORT)..."
-	@LOG_FILE=$(SSE_BASE_LOG_FILE)$(SSE_PORT) nohup ./build/dist/langchain_rag-master/sse_app --workers 5 --port $(SSE_PORT) --timeout 300 >>$(SSE_START_LOG_FILE) 2>&1 &
+	@LOG_FILE=$(SSE_BASE_LOG_FILE)$(SSE_PORT) nohup ./build/dist/rag_core/sse_app --workers 5 --port $(SSE_PORT) --timeout 300 >>$(SSE_START_LOG_FILE) 2>&1 &
 	echo "应用启动成功，日志文件为./logs/$(SSE_BASE_LOG_FILE)$(SSE_PORT).log。";
 
 # 启动 asyn_doc_status_init
 start_asyn_doc_status_init:
-	@nohup ./build/dist/langchain_rag-master/asyn_doc_status_init > logs/init_asyn.out 2>&1
+	@nohup ./build/dist/rag_core/asyn_doc_status_init > logs/init_asyn.out 2>&1
 	@sleep 1
 
 # 启动 async_add_file
 start_async_add_file:
 	@for ADDID in $$(seq -f "%03g" 1 2); do \
 	    LOG_FILE=$$(echo "$(ASYNC_ADD_FILE_BASE_LOG_FILE)$$ADDID") \
-	    nohup ./build/dist/langchain_rag-master/asyn_add_file >>$$LOG_FILE 2>&1 & \
+	    nohup ./build/dist/rag_core/asyn_add_file >>$$LOG_FILE 2>&1 & \
 	    echo "应用启动成功，日志文件为$$LOG_FILE"; \
 	done
 
 # 启动 guarding
 start_guarding:
-	@nohup ./build/dist/langchain_rag-master/guarding_asyn_add_app > logs/guarding_asyn_add_process.out 2>&1 &
+	@nohup ./build/dist/rag_core/guarding_asyn_add_app > logs/guarding_asyn_add_process.out 2>&1 &
 	@echo "守护异步解析进程监控已启动"
 
 # 启动 url single
 start_url_single:
 	@echo "正在启动url single应用..."
 	@echo "正在启动url single应用，端口号为$(URL_PORT)..."
-	@LOG_FILE=$(URL_SINGLE_BASE_LOG_FILE)$(URL_PORT) nohup ./build/dist/langchain_rag-master/url_parser/url_single_app --port $(URL_PORT) >>$(URL_SINGLE_START_LOG_FILE) 2>&1 &
+	@LOG_FILE=$(URL_SINGLE_BASE_LOG_FILE)$(URL_PORT) nohup ./build/dist/rag_core/url_parser/url_single_app --port $(URL_PORT) >>$(URL_SINGLE_START_LOG_FILE) 2>&1 &
 	echo "应用url single启动成功，日志文件为./logs/$(URL_SINGLE_BASE_LOG_FILE)$(URL_PORT).log。";
 
 # 启动 minio
@@ -92,7 +92,7 @@ start_minio:
 start_es_server:
 	@echo "启动 es_rag_server 程序..."
 	@echo "启动 es_rag_server 程序...到$(ES_PORT)端口"
-	@cd ./build/dist/rag-es-server-unify/ && \
+	@cd ./build/dist/rag_es_server_unify/ && \
 	nohup ./es_app --port $(ES_PORT) --workers $(ES_NUM_WORKERS) >>$(ES_START_LOG_FILE) 2>&1 &
 	if [ $$? -eq 0 ]; then \
 	    echo "应用启动成功，日志文件为./logs/es_logs_$(ES_PORT).log。"; \

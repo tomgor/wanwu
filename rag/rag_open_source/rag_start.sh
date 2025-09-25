@@ -17,9 +17,9 @@ RUN_TIMEOUT=600
 for PORT in {8681..8681}; do
     # 启动应用
     echo "正在启动FlaskAPI应用，端口号为$PORT..."
-    cd ./build/dist/langchain_rag-master/ || exit
+    cd ./build/dist/rag_core/ || exit
     LOG_FILE=$RUN_BASE_LOG_FILE$PORT nohup ./run_app --port $PORT --workers $RUN_NUM_WORKERS --timeout $RUN_TIMEOUT >>$RUN_START_LOG_FILE 2>&1 &
-    echo "应用启动成功，日志文件为./build/dist/langchain_rag-master/logs/$RUN_BASE_LOG_FILE$PORT.log。"
+    echo "应用启动成功，日志文件为./build/dist/rag_core/logs/$RUN_BASE_LOG_FILE$PORT.log。"
     cd ../../../
 done
 #-------- sse_app ---------
@@ -33,14 +33,14 @@ SSE_START_LOG_FILE="kb_sse_console.log"
 for PORT in {10891..10891}; do
     # 启动应用
     echo "正在启动FastAPI应用，端口号为$PORT..."
-    cd ./build/dist/langchain_rag-master/ || exit
+    cd ./build/dist/rag_core/ || exit
     LOG_FILE=$SSE_BASE_LOG_FILE$PORT nohup ./sse_app --port $PORT >>$SSE_START_LOG_FILE 2>&1 &
     echo "应用启动成功，日志文件为./logs/$SSE_BASE_LOG_FILE$PORT.log。"
     cd ../../../
 done
 
 #-------- asyn_doc_status_init ---------
-nohup ./build/dist/langchain_rag-master/asyn_doc_status_init > logs/init_asyn.out 2>&1
+nohup ./build/dist/rag_core/asyn_doc_status_init > logs/init_asyn.out 2>&1
 sleep 1
 
 #-------- async_add_file ---------
@@ -50,7 +50,7 @@ ps -ef | grep '[a]syn_add_file' | grep -v grep | awk '{print $2}' | xargs kill -
 ASYNC_ADD_FILE_BASE_LOG_FILE="asyn_add_"
 ASYNC_ADD_FILE_START_LOG_FILE="kb_sse_console.log"
 
-cd ./build/dist/langchain_rag-master/ || exit
+cd ./build/dist/rag_core/ || exit
 #循环5次，启动asyn_add
 for ADDID in $(seq -f "%03g" 1 2)
 do
@@ -63,7 +63,7 @@ cd ../../../
 #kill现有进程
 ps -ef | grep '[g]uarding_asyn_add_app' | grep -v grep | awk '{print $2}' | xargs kill -9
 # 定义日志文件名称
-nohup ./build/dist/langchain_rag-master/guarding_asyn_add_app > logs/guarding_asyn_add_process.out 2>&1 &
+nohup ./build/dist/rag_core/guarding_asyn_add_app > logs/guarding_asyn_add_process.out 2>&1 &
 echo "守护异步解析进程监控已启动"
 
 #-------- url single ---------
@@ -75,7 +75,7 @@ URL_SINGLE_START_LOG_FILE="url_single_console.log"
 for PORT in {8613..8613}; do
     # 启动应用
     echo "正在启动url single应用，端口号为$PORT..."
-    cd ./build/dist/langchain_rag-master/url_parser || exit
+    cd ./build/dist/rag_core/url_parser || exit
     LOG_FILE=$URL_SINGLE_BASE_LOG_FILE$PORT nohup ./url_single_app --port $PORT >>$URL_SINGLE_START_LOG_FILE 2>&1 &
     echo "应用url single启动成功，日志文件为./logs/$URL_SINGLE_BASE_LOG_FILE$PORT.log。"
     cd ../../../../
@@ -106,7 +106,7 @@ ES_START_LOG_FILE="es_console.log"
 for PORT in {20041..20041}; do
     # 启动应用
     echo "启动 es_app 程序...到${PORT}端口"
-    cd ./build/dist/rag-es-server-unify/ || exit
+    cd ./build/dist/rag_es_server_unify/ || exit
     LOG_FILE=$ES_BASE_LOG_FILE$PORT nohup ./es_app --port $PORT --workers $ES_NUM_WORKERS >>$ES_START_LOG_FILE 2>&1 &
     echo "应用启动成功，日志文件为./logs/$ES_BASE_LOG_FILE$PORT.log。"
     cd ../../../

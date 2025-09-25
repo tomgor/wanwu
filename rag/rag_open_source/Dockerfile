@@ -8,9 +8,9 @@ WORKDIR /model_extend
 RUN mkdir -p /model_extend/
 
 # 2. 复制本地文件
-COPY ./langchain_rag-master /model_extend/langchain_rag-master
+COPY ./rag_core /model_extend/rag_core
 COPY ./minio_project /model_extend/minio_project
-COPY ./rag-es-server-unify /model_extend/rag-es-server-unify
+COPY ./rag_es_server_unify /model_extend/rag_es_server_unify
 COPY ./start.sh /model_extend/start.sh
 
 # 4. 设置脚本权限

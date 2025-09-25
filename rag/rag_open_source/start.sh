@@ -6,7 +6,7 @@ source activate
 conda deactivate
 sleep 2
 
-cd /model_extend/langchain_rag-master
+cd /model_extend/rag_core
 conda activate rag-new
 bash start_run.sh
 sleep 2
@@ -18,14 +18,8 @@ sleep 2
 # URL解析及入库-单条
 bash start_url_single.sh
 sleep 2
-# URL解析-多条
-bash start_url_batch_parse.sh
-sleep 2
-# URL入库-多条
-bash start_url_batch_insert.sh
-sleep 2
 
-cd /model_extend/rag-es-server-unify
+cd /model_extend/rag_es_server_unify
 bash start_es_server.sh
 sleep 2
 
