@@ -639,7 +639,6 @@ services:
     #   - 15002:15002
     #   - 15003:15003
     volumes:
-      - ./agent/agent_open_source:/agent/agent_open_source
       - ${WANWU_PROJECT_DIR}/agent-wanwu/agent_open_source/logs:/agent/agent_open_source/logs
       - ${WANWU_PROJECT_DIR}/agent-wanwu/agent_open_source/minio/logs:/agent/agent_open_source/minio/logs
       - ${WANWU_PROJECT_DIR}/agent-wanwu/agent_open_source/agent_plugin/logs:/agent/agent_open_source/agent_plugin/logs
@@ -651,8 +650,6 @@ services:
       URL_MODEL: http://bff-service
       URL_MINIO: http://bff-service
       URL_RAG: http://rag-wanwu
-    working_dir: /agent/agent_open_source
-    command: bash -c "./start_all.sh && tail -f /dev/null"
 
   # agentscope:
   #   depends_on:
