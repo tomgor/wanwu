@@ -36,6 +36,7 @@ func registerKnowledge(apiV1 *gin.RouterGroup) {
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/segment/batch/create", http.MethodPost, v1.BatchCreateDocSegment, "批量新增文档切片")
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/segment/delete", http.MethodDelete, v1.DeleteDocSegment, "删除文档切片")
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/segment/update", http.MethodPost, v1.UpdateDocSegment, "更新文档切片")
+	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/segment/child/list", http.MethodGet, v1.GetDocChildSegmentList, "获取子分段列表")
 
 	// 知识库url文档导入
 	mid.Sub("knowledge").Reg(apiV1, "/knowledge/doc/url/analysis", http.MethodPost, v1.AnalysisDocUrl, "解析url")

@@ -39,8 +39,9 @@ service KnowledgeBaseDocService {
   rpc DeleteDocSegment(DeleteDocSegmentReq) returns (google.protobuf.Empty) {}
   // 更新文档分片
   rpc UpdateDocSegment(UpdateDocSegmentReq) returns (google.protobuf.Empty) {}
+  // 获取文档子分段列表
+  rpc GetDocChildSegmentList(GetDocChildSegmentListReq) returns (GetDocChildSegmentListResp){}
 }
-
 
 message GetDocListReq{
   string knowledgeId = 1;
@@ -175,6 +176,8 @@ message SegmentContent{
   string contentId = 4;
   int32 contentNum = 5;
   repeated string labels = 6;
+  bool isParent = 7; // 父子分段/通用分段
+  int32 childNum = 8; // 子分段数量
 }
 
 message DocInfo{
@@ -259,4 +262,22 @@ message UpdateDocSegmentReq{
   string docId = 3;
   string contentId = 4;
   string content = 5;
+}
+
+message GetDocChildSegmentListReq{
+  string userId = 1;
+  string orgId = 2;
+  string contentId = 3;
+  string docId = 4;
+}
+
+message GetDocChildSegmentListResp{
+  repeated ChildSegmentInfo contentList = 1;
+}
+
+message ChildSegmentInfo{
+  string content = 1;
+  string childId = 2;
+  int32 childNum = 3;
+  string parentId = 4;
 }

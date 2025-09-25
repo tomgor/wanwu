@@ -89,6 +89,7 @@ enum Code {
   KnowledgeMetaDuplicateKey = 145018; // 已存在同名元数据key
   KnowledgeInvalidArguments = 145019; // 非法参数
   KnowledgeDocSegmentEmpty = 145020; // 文档分段内容为空
+  KnowledgeMetaUpdatePartialSuccess = 145021; // 部分元数据更新成功
 
   // --- rag-service ---
   // [150000, 159999]

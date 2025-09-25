@@ -132,6 +132,7 @@ func buildKnowledgeMetaList(metaList []*knowledgebase_service.KnowledgeMetaData)
 		retMetaList = append(retMetaList, &response.KnowledgeMetaItem{
 			MetaKey:       meta.Key,
 			MetaValueType: meta.Type,
+			MetaId:        meta.MetaId,
 		})
 	}
 	return &response.GetKnowledgeMetaSelectResp{MetaList: retMetaList}
@@ -196,10 +197,23 @@ func buildKnowledgeHitResp(resp *knowledgebase_service.KnowledgeHitResp) *respon
 	var searchList = make([]*response.ChunkSearchList, 0)
 	if len(resp.SearchList) > 0 {
 		for _, search := range resp.SearchList {
+			childContentList := make([]*response.ChildContent, 0)
+			for _, child := range search.ChildContentList {
+				childContentList = append(childContentList, &response.ChildContent{
+					ChildSnippet: child.ChildSnippet,
+					Score:        float64(child.Score),
+				})
+			}
+			childScore := make([]float64, 0)
+			for _, score := range search.ChildScore {
+				childScore = append(childScore, float64(score))
+			}
 			searchList = append(searchList, &response.ChunkSearchList{
-				Title:         search.Title,
-				Snippet:       search.Snippet,
-				KnowledgeName: search.KnowledgeName,
+				Title:            search.Title,
+				Snippet:          search.Snippet,
+				KnowledgeName:    search.KnowledgeName,
+				ChildContentList: childContentList,
+				ChildScore:       childScore,
 			})
 		}
 	}

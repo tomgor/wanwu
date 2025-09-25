@@ -1406,6 +1406,10 @@ const docTemplate = `{
                     "description": "ApiKey",
                     "type": "string"
                 },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
+                },
                 "endpointUrl": {
                     "description": "推理url",
                     "type": "string"
@@ -1455,6 +1459,10 @@ const docTemplate = `{
                 "apiKey": {
                     "description": "ApiKey",
                     "type": "string"
+                },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
                 },
                 "endpointUrl": {
                     "description": "推理url",
@@ -1506,6 +1514,10 @@ const docTemplate = `{
                     "description": "ApiKey",
                     "type": "string"
                 },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
+                },
                 "endpointUrl": {
                     "description": "推理url",
                     "type": "string"
@@ -1518,6 +1530,10 @@ const docTemplate = `{
                 "apiKey": {
                     "description": "ApiKey",
                     "type": "string"
+                },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
                 },
                 "endpointUrl": {
                     "description": "推理url",
@@ -1569,6 +1585,10 @@ const docTemplate = `{
                     "description": "ApiKey",
                     "type": "string"
                 },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
+                },
                 "endpointUrl": {
                     "description": "推理url",
                     "type": "string"
@@ -1619,6 +1639,10 @@ const docTemplate = `{
                     "description": "ApiKey",
                     "type": "string"
                 },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
+                },
                 "endpointUrl": {
                     "description": "推理url",
                     "type": "string"
@@ -1631,6 +1655,10 @@ const docTemplate = `{
                 "apiKey": {
                     "description": "ApiKey",
                     "type": "string"
+                },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
                 },
                 "endpointUrl": {
                     "description": "推理url",
@@ -1682,6 +1710,10 @@ const docTemplate = `{
                     "description": "ApiKey",
                     "type": "string"
                 },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
+                },
                 "endpointUrl": {
                     "description": "推理url",
                     "type": "string"
@@ -1694,6 +1726,10 @@ const docTemplate = `{
                 "apiKey": {
                     "description": "ApiKey",
                     "type": "string"
+                },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
                 },
                 "endpointUrl": {
                     "description": "推理url",
@@ -1783,6 +1819,10 @@ const docTemplate = `{
                 "apiKey": {
                     "description": "ApiKey",
                     "type": "string"
+                },
+                "contextSize": {
+                    "description": "上下文长度",
+                    "type": "integer"
                 },
                 "endpointUrl": {
                     "description": "推理url",

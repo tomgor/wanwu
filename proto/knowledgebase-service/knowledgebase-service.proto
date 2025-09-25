@@ -142,8 +142,9 @@ message KnowledgeTagInfo {
 }
 
 message KnowledgeMetaData{
-  string key = 1;// key
-  string type = 2; // type(time, string, number)
+  string metaId = 1;
+  string key = 2;// key
+  string type = 3; // type(time, string, number)
 }
 
 message KnowledgeHitResp{
@@ -156,6 +157,13 @@ message KnowledgeSearchInfo{
   string title = 1;
   string snippet = 2;
   string knowledgeName = 3;
+  repeated ChildContent childContentList = 4;
+  repeated float childScore = 5;
+}
+
+message ChildContent{
+  string childSnippet = 1;
+  float score = 2;
 }
 
 message SelectKnowledgeMetaReq{

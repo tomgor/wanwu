@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/samber/lo"
 	"time"
 
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
@@ -313,12 +314,15 @@ func buildKnowledgeMetaSelectResp(metaList []*model.KnowledgeDocMeta) *knowledge
 		return &knowledgebase_service.SelectKnowledgeMetaResp{}
 	}
 	var retMetaList []*knowledgebase_service.KnowledgeMetaData
-	keyValueMap := checkRepeatedKeyType(metaList)
-	for key, valueType := range keyValueMap {
-		retMetaList = append(retMetaList, &knowledgebase_service.KnowledgeMetaData{
-			Key:  key,
-			Type: valueType,
-		})
+	newMetaList := checkRepeatedMetaKey(metaList)
+	for _, meta := range newMetaList {
+		if meta.Key != "" {
+			retMetaList = append(retMetaList, &knowledgebase_service.KnowledgeMetaData{
+				MetaId: meta.MetaId,
+				Key:    meta.Key,
+				Type:   meta.ValueType,
+			})
+		}
 	}
 	return &knowledgebase_service.SelectKnowledgeMetaResp{
 		MetaList: retMetaList,
@@ -382,21 +386,13 @@ func buildKnowledgeTagList(knowledgeId string, knowledgeTagMap map[string][]*orm
 	return retList
 }
 
-func checkRepeatedKeyType(metaList []*model.KnowledgeDocMeta) map[string]string {
-	var keyValueMap = make(map[string]string)
-	for _, meta := range metaList {
-		if meta.Key == "" || meta.ValueType == "" {
-			continue
-		}
-		if _, exists := keyValueMap[meta.Key]; !exists {
-			keyValueMap[meta.Key] = meta.ValueType
-		} else {
-			if meta.ValueType != keyValueMap[meta.Key] {
-				log.Errorf("key %s already exists, type = %s", meta.Key, meta.ValueType)
-			}
-		}
+func checkRepeatedMetaKey(metaList []*model.KnowledgeDocMeta) []*model.KnowledgeDocMeta {
+	if len(metaList) == 0 {
+		return []*model.KnowledgeDocMeta{}
 	}
-	return keyValueMap
+	return lo.UniqBy(metaList, func(item *model.KnowledgeDocMeta) string {
+		return item.Key
+	})
 }
 
 // buildKnowledgeInfo 构造知识库信息
@@ -463,10 +459,23 @@ func buildKnowledgeBaseHitResp(ragKnowledgeHitResp *rag_service.RagKnowledgeHitR
 	list := knowledgeHitData.SearchList
 	if len(list) > 0 {
 		for _, search := range list {
+			childContentList := make([]*knowledgebase_service.ChildContent, 0)
+			for _, child := range search.ChildContentList {
+				childContentList = append(childContentList, &knowledgebase_service.ChildContent{
+					ChildSnippet: child.ChildSnippet,
+					Score:        float32(child.Score),
+				})
+			}
+			childScore := make([]float32, 0)
+			for _, score := range search.ChildScore {
+				childScore = append(childScore, float32(score))
+			}
 			searchList = append(searchList, &knowledgebase_service.KnowledgeSearchInfo{
-				Title:         search.Title,
-				Snippet:       search.Snippet,
-				KnowledgeName: search.KbName,
+				Title:            search.Title,
+				Snippet:          search.Snippet,
+				KnowledgeName:    search.KbName,
+				ChildContentList: childContentList,
+				ChildScore:       childScore,
 			})
 		}
 	}

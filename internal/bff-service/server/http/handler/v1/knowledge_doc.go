@@ -300,3 +300,24 @@ func UpdateDocSegment(ctx *gin.Context) {
 	err := service.UpdateDocSegment(ctx, userId, orgId, &req)
 	gin_util.Response(ctx, nil, err)
 }
+
+// GetDocChildSegmentList
+//
+//	@Tags			knowledge
+//	@Summary		获取子分段列表
+//	@Description	获取子分段列表
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.DocChildListReq	true	"获取子分段列表查询请求参数"
+//	@Success		200		{object}	response.Response{data=response.DocChildSegmentResp}
+//	@Router			/knowledge/doc/segment/child/list [get]
+func GetDocChildSegmentList(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.DocChildListReq
+	if !gin_util.BindQuery(ctx, &req) {
+		return
+	}
+	resp, err := service.GetDocChildSegmentList(ctx, userId, orgId, &req)
+	gin_util.Response(ctx, resp, err)
+}

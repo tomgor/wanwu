@@ -34,9 +34,16 @@ type KnowledgeMetaData struct {
 }
 
 type ChunkSearchList struct {
-	Title         string `json:"title"`
-	Snippet       string `json:"snippet"`
-	KnowledgeName string `json:"knowledgeName"`
+	Title            string          `json:"title"`
+	Snippet          string          `json:"snippet"`
+	KnowledgeName    string          `json:"knowledgeName"`
+	ChildContentList []*ChildContent `json:"childContentList"`
+	ChildScore       []float64       `json:"childScore"`
+}
+
+type ChildContent struct {
+	ChildSnippet string  `json:"childSnippet"`
+	Score        float64 `json:"score"`
 }
 
 type GetKnowledgeMetaSelectResp struct {
@@ -44,6 +51,7 @@ type GetKnowledgeMetaSelectResp struct {
 }
 
 type KnowledgeMetaItem struct {
+	MetaId        string `json:"metaId"`
 	MetaKey       string `json:"metaKey"`
 	MetaValueType string `json:"metaValueType"`
 }

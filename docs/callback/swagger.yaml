@@ -630,6 +630,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -666,6 +669,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -702,6 +708,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -711,6 +720,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -747,6 +759,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -783,6 +798,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -792,6 +810,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -828,6 +849,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -837,6 +861,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -900,6 +927,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string

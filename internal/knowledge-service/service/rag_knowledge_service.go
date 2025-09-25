@@ -97,10 +97,36 @@ type KnowledgeHitData struct {
 }
 
 type ChunkSearchList struct {
-	Title    string      `json:"title"`
-	Snippet  string      `json:"snippet"`
-	KbName   string      `json:"kb_name"`
-	MetaData interface{} `json:"meta_data"`
+	Title            string          `json:"title"`
+	Snippet          string          `json:"snippet"`
+	KbName           string          `json:"kb_name"`
+	MetaData         interface{}     `json:"meta_data"`
+	ChildContentList []*ChildContent `json:"child_content_list"`
+	ChildScore       []float64       `json:"child_score"`
+}
+
+type ChildContent struct {
+	ChildSnippet string  `json:"child_snippet"`
+	Score        float64 `json:"score"`
+}
+
+type RagBatchDeleteMetaParams struct {
+	UserId        string   `json:"userId"`        // 用户id
+	KnowledgeBase string   `json:"knowledgeBase"` // 知识库名称
+	KnowledgeId   string   `json:"kb_id"`         // 知识库id
+	Keys          []string `json:"keys"`          // 删除的元数据key列表
+}
+
+type RagBatchUpdateMetaKeyParams struct {
+	UserId        string            `json:"userId"`        // 用户id
+	KnowledgeBase string            `json:"knowledgeBase"` // 知识库名称
+	KnowledgeId   string            `json:"kb_id"`         // 知识库id
+	Mappings      []*RagMetaMapKeys `json:"mappings"`      // 元数据key映射列表
+}
+
+type RagMetaMapKeys struct {
+	OldKey string `json:"old_key"`
+	NewKey string `json:"new_key"`
 }
 
 // RagKnowledgeCreate rag创建知识库
@@ -221,4 +247,60 @@ func RagKnowledgeHit(ctx context.Context, knowledgeHitParams *KnowledgeHitParams
 		return nil, errors.New(resp.Message)
 	}
 	return &resp, nil
+}
+
+func RagBatchDeleteMeta(ctx context.Context, ragDeleteParams *RagBatchDeleteMetaParams) error {
+	ragServer := config.GetConfig().RagServer
+	url := ragServer.Endpoint + ragServer.BatchDeleteMetaKeyUri
+	paramsByte, err := json.Marshal(ragDeleteParams)
+	if err != nil {
+		return err
+	}
+	result, err := http.GetClient().PostJson(ctx, &http_client.HttpRequestParams{
+		Url:        url,
+		Body:       paramsByte,
+		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
+		MonitorKey: "rag_delete_meta_key",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return err
+	}
+	var resp RagCommonResp
+	if err := json.Unmarshal(result, &resp); err != nil {
+		log.Errorf(err.Error())
+		return err
+	}
+	if resp.Code != successCode {
+		return errors.New(resp.Message)
+	}
+	return nil
+}
+
+func RagBatchUpdateMeta(ctx context.Context, ragUpdateParams *RagBatchUpdateMetaKeyParams) error {
+	ragServer := config.GetConfig().RagServer
+	url := ragServer.Endpoint + ragServer.BatchRenameMetakeyUri
+	paramsByte, err := json.Marshal(ragUpdateParams)
+	if err != nil {
+		return err
+	}
+	result, err := http.GetClient().PostJson(ctx, &http_client.HttpRequestParams{
+		Url:        url,
+		Body:       paramsByte,
+		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
+		MonitorKey: "rag_update_meta_key",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return err
+	}
+	var resp RagCommonResp
+	if err := json.Unmarshal(result, &resp); err != nil {
+		log.Errorf(err.Error())
+		return err
+	}
+	if resp.Code != successCode {
+		return errors.New(resp.Message)
+	}
+	return nil
 }
