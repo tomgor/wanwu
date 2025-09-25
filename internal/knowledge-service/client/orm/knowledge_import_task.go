@@ -62,7 +62,7 @@ func SelectKnowledgeImportTaskByIdList(ctx context.Context, importId []string) (
 	var importTask []*model.KnowledgeImportTask
 	err := sqlopt.SQLOptions(sqlopt.WithImportIDs(importId)).
 		Apply(db.GetHandle(ctx), &model.KnowledgeImportTask{}).
-		First(&importTask).Error
+		Find(&importTask).Error
 	if err != nil {
 		log.Errorf("SelectKnowledgeImportTaskByIdList importId %s err: %v", importId, err)
 		return nil, util.ErrCode(errs.Code_KnowledgeBaseDeleteFailed)
