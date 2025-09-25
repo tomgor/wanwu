@@ -39,7 +39,8 @@ export default {
             query:'',
             isStoped : false,
             access_token:'',
-            runResponse: ""
+            runResponse: "",
+            isConnectionClosed: false
         };
     },
     created() {
@@ -358,7 +359,9 @@ export default {
 
             this.sseResponse = {}
             //发送问题后不允许继续提问
-            this.setStoreSessionStatus(0)
+            if (!this.isConnectionClosed) {
+                this.setStoreSessionStatus(0)
+            }
             this.clearInput()
             let params = {
                 query: prompt, 
@@ -523,6 +526,7 @@ export default {
                 },
                 onclose: () => {
                     console.log('===> eventSource onClose')
+                    this.isConnectionClosed = true
                     this.setStoreSessionStatus(-1)//关闭后改变状态
                     this.sseOnCloseCallBack()
                 },

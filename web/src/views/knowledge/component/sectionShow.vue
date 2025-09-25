@@ -29,7 +29,6 @@
         <el-collapse 
           v-model="activeNames" 
           class="section-collapse"
-          accordion
         >
           <el-collapse-item 
             v-for="(segment, index) in segmentList" 
@@ -45,8 +44,6 @@
               </span>
             </template>
             {{ index + 1 }}、{{ segment.content }}
-            <span class="segment-action">(展示完整分段内容)</span>
-            <span v-if="segment.autoSave" class="auto-save">--失去焦点自动保存</span>
           </el-collapse-item>
         </el-collapse>
       </div>
@@ -95,6 +92,8 @@ export default {
             autoSave: Boolean(segment.autoSave),
             score: parseFloat(segment.score) || 0
           }));
+          // 设置所有折叠项为展开状态
+          this.activeNames = this.segmentList.map((_, index) => index);
         }
         
         
