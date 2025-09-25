@@ -60,8 +60,8 @@
               <div class="resultTitle">
                 <span>
                   <span class="tag"  @click="showSectionDetail(index)">{{$t('knowledgeManage.section')}}#{{index+1}}</span>
-                  <span class="segment-type">{{item.childcontentList && item.childcontentList.length > 0 ? '#父子分段' : '#通用分段'}}</span>
-                  <span class="segment-length" v-if="item.childcontentList && item.childcontentList.length > 0">#{{item.childcontentList.length || 0}}个子分段</span>
+                  <span class="segment-type">{{item.childContentList && item.childContentList.length > 0 ? '#父子分段' : '#通用分段'}}</span>
+                  <span class="segment-length" v-if="item.childContentList && item.childContentList.length > 0">#{{item.childContentList.length || 0}}个子分段</span>
                 </span>
                 <span class="score">{{$t('knowledgeManage.hitScore')}}: {{score[index]}}</span>
               </div>

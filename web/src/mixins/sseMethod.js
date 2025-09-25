@@ -40,7 +40,6 @@ export default {
             isStoped : false,
             access_token:'',
             runResponse: "",
-            isConnectionClosed: false
         };
     },
     created() {
@@ -359,9 +358,8 @@ export default {
 
             this.sseResponse = {}
             //发送问题后不允许继续提问
-            if (!this.isConnectionClosed) {
-                this.setStoreSessionStatus(0)
-            }
+            this.setStoreSessionStatus(0)
+
             this.clearInput()
             let params = {
                 query: prompt, 
@@ -370,8 +368,10 @@ export default {
                 requestFileUrls: this.queryFilePath?[this.queryFilePath]:[],
                 fileName:this.fileList.length > 0 ? this.fileList[0]['name'] : '',
                 fileSize:this.fileList.length > 0 ? this.fileList[0]['size'] : '',
-                fileUrl:this.fileList.length > 0 ? URL.createObjectURL(this.fileList[0].raw): '',
-                fileType:this.fileList.length > 0 ? this.fileList[0]['raw']['type'] : '',
+                fileUrl: this.fileList.length > 0 
+                ? (this.fileList[0].fileUrl ? this.fileList[0].fileUrl:URL.createObjectURL(this.fileList[0].raw))
+                : '',
+                fileType:this.fileList.length > 0 ? this.fileList[0].name.split('.').pop().toLowerCase():'',
                 pendingResponse:''
             }
             //正式环境传模型参数
@@ -445,9 +445,6 @@ export default {
                 },
                 onmessage: (e) => {
                     if (e && e.data) {
-                        if (!this.isConnectionClosed) {
-                            this.setStoreSessionStatus(0)
-                          }
                         let data = JSON.parse(e.data)
                         console.log('===>',new Date().getTime(),data)
                         this.sseResponse = data
@@ -458,8 +455,10 @@ export default {
                             "query": prompt,
                             "fileName":this.fileList.length > 0 ? this.fileList[0]['name'] : '',
                             "fileSize":this.fileList.length > 0 ? this.fileList[0]['size'] : '',
-                            "fileUrl":this.fileList.length > 0 ? URL.createObjectURL(this.fileList[0].raw): '',
-                            "fileType":this.fileList.length > 0 ? this.fileList[0]['raw']['type'] : '',
+                            fileUrl: this.fileList.length > 0 
+                            ? (this.fileList[0].fileUrl ? this.fileList[0].fileUrl:URL.createObjectURL(this.fileList[0].raw))
+                            : '',
+                            fileType:this.fileList.length > 0 ? this.fileList[0].name.split('.').pop().toLowerCase():'',
                             "response": '',
                             "filepath": data.file_url || '',
                             "requestFileUrls": this.queryFilePath?[this.queryFilePath] : data.requestFileUrls,
@@ -529,7 +528,6 @@ export default {
                 },
                 onclose: () => {
                     console.log('===> eventSource onClose')
-                    this.isConnectionClosed = true
                     this.setStoreSessionStatus(-1)//关闭后改变状态
                     this.sseOnCloseCallBack()
                 },
@@ -663,7 +661,7 @@ export default {
                     fileSize:_history.fileSize,
                     fileUrl:_history.fileInfo ? _history.fileInfo['fileUrl'] : _history.requestFileUrls[0],
                 }
-                fileInfo = [{name:_history['fileName'],size:_history['fileSize']}] || [];
+                fileInfo = [{name:_history['fileName'],size:_history['fileSize'],fileUrl:fileId['fileUrl']}] || [];
             }
 
             this.preSend(inputVal,fileId,fileInfo);

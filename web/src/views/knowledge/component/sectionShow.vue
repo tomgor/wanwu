@@ -43,7 +43,7 @@
                 <span class="score-value">{{ formatScore(childscore[index]) }}</span>
               </span>
             </template>
-            {{ index + 1 }}、{{ segment.content }}
+            {{ segment.content }}
           </el-collapse-item>
         </el-collapse>
       </div>
@@ -86,9 +86,9 @@ export default {
         
         // 更新子分段数据
         if (data.searchList && Array.isArray(data.searchList.childContentList)) {
-          this.childscore = data.searchList.childscore;
+          this.childscore = data.searchList.childScore;
           this.segmentList = data.searchList.childContentList.map(segment => ({
-            content: segment.childsnippet || '',
+            content: segment.childSnippet || '',
             autoSave: Boolean(segment.autoSave),
             score: parseFloat(segment.score) || 0
           }));

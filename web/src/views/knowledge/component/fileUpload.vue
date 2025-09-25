@@ -493,7 +493,7 @@ export default {
           maxSplitter: 1024,
           overlap: 0.2,
           segmentMethod:"0",//0是通用分段，1是父子分段
-          subMaxSplitter:1024,//父子分段必填
+          subMaxSplitter:200,//父子分段必填
           subSplitter:["！", "。", "？", "?", "!", ".", "......"]//父子分段必填
         },
         docInfoList: [],
