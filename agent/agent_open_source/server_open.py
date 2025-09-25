@@ -23,6 +23,7 @@ from bing_plus import *
 import configparser
 from langchain.requests import RequestsWrapper
 from mcp_client import *
+from urllib.parse import urlparse
 
 
 import logging
@@ -51,6 +52,15 @@ logger.info("主服务启动")
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
+
+
+def img2base64(img_path):
+    img_format = img_path.split('.')[-1]
+    with open(img_path, "rb") as f:
+        encoded_image = base64.b64encode(f.read())
+        encoded_image_text = encoded_image.decode("utf-8")
+        img_base64_str = f"data:image/{img_format};base64,{encoded_image_text}"
+        return img_base64_str
 
 
 os.environ["ARK_API_KEY"] = "eyJh"
@@ -124,16 +134,23 @@ def agent_start():
             url = URL_MODEL+f":6668/callback/v1/model/{model_id}"
             response = requests.get(url)
             function_call = False
+            is_vision = False
             if response.status_code == 200:
                 data = response.json()
                 result = data.get("data", {}).get("config").get("functionCalling")
-                logger.info(f"support result{result}")
+                is_visionSupport = data.get("data", {}).get("config").get("visionSupport")
+                logger.info(f"function_call support result{result}")
+                logger.info(f"vision support result{is_visionSupport}")
                 if result == "noSupport":
                     function_call = False
                     logger.info(f"不支持function_call {function_call}")
                 else:
                     function_call = False
                     logger.info(f"支持function_call {function_call}")
+
+                if is_visionSupport == "support":
+                    is_vision = True
+
 
 
 
@@ -224,6 +241,81 @@ def agent_start():
                 metadata_filtering_conditions = kn_params.get('metadata_filtering_conditions',[])
 
 
+#如果是多模态模型，则进入多模态模式
+            if is_vision:
+                logger.info(f"to_vision model answer")
+                client = OpenAI(api_key='aaaaa',
+                         base_url = model_url,
+                )
+                if upload_file_url:
+                    logger.info(f"minio_file_is {upload_file_url}")
+                    #把图片文件下载到本地
+                    path = urlparse(upload_file_url).path  # "/bucket/yourfile.jpg"
+                    filename = os.path.basename(path)  # "yourfile.jpg"
+                    local_path = "/agent/agent_open_source/file/"+filename
+                    logger.info(f"minio_file_path {local_path}")
+                    with requests.get(upload_file_url, stream=True) as r:
+                        r.raise_for_status()
+                        with open(local_path, "wb") as f:
+                            for chunk in r.iter_content(chunk_size=8192):
+                                if chunk:
+                                    f.write(chunk)
+
+                    print(f"jpg_file save: {local_path}")
+
+                    messages = [{
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": question},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": img2base64(local_path)
+                                }
+                            }
+                        ]
+                    }]
+                else:
+                    messages = [{
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": question}
+                        ]
+                    }]
+
+                completion = client.chat.completions.create(
+                    model="YuanjingVL",
+                    messages=messages,
+                    stream=True,
+                    extra_body={  # 模型其他参数，非必传
+                        "api_option": "general",  # general:通用；ocr：多模态ocr；math：拍照答题
+                    }
+                )
+                answer = {
+                    "code": 0,
+                    "message": "success",
+                    "response": "",
+                    "gen_file_url_list": [],
+                    "history": [],
+                    "finish": 0,
+                    "usage": {
+                        "prompt_tokens": 0,
+                        "completion_tokens": 0,
+                        "total_tokens": 0
+                    },
+                    "search_list": [],
+                    "qa_type": 0
+                }
+                for event in completion:
+                    logger.info(f"event_is {event}")
+                    if event.choices:
+                       answer['response'] = event.choices[0].delta.content
+                       logger.info(f"finish_reason_receive_is:{event.choices[0].finish_reason}")
+                       if event.choices[0].finish_reason == 'stop':
+                           logger.info(f"finish_stop")
+                           answer['finish'] = 1
+                    yield f"data:{json.dumps(answer, ensure_ascii=False)}\n"
+                return
 
             if mcp_tools:
                 mcp_server_response = mcp_server_client(question, mcp_tools, temperature=temperature,model_name=model,model_url=model_url,
