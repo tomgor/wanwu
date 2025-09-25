@@ -1018,7 +1018,7 @@ func buildSegmentListResp(importTask *model.KnowledgeImportTask, doc *model.Know
 		log.Errorf("SegmentConfig process error %s", err.Error())
 		return nil, err
 	}
-
+	segmentConfigMap := buildSegmentConfigMap([]*model.KnowledgeImportTask{importTask})
 	var resp = &knowledgebase_doc_service.DocSegmentListResp{
 		FileName:            doc.Name,
 		MaxSegmentSize:      int32(config.MaxSplitter),
@@ -1030,6 +1030,7 @@ func buildSegmentListResp(importTask *model.KnowledgeImportTask, doc *model.Know
 		ContentList:         buildContentList(segmentListResp.List, pageNo, pageSize),
 		MetaDataList:        buildMetaList(metaDataList),
 		SegmentImportStatus: buildSegmentImportStatus(segmentImportTask),
+		SegmentMethod:       buildSegmentMethod(doc, segmentConfigMap),
 	}
 	return resp, nil
 }

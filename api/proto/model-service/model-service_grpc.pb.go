@@ -64,8 +64,9 @@ func NewModelServiceClient(cc grpc.ClientConnInterface) ModelServiceClient {
 }
 
 func (c *modelServiceClient) ImportModel(ctx context.Context, in *ModelInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, ModelService_ImportModel_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ModelService_ImportModel_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -73,8 +74,9 @@ func (c *modelServiceClient) ImportModel(ctx context.Context, in *ModelInfo, opt
 }
 
 func (c *modelServiceClient) UpdateModel(ctx context.Context, in *ModelInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, ModelService_UpdateModel_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ModelService_UpdateModel_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -82,8 +84,9 @@ func (c *modelServiceClient) UpdateModel(ctx context.Context, in *ModelInfo, opt
 }
 
 func (c *modelServiceClient) DeleteModel(ctx context.Context, in *DeleteModelReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, ModelService_DeleteModel_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ModelService_DeleteModel_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -91,8 +94,9 @@ func (c *modelServiceClient) DeleteModel(ctx context.Context, in *DeleteModelReq
 }
 
 func (c *modelServiceClient) GetModel(ctx context.Context, in *GetModelReq, opts ...grpc.CallOption) (*ModelInfo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ModelInfo)
-	err := c.cc.Invoke(ctx, ModelService_GetModel_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ModelService_GetModel_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -100,8 +104,9 @@ func (c *modelServiceClient) GetModel(ctx context.Context, in *GetModelReq, opts
 }
 
 func (c *modelServiceClient) ListModels(ctx context.Context, in *ListModelsReq, opts ...grpc.CallOption) (*ModelInfos, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ModelInfos)
-	err := c.cc.Invoke(ctx, ModelService_ListModels_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ModelService_ListModels_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -109,8 +114,9 @@ func (c *modelServiceClient) ListModels(ctx context.Context, in *ListModelsReq, 
 }
 
 func (c *modelServiceClient) ChangeModelStatus(ctx context.Context, in *ModelStatusReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, ModelService_ChangeModelStatus_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ModelService_ChangeModelStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -118,8 +124,9 @@ func (c *modelServiceClient) ChangeModelStatus(ctx context.Context, in *ModelSta
 }
 
 func (c *modelServiceClient) GetModelById(ctx context.Context, in *GetModelByIdReq, opts ...grpc.CallOption) (*ModelInfo, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ModelInfo)
-	err := c.cc.Invoke(ctx, ModelService_GetModelById_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ModelService_GetModelById_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -127,8 +134,9 @@ func (c *modelServiceClient) GetModelById(ctx context.Context, in *GetModelByIdR
 }
 
 func (c *modelServiceClient) ListTypeModels(ctx context.Context, in *ListTypeModelsReq, opts ...grpc.CallOption) (*ModelInfos, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ModelInfos)
-	err := c.cc.Invoke(ctx, ModelService_ListTypeModels_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ModelService_ListTypeModels_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -136,8 +144,9 @@ func (c *modelServiceClient) ListTypeModels(ctx context.Context, in *ListTypeMod
 }
 
 func (c *modelServiceClient) GetModelByIds(ctx context.Context, in *GetModelByIdsReq, opts ...grpc.CallOption) (*ModelInfos, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ModelInfos)
-	err := c.cc.Invoke(ctx, ModelService_GetModelByIds_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, ModelService_GetModelByIds_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +155,7 @@ func (c *modelServiceClient) GetModelByIds(ctx context.Context, in *GetModelById
 
 // ModelServiceServer is the server API for ModelService service.
 // All implementations must embed UnimplementedModelServiceServer
-// for forward compatibility
+// for forward compatibility.
 type ModelServiceServer interface {
 	// 模型导入(默认启用
 	ImportModel(context.Context, *ModelInfo) (*emptypb.Empty, error)
@@ -169,9 +178,12 @@ type ModelServiceServer interface {
 	mustEmbedUnimplementedModelServiceServer()
 }
 
-// UnimplementedModelServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedModelServiceServer struct {
-}
+// UnimplementedModelServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedModelServiceServer struct{}
 
 func (UnimplementedModelServiceServer) ImportModel(context.Context, *ModelInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ImportModel not implemented")
@@ -201,6 +213,7 @@ func (UnimplementedModelServiceServer) GetModelByIds(context.Context, *GetModelB
 	return nil, status.Errorf(codes.Unimplemented, "method GetModelByIds not implemented")
 }
 func (UnimplementedModelServiceServer) mustEmbedUnimplementedModelServiceServer() {}
+func (UnimplementedModelServiceServer) testEmbeddedByValue()                      {}
 
 // UnsafeModelServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to ModelServiceServer will
@@ -210,6 +223,13 @@ type UnsafeModelServiceServer interface {
 }
 
 func RegisterModelServiceServer(s grpc.ServiceRegistrar, srv ModelServiceServer) {
+	// If the following call pancis, it indicates UnimplementedModelServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
 	s.RegisterService(&ModelService_ServiceDesc, srv)
 }
 
