@@ -98,6 +98,7 @@ rag-server:
   delete-knowledge-uri: '/rag/del-knowledge-base'
   knowledge-hit-uri: '/rag/search-knowledge-base'
   get-doc-segment-uri: '/rag/get-content-list'
+  get-child-content-uri: '/rag/get-child-content-list'
   doc-segment-update-status-uri: '/rag/update-content-status'
   doc-delete-uri: '/rag/del-knowledge-file'
   doc-tag-uri: '/rag/update-file-tags'
@@ -108,6 +109,8 @@ rag-server:
   doc-segment-create-uri: '/rag/batch-add-chunks'
   doc-segment-update-uri: '/rag/update-chunk'
   doc-segment-delete-uri: '/rag/batch-delete-chunks'
+  batch-delete-meta-key-uri: '/rag/delete-meta-by-keys'
+  batch-rename-meta-key-uri: '/rag/rename-meta-keys'
   timeout: 60
 
 usage-limit:

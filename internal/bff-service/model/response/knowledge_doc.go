@@ -42,11 +42,19 @@ type DocMetaData struct {
 
 type SegmentContent struct {
 	Content    string   `json:"content"`
-	Len        int      `json:"len"`
 	Available  bool     `json:"available"`
 	ContentId  string   `json:"contentId"`
 	ContentNum int      `json:"contentNum"`
 	Labels     []string `json:"labels"`
+	IsParent   bool     `json:"isParent"` // 父子分段/通用分段 true是父分段，false是通用分段
+	ChildNum   int      `json:"childNum"` // 子分段数量
+}
+
+type ChildSegmentInfo struct {
+	Content  string `json:"content"`  // 内容
+	ChildId  string `json:"childId"`  // 子分段id
+	ChildNum int    `json:"childNum"` // 子分段序号
+	ParentId string `json:"parentId"` // 父分段id
 }
 
 type AnalysisDocUrlResp struct {
@@ -57,4 +65,8 @@ type Url struct {
 	Url      string `json:"url"`
 	FileName string `json:"fileName"`
 	FileSize int    `json:"fileSize"`
+}
+
+type DocChildSegmentResp struct {
+	SegmentContentList []*ChildSegmentInfo `json:"contentList"` //内容
 }

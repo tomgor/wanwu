@@ -37,6 +37,14 @@ type RagGetDocSegmentParams struct {
 	SearchAfter       int32  `json:"search_after"`
 }
 
+type RagGetDocChildSegmentParams struct {
+	UserId            string `json:"userId"`        // 用户id
+	KnowledgeBaseName string `json:"knowledgeBase"` // 知识库名称
+	KnowledgeId       string `json:"kb_id"`         // 知识库id
+	FileName          string `json:"file_name"`     // 文件名
+	ChunkId           string `json:"chunk_id"`      // 使用父分段的contentId
+}
+
 type RagMetaDataParams struct {
 	MetaId    string      `json:"meta_id"`    // 元数据id
 	Key       string      `json:"key"`        // key
@@ -175,22 +183,69 @@ type ContentListResp struct {
 }
 
 type FileSplitContent struct {
-	Content   string          `json:"content"`
-	Order     int             `json:"order"`
-	Status    bool            `json:"status"`
-	MetaData  ContentMetaData `json:"meta_data"`
-	ContentId string          `json:"content_id"`
-	UserId    string          `json:"userId"`
-	KbName    string          `json:"kb_name"`
-	FileName  string          `json:"file_name"`
-	Labels    []string        `json:"labels"`
+	Content            string          `json:"content"`
+	Order              int             `json:"order"`
+	Status             bool            `json:"status"`
+	MetaData           ContentMetaData `json:"meta_data"`
+	ContentId          string          `json:"content_id"`
+	UserId             string          `json:"userId"`
+	KbName             string          `json:"kb_name"`
+	FileName           string          `json:"file_name"`
+	Labels             []string        `json:"labels"`
+	ChunkId            string          `json:"chunk_id"`
+	OssPath            string          `json:"oss_path"`
+	IsParent           bool            `json:"is_parent"`             // 区分是否是父分段，true是父分段，false是子分段,不存在这个key时说明文档分段模式不是父子分段
+	ChildChunkTotalNum int             `json:"child_chunk_total_num"` // 父分段对应子分段数量
 }
 
 type ContentMetaData struct {
-	FileName        string `json:"file_name"`
-	ChunkLen        int    `json:"chunk_len"`
-	ChunkCurrentNum int    `json:"chunk_current_num"`
-	ChunkTotalNum   int    `json:"chunk_total_num"`
+	FileName        string         `json:"file_name"`
+	ChunkCurrentNum int            `json:"chunk_current_num"`
+	ChunkTotalNum   int            `json:"chunk_total_num"`
+	DownloadLink    string         `json:"download_link"`
+	BucketName      string         `json:"bucket_name"`
+	ObjectName      string         `json:"object_name"`
+	DocMeta         []*DocMetaData `json:"doc_meta"`
+}
+
+type DocMetaData struct {
+	ValueType   string `json:"value_type"`
+	StringValue string `json:"string_value"`
+	Key         string `json:"key"`
+}
+
+type RagGetDocChildSegmentResp struct {
+	RagCommonResp
+	Data *ChildContentListResp `json:"data"`
+}
+
+type ChildContentListResp struct {
+	ParentChunkId      string                   `json:"parent_chunk_id"`
+	ChildChunkTotalNum int                      `json:"child_chunk_total_num"` // 以这个字段为准
+	ChildContentList   []*ChildFileSplitContent `json:"child_content_list"`
+}
+
+type ChildFileSplitContent struct {
+	Content         string           `json:"content"`
+	ChunkId         string           `json:"chunk_id"` // 尽量不用
+	FileName        string           `json:"file_name"`
+	OssPath         string           `json:"oss_path"`
+	MetaData        ChildContentMeta `json:"meta_data"`
+	Status          bool             `json:"status"`
+	ContentId       string           `json:"content_id"`
+	ParentContentId string           `json:"parent_content_id"`
+	KnowledgeName   string           `json:"kb_name"`
+	IsParent        bool             `json:"is_parent"` // false是子分段
+}
+
+type ChildContentMeta struct {
+	FileName             string         `json:"file_name"`
+	ChildChunkCurrentNum int            `json:"child_chunk_current_num"`
+	ChildChunkTotalNum   int            `json:"child_chunk_total_num"`
+	DownloadLink         string         `json:"download_link"`
+	BucketName           string         `json:"bucket_name"`
+	ObjectName           string         `json:"object_name"`
+	DocMeta              []*DocMetaData `json:"doc_meta"`
 }
 
 type DocSegmentStatusUpdateParams struct {
@@ -403,6 +458,37 @@ func RagGetDocSegmentList(ctx context.Context, ragGetDocSegmentParams *RagGetDoc
 	}
 	if resp.Data == nil || len(resp.Data.List) == 0 {
 		return nil, errors.New("doc segment response is empty")
+	}
+	return resp.Data, nil
+}
+
+func RagGetDocChildSegmentList(ctx context.Context, ragGetDocChildSegmentParams *RagGetDocChildSegmentParams) (*ChildContentListResp, error) {
+	ragServer := config.GetConfig().RagServer
+	url := ragServer.Endpoint + ragServer.GetDocChildSegmentUri
+	paramsByte, err := json.Marshal(ragGetDocChildSegmentParams)
+	if err != nil {
+		return nil, err
+	}
+	result, err := http.GetClient().PostJson(ctx, &http_client.HttpRequestParams{
+		Url:        url,
+		Body:       paramsByte,
+		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
+		MonitorKey: "rag_get_doc_child_segment",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var resp RagGetDocChildSegmentResp
+	if err := json.Unmarshal(result, &resp); err != nil {
+		log.Errorf(err.Error())
+		return nil, err
+	}
+	if resp.Code != successCode {
+		return nil, errors.New(resp.Message)
+	}
+	if resp.Data == nil || len(resp.Data.ChildContentList) == 0 {
+		return nil, errors.New("doc child segment response is empty")
 	}
 	return resp.Data, nil
 }

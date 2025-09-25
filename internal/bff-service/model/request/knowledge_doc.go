@@ -126,6 +126,12 @@ type UpdateDocSegmentReq struct {
 	CommonCheck
 }
 
+type DocChildListReq struct {
+	DocId     string `json:"docId" form:"docId" validate:"required"`
+	ContentId string `json:"contentId"  form:"contentId" validate:"required"`
+	CommonCheck
+}
+
 func (c *DocImportReq) Check() error {
 	if len(c.DocAnalyzer) > 0 {
 		for _, v := range c.DocAnalyzer {
@@ -185,18 +191,6 @@ func isValidKey(s string) bool {
 func (c *DocMetaDataReq) Check() error {
 	if len(c.KnowledgeId) == 0 && len(c.DocId) == 0 {
 		return errors.New("knowledgeId and docId can not all empty")
-	}
-	if len(c.MetaDataList) > 0 {
-		keyMap := make(map[string]bool)
-		for _, meta := range c.MetaDataList {
-			if meta.MetaKey == "" || meta.MetaValueType == "" {
-				return errors.New("key or value type can not be empty")
-			}
-			if keyMap[meta.MetaKey] {
-				return errors.New("key can not be repeated")
-			}
-			keyMap[meta.MetaKey] = true
-		}
 	}
 	return nil
 }

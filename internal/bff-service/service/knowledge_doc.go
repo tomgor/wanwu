@@ -224,10 +224,11 @@ func buildDocSegmentResp(docSegmentListResp *knowledgebase_doc_service.DocSegmen
 			segmentContentList = append(segmentContentList, &response.SegmentContent{
 				ContentId:  contentInfo.ContentId,
 				Content:    contentInfo.Content,
-				Len:        int(contentInfo.Len),
 				Available:  contentInfo.Available,
 				ContentNum: int(contentInfo.ContentNum),
 				Labels:     contentLabels,
+				IsParent:   contentInfo.IsParent,
+				ChildNum:   int(contentInfo.ChildNum),
 			})
 		}
 	}
@@ -243,6 +244,21 @@ func buildDocSegmentResp(docSegmentListResp *knowledgebase_doc_service.DocSegmen
 		MetaDataList:        buildMetaDataResultList(docSegmentListResp.MetaDataList),
 		SegmentImportStatus: docSegmentListResp.SegmentImportStatus,
 	}
+}
+
+func buildDocChildSegmentResp(docSegmentListResp *knowledgebase_doc_service.GetDocChildSegmentListResp) *response.DocChildSegmentResp {
+	var segmentContentList = make([]*response.ChildSegmentInfo, 0)
+	if len(docSegmentListResp.ContentList) > 0 {
+		for _, contentInfo := range docSegmentListResp.ContentList {
+			segmentContentList = append(segmentContentList, &response.ChildSegmentInfo{
+				ChildId:  contentInfo.ChildId,
+				Content:  contentInfo.Content,
+				ChildNum: int(contentInfo.ChildNum),
+				ParentId: contentInfo.ParentId,
+			})
+		}
+	}
+	return &response.DocChildSegmentResp{SegmentContentList: segmentContentList}
 }
 
 func buildMetaDataList(metaDataList []*request.DocMetaData) []*knowledgebase_doc_service.MetaData {
@@ -348,6 +364,16 @@ func UpdateDocSegment(ctx *gin.Context, userId, orgId string, r *request.UpdateD
 		Content:   r.Content,
 	})
 	return err
+}
+
+func GetDocChildSegmentList(ctx *gin.Context, userId, orgId string, req *request.DocChildListReq) (*response.DocChildSegmentResp, error) {
+	docSegmentListResp, err := knowledgeBaseDoc.GetDocChildSegmentList(ctx.Request.Context(), &knowledgebase_doc_service.GetDocChildSegmentListReq{
+		UserId:    userId,
+		OrgId:     orgId,
+		DocId:     req.DocId,
+		ContentId: req.ContentId,
+	})
+	return buildDocChildSegmentResp(docSegmentListResp), err
 }
 
 func buildMetaInfoList(req *request.DocImportReq) []*knowledgebase_doc_service.DocMetaData {

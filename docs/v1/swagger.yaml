@@ -181,6 +181,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -250,6 +253,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -319,6 +325,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -328,6 +337,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -397,6 +409,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -466,6 +481,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -475,6 +493,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -544,6 +565,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -553,6 +577,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -649,6 +676,9 @@ definitions:
       apiKey:
         description: ApiKey
         type: string
+      contextSize:
+        description: 上下文长度
+        type: integer
       endpointUrl:
         description: 推理url
         type: string
@@ -1169,6 +1199,17 @@ definitions:
     - knowledgeId
     - tagIdList
     type: object
+  request.BuiltInToolReq:
+    properties:
+      apiKey:
+        description: apiKey
+        type: string
+      toolSquareId:
+        description: 广场toolId
+        type: string
+    required:
+    - toolSquareId
+    type: object
   request.ChangeExplorationAppFavoriteRequest:
     properties:
       appId:
@@ -1577,6 +1618,16 @@ definitions:
         type: string
     required:
     - tableId
+    type: object
+  request.DocChildListReq:
+    properties:
+      contentId:
+        type: string
+      docId:
+        type: string
+    required:
+    - contentId
+    - docId
     type: object
   request.DocImportReq:
     properties:
@@ -2797,8 +2848,38 @@ definitions:
         description: 0:不存在，1：已完成
         type: integer
     type: object
+  response.ChildContent:
+    properties:
+      childSnippet:
+        type: string
+      score:
+        type: number
+    type: object
+  response.ChildSegmentInfo:
+    properties:
+      childId:
+        description: 子分段id
+        type: string
+      childNum:
+        description: 子分段序号
+        type: integer
+      content:
+        description: 内容
+        type: string
+      parentId:
+        description: 父分段id
+        type: string
+    type: object
   response.ChunkSearchList:
     properties:
+      childContentList:
+        items:
+          $ref: '#/definitions/response.ChildContent'
+        type: array
+      childScore:
+        items:
+          type: number
+        type: array
       knowledgeName:
         type: string
       snippet:
@@ -2887,6 +2968,8 @@ definitions:
       model:
         description: 模型名称
         type: string
+      model_ability:
+        $ref: '#/definitions/response.CozeWorkflowModelInfoAbility'
       model_params:
         items:
           $ref: '#/definitions/config.WorkflowModelParam'
@@ -2924,6 +3007,19 @@ definitions:
     - model
     - modelType
     - provider
+    type: object
+  response.CozeWorkflowModelInfoAbility:
+    properties:
+      audio_understanding:
+        type: boolean
+      cot_display:
+        type: boolean
+      function_call:
+        type: boolean
+      image_understanding:
+        type: boolean
+      video_understanding:
+        type: boolean
     type: object
   response.CreateKnowledgeResp:
     properties:
@@ -3093,6 +3189,9 @@ definitions:
       schema:
         description: schema
         type: string
+      toolSquareId:
+        description: 广场mcpId(非空表示来源于广场)
+        type: string
     type: object
   response.CustomToolSelect:
     properties:
@@ -3114,6 +3213,14 @@ definitions:
       status:
         description: 0:删除失败，1：已完成
         type: integer
+    type: object
+  response.DocChildSegmentResp:
+    properties:
+      contentList:
+        description: 内容
+        items:
+          $ref: '#/definitions/response.ChildSegmentInfo'
+        type: array
     type: object
   response.DocMenu:
     properties:
@@ -3354,6 +3461,8 @@ definitions:
     type: object
   response.KnowledgeMetaItem:
     properties:
+      metaId:
+        type: string
       metaKey:
         type: string
       metaValueType:
@@ -3973,12 +4082,18 @@ definitions:
     properties:
       available:
         type: boolean
+      childNum:
+        description: 子分段数量
+        type: integer
       content:
         type: string
       contentId:
         type: string
       contentNum:
         type: integer
+      isParent:
+        description: 父子分段/通用分段
+        type: boolean
       labels:
         items:
           type: string
@@ -4021,6 +4136,65 @@ definitions:
         type: string
       wordId:
         description: 敏感词id
+        type: string
+    type: object
+  response.ToolSquareDetail:
+    properties:
+      actionSum:
+        description: action总数
+        type: integer
+      apiKey:
+        description: apiKey
+        type: string
+      avatar:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 图标
+      desc:
+        description: 描述
+        type: string
+      detail:
+        description: 详细描述
+        type: string
+      name:
+        description: 名称
+        type: string
+      needApiKeyInput:
+        description: 是否需要apiKey输入
+        type: boolean
+      tags:
+        description: 标签
+        items:
+          type: string
+        type: array
+      toolSquareId:
+        description: 广场mcpId(非空表示来源于广场)
+        type: string
+      tools:
+        description: 工具列表
+        items:
+          $ref: '#/definitions/response.MCPTool'
+        type: array
+    type: object
+  response.ToolSquareInfo:
+    properties:
+      avatar:
+        allOf:
+        - $ref: '#/definitions/request.Avatar'
+        description: 图标
+      desc:
+        description: 描述
+        type: string
+      name:
+        description: 名称
+        type: string
+      tags:
+        description: 标签
+        items:
+          type: string
+        type: array
+      toolSquareId:
+        description: 广场mcpId(非空表示来源于广场)
         type: string
     type: object
   response.UploadFileResp:
@@ -6224,6 +6398,35 @@ paths:
       summary: 批量新增文档切片
       tags:
       - knowledge
+  /knowledge/doc/segment/child/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取子分段列表
+      parameters:
+      - description: 获取子分段列表查询请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DocChildListReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.DocChildSegmentResp'
+              type: object
+      security:
+      - JWT: []
+      summary: 获取子分段列表
+      tags:
+      - knowledge
   /knowledge/doc/segment/create:
     post:
       consumes:
@@ -8230,6 +8433,28 @@ paths:
       summary: 获取词表数据列表
       tags:
       - safety
+  /tool/builtin:
+    post:
+      consumes:
+      - application/json
+      description: 修改内置工具
+      parameters:
+      - description: 内置工具信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.BuiltInToolReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 修改内置工具
+      tags:
+      - tool
   /tool/custom:
     delete:
       consumes:
@@ -8417,6 +8642,64 @@ paths:
       summary: 获取自定义工具列表（用于下拉选择）
       tags:
       - tool
+  /tool/square:
+    get:
+      consumes:
+      - application/json
+      description: 获取内置工具详情
+      parameters:
+      - description: toolSquareId
+        in: query
+        name: toolSquareId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.ToolSquareDetail'
+              type: object
+      summary: 获取内置工具详情
+      tags:
+      - tool.square
+  /tool/square/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取内置工具列表
+      parameters:
+      - description: tool名称
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/response.ListResult'
+                  - properties:
+                      list:
+                        items:
+                          $ref: '#/definitions/response.ToolSquareInfo'
+                        type: array
+                    type: object
+              type: object
+      summary: 获取内置工具列表
+      tags:
+      - tool.square
   /user:
     delete:
       consumes:

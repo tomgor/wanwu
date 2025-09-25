@@ -24,3 +24,8 @@ type KnowledgeDocMeta struct {
 func (KnowledgeDocMeta) TableName() string {
 	return "knowledge_doc_meta"
 }
+
+type UpdateKeys struct {
+	OldKey string `json:"oldKey"`
+	NewKey string `json:"newKey"`
+}

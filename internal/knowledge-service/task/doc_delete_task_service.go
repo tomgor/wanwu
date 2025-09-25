@@ -163,7 +163,7 @@ func BatchDeleteAllDoc(ctx context.Context, tx *gorm.DB, knowledge *model.Knowle
 		return err
 	}
 	//4.删除元数据
-	err = orm.DeleteMetaDataByDocIdList(tx, buildDocIdList(docList))
+	err = orm.DeleteMetaDataByDocIdList(tx, knowledge.KnowledgeId, buildDocIdList(docList))
 	if err != nil {
 		//只打印，不阻塞
 		log.Errorf("DeleteMetaDataByDocIdList error %v", err)

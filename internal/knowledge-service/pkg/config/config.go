@@ -134,6 +134,7 @@ type RagServerConfig struct {
 	DeleteKnowledgeUri        string `mapstructure:"delete-knowledge-uri" json:"delete-knowledge-uri"`
 	KnowledgeHitUri           string `mapstructure:"knowledge-hit-uri" json:"knowledge-hit-uri"`
 	GetDocSegmentUri          string `mapstructure:"get-doc-segment-uri" json:"get-doc-segment-uri"`
+	GetDocChildSegmentUri     string `mapstructure:"get-child-content-uri" json:"get-child-content-uri"`
 	DocSegmentUpdateStatusUri string `mapstructure:"doc-segment-update-status-uri" json:"doc-segment-update-status-uri"`
 	DocDeleteUri              string `mapstructure:"doc-delete-uri" json:"doc-delete-uri"`
 	DocTagUri                 string `mapstructure:"doc-tag-uri" json:"doc-tag-uri"`
@@ -145,5 +146,7 @@ type RagServerConfig struct {
 	DocSegmentCreateUri       string `mapstructure:"doc-segment-create-uri" json:"doc-segment-create-uri"`
 	DocSegmentUpdateUri       string `mapstructure:"doc-segment-update-uri" json:"doc-segment-update-uri"`
 	DocSegmentDeleteUri       string `mapstructure:"doc-segment-delete-uri" json:"doc-segment-delete-uri"`
+	BatchDeleteMetaKeyUri     string `mapstructure:"batch-delete-meta-key-uri" json:"batch-delete-meta-key-uri"`
+	BatchRenameMetakeyUri     string `mapstructure:"batch-rename-meta-key-uri" json:"batch-rename-meta-key-uri"`
 	Timeout                   int64  `mapstructure:"timeout" json:"timeout"`
 }

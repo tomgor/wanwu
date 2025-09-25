@@ -102,6 +102,18 @@ func WithIDs(ids []uint32) SQLOption {
 	})
 }
 
+func WithMetaId(metaId string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("meta_id = ?", metaId)
+	})
+}
+
+func WithMetaIds(metaIds []string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("meta_id IN ?", metaIds)
+	})
+}
+
 func WithOrgID(orgID string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		return db.Where("org_id = ?", orgID)
