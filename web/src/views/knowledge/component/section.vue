@@ -199,6 +199,7 @@
                 v-model="scope.row.content"
                 :autosize="{ minRows: 3, maxRows: 5}"
                 class="full-width-textarea"
+                :disabled="scope.row.isParent"
                 >
               </el-input>
               <div class="segment-list" v-if="scope.row.childContent.length > 0">
@@ -231,7 +232,7 @@
       </div>
 
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleSubmit" :loading="submitLoading">确定</el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="submitLoading" v-if="!cardObj[0]['isParent']">确定</el-button>
         <!-- <el-button type="primary" @click="handleParse" v-if="cardObj[0]['isParent']">保存并重新解析子分段</el-button> -->
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
