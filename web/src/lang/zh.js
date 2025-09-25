@@ -13,7 +13,7 @@ export default {
         button: '登 录',
     },
     register: {
-        title: '注册',
+        title: '注 册',
         form: {
             username: '用户名',
             email: '邮箱',
@@ -21,6 +21,20 @@ export default {
         },
         action: '获取',
         button: '注 册',
+        back: '返回登录'
+    },
+    reset: {
+        title: '重置密码',
+        form: {
+            email: '邮箱',
+            code: '验证码',
+            password: '新密码',
+        },
+        pwd1Placeholder: '密码需包含字母，数字，特殊字符，长度8-20',
+        action1: '设置',
+        action2: '确认',
+        action: '获取',
+        button: '确 认',
         back: '返回登录'
     },
     about: {
@@ -777,6 +791,31 @@ export default {
         favorite:'是否要将该应用设置为常用应用?',
         setSuccess:'设置成功',
         delSuccess:'移除成功'
+    },
+    tool:{
+        server:{
+            slogan:'可绑定已发布的应用，创建自己的MCP server，并对外提供服务。',
+            search:'请输入MCP名称进行搜索',
+            create:'创建MCP',
+            name:'服务名称',
+            desc:'服务描述',
+            bind: {
+                title:'绑定应用',
+                bind:'绑定应用',
+                hint:'已绑定的应用发布新版本之后，引用此工具所创建的MCP服务不会自动更新到该工具的最新版本，以免影响已线上业务的正常运行。若需绑定最新版应用，请手动删除原应用后，重新添加新版应用。',
+                action:'管理',
+                methodName:'显示名称',
+                placeholder:'仅英语',
+                name:'应用',
+                desc:'应用描述',
+                operate:'操作',
+                openapi:{
+                    action:'+导入openapi',
+                    hint:'导入的openapi不会保存至应用。若想永久保存，方便后续调用，可在资源库-自定义工具模块，将openapi添加为自定义工具。',
+                }
+            },
+
+        }
     },
     agent:{
         addComponent:'添加组件',

@@ -1,6 +1,6 @@
 <template>
   <div class="mcp-detail" id="timeScroll">
-    <span class="back" @click="back">{{$t('menu.back') + $t('menu.mcp')}}</span>
+    <span class="back" @click="back">{{$t('menu.back') + (isFromSquare ? $t('menu.mcp') : $t('menu.tool'))}}</span>
     <div class="mcp-title">
       <img class="logo" v-if="detail.avatar && detail.avatar.path" :src="basePath + '/user/api/' + detail.avatar.path" />
       <div :class="['info',{fold:foldStatus}]">
@@ -154,7 +154,7 @@
 <script>
 import sendDialog from './sendDialog'
 import { md } from '@/mixins/marksown-it'
-import { getRecommendsList, getPublicMcpInfo, getDetail, getTools } from "@/api/mcp"
+import { getRecommendsList, getPublicMcpInfo, getDetail, getTools, getServer, getServerTools } from "@/api/mcp"
 import { formatTools } from "@/utils/util"
 
 export default {
@@ -164,6 +164,8 @@ export default {
       md:md,
       isFromSquare: true,
       mcpSquareId:'',
+      mcpId: '',
+      mcpServerId: '',
       detail: {},
       tools: [],
       foldStatus:false,
@@ -189,6 +191,7 @@ export default {
     initData(){
       this.mcpSquareId = this.$route.query.mcpSquareId
       this.mcpId = this.$route.query.mcpId
+      this.mcpServerId = this.$route.query.mcpServerId
       this.isFromSquare = this.$route.params.type === 'square'
       this.tabActive = 0
       this.getDetailData()
@@ -205,10 +208,21 @@ export default {
         })
       } else {
         if (!this.mcpSquareId) this.tabActive = 1
-        getDetail({mcpId:this.mcpId}).then((res) => {
-          this.detail = res.data || {}
-        })
-        this.getToolsList()
+        if (this.mcpId) {
+          getDetail({mcpId:this.mcpId}).then((res) => {
+            this.detail = res.data || {}
+          })
+          this.getToolsList()
+        } else {
+          getServer({mcpServerId:this.mcpServerId}).then((res) => {
+            this.detail = res.data || {}
+          })
+          getServerTools({
+            mcpServerId:this.mcpServerId,
+          }).then((res) => {
+            this.tools = formatTools(res.data.tools)
+          })
+        }
       }
     },
     getToolsList(){
@@ -255,7 +269,8 @@ export default {
       this.dialogVisible = false
     },
     back() {
-      this.$router.push({path: '/mcp'})
+      if (this.isFromSquare) this.$router.push({path: '/mcp'})
+      else this.$router.push({path: '/tool'})
     },
   },
   components: {

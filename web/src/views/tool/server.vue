@@ -4,11 +4,11 @@
       <div class="card-search card-search-cust">
         <div>
           <p class="card-search-des" style="display: flex; align-items: center">
-            <span>可绑定已发布的应用，创建自己的MCP server，并对外提供服务。</span>
+            <span>{{$t('tool.server.slogan')}}</span>
           </p>
         </div>
         <div>
-          <search-input placeholder="请输入MCP名称进行搜索" ref="searchInput" @handleSearch="fetchList()" />
+          <search-input :placeholder="$t('tool.server.search')" ref="searchInput" @handleSearch="fetchList" />
         </div>
       </div>
 
@@ -20,34 +20,29 @@
               <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
               <div class="create-filter"></div>
             </div>
-            <span>创建MCP</span>
+            <span>{{$t('tool.server.create')}}</span>
           </div>
         </div>
         <div
-          v-if="list && list.length"
-          class="card"
-          v-for="(item, index) in list"
-          :key="index"
-          @click.stop="handleClick(item.mcpServerId)"
+            v-if="list && list.length"
+            class="card"
+            v-for="(item, index) in list"
+            :key="index"
+            @click.stop="handleClick(item.mcpServerId)"
         >
           <div class="card-title">
             <img class="card-logo" v-if="item.avatar && item.avatar.path" :src="basePath + '/user/api/' + item.avatar.path" />
             <div class="mcp_detailBox">
               <span class="mcp_name">{{ item.name }}</span>
-              <span class="mcp_from">
-                <label>
-                  {{ item.from }}
-                </label>
-              </span>
             </div>
             <i class="el-icon-link action-icon"
                style="margin-right: 40px"
-               @click.stop="addressOpen = true"/>
+               @click.stop="$refs.urlDialog.showDialog(item.mcpServerId)"/>
             <i class="el-icon-edit-outline action-icon"
                style="margin-right: 20px"
                @click.stop="handleAddServer(item.mcpServerId)"/>
             <i class="el-icon-delete-solid action-icon"
-              @click.stop="handleDelete(item)"
+               @click.stop="handleDelete(item)"
             ></i>
           </div>
           <div class="card-des">{{ item.desc }}</div>
@@ -56,15 +51,15 @@
 
       <el-empty class="noData" v-if="!(list && list.length)" :description="$t('common.noData')"/>
     </div>
-    <serverDialog ref="serverDialog"/>
-    <urlDialog :dialogVisible="addressOpen"  @handleClose="addressOpen=false"/>
+    <serverDialog ref="serverDialog" @handleFetch="fetchList()"/>
+    <urlDialog ref="urlDialog"/>
   </div>
 </template>
 <script>
 import serverDialog from "./serverDialog.vue";
 import urlDialog from "./urlDialog.vue";
 import SearchInput from "@/components/searchInput.vue"
-import { getList, getServerList, deleteServer } from "@/api/mcp";
+import { getServerList, deleteServer } from "@/api/mcp";
 import LinkIcon from "@/components/linkIcon.vue"
 export default {
   components: { LinkIcon, SearchInput, serverDialog, urlDialog },
@@ -84,31 +79,31 @@ export default {
       const params = {
         name: searchInput.value,
       }
-      getList(params)
-        .then((res) => {
-          this.list = res.data.list || []
-        })
+      getServerList(params)
+          .then((res) => {
+            this.list = res.data.list || []
+          })
     },
     handleClick(mcpServerId) {
-      this.$router.push({path: `/mcp/detail/custom?mcpServerId=${mcpServerId}`})
+      this.$router.push({path: `/mcp/detail/server?mcpServerId=${mcpServerId}`})
     },
     handleAddServer(mcpServerId) {
       this.$refs.serverDialog.showDialog(mcpServerId)
     },
     handleDelete(item) {
       this.$confirm(
-        "确定要删除 <span style='font-weight: bold;'>" + item.name + "</span> 该服务吗？",
-        "提示",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          dangerouslyUseHTMLString: true,
-          type: "warning",
-          center: true,
-        }
+          "确定要删除 <span style='font-weight: bold;'>" + item.name + "</span> 该服务吗？",
+          "提示",
+          {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            dangerouslyUseHTMLString: true,
+            type: "warning",
+            center: true,
+          }
       ).then(async () => {
-        setDelete({
-          mcpId: item.mcpId,
+        deleteServer({
+          mcpServerId: item.mcpServerId,
         }).then((res) => {
           if (res.code === 0) {
             this.$message.success("删除成功")

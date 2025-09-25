@@ -7,17 +7,17 @@
       </div>
       <!-- tabs -->
       <div class="mcp-tabs">
-        <div :class="['mcp-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">MCP服务</div>
-        <div :class="['mcp-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">自定义工具</div>
+        <div :class="['mcp-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">导入MCP服务</div>
+        <div :class="['mcp-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">工具</div>
       </div>
 
-      <mcpIndex ref="mcpIndex" v-if="tabActive === 0"/>
+      <customize ref="customize" v-if="tabActive === 0"/>
       <toolIndex ref="autoTools" v-if="tabActive === 1"/>
     </div>
   </div>
 </template>
 <script>
-import mcpIndex from './mcpIndex'
+import customize from './customize'
 import toolIndex from './toolIndex'
 export default {
   data() {
@@ -25,14 +25,25 @@ export default {
       tabActive:0
     };
   },
-  created() {},
+  watch: {
+    $route: {
+      handler() {
+        this.tabActive = Number(this.$route.query.tabActive) || 0
+      },
+      // 深度观察监听
+      deep: true
+    }
+  },
+  mounted() {
+    this.tabActive = Number(this.$route.query.tabActive) || 0
+  },
   methods: {
     tabClick(status){
       this.tabActive = status
     },
   },
   components: {
-    mcpIndex,
+    customize,
     toolIndex
   },
 };
@@ -94,6 +105,12 @@ export default {
     display: none;
     position: absolute;
     top: 10px;
+    right: 10px;
+    color: #777;
+
+    &:hover {
+      color: $color;
+    }
   }
   .card-box {
     display: flex;
@@ -125,6 +142,7 @@ export default {
       .card-title {
         display: flex;
         width: 100%;
+        height: 58px;
         border-bottom: 1px solid #ddd;
         padding-bottom: 7px;
         .svg-icon {

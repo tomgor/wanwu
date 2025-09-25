@@ -6,9 +6,8 @@
 </template>
 
 <script>
-
 export default {
-  name: "copyIcon",
+  name: "CopyIcon",
   props: {
     iconClass: {
       type: String,
@@ -18,24 +17,35 @@ export default {
   methods: {
     async handleCopy() {
       try {
-        await navigator.clipboard.writeText(this.iconClass);
-        this.$message.success("复制成功");
+        const text = this.iconClass;
+
+        // 优先使用现代 Clipboard API
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          // 降级方案：创建 input 并使用 execCommand
+          const input = document.createElement('input');
+          input.value = text;
+          input.setAttribute('readonly', '');
+          input.style.cssText = 'position: absolute; left: -9999px;';
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand('copy');
+          document.body.removeChild(input);
+        }
+
+        this.$message.success('已复制到剪贴板');
       } catch (err) {
-        this.$message.error("复制失败");
+        console.error('复制失败:', err);
+        this.$message.error('复制失败，请手动复制');
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .copy-icon {
-  color: #333;
-  background: #f5f5f5;
-  border-radius: 4px;
-  padding: 5px 10px;
-  cursor: pointer;
   margin-left: 10px;
 }
 </style>
-
