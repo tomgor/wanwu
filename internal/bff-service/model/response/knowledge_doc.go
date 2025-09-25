@@ -30,6 +30,7 @@ type DocSegmentResp struct {
 	MetaDataList        []*DocMetaData    `json:"metaDataList"`        //文档元数据
 	SegmentContentList  []*SegmentContent `json:"contentList"`         //内容
 	SegmentImportStatus string            `json:"segmentImportStatus"` //分段导入状态描述
+	SegmentMethod       string            `json:"segmentMethod"`       // 分段方式 父子分段/通用分段
 }
 
 type DocMetaData struct {

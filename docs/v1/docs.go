@@ -920,6 +920,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/appspace/workflow/export": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "导出工作流的json文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "workflow"
+                ],
+                "summary": "导出Workflow",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "工作流ID",
+                        "name": "workflow_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/appspace/workflow/import": {
             "post": {
                 "security": [
@@ -6946,40 +6983,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/tool/builtin": {
-            "post": {
-                "description": "修改内置工具",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tool"
-                ],
-                "summary": "修改内置工具",
-                "parameters": [
-                    {
-                        "description": "内置工具信息",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.BuiltInToolReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/tool/custom": {
             "get": {
                 "description": "获取自定义工具详情",
@@ -7283,108 +7286,6 @@ const docTemplate = `{
                                                             "type": "array",
                                                             "items": {
                                                                 "$ref": "#/definitions/response.CustomToolSelect"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/tool/square": {
-            "get": {
-                "description": "获取内置工具详情",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tool.square"
-                ],
-                "summary": "获取内置工具详情",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "toolSquareId",
-                        "name": "toolSquareId",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/response.ToolSquareDetail"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/tool/square/list": {
-            "get": {
-                "description": "获取内置工具列表",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tool.square"
-                ],
-                "summary": "获取内置工具列表",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "tool名称",
-                        "name": "name",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/definitions/response.ListResult"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "list": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "$ref": "#/definitions/response.ToolSquareInfo"
                                                             }
                                                         }
                                                     }
@@ -9578,22 +9479,6 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
-                }
-            }
-        },
-        "request.BuiltInToolReq": {
-            "type": "object",
-            "required": [
-                "toolSquareId"
-            ],
-            "properties": {
-                "apiKey": {
-                    "description": "apiKey",
-                    "type": "string"
-                },
-                "toolSquareId": {
-                    "description": "广场toolId",
-                    "type": "string"
                 }
             }
         },
@@ -12516,10 +12401,6 @@ const docTemplate = `{
                 "schema": {
                     "description": "schema",
                     "type": "string"
-                },
-                "toolSquareId": {
-                    "description": "广场mcpId(非空表示来源于广场)",
-                    "type": "string"
                 }
             }
         },
@@ -12682,6 +12563,10 @@ const docTemplate = `{
                 },
                 "segmentImportStatus": {
                     "description": "分段导入状态描述",
+                    "type": "string"
+                },
+                "segmentMethod": {
+                    "description": "分段方式 父子分段/通用分段",
                     "type": "string"
                 },
                 "segmentTotalNum": {
@@ -13868,7 +13753,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "isParent": {
-                    "description": "父子分段/通用分段",
+                    "description": "父子分段/通用分段 true是父分段，false是通用分段",
                     "type": "boolean"
                 },
                 "labels": {
@@ -13876,9 +13761,6 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
-                },
-                "len": {
-                    "type": "integer"
                 }
             }
         },
@@ -13931,93 +13813,6 @@ const docTemplate = `{
                 },
                 "wordId": {
                     "description": "敏感词id",
-                    "type": "string"
-                }
-            }
-        },
-        "response.ToolSquareDetail": {
-            "type": "object",
-            "properties": {
-                "actionSum": {
-                    "description": "action总数",
-                    "type": "integer"
-                },
-                "apiKey": {
-                    "description": "apiKey",
-                    "type": "string"
-                },
-                "avatar": {
-                    "description": "图标",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/request.Avatar"
-                        }
-                    ]
-                },
-                "desc": {
-                    "description": "描述",
-                    "type": "string"
-                },
-                "detail": {
-                    "description": "详细描述",
-                    "type": "string"
-                },
-                "name": {
-                    "description": "名称",
-                    "type": "string"
-                },
-                "needApiKeyInput": {
-                    "description": "是否需要apiKey输入",
-                    "type": "boolean"
-                },
-                "tags": {
-                    "description": "标签",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "toolSquareId": {
-                    "description": "广场mcpId(非空表示来源于广场)",
-                    "type": "string"
-                },
-                "tools": {
-                    "description": "工具列表",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.MCPTool"
-                    }
-                }
-            }
-        },
-        "response.ToolSquareInfo": {
-            "type": "object",
-            "properties": {
-                "avatar": {
-                    "description": "图标",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/request.Avatar"
-                        }
-                    ]
-                },
-                "desc": {
-                    "description": "描述",
-                    "type": "string"
-                },
-                "name": {
-                    "description": "名称",
-                    "type": "string"
-                },
-                "tags": {
-                    "description": "标签",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "toolSquareId": {
-                    "description": "广场mcpId(非空表示来源于广场)",
                     "type": "string"
                 }
             }

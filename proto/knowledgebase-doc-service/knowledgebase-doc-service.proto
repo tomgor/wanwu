@@ -167,6 +167,7 @@ message DocSegmentListResp{
   string splitter = 8;
   repeated MetaData metaDataList = 9;//文档元数据信息
   string segmentImportStatus = 10;//文档分段导入状态
+  string segmentMethod = 11;
 }
 
 message SegmentContent{
