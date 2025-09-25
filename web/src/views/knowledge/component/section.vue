@@ -354,10 +354,15 @@ export default {
       }
     },
     handleSubmit(){
-      if(this.oldContent === this.cardObj[0]['content'] ){
+      // 检查是否有修改
+      const hasChanges = this.oldContent !== this.cardObj[0]['content'];
+      
+      if(!hasChanges){
         this.$message.warning('无修改')
         return false;
       }
+      
+      // 只处理有修改的内容
       this.submitLoading = true;
       editSegment({content:this.cardObj[0]['content'],contentId:this.cardObj[0]['contentId'],docId:this.obj.id}).then(res =>{
         if(res.code === 0){
