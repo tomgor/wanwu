@@ -323,6 +323,7 @@ services:
       KAFKA_DOC_STATUS_INIT_URL: http://bff-service:6668/v1/api/doc_status_init
       MODEL_PROVIDER_URL: http://bff-service:6668
       REPLACE_MINIO_DOWNLOAD_URL: ${WANWU_WEB_BASE_URL}/minio/download/api/
+    command: /model_extend/start.sh
 
   # agentscope:
   #   restart: always
