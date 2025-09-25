@@ -123,6 +123,7 @@
                   </div>
                 </el-option>
               </el-select>
+              <div class="model-select-tips" v-if="editForm.visionsupport === 'support'">*您选择的是图文问答类模型，此类模型暂时无法调用知识库、联网检索及工具</div>
             </div>
           </div>
           <div class="block prompt-box">
@@ -494,9 +495,9 @@ export default {
       showActionConfig: false,
       rerankOptions: [],
       initialEditForm: null,
-        editForm: {
-          visionsupport:'',
-          assistantId: "",
+      editForm: {
+        visionsupport:'',
+        assistantId: "",
         avatar: {},
         name: "",
         desc: "",
@@ -619,7 +620,7 @@ export default {
     setModelInfo(val){
        const selectedModel = this.modleOptions.find(item => item.modelId === val);
         if (selectedModel) {
-          // this.editForm.visionsupport = selectedModel.config.visionSupport;
+          this.editForm.visionsupport = selectedModel.config.visionSupport;
           this.limitMaxTokens = selectedModel.config.maxTokens?selectedModel.config.maxTokens:this.limitMaxTokens;
         }
     },
@@ -1325,6 +1326,10 @@ export default {
       }
       .model-select {
         width: 100%;
+      }
+      .model-select-tips{
+        margin-top: 10px;
+        color: #dc6803;
       }
       .operation {
         text-align: center;
