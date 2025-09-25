@@ -10,12 +10,6 @@
     >
       <div v-loading="loading">
         <el-button-group class="mcpBtn">
-          <!-- <el-button
-            type="primary"
-            @click="handleClick('工具广场')"
-            :class="{ active: active === '工具广场' }"
-            >工具广场</el-button
-          > -->
           <el-button
             type="primary"
             @click="handleClick('自定义MCP')"
