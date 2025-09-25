@@ -161,6 +161,7 @@ export default {
       }).then((res) => {
         if (res.code === 0) {
           this.$message.success(this.$t('common.message.success'))
+          this.getDetailData()
         }
       })
     },

@@ -106,6 +106,7 @@ export default {
             this.uploading = false
             this.$message.success(this.$t('common.message.success'))
             this.handleClose()
+            this.$emit('reloadData')
           }).catch(() => this.uploading = false)
         }
       })
