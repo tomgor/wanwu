@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	net_url "net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -140,6 +141,11 @@ func (s *Service) GetConversationDetailList(ctx context.Context, req *assistant_
 			log.Warnf("解析ES文档失败: %v", err)
 			continue
 		}
+
+		// 替换fileUrl为minio对外下载url
+		downloadURL := os.Getenv("MINIO_DOWNLOAD_URL")
+		minioEndpoint := os.Getenv("MINIO_ENDPOINT")
+		detail.FileUrl = strings.Replace(detail.FileUrl, "http://"+minioEndpoint+"/", downloadURL, 1)
 
 		conversationDetails = append(conversationDetails, &assistant_service.ConversionDetailInfo{
 			Id:              detail.Id,
