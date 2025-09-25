@@ -176,7 +176,7 @@
                             response:[0,1,2,3,4,5,6,20,21,10].includes(n.qa_type)?md.render(n.response):n.response.replaceAll('\n-','\n•'),
                             oriResponse:n.response,
                             searchList: n.searchList ? n.searchList : [],
-                            filepath: n.responseFileUrls,
+                            filepath: n.responseFileUrls[0]||'',
                             "gen_file_url_list":n.responseFileUrls || [],
                             "isOpen":true,
                             toolText:'已使用工具',

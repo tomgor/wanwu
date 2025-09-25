@@ -73,12 +73,7 @@ export default {
         this.listData = []
         this.type = type
         this.$refs.searchInput.value = ''
-        // if(this.type === 'agent'){
-        //   this.agnet_type = 'template'
-        //   this.getAgentTemplate()
-        // }else{
-        //   this.getTableData()
-        // }
+        // this.getTypeData();
         this.getTableData()
       },
       // 深度观察监听
@@ -88,12 +83,7 @@ export default {
       handler(val){
         if(val !== ''){
           this.type = val;
-          // if(this.type === 'agent'){
-          //   this.agnet_type = 'template'
-          //   this.getAgentTemplate()
-          // }else{
-          //     this.getTableData()
-          // }
+          // this.getTypeData();
           this.getTableData()
         }
       }
@@ -105,15 +95,18 @@ export default {
   mounted() {
     const {type} = this.$route.params || {}
     this.type = type
-    // if(this.type === 'agent'){
-    //   this.agnet_type = 'template'
-    //   this.getAgentTemplate();
-    // }else{
-    //   this.getTableData();
-    // }
+    // this.getTypeData();
     this.getTableData();
   },
   methods: {
+    getTypeData(){
+      if(this.type === 'agent'){
+      this.agnet_type = 'template'
+      this.getAgentTemplate();
+      }else{
+        this.getTableData();
+      }
+    },
     handleSearch(){
       if(this.type === 'agent' && this.agnet_type === 'template'){
         this.getAgentTemplate();
