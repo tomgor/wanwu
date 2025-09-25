@@ -227,6 +227,7 @@ export default {
         if(!citationElement) return;
         const tagIndex = citationElement.textContent;
         const allSubTag = document.querySelectorAll('.subTag');
+        if(allSubTag.length === 0) return;
         const parentsIndex = allSubTag[tagIndex - 1].dataset.parentsIndex;
         const collapse = allSubTag[tagIndex - 1].dataset.collapse;
         if(allSubTag.length === 0) return;
