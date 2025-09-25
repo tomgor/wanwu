@@ -103,7 +103,7 @@
                 <span>
                   {{ $t('knowledgeManage.split')+":" + item.contentNum }}
                   <span class="segment-type">#{{ item.isParent?"父子分段":"通用分段" }}</span>
-                  <span class="segment-length">#{{ item.content.length }}{{$t('knowledgeManage.character')}}</span>
+                  <span class="segment-length" v-if="!item.isParent">#{{ item.content.length }}{{$t('knowledgeManage.character')}}</span>
                   <span class="segment-child" v-if="item.childNum">#{{ item.childNum || 0 }}个子分段</span>
                 </span>
                 <div>
@@ -166,6 +166,7 @@
       width="60%"
       :show-close="false"
       v-loading="loading.dialog"
+      class="section-dialog"
     >
       <div slot="title">
         <span style="font-size: 16px">{{$t('knowledgeManage.detailView')}}</span>
@@ -177,7 +178,7 @@
         >
         </el-switch>
       </div>
-      <div>
+      <div class="dialog-content">
         <el-table
           :data="cardObj"
           border
@@ -198,13 +199,13 @@
                 v-model="scope.row.content"
                 :autosize="{ minRows: 3, maxRows: 5}"
                 class="full-width-textarea"
+                :disabled="scope.row.isParent"
                 >
               </el-input>
               <div class="segment-list" v-if="scope.row.childContent.length > 0">
                 <el-collapse 
                   v-model="activeNames" 
                   class="section-collapse"
-                  accordion
                 >
                   <el-collapse-item 
                     v-for="(segment, index) in scope.row.childContent" 
@@ -214,18 +215,14 @@
                   >
                     <template slot="title">
                       <span class="segment-badge">C#-{{ index + 1 }}</span>
-                      <span class="segment-score">
-                        <span class="score-label">命中得分:</span>
-                        <span class="score-value">{{ formatScore(segment.score || 0.85761) }}</span>
-                      </span>
                     </template>
-                    {{ index + 1 }}、{{ segment.content }}
-                    <span class="segment-action">(展示完整分段内容)</span>
-                    <span v-if="segment.autoSave" class="auto-save">--失去焦点自动保存</span>
-                    <div class="segment-actions">
+                    <div class="segment-content">
+                      {{ index + 1 }}、{{ segment.content }}
+                    </div>
+                    <!-- <div class="segment-actions">
                       <i class="el-icon-edit-outline edit-icon" @click="editSegment(scope.row, index)"></i>
                       <i class="el-icon-delete delete-icon" @click="deleteSegment(scope.row, index)"></i>
-                    </div>
+                    </div> -->
                   </el-collapse-item>
                 </el-collapse>
               </div>
@@ -235,7 +232,7 @@
       </div>
 
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleSubmit" :loading="submitLoading">确定</el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="submitLoading" v-if="!cardObj[0]['isParent']">确定</el-button>
         <!-- <el-button type="primary" @click="handleParse" v-if="cardObj[0]['isParent']">保存并重新解析子分段</el-button> -->
         <el-button type="primary" @click="handleClose">{{$t('knowledgeManage.close')}}</el-button>
       </span>
@@ -318,6 +315,8 @@ export default {
         if(res.code === 0){
           this.$message.success('解析成功');
           this.cardObj[0].childContent = res.data.contentList || [];
+          // 设置所有折叠项为展开状态
+          this.activeNames = this.cardObj[0].childContent.map((_, index) => index);
         }
       }).catch(() =>{})
     },
@@ -484,8 +483,12 @@ export default {
       this.$nextTick(() => {
         this.$set(obj,'childContent',[]);
         this.cardObj = [obj];
-        this.handleParse();
+        if(this.cardObj[0].isParent){
+          this.handleParse();
+        }
         this.activeStatus = obj.available;
+        // 默认展开所有折叠项
+        this.activeNames = [];
       });
     },
     handleCurrentChange(val) {
@@ -582,6 +585,10 @@ export default {
 };
 </script>
 <style lang="scss">
+.dialog-content {
+  max-height:55vh!important;
+  overflow-y: auto;
+}
 .segment-list {
   margin-top: 10px;
   
@@ -666,6 +673,11 @@ export default {
         font-weight: bold;
         font-family: 'Courier New', monospace;
       }
+    }
+    
+    .segment-content {
+      padding: 10px;
+      text-align: left;
     }
     
     /deep/ .el-collapse-item__content {
