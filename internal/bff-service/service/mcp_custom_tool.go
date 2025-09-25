@@ -2,6 +2,8 @@ package service
 
 import (
 	"encoding/json"
+	"strings"
+
 	assistant_service "github.com/UnicomAI/wanwu/api/proto/assistant-service"
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
@@ -11,7 +13,6 @@ import (
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/yaml.v3"
-	"strings"
 )
 
 func CreateCustomTool(ctx *gin.Context, userID, orgID string, req request.CustomToolCreate) error {

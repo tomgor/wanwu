@@ -2,13 +2,13 @@ package mcp
 
 import (
 	"context"
-	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"strings"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
 	"github.com/UnicomAI/wanwu/internal/mcp-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/mcp-service/config"
+	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/util"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -37,6 +37,7 @@ func (s *Service) CreateCustomTool(ctx context.Context, req *mcp_service.CreateC
 	}
 	return &emptypb.Empty{}, nil
 }
+
 func (s *Service) GetCustomToolInfo(ctx context.Context, req *mcp_service.GetCustomToolInfoReq) (*mcp_service.GetCustomToolInfoResp, error) {
 	if req.CustomToolId == "" && req.ToolSquareId == "" {
 		return nil, errStatus(errs.Code_MCPGetCustomToolInfoErr, toErrStatus("mcp_get_custom_tool_info_err", "customToolId and toolSquareId are empty"))
@@ -133,6 +134,7 @@ func (s *Service) GetCustomToolInfo(ctx context.Context, req *mcp_service.GetCus
 		},
 	}, nil
 }
+
 func (s *Service) GetCustomToolList(ctx context.Context, req *mcp_service.GetCustomToolListReq) (*mcp_service.GetCustomToolListResp, error) {
 	if req.Identity == nil {
 		return nil, errStatus(errs.Code_MCPGetCustomToolListErr, toErrStatus("mcp_get_custom_tool_list_err", "identity is empty"))
@@ -153,6 +155,7 @@ func (s *Service) GetCustomToolList(ctx context.Context, req *mcp_service.GetCus
 		List: list,
 	}, nil
 }
+
 func (s *Service) GetCustomToolByCustomToolIdList(ctx context.Context, req *mcp_service.GetCustomToolByCustomToolIdListReq) (*mcp_service.GetCustomToolListResp, error) {
 	if len(req.CustomToolIdList) == 0 {
 		return nil, errStatus(errs.Code_MCPGetCustomToolListErr, toErrStatus("mcp_get_custom_tool_list_err", "customToolIdList is empty"))
@@ -181,6 +184,7 @@ func (s *Service) GetCustomToolByCustomToolIdList(ctx context.Context, req *mcp_
 		List: list,
 	}, nil
 }
+
 func (s *Service) UpdateCustomTool(ctx context.Context, req *mcp_service.UpdateCustomToolReq) (*emptypb.Empty, error) {
 	if req.CustomToolId == "" {
 		return nil, errStatus(errs.Code_MCPUpdateCustomToolErr, toErrStatus("mcp_update_custom_tool_err", "customToolId is empty"))
@@ -203,6 +207,7 @@ func (s *Service) UpdateCustomTool(ctx context.Context, req *mcp_service.UpdateC
 	}
 	return &emptypb.Empty{}, nil
 }
+
 func (s *Service) DeleteCustomTool(ctx context.Context, req *mcp_service.DeleteCustomToolReq) (*emptypb.Empty, error) {
 	if req.CustomToolId == "" {
 		return nil, errStatus(errs.Code_MCPDeleteCustomToolErr, toErrStatus("mcp_delete_custom_tool_err", "customToolId is empty"))
@@ -231,6 +236,7 @@ func (s *Service) GetSquareTool(ctx context.Context, req *mcp_service.GetSquareT
 	}
 	return buildSquareToolDetail(mcpCfg, apiKey), nil
 }
+
 func (s *Service) GetSquareToolList(ctx context.Context, req *mcp_service.GetSquareToolListReq) (*mcp_service.SquareToolList, error) {
 	var toolSquareInfo []*mcp_service.ToolSquareInfo
 	for _, toolCfg := range config.Cfg().Tools {
@@ -251,6 +257,7 @@ func buildSquareToolInfo(toolCfg config.ToolConfig) *mcp_service.ToolSquareInfo 
 		Tags:         toolCfg.Tags,
 	}
 }
+
 func buildSquareToolDetail(toolCfg config.ToolConfig, apiKey string) *mcp_service.SquareToolDetail {
 	return &mcp_service.SquareToolDetail{
 		Info: buildSquareToolInfo(toolCfg),

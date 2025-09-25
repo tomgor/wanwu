@@ -23,6 +23,17 @@ const (
 	MsgRoleFunction  MsgRole = "tool"
 )
 
+const (
+	TagChat          string = "CHAT"
+	TagEmbedding     string = "Embedding"
+	TagRerank        string = "Rerank"
+	TagGui           string = "GUI"
+	TagOcr           string = "OCR"
+	TagPdfParser     string = "PDF解析"
+	TagVisionSupport string = "图文问答"
+	TagToolCall      string = "工具调用"
+)
+
 type Tag struct {
 	Text string `json:"text"`
 }
@@ -41,9 +52,9 @@ func GetTagsByContentSize(size *int) []Tag {
 	var tags []Tag
 	if size != nil && *size > 0 {
 		kValue := *size / 1024
-		// 格式化为"Xk"字符串并添加到tags列表
+		// 格式化为"XK"字符串并添加到tags列表
 		tags = append(tags, Tag{
-			Text: fmt.Sprintf("%dk", kValue),
+			Text: fmt.Sprintf("%dK", kValue),
 		})
 	}
 	return tags
@@ -61,17 +72,6 @@ const (
 	FCTypeFunctionCall FCType = "functionCall"
 	FCTypeNoSupport    FCType = "noSupport"
 	FCTypeToolCall     FCType = "toolCall"
-)
-
-const (
-	TagChat          string = "CHAT"
-	TagEmbedding     string = "Embedding"
-	TagRerank        string = "Rerank"
-	TagGui           string = "GUI"
-	TagOcr           string = "OCR"
-	TagPdfParser     string = "PDF解析"
-	TagVisionSupport string = "图文问答"
-	TagToolCall      string = "工具调用"
 )
 
 type VSType string

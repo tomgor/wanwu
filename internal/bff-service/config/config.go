@@ -83,11 +83,11 @@ type WorkflowServiceConfig struct {
 	DeleteUri          string               `json:"delete_uri" mapstructure:"delete_uri"`
 	CopyUri            string               `json:"copy_uri" mapstructure:"copy_uri"`
 	ExportUri          string               `json:"export_uri" mapstructure:"export_uri"`
+	ImportUri          string               `json:"import_uri" mapstructure:"import_uri"`
 	TestRunUri         string               `json:"test_run_uri" mapstructure:"test_run_uri"`
 	UploadActionUri    string               `json:"upload_action_uri" mapstructure:"upload_action_uri"`
 	UploadCommonUri    string               `json:"upload_common_uri" mapstructure:"upload_common_uri"`
 	SignImgUri         string               `json:"sign_img_uri" mapstructure:"sign_img_uri"`
-	ImportUri          string               `json:"import_uri" mapstructure:"import_uri"`
 	ModelParams        []WorkflowModelParam `json:"model_params" mapstructure:"model_params"`
 }
 

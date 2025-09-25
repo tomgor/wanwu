@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/samber/lo"
 	"time"
 
+	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
+	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/generator"
@@ -15,9 +16,7 @@ import (
 	rag_service "github.com/UnicomAI/wanwu/internal/knowledge-service/service"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	pkg_util "github.com/UnicomAI/wanwu/pkg/util"
-
-	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
-	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
+	"github.com/samber/lo"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 

@@ -82,6 +82,7 @@ func (s *Service) GetCustomMCPList(ctx context.Context, req *mcp_service.GetCust
 	}
 	return &mcp_service.CustomMCPList{Infos: infos}, nil
 }
+
 func (s *Service) GetCustomMCPByMCPIdList(ctx context.Context, req *mcp_service.GetCustomMCPByMCPIdListReq) (*mcp_service.CustomMCPList, error) {
 	// 校验MCP ID列表是否为空
 	if len(req.McpIdList) == 0 {

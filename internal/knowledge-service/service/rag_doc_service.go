@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/config"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/http"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/mq"

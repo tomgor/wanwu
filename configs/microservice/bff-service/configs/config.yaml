@@ -189,12 +189,12 @@ workflow:
   create_uri: /api/workflow_api/create
   delete_uri: /api/workflow_api/delete
   copy_uri: /api/workflow_api/copy
+  export_uri: /api/workflow_api/export
+  import_uri: /api/workflow_api/import
   test_run_uri: /v1/workflow/%v/run_by_wanwu
   upload_action_uri: /api/common/upload/apply_upload_action
   upload_common_uri: /api/common/upload
   sign_img_uri: /api/workflow_api/sign_image_url
-  export_uri: /api/workflow_api/export
-  import_uri: /api/workflow_api/import
 
   model_params:
     - name: temperature

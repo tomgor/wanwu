@@ -2,13 +2,13 @@ package orm
 
 import (
 	"context"
-	"github.com/UnicomAI/wanwu/pkg/log"
 	"strconv"
 
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm/sqlopt"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/db"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/service"
+	"github.com/UnicomAI/wanwu/pkg/log"
 	"gorm.io/gorm"
 )
 
