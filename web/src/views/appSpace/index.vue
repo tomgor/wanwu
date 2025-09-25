@@ -27,7 +27,11 @@
         @reloadData="getTableData"
       />
       <CreateTotalDialog ref="createTotalDialog" />
-      <UploadFileDialog :title="$t('appSpace.workflowExport')" ref="uploadFileDialog" />
+      <UploadFileDialog
+        @reloadData="getTableData"
+        :title="$t('appSpace.workflowExport')"
+        ref="uploadFileDialog"
+      />
     </div>
   </div>
 </template>

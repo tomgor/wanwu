@@ -101,6 +101,8 @@ export default {
   label {
     display: inline-block !important;
     width: auto !important;
+    margin-right: 5px;
+    
   }
 }
 </style>
