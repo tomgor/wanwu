@@ -445,6 +445,9 @@ export default {
                 },
                 onmessage: (e) => {
                     if (e && e.data) {
+                        if (!this.isConnectionClosed) {
+                            this.setStoreSessionStatus(0)
+                          }
                         let data = JSON.parse(e.data)
                         console.log('===>',new Date().getTime(),data)
                         this.sseResponse = data

@@ -51,7 +51,7 @@ export default {
             }
             
             if(matchType === 'mix' && priorityMatch === 1){
-                this.formInline.knowledgeMatchParams.rerankModelId = '';
+                this.knowledgeConfig.rerankModelId = '';
             }
             this.dialogVisible = false;
             this.$emit('setKnowledgeSet',this.knowledgeConfig)
