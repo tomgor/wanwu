@@ -137,7 +137,7 @@ func (c *DocImportReq) Check() error {
 		for _, v := range c.DocAnalyzer {
 			if v == DocAnalyzerOCR || v == DocAnalyzerPdfParser {
 				if c.ParserModelId == "" {
-					return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "ocrModelId can not be empty")
+					return errors.New("parserModelId can not be empty")
 				}
 			}
 		}
@@ -173,10 +173,13 @@ func (c *DocImportReq) Check() error {
 
 	if c.DocSegment != nil {
 		if c.DocSegment.SegmentMethod != CommonSplitMethod && c.DocSegment.SegmentMethod != ParentSplitMethod {
-			return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "segmentMethod error")
+			return errors.New("segmentMethod error")
 		}
 		if c.DocSegment.SegmentMethod == CommonSplitMethod && c.DocSegment.SegmentType == "" {
-			return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "segmentType error")
+			return errors.New("segmentType error")
+		}
+		if c.DocSegment.SubMaxSplitter > c.DocSegment.MaxSplitter {
+			return errors.New("subMaxSplitter error")
 		}
 	}
 
