@@ -48,9 +48,11 @@
           <div class="tool-item">
             <!--<p class="title">工具介绍:</p>-->
             <div class="tool-item-bg tool-intro">
-              <el-collapse class="mcp-el-collapse">
+              <el-collapse class="mcp-el-collapse" v-model="activeNames">
                 <el-collapse-item v-for="(n,i) in tools" :key="n.name + i" :title="n.name" :name="i">
-                  <div class="desc">描述：<span v-html="parseTxt(n.description)"></span></div>
+                  <div class="desc" v-if="n.description">
+                    描述：<span v-html="parseTxt(n.description)"></span>
+                  </div>
                   <div class="params">
                     <p>参数说明:</p>
                     <div class="params-table" v-for="(m, j) in n.params" :key="m.name + j">
@@ -97,6 +99,7 @@ export default {
       foldStatus:false,
       tabActive:0,
       recommendList: [],
+      activeNames: [],
       dialogVisible: false,
     };
   },
@@ -129,6 +132,7 @@ export default {
         this.detail = data
         this.apiKey = data.apiKey || ''
         this.tools = formatTools(data.tools)
+        this.activeNames = data.actionSum === 1 ? [0] : []
       })
     },
     getRecommendList() {
