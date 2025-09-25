@@ -188,6 +188,19 @@ stop-workflow:
 		--env-file .env \
 		down workflow
 
+# --- rag ---
+run-rag:
+	docker compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		up -d rag
+
+down-rag:
+	docker compose -f docker-compose-develop.yaml \
+		--env-file .env.image.${WANWU_ARCH} \
+		--env-file .env \
+		down rag
+
 # --- agentscope ---
 # run-agentscope: # 启动agentscope后自动重启下nginx
 # 	docker compose -f docker-compose-develop.yaml \

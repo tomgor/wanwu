@@ -615,6 +615,12 @@ services:
       REDIS_HOST: ${WANWU_REDIS_HOST}
       REDIS_PORT: ${WANWU_REDIS_PORT}
       REDIS_PASSWD: ${WANWU_REDIS_PASSWORD}
+      # 用于rag调用外部API的env
+      GET_KB_ID_URL: http://bff-service:6668/v1/api/category/info
+      KAFKA_MQ_REL_URL: http://bff-service:6668/v1/api/docstatus
+      KAFKA_DOC_STATUS_INIT_URL: http://bff-service:6668/v1/api/doc_status_init
+      MODEL_PROVIDER_URL: http://bff-service:6668
+      REPLACE_MINIO_DOWNLOAD_URL: ${WANWU_WEB_BASE_URL}/minio/download/api/
 
   agent:
     depends_on:

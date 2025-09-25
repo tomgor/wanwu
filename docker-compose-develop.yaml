@@ -289,6 +289,41 @@ services:
     working_dir: /app
     command: ./bin/workflow-wanwu
 
+  rag:
+    restart: always
+    image: ${WANWU_RAG_BASE_IMAGE}
+    container_name: rag-wanwu
+    networks:
+      - ${WANWU_DOCKER_NETWORK}
+    ports:
+      - 8613:8613
+      - 8681:8681
+      - 10891:10891
+      - 15000:15000
+    volumes:
+      - ./rag/rag_open_source:/model_extend
+      - ${WANWU_PROJECT_DIR}/rag-wanwu/langchain_rag-master/logs:/model_extend/build/dist/langchain_rag-master/logs
+      - ${WANWU_PROJECT_DIR}/rag-wanwu/rag-es-server-unify/logs:/model_extend/build/dist/rag-es-server-unify/logs
+    environment:
+      MINIO_ADDRESS: ${WANWU_MINIO_ENDPOINT}
+      MINIO_ACCESS_KEY: ${WANWU_MINIO_USER}
+      MINIO_SECRET_KEY: ${WANWU_MINIO_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: ${WANWU_KAFKA_ADDRESS}
+      KAFKA_SASL_PLAIN_USERNAME: ${WANWU_KAFKA_USER}
+      KAFKA_SASL_PLAIN_PASSWORD: ${WANWU_KAFKA_PASSWORD}
+      ES_HOSTS: https://${WANWU_ELASTIC_ADDRESS}
+      ES_USER: ${WANWU_ELASTIC_USER}
+      ES_PASSWORD: ${WANWU_ELASTIC_PASSWORD}
+      REDIS_HOST: ${WANWU_REDIS_HOST}
+      REDIS_PORT: ${WANWU_REDIS_PORT}
+      REDIS_PASSWD: ${WANWU_REDIS_PASSWORD}
+      # 用于rag调用外部API的env
+      GET_KB_ID_URL: http://bff-service:6668/v1/api/category/info
+      KAFKA_MQ_REL_URL: http://bff-service:6668/v1/api/docstatus
+      KAFKA_DOC_STATUS_INIT_URL: http://bff-service:6668/v1/api/doc_status_init
+      MODEL_PROVIDER_URL: http://bff-service:6668
+      REPLACE_MINIO_DOWNLOAD_URL: ${WANWU_WEB_BASE_URL}/minio/download/api/
+
   # agentscope:
   #   restart: always
   #   image: ${WANWU_AGENTSCOPE_BASE_IMAGE}
