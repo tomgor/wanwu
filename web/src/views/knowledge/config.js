@@ -7,6 +7,7 @@ export const FAT_SON_BLOCK = [
         maxSplitter:'maxSplitter',
         splitterProp:'docSegment.splitter',
         maxSplitterProp:'docSegment.maxSplitter',
+        maxSplitterNum:4000,
     },
     {
         title:'子块',
@@ -15,7 +16,8 @@ export const FAT_SON_BLOCK = [
         splitter:'subSplitter',
         maxSplitter:'subMaxSplitter',
         splitterProp:'docSegment.subSplitter',
-        maxSplitterProp:'docSegment.subMaxSplitter'
+        maxSplitterProp:'docSegment.subMaxSplitter',
+        maxSplitterNum:4000,
     }
 ]
 export const SEGMENT_COMMON_LIST = [

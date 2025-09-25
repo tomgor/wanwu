@@ -243,7 +243,7 @@
                     :prop="item.maxSplitterProp"
                     :rules="[
                     { required: true, message: $t('knowledgeManage.splitMax'),trigger:'blur'},
-                    { type:'number',min:200,max:4000,message:'请输入有效范围内的数值',trigger: 'blur'}
+                    { type:'number',min:200,max:item.maxSplitterNum,message:'请输入有效范围内的数值',trigger: 'blur'}
                     ]"
                   >
                     <template #label>
@@ -255,7 +255,7 @@
                         <span class="el-icon-question question"></span>
                       </el-tooltip>
                     </template>
-                    <el-input type="number" :min="200" :max="4000" v-model.number="ruleForm.docSegment[item.maxSplitter]" :placeholder="$t('knowledgeManage.splitMax')"></el-input>
+                    <el-input type="number" :min="200" :max="item.maxSplitterNum" v-model.number="ruleForm.docSegment[item.maxSplitter]" :placeholder="$t('knowledgeManage.splitMax')" @change="maxSplitterChange(item)"></el-input>
                   </el-form-item>
                 </div>
               </template>
@@ -519,6 +519,26 @@ export default {
     await this.custom();
   },
   methods: {
+    maxSplitterChange(item){
+      if(item.level === 'parent'){
+        const parentMaxValue = this.ruleForm.docSegment.maxSplitter;
+        const sonBlock = this.fatSonBlock.find(block => block.level === 'son');
+        if (sonBlock) {
+          sonBlock.maxSplitterNum = parentMaxValue;
+          if (this.ruleForm.docSegment.subMaxSplitter > parentMaxValue) {
+            this.ruleForm.docSegment.subMaxSplitter = parentMaxValue;
+            this.$message.warning(`子分段最大值已调整为 ${parentMaxValue}，不能超过父分段的最大值`);
+          }
+        }
+      }else if(item.level === 'son'){
+        const sonMaxValue = this.ruleForm.docSegment.subMaxSplitter;
+        const parentMaxValue = this.ruleForm.docSegment.maxSplitter;
+        if (sonMaxValue > parentMaxValue) {
+          this.ruleForm.docSegment.subMaxSplitter = parentMaxValue;
+          this.$message.warning(`子分段最大值不能超过父分段的最大值 ${parentMaxValue}`);
+        }
+      }
+    },
     getParserList() {
       parserSelect()
         .then((res) => {
