@@ -8,10 +8,10 @@ WORKDIR /model_extend
 RUN mkdir -p /model_extend/
 
 # 2. 复制本地文件
-COPY ./rag/rag_core /model_extend/rag_core
-COPY ./rag/minio_project /model_extend/minio_project
-COPY ./rag/rag_es_server_unify /model_extend/rag_es_server_unify
-COPY ./rag/start.sh /model_extend/start.sh
+COPY ./rag/rag_open_source/rag_core /model_extend/rag_core
+COPY ./rag/rag_open_source/minio_project /model_extend/minio_project
+COPY ./rag/rag_open_source/rag_es_server_unify /model_extend/rag_es_server_unify
+COPY ./rag/rag_open_source/start.sh /model_extend/start.sh
 
 # 4. 设置脚本权限
 RUN chmod +x /model_extend/start.sh
