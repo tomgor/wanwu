@@ -303,8 +303,8 @@ services:
       - 15000:15000
     volumes:
       - ./rag/rag_open_source:/model_extend
-      - ${WANWU_PROJECT_DIR}/rag-wanwu/rag_core/logs:/model_extend/build/dist/rag_core/logs
-      - ${WANWU_PROJECT_DIR}/rag-wanwu/rag_es_server_unify/logs:/model_extend/build/dist/rag_es_server_unify/logs
+      - ${WANWU_PROJECT_DIR}/rag-wanwu/rag_core/logs:/model_extend/rag_core/logs
+      - ${WANWU_PROJECT_DIR}/rag-wanwu/rag_es_server_unify/logs:/model_extend/rag_es_server_unify/logs
     environment:
       MINIO_ADDRESS: ${WANWU_MINIO_ENDPOINT}
       MINIO_ACCESS_KEY: ${WANWU_MINIO_USER}
