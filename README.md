@@ -18,11 +18,10 @@
 </p>
 <p align="center">
     English |
-    <a href="https://github.com/UnicomAI/wanwu/blob/main/README_CN.md">中文</a> |
+    <a href="https://github.com/UnicomAI/wanwu/blob/main/README_CN.md">简体中文</a> |
     <a href="https://github.com/UnicomAI/wanwu/blob/main/README_繁體.md">繁體中文</a>
 </p>
 </div>
-
 **Wanwu AI Agent Platform** is an **enterprise-grade** **one-stop** **commercially friendly** AI agent development platform designed for business scenarios. It is committed to providing enterprises with a safe, efficient, and compliant one-stop AI solution. With the core philosophy of "technology openness and ecological co-construction", we integrate cutting-edge technologies such as large language models and business process automation to build an AI engineering platform with a complete functional system covering model full life-cycle management, MCP, web search, AI agent rapid development, enterprise knowledge base construction, and complex workflow orchestration. The platform adopts a modular architecture design, supports flexible functional expansion and secondary development, and greatly reduces the application threshold of AI technology while ensuring the security and privacy protection of enterprise data. Whether it is for small and medium-sized enterprises to quickly build intelligent applications or for large enterprises to achieve intelligent transformation of complex business scenarios, the Wanwu AI Agent Platform can provide strong technical support to help enterprises accelerate the process of digital transformation, achieve cost reduction and efficiency improvement, and business innovation.
 
 ------
@@ -118,7 +117,7 @@ The platform has been successfully applied in multiple industries such as **fina
     # amd64 / arm64
     WANWU_ARCH=amd64
     
-    # external ip port (Note: if the browser accesses Wanwu deployed on a non-localhost server, you need to change localhost to the external IP, for example, 192.168.xx.xx.)
+    # external ip port (Note: localhost should be replaced with the local area network or external IP of the machine, such as 192.168.0.xx, and cannot be localhost or 127.0.0.1)
     WANWU_EXTERNAL_IP=localhost
     ```
     1.3 Create a Docker running network
@@ -190,25 +189,26 @@ The platform has been successfully applied in multiple industries such as **fina
 ------
 ### &#x1F4D1; Using Wanwu
 To help you quickly get started with this project, we strongly recommend that you first check out the [ Documentation Operation Manual](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual). We provide users with interactive and structured operation guides, where you can directly view operation instructions, interface documents, etc., greatly reducing the threshold for learning and use. The detailed function list is as follows:
-|                           Function                           | Detailed Description                                         |
-| :----------------------------------------------------------: | :----------------------------------------------------------- |
-| [Model Management](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/1.%E6%A8%A1%E5%9E%8B%E7%AE%A1%E7%90%86.md) | Supports users to import LLM, Embedding, and Rerank models from model suppliers such as Unicom Yujing, OpenAI-API-compatible, Ollama, Tongyi Qianwen, and Volcano Engine. [ Model Import Method-Detailed Version](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/%E6%A8%A1%E5%9E%8B%E5%AF%BC%E5%85%A5%E6%96%B9%E5%BC%8F-%E8%AF%A6%E7%BB%86%E7%89%88.md) |
-| [Knowledge Base](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/2.%E7%9F%A5%E8%AF%86%E5%BA%93) | Document parsing (supports OCR), hit testing, and keyword management |
-| [Tool Square](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/3.%E5%B7%A5%E5%85%B7%E5%B9%BF%E5%9C%BA.md) | Built-in 100+ selected industry MCP servers, while also supporting importing your own MCP services or custom tools and using them in workflows and agents |
-| [Safety Barrier](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/4.%E5%AE%89%E5%85%A8%E6%8A%A4%E6%A0%8F.md) | Users can create a list of sensitive words to control the security of model feedback results |
-| [Text Q&A](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/5.%E6%96%87%E6%9C%AC%E9%97%AE%E7%AD%94.md) | Exclusive knowledge consultant based on a private knowledge base, supporting knowledge base management, knowledge Q&A, knowledge summary, personalized parameter configuration, safety barrier, search configuration, and other functions to improve the efficiency of knowledge management and learning. Supports public or private release of text Q&A applications |
-| [Workflow](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/6.%E5%B7%A5%E4%BD%9C%E6%B5%81) | Can expand the ability boundary of agents, composed of nodes, providing visual workflow editing capabilities, users can orchestrate multiple different workflow nodes to achieve complex and stable business processes. Supports public or private release of workflow applications |
-| [Agent](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/7.%E6%99%BA%E8%83%BD%E4%BD%93.md) | Create agents based on user usage scenarios and business needs, support selecting models, setting prompts, online search, knowledge base selection, MCP, workflow, custom tools, etc. Supports public or private release of agent applications |
-| [Application Square](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/8.%E5%BA%94%E7%94%A8%E5%B9%BF%E5%9C%BA.md) | Supports users to experience the applications that have been released, including text Q&A, workflow, and agents |
-| [Settings](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/9.%E8%AE%BE%E7%BD%AE.md) | The platform supports multi-tenancy, allowing users to manage organizations, roles, users, and platform basic configurations |
+
+| Feature                                                      | Detailed Description                                         |
+| :----------------------------------------------------------- | :----------------------------------------------------------- |
+| [Model Management](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/1.%E6%A8%A1%E5%9E%8B%E7%AE%A1%E7%90%86.md) | Supports users to import LLM, Embedding, and Rerank models from various model providers, including Unicom Yuanjing, OpenAI-API-compatible, Ollama, Tongyi Qianwen, and Volcano Engine. [Model Import Methods - Detailed Version](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/%E6%A8%A1%E5%9E%8B%E5%AF%BC%E5%85%A5%E6%96%B9%E5%BC%8F-%E8%AF%A6%E7%BB%86%E7%89%88.md) |
+| [Knowledge Base](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/2.%E7%9F%A5%E8%AF%86%E5%BA%93) | In terms of document parsing capabilities: supports uploading of 12 file types and URL parsing; document parsing methods include OCR and [ high-precision model parsing (titles/tables/formulas)](https://github.com/UnicomAI/DocParserServer/tree/main); document segmentation settings support both general segmentation and parent-child segmentation. In terms of optimization capabilities: supports metadata management and metadata filtering queries, supports adding, deleting, and modifying segmented content, supports setting keyword tags for segments to improve recall performance, supports segment enable/disable operations, and supports hit testing. In terms of retrieval capabilities: supports multiple retrieval modes including vector search, full-text search, and hybrid search. In terms of Q&A capabilities: supports automatic citation of sources and generating answers with both text and images.<br |
+| [Resource Library](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/3.%E5%B7%A5%E5%85%B7%E5%B9%BF%E5%9C%BA.md) | Supports importing your own MCP services or custom tools for use in workflows and agents. |
+| [Safety Guardrails](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/4.%E5%AE%89%E5%85%A8%E6%8A%A4%E6%A0%8F.md) | Users can create sensitive word lists to control the safety of the model's output. |
+| [Text Q&A](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/5.%E6%96%87%E6%9C%AC%E9%97%AE%E7%AD%94.md) | A dedicated knowledge advisor based on a private knowledge base. It supports features like knowledge base management, Q&A, knowledge summarization, personalized parameter configuration, safety guardrails, and retrieval configuration to improve the efficiency of knowledge management and learning. Supports publishing text Q&A applications publicly or privately, and can be published as an API. |
+| [Workflow](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/6.%E5%B7%A5%E4%BD%9C%E6%B5%81) | Extends the capabilities of agents. Composed of nodes, it provides a visual workflow editor. Users can orchestrate multiple different workflow nodes to implement complex and stable business processes. Supports publishing workflow applications publicly or privately, can be published as an API, and supports import/export. |
+| [Agent](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/7.%E6%99%BA%E8%83%BD%E4%BD%93.md) | Create agents based on user scenarios and business requirements. Supports model selection, prompt setting, web search, knowledge base selection, MCP, workflows, and custom tools. Supports publishing agent applications publicly or privately, and can be published as an API and a Web URL. |
+| [App Marketplace](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/8.%E5%BA%94%E7%94%A8%E5%B9%BF%E5%9C%BA.md) | Allows users to experience published applications, including Text Q&A, Workflows, and Agents. |
+| MCP Hub                                                      | Features 100+ pre-selected industry-specific MCP servers, ready for immediate use. |
+| [Settings](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/9.%E8%AE%BE%E7%BD%AE.md) | The platform supports multi-tenancy, allowing users to manage organizations, roles, users, and perform basic platform configuration. |
+
 ------
 ### &#x1F4F0; TO DO LIST
 - [ ] Multi-modal model access
 - [ ] Support custom MCP Server, which means that workflows, agents, or APIs that conform to the OpenAPI specification can be added to the MCP Server for release
-- [ ] Increase workflow node types
 - [ ] Knowledge base sharing
 - [ ] Agent and model evaluation
-- [ ] Knowledge base supports segmented content addition
 - [ ] Agent monitoring statistics
 - [ ] Model experience
 - [ ] Prompt engineering
@@ -216,10 +216,10 @@ To help you quickly get started with this project, we strongly recommend that yo
 ### &#128172; Q & A
 - **[Q] Error when starting Elastic (elastic-wanwu) on Linux system: Memory limited without swap.**
   **[A]** Stop the service, run `sudo sysctl -w vm.max_map_count=262144`, and then restart the service.
-- **[Q] Error when starting Agent (agent-wanwu) on Windows system: bash: ./start_all.sh: /bin/bash^M: bad interpreter**
-  **[A]** Disable automatic CRLF line endings in Git by running `git config --global core.autocrlf false`. Then stop the service, re-clone the wanwu repository, and restart the service.
-- **[Q] After the system services start normally, the mysql-wanwu-setup and elastic-wanwu-setup containers exit with status code Exited (0).**
+  
+- **[Q] After the system services start normally, the mysql-wanwu-worker and elastic-wanwu-setup containers exit with status code Exited (0).**
   **[A]** This is normal. These two containers are used to complete some initialization tasks and will automatically exit after execution.
+  
 - **[Q] Regarding model import**
   **[A]** Taking the import of Unicom Yuanjing LLM as an example (the process is similar for importing OpenAI-API-compatible models, Embedding, or Rerank types):
   ```
@@ -256,6 +256,6 @@ The Yuanjing Wanwu AI Agent Platform is released under the Apache License 2.0.
 ------
 
 ### &#x1F4E9; Contact Us
-| QQ Group:490071123                                           |
+| QQ Group:490071123、1026898615                               |
 | ------------------------------------------------------------ |
 | <img width="183" height="258" alt="image" src="https://github.com/user-attachments/assets/010f1d68-78e9-446d-baf1-0a7339efb48e" /> |

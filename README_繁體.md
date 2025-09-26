@@ -18,7 +18,7 @@
 </p>
 <p align="center">
     <a href="https://github.com/UnicomAI/wanwu/blob/main/README.md">English</a> |
-    <a href="https://github.com/UnicomAI/wanwu/blob/main/README_CN.md">中文</a> |
+    <a href="https://github.com/UnicomAI/wanwu/blob/main/README_CN.md">简体中文</a> |
     繁體中文
 </p>
 </div>
@@ -119,7 +119,7 @@
     # amd64 / arm64
     WANWU_ARCH=amd64
     
-    # external ip port（注意如果瀏覽器訪問非localhost部署的萬悟，則需要修改localhost為對外ip，例如192.168.xx.xx）
+    # external ip port（注意localhost要換成本機局域網或對外IP，例如192.168.0.xx，不能是localhost或127.0.0.1）
     WANWU_EXTERNAL_IP=localhost
     ```
     1.3 創建docker運行網絡
@@ -188,25 +188,27 @@
 ------
 ### &#x1F4D1; 使用萬悟
 為了幫助您快速上手本項目，我們強烈推薦先查看[ 文檔操作手冊](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual)。我們為用戶提供了交互式、結構化的操作指南，您可以直接在其中查看操作說明、接口文檔等，極大地降低了學習和使用的門檻。詳細功能清單如下：
-|                             功能                             | 詳細描述                                                     |
-| :----------------------------------------------------------: | :----------------------------------------------------------- |
-| [模型管理](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/1.%E6%A8%A1%E5%9E%8B%E7%AE%A1%E7%90%86.md) | 支援用戶導入包括聯通元景、OpenAI-API-compatible、Ollama、通義千問、火山引擎等模型供應商的LLM、Embedding、Rerank模型。[ 模型導入方式-詳細版](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/%E6%A8%A1%E5%9E%8B%E5%AF%BC%E5%85%A5%E6%96%B9%E5%BC%8F-%E8%AF%A6%E7%BB%86%E7%89%88.md) |
-| [知識庫](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/2.%E7%9F%A5%E8%AF%86%E5%BA%93) | 文檔解析（支援OCR）、命中測試、關鍵詞管理                    |
-| [工具廣場](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/3.%E5%B7%A5%E5%85%B7%E5%B9%BF%E5%9C%BA.md) | 內置100+優選行業MCP server，同時支援導入自己的MCP服務或自定義工具，並在工作流和智能體中使用 |
-| [安全護欄](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/4.%E5%AE%89%E5%85%A8%E6%8A%A4%E6%A0%8F.md) | 用戶可以創建敏感詞表，控制模型反饋結果的安全性               |
-| [文本問答](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/5.%E6%96%87%E6%9C%AC%E9%97%AE%E7%AD%94.md) | 基於私人知識庫的專屬知識顧問，支援知識庫管理、知識問答、知識總結、個性參數配置、安全護欄、檢索配置等功能，提高知識管理與學習的效率。支援公開或私密發布文本問答應用 |
-| [工作流](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/6.%E5%B7%A5%E4%BD%9C%E6%B5%81) | 可以擴展智能體能力邊界，由節點組成，提供可視化工作流編輯能力，用戶可以編排多個不同的工作流節點，實現複雜且穩定的業務流程。支援公開或私密發布工作流應用 |
-| [智能體](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/7.%E6%99%BA%E8%83%BD%E4%BD%93.md) | 基於用戶使用場景和業務需求創建智能體，支援選模型、設置提示詞、聯網檢索、知識庫選擇、MCP、工作流、自定義工具等。支援公開或私密發布智能體應用 |
-| [應用廣場](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/8.%E5%BA%94%E7%94%A8%E5%B9%BF%E5%9C%BA.md) | 支援用戶體驗已發布的應用，包括文本問答、工作流和智能體       |
-| [設置](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/9.%E8%AE%BE%E7%BD%AE.md) | 平台支援多租戶，允許用戶進行組織、角色、用戶管理、平台基礎配置 |
+
+以下是您提供的 Markdown 表格內容的繁體中文翻譯，保留原有格式與連結：
+|                             功能                             |                           詳細描述                           |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
+| [模型管理](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/1.%E6%A8%A1%E5%9E%8B%E7%AE%A1%E7%90%86.md) | 支援使用者匯入包括聯通元景、OpenAI-API-compatible、Ollama、通義千問、火山引擎等模型供應商的 LLM、Embedding、Rerank 模型。[ 模型匯入方式-詳細版](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/%E6%A8%A1%E5%9E%8B%E5%AF%BC%E5%85%A5%E6%96%B9%E5%BC%8F-%E8%AF%A6%E7%BB%86%E7%89%88.md) |
+| [知識庫](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/2.%E7%9F%A5%E8%AF%86%E5%BA%93) | 在文件解析能力方面：支援12種文件類型的上傳，支援 URL 解析；文件解析方式支援 OCR 和[ 高精度模型解析（標題/表格/公式）](https://github.com/UnicomAI/DocParserServer/tree/main)，文件分段設定支援通用分段和父子分段。在調優能力方面：支援元數據管理及元數據過濾查詢，支援分段內容增刪改，支援對分段設定關鍵字標籤提升召回效果，支援分段啟停操作，支援命中測試等功能。在檢索能力方面：支援向量檢索、全文檢索、混合檢索等多種檢索模式；在問答能力方面：支援自動引用出處，支援圖文並茂的生成答案。 |
+| [資源庫](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/3.%E5%B7%A5%E5%85%B7%E5%B9%BF%E5%9C%BA.md) | 同時支援匯入自己的 MCP 服務或自訂工具，並在工作流和智能體中使用。 |
+| [安全護欄](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/4.%E5%AE%89%E5%85%A8%E6%8A%A4%E6%A0%8F.md) |      使用者可以建立敏感詞表，控制模型回饋結果的安全性。      |
+| [文本問答](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/5.%E6%96%87%E6%9C%AC%E9%97%AE%E7%AD%94.md) | 基於私人知識庫的專屬知識顧問，支援知識庫管理、知識問答、知識總結、個性參數配置、安全護欄、檢索配置等功能，提高知識管理與學習的效率。支援公開或私密發布文本問答應用，支援發布為 API。 |
+| [工作流](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/6.%E5%B7%A5%E4%BD%9C%E6%B5%81) | 可擴展智能體能力邊界，由節點組成，提供視覺化工作流編輯能力，使用者可編排多個不同的工作流節點，實現複雜且穩定的業務流程。支援公開或私密發布工作流應用，支援發布為 API，支援匯入匯出。 |
+| [智能體](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/7.%E6%99%BA%E8%83%BD%E4%BD%93.md) | 基於使用者使用場景和業務需求建立智能體，支援選模型、設定提示詞、聯網檢索、知識庫選擇、MCP、工作流、自訂工具等。支援公開或私密發布智能體應用，支援發布為 API 和 Web Url。 |
+| [應用廣場](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/8.%E5%BA%94%E7%94%A8%E5%B9%BF%E5%9C%BA.md) |  支援使用者體驗已發布的應用，包括文本問答、工作流和智能體。  |
+|                           MCP廣場                            |          內建 100+ 精選行業 MCP server，即選即用。           |
+| [設定](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/9.%E8%AE%BE%E7%BD%AE.md) | 平台支援多租戶，允許使用者進行組織、角色、使用者管理、平台基礎配置。 |
+
 ------
 ### &#x1F4F0; TODO LIST
 - [ ] 多模態模型接入
 - [ ] 支援自定義MCP Server，即可以把工作流、智能體、或者符合OpenAPI規範的API作為tools添加到MCP Server裡進行發布
-- [ ] 增加工作流節點類型
 - [ ] 知識庫共享
 - [ ] 智能體和模型測評
-- [ ] 知識庫支援分段內容添加
 - [ ] 智能體監控統計
 - [ ] 模型體驗
 - [ ] 提示詞工程
@@ -214,10 +216,10 @@
 ### &#128172; Q & A
 - **【Q】Linux系統Elastic(elastic-wanwu)啟動報錯：Memory limited without swap.**
     【A】關閉服務，執行 `sudo sysctl -w vm.max_map_count=262144` 後，重啟服務
-- **【Q】Windows系統Agent(agent-wanwu)啟動報錯：bash: ./start_all.sh: /bin/bash^M: bad interpreter**
-    【A】git配置關閉自動回車換行(CRLF)，執行 `git config --global core.autocrlf false` 後，關閉服務，重新clone wanwu倉庫，重啟服務
-- **【Q】系統服務正常啟動後，mysql-wanwu-setup和elastic-wanwu-setup容器退出：狀態碼為Exited (0)**
+    
+- **【Q】系統服務正常啟動後，mysql-wanwu-worker和elastic-wanwu-setup容器退出：狀態碼為Exited (0)**
     【A】正常，這兩個容器用於完成一些初始化任務，執行完成後會自動退出
+    
 - **【Q】模型導入相關**
     【A】以導入聯通元景LLM為例（導入OpenAI-API-compatible或導入Embedding、Rerank類型類似）：
     ```
@@ -257,6 +259,6 @@
 元景萬悟智能體平台根據Apache License 2.0發布。
 
 ### &#x1F4E9; 聯繫我們
-| QQ群:490071123                                               |
+| QQ群:490071123、1026898615                                   |
 | ------------------------------------------------------------ |
 | <img width="183" height="258" alt="image" src="https://github.com/user-attachments/assets/010f1d68-78e9-446d-baf1-0a7339efb48e" /> |

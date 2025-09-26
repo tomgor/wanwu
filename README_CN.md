@@ -18,10 +18,11 @@
 </p>
 <p align="center">
     <a href="https://github.com/UnicomAI/wanwu/blob/main/README.md">English</a> |
-    中文 |
+    简体中文 |
     <a href="https://github.com/UnicomAI/wanwu/blob/main/README_繁體.md">繁體中文</a>
 </p>
 </div>
+
 
 &emsp;&emsp;**元景万悟智能体平台**是一款面向**企业级**场景的**一站式**、**商用license友好**的**智能体开发平台**，致力于为企业提供安全、高效、合规的一站式AI解决方案。我们以"技术开放、生态共建"为核心理念，通过整合大语言模型、业务流程自动化等前沿技术，构建了覆盖模型全生命周期管理、MCP、联网检索、智能体快速开发、企业知识库建设、复杂工作流编排等完整功能体系的AI工程化平台。平台采用模块化架构设计，支持灵活的功能扩展和二次开发，在确保企业数据安全和隐私保护的同时，大幅降低了AI技术的应用门槛。无论是中小型企业快速构建智能化应用，还是大型企业实现复杂业务场景的智能化改造，元景万悟智能体平台都能提供强有力的技术支撑，助力企业加速数字化转型进程，实现降本增效和业务创新。
 
@@ -144,7 +145,7 @@
     # amd64 / arm64
     WANWU_ARCH=amd64
     
-    # external ip port（注意如果浏览器访问非localhost部署的万悟，则需要修改localhost为对外ip，例如192.168.xx.xx）
+    # external ip port（注意localhost要换成本机局域网或对外IP，例如192.168.0.xx，不能是localhost或127.0.0.1）
     WANWU_EXTERNAL_IP=localhost
     ```
 
@@ -231,16 +232,17 @@
 
 为了帮助您快速上手本项目，我们强烈推荐先查看[ 文档操作手册](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual)。我们为用户提供了交互式、结构化的操作指南，您可以直接在其中查看操作说明、接口文档等，极大地降低了学习和使用的门槛。详细功能清单如下：
 
-|                             功能                             | 详细描述                                                     |
-| :----------------------------------------------------------: | :----------------------------------------------------------- |
+|                             功能                             |                           详细描述                           |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
 | [模型管理](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/1.%E6%A8%A1%E5%9E%8B%E7%AE%A1%E7%90%86.md) | 支持用户导入包括联通元景、OpenAI-API-compatible、Ollama、通义千问、火山引擎等模型供应商的LLM、Embedding、Rerank模型。[ 模型导入方式-详细版](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/%E6%A8%A1%E5%9E%8B%E5%AF%BC%E5%85%A5%E6%96%B9%E5%BC%8F-%E8%AF%A6%E7%BB%86%E7%89%88.md) |
-| [知识库](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/2.%E7%9F%A5%E8%AF%86%E5%BA%93) | 文档解析（支持OCR）、命中测试、关键词管理                    |
-| [工具广场](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/3.%E5%B7%A5%E5%85%B7%E5%B9%BF%E5%9C%BA.md) | 内置100+优选行业MCP server，同时支持导入自己的MCP服务或自定义工具，并在工作流和智能体中使用 |
-| [安全护栏](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/4.%E5%AE%89%E5%85%A8%E6%8A%A4%E6%A0%8F.md) | 用户可以创建敏感词表，控制模型反馈结果的安全性               |
-| [文本问答](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/5.%E6%96%87%E6%9C%AC%E9%97%AE%E7%AD%94.md) | 基于私人知识库的专属知识顾问，支持知识库管理、知识问答、知识总结、个性参数配置、安全护栏、检索配置等功能，提高知识管理与学习的效率。支持公开或私密发布文本问答应用 |
-| [工作流](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/6.%E5%B7%A5%E4%BD%9C%E6%B5%81) | 可以扩展智能体能力边界，由节点组成，提供可视化工作流编辑能力，用户可以编排多个不同的工作流节点，实现复杂且稳定的业务流程。支持公开或私密发布工作流应用 |
-| [智能体](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/7.%E6%99%BA%E8%83%BD%E4%BD%93.md) | 基于用户使用场景和业务需求创建智能体，支持选模型、设置提示词、联网检索、知识库选择、MCP、工作流、自定义工具等。支持公开或私密发布智能体应用 |
-| [应用广场](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/8.%E5%BA%94%E7%94%A8%E5%B9%BF%E5%9C%BA.md) | 支持用户体验已发布的应用，包括文本问答、工作流和智能体       |
+| [知识库](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/2.%E7%9F%A5%E8%AF%86%E5%BA%93) | 在文档解析能力方面:支持12种文件类型的上传，支持ur解析;文档解析方式支持OCR和[ 高精度模型解析(标题/表格/公式)](https://github.com/UnicomAI/DocParserServer/tree/main)，文档分段设置支持通用分段和父子分段。在调优能力方面:支持元数据管理及元数据过滤查询，支持分段内容增删改，支持对分段设置关键词标签提升召回效果，支持分段启停操作，支持命中测试等功能。在检索能力方面:支持向量检索、全文检索、混合检索多种检索模式;在问答能力方面:支持自动引用出处，支持图文并茂的生成答案 |
+| [资源库](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/3.%E5%B7%A5%E5%85%B7%E5%B9%BF%E5%9C%BA.md) | 同时支持导入自己的MCP服务或自定义工具，并在工作流和智能体中使用 |
+| [安全护栏](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/4.%E5%AE%89%E5%85%A8%E6%8A%A4%E6%A0%8F.md) |        用户可以创建敏感词表，控制模型反馈结果的安全性        |
+| [文本问答](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/5.%E6%96%87%E6%9C%AC%E9%97%AE%E7%AD%94.md) | 基于私人知识库的专属知识顾问，支持知识库管理、知识问答、知识总结、个性参数配置、安全护栏、检索配置等功能，提高知识管理与学习的效率。支持公开或私密发布文本问答应用，支持发布为API |
+| [工作流](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/6.%E5%B7%A5%E4%BD%9C%E6%B5%81) | 可以扩展智能体能力边界，由节点组成，提供可视化工作流编辑能力，用户可以编排多个不同的工作流节点，实现复杂且稳定的业务流程。支持公开或私密发布工作流应用，支持发布为API，支持导入导出 |
+| [智能体](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/7.%E6%99%BA%E8%83%BD%E4%BD%93.md) | 基于用户使用场景和业务需求创建智能体，支持选模型、设置提示词、联网检索、知识库选择、MCP、工作流、自定义工具等。支持公开或私密发布智能体应用，支持发布为API和Web Url |
+| [应用广场](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/8.%E5%BA%94%E7%94%A8%E5%B9%BF%E5%9C%BA.md) |    支持用户体验已发布的应用，包括文本问答、工作流和智能体    |
+|                           MCP广场                            |             内置100+优选行业MCP server，即选即用             |
 | [设置](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/9.%E8%AE%BE%E7%BD%AE.md) | 平台支持多租户，允许用户进行组织、角色、用户管理、平台基础配置 |
 
 ------
@@ -249,10 +251,8 @@
 
 - [ ] 多模态模型接入
 - [ ] 支持自定义MCP Server，即可以把工作流、智能体、或者符合OpenAPI规范的API作为tools添加到MCP Server里进行发布
-- [ ] 增加工作流节点类型
 - [ ] 知识库共享
 - [ ] 智能体和模型测评
-- [ ] 知识库支持分段内容添加
 - [ ] 智能体监控统计
 - [ ] 模型体验
 - [ ] 提示词工程
@@ -265,11 +265,7 @@
 
     【A】关闭服务，执行 `sudo sysctl -w vm.max_map_count=262144` 后，重启服务
 
-- **【Q】Windows系统Agent(agent-wanwu)启动报错：bash: ./start_all.sh: /bin/bash^M: bad interpreter**
-
-    【A】git配置关闭自动回车换行(CRLF)，执行 `git config --global core.autocrlf false` 后，关闭服务，重新clone wanwu仓库，重启服务
-
-- **【Q】系统服务正常启动后，mysql-wanwu-setup和elastic-wanwu-setup容器退出：状态码为Exited (0)**
+- **【Q】系统服务正常启动后，mysql-wanwu-worker和elastic-wanwu-setup容器退出：状态码为Exited (0)**
 
     【A】正常，这两个容器用于完成一些初始化任务，执行完成后会自动退出
 
@@ -320,6 +316,6 @@
 ------
 
 ### &#x1F4E9; 联系我们
-| QQ群:490071123                                               |
+| QQ群:490071123、1026898615                                   |
 | ------------------------------------------------------------ |
 | <img width="183" height="258" alt="image" src="https://github.com/user-attachments/assets/010f1d68-78e9-446d-baf1-0a7339efb48e" /> |
