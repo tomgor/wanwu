@@ -1,49 +1,48 @@
-# RAG 模型服务部署指南
+# RAG_OPEN_SOURCE 文档
 
-## 📦 打包流程
+## 项目概述
 
-### 1. 进入源码容器
-```bash
-docker exec -it 容器ID /bin/bash
-```
-### 2. 进入工作目录
-```bash
-cd /model_extend
-```
-### 3. 激活Conda环境
-```bash
-conda activate rag-new
-```
-### 4. 执行打包脚本
-```bash
-# 如果脚本没有执行权限，先添加权限
-chmod +x rag_pack.sh
+RAG_OPEN_SOURCE 项目是一个基于检索增强生成技术的企业级知识问答系统。该项目可支持企业搭建私域知识库，实现私域知识问答。
 
-# 更新包列表（可选，但推荐）
-apt-get update
+## 🔧 核心功能模块
 
-# 安装binutils，-y选项表示自动同意
-apt-get install -y binutils
+### 1. 文档解析服务
 
-# 后台运行打包脚本（输出将保存到nohup.out）
-nohup ./rag_pack.sh &
-```
-### 5. 复制生成文件
-```bash
-mkdir -p /model_extend/opt
-mkdir -p /model_extend/Fonts
-cp -r /opt/* /model_extend/opt
-cp -r /usr/share/fonts/Fonts/* /model_extend/Fonts
-```
-### 6. 退出容器
-```bash
-exit
-```
-### 7. 构建Docker镜像
-```bash
-#进入model_extend（代码挂载目录，查看容器启动命令）
-#ARM64架构：
-make docker-image-rag-arm64
-#AMD64架构：
-make docker-image-rag-amd64
-```
+提供知识库管理功能：
+- 支持pdf/docx/pptx/doc/wps/ofd/xlsx/xls/csv/txt/html/md 多种文件格式
+- 支持url内容解析
+- 分段设置支持通用分段和父子分段
+- 分段方式支持自动分段和自定义分段（自定义分隔符和分段大小）
+- 解析方式支持以下几种
+    - 文本提取：提取文档文本信息，适用于所有文件
+    - OCR解析：解析图片、扫描件文档时开启，仅适用于pdf文件
+    - 模型解析：提取标题、图表、公式时开启，适用于pdf/word/ppt文件
+
+### 2. 知识库管理功能
+
+提供知识库管理功能：
+- 知识库管理：创建/删除知识库，知识库标签
+- 元数据管理：添加元数据
+- 关键词管理：添加关键词
+- 分段管理：新增分段、更新分段、删除分段、分段启停等
+
+
+### 3. 命中测试
+
+提供命中测试功能:
+- 检索模式设置：支持向量检索/全文检索/混合检索多种检索模式
+- 元数据过滤：通过设置元数据过滤条件快速筛选相关文档 
+- 自定义重排策略：支持RERANK 模型重排和权重规则重排
+- 自定义召回设置：相似度阈值（score），召回条数（TopK）
+
+### 4. 文本问答
+
+提供流式问答功能：
+- 模型配置：选模型，设置模型参数（温度、多样性、重复惩罚）
+- 关联知识库：配置元数据过滤
+- 检索模式设置：支持向量检索/全文检索/混合检索多种检索模式， 支持RERANK 模型重排和权重规则重排
+- 问答参数设置：通过设置最长上下文支持对话记忆（history），相似度阈值（score），召回条数（TopK）
+- 安全护栏配置： 支持敏感词配置
+
+
+
