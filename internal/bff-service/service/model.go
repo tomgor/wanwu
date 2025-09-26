@@ -177,7 +177,7 @@ func toModelInfo(ctx *gin.Context, modelInfo *model_service.ModelInfo) (*respons
 	if err != nil {
 		return nil, grpc_util.ErrorStatus(err_code.Code_BFFGeneral, fmt.Sprintf("model %v get model tags err: %v", modelInfo.ModelId, err))
 	}
-	return &response.ModelInfo{
+	res := &response.ModelInfo{
 		ModelId:     modelInfo.ModelId,
 		Provider:    modelInfo.Provider,
 		Model:       modelInfo.Model,
@@ -193,5 +193,9 @@ func toModelInfo(ctx *gin.Context, modelInfo *model_service.ModelInfo) (*respons
 		ModelDesc:   modelInfo.ModelDesc,
 		Config:      modelConfig,
 		Tags:        tags,
-	}, nil
+	}
+	if res.DisplayName == "" {
+		res.DisplayName = res.Model
+	}
+	return res, nil
 }
