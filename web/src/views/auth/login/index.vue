@@ -47,6 +47,7 @@
               </span>
             </span>
             <span
+              v-if="commonInfo.resetPassword.email.status"
               :style="{ color: '#384BF7', cursor: 'pointer', float: 'right' }"
               @click="$router.push({path: `/reset`})">
               {{ $t('login.forgetPassword') }}
