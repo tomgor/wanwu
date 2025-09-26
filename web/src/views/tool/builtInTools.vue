@@ -22,10 +22,15 @@
         >
           <div class="card-title">
             <img class="card-logo" v-if="item.avatar && item.avatar.path" :src="basePath + '/user/api/' + item.avatar.path" />
-            <div class="mcp_detailBox">
+            <div class="mcp_detailBox" style="width: 100%">
               <span class="mcp_name">{{ item.name }}</span>
               <span class="mcp_from tool_tag">
-                <label v-if="item.tags && item.tags.length" v-for="it in item.tags" :for="it">
+                <label
+                  style="font-size: 11px"
+                  v-if="item.tags && item.tags.length"
+                  v-for="it in item.tags"
+                  :key="it"
+                >
                   {{ it }}
                 </label>
               </span>
