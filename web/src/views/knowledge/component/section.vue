@@ -215,7 +215,7 @@
                     class="segment-collapse-item"
                   >
                     <template slot="title">
-                      <span class="segment-badge">C#-{{ index + 1 }}</span>
+                      <span class="segment-badge">C-{{ index + 1 }}</span>
                     </template>
                     <div class="segment-content">
                       {{ index + 1 }}、{{ segment.content }}
@@ -314,7 +314,6 @@ export default {
     handleParse(){
       getSegmentChild({contentId:this.cardObj[0]['contentId'],docId:this.obj.id}).then(res =>{
         if(res.code === 0){
-          this.$message.success('解析成功');
           this.cardObj[0].childContent = res.data.contentList || [];
           // 设置所有折叠项为展开状态
           this.activeNames = this.cardObj[0].childContent.map((_, index) => index);

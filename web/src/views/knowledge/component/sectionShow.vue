@@ -37,7 +37,7 @@
             class="segment-collapse-item"
           >
             <template slot="title">
-              <span class="segment-badge">C#-{{ index + 1 }}</span>
+              <span class="segment-badge">C-{{ index + 1 }}</span>
               <span class="segment-score">
                 <span class="score-label">命中得分:</span>
                 <span class="score-value">{{ formatScore(childscore[index]) }}</span>

@@ -61,7 +61,7 @@
                 <span>
                   <span class="tag"  @click="showSectionDetail(index)">{{$t('knowledgeManage.section')}}#{{index+1}}</span>
                   <span class="segment-type">{{item.childContentList && item.childContentList.length > 0 ? '#父子分段' : '#通用分段'}}</span>
-                  <span class="segment-length" v-if="item.childContentList && item.childContentList.length > 0">#{{item.childContentList.length || 0}}个子分段</span>
+                  <span class="segment-length" v-if="item.childContentList && item.childContentList.length > 0" @click="showSectionDetail(index)">#{{item.childContentList.length || 0}}个子分段</span>
                 </span>
                 <span class="score">{{$t('knowledgeManage.hitScore')}}: {{score[index]}}</span>
               </div>
@@ -285,6 +285,12 @@ export default {
               }
               .segment-type {
                 padding: 0 5px;
+              }
+              .segment-length{
+                cursor: pointer;
+              }
+              .segment-length:hover{
+                color: #384bf7;
               }
               .segment-type,
               .segment-length {
