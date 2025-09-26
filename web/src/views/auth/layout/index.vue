@@ -47,6 +47,11 @@ export default {
             status: false,
           },
         },
+        resetPassword: {
+          email: {
+            status: false,
+          },
+        },
       },
       backgroundSrc: require('@/assets/imgs/auth_bg.png'),
       basePath: this.$basePath
@@ -304,6 +309,14 @@ export default {
         top: 13.5px;
         right: 17px;
         cursor: pointer;
+      }
+
+      .nav-bt {
+        width: 100%;
+        height: 1px;
+        line-height: 30px;
+        font-size: 14px;
+        margin-top: -20px;
       }
 
       .auth-bt {

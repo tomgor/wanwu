@@ -621,7 +621,8 @@ export default {
        const selectedModel = this.modleOptions.find(item => item.modelId === val);
         if (selectedModel) {
           this.editForm.visionsupport = selectedModel.config.visionSupport;
-          this.limitMaxTokens = selectedModel.config.maxTokens?selectedModel.config.maxTokens:this.limitMaxTokens;
+          const maxTokens = selectedModel.config.maxTokens;
+          this.limitMaxTokens = (maxTokens && maxTokens > 0) ? maxTokens : 4096;
         }
     },
     submitMeta(){

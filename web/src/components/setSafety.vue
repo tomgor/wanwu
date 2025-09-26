@@ -60,21 +60,17 @@ export default {
         },
         showDialog(row=null){
             this.dialogVisible = true;
-            if(row !== null){
-                this.$nextTick(() =>{
-                    this.ruleForm.tables = this.safetyOptions.filter(item => 
-                        row.some(i => i.tableId === item.tableId)
-                    );
-                })
-            }else{
-                this.ruleForm.tables = [];
-                this.$nextTick(() => {
-                    if (this.$refs.ruleForm) {
-                        this.$refs.ruleForm.clearValidate();
-                        this.$refs.ruleForm.resetFields();
-                    }
-                });
-            }
+            this.$nextTick(() =>{
+                const form = this.$refs.ruleForm;
+                 if (form) {
+                    form.clearValidate();
+                    if (!row) form.resetFields();
+                }
+                this.ruleForm.tables = row ? 
+                this.safetyOptions.filter(item => 
+                    row.some(i => i.tableId === item.tableId)
+                ) : [];
+            })
         },
         getList(){
             sensitiveSelect().then(res =>{

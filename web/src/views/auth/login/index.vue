@@ -39,7 +39,7 @@
               </span>
             </el-form-item>
           </el-form>
-          <div class="register-bt">
+          <div class="nav-bt">
             <span v-if="commonInfo.register.email.status">
                 {{ $t('login.askAccount') }}
               <span :style="{ color: '#384BF7', cursor: 'pointer' }" @click="$router.push({path: `/register`})">
@@ -47,6 +47,7 @@
               </span>
             </span>
             <span
+              v-if="commonInfo.resetPassword.email.status"
               :style="{ color: '#384BF7', cursor: 'pointer', float: 'right' }"
               @click="$router.push({path: `/reset`})">
               {{ $t('login.forgetPassword') }}
@@ -135,11 +136,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.register-bt {
-  width: 100%;
-  height: 1px;
-  line-height: 30px;
-  font-size: 14px;
-  margin-top: -20px;
-}
+
 </style>

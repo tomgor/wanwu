@@ -169,12 +169,12 @@ const constantRoutes = [
             {
                 path:'/safety',
                 component:resolve =>require(['@/views/safety'],resolve),
-                meta:{perm: [PERMS.SAFRTY]},
+                meta:{perm: [PERMS.SAFETY]},
             },
             {
                 path:'/safety/wordList/:id',
                 component:resolve =>require(['@/views/safety/component/wordList'],resolve),
-                meta:{perm: [PERMS.SAFRTY]},
+                meta:{perm: [PERMS.SAFETY]},
             },
             {
                 path:'/agent/publishSet',
