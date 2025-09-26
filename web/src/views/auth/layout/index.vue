@@ -47,6 +47,11 @@ export default {
             status: false,
           },
         },
+        resetPassword: {
+          email: {
+            status: false,
+          },
+        },
       },
       backgroundSrc: require('@/assets/imgs/auth_bg.png'),
       basePath: this.$basePath
