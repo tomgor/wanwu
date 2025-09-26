@@ -57,8 +57,12 @@ export default {
                 presencePenaltyEnable:false,
                 maxTokensEnable:false,
                 frequencyPenaltyEnable:false
-            },
-            modelSet: [
+            }
+        }
+    },
+    computed:{
+        modelSet(){
+            return  [
                 {
                     label:'温度',
                     desc: '增加温度将使模型的回答更具创造性',
