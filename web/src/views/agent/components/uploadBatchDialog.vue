@@ -59,7 +59,7 @@
                                             <span>{{tipsArr}}</span>
                                             {{$t('common.fileUpload.typeFileTip')}}
                                         </p>
-                                        <p style="padding-top: 3px;">*若该智能体基于大语言模型创建，则上传图片暂时无法进行解析</p>
+                                        <p style="padding-top: 5px;color:#dc6803!important;">*若该智能体基于大语言模型创建，则上传图片暂时无法进行解析</p>
                                     </div>
                                 </div>
                         </el-upload>

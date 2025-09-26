@@ -18,6 +18,15 @@
             <div class="answer-content" >
                 <div class="answer-content-query">
                   <span class="session-setting-id" v-if="$route.params && $route.params.id && (type && type !=='webChat')">智能体ID: {{$route.params.id}}</span>
+                  <el-popover
+                          placement="bottom-start"
+                          trigger="hover"
+                          :visible-arrow="false"
+                          popper-class="query-copy-popover"
+                          content="">
+                    <p class="query-copy" @click="queryCopy(n.query)" style="cursor: pointer"><i class="el-icon-s-order"></i>&nbsp;{{$t('agent.copyToInput')}}</p>
+                    <span slot="reference" class="answer-text" style="display:inline-block;margin-top:5px;">{{n.query}}</span>
+                  </el-popover>
                   <div class="echo-doc-box" v-if="n.fileName && n.fileName !== ''">
                     <img :src="n.fileUrl || n.filepath"  class="docIcon" style="width:auto!important;height:30px!important;" v-if="(n.fileType && typeof n.fileType === 'string' && n.fileType.includes('image')) || (n.fileName && typeof n.fileName === 'string' && ['jpg','png','jpeg'].includes(n.fileName.split('.').pop().toLowerCase()))" />
                     <img :src="require('@/assets/imgs/fileicon.png')"  class="docIcon" style="width:30px!important;" v-else />
@@ -26,15 +35,6 @@
                       <p class="docInfo_size">文件大小:{{getFileSizeDisplay(n.fileSize)}}</p>
                     </div>
                   </div>
-                  <el-popover
-                          placement="bottom-start"
-                          trigger="hover"
-                          :visible-arrow="false"
-                          popper-class="query-copy-popover"
-                          content="">
-                    <p class="query-copy" @click="queryCopy(n.query)" style="cursor: pointer"><i class="el-icon-s-order"></i>&nbsp;{{$t('agent.copyToInput')}}</p>
-                    <span slot="reference" class="answer-text">{{n.query}}</span>
-                  </el-popover>
                 </div>
 
               <!-- <div v-if="n.requestFileUrls && n.requestFileUrls.length" class="file-path query-file">
@@ -756,7 +756,7 @@ export default {
           .answer-text{
             background:#7288FA ;
             color:#fff;
-            padding:10px 20px 10px 10px;
+            padding:8px 20px 8px 10px;
             border-radius: 0 10px 10px 10px;
           }
           .session-setting-id{
@@ -765,7 +765,7 @@ export default {
             margin-top: -8px;
           }
           .echo-doc-box{
-            margin-bottom:10px;
+            margin-top:10px;
             background:#fff;
             width: auto;
             border:1px solid #DCDFE6;
