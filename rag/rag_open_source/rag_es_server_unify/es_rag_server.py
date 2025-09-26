@@ -835,6 +835,8 @@ def get_content_by_ids():
         logger.info(
             f"用户:{userId},请求的kb_name为:{kb_id},content_ids:{content_ids}")
         contents = es_ops.get_cc_contents(content_index_name, kb_id, content_ids)
+        for item in contents:  # 将 kb_id 转换为 kb_name
+            item["kb_name"] = display_kb_name
         result = {
             "code": 0,
             "message": "success",
@@ -1133,6 +1135,9 @@ def snippet_search():
 
         result = es_ops.search_data_text_recall(index_name, kb_id, query, top_k, min_score, search_by,
                                                 filter_file_name_list=filter_file_name_list)
+        search_list = result["search_list"]
+        for item in search_list:  # 将 kb_id 转换为 kb_name
+            item["kb_name"] = kb_id_2_kb_name[item["kb_name"]]
         response = json.dumps({'code': 200, 'msg': 'Success', 'result': result}, indent=4, ensure_ascii=False)
         logger.info("search response: %s", response)
         return Response(response, mimetype='application/json', status=200)
@@ -1161,12 +1166,12 @@ def keyword_search():
     filter_file_name_list = data.get('filter_file_name_list', [])
     metadata_filtering_conditions = data.get('metadata_filtering_conditions', [])
     try:
-        kb_name = es_ops.get_uk_kb_id(user_id, display_kb_name)  # 从映射表中获取 kb_id ，这是真正的名字
+        kb_id = es_ops.get_uk_kb_id(user_id, display_kb_name)  # 从映射表中获取 kb_id ，这是真正的名字
 
         final_conditions = []
         for condition in metadata_filtering_conditions:
             if condition["filtering_kb_name"] == display_kb_name:
-                condition["filtering_kb_name"] = kb_name
+                condition["filtering_kb_name"] = kb_id
                 final_conditions.append(deepcopy(condition))
 
         meta_filter_file_name_list = []
@@ -1186,9 +1191,11 @@ def keyword_search():
         if meta_filter_file_name_list:
             filter_file_name_list = filter_file_name_list + meta_filter_file_name_list
 
-        result = es_ops.search_data_keyword_recall(content_index_name, kb_name, keywords, top_k, min_score, search_by,
+        result = es_ops.search_data_keyword_recall(content_index_name, kb_id, keywords, top_k, min_score, search_by,
                                                    filter_file_name_list=filter_file_name_list)
-
+        search_list = result["search_list"]
+        for item in search_list:  # 将 kb_id 转换为 kb_name
+            item["kb_name"] = display_kb_name
         response = json.dumps({'code': 200, 'msg': 'Success', 'result': result}, indent=4, ensure_ascii=False)
         logger.info("search response: %s", response)
         return Response(response, mimetype='application/json', status=200)

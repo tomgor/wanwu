@@ -911,11 +911,11 @@ def aggregate_chunks(user_id, sorted_scores, sorted_search_list):
         if content_id in parent_items:
             continue
         # 获取父片段信息
-        kb_id = children["search_list"][0]["kb_name"]
-        content_response = milvus_utils.get_content_by_ids(user_id, "", [content_id], kb_id)
+        kb_name = children["search_list"][0]["kb_name"]
+        content_response = milvus_utils.get_content_by_ids(user_id, kb_name, [content_id])
         logger.info(f"获取父分段 content_id: {content_id}, 结果: {content_response}")
         if content_response['code'] != 0:
-            logger.error(f"获取分段信息失败， user_id: {user_id},kb_id: {kb_id}, content_id: {content_id}")
+            logger.error(f"获取分段信息失败， user_id: {user_id},kb_name: {kb_name}, content_id: {content_id}")
             continue
 
         parent_content = content_response["data"]["contents"][0]
