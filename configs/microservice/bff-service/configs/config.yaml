@@ -59,7 +59,7 @@ custom-info:
   modes:
     - mode: light
       login:
-        background_path: "/v1/static/logo/login_bg.png"
+        background_path: "/v1/static/logo/login_bg.jpg"
         logo_path: "/v1/static/logo/login_logo.png"
         login_button_color: "#384BF7"
         welcome_text: bff_custom_login_welcome_text

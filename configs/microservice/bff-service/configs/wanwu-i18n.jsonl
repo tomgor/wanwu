@@ -46,6 +46,7 @@
 {"code":110000,"key":"bff_workflow_test_run","langs":{"zh":"工作流试运行错误: %v"}}
 {"code":110000,"key":"bff_workflow_openapi_file_upload","langs":{"zh":"工作流openapi上传文件错误: %v"}}
 {"code":110000,"key":"bff_workflow_upload_file","langs":{"zh":"工作流上传文件错误: %v"}}
+{"code":110000,"key":"bff_workflow_import_file","langs":{"zh":"工作流导入文件错误: %v"}}
 {"code":0,"key":"------ doc ------","langs":{}}
 {"code":110000,"key":"bff_doc_center_file_unescape","langs":{"en":"path unescape error: %v","zh":"路径去除转义错误: %v"}}
 {"code":110000,"key":"bff_doc_center_file_md","langs":{"en":"no markdown files found: %v","zh":"未含有md文件: %v"}}
@@ -55,12 +56,7 @@
 {"code":110005,"key":"bff_sensitive_check_req","langs":{"en":"%v","zh":"%v"}}
 {"code":110005,"key":"bff_sensitive_check_req_default_reply","langs":{"en":"your current request or history contains sensitive content. In accordance with relevant security requirements, this round of dialogue has been terminated. Please clear your history or start a new dialogue","zh":"您当前请求或者历史信息中包含敏感内容，根据相关安全要求，该轮对话终止，请清除历史信息或者重新开启新的对话"}}
 {"code":110005,"key":"bff_sensitive_check_resp_default_reply","langs":{"en":"the response contains sensitive content. In accordance with relevant security requirements, this round of dialogue has been terminated. Please clear the history or start a new dialogue.","zh":"回答中包含敏感内容，根据相关安全要求，该轮对话终止，请清除历史信息或者重新开启新的对话"}}
-{"code":0,"key":"------ mcp server ------","langs":{}}
-{"code":110000,"key":"bff_mcp_server_convert_tool_err","langs":{"zh":"MCP服务转换工具错误:%v"}}
-{"code":110000,"key":"bff_mcp_server_register_tool_err","langs":{"zh":"MCP服务注册工具错误:%v"}}
-{"code":110000,"key":"bff_mcp_server_unregister_tool_err","langs":{"zh":"MCP服务注销工具错误:%v"}}
-{"code":110000,"key":"bff_mcp_server_shutdown_err","langs":{"zh":"关闭MCP服务错误:%v"}}
-{"code":110000,"key":"bff_mcp_server_not_exist","langs":{"zh":"MCP服务不存在"}}
+{"code":0,"key":"","langs":{}}
 {"code":0,"key":"------ custom ------","langs":{}}
 {"code":0,"key":"bff_custom_home_title","langs":{"en":"Yuanjing Wanwu Intelligent Body Development Platform","zh":"元景万悟智能体开发平台"}}
 {"code":0,"key":"bff_custom_tab_title","langs":{"en":"Yuanjing Wanwu","zh":"元景万悟"}}
@@ -225,18 +221,7 @@
 {"code":310009,"key":"mcp_get_custom_tool_list_err","langs":{"zh":"获取自定义工具列表异常:%v"}}
 {"code":310010,"key":"mcp_update_custom_tool_err","langs":{"zh":"更新自定义工具异常:%v"}}
 {"code":310011,"key":"mcp_delete_custom_tool_err","langs":{"zh":"删除自定义工具:%v"}}
-{"code":310012,"key":"mcp_create_mcp_server_err","langs":{"zh":"创建MCP服务异常:%v"}}
-{"code":310012,"key":"mcp_create_duplicate_mcp_server_err","langs":{"zh":"创建MCP服务异常:已存在同名"}}
-{"code":310012,"key":"mcp_create_mcp_server_apps_err","langs":{"zh":"创建MCP服务绑定应用异常:%v"}}
-{"code":310012,"key":"mcp_create_mcp_server_tools_err","langs":{"zh":"创建MCP服务工具异常:%v"}}
-{"code":310013,"key":"mcp_get_mcp_server_info_err","langs":{"zh":"获取MCP服务详情异常:%v"}}
-{"code":310014,"key":"mcp_get_mcp_server_list_err","langs":{"zh":"获取MCP服务列表异常:%v"}}
-{"code":310015,"key":"mcp_get_mcp_server_tool_list_err","langs":{"zh":"获取MCP服务工具列表异常:%v"}}
-{"code":310016,"key":"mcp_get_mcp_servers_app_list_err","langs":{"zh":"获取MCP服务绑定应用列表异常:%v"}}
-{"code":310017,"key":"mcp_update_mcp_server_err","langs":{"zh":"更新MCP服务异常:%v"}}
-{"code":310018,"key":"mcp_delete_mcp_server_err","langs":{"zh":"删除MCP服务异常:%v"}}
-{"code":310018,"key":"mcp_delete_mcp_server_apps_err","langs":{"zh":"删除MCP服务绑定应用异常:%v"}}
-{"code":310018,"key":"mcp_delete_mcp_server_tools_err","langs":{"zh":"删除MCP服务工具异常:%v"}}
+{"code":310012,"key":"mcp_get_square_tool_err","langs":{"zh":"获取内置工具详情不存在"}}
 {"code":150001,"key":"rag_role_err","langs":{"zh":"角色权限错误：%v"}}
 {"code":150002,"key":"rag_info_not_exist","langs":{"zh":"文本问答信息不存在：%v"}}
 {"code":150003,"key":"rag_delete_err","langs":{"zh":"删除文本问答错误：%v"}}
