@@ -198,7 +198,7 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 	ragChatParams.Question = req.Question
 	ragChatParams.Stream = true
 	ragChatParams.Chichat = true
-	ragChatParams.History = []*HistoryItem{}
+	ragChatParams.History = make([]*HistoryItem, 0)
 	ragChatParams.RewriteQuery = true
 	ragChatParams.ReturnMeta = true
 	//自动角标
@@ -245,10 +245,10 @@ func BuildChatConsultParams(req *rag_service.ChatRagReq, rag *model.RagInfo, kno
 
 // 构建历史参数
 func buildHistory(historyList []*rag_service.HistoryItem) []*HistoryItem {
+	var retList = make([]*HistoryItem, 0)
 	if len(historyList) == 0 {
-		return nil
+		return retList
 	}
-	var retList []*HistoryItem
 	for _, item := range historyList {
 		retList = append(retList, &HistoryItem{
 			NeedHistory: item.NeedHistory,
