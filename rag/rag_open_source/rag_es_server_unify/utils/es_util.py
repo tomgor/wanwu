@@ -824,7 +824,7 @@ def search_data_knn_recall(index_name, kb_names, query, top_k, min_score, filter
             "sort": [
                 {"_score": {"order": "desc"}}  # 按分数降序排序
             ],
-            "_source": ["content", "embedding_content", "file_name", "kb_name", "chunk_id", "meta_data", "content_id"],
+            "_source": ["content", "embedding_content", "file_name", "kb_name", "chunk_id", "meta_data", "content_id", "is_parent"],
             # 指定您希望返回的字段
         }
     else:
@@ -856,7 +856,7 @@ def search_data_knn_recall(index_name, kb_names, query, top_k, min_score, filter
         hit_data = hit['_source']
         hit_data["score"] = hit['_score']
         # 父子分段模式
-        if "is_parent" in hit_data and hit_data["is_parent"]:
+        if "is_parent" in hit_data and not hit_data["is_parent"]:
             hit_data["content"] = hit_data["embedding_content"]
         search_list.append(hit_data)
         scores.append(hit['_score'])

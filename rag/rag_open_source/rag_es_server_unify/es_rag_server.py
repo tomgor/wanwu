@@ -1223,7 +1223,11 @@ def snippet_rescore():
     display_kb_names = data.get("kb_names")
     embedding_model_id = es_ops.get_uk_kb_emb_model_id(user_id, display_kb_names[0])
     logger.info(f"用户:{index_name},请求查询的kb_names为:{display_kb_names},embedding_model_id:{embedding_model_id}")
+    kb_id_2_kb_name = {}
     try:
+        for kb_name in display_kb_names:
+            kb_id = es_ops.get_uk_kb_id(data.get('user_id'), kb_name)
+            kb_id_2_kb_name[kb_id] = kb_name
         result = es_ops.rescore_bm25_score(index_name, query, search_by, search_list)
         search_list = result["search_list"]
         bm25_scores = result["scores"]
@@ -1246,7 +1250,7 @@ def snippet_rescore():
         for item, text_score, vector_score in zip(search_list, bm25_normalized, cosine_normalized):
             score = weights["vector_weight"] * vector_score + weights["text_weight"] * text_score
             item["score"] = score
-            item["kb_name"] = display_kb_names
+            item["kb_name"] = kb_id_2_kb_name[item["kb_name"]]
             final_search_list.append(item)
 
         final_search_list.sort(key=lambda x: x["score"], reverse=True)
