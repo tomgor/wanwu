@@ -13,5 +13,5 @@ export const PERMS = {
     RAG: 'rag', // 文本问答
     WORKFLOW: 'workflow', // 工作流
     AGENT: 'agent', // 智能体
-    SAFRTY:'safety',//安全护栏
+    SAFETY:'safety',//安全护栏
 }
