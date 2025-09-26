@@ -1246,6 +1246,7 @@ def snippet_rescore():
         for item, text_score, vector_score in zip(search_list, bm25_normalized, cosine_normalized):
             score = weights["vector_weight"] * vector_score + weights["text_weight"] * text_score
             item["score"] = score
+            item["kb_name"] = display_kb_names
             final_search_list.append(item)
 
         final_search_list.sort(key=lambda x: x["score"], reverse=True)

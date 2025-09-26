@@ -234,8 +234,16 @@ def gen_raw_list(searchList, es_list):
 
     for i in searchList:
         if i["content"] in tmp_content: continue
-        raw_search_list.append(
-            {"title": i["file_name"], "snippet": i["content"], "kb_name": i["kb_name"], "content_id": i["content_id"],"meta_data": i["meta_data"]})
+        content = {
+            "title": i["file_name"],
+            "snippet": i["content"],
+            "kb_name": i["kb_name"],
+            "content_id": i["content_id"],
+            "meta_data": i["meta_data"]
+        }
+        if "is_parent" in i:
+            content["is_parent"] = i["is_parent"]
+        raw_search_list.append(content)
         tmp_content.append(i["content"])
 
     for i in es_list:
