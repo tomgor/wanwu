@@ -39,7 +39,7 @@
               </span>
             </el-form-item>
           </el-form>
-          <div class="register-bt">
+          <div class="nav-bt">
             <span v-if="commonInfo.register.email.status">
                 {{ $t('login.askAccount') }}
               <span :style="{ color: '#384BF7', cursor: 'pointer' }" @click="$router.push({path: `/register`})">
@@ -135,11 +135,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.register-bt {
-  width: 100%;
-  height: 1px;
-  line-height: 30px;
-  font-size: 14px;
-  margin-top: -20px;
-}
+
 </style>
