@@ -63,8 +63,7 @@ def is_text_garbled(text):
 
 def kafkal():
     while True:
-        
-        print('开始消费消息')
+
         consumer = KafkaConsumer(KAFKA_TOPIC,
                                  bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
                                  security_protocol='SASL_PLAINTEXT',
@@ -81,8 +80,8 @@ def kafkal():
             logger.info('收到kafka消息：'+repr(message.value))
             message_value = json.loads(message.value)
             
-            url =  message_value["doc"]["url"]
-            task_id =  message_value["doc"]["task_id"]
+            url = message_value["doc"]["url"]
+            task_id = message_value["doc"]["task_id"]
 
             url = unquote_plus(url)
 
@@ -97,9 +96,7 @@ def kafkal():
                 # add_files(user_id,kb_name,filename,sentence_size,overlap_size,object_name,task_id,separators,chunk_type,is_enhanced)
             except Exception as e:
                 import traceback
-                logger.error("====> kafkal error %s" % e)
                 logger.error(traceback.format_exc())
-                logger.error(repr(e))
                 logger.error("kafka处理异常："+repr(e))
                 continue
                 
@@ -113,64 +110,17 @@ def url_ana(url, task_id):
     try:
         headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'
-    }
-        if "tzxm.beijing.gov.cn" in url:
-            logger.info(f"先进入谷歌解析: ") 
-            start_time = time.time() 
-            option = Options()  
-            option.add_argument('--headless')  
-            option.add_argument('--no-sandbox')  
-            option.add_argument('--disable-dev-shm-usage')  
-            option.binary_location = os.path.join(CHROME_DIR, 'chrome-linux64/chrome')
-            service = Service(executable_path=os.path.join(CHROME_DIR, 'chromedriver-linux64/chromedriver'))
-            driver = webdriver.Chrome(options=option, service=service)  
-            driver.get(url)
-            time.sleep(3)    
-            page_source = driver.page_source
-            soup = BeautifulSoup(page_source, 'html.parser')
-            a = clean_text(soup.get_text())
-            end_time = time.time() 
-            time_difference = end_time - start_time
-            logger.info(f"谷歌解析用时: {time_difference}")
-            #driver.quit()
-            logger.info(f"谷歌解析出来的是: {a}")
-        else:
-            response = requests.get(url, headers=headers, timeout=10)
-            response.raise_for_status()
-            encoding = chardet.detect(response.content)['encoding']
-            response.encoding = encoding if encoding else 'utf-8'# 设置编码，确保中文显示正常
-            soup = BeautifulSoup(response.content, 'html.parser')
-            a = clean_text(soup.get_text())
-            logger.info(f"正常解析出的内容是: {a}")
-            '''
-        
-        if is_text_garbled(soup.get_text()) or len(a) < 150:
-            logger.info(f"进入谷歌解析: ") 
-            start_time = time.time() 
-            option = Options()  
-            option.add_argument('--headless')  
-            option.add_argument('--no-sandbox')  
-            option.add_argument('--disable-dev-shm-usage')  
-            #option.binary_location = r'/home/jovyan/wj/chrome-linux64/chrome' 
-            option.binary_location = r'/home/jovyan/wyy/QAnything-master/chrome-linux64/chrome'
-            #service = Service(executable_path=r'/home/jovyan/wj/chromedriver-linux64/chromedriver')  
-            service = Service(executable_path=r'/home/jovyan/wyy/QAnything-master/chromedriver-linux64/chromedriver')
-            driver = webdriver.Chrome(options=option, service=service)  
-            driver.get(url)
-            time.sleep(3)    
-            page_source = driver.page_source
-            soup = BeautifulSoup(page_source, 'html.parser')
-            a = clean_text(soup.get_text())
-            end_time = time.time() 
-            time_difference = end_time - start_time
-            logger.info(f"谷歌解析用时: {time_difference}")
-            '''
-
-
-        
+        }
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        encoding = chardet.detect(response.content)['encoding']
+        response.encoding = encoding if encoding else 'utf-8'# 设置编码，确保中文显示正常
+        soup = BeautifulSoup(response.content, 'html.parser')
+        a = clean_text(soup.get_text())
+        logger.info(f"正常解析出的内容是: {a}")
         b = ''
         title_tag = soup.find('title')
-        logger.info("原来标题是："+title_tag.text)
+        logger.info("title is:"+title_tag.text)
         #logger.info(f"原来标题是: {title_tag.text}")
         c = title_tag.text
         b = c.replace('|', '_').replace(':', '_').replace(' ', '_')
@@ -181,7 +131,6 @@ def url_ana(url, task_id):
             b = b
         title_text = b if title_tag else '无标题'
         logger.info("处理完的标题是："+title_text)
-        #logger.info(f"处理完的标题是: {title_text}")
 
         name = task_id+'.txt'
         file_path = os.path.join(TEMP_URL_FILES_DIR, name)
