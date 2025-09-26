@@ -15,6 +15,7 @@ enum Code {
   BFFAuth = 110003; // Auth错误
   BFFSensitiveWordCheck = 110005; // 敏感词校验错误
   BFFRegisterDisable = 110006; // 用户注册禁用
+  BFFResetPasswordDisable = 110007; // 用户忘记密码禁用
 
   // --- iam-service ---
   // [120000, 129999]

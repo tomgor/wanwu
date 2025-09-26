@@ -13,6 +13,7 @@
 {"code":0,"key":"bff_avatar_type_error","langs":{"zh":"自定义图标文件类型错误"}}
 {"code":0,"key":"bff_avatar_upload_error","langs":{"zh":"自定义图标上传错误: %v"}}
 {"code":110006,"key":"","langs":{"zh":"注册已禁用"}}
+{"code":110007,"key":"","langs":{"zh":"忘记密码已禁用"}}
 {"code":0,"key":"------ auth ------","langs":{}}
 {"code":110004,"key":"bff_auth_server_authorized","langs":{"en":"authorized","zh":"已授权"}}
 {"code":110004,"key":"bff_auth_server_error","langs":{"en":"auth-service err","zh":"授权服务异常"}}
