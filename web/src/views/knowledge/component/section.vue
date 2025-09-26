@@ -71,6 +71,7 @@
           type="primary"
           @click="createChunk"
           size="mini"
+          v-if="res.segmentMethod === '0'"
           :loading="loading.start"
           >新增分段</el-button
         >
