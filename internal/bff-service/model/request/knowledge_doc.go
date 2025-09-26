@@ -179,7 +179,7 @@ func (c *DocImportReq) Check() error {
 		if c.DocSegment.SegmentMethod == CommonSplitMethod && c.DocSegment.SegmentType == "" {
 			return errors.New("segmentType error")
 		}
-		if c.DocSegment.SubMaxSplitter > c.DocSegment.MaxSplitter {
+		if c.DocSegment.SegmentMethod == ParentSplitMethod && c.DocSegment.SubMaxSplitter > c.DocSegment.MaxSplitter {
 			return errors.New("subMaxSplitter error")
 		}
 	}
