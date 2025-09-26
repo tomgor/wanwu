@@ -9,7 +9,7 @@ export default {
         },
         askAccount: '没有账号？',
         register: '立即注册',
-        forgetPassword: '忘记密码',
+        forgetPassword: '忘记密码？',
         button: '登 录',
     },
     register: {
@@ -20,8 +20,9 @@ export default {
             code: '验证码'
         },
         action: '获取',
+        askAccount: '已有账号？',
+        login: '立即登录',
         button: '注 册',
-        back: '返回登录'
     },
     reset: {
         title: '重置密码',
@@ -34,8 +35,9 @@ export default {
         action1: '设置',
         action2: '确认',
         action: '获取',
+        askAccount: '记得密码？',
+        login: '立即登录',
         button: '确 认',
-        back: '返回登录'
     },
     about: {
         version: '版本',

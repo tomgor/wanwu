@@ -37,6 +37,12 @@
               <p class="message" v-if="codeSentMessage">{{ codeSentMessage }}</p>
             </el-form-item>
           </el-form>
+          <div class="nav-bt">
+            {{ $t('register.askAccount') }}
+            <span :style="{ color: '#384BF7', cursor: 'pointer' }" @click="$router.push({path: `/login`})">
+              {{ $t('register.login') }}
+            </span>
+          </div>
           <div class="auth-bt">
             <p
               class="primary-bt" :style="`background: ${commonInfo.login.loginButtonColor} !important`"

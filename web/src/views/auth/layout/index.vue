@@ -306,6 +306,14 @@ export default {
         cursor: pointer;
       }
 
+      .nav-bt {
+        width: 100%;
+        height: 1px;
+        line-height: 30px;
+        font-size: 14px;
+        margin-top: -20px;
+      }
+
       .auth-bt {
         width: 100%;
         height: 40px;
