@@ -22,7 +22,17 @@
     <a href="https://github.com/UnicomAI/wanwu/blob/main/README_繁體.md">繁體中文</a>
 </p>
 </div>
+
+
 **Wanwu AI Agent Platform** is an **enterprise-grade** **one-stop** **commercially friendly** AI agent development platform designed for business scenarios. It is committed to providing enterprises with a safe, efficient, and compliant one-stop AI solution. With the core philosophy of "technology openness and ecological co-construction", we integrate cutting-edge technologies such as large language models and business process automation to build an AI engineering platform with a complete functional system covering model full life-cycle management, MCP, web search, AI agent rapid development, enterprise knowledge base construction, and complex workflow orchestration. The platform adopts a modular architecture design, supports flexible functional expansion and secondary development, and greatly reduces the application threshold of AI technology while ensuring the security and privacy protection of enterprise data. Whether it is for small and medium-sized enterprises to quickly build intelligent applications or for large enterprises to achieve intelligent transformation of complex business scenarios, the Wanwu AI Agent Platform can provide strong technical support to help enterprises accelerate the process of digital transformation, achieve cost reduction and efficiency improvement, and business innovation.
+
+------
+
+<div>
+  <p align="center">
+    <a href="https://www.bilibili.com/video/BV1HxpazNEAM"><img width="600" src="https://github.com/user-attachments/assets/54efe5d3-c28d-48fb-9a6e-d6ac536a1f95" /></a>
+  </p>
+</div>
 
 ------
 ### &#x1F525; Adopt a permissive and friendly Apache 2.0 License, supporting developers to freely expand and develop secondary
@@ -256,6 +266,6 @@ The Yuanjing Wanwu AI Agent Platform is released under the Apache License 2.0.
 ------
 
 ### &#x1F4E9; Contact Us
-| QQ Group:490071123、1026898615                               |
-| ------------------------------------------------------------ |
-| <img width="183" height="258" alt="image" src="https://github.com/user-attachments/assets/010f1d68-78e9-446d-baf1-0a7339efb48e" /> |
+| QQ Group1(Full):490071123                                    | QQ Group2:1026898615                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| <img width="183" height="258" alt="image" src="https://github.com/user-attachments/assets/010f1d68-78e9-446d-baf1-0a7339efb48e" /> | <img width="183" height="258" alt="image" src="https://github.com/user-attachments/assets/10796f69-5c18-4f21-adbb-b22b6ef88df2" /> |

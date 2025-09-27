@@ -28,6 +28,14 @@
 
 ------
 
+<div>
+  <p align="center">
+    <a href="https://www.bilibili.com/video/BV1HxpazNEAM"><img width="600" src="https://github.com/user-attachments/assets/54efe5d3-c28d-48fb-9a6e-d6ac536a1f95" /></a>
+  </p>
+</div>
+
+------
+
 ### &#x1F525; 采用宽松友好的 Apache 2.0 License，支持开发者自由扩展与二次开发
 
 ✔ **企业级工程化**：提供从模型纳管到应用落地的完整工具链，解决LLM技术落地"最后一公里"问题  
@@ -316,6 +324,6 @@
 ------
 
 ### &#x1F4E9; 联系我们
-| QQ群:490071123、1026898615                                   |
-| ------------------------------------------------------------ |
-| <img width="183" height="258" alt="image" src="https://github.com/user-attachments/assets/010f1d68-78e9-446d-baf1-0a7339efb48e" /> |
+| QQ 群1(已满):490071123                                    | QQ 群2:1026898615                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| <img width="183" height="258" alt="image" src="https://github.com/user-attachments/assets/010f1d68-78e9-446d-baf1-0a7339efb48e" /> | <img width="183" height="258" alt="image" src="https://github.com/user-attachments/assets/10796f69-5c18-4f21-adbb-b22b6ef88df2" /> |
