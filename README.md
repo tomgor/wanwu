@@ -117,6 +117,7 @@ The platform has been successfully applied in multiple industries such as **fina
   - v0.2.0 and later: [wanwu-workflow](https://github.com/UnicomAI/wanwu-workflow/tree/dev/wanwu-backend) project
 - **Docker Installation (Recommended**)
 1. Before the first run
+
     1.1 Copy the environment variable file
 
     ```bash
@@ -127,7 +128,7 @@ The platform has been successfully applied in multiple industries such as **fina
     # amd64 / arm64
     WANWU_ARCH=amd64
     
-    # external ip port (Note: localhost should be replaced with the local area network or external IP of the machine, such as 192.168.0.xx, and cannot be localhost or 127.0.0.1)
+    # external ip port (Note: if the browser accesses Wanwu deployed on a non-localhost server, you need to change localhost to the external IP, for example, 192.168.xx.xx)
     WANWU_EXTERNAL_IP=localhost
     ```
     1.3 Create a Docker running network
@@ -227,7 +228,7 @@ To help you quickly get started with this project, we strongly recommend that yo
 - **[Q] Error when starting Elastic (elastic-wanwu) on Linux system: Memory limited without swap.**
   **[A]** Stop the service, run `sudo sysctl -w vm.max_map_count=262144`, and then restart the service.
   
-- **[Q] After the system services start normally, the mysql-wanwu-worker and elastic-wanwu-setup containers exit with status code Exited (0).**
+- **[Q] After the system services start normally, the mysql-wanwu-setup and elastic-wanwu-setup containers exit with status code Exited (0).**
   **[A]** This is normal. These two containers are used to complete some initialization tasks and will automatically exit after execution.
   
 - **[Q] Regarding model import**
