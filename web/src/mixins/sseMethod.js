@@ -10,6 +10,7 @@ var originalFetch = window.fetch;
 
 import {md} from './marksown-it'
 import $ from './jquery.min.js'
+import { file } from "jszip";
 
 
 export default {
@@ -17,7 +18,6 @@ export default {
         return {
             isTestChat:false,
             defaultUrl: '/img/smart/logo.png',
-            //sessionStatus:-1,
             inputVal: '',
             eventSource: null,
             ctrlAbort: null,
@@ -39,7 +39,7 @@ export default {
             query:'',
             isStoped : false,
             access_token:'',
-            runResponse: ""
+            runResponse: "",
         };
     },
     created() {
@@ -201,7 +201,13 @@ export default {
             this.sseResponse = {}
             this.setStoreSessionStatus(0)
             this.clearInput()
-            let params = {query: prompt, pending: true, responseLoading: true, requestFileUrls:[],pendingResponse:''}
+            let params = {
+                query: prompt, 
+                pending: true, 
+                responseLoading: true, 
+                requestFileUrls:[],
+                pendingResponse:''
+            }
             this.$refs['session-com'].pushHistory(params)
             let endStr = ''
             this._print = new Print({
@@ -209,7 +215,9 @@ export default {
                     // this.setStoreSessionStatus(-1)
                 }
             })
-            
+
+            let history_list = this.$refs['session-com'].getSessionData();
+            const history = history_list['history'].length > 1 ? history_list['history'][history_list['history'].length - 2]['history'] : [];
             this.ctrlAbort = new AbortController();
             const userInfo = this.$store.state.user.userInfo || {};
             this.eventSource = new fetchEventSource(this.origin + this.rag_sseApi, {
@@ -221,7 +229,7 @@ export default {
                     "x-org-id": userInfo.orgId
                 },
                 signal: this.ctrlAbort.signal,
-                body: JSON.stringify(this.sseParams),
+                body: JSON.stringify({...this.sseParams,'history':history}),
                 openWhenHidden: true, //页面退至后台保持连接
                 onopen: async(e) => {
                     console.log("已建立SSE连接~",new Date().getTime());
@@ -351,7 +359,9 @@ export default {
             this.sseResponse = {}
             //发送问题后不允许继续提问
             this.setStoreSessionStatus(0)
+
             this.clearInput()
+
             let params = {
                 query: prompt, 
                 pending: true, 
@@ -359,6 +369,10 @@ export default {
                 requestFileUrls: this.queryFilePath?[this.queryFilePath]:[],
                 fileName:this.fileList.length > 0 ? this.fileList[0]['name'] : '',
                 fileSize:this.fileList.length > 0 ? this.fileList[0]['size'] : '',
+                fileUrl:this.fileList.length > 0 
+                ? (this.fileList[0].fileUrl ? this.fileList[0].fileUrl:URL.createObjectURL(this.fileList[0].raw))
+                : '',
+                fileType:this.fileList.length > 0 ? this.fileList[0].name.split('.').pop().toLowerCase():'',
                 pendingResponse:''
             }
             //正式环境传模型参数
@@ -442,6 +456,10 @@ export default {
                             "query": prompt,
                             "fileName":this.fileList.length > 0 ? this.fileList[0]['name'] : '',
                             "fileSize":this.fileList.length > 0 ? this.fileList[0]['size'] : '',
+                            fileUrl: this.fileList.length > 0 
+                            ? (this.fileList[0].fileUrl ? this.fileList[0].fileUrl:URL.createObjectURL(this.fileList[0].raw))
+                            : '',
+                            fileType:this.fileList.length > 0 ? this.fileList[0].name.split('.').pop().toLowerCase():'',
                             "response": '',
                             "filepath": data.file_url || '',
                             "requestFileUrls": this.queryFilePath?[this.queryFilePath] : data.requestFileUrls,
@@ -644,9 +662,13 @@ export default {
                     fileSize:_history.fileSize,
                     fileUrl:_history.fileInfo ? _history.fileInfo['fileUrl'] : _history.requestFileUrls[0],
                 }
-                fileInfo = [{name:_history['fileName'],size:_history['fileSize']}] || [];
+                fileInfo = [
+                    { name:_history['fileName'],
+                      size:_history['fileSize'],
+                      fileUrl: _history['filepath'] || _history['fileUrl'] || (_history.requestFileUrls && _history.requestFileUrls[0]) || ''
+                    }
+                ]
             }
-
             this.preSend(inputVal,fileId,fileInfo);
         }
     }

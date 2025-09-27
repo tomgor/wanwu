@@ -2,52 +2,49 @@
   <div class="page-wrapper mcp-management">
     <div class="common_bg">
       <div class="page-title">
-        <img class="page-title-img" src="@/assets/imgs/mcp.png" alt="" />
-        <span class="page-title-name">工具广场</span>
+        <img class="page-title-img" src="@/assets/imgs/mcp_menu.png" alt="" />
+        <span class="page-title-name">{{$t('menu.tool')}}</span>
       </div>
       <!-- tabs -->
       <div class="mcp-tabs">
-        <div :class="['mcp-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">精选推荐</div>
-        <div :class="['mcp-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">导入MCP服务</div>
-        <div :class="['mcp-tab',{ 'active': tabActive === 3 }]" @click="tabClick(3)">自定义工具</div>
+        <div :class="['mcp-tab',{ 'active': tabActive === 0 }]" @click="tabClick(0)">导入MCP服务</div>
+        <div :class="['mcp-tab',{ 'active': tabActive === 1 }]" @click="tabClick(1)">工具</div>
       </div>
 
-      <square ref="square" v-if="tabActive === 0"/>
-      <customize ref="customize" v-if="tabActive === 1"/>
-      <autoTools ref="autoTools" v-if="tabActive === 3"/>
+      <customize ref="customize" v-if="tabActive === 0"/>
+      <toolIndex ref="autoTools" v-if="tabActive === 1"/>
     </div>
   </div>
 </template>
 <script>
-import square from '../mcpManagementPublic/square'
 import customize from './customize'
-import autoTools from './autoTools'
+import toolIndex from './toolIndex'
 export default {
   data() {
     return {
       tabActive:0
     };
   },
-  created() {},
+  watch: {
+    $route: {
+      handler() {
+        this.tabActive = Number(this.$route.query.tabActive) || 0
+      },
+      // 深度观察监听
+      deep: true
+    }
+  },
+  mounted() {
+    this.tabActive = Number(this.$route.query.tabActive) || 0
+  },
   methods: {
     tabClick(status){
       this.tabActive = status
-      /*if(status === 0){
-          this.$nextTick(() => {
-              this.$refs['square'].init()
-          })
-      }
-      if(status === 1){
-          this.$nextTick(() => {
-              this.$refs['customize'].init()
-          })
-      }*/
     },
   },
   components: {
-      square,
-      customize,
-      autoTools
+    customize,
+    toolIndex
   },
 };
 </script>
@@ -68,11 +65,6 @@ export default {
       color: $color;
       vertical-align: -0.25em;
     }
-  }
-  .des {
-    color: $txt_color;
-    margin-bottom: 20px;
-    text-align: center;
   }
   .mcp-tabs{
     margin: 20px;
@@ -109,23 +101,11 @@ export default {
   .el-tabs__nav-wrap::after {
     display: none;
   }
-  .edit {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 30px;
-    color: #777;
-
-    &:hover {
-      color: $color;
-    }
-  }
-  .del {
+  .action-icon {
     display: none;
     position: absolute;
     top: 10px;
     right: 10px;
-    // color: $color;
     color: #777;
 
     &:hover {
@@ -155,17 +135,14 @@ export default {
         box-shadow: 0 2px 8px #171a220d, 0 4px 16px #0000000f;
         border: 1px solid $border_color;
 
-        .del {
-          display: block;
-        }
-
-        .edit {
+        .action-icon {
           display: block;
         }
       }
       .card-title {
         display: flex;
         width: 100%;
+        height: 58px;
         border-bottom: 1px solid #ddd;
         padding-bottom: 7px;
         .svg-icon {
@@ -299,9 +276,6 @@ export default {
     text-align: right;
     padding: 10px 0;
   }
-  .input-with-select {
-    width: 300px;
-  }
   .el-tabs__content {
     max-width: 1500px;
     margin: 0 auto;
@@ -329,11 +303,6 @@ export default {
   .el-radio__input.is-checked .el-radio__inner {
     border-color: $color;
     background: $color;
-  }
-  .empty{
-    width: 200px;
-    height: 100px;
-    margin: 50px auto;
   }
 }
 </style>

@@ -8,7 +8,7 @@
             <img class="create-img" src="@/assets/imgs/create_icon.png" alt="" />
             <div class="create-filter"></div>
           </div>
-          <span>{{`${$t('common.button.add')}${apptype[type]}`}}</span>
+          <span>{{`${$t('common.button.add')}${apptype[type] || ''}`}}</span>
         </div>
       </div>
       <div
@@ -129,6 +129,12 @@
               >
                 发布配置
               </el-dropdown-item>
+              <el-dropdown-item
+                command="export"
+                v-if="n.appType === 'workflow'"
+              >
+                {{$t('common.button.export')}}
+              </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -165,8 +171,8 @@
 
 <script>
 import { AppType } from "@/utils/commonSet";
-import { deleteApp, appCancelPublish,copyAgnetTemplate, appPublish } from "@/api/appspace";
-import { copyWorkFlow, publishWorkFlow, copyExample } from "@/api/workflow";
+import { deleteApp, appCancelPublish, copyAgnetTemplate, appPublish } from "@/api/appspace";
+import { copyWorkFlow, publishWorkFlow, copyExample, exportWorkflow } from "@/api/workflow";
 import { setFavorite } from "@/api/explore";
 export default {
   props:{
@@ -291,6 +297,7 @@ export default {
         });
       }
     },
+
     workflowPublish(row) {
       this.row = row
       this.dialogVisible = true
@@ -329,15 +336,16 @@ export default {
         }
       }
     },
-    async showDeleteConfirm(tips){
-      try{
-        await this.$alert(tips, this.$t("list.tips"), {
-          confirmButtonText: this.$t("list.confirm"),
-        });
-        return true;
-      }catch(err){
-        return false;
-      }
+    workflowExport(row) {
+      exportWorkflow({workflow_id: row.appId}).then(response => {
+        const blob = new Blob([response], { type: response.type })
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a")
+        link.href = url
+        link.download = row.name + '.json'
+        link.click()
+        window.URL.revokeObjectURL(link.href)
+      })
     },
     workflowOperation(method, row) {
       switch (method) {
@@ -359,6 +367,18 @@ export default {
         case "publishSet":
           this.$router.push({path:`/workflow/publishSet`, query: {appId: row.appId, appType: row.appType, name: row.name}})
           break;
+        case 'export':
+          this.workflowExport(row)
+      }
+    },
+    async showDeleteConfirm(tips){
+      try{
+        await this.$alert(tips, this.$t("list.tips"), {
+          confirmButtonText: this.$t("list.confirm"),
+        });
+        return true;
+      }catch(err){
+        return false;
       }
     },
     intelligentEdit(row) {

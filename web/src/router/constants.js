@@ -8,9 +8,10 @@ export const PERMS = {
     EXPLORE: 'exploration', // 探索广场
     MODEL: 'model', // 模型管理
     KNOWLEDGE: 'knowledge', // 知识库
+    TOOL: 'tool', // 资源库
     MCP: 'mcp', // MCP 广场
     RAG: 'rag', // 文本问答
     WORKFLOW: 'workflow', // 工作流
     AGENT: 'agent', // 智能体
-    SAFRTY:'safety',//安全护栏
+    SAFETY:'safety',//安全护栏
 }

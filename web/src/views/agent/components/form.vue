@@ -101,15 +101,29 @@
                 :loading="modelLoading"
                 clearable
                 filterable
+                value-key="modelId"
+                @change="handleModelChange($event)"
               >
                 <el-option
-                  v-for="(item,index) in modleOptions"
+                  class="model-option-item"
+                  v-for="(item, index) in modleOptions"
                   :key="item.modelId"
-                  :label="item.displayName"
                   :value="item.modelId"
+                  :label="item.displayName"
                 >
+                  <div class="model-option-content">
+                    <span class="model-name">{{ item.displayName }}</span>
+                    <div class="model-select-tags" v-if="item.tags && item.tags.length > 0">
+                      <span
+                        v-for="(tag, tagIdx) in item.tags"
+                        :key="tagIdx"
+                        class="model-select-tag"
+                      >{{ tag.text }}</span>
+                    </div>
+                  </div>
                 </el-option>
               </el-select>
+              <div class="model-select-tips" v-if="editForm.visionsupport === 'support'">*您选择的是图文问答类模型，此类模型暂时无法调用知识库、联网检索及工具</div>
             </div>
           </div>
           <div class="block prompt-box">
@@ -337,6 +351,7 @@
       @setModelSet="setModelSet"
       ref="modelSetDialog"
       :modelform="editForm.modelConfig"
+      :limitMaxTokens="limitMaxTokens"
     />
     <!-- 选择工作类型 -->
     <ToolDiaglog
@@ -467,6 +482,7 @@ export default {
   },
   data() {
     return {
+      limitMaxTokens:4096,
       knowledgeIndex:-1,
       currentKnowledgeId:'',
       currentMetaData:{},
@@ -480,6 +496,7 @@ export default {
       rerankOptions: [],
       initialEditForm: null,
       editForm: {
+        visionsupport:'',
         assistantId: "",
         avatar: {},
         name: "",
@@ -597,6 +614,17 @@ export default {
     store.dispatch("app/initState");
   },
   methods: {
+    handleModelChange(val){
+      this.setModelInfo(val);
+    },
+    setModelInfo(val){
+       const selectedModel = this.modleOptions.find(item => item.modelId === val);
+        if (selectedModel) {
+          this.editForm.visionsupport = selectedModel.config.visionSupport;
+          const maxTokens = selectedModel.config.maxTokens;
+          this.limitMaxTokens = (maxTokens && maxTokens > 0) ? maxTokens : 4096;
+        }
+    },
     submitMeta(){
       const metaData  = this.$refs.metaSet.getMetaData();
       if(this.$refs.metaSet.validateRequiredFields(metaData['metaDataFilterParams']['metaFilterParams'])){
@@ -647,18 +675,6 @@ export default {
       this.$refs.knowledgeSetDialog.showDialog(this.editForm.knowledgeConfig);
     },
     //获取模型列表
-    getModelData() {
-      selectModelList().then((res) => {
-        if (res.code === 0) {
-          this.modleOptions = res.data.map((item) => {
-            return {
-              label: item.name,
-              value: item.id,
-            };
-          });
-        }
-      });
-    },
     //获取rerank模型
     getRerankData() {
       getRerankList().then((res) => {
@@ -843,9 +859,14 @@ export default {
     },
     async updateInfo() {
       //模型数据
-      const modeInfo = this.modleOptions.find(
-        (item) => item.modelId === this.editForm.modelParams
-      );
+      let modeInfo;
+      if (typeof this.editForm.modelParams === 'object' && this.editForm.modelParams) {
+        modeInfo = this.editForm.modelParams;
+      } else {
+        modeInfo = this.modleOptions.find(
+          (item) => item.modelId === this.editForm.modelParams
+        );
+      }
       const rerankInfo = this.rerankOptions.find(
         (item) => item.modelId === this.editForm.knowledgeConfig.rerankModelId
       );
@@ -909,7 +930,10 @@ export default {
         let data = res.data;
         this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config.matchType === '' ? this.editForm.knowledgeConfig : res.data.knowledgeBaseConfig.config;
         this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
-        this.editForm.knowledgebases = res.data.knowledgeBaseConfig.knowledgebases;
+        const knowledgeData = res.data.knowledgeBaseConfig.knowledgebases;
+        if(knowledgeData && knowledgeData.length > 0){
+          this.editForm.knowledgebases = knowledgeData;
+        }
         this.editForm = {
           ...this.editForm,
           avatar: data.avatar || {},
@@ -937,6 +961,9 @@ export default {
               ? data.safetyConfig
               : this.editForm.safetyConfig,
         };
+
+        //设置模型信息
+        this.setModelInfo(data.modelConfig.modelId);
 
         //回显自定义插件
         this.workFlowInfos = data.workFlowInfos || [];
@@ -1301,6 +1328,10 @@ export default {
       .model-select {
         width: 100%;
       }
+      .model-select-tips{
+        margin-top: 10px;
+        color: #dc6803;
+      }
       .operation {
         text-align: center;
         cursor: pointer;
@@ -1596,6 +1627,35 @@ export default {
 }
 .custom-tooltip.el-tooltip__popper.is-light[x-placement^="top"] .popper__arrow {
   border-top-color: #ccc !important;
+}
+
+
+.model-option-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  
+  .model-name {
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+  
+  .model-select-tags {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-top: 4px;
+    .model-select-tag {
+      background-color: #f0f2ff;
+      color: #384bf7;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+  }
 }
 </style>
 

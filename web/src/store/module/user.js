@@ -12,10 +12,17 @@ export const user = {
       token: '',
       permission:{},
       commonInfo:{},
-      lang: ''
+      lang: '',
+      defaultIcons: {
+        agentIcon: '',
+        ragIcon: ''
+      }
   },
 
   mutations: {
+      setDefaultIcons(state, defaultIcons) {
+          state.defaultIcons = { ...state.defaultIcons, ...defaultIcons }
+      },
       setUserInfo(state, userInfo) {
           state.userInfo = { ...state.userInfo, ...userInfo }
       },
@@ -118,6 +125,12 @@ export const user = {
         const res = await getCommonInfo() || {}
         if(res.code === 0){
             commit('setCommonInfo', {data: res.data || {}})
+            // 存储默认图标信息
+            const defaultIcons = {
+              agentIcon: res.data.defaultIcon.agentIcon || '',
+              ragIcon: res.data.defaultIcon.ragIcon || ''
+            }
+            commit('setDefaultIcons', defaultIcons)
         }
       }
   },
@@ -139,6 +152,9 @@ export const user = {
     },
     permission(state){
       return state.permission
+    },
+    defaultIcons(state){
+      return state.defaultIcons
     }
   }
 }

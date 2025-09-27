@@ -58,7 +58,11 @@
               class="resultItem"
             >
               <div class="resultTitle">
-                <span class="tag">{{$t('knowledgeManage.section')}}{{index+1}}</span>
+                <span>
+                  <span class="tag"  @click="showSectionDetail(index)">{{$t('knowledgeManage.section')}}#{{index+1}}</span>
+                  <span class="segment-type">{{item.childContentList && item.childContentList.length > 0 ? '#父子分段' : '#通用分段'}}</span>
+                  <span class="segment-length" v-if="item.childContentList && item.childContentList.length > 0" @click="showSectionDetail(index)">#{{item.childContentList.length || 0}}个子分段</span>
+                </span>
                 <span class="score">{{$t('knowledgeManage.hitScore')}}: {{score[index]}}</span>
               </div>
               <div>
@@ -75,6 +79,8 @@
             <p class="nodata_tip">暂无数据</p>
           </div>
         </div>
+        <!-- 分段详情区域 -->
+        <sectionShow ref="sectionShow" />
       </div>
     </div>
   </div>
@@ -85,8 +91,9 @@ import { md } from "@/mixins/marksown-it";
 import searchConfig from '@/components/searchConfig.vue';
 import LinkIcon from "@/components/linkIcon.vue";
 import metaSet from "@/components/metaSet";
+import sectionShow from "./sectionShow.vue";
 export default {
-  components:{LinkIcon, searchConfig,metaSet},
+  components:{LinkIcon, searchConfig, metaSet, sectionShow}, 
   data() {
     return {
       md: md,
@@ -163,6 +170,17 @@ export default {
       }).catch(() =>{
         this.resultLoading = false;
       })
+    },
+    
+    // 显示分段详情弹框
+    showSectionDetail(index) {
+      const currentItem = this.searchList[index];
+      const currentScore = parseFloat(this.score[index]) || 0;
+      const data = {
+        searchList:currentItem,
+        score:currentScore,
+      }
+      this.$refs.sectionShow.showDiaglog(data);
     },
   },
 };
@@ -262,7 +280,28 @@ export default {
                 display: inline-block;
                 background: #d2d7ff;
                 padding: 0 10px;
-                border-radius: 6px;
+                border-radius: 4px;
+                cursor: pointer;
+              }
+              .segment-type {
+                padding: 0 5px;
+              }
+              .segment-length{
+                cursor: pointer;
+              }
+              .segment-length:hover{
+                color: #384bf7;
+              }
+              .segment-type,
+              .segment-length {
+                color: #999;
+                font-size: 12px;
+              }
+              .checkDetail{
+                color: #384bf7;
+                cursor: pointer;
+                margin-left: 10px;
+                font-size:12px;
               }
               .score {
                 color: #384bf7;

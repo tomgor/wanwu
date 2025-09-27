@@ -99,17 +99,30 @@
             ...mapGetters('menu', ['basicInfo']),
             ...mapGetters('user', ['commonInfo']),
         },
+        watch: {
+            // 'editForm.visionsupport': {
+            //     handler(newVal) {
+            //         if ( newVal === 'support') {
+            //             this.fileTypeArr = ['doc/*','image/*'];
+            //         } else {
+            //             this.fileTypeArr = ['doc/*'];
+            //         }
+            //     },
+            //     immediate: true
+            // }
+        },
         data() {
             return {
                 amswerNum:0,
                 isModelDisable:false,
                 currentModel:null,
                 echo: true,
-                fileTypeArr: ['doc/*'],
+                fileTypeArr: ['doc/*','image/*'],
                 hasDrawer: false,
                 drawer: true,
             }
         },
+
         methods: {
             createConversion(){
                 if (this.echo) {
@@ -163,7 +176,7 @@
                             response:[0,1,2,3,4,5,6,20,21,10].includes(n.qa_type)?md.render(n.response):n.response.replaceAll('\n-','\n•'),
                             oriResponse:n.response,
                             searchList: n.searchList ? n.searchList : [],
-                            filepath: n.responseFileUrls,
+                            filepath: n.requestFileUrls[0],
                             "gen_file_url_list":n.responseFileUrls || [],
                             "isOpen":true,
                             toolText:'已使用工具',
@@ -255,6 +268,9 @@
                 }
                 let fileId = this.$refs['editable'].getFileIdList() || this.fileId;
                 this.useSearch = this.$refs['editable'].sendUseSearch();
+                if(fileId && fileId.imgUrl){
+                    delete fileId.imgUrl;
+                }
                 this.setSseParams({conversationId: this.conversationId, fileInfo:fileId,assistantId:this.editForm.assistantId})
                 this.doSend()
                 this.echo = false

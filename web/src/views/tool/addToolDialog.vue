@@ -61,16 +61,15 @@
                     border
                     size="mini"
                     class="api-table"
+                    :header-cell-style="{ textAlign: 'center' }"
                 >
                   <el-table-column
                       prop="name"
-                      label="Name"
-                      width="180">
+                      label="Name">
                   </el-table-column>
                   <el-table-column
                       prop="method"
-                      label="Method"
-                      width="180">
+                      label="Method">
                   </el-table-column>
                   <el-table-column
                       prop="path"
@@ -128,17 +127,17 @@
           </el-form>
         </div>
         <span slot="footer" class="dialog-footer">
-                <el-button @click="beforeApiAuthClose">取 消</el-button>
-                <el-button type="primary" @click="listenerApiKey">确 定</el-button>
+                <el-button @click="beforeApiAuthClose">{{ $t('common.button.cancel') }}</el-button>
+                <el-button type="primary" @click="listenerApiKey">{{ $t('common.button.confirm') }}</el-button>
             </span>
       </el-dialog>
     </div>
     <span slot="footer" class="dialog-footer" v-show="!dialogDetailVisible">
-        <el-button @click="cancel">取 消</el-button>
+        <el-button @click="cancel">{{ $t('common.button.cancel') }}</el-button>
         <el-button
             type="primary"
             @click="submit"
-            :loading="loading">确 定</el-button>
+            :loading="loading">{{ $t('common.button.confirm') }}</el-button>
     </span>
     <span slot="footer" class="dialog-footer" v-show="dialogDetailVisible">
         <el-button
@@ -173,6 +172,7 @@ export default {
         name: '',
         schema: '',
         privacyPolicy: '',
+        flag: '0',
         apiAuth: {
           type: 'None',
           authType: 'Custom',
@@ -197,7 +197,7 @@ export default {
     }
   },
   methods: {
-    showDialog(customToolId, dialogDetailVisible) {
+    showDialog(customToolId, dialogDetailVisible, title) {
       this.dialogDetailVisible = dialogDetailVisible
       this.dialogBasicVisible = true
       if (customToolId) {
@@ -215,6 +215,11 @@ export default {
               this.listenerSchema()
             })
       } else this.title = '新增自定义工具'
+      if (title) {
+        this.title = title
+        // 区分自定义工具和用户导入的openapi 0:自定义工具 1:用户导入的openapi
+        this.form.flag = '1'
+      }
     },
     exampleChange(value) {
       this.form.schema = this.schemaConfig[value]
@@ -226,7 +231,7 @@ export default {
     },
     listenerApiKey() {
       this.$refs.apiAuthForm.validate(async (valid) => {
-        if (!valid) return;
+        if (!valid && this.form.apiAuth.type === 'API Key') return;
         this.dialogAuthVisible = false
       })
     },
@@ -246,7 +251,7 @@ export default {
       this.$refs.form.validate(async (valid) => {
         if (!valid) return;
         this.loading = true
-        if(this.form.apiAuth.type === 'None'){
+        if (this.form.apiAuth.type === 'None') {
           this.form.apiAuth.authType = '';
           this.form.apiAuth.apiKey = '';
           this.form.apiAuth.customHeaderName = ''
@@ -259,20 +264,23 @@ export default {
               .then((res) => {
                 if (res.code === 0) {
                   this.$message.success("修改成功")
-                  this.dialogBasicVisible = false
+                  this.$emit("handleFetch", false)
                   this.cancel()
                 }
-              }).catch(() => this.loading = false)
+              }).finally(() => this.loading = false)
         } else {
           delete params.customToolId
-          addCustom(params)
-              .then((res) => {
-                if (res.code === 0) {
-                  this.$message.success("新增成功")
-                  this.dialogBasicVisible = false
-                  this.cancel()
-                }
-              }).catch(() => this.loading = false)
+          if (this.form.flag === '1') {
+            this.$emit('addOpenapi', params);
+            this.dialogBasicVisible = false
+            this.cancel()
+          } else addCustom(params).then((res) => {
+            if (res.code === 0) {
+              this.$message.success("新增成功")
+              this.$emit("handleFetch", false)
+              this.cancel()
+            }
+          }).finally(() => this.loading = false)
         }
       })
     },
@@ -290,6 +298,7 @@ export default {
         name: '',
         schema: '',
         privacyPolicy: '',
+        flag: '0',
         apiAuth: {
           type: 'None',
           authType: 'Custom',

@@ -175,3 +175,32 @@ export const getList = (data)=>{
         params: data
     })
 };
+
+// 工作流图片上传
+export const uploadFile = (data) => {
+    return request({
+        url: `/api/bot/upload_file`,
+        method: "post",
+        data
+    })
+}
+
+// 导入工作流
+export const importWorkflow = (data, config) => {
+    return request({
+        url: `/user/api/v1/appspace/workflow/import`,
+        method: 'post',
+        data,
+        config
+    });
+};
+
+// 导出工作流
+export const exportWorkflow = (params) => {
+    return request({
+        url: `/user/api/v1/appspace/workflow/export`,
+        method: "get",
+        params,
+        responseType: 'blob'
+    });
+};

@@ -49,7 +49,7 @@
         </ul>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handleCancel" size="mini">取 消</el-button>
+        <el-button @click="handleCancel" size="mini">{{ $t('common.button.cancel') }}</el-button>
         <el-button
           type="primary"
           size="mini"
@@ -124,10 +124,10 @@ export default {
             .then((res) => {
               if(res.code === 0){
                 this.$message.success("发布成功")
-                this.publishLoading = false
+                this.$emit("handleFetch", false)
                 this.handleCancel()
               }
-            }).catch(() => this.publishLoading = false)
+            }).finally(() => this.publishLoading = false)
         }
       });
     },
@@ -137,8 +137,7 @@ export default {
         serverUrl: this.ruleForm.sseUrl,
       }).then((res) => {
         this.mcpList = res.data.tools;
-        this.toolsLoading = false
-      }).catch(() => this.toolsLoading = false)
+      }).finally(() => this.toolsLoading = false)
     },
   },
   computed: {

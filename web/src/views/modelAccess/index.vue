@@ -99,8 +99,7 @@
               </div>
             </div>
             <div class="card-middle">
-              <div class="card-type">{{modelTypeObj[item.modelType]}}</div>
-              <!--<div class="card-type" v-if="item.version">{{item.version}}</div>-->
+              <div v-if="item.tags" class="card-type" v-for="it in item.tags">{{it.text}}</div>
             </div>
             <div class="card-bottom">
               <div

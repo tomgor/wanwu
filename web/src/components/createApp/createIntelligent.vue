@@ -21,7 +21,7 @@
                 :on-change="uploadOnChange"
                 >
             <div class="echo-img">
-                <img :src="imageUrl || defaultLogo || `/user/api/` + form.avatar.path" />
+                <img :src="getImageSrc()" />
                 <p class="echo-img-tip" v-if="isLoading">
                   {{this.$t('common.fileUpload.imgUploading')}}
                   <span class="el-icon-loading"></span>
@@ -59,7 +59,7 @@
 <script>
 import { uploadAvatar} from "@/api/user";
 import { createAgent,updateAgent} from "@/api/agent";
-import {mapActions} from 'vuex';
+import {mapActions,mapGetters} from 'vuex';
 export default {
   props: {
     type: {
@@ -73,7 +73,7 @@ export default {
   data() {
     return {
       isLoading:false,
-      defaultLogo:require("@/assets/imgs/bg-logo.png"),
+      defaultLogo:'',
       logoFileList:[],
       imageUrl:'',
       dialogVisible: false,
@@ -111,9 +111,6 @@ export default {
           { required: true, message:this.$t('agentDiglog.descplaceholder'), trigger: "blur" },
           { max:600, message:this.$t('agentDiglog.descRules'),trigger: "blur"}
         ],
-        'avatar.path':[
-            { required: true, message: this.$t('agentDiglog.uploadImg'), trigger: "blur" },
-        ]
       },
       titleMap: {
         edit: this.$t('agentDiglog.editApp'),
@@ -121,28 +118,30 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapGetters('user', ['defaultIcons'])
+  },
   watch:{
-    form:{
-       handler(newVal) {
-        Object.keys(newVal).forEach(key => {
-          if (newVal[key] && typeof newVal[key] !== 'object') {
-            this.$refs.form.clearValidate(key);
-          }
-        });
-      },
-      deep: true
-    },
-    'form.avatar': {
+    defaultIcons:{
       handler(newVal) {
-        if (newVal && newVal.path) {
-          this.$refs.form.clearValidate('avatar.path');
+        if(this.type === 'create'){
+          this.defaultLogo = newVal.agentIcon;
         }
       },
-      deep: true
-    }
+      deep: true,
+      immediate: true
+    },
   },
   methods: {
     ...mapActions("app", ["setFromList"]),
+    getImageSrc(){
+      if (this.imageUrl) return this.imageUrl;
+      if (this.type === 'create') {
+        return this.defaultLogo ? `/user/api/${this.defaultLogo}` : '';
+      } else {
+        return this.form.avatar.path ? `/user/api/${this.form.avatar.path}` : '';
+      }
+    },
     openDialog() {
       if (this.type === "edit" && this.editForm) {
         this.defaultLogo = ''

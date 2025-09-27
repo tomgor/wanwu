@@ -83,6 +83,15 @@
                 >
                 </el-table-column>
                 <el-table-column
+                  prop="segmentMethod"
+                  label="分段模式"
+                  width="200"
+                >
+                <template slot-scope="scope">
+                  <span>{{ getSegmentMethodText(scope.row.segmentMethod) }}</span>
+                </template>
+                </el-table-column>
+                <el-table-column
                   prop="uploadTime"
                   :label="$t('knowledgeManage.importTime')"
                   width="200"
@@ -205,7 +214,7 @@ export default {
     },
     metaData:{
       handler(val){
-        if(val.some(item => item.metaKey === '' || item.metaValueType === '') || val.length === 0){
+        if(val.some(item => !item.metaKey || !item.metaValueType) || !val.length){
           this.isDisabled = true
         }else{
           this.isDisabled = false
@@ -220,6 +229,16 @@ export default {
     this.clearTimer()
   },
   methods: {
+    getSegmentMethodText(value){
+      switch (value) {
+        case '0':
+          return '通用分段';
+        case '1':
+          return '父子分段';
+        default:
+          return '未知';
+      }
+    },
     createMeta(){
       this.$refs.mataData.createMetaData();
       this.scrollToBottom();
@@ -233,22 +252,28 @@ export default {
       });
      },
     submitMeta(){
+      this.isDisabled = true;
+      const metaList = this.metaData.filter(item => item.option !== '').map(({metaId,metaKey,metaValueType,option}) =>({
+          metaKey,
+          ...(option === 'add' ? {metaValueType } : {}),
+          option,
+          ...(option === 'update'||option === 'delete' ? {metaId } : {})
+        }))
       const data = {
         docId:'',
         knowledgeId:this.docQuery.knowledgeId,
-        metaDataList:this.metaData.map(({metaKey,metaValueType,option}) =>({
-          metaKey,
-          metaValueType,
-          option
-        }))
+        metaDataList:metaList
       }
       updateDocMeta(data).then(res =>{
         if(res.code === 0){
           this.$message.success('操作成功');
           this.$refs.mataData.getList();
           this.metaVisible = false;
+          this.isDisabled = false;
         }
-      }).catch(() =>{})
+      }).catch(() =>{
+          this.isDisabled = false;
+      })
     },
     showMeta(){
       this.metaVisible = true;
@@ -430,7 +455,8 @@ export default {
           id: row.docId,
           type: row.docType,
           name:row.docName,
-          knowledgeId:row.knowledgeId
+          knowledgeId:row.knowledgeId,
+          knowledgeName:this.knowledgeName
         },
       });
     },

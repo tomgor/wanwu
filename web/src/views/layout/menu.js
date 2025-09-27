@@ -19,12 +19,12 @@ export const menuList = [
         perm: PERMS.KNOWLEDGE,
     },
     {
-        name: i18n.t('menu.mcp'),
-        key: 'mcpManage',
-        img: require('@/assets/imgs/mcp.png'),
-        imgActive: require('@/assets/imgs/mcp_active.png'),
-        path: '/mcp',
-        perm: PERMS.MCP,
+        name: i18n.t('menu.tool'),
+        key: 'tool',
+        img: require('@/assets/imgs/tool.png'),
+        imgActive: require('@/assets/imgs/tool_active.png'),
+        path: '/tool',
+        perm: PERMS.TOOL,
     },
     {
         name: i18n.t('menu.safetyGuard'),
@@ -32,11 +32,11 @@ export const menuList = [
         img: require('@/assets/imgs/safety.png'),
         imgActive: require('@/assets/imgs/safety_active.png'),
         path: '/safety',
-        perm: PERMS.SAFRTY,
+        perm: PERMS.SAFETY,
     },
     {
         key: 'line',
-        perm: [PERMS.MODEL, PERMS.KNOWLEDGE, PERMS.MCP]
+        perm: [PERMS.MODEL, PERMS.KNOWLEDGE, PERMS.TOOL]
     },
     {
         name: i18n.t('menu.app.rag'),
@@ -65,6 +65,14 @@ export const menuList = [
     {
         key: 'line',
         perm: [PERMS.RAG, PERMS.WORKFLOW, PERMS.AGENT]
+    },
+    {
+        name: i18n.t('menu.mcp'),
+        key: 'mcpManage',
+        img: require('@/assets/imgs/mcp_menu.png'),
+        imgActive: require('@/assets/imgs/mcp_menu_active.png'),
+        path: '/mcp',
+        perm: PERMS.MCP,
     },
     {
         name: i18n.t('menu.explore'),

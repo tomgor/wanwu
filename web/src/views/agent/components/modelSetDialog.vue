@@ -37,6 +37,10 @@ export default {
         modelform:{
             type:Object,
             default:null
+        },
+        limitMaxTokens:{
+            type:Number,
+            default:4096
         }
     },
     data(){
@@ -53,8 +57,12 @@ export default {
                 presencePenaltyEnable:false,
                 maxTokensEnable:false,
                 frequencyPenaltyEnable:false
-            },
-            modelSet: [
+            }
+        }
+    },
+    computed:{
+        modelSet(){
+            return  [
                 {
                     label:'温度',
                     desc: '增加温度将使模型的回答更具创造性',
@@ -97,7 +105,7 @@ export default {
                     props: "maxTokens",
                     btnProps:'maxTokensEnable',
                     min: 1,
-                    max: 4096,
+                    max: this.limitMaxTokens,
                     step: 1,
                 }
             ]

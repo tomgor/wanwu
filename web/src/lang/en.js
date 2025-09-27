@@ -9,19 +9,35 @@ export default {
         },
         askAccount: '没有账号？',
         register: '立即注册',
-        forgetPassword: '忘记密码',
+        forgetPassword: '忘记密码？',
         button: '登 录',
     },
     register: {
-        title: '注册',
+        title: '注 册',
         form: {
             username: '用户名',
             email: '邮箱',
             code: '验证码'
         },
         action: '获取',
+        askAccount: '已有账号？',
+        login: '立即登录',
         button: '注 册',
-        back: '返回登录'
+    },
+    reset: {
+        title: '重置密码',
+        form: {
+            email: '邮箱',
+            code: '验证码',
+            password: '新密码',
+        },
+        pwd1Placeholder: '密码需包含字母，数字，特殊字符，长度8-20',
+        action1: '设置',
+        action2: '确认',
+        action: '获取',
+        askAccount: '记得密码？',
+        login: '立即登录',
+        button: '确 认',
     },
     about: {
         version: '版本',
@@ -29,7 +45,8 @@ export default {
     menu: {
         explore: '应用广场',
         workspace: '工作室',
-        mcp: '工具广场',
+        tool: '资源库',
+        mcp: 'MCP广场',
         app: {
             index: '应用空间',
             all: '全部',
@@ -45,7 +62,8 @@ export default {
         org: '组织管理',
         modelAccess: '模型管理',
         about: '关于',
-        helpDoc: '帮助文档'
+        helpDoc: '帮助文档',
+        back: '返回',
     },
     header: {
         title: '智能体平台',
@@ -119,7 +137,8 @@ export default {
             modelId: '支持英文、数字、下划线(_)、中划线(-)、(.)，2-50个字符，不能以下划线为开头',
             version: '支持英文、数字、(.)',
             inferUrl: 'Base Url，例如：',
-            apiKey: '输入APIKey, 例如：'
+            apiKey: '输入APIKey, 例如：',
+            codeSent: '已向邮箱发送验证码及初始密码，首次登录请修改密码。',
         },
         select: {
             placeholder: '请选择'
@@ -178,7 +197,15 @@ export default {
     },
     appSpace: {
         title: '应用空间',
-        search: '按照应用名称搜索'
+        search: '按照应用名称搜索',
+        workflowExport: '文件导入'
+    },
+    uploadDialog: {
+        title: '文件上传',
+        file: '文件上传: ',
+        hint: '文件格式：json文件',
+        noUpload: '请上传文件',
+        uploadError: '上传失败，请重新上传'
     },
     userInfo: {
         title: '个人信息',
@@ -343,6 +370,8 @@ export default {
         table: {
             modelName: '模型名称',
             modelDisplayName: '模型显示名称',
+            modelDesc: '模型描述',
+            contextSize: '模型上下文长度',
             modelId: '模型ID',
             version: '版本号',
             detailInfo: '说明文档',
@@ -357,7 +386,8 @@ export default {
             publish: '发布',
             isStart: '是否启用',
             on: '上架',
-            off: '下架'
+            off: '下架',
+            vision: '图文问答'
         },
         confirm: {
             delete: '该模型删除后不可恢复，是否确认删除？',
@@ -373,12 +403,14 @@ export default {
             title: '供应商选择'
         },
         hint: {
-            urlError: 'URL格式不正确'
+            urlError: 'URL格式不正确',
+            yuanjing: '可前往 https://maas.ai-yuanjing.com/ 申请API Key',
         }
     },
 
     // 工作流
     list:{
+        pluginPic: '工作流图标',
         pluginName: '工作流名称',
         pluginNameRules:' 工作流名称须在30字符以内',
         pluginEnName: '工作流英文名',
@@ -727,5 +759,30 @@ export default {
         backAnalysis:'返回解析',
         saveIntoData:'保存成功结果入库',
         fileSizeTips:'上传文件不能超过15MB!'
-    }
+    },
+    tool:{
+        server:{
+            slogan:'可绑定已发布的应用，创建自己的MCP server，并对外提供服务。',
+            search:'请输入MCP名称进行搜索',
+            create:'创建MCP',
+            name:'服务名称',
+            desc:'服务描述',
+            bind: {
+                title:'绑定应用',
+                bind:'绑定应用',
+                hint:'已绑定的应用发布新版本之后，引用此工具所创建的MCP服务不会自动更新到该工具的最新版本，以免影响已线上业务的正常运行。若需绑定最新版应用，请手动删除原应用后，重新添加新版应用。',
+                action:'管理',
+                methodName:'显示名称',
+                placeholder:'仅英语',
+                name:'应用',
+                desc:'应用描述',
+                operate:'操作',
+                openapi:{
+                    action:'+导入openapi',
+                    hint:'导入的openapi不会保存至应用。若想永久保存，方便后续调用，可在资源库-自定义工具模块，将openapi添加为自定义工具。',
+                }
+            },
+
+        }
+    },
 }

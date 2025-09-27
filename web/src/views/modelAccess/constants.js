@@ -3,13 +3,15 @@ export const RERANK = 'rerank'
 export const EMBEDDING = 'embedding'
 export const OCR = 'ocr'
 export const GUI = 'gui'
+export const PDF_PARSER = 'pdf-parser'
 
 export const MODEL_TYPE_OBJ = {
     [LLM]: 'LLM',
     [RERANK]: 'Rerank',
     [EMBEDDING]: 'Embedding',
     [OCR]: 'OCR',
-    [GUI]: 'GUI'
+    [GUI]: 'GUI',
+    [PDF_PARSER]: 'pdf文档解析模型'
 }
 
 export const MODEL_TYPE = Object.keys(MODEL_TYPE_OBJ).map(key => ({key, name: MODEL_TYPE_OBJ[key]}))
@@ -47,7 +49,7 @@ export const PROVIDER_TYPE = Object.keys(PROVIDER_OBJ)
                 ? MODEL_TYPE
                 : [OLLAMA, HUOSHAN].includes(key)
                     ? MODEL_TYPE.filter(item => [LLM, EMBEDDING].includes(item.key))
-                    : MODEL_TYPE.filter(item => ![OCR, GUI].includes(item.key))
+                    : MODEL_TYPE.filter(item => [LLM, RERANK, EMBEDDING].includes(item.key))
         })
     })
 
@@ -55,7 +57,13 @@ export const DEFAULT_CALLING = 'noSupport'
 export const FUNC_CALLING = [
     {key: 'noSupport', name: '不支持'},
     {key: 'toolCall', name: 'Tool call'},
-    {key: 'functionCall', name: 'Function call'},
+    /*{key: 'functionCall', name: 'Function call'},*/
+]
+
+export const DEFAULT_SUPPORT = 'noSupport'
+export const SUPPORT_LIST = [
+    {key: 'noSupport', name: '不支持'},
+    {key: 'support', name: '支持'},
 ]
 
 export const TYPE_OBJ = {
@@ -67,6 +75,9 @@ export const TYPE_OBJ = {
         [HUOSHAN]: 'd8008ac0-****-****-****-**************'
     },
     inferUrl: {
+        [OCR]: 'https://maas-api.ai-yuanjing.com/openapi/v1',
+        [GUI]: 'https://maas-api.ai-yuanjing.com/openapi/v1',
+        [PDF_PARSER]: 'https://maas-api.ai-yuanjing.com/openapi/v1',
         [YUAN_JING]: 'https://maas.ai-yuanjing.com/openapi/compatible-mode/v1',
         [OPENAI_API]: 'https://api.siliconflow.cn/v1',
         [OLLAMA]: 'https://192.168.21.100:11434',

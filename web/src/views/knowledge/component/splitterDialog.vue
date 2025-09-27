@@ -73,10 +73,10 @@ export default {
         required:true,
         default:''
     },
-    selectData:{
-      typeof:Array,
-      default:[]
-    }
+    // selectData:{
+    //   typeof:Array,
+    //   default:[]
+    // }
   },
   watch:{
     dataList:{
@@ -104,6 +104,7 @@ export default {
       dialogVisible: false,
       tagList:[],
       tagName: "",
+      selectData:[]
     };
   },
   methods: {
@@ -115,7 +116,11 @@ export default {
     delTag(item){
       this.$emit('delItem',item)
     },
-    showDiaglog() {
+    showDiaglog(data=[]) {
+      this.selectData = [];
+      if(data.length){
+        this.selectData = data;
+      }
       this.dialogVisible = true;
     },
     handleClose() {

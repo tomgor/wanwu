@@ -11,6 +11,7 @@
       <div
         v-for="(item,index) in docMetaData"
         class="docItem"
+        :key="'meta'+index"
       >
         <div class="docItem_data">
           <span class="docItem_data_label">
@@ -24,12 +25,14 @@
               <span class="el-icon-question question" v-if="type === 'create'"></span>
             </el-tooltip>
           </span>
-          <el-input
-            v-if="type === 'create'"
-            v-model="item.metaKey"
-            @blur="metakeyBlur(item,index)"
-            :disabled="item.hasMetaId"
-          ></el-input>
+          <template v-if="type === 'create'">
+            <el-input
+              v-if="item.showEdit"
+              v-model="item.metaKey"
+              @blur="metakeyBlur(item,index)"
+            ></el-input>
+            <span v-else class="metaItemKey">{{item.metaKey}}</span>
+          </template>
           <el-select
               v-else
               v-model="item.metaKey"
@@ -52,7 +55,7 @@
             v-if="type === 'create'"
             v-model="item.metaValueType"
             placeholder="请选择"
-            :disabled="item.hasMetaId"
+            :disabled="Boolean(item.metaId)"
           >
             <el-option
               v-for="item in typeOptions"
@@ -83,7 +86,7 @@
           </el-select>
           <el-input
             v-model="item.metaValue"
-            v-if="(item.metadataType ==='value' && item.metaValueType === 'string') || item.metaValueType === ''"
+            v-if="item.metadataType ==='value' && item.metaValueType === 'string'"
             @blur="metaValueBlur(item)"
             placeholder="string"
           ></el-input>
@@ -113,15 +116,14 @@
         </div>
         <el-divider direction="vertical" v-if="type !== 'create'"></el-divider>
         <div class="docItem_data docItem_data_btn">
-          <!-- <span
+          <span
           v-if="type === 'create'"
           class="el-icon-edit-outline setBtn"
           @click="editMataItem(item)"
-          ></span> -->
+          ></span>
           <span
             class="el-icon-delete setBtn"
             @click="delMataItem(index,item)"
-            :style="{color:item.hasMetaId?'#ccc':'#384BF7'}"
           ></span>
         </div>
       </div>
@@ -129,7 +131,7 @@
   </div>
 </template>
 <script>
-import {metaSelect} from "@/api/knowledge"
+import {metaSelect,updateDocMeta} from "@/api/knowledge"
 export default {
   props:['metaData','type','knowledgeId'],
   watch: {
@@ -144,15 +146,19 @@ export default {
     },
     docMetaData: {
       handler(val) {
-        if (this.debounceTimer) {
-          clearTimeout(this.debounceTimer);
-        }
+        if (this.debounceTimer) clearTimeout(this.debounceTimer);
+        const metaList = Array.isArray(val) ? val : []
+
+        const payload = metaList.map(item => ({
+          ...item,
+          metaValue:
+            item && item.metaValueType === 'time'
+              ? item.metaValue
+              : (item && item.metaValue != null ? String(item.metaValue) : ''),
+        }))
+
         this.debounceTimer = setTimeout(() => {
-          val = val.map(item => ({
-            ...item,
-            metaValue:String(item.metaValue)
-          }))
-          this.$emit("updateMeata", val);
+          this.$emit("updateMeata",payload);
         }, 500);
       },
       deep: true,
@@ -180,11 +186,11 @@ export default {
       valueOptions: [
         {
           value: "value",
-          name: "确认值",
+          label: "确认值",
         },
         {
           value: "regExp",
-          name: "正则表达式",
+          label: "正则表达式",
         },
       ],
       keyOptions:[]
@@ -201,8 +207,8 @@ export default {
               if(this.type === 'create'){
                 this.docMetaData = (res.data.knowledgeMetaList || []).map(item => ({
                   ...item,
-                  hasMetaId:true,
-                  option: 'add'
+                  showEdit:false,
+                  option: ''
                 }));
               }
               
@@ -210,8 +216,12 @@ export default {
       }).catch(() =>{})
     },
     keyChange(val,item){
-      item.metaValue = '';
-      item.metaValueType = this.keyOptions.filter(i => i.metaKey === val).map(e => e.metaValueType)[0];
+      item.metaValue = ''
+      item.metadataType = 'value'
+      const opt = Array.isArray(this.keyOptions)
+        ? this.keyOptions.find(i => i.metaKey === val)
+        : null
+      item.metaValueType = opt ? opt.metaValueType : ''
     },
     createMetaData() {
       if(this.type === 'create' && this.docMetaData.length > 0  ){
@@ -230,7 +240,8 @@ export default {
         metaKey: "",
         metaRule: "",
         metaValue: "",
-        metaValueType: "",
+        metaValueType: "string",
+        showEdit:true,
         metadataType: "value",
         option:"add"
       });
@@ -253,11 +264,36 @@ export default {
       }
       return true;
     },
-    delMataItem(i,item) {
-      if(this.type === 'create' && item.hasMetaId){
-        return;
+    editMataItem(item){
+      item.showEdit = true;
+      if(item.metaId){
+        item.option = 'update';
       }
-      this.docMetaData.splice(i, 1);
+    },
+    delMataItem(i,item) {
+      if(item.metaId){
+        item.option = 'delete'
+        this.delMetaData(item)
+      }else{
+        this.docMetaData.splice(i, 1);
+      }
+    },
+    delMetaData(item){
+      const dataItem = [item]
+      const data = {
+        docId:'',
+        knowledgeId:this.knowledgeId,
+        metaDataList:dataItem.map(({metaId,option}) =>({
+          metaId,
+          option
+        }))
+      }
+      updateDocMeta(data).then(res =>{
+        if(res.code === 0){
+            this.$message.success('操作成功')
+            this.getList();
+        }
+      })
     },
     valueChange(item) {
       item.metaValue = "";
@@ -265,22 +301,28 @@ export default {
     },
     metakeyBlur(item,index) {
       const regex = /^[a-z][a-z0-9_]*$/;
-      if (!item.metaKey) {
-        this.$message.warning("请输入key值");
-        return;
+      if (!item.metaKey || typeof item.metaKey !== 'string' || item.metaKey.trim() === '') {
+        this.$message.warning('请输入key值')
+        return
       }
       if (!regex.test(item.metaKey)) {
         this.$message.warning("请输入符合标准的key值");
-        item.metaKey = "";
+        item.metaKey = '';
         return;
       }
-      const list  = this.docMetaData.slice(0,-1)//不与最新数据进行比较
-      const found = list.find(i => i.metaKey === item.metaKey )
-      if(found){
+
+      if(this.isFound()){
         this.$message.warning("存在相同key值");
-        this.docMetaData.splice(index,1);
+        item.metaKey = ''
         return;
       }
+      
+      item.showEdit = false;
+    },
+    isFound(){
+      const metaKeys = this.docMetaData.map(item => item.metaKey);
+      const uniqueKeys = new Set(metaKeys);
+      return uniqueKeys.size !== metaKeys.length;
     },
     metaValueBlur(item) {
       if (!item.metaValue) {
@@ -323,20 +365,27 @@ export default {
 </script>
 <style lang="scss" scoped>
 .docMetaData {
+  display:flex;
+  gap:10px;
+  flex-direction: column;
   .docItem {
     display: flex;
     align-items: center;
     border-radius: 8px;
     background: #f7f8fa;
-    margin-top: 10px;
+
     width: fit-content;
     .docItem_data {
       display: flex;
       align-items: center;
       padding:5px 10px;
+      .metaItemKey{
+        padding:0 15px;
+      }
       .el-input,
       .el-select,
-      .el-date-picker {
+      .el-date-picker,
+      .metaItemKey {
         min-width: 160px;
       }
       .label{

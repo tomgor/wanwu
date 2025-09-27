@@ -6,14 +6,7 @@
   >
   <template #title>
     <span class="dialog-title">元数据管理</span>
-    <!-- <el-popover
-    placement="right"
-    width="220"
-    trigger="hover"
-    >
-    <p>元数据key为空时，去<span class="link" @click="goCreate">创建元数据</span></p>
-    <span class="el-icon-question question" slot="reference"></span>
-    </el-popover> -->
+    <span>[ 元数据key为空时，去<span class="link" @click="goCreate">创建元数据</span> ]</span>
   </template>
     <div>
         <el-table
@@ -32,6 +25,7 @@
                 v-model="row.metaKey"
                 placeholder="请选择key"
                 @change="keyChange($event,row)"
+                :disabled="Boolean(row.metaId)"
             >
                 <el-option
                 v-for="item in keyOptions"
@@ -61,6 +55,7 @@
                   v-if="row.metaValueType === 'string' || row.metaValueType === ''"
                   v-model="row.metaValue"
                   @blur="handleBlur(row)"
+                  @change="handleValueChange(row)"
                   clearable
                   :disabled="!row.editable"
                   placeholder="请输入内容"
@@ -73,11 +68,13 @@
                   :disabled="!row.editable"
                   type="number"
                   placeholder="请输入数字"
+                  @change="handleValueChange(row)"
               />
               <el-date-picker
                   v-if="row.metaValueType === 'time'"
                   v-model="row.metaValue"
                   @blur="handleBlur(row)"
+                  @change="handleValueChange(row)"
                   clearable
                   :disabled="!row.editable"
                   align="right"
@@ -85,6 +82,7 @@
                   value-format="timestamp"
                   type="datetime"
                   placeholder="请选择日期时间"
+                  style="width:100%;"
               />
             </template>
           </el-table-column>
@@ -94,7 +92,7 @@
           >
             <template #default="{ row }">
               <i class="el-icon-edit-outline table-opera-icon"
-                 style="margin-right: 20px;"
+                 style="margin-right: 10px;"
                  @click="editItem(row)"/>
               <i class="el-icon-delete table-opera-icon"
                  @click="delItem(row)"/>
@@ -110,8 +108,8 @@
       <el-button @click="addItem" type="primary">+ 创建元数据</el-button>
       <el-button
         type="primary"
-        @click="submitDialog"
-        :disabled="rule"
+        @click="submitDialog('submit')"
+        :disabled="isDisabled"
       >确 定</el-button>
     </span>
   </el-dialog>
@@ -119,13 +117,10 @@
 <script>
 import { updateDocMeta,metaSelect} from "@/api/knowledge";
 export default {
-  props:['knowledgeId'],
+  props:['knowledgeId','name'],
   computed: {
     filteredTableData() {
       return this.tableData.filter(item => item.option !== "delete");
-    },
-    rule() {
-      return this.tableData.some(item => !item.metaValue || !item.metaKey)
     }
   },
   data() {
@@ -133,8 +128,34 @@ export default {
       dialogVisible: false,
       tableData: [],
       docId: "",
-      keyOptions:[]
+      keyOptions:[],
+      isDisabled:false
     };
+  },
+  watch: {
+    tableData: {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        const hasEmptyField = Array.isArray(val) && val.some(item => {
+        if (item.option === 'delete') return false;
+        const isMetaKeyEmpty = !item.metaKey || 
+          (typeof item.metaKey === 'string' && item.metaKey.trim() === '');
+        
+        const isMetaValueEmpty = item.metaValue === null || 
+          item.metaValue === undefined || 
+          (typeof item.metaValue === 'string' && item.metaValue.trim() === '') ||
+          item.metaValue === '';
+        
+        return isMetaKeyEmpty || isMetaValueEmpty;
+      });
+      
+        const hasValidData = Array.isArray(val) && val.length > 0 && 
+          val.some(item => item.option !== 'delete');
+        
+        this.isDisabled = !hasValidData || hasEmptyField;
+      }
+    }
   },
   created(){
     this.getList()
@@ -151,25 +172,35 @@ export default {
       row.metaValueType = this.keyOptions.filter(i => i.metaKey === val).map(e => e.metaValueType)[0];
     },
     goCreate(){
-      this.$route.push({path:'/knowledge/doclist'})
       this.dialogVisible = false;
+      this.$router.push({path:`/knowledge/doclist/${this.knowledgeId}`,query:{name:this.name}})
     },
-    submitDialog() {
+    submitDialog(type) {
+      this.isDisabled = true;
       this.tableData.forEach(i => {
         delete i.editable
         delete i.created
         i.metaValue = i.metaValue.toString()
       });
+      const metaData = this.tableData.filter(item => item.option !== '');
+      if(type === 'submit' && !metaData.length){
+         this.dialogVisible = false;
+         return false;
+      }
       const data = {
-        metaDataList:this.tableData,
-        docId:this.docId
+        metaDataList:metaData,
+        docId:this.docId,
+        knowledgeId:this.knowledgeId
       }
       updateDocMeta(data).then(res =>{
         if(res.code === 0){
-            this.$message.success('修改成功')
+            this.$message.success('操作成功成功');
             this.$emit('updateData')
+            this.isDisabled = true;
             this.dialogVisible = false;
         }
+      }).catch(() =>{
+        this.isDisabled = true;
       })
       
     },
@@ -188,6 +219,11 @@ export default {
     editItem(n){
         n.editable = !n.editable;
     },
+    handleValueChange(n){
+      if(Boolean(n.metaId)){
+        n.option = 'update'
+      }
+    },
     handleBlur(n){
       if (n.metaKey && n.metaValueType && n.metaValue) n.editable = false;
     },
@@ -199,7 +235,7 @@ export default {
       this.docId = id;
       this.tableData = data.map(item => ({
           ...item,
-          option: 'update',
+          option: '',
           editable: false,
           created: false,
         }));
@@ -229,6 +265,7 @@ export default {
   line-height:24px;
   font-size: 18px;
   color: #434C6C;
+  margin-right:10px;
 }
 .question{
   color: #aaadcc;

@@ -1,0 +1,75 @@
+export const FAT_SON_BLOCK = [
+    {
+        title:'父块',
+        level:'parent',
+        key:"splitter",
+        splitter:'splitter',
+        maxSplitter:'maxSplitter',
+        splitterProp:'docSegment.splitter',
+        maxSplitterProp:'docSegment.maxSplitter',
+        maxSplitterNum:4000,
+    },
+    {
+        title:'子块',
+        level:'son',
+        key:"subSplitter",
+        splitter:'subSplitter',
+        maxSplitter:'subMaxSplitter',
+        splitterProp:'docSegment.subSplitter',
+        maxSplitterProp:'docSegment.subMaxSplitter',
+        maxSplitterNum:4000,
+    }
+]
+export const SEGMENT_COMMON_LIST = [
+    {
+        label:'0',
+        text:'自动分段',
+        desc:'您选择‘自动分段’，系统将按默认方式进行分段'
+    },
+    {
+        label:'1',
+        text:'自定义分段',
+        desc:'您选择‘自定义分段’，可进行分段方式配置'
+    },
+]
+export const SEGMENT_LIST = [
+    {
+        label:'0',
+        img:'setting-gear.png',
+        text:'通用分段',
+        desc:'检索和召回的分段内容相同'
+    },
+    {
+        label:'1',
+        img:'setting-effect.png',
+        text:'父子分段',
+        desc:'父分段用作上下文，子分段用于检索'
+    },
+]
+export const DOC_ANALYZER_LIST = [
+    {
+        label:'text',
+        text:'文本提取',
+        desc:'提取文档文本信息时开启，适用于所有文件'
+    },
+    {
+        label:'ocr',
+        text:'启用OCR解析',
+        desc:'解析图片、扫描件文档时开启，仅适用于pdf文件'
+    },
+    {
+        label:'model',
+        text:'模型解析',
+        desc:'提取标题、图表、公式时开启，适用于pdf/word/ppt文件'
+    }
+]
+export const MODEL_TYPE_TIP = {
+    ocr:{
+        label:'OCR模型',
+        desc:'若需使用，请前往模型管理-联通元景-添加ocr模型'
+    },
+    model:{
+        label:'pdf_parser模型',
+        desc:'若需使用，请前往模型管理-联通元景-添加pdf文档解析模型'
+    }
+}

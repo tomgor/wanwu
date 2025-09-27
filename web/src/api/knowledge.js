@@ -400,3 +400,16 @@ export const metaSelect = (params)=>{
         params
     })
 };
+export const parserSelect = ()=>{
+    return service({
+        url: `${BASE_URL}/model/select/pdf-parser`,
+        method: 'get'
+    })
+};
+export const getSegmentChild = (params)=>{
+    return service({
+        url: `${BASE_URL}/knowledge/doc/segment/child/list`,
+        method: 'get',
+        params
+    })
+};

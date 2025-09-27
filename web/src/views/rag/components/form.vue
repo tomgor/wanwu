@@ -49,6 +49,7 @@
               <span class="common-set-label">
                 <img :src="require('@/assets/imgs/require.png')" class="required-label"/>
                 模型选择
+                <span class="model-tips">[ 暂不支持选择图文问答类模型 ]</span>
               </span>
               <span class="el-icon-s-operation operation" @click="showModelSet"></span>
             </p>
@@ -63,6 +64,7 @@
                 :loading="modelLoading"
                 clearable
                 filterable
+                value-key="modelId"
               >
                 <el-option
                   v-for="(item,index) in modleOptions"
@@ -70,6 +72,16 @@
                   :label="item.displayName"
                   :value="item.modelId"
                 >
+                  <div class="model-option-content">
+                    <span class="model-name">{{ item.displayName }}</span>
+                    <div class="model-select-tags" v-if="item.tags && item.tags.length > 0">
+                      <span
+                        v-for="(tag, tagIdx) in item.tags"
+                        :key="tagIdx"
+                        class="model-select-tag"
+                      >{{ tag.text }}</span>
+                    </div>
+                  </div>
                 </el-option>
               </el-select>
             </div>
@@ -457,7 +469,10 @@ export default {
       this.modelLoading = true;
       const res = await selectModelList();
       if (res.code === 0) {
-        this.modleOptions = res.data.list || [];
+        this.modleOptions = (res.data.list || []).filter(item => {
+            return item.config && item.config.visionSupport !== 'support'; 
+        });
+
         this.modelLoading = false;
       }
       this.modelLoading = false;
@@ -515,6 +530,33 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.model-option-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  
+  .model-name {
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+  
+  .model-select-tags {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-top: 4px;
+    .model-select-tag {
+      background-color: #f0f2ff;
+      color: #384bf7;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+  }
+}
 .isDisabled .header-right,.isDisabled .drawer-form > div{
   user-select: none;
   pointer-events: none !important;      
@@ -668,6 +710,11 @@ export default {
     margin-bottom:10px;
     .block{
       margin-bottom:10px;
+    }
+    .model-tips{
+      color: #999;
+      margin-left: 10px;
+      font-weight:normal!important;
     }
   }
   .safety-box{

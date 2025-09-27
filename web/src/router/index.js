@@ -71,8 +71,18 @@ const constantRoutes = [
                 meta:{perm: [PERMS.MODEL]},
             },
             {
+                path: '/tool',
+                component:resolve => require(['@/views/tool'],resolve),
+                meta:{perm: [PERMS.TOOL]},
+            },
+            {
+                path: '/tool/detail/:type',
+                component:resolve =>require(['@/views/tool/toolDetail'],resolve),
+                meta:{perm: [PERMS.TOOL]},
+            },
+            {
                 path: '/mcp',
-                component:resolve => require(['@/views/mcpManagement'],resolve),
+                component:resolve => require(['@/views/mcpManagementPublic/square'],resolve),
                 meta:{perm: [PERMS.MCP]},
             },
             {
@@ -159,12 +169,12 @@ const constantRoutes = [
             {
                 path:'/safety',
                 component:resolve =>require(['@/views/safety'],resolve),
-                meta:{perm: [PERMS.SAFRTY]},
+                meta:{perm: [PERMS.SAFETY]},
             },
             {
                 path:'/safety/wordList/:id',
                 component:resolve =>require(['@/views/safety/component/wordList'],resolve),
-                meta:{perm: [PERMS.SAFRTY]},
+                meta:{perm: [PERMS.SAFETY]},
             },
             {
                 path:'/agent/publishSet',
@@ -200,11 +210,15 @@ const constantRoutes = [
     },
     {
         path: '/login',
-        component:resolve =>require(['@/views/login'],resolve),
+        component: () => import('@/views/auth/login'),
     },
     {
         path: '/register',
-        component: () => import('@/views/register'),
+        component: () => import('@/views/auth/register'),
+    },
+    {
+        path: '/reset',
+        component: () => import('@/views/auth/reset'),
     },
     {
         path: '/:catchAll(.*)',

@@ -2,20 +2,36 @@
   <div class="createDialog">
     <!--:title="isEdit ? $t('modelAccess.dialog.edit') : $t('modelAccess.dialog.create')"-->
     <el-dialog
-      :title="provider.name || ''"
       :visible.sync="dialogVisible"
       width="760px"
       append-to-body
       :close-on-click-modal="false"
       :before-close="handleClose"
     >
-      <el-form :model="{...createForm}" :rules="rules" ref="createForm" label-width="110px" class="createForm form">
+      <template slot="title">
+        <div class="dialog-title-wrapper">
+          <span class="dialog-title">{{provider.name || ''}}</span>
+          <span class="dialog-desc" v-if="provider.key === yuanjing">
+            {{$t('modelAccess.hint.yuanjing')}}
+          </span>
+        </div>
+      </template>
+      <el-form :model="{...createForm}" :rules="rules" ref="createForm" label-width="130px" class="createForm form">
         <el-form-item :label="$t('modelAccess.table.modelType')" prop="modelType">
-          <el-radio-group :disabled="isEdit" v-model="createForm.modelType">
-            <el-radio v-for="item in modelType" :label="item.key" :key="item.key">
-              {{item.name}}
-            </el-radio>
-          </el-radio-group>
+          <el-select
+            v-model="createForm.modelType"
+            :placeholder="$t('common.select.placeholder')"
+            :disabled="isEdit"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in modelType"
+              :key="item.key"
+              :label="item.name"
+              :value="item.key"
+            >
+            </el-option>
+          </el-select>
           <div v-if="createForm.modelType === embedding && provider.key === yuanjing" class="embedding-tip">
             {{$t('modelAccess.table.embeddingTip')}}
           </div>
@@ -48,6 +64,9 @@
             </span>
           </el-upload>
         </el-form-item>
+        <el-form-item :label="$t('modelAccess.table.modelDesc')" prop="modelDesc">
+          <el-input v-model="createForm.modelDesc" :placeholder="$t('common.input.placeholder')"></el-input>
+        </el-form-item>
         <el-form-item v-if="createForm.modelType === llm" label="Function Call" prop="functionCalling">
           <el-select
             v-model="createForm.functionCalling"
@@ -63,6 +82,39 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item v-if="createForm.modelType === llm && provider.key === yuanjing" label="Vision" prop="visionSupport">
+          <el-select
+            v-model="createForm.visionSupport"
+            :placeholder="$t('common.select.placeholder')"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in supportList"
+              :key="item.key"
+              :label="item.name"
+              :value="item.key"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          v-if="[llm, embedding, rerank].includes(createForm.modelType)"
+          :label="$t('modelAccess.table.contextSize')"
+          prop="contextSize"
+        >
+          <el-input-number
+            v-model="createForm.contextSize"
+            :placeholder="$t('common.input.placeholder')"
+            :min="0"
+          ></el-input-number>
+        </el-form-item>
+        <el-form-item v-if="createForm.modelType === llm" label="Max_token" prop="maxTokens">
+          <el-input-number
+            v-model="createForm.maxTokens"
+            :placeholder="$t('common.input.placeholder')"
+            :min="0"
+          ></el-input-number>
+        </el-form-item>
         <el-form-item v-if="provider.key !== ollama" :label="$t('modelAccess.table.apiKey')" prop="apiKey">
           <el-input
             type="password"
@@ -74,7 +126,7 @@
         <el-form-item :label="$t('modelAccess.table.inferUrl')" prop="endpointUrl">
           <el-input
             v-model="createForm.endpointUrl"
-            :placeholder="$t('common.hint.inferUrl') + typeObj.inferUrl[provider.key]"
+            :placeholder="$t('common.hint.inferUrl') + (typeObj.inferUrl[createForm.modelType] || typeObj.inferUrl[provider.key])"
           >
           </el-input>
         </el-form-item>
@@ -104,13 +156,18 @@ import {
   FUNC_CALLING,
   LLM,
   DEFAULT_CALLING,
+  DEFAULT_SUPPORT,
+  SUPPORT_LIST,
   TYPE_OBJ,
   OLLAMA,
   EMBEDDING,
+  RERANK,
   YUAN_JING
 } from "../constants"
+import LinkIcon from "@/components/linkIcon.vue";
 
 export default {
+  components: {LinkIcon},
   data() {
     const validateUrls = (rule, value, callback) => {
       const reg = /^(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?$/
@@ -127,10 +184,12 @@ export default {
       dialogVisible: false,
       modelType: [],
       functionCalling: FUNC_CALLING,
+      supportList: SUPPORT_LIST,
       typeObj: TYPE_OBJ,
       llm: LLM,
       ollama: OLLAMA,
       embedding: EMBEDDING,
+      rerank: RERANK,
       yuanjing: YUAN_JING,
       createForm: {
         model: '',
@@ -138,18 +197,28 @@ export default {
         endpointUrl: '',
         apiKey: '',
         modelType: LLM,
+        modelDesc: '',
+        contextSize: 0,
+        maxTokens: 4096,
         avatar: {
           key: '',
           path: ''
         },
         publishDate: '',
-        functionCalling: DEFAULT_CALLING
+        functionCalling: DEFAULT_CALLING,
+        visionSupport: DEFAULT_SUPPORT
       },
       rules: {
         model: [
           { required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'},
           // { min: 2, max: 50, message: this.$t('common.hint.modelNameLimit'), trigger: 'blur'},
           // { pattern: /^(?!_)[a-zA-Z0-9-_.\u4e00-\u9fa5]+$/, message: this.$t('common.hint.modelName'), trigger: "blur"}
+        ],
+        contextSize: [
+          { required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'},
+        ],
+        maxTokens: [
+          { required: true, message: this.$t('common.input.placeholder'), trigger: 'blur'},
         ],
         displayName: [
           { pattern: /^(?!_)[a-zA-Z0-9-_.\u4e00-\u9fa5]+$/, message: this.$t('common.hint.modelName'), trigger: "blur"},
@@ -205,27 +274,41 @@ export default {
     },
     handleClose(){
       this.dialogVisible = false
-      this.formatValue({modelType: LLM, functionCalling: DEFAULT_CALLING, avatar: { key: '', path: ''}})
+      this.formatValue({
+        modelType: LLM,
+        functionCalling: DEFAULT_CALLING,
+        visionSupport: DEFAULT_SUPPORT,
+        contextSize: 0,
+        maxTokens: 4096,
+        avatar: { key: '', path: ''}
+      })
       this.$refs.createForm.resetFields()
       this.$refs.createForm.clearValidate()
     },
     handleSubmit() {
       this.$refs.createForm.validate(async (valid) => {
         if (valid) {
-          const {apiKey, endpointUrl, functionCalling, modelType} = this.createForm
-          const functionCallingObj = modelType === LLM ? {functionCalling} : {}
+          const {apiKey, endpointUrl, functionCalling, modelType, visionSupport, contextSize, maxTokens} = this.createForm
+          const functionCallingObj = modelType === LLM ? {functionCalling, maxTokens} : {}
+          const visionSupportObj = modelType === LLM && this.provider.key === YUAN_JING ? {visionSupport} : {}
+          const contextSizeObj = [LLM, EMBEDDING, RERANK].includes(modelType) ? {contextSize} : {}
           const form = {
             ...this.createForm,
             provider: this.provider.key || '',
             config: {
               apiKey,
               endpointUrl,
-              ...functionCallingObj
+              ...functionCallingObj,
+              ...visionSupportObj,
+              ...contextSizeObj
             }
           }
           delete form.apiKey
           delete form.endpointUrl
           delete form.functionCalling
+          delete form.visionSupport
+          delete form.contextSize
+          delete form.maxTokens
 
           try {
             this.loading = true
@@ -268,6 +351,19 @@ export default {
   .embedding-tip {
     color: #F56C6C;
     line-height: 16px;
+  }
+}
+.dialog-title-wrapper {
+  display: flex;
+  align-items: center;
+  .dialog-title {
+    color: $color_title;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .dialog-desc {
+    color: #888;
+    margin-left: 20px;
   }
 }
 </style>
