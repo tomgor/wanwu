@@ -211,7 +211,7 @@
 | [工作流](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual/6.%E5%B7%A5%E4%BD%9C%E6%B5%81) | 可擴展智能體能力邊界，由節點組成，提供視覺化工作流編輯能力，使用者可編排多個不同的工作流節點，實現複雜且穩定的業務流程。支援公開或私密發布工作流應用，支援發布為 API，支援匯入匯出。 |
 | [智能體](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/7.%E6%99%BA%E8%83%BD%E4%BD%93.md) | 基於使用者使用場景和業務需求建立智能體，支援選模型、設定提示詞、聯網檢索、知識庫選擇、MCP、工作流、自訂工具等。支援公開或私密發布智能體應用，支援發布為 API 和 Web Url。 |
 | [應用廣場](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/8.%E5%BA%94%E7%94%A8%E5%B9%BF%E5%9C%BA.md) |  支援使用者體驗已發布的應用，包括文本問答、工作流和智能體。  |
-|                           MCP廣場                            |          內建 100+ 精選行業 MCP server，即選即用。           |
+| [MCP廣場](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/9.MCP%E5%B9%BF%E5%9C%BA.md) |          內建 100+ 精選行業 MCP server，即選即用。           |
 | [設定](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/9.%E8%AE%BE%E7%BD%AE.md) | 平台支援多租戶，允許使用者進行組織、角色、使用者管理、平台基礎配置。 |
 
 ------
