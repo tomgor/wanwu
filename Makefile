@@ -88,10 +88,10 @@ doc-swag:
 	swag init -g openurl.go -d internal/bff-service/server/http/handler/openurl -o docs/openurl --pd
 
 docker-image-backend:
-	docker build -f Dockerfile.backend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/backend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-${WANWU_ARCH} .
+	docker build -f Dockerfile.backend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/wanwu-backend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-${WANWU_ARCH} .
 
 docker-image-frontend:
-	docker build -f Dockerfile.frontend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/frontend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-${WANWU_ARCH} .
+	docker build -f Dockerfile.frontend --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/wanwu-frontend:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-${WANWU_ARCH} .
 
 docker-image-rag:
 	docker build -f Dockerfile.rag --build-arg WANWU_ARCH=${WANWU_ARCH} -t wanwulite/rag:${WANWU_VERSION}-$(shell git rev-parse --short HEAD)-${WANWU_ARCH} .
