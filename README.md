@@ -113,7 +113,7 @@ The platform has been successfully applied in multiple industries such as **fina
 ------
 ### 🚀 Quick Start
 - The workflow module of the Wanwu AI Agent Platform uses the following project, you can go to its warehouse to view the details.
-  - v0.1.8 and earlier: [wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git) project
+  - v0.1.8 and earlier: wanwu-agentscope project
   - v0.2.0 and later: [wanwu-workflow](https://github.com/UnicomAI/wanwu-workflow/tree/dev/wanwu-backend) project
 - **Docker Installation (Recommended**)
 1. Before the first run
@@ -123,7 +123,9 @@ The platform has been successfully applied in multiple industries such as **fina
     ```bash
     cp .env.bak .env
     ```
-    1.2 Modify the `WANWU_ARCH` and `WANWU_EXTERNAL_IP` variables in the `.env` file according to the system
+
+    1.2 Modify the `WANWU_ARCH` and `WANWU_EXTERNAL_IP` variables in the .env file according to the system
+
     ```
     # amd64 / arm64
     WANWU_ARCH=amd64
@@ -131,7 +133,16 @@ The platform has been successfully applied in multiple industries such as **fina
     # external ip port (Note: if the browser accesses Wanwu deployed on a non-localhost server, you need to change localhost to the external IP, for example, 192.168.xx.xx)
     WANWU_EXTERNAL_IP=localhost
     ```
-    1.3 Create a Docker running network
+
+    1.3 Configure the `WANUW_BFF_JWT_SIGNING_KEY` variable in the .env file, a custom complex random string used for generating JWT tokens
+
+    ```
+    # bff
+    WANUW_BFF_JWT_SIGNING_KEY=
+    ```
+
+    1.4 Create a Docker running network
+
     ```
     docker network create wanwu-net
     ```

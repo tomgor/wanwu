@@ -37,6 +37,9 @@ func InitUserJWT(key string) {
 	if userSecretKey != "" {
 		log.Panicf("jwt already init")
 	}
+	if key == "" {
+		log.Panicf("jwt secret key empty")
+	}
 	userSecretKey = key
 }
 

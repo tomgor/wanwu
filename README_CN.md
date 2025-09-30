@@ -133,7 +133,7 @@
 
 - 元景万悟智能体平台的工作流模块使用的是以下项目，可到其仓库查看详情。
 
-  - v0.1.8及以前：[wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git) 项目
+  - v0.1.8及以前：wanwu-agentscope 项目
 
   - v0.2.0开始：[wanwu-workflow](https://github.com/UnicomAI/wanwu-workflow/tree/dev/wanwu-backend) 项目
 
@@ -157,7 +157,14 @@
     WANWU_EXTERNAL_IP=localhost
     ```
 
-    1.3 创建docker运行网络
+    1.3 配置.env文件中的`WANUW_BFF_JWT_SIGNING_KEY`变量，一串自定义复杂随机字符串，用于生成jwt token
+
+    ```
+    # bff
+    WANUW_BFF_JWT_SIGNING_KEY=
+    ```
+
+    1.4 创建docker运行网络
     ```
     docker network create wanwu-net
     ```

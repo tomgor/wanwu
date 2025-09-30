@@ -115,7 +115,7 @@
 ------
 ### 🚀 快速開始
 - 元景萬悟智能體平台的工作流模組使用的是以下項目，可到其倉庫查看詳情。
-  - v0.1.8及以前：[wanwu-agentscope](https://github.com/UnicomAI/wanwu-agentscope.git) 項目
+  - v0.1.8及以前：wanwu-agentscope 項目
   - v0.2.0開始：[wanwu-workflow](https://github.com/UnicomAI/wanwu-workflow/tree/dev/wanwu-backend) 項目
 - **Docker安裝（推薦）**
 1. 首次運行前
@@ -125,7 +125,9 @@
     ```bash
     cp .env.bak .env
     ```
+
     1.2 根據系統修改.env文件中的`WANWU_ARCH`、`WANWU_EXTERNAL_IP`變量
+
     ```
     # amd64 / arm64
     WANWU_ARCH=amd64
@@ -133,7 +135,16 @@
     # external ip port（注意如果瀏覽器訪問非localhost部署的萬悟，則需要修改localhost為對外ip，例如192.168.xx.xx）
     WANWU_EXTERNAL_IP=localhost
     ```
-    1.3 創建docker運行網絡
+
+    1.3 配置.env文件中的`WANUW_BFF_JWT_SIGNING_KEY`變量，一串自定義的複雜隨機字符串，用於生成jwt token
+
+    ```
+    # bff
+    WANUW_BFF_JWT_SIGNING_KEY=
+    ```
+
+    1.4 創建docker運行網絡
+
     ```
     docker network create wanwu-net
     ```
