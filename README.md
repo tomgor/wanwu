@@ -135,11 +135,11 @@ The platform has been successfully applied in multiple industries such as **fina
     WANWU_EXTERNAL_IP=localhost
     ```
 
-    1.3 Configure the `WANUW_BFF_JWT_SIGNING_KEY` variable in the .env file, a custom complex random string used for generating JWT tokens
+    1.3 Configure the `WANWU_BFF_JWT_SIGNING_KEY` variable in the .env file, a custom complex random string used for generating JWT tokens
 
     ```
     # bff
-    WANUW_BFF_JWT_SIGNING_KEY=
+    WANWU_BFF_JWT_SIGNING_KEY=
     ```
 
     1.4 Create a Docker running network

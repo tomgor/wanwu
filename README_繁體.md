@@ -137,11 +137,11 @@
     WANWU_EXTERNAL_IP=localhost
     ```
 
-    1.3 配置.env文件中的`WANUW_BFF_JWT_SIGNING_KEY`變量，一串自定義的複雜隨機字符串，用於生成jwt token
+    1.3 配置.env文件中的`WANWU_BFF_JWT_SIGNING_KEY`變量，一串自定義的複雜隨機字符串，用於生成jwt token
 
     ```
     # bff
-    WANUW_BFF_JWT_SIGNING_KEY=
+    WANWU_BFF_JWT_SIGNING_KEY=
     ```
 
     1.4 創建docker運行網絡
