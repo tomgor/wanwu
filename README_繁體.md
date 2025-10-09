@@ -38,6 +38,7 @@
 ------
 
 ### &#x1F525; 採用寬鬆友好的 Apache 2.0 License，支援開發者自由擴展與二次開發
+
 ✔ **企業級工程化**：提供從模型納管到應用落地的完整工具鏈，解決LLM技術落地「最後一公里」問題  
 
 ✔ **開放開源生態**：採用寬鬆友好的 **Apache 2.0 License**，支援開發者自由擴展與二次開發  
@@ -51,7 +52,8 @@
 ------
 
 ### 🚩 核心功能模組
-**1. 模型納管（Model Hub）**
+
+#### **1. 模型納管（Model Hub）**
 
 ▸ 支援 **數百種專有/開源大模型**（包括GPT、Claude、Llama等系列）的統一接入與生命週期管理
 
@@ -107,28 +109,35 @@
 | license友好 |         ✅          |   ❌（商用有限制）   | ❌（商用有限制） |     未完全開源      |          ✅          |
 |   多租戶    |         ✅          |   ❌（商用有限制）   | ❌（商用有限制） |          ✅          | ✅（但用戶間不互通） |
 > 截止2025年8月1日對比。
+
 ------
+
 ### &#x1F3AF; 典型應用場景
+
 - **智能客服**：基於RAG+Agent實現高準確率的業務諮詢與工單處理  
 - **知識管理**：構建企業專屬知識庫，支援語義搜索與智能摘要生成  
 - **流程自動化**：透過工作流引擎實現合同審核、報銷審批等業務的AI輔助決策  
+
 平台已成功應用於 **金融、工業、政務** 等多個行業，助力企業將LLM技術的理論價值轉化為實際業務收益。我們誠邀開發者加入開源社區，共同推動AI技術的民主化進程。  
+
 ------
+
 ### 🚀 快速開始
+
 - 元景萬悟智能體平台的工作流模組使用的是以下項目，可到其倉庫查看詳情。
   - v0.1.8及以前：wanwu-agentscope 項目
   - v0.2.0開始：[wanwu-workflow](https://github.com/UnicomAI/wanwu-workflow/tree/dev/wanwu-backend) 項目
+
 - **Docker安裝（推薦）**
+
 1. 首次運行前
 
     1.1 拷貝環境變量文件
-
     ```bash
     cp .env.bak .env
     ```
 
     1.2 根據系統修改.env文件中的`WANWU_ARCH`、`WANWU_EXTERNAL_IP`變量
-
     ```
     # amd64 / arm64
     WANWU_ARCH=amd64
@@ -138,14 +147,12 @@
     ```
 
     1.3 配置.env文件中的`WANWU_BFF_JWT_SIGNING_KEY`變量，一串自定義的複雜隨機字符串，用於生成jwt token
-
     ```
     # bff
     WANWU_BFF_JWT_SIGNING_KEY=
     ```
 
     1.4 創建docker運行網絡
-
     ```
     docker network create wanwu-net
     ```
@@ -172,12 +179,16 @@
     docker compose --env-file .env --env-file .env.image.arm64 down
     ```
 - **源碼啟動（開發）**
+
 1. 基於上述Docker安裝步驟，將系統服務完整啟動
+
 2. 以後端bff-service服務為例
+
     2.1 停止bff-service
     ```
     make -f Makefile.develop stop-bff
     ```
+
     2.2 編譯bff-service可執行文件
     ```
     # amd64系統執行:
@@ -185,14 +196,20 @@
     # arm64系統執行:
     make build-bff-arm64
     ```
+
     2.3 啟動bff-service
     ```
     make -f Makefile.develop run-bff
     ```
+
 ------
+
 ### ⬆️ 版本升級
+
 1. 基於上述Docker安裝步驟，將系統服務完整停止
+
 2. 更新至最新版本代碼
+
     2.1 wanwu倉庫目錄內，更新代碼
     ```bash
     # 切換到main分支
@@ -200,6 +217,7 @@
     # 拉取最新代碼
     git pull
     ```
+
     2.2 重新拷貝環境變量文件（如果有環境變量修改，請自行重新修改）
     ```bash
     # 備份當前.env文件
@@ -207,8 +225,11 @@
     # 拷貝.env文件
     cp .env.bak .env
     ```
+
 3. 基於上述Docker安裝步驟，將系統服務完整啟動
+
 ------
+
 ### &#x1F4D1; 使用萬悟
 為了幫助您快速上手本項目，我們強烈推薦先查看[ 文檔操作手冊](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual)。我們為用戶提供了交互式、結構化的操作指南，您可以直接在其中查看操作說明、接口文檔等，極大地降低了學習和使用的門檻。詳細功能清單如下：
 
@@ -227,7 +248,9 @@
 | [設定](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/9.%E8%AE%BE%E7%BD%AE.md) | 平台支援多租戶，允許使用者進行組織、角色、使用者管理、平台基礎配置。 |
 
 ------
+
 ### &#x1F4F0; TODO LIST
+
 - [ ] 多模態模型接入
 - [ ] 支援自定義MCP Server，即可以把工作流、智能體、或者符合OpenAPI規範的API作為tools添加到MCP Server裡進行發布
 - [ ] 知識庫共享
@@ -235,8 +258,11 @@
 - [ ] 智能體監控統計
 - [ ] 模型體驗
 - [ ] 提示詞工程
+
 ------
+
 ### &#128172; Q & A
+
 - **【Q】Linux系統Elastic(elastic-wanwu)啟動報錯：Memory limited without swap.**
     【A】關閉服務，執行 `sudo sysctl -w vm.max_map_count=262144` 後，重啟服務
     
@@ -273,11 +299,15 @@
     6. 導入Rerank模型同上述導入LLM，注意推理URL不帶 /rerank 後綴
     ```
 ------
+
 ### &#x1F517; 致謝
+
 - [Coze](https://github.com/coze-dev)
 - [LangChain](https://github.com/langchain-ai/langchain)
 - [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent)
+
 ------
+
 ### ⚖️ 許可證
 元景萬悟智能體平台根據Apache License 2.0發布。
 

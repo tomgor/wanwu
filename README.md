@@ -36,7 +36,9 @@
 </div>
 
 ------
+
 ### &#x1F525; Adopt a permissive and friendly Apache 2.0 License, supporting developers to freely expand and develop secondary
+
 ✔ **Enterprise-level engineering**: Provides a complete toolchain from model management to application landing, solving the "last mile" problem of LLM technology landing
 
 ✔ **Open-source ecological**: Adopt a permissive and friendly **Apache 2.0 License**, supporting developers to freely expand and develop
@@ -50,7 +52,8 @@
 ------
 
 ### 🚩 Core Function Modules
-**1. Model Management (Model Hub**)
+
+#### **1. Model Management (Model Hub**)
 ▸ Supports the unified access and lifecycle management of **hundreds of proprietary/open-source large models** (including GPT, Claude, Llama, etc.)
 
 ▸ Deeply adapts to **OpenAI API standards** and **Unicom Yuanjing** ecological models, realizing seamless switching of heterogeneous models
@@ -105,28 +108,35 @@
 |  license friendly  |   ✅   |   ❌(Commercially restricted)    | ❌(Commercially restricted) |      Not fully open source      |                ✅                |
 |    Multi-tenant    |   ✅   |   ❌(Commercially restricted)    | ❌(Commercially restricted) |                ✅                | ✅(Users are not interconnected) |
 > As of August 1, 2025.
+
 ------
+
 ### &#x1F3AF; Typical Application Scenarios
+
 - **Intelligent Customer Service**: Realize high-accuracy business consultation and ticket processing based on RAG + Agent
 - **Knowledge Management**: Build an exclusive enterprise knowledge base, support semantic search and intelligent summary generation
 - **Process Automation**: Realize AI-assisted decision-making for business processes such as contract review and reimbursement approval through the workflow engine
-The platform has been successfully applied in multiple industries such as **finance, industry, and government**, helping enterprises transform the theoretical value of LLM technology into actual business benefits. We sincerely invite developers to join the open source community and jointly promote the democratization of AI technology.  
+
+The platform has been successfully applied in multiple industries such as **finance, industry, and government**, helping enterprises transform the theoretical value of LLM technology into actual business benefits. We sincerely invite developers to join the open source community and jointly promote the democratization of AI technology.
+
 ------
+
 ### 🚀 Quick Start
+
 - The workflow module of the Wanwu AI Agent Platform uses the following project, you can go to its warehouse to view the details.
   - v0.1.8 and earlier: wanwu-agentscope project
   - v0.2.0 and later: [wanwu-workflow](https://github.com/UnicomAI/wanwu-workflow/tree/dev/wanwu-backend) project
+
 - **Docker Installation (Recommended**)
+
 1. Before the first run
 
     1.1 Copy the environment variable file
-
     ```bash
     cp .env.bak .env
     ```
 
     1.2 Modify the `WANWU_ARCH` and `WANWU_EXTERNAL_IP` variables in the .env file according to the system
-
     ```
     # amd64 / arm64
     WANWU_ARCH=amd64
@@ -136,19 +146,18 @@ The platform has been successfully applied in multiple industries such as **fina
     ```
 
     1.3 Configure the `WANWU_BFF_JWT_SIGNING_KEY` variable in the .env file, a custom complex random string used for generating JWT tokens
-
     ```
     # bff
     WANWU_BFF_JWT_SIGNING_KEY=
     ```
 
     1.4 Create a Docker running network
-
     ```
     docker network create wanwu-net
     ```
 
 2. Start the service (the image will be automatically pulled from Docker Hub during the first run)
+
     ```bash
     # For amd64 system:
     docker compose --env-file .env --env-file .env.image.amd64 up -d
@@ -173,12 +182,16 @@ The platform has been successfully applied in multiple industries such as **fina
     ```
 
 - **Source Code Start (Development**)
+
 1. Based on the above Docker installation steps, start the system service completely
+
 2. Take the backend bff-service service as an example
+
     2.1 Stop bff-service
     ```
     make -f Makefile.develop stop-bff
     ```
+
     2.2 Compile the bff-service executable file
     ```
     # For amd64 system:
@@ -186,14 +199,20 @@ The platform has been successfully applied in multiple industries such as **fina
     # For arm64 system:
     make build-bff-arm64
     ```
+
     2.3 Start bff-service
     ```
     make -f Makefile.develop run-bff
     ```
+
 ------
+
 ### ⬆️ Version Upgrade
+
 1. Based on the above Docker installation steps, completely stop the system service
+
 2. Update to the latest version of the code
+
     2.1 In the wanwu repository directory, update the code
     ```bash
     # Switch to the main branch
@@ -201,6 +220,7 @@ The platform has been successfully applied in multiple industries such as **fina
     # Pull the latest code
     git pull
     ```
+
     2.2 Recopy the environment variable file (if there are changes to the environment variables, please modify them again)
     ```bash
     # Backup the current .env file
@@ -208,8 +228,11 @@ The platform has been successfully applied in multiple industries such as **fina
     # Copy the .env file
     cp .env.bak .env
     ```
+
 3. Based on the above Docker installation steps, completely start the system service
+
 ------
+
 ### &#x1F4D1; Using Wanwu
 To help you quickly get started with this project, we strongly recommend that you first check out the [ Documentation Operation Manual](https://github.com/UnicomAI/wanwu/tree/main/configs/microservice/bff-service/static/manual). We provide users with interactive and structured operation guides, where you can directly view operation instructions, interface documents, etc., greatly reducing the threshold for learning and use. The detailed function list is as follows:
 
@@ -227,7 +250,9 @@ To help you quickly get started with this project, we strongly recommend that yo
 | [Settings](https://github.com/UnicomAI/wanwu/blob/main/configs/microservice/bff-service/static/manual/9.%E8%AE%BE%E7%BD%AE.md) | The platform supports multi-tenancy, allowing users to manage organizations, roles, users, and perform basic platform configuration. |
 
 ------
+
 ### &#x1F4F0; TO DO LIST
+
 - [ ] Multi-modal model access
 - [ ] Support custom MCP Server, which means that workflows, agents, or APIs that conform to the OpenAPI specification can be added to the MCP Server for release
 - [ ] Knowledge base sharing
@@ -235,8 +260,11 @@ To help you quickly get started with this project, we strongly recommend that yo
 - [ ] Agent monitoring statistics
 - [ ] Model experience
 - [ ] Prompt engineering
+
 ------
+
 ### &#128172; Q & A
+
 - **[Q] Error when starting Elastic (elastic-wanwu) on Linux system: Memory limited without swap.**
   **[A]** Stop the service, run `sudo sysctl -w vm.max_map_count=262144`, and then restart the service.
   
@@ -267,12 +295,17 @@ To help you quickly get started with this project, we strongly recommend that yo
   5. Importing an Embedding model is the same as importing an LLM as described above. Note that the inference URL should not include the /embeddings suffix.
   6. Importing a Rerank model is the same as importing an LLM as described above. Note that the inference URL should not include the /rerank suffix.
   ```
----
+
+------
+
 ### &#x1F517; Acknowledgments
+
 - [Coze](https://github.com/coze-dev)
 - [LangChain](https://github.com/langchain-ai/langchain)
 - [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent)
----
+
+------
+
 ### ⚖️ License
 The Yuanjing Wanwu AI Agent Platform is released under the Apache License 2.0.
 
