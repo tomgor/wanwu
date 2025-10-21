@@ -227,3 +227,23 @@ stop-agent:
 # 		--env-file .env.image.${WANWU_ARCH} \
 # 		--env-file .env \
 # 		down agentscope
+
+
+
+# 构建proto
+# 定义变量
+
+.PHONY: proto-iam
+
+proto-iam:
+	@echo "-> 1. Generating Protobuf messages for $(IAM_PROTO_FILE)"
+	protoc -I=. \
+       --go_out=paths=source_relative:./api \
+       ./proto/iam-service/iam-service.proto
+
+	@echo "-> 2. Generating gRPC services for $(IAM_PROTO_FILE)"
+	protoc -I=. \
+       --go-grpc_out=paths=source_relative:./api \
+       ./proto/iam-service/iam-service.proto
+
+	@echo "✨ Protobuf generation for iam-service completed."

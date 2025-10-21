@@ -8,6 +8,12 @@ type Login struct {
 	Code     string `json:"code" validate:"required"`     // 验证码
 }
 
+type SimpleSSO struct {
+	Platform string `json:"platform" validate:"required"` // 平台
+	Key      string `json:"key" validate:"required"`      // aes加密的key
+	Payload  string `json:"payload" validate:"required"`  // aes加密的内容
+}
+
 type RegisterByEmail struct {
 	Username string `json:"username" validate:"required"` // 用户名
 	Email    string `json:"email" validate:"required"`    // 邮箱
@@ -46,5 +52,9 @@ func (r *ResetPasswordSendEmailCode) Check() error {
 }
 
 func (r *ResetPasswordByEmail) Check() error {
+	return nil
+}
+
+func (l *SimpleSSO) Check() error {
 	return nil
 }

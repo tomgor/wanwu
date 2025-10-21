@@ -102,6 +102,48 @@ func (c *Client) SelectUsersNotInOrg(ctx context.Context, orgID uint32, name str
 
 }
 
+func (c *Client) GetUserIDByOrgAndName(ctx context.Context, orgID string, name string) (uint32, *errs.Status) {
+	var userID uint32 // 用于存储查询到的用户ID
+
+	// 使用 c.transaction 封装数据库操作
+	status := c.transaction(ctx, func(tx *gorm.DB) *errs.Status {
+
+		// 1. 构建查询，检查用户是否在指定机构中 (org_users 表)
+		// 确保用户名和机构ID同时匹配
+
+		// 优化：使用 JOIN 或 SubQuery 来检查用户表和机构用户表
+
+		// 方案一：使用子查询 (SubQuery)
+		orgUsersQuery := tx.Select("user_id").
+			Table("org_users").
+			Where("org_id = ?", orgID)
+
+		// 2. 在用户表 (users) 中查询匹配的用户
+		var user model.User // 假设您的用户模型叫 model.User，且ID为 uint32
+
+		// 检查用户名是否匹配，并且用户ID必须在指定机构的用户ID列表中
+		result := sqlopt.WithName(name).Apply(tx).
+			Where("id IN (?)", orgUsersQuery).
+			Select("id"). // 仅查询 ID，以提高效率
+			First(&user)
+
+		if result.Error != nil {
+			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+				// 未找到记录，返回 nil 错误状态，但 user.ID 为 0
+				return nil
+			}
+			// 数据库查询发生其他错误
+			return toErrStatus("iam_user_select_by_org_name", orgID, result.Error.Error())
+		}
+
+		userID = user.ID
+		return nil
+	})
+
+	// 返回结果和错误状态
+	return userID, status
+}
+
 func (c *Client) SelectUsersByUserIDs(ctx context.Context, userIDs []uint32) ([]IDName, *errs.Status) {
 	var users []*model.User
 	if err := sqlopt.WithIDs(userIDs).Apply(c.db.WithContext(ctx)).Find(&users).Error; err != nil {

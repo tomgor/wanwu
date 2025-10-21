@@ -30,6 +30,14 @@ decrypt-passwd:
   iv: "sdf4ddfsFD86Vdf2"
   key: "f5Su3GhNMM1rndyp"
 
+simple-sso:
+  - platform: "agent-market"
+    public_key: "ssss"
+    private_key: "ssss"
+    fixed_org_id: "org-123456"
+    fixed_role_id: "role-123456"
+    init_password: "Welcome123!"
+
 i18n:
   type: jsonl
   xlsxPath: configs/microservice/bff-service/configs/wanwu-i18n.xlsx
