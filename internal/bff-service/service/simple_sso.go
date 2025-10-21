@@ -102,6 +102,17 @@ func SimpleSSO(ctx *gin.Context, login *request.SimpleSSO, language string) (*re
 			return nil, err
 		}
 
+		// 改个密码，否则会提示用户修改
+		_, err = iam.UpdateUserPassword(ctx.Request.Context(), &iam_service.UpdateUserPasswordReq{
+			UserId:      resp.Id,
+			OldPassword: ssoConfig.InitPassword,
+			NewPassword: ssoConfig.InitPassword,
+		})
+
+		if err != nil {
+			return nil, fmt.Errorf("初始化用户密码失败: %v", err)
+		}
+
 		userId = resp.Id
 	} else {
 		userId = strconv.FormatUint(uint64(userRsp.UserId), 10)
@@ -149,7 +160,7 @@ func SimpleSSO(ctx *gin.Context, login *request.SimpleSSO, language string) (*re
 		Orgs:             toOrgIDNames(ctx, orgs.Selects, user.UserId == config.SystemAdminUserID),
 		OrgPermission:    toOrgPermission(ctx, userPermission),
 		Language:         getLanguageByCode(user.Language),
-		IsUpdatePassword: userPermission.LastUpdatePasswordAt != 0,
+		IsUpdatePassword: userPermission.LastUpdatePasswordAt != 0, //是否已修改密码，单点登陆不用修改密码
 	}, nil
 }
 
