@@ -86,4 +86,6 @@ type IClient interface {
 
 	ResetPasswordSendEmailCode(ctx context.Context, email string) *errs.Status
 	ResetPasswordByEmail(ctx context.Context, email, password, code string) *errs.Status
+
+	GetUserIDByOrgAndName(ctx context.Context, orgID string, name string) (uint32, *errs.Status)
 }

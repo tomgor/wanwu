@@ -2,6 +2,7 @@ package util
 
 import (
 	"time"
+	_ "time/tzdata"
 )
 
 var UTC8 *time.Location

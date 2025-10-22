@@ -95,6 +95,9 @@ service IAMService {
   rpc ResetPasswordSendEmailCode(ResetPasswordSendEmailCodeReq) returns (google.protobuf.Empty) {}
   // 邮箱注册发送邮件
   rpc ResetPasswordByEmail(ResetPasswordByEmailReq) returns (google.protobuf.Empty) {}
+
+  // 根据用户名检查是否存在组织中的用户，返回用户ID
+  rpc GetUserIDByOrgAndName (GetUserIDByOrgAndNameReq) returns (GetUserIDByOrgAndNameResp);
 }
 
 message Perm {
@@ -427,4 +430,13 @@ message ResetPasswordByEmailReq{
   string email = 1;
   string password = 2;
   string code = 3;
+}
+
+message GetUserIDByOrgAndNameReq {
+  string org_id = 1;
+  string name = 2; // 用户名
+}
+
+message GetUserIDByOrgAndNameResp {
+  uint32 user_id = 1; // 找到的用户ID，未找到时为 0
 }

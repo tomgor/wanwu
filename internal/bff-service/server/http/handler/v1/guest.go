@@ -37,6 +37,15 @@ func Login(ctx *gin.Context) {
 	gin_util.Response(ctx, resp, err)
 }
 
+func SimpleSSO(ctx *gin.Context) {
+	var req request.SimpleSSO
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	resp, err := service.SimpleSSO(ctx, &req, getLanguage(ctx))
+	gin_util.Response(ctx, resp, err)
+}
+
 // GetCaptcha
 //
 //	@Tags		guest

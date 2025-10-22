@@ -38,6 +38,7 @@ type Config struct {
 
 	Workflow           WorkflowServiceConfig           `json:"workflow" mapstructure:"workflow"`
 	AgentScopeWorkFlow AgentScopeWorkFlowServiceConfig `json:"agentscope-workflow" mapstructure:"agentscope-workflow"`
+	SimpleSSO          []SimpleSSOConfig               `json:"simple_sso" mapstructure:"simple_sso"`
 }
 
 type ServerConfig struct {
@@ -195,6 +196,15 @@ type DefaultIconConfig struct {
 	RagIcon      string `json:"rag" mapstructure:"rag"`
 	AgentIcon    string `json:"agent" mapstructure:"agent"`
 	WorkflowIcon string `json:"workflow" mapstructure:"workflow"`
+}
+
+type SimpleSSOConfig struct {
+	Platform     string `json:"platform" mapstructure:"platform"`
+	PublicKey    string `json:"public_key" mapstructure:"public_key"`
+	PrivateKey   string `json:"private_key" mapstructure:"private_key"`
+	FixedOrgID   string `json:"fixed_org_id" mapstructure:"fixed_org_id"`
+	FixedRoleId  string `json:"fixed_role_id" mapstructure:"fixed_role_id"`
+	InitPassword string `json:"init_password" mapstructure:"init_password"`
 }
 
 func LoadConfig(in string) error {

@@ -117,91 +117,91 @@ pb:
 
 # --- mysql ---
 run-mysql:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		up -d mysql
 
 stop-mysql:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		down mysql
 
 # --- mysql-setup ---
 run-mysql-setup:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		up mysql-setup
 
 stop-mysql-setup:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		down mysql-setup
 
 # --- redis ---
 run-redis:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		up -d redis
 
 stop-redis:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		down redis
 
 # --- minio ---
 run-minio:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		up -d minio
 
 stop-minio:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		down minio
 
 # --- kafka ---
 run-kafka:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		up -d kafka
 
 stop-kafka:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		down kafka
 
 # --- elastic-setup ---
 run-es-setup:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		up -d es-setup
 
 stop-es-setup:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		down es-setup
 
 # --- elastic ---
 run-es:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		up -d es
 
 stop-es:
-	docker-compose -f docker-compose.yaml \
+	docker compose -f docker-compose.yaml \
 		--env-file .env.image.${WANWU_ARCH} \
 		--env-file .env \
 		down es
