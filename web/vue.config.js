@@ -13,7 +13,7 @@ const isProdOrTest = process.env.NODE_ENV !== 'development'
 
 module.exports = {
   // 基础配置 详情看文档
-  publicPath: isProdOrTest ? process.env.VUE_APP_BASE_PATH + '/aibase' : '/',
+  publicPath: '/',
   outputDir: "dist",
   assetsDir: "static",
   lintOnSave: process.env.NODE_ENV === "development",
