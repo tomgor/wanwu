@@ -213,6 +213,10 @@ const constantRoutes = [
         component: () => import('@/views/auth/login'),
     },
     {
+        path: '/sso',
+        component: () => import('@/views/auth/sso'),
+    },
+    {
         path: '/register',
         component: () => import('@/views/auth/register'),
     },

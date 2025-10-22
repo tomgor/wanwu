@@ -1,4 +1,4 @@
-import { login,getPermission,getCommonInfo } from '@/api/user'
+import { login, sso, getPermission,getCommonInfo } from '@/api/user'
 import { fetchOrgs } from "@/api/permission/org"
 import { redirectUrl } from "@/utils/util"
 import { formatPerms } from "@/router/permission"
@@ -53,35 +53,44 @@ export const user = {
       }
   },
   actions: {
-      async LoginIn({ commit }, loginInfo) {
+      async LoginIn({ dispatch, commit }, loginInfo) {
           const res = await login(loginInfo)
-          const orgs = res.data.orgs || []
-          const orgPermission = res.data.orgPermission || {}
-          const orgId = orgPermission.org ? orgPermission.org.id : ''
-          const {isAdmin, isSystem} = orgPermission || {}
+          await dispatch('fetchUserInfo', res)
+      },
 
-          let permission = {}
-          permission.orgPermission = formatPerms(orgPermission.permissions)
-          permission.roles = orgPermission.roles || []
+      async fetchUserInfo({ commit }, res) {
+        const orgs = res.data.orgs || []
+        const orgPermission = res.data.orgPermission || {}
+        const orgId = orgPermission.org ? orgPermission.org.id : ''
+        const {isAdmin, isSystem} = orgPermission || {}
 
-          if (res.code === 0) {
-              commit('setUserInfo', {
-                  uid:res.data.uid,
-                  userName:res.data.username,
-                  orgId,userCategory:
-                  res.data.userCategory
-              })
-              commit('setOrgInfo', {orgs})
-              commit('setToken', res.data.token)
-              commit('setPermission', {...permission, isAdmin, isSystem, isUpdatePassword: res.data.isUpdatePassword})
-              //配置导航用户logo和名称以及欢迎文字
-              commit('setCommonInfo', {data: res.data.custom || {}})
+        let permission = {}
+        permission.orgPermission = formatPerms(orgPermission.permissions)
+        permission.roles = orgPermission.roles || []
 
-              // 更新权限路由
-              replaceRouter(permission.orgPermission)
-              // 重定向到有权限的页面
-              redirectUrl()
-          }
+        if (res.code === 0) {
+            commit('setUserInfo', {
+                uid:res.data.uid,
+                userName:res.data.username,
+                orgId,userCategory:
+                res.data.userCategory
+            })
+            commit('setOrgInfo', {orgs})
+            commit('setToken', res.data.token)
+            commit('setPermission', {...permission, isAdmin, isSystem, isUpdatePassword: res.data.isUpdatePassword})
+            //配置导航用户logo和名称以及欢迎文字
+            commit('setCommonInfo', {data: res.data.custom || {}})
+
+            // 更新权限路由
+            replaceRouter(permission.orgPermission)
+            // 重定向到有权限的页面
+            redirectUrl()
+        }
+      },
+
+      async ssoLogin({ dispatch, commit }, loginInfo) { 
+        const res = await sso(loginInfo)
+        await dispatch('fetchUserInfo', res)
       },
 
       // 获取权限

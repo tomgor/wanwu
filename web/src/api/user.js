@@ -12,6 +12,15 @@ export const login = (data) => {
     });
 };
 
+export const sso = (data) => {
+    return service({
+        url: `${BASE_URL}/base/simple-sso`,
+        method: "post",
+        data,
+        hasLang
+    });
+};
+
 // 获取图形验证码
 export const getImgVerCode = () => {
     return service({
