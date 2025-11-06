@@ -18,8 +18,6 @@ export default {
   beforeCreate() {
   },
   mounted() {
-        console.log("ssoLogin", this.rawQuery1);
-
     this.doLogin();
   },
   methods: {

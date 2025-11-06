@@ -3,6 +3,7 @@ import { fetchOrgs } from "@/api/permission/org"
 import { redirectUrl } from "@/utils/util"
 import { formatPerms } from "@/router/permission"
 import { replaceRouter } from "@/router"
+import router from '@/router/index'
 
 export const user = {
   namespaced: true,
@@ -55,10 +56,10 @@ export const user = {
   actions: {
       async LoginIn({ dispatch, commit }, loginInfo) {
           const res = await login(loginInfo)
-          await dispatch('fetchUserInfo', res)
+          await dispatch('fetchUserInfo', {res})
       },
 
-      async fetchUserInfo({ commit }, res) {
+      async fetchUserInfo({ commit }, {res, loginInfo}) {
         const orgs = res.data.orgs || []
         const orgPermission = res.data.orgPermission || {}
         const orgId = orgPermission.org ? orgPermission.org.id : ''
@@ -84,13 +85,19 @@ export const user = {
             // 更新权限路由
             replaceRouter(permission.orgPermission)
             // 重定向到有权限的页面
+            
+            console.log('loginInfologinInfo', loginInfo)
+            if(loginInfo && loginInfo.redirect) {
+              router.push({path: loginInfo.redirect || '/404'})
+              return;
+            }
             redirectUrl()
         }
       },
 
       async ssoLogin({ dispatch, commit }, loginInfo) { 
         const res = await sso(loginInfo)
-        await dispatch('fetchUserInfo', res)
+        await dispatch('fetchUserInfo', {res, loginInfo})
       },
 
       // 获取权限

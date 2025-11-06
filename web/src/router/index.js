@@ -139,7 +139,7 @@ const constantRoutes = [
             {
                 path: '/knowledge',
                 component:resolve =>require(['@/views/knowledge'],resolve),
-                meta:{perm: [PERMS.KNOWLEDGE]},
+                meta:{perm: [PERMS.KNOWLEDGE], nav: false},
             },
             {
                 path: '/knowledge/doclist/:id',

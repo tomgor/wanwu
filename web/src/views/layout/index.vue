@@ -287,6 +287,7 @@ export default {
         this.justifyIsShowNav(val.path)
         this.getMenuList(val.path)
         this.redirectUserInfo()
+        console.log('$route4444', val)
       },
       // 深度观察监听
       deep: true
@@ -368,7 +369,7 @@ export default {
     justifyIsShowNav(path) {
       const notShowArr = ['/userInfo', '/permission', '/workflow', '/explore/workflow']
       let isShowNav = true
-      if (this.justifyDocPages(path)) {
+      if (this.justifyDocPages(path) || path.includes('/knowledge')) {
         isShowNav = false
       } else {
         for (let item of notShowArr) {
