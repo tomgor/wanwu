@@ -369,7 +369,7 @@ export default {
     justifyIsShowNav(path) {
       const notShowArr = ['/userInfo', '/permission', '/workflow', '/explore/workflow']
       let isShowNav = true
-      if (this.justifyDocPages(path) || path.includes('/knowledge')) {
+      if (this.justifyDocPages(path) || (!!localStorage.getItem('redirect') && path.includes('/knowledge'))) {
         isShowNav = false
       } else {
         for (let item of notShowArr) {
@@ -378,6 +378,9 @@ export default {
             break
           }
         }
+      }
+      if(!path.includes('/knowledge')) {
+        localStorage.removeItem('redirect')
       }
       this.isShowNav = isShowNav
     },

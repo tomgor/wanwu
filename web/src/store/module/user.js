@@ -88,6 +88,7 @@ export const user = {
             
             console.log('loginInfologinInfo', loginInfo)
             if(loginInfo && loginInfo.redirect) {
+              localStorage.setItem('redirect', loginInfo.redirect)
               router.push({path: loginInfo.redirect || '/404'})
               return;
             }
