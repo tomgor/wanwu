@@ -18,7 +18,18 @@ module.exports = {
   assetsDir: "static",
   lintOnSave: process.env.NODE_ENV === "development",
   productionSourceMap: false,//源码映射
+<<<<<<< HEAD
   chainWebpack(config) {
+=======
+  transpileDependencies: [
+    'ml-matrix',
+    '@antv/layout',
+    '@antv/g6',
+    '@antv/graphlib'
+  ],
+  parallel: false,
+  chainWebpack(config){
+>>>>>>> upstream/main
     config.module
       .rule('md')
       .test(/\.md$/)
@@ -39,6 +50,7 @@ module.exports = {
         })
       )
     }
+
     config.module
       .rule('svg')
       .exclude.add(resolve('src/assets/icons'))	//svg文件位置
@@ -54,6 +66,15 @@ module.exports = {
         symbolId: 'icon-[name]'
       })
       .end()
+
+    // 生产环境去掉 console 打印
+    config.when(process.env.NODE_ENV === 'production', config => {
+      config.optimization.minimize(true)
+      config.optimization.minimizer('terser').tap(args => {
+        args[0].terserOptions.compress.drop_console = true
+        return args
+      })
+    })
   },
   devServer: {
     port: 8080,
@@ -198,7 +219,7 @@ module.exports = {
     }
   },
   configureWebpack: {
-    //    @路径走src文件夹
+    // @路径走src文件夹
     module: {
       rules: [
         {
@@ -216,6 +237,10 @@ module.exports = {
         'vue$': 'vue/dist/vue.esm.js',
         "@": resolve("src"),
         "@common": resolve("common"),
+<<<<<<< HEAD
+=======
+        "@antv/g6": path.resolve(__dirname, 'node_modules/@antv/g6'),
+>>>>>>> upstream/main
       },
     },
     output: {

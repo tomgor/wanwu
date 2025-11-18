@@ -6,6 +6,7 @@ import (
 
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
+	"github.com/UnicomAI/wanwu/pkg/constant"
 	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	mp "github.com/UnicomAI/wanwu/pkg/model-provider"
 	"github.com/gin-gonic/gin"
@@ -104,6 +105,69 @@ func ExportWorkflow(ctx *gin.Context) {
 //	@Success		200		{object}	response.Response{data=response.CozeWorkflowIDData}
 //	@Router			/appspace/workflow/import [post]
 func ImportWorkflow(ctx *gin.Context) {
-	resp, err := service.ImportWorkflow(ctx, getOrgID(ctx))
+	resp, err := service.ImportWorkflow(ctx, getOrgID(ctx), constant.AppTypeWorkflow)
+	gin_util.Response(ctx, resp, err)
+}
+
+// GetWorkflowToolSelect
+//
+//	@Tags		workflow
+//	@Summary	工具列表（用于workflow）
+//	@Description工具列表（用于workflow）
+//	@Security	JWT
+//	@Accept		json
+//	@Produce	json
+//	@Param		toolType	query		string	true	"工具类型"	Enums(builtin,custom)
+//	@Param		name		query		string	false	"工具名称"
+//	@Success	200			{object}	response.Response{data=response.ListResult{list=[]response.ToolSelect4Workflow}}
+//	@Router		/workflow/tool/select [get]
+func GetWorkflowToolSelect(ctx *gin.Context) {
+	tools, err := service.GetWorkflowToolSelect(ctx, getUserID(ctx), getOrgID(ctx), ctx.Query("toolType"), ctx.Query("name"))
+	if err != nil {
+		gin_util.Response(ctx, nil, err)
+		return
+	}
+	gin_util.Response(ctx, tools, err)
+}
+
+// GetWorkflowToolDetail
+//
+//	@Tags		workflow
+//	@Summary	工具具体action（用于workflow）
+//	@Description工具具体action（用于workflow）
+//	@Security	JWT
+//	@Accept		json
+//	@Produce	json
+//	@Param		toolType	query		string	true	"工具类型"	Enums(builtin,custom)
+//	@Param		actionName	query		string	true	"工具具体action名称"
+//	@Param		toolId		query		string	true	"工具ID"
+//	@Success	200			{object}	response.Response{data=response.ToolDetail4Workflow}
+//	@Router		/workflow/tool/action [get]
+func GetWorkflowToolDetail(ctx *gin.Context) {
+	data, err := service.GetWorkflowToolDetail(ctx, getUserID(ctx), getOrgID(ctx), ctx.Query("toolId"), ctx.Query("toolType"), ctx.Query("actionName"))
+	if err != nil {
+		gin_util.Response(ctx, nil, err)
+		return
+	}
+	gin_util.Response(ctx, data, err)
+}
+
+// CreateWorkflowByTemplate
+//
+//	@Tags		workflow
+//	@Summary	复制工作流模板
+//	@Description复制工作流模板
+//	@Security	JWT
+//	@Accept		json
+//	@Produce	json
+//	@Param		data	body		request.CreateWorkflowByTemplateReq	true	"通过模板创建Workflow的请求参数"
+//	@Success	200		{object}	response.Response{data=response.CozeWorkflowIDData}
+//	@Router		/workflow/template [post]
+func CreateWorkflowByTemplate(ctx *gin.Context) {
+	var req request.CreateWorkflowByTemplateReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	resp, err := service.CreateWorkflowByTemplate(ctx, getOrgID(ctx), getClientID(ctx), req)
 	gin_util.Response(ctx, resp, err)
 }

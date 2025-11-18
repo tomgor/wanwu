@@ -18,7 +18,7 @@ type AssistantConfig struct {
 	KnowledgeBaseConfig AppKnowledgebaseConfig `json:"knowledgeBaseConfig"` // 知识库
 	SafetyConfig        AppSafetyConfig        `json:"safetyConfig"`        // 敏感词表配置
 	RerankConfig        AppModelConfig         `json:"rerankConfig"`        // Rerank模型
-	OnlineSearchConfig  OnlineSearchConfig     `json:"onlineSearchConfig"`  // 在线搜索
+	VisionConfig        VisionConfig           `json:"visionConfig"`        // 视觉配置
 }
 
 func (a *AssistantConfig) Check() error { return nil }
@@ -67,6 +67,8 @@ func (w *AssistantWorkFlowToolEnableRequest) Check() error { return nil }
 type AssistantMCPToolAddRequest struct {
 	AssistantId string `json:"assistantId" validate:"required"`
 	MCPId       string `json:"mcpId" validate:"required"`
+	MCPType     string `json:"mcpType" validate:"required,oneof=mcp mcpserver"`
+	ActionName  string `json:"actionName" validate:"required"`
 }
 
 func (m *AssistantMCPToolAddRequest) Check() error { return nil }
@@ -74,6 +76,8 @@ func (m *AssistantMCPToolAddRequest) Check() error { return nil }
 type AssistantMCPToolDelRequest struct {
 	AssistantId string `json:"assistantId" validate:"required"`
 	MCPId       string `json:"mcpId" validate:"required"`
+	MCPType     string `json:"mcpType" validate:"required,oneof=mcp mcpserver"`
+	ActionName  string `json:"actionName" validate:"required"`
 }
 
 func (w *AssistantMCPToolDelRequest) Check() error { return nil }
@@ -81,6 +85,8 @@ func (w *AssistantMCPToolDelRequest) Check() error { return nil }
 type AssistantMCPToolEnableRequest struct {
 	AssistantId string `json:"assistantId" validate:"required"`
 	MCPId       string `json:"mcpId" validate:"required"`
+	MCPType     string `json:"mcpType" validate:"required,oneof=mcp mcpserver"`
+	ActionName  string `json:"actionName" validate:"required"`
 	Enable      bool   `json:"enable"`
 }
 
@@ -116,11 +122,11 @@ type ConversationGetDetailListRequest struct {
 func (c *ConversationGetDetailListRequest) Check() error { return nil }
 
 type ConversionStreamRequest struct {
-	AssistantId    string               `json:"assistantId" form:"assistantId"  validate:"required"`
-	ConversationId string               `json:"conversationId" form:"conversionId"`
-	FileInfo       ConversionStreamFile `json:"fileInfo" form:"fileInfo"`
-	Trial          bool                 `json:"trial" form:"trial"`
-	Prompt         string               `json:"prompt" form:"prompt"  validate:"required"`
+	AssistantId    string                 `json:"assistantId" form:"assistantId"  validate:"required"`
+	ConversationId string                 `json:"conversationId" form:"conversionId"`
+	FileInfo       []ConversionStreamFile `json:"fileInfo" form:"fileInfo"`
+	Trial          bool                   `json:"trial" form:"trial"`
+	Prompt         string                 `json:"prompt" form:"prompt"  validate:"required"`
 }
 
 func (c *ConversionStreamRequest) Check() error {
@@ -137,44 +143,48 @@ type ConversionStreamFile struct {
 	FileUrl  string `json:"fileUrl" form:"fileUrl"`
 }
 
-type OnlineSearchConfig struct {
-	SearchUrl      string `json:"searchUrl" form:"searchUrl"`
-	SearchKey      string `json:"searchKey" form:"searchKey"`
-	SearchRerankId string `json:"searchRerankId" form:"searchRerankId"`
-	Enable         bool   `json:"enable" form:"enable"`
-}
-
-func (o *OnlineSearchConfig) Check() error {
-	if (o.SearchUrl == "" && o.SearchKey != "") || (o.SearchUrl != "" && o.SearchKey == "") {
-		return fmt.Errorf("searchUrl and searchKey must be set together")
-	}
-	return nil
-}
-
 type AssistantTemplateRequest struct {
 	AssistantTemplateId string `json:"assistantTemplateId" form:"assistantTemplateId"  validate:"required"`
 }
 
 func (a *AssistantTemplateRequest) Check() error { return nil }
 
-type AssistantCustomToolAddRequest struct {
-	AssistantId  string `json:"assistantId" validate:"required"`
-	CustomToolId string `json:"customToolId" validate:"required"`
+type AssistantToolAddRequest struct {
+	AssistantId string `json:"assistantId" validate:"required"`
+	ToolId      string `json:"toolId" validate:"required"`
+	ToolType    string `json:"toolType" validate:"required,oneof=builtin custom"`
+	ActionName  string `json:"actionName" validate:"required"`
 }
 
-func (c *AssistantCustomToolAddRequest) Check() error { return nil }
+func (c *AssistantToolAddRequest) Check() error { return nil }
 
-type AssistantCustomToolDelRequest struct {
-	AssistantId  string `json:"assistantId" validate:"required"`
-	CustomToolId string `json:"customToolId" validate:"required"`
+type AssistantToolDelRequest struct {
+	AssistantId string `json:"assistantId" validate:"required"`
+	ToolId      string `json:"toolId" validate:"required"`
+	ToolType    string `json:"toolType" validate:"required,oneof=builtin custom"`
+	ActionName  string `json:"actionName" validate:"required"`
 }
 
-func (c *AssistantCustomToolDelRequest) Check() error { return nil }
+func (c *AssistantToolDelRequest) Check() error { return nil }
 
-type AssistantCustomToolEnableRequest struct {
-	AssistantId  string `json:"assistantId" validate:"required"`
-	CustomToolId string `json:"customToolId" validate:"required"`
-	Enable       bool   `json:"enable"`
+type AssistantToolEnableRequest struct {
+	AssistantId string `json:"assistantId" validate:"required"`
+	ToolId      string `json:"toolId" validate:"required"`
+	ToolType    string `json:"toolType" validate:"required,oneof=builtin custom"`
+	ActionName  string `json:"actionName" validate:"required"`
+	Enable      bool   `json:"enable"`
 }
 
-func (c *AssistantCustomToolEnableRequest) Check() error { return nil }
+func (c *AssistantToolEnableRequest) Check() error { return nil }
+
+type AssistantToolConfigRequest struct {
+	AssistantId string              `json:"assistantId" validate:"required"`
+	ToolId      string              `json:"toolId" validate:"required"`
+	ToolConfig  AssistantToolConfig `json:"toolConfig" validate:"required"`
+}
+
+type AssistantToolConfig struct {
+	RerankId string `json:"rerankId,omitempty"`
+}
+
+func (c *AssistantToolConfigRequest) Check() error { return nil }

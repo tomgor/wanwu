@@ -28,10 +28,14 @@ func CreateRag(ctx *gin.Context, userId, orgId string, req request.AppBriefConfi
 	}, err
 }
 
-func UpdateRag(ctx *gin.Context, req request.RagBrief) error {
+func UpdateRag(ctx *gin.Context, req request.RagBrief, userId, orgId string) error {
 	_, err := rag.UpdateRag(ctx.Request.Context(), &rag_service.UpdateRagReq{
 		RagId:    req.RagID,
 		AppBrief: appBriefConfigModel2Proto(req.AppBriefConfig),
+		Identity: &rag_service.Identity{
+			UserId: userId,
+			OrgId:  orgId,
+		},
 	})
 	return err
 }
@@ -75,6 +79,7 @@ func ragKBConfigToProto(knowledgeConfig request.AppKnowledgebaseConfig) *rag_ser
 		// 初始化单个知识库配置
 		perConfig := &rag_service.RagPerKnowledgeConfig{
 			KnowledgeId: knowledge.ID,
+			GraphSwitch: knowledge.GraphSwitch,
 		}
 		// 构建元数据过滤条件（如果启用）
 		if metaFilter := buildRagMetaFilter(knowledge.MetaDataFilterParams); metaFilter != nil {
@@ -121,6 +126,7 @@ func buildRagGlobalConfig(kbConfig request.AppKnowledgebaseParams) *rag_service.
 		SemanticsPriority: kbConfig.SemanticsPriority,
 		TermWeight:        kbConfig.TermWeight,
 		TermWeightEnable:  kbConfig.TermWeightEnable,
+		UseGraph:          kbConfig.UseGraph,
 	}
 }
 
@@ -220,8 +226,9 @@ func ragKBConfigProto2Model(ctx *gin.Context, kbConfig *rag_service.RagKnowledge
 		}
 		// 基础信息映射
 		knowledge := request.AppKnowledgeBase{
-			ID:   perConfig.KnowledgeId,
-			Name: kbInfo.Name,
+			ID:          perConfig.KnowledgeId,
+			Name:        kbInfo.Name,
+			GraphSwitch: kbInfo.GraphSwitch,
 		}
 		// 转换元数据过滤配置
 		metaFilter := perConfig.RagMetaFilter
@@ -243,6 +250,7 @@ func ragKBConfigProto2Model(ctx *gin.Context, kbConfig *rag_service.RagKnowledge
 		SemanticsPriority: globalConfig.SemanticsPriority,
 		TermWeight:        globalConfig.TermWeight,
 		TermWeightEnable:  globalConfig.TermWeightEnable,
+		UseGraph:          globalConfig.UseGraph,
 	}
 	return request.AppKnowledgebaseConfig{
 		Knowledgebases: knowledgeList,
@@ -268,4 +276,20 @@ func convertRagMetaFilterToParams(metaFilter *rag_service.RagMetaFilter) *reques
 		FilterLogicType:  metaFilter.FilterLogicType,
 		MetaFilterParams: filterParams, // 映射过滤条件列表
 	}
+}
+
+func CopyRag(ctx *gin.Context, userId, orgId string, req request.RagReq) (*request.RagReq, error) {
+	resp, err := rag.CopyRag(ctx.Request.Context(), &rag_service.CopyRagReq{
+		Identity: &rag_service.Identity{
+			UserId: userId,
+			OrgId:  orgId,
+		},
+		RagId: req.RagID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &request.RagReq{
+		RagID: resp.RagId,
+	}, err
 }

@@ -9,14 +9,14 @@ import (
 
 // GetDocList
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		获取文档列表
 //	@Description	获取知识库文档列表，不展示状态为无效（-1）的文档数据
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.DocListReq	true	"文档列表查询请求参数"
-//	@Success		200		{object}	response.PageResult{list=[]response.ListDocResp}
+//	@Param			data	query		request.DocListReq	true	"文档列表查询请求参数"
+//	@Success		200		{object}	response.Response{data=response.DocPageResult}
 //	@Router			/knowledge/doc/list [get]
 func GetDocList(ctx *gin.Context) {
 	userId, orgId := getUserID(ctx), getOrgID(ctx)
@@ -30,7 +30,7 @@ func GetDocList(ctx *gin.Context) {
 
 // ImportDoc
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		上传文档
 //	@Description	上传文档
 //	@Security		JWT
@@ -51,7 +51,7 @@ func ImportDoc(ctx *gin.Context) {
 
 // DeleteDoc
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		删除文档
 //	@Description	删除文档
 //	@Security		JWT
@@ -72,7 +72,7 @@ func DeleteDoc(ctx *gin.Context) {
 
 // UpdateDocMetaData
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		更新文档元数据
 //	@Description	更新文档元数据
 //	@Security		JWT
@@ -93,7 +93,7 @@ func UpdateDocMetaData(ctx *gin.Context) {
 
 // BatchUpdateDocMetaData
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		批量更新文档元数据
 //	@Description	批量更新文档元数据
 //	@Security		JWT
@@ -114,13 +114,13 @@ func BatchUpdateDocMetaData(ctx *gin.Context) {
 
 // GetDocImportTip
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		获取知识库异步上传任务提示
 //	@Description	获取知识库异步上传任务提示：有正在执行的异步上传任务/最近一次上传任务的失败信息
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.QueryKnowledgeReq	true	"获取知识库异步上传任务提示请求参数"
+//	@Param			data	query		request.QueryKnowledgeReq	true	"获取知识库异步上传任务提示请求参数"
 //	@Success		200		{object}	response.Response(data=response.DocImportTipResp)
 //	@Router			/knowledge/doc/import/tip [get]
 func GetDocImportTip(ctx *gin.Context) {
@@ -135,13 +135,13 @@ func GetDocImportTip(ctx *gin.Context) {
 
 // GetDocSegmentList
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		获取文档切分结果
 //	@Description	获取文档切分结果
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.DocSegmentListReq	true	"获取文档切分结果请求参数"
+//	@Param			data	query		request.DocSegmentListReq	true	"获取文档切分结果请求参数"
 //	@Success		200		{object}	response.Response{data=response.DocSegmentResp}
 //	@Router			/knowledge/doc/segment/list [get]
 func GetDocSegmentList(ctx *gin.Context) {
@@ -156,7 +156,7 @@ func GetDocSegmentList(ctx *gin.Context) {
 
 // UpdateDocSegmentStatus
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		更新文档切片启用状态
 //	@Description	更新文档切片启用状态
 //	@Security		JWT
@@ -177,7 +177,7 @@ func UpdateDocSegmentStatus(ctx *gin.Context) {
 
 // AnalysisDocUrl
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		解析url
 //	@Description	解析url
 //	@Security		JWT
@@ -198,7 +198,7 @@ func AnalysisDocUrl(ctx *gin.Context) {
 
 // UpdateDocSegmentLabels
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		更新文档切片标签
 //	@Description	更新文档切片标签
 //	@Security		JWT
@@ -219,7 +219,7 @@ func UpdateDocSegmentLabels(ctx *gin.Context) {
 
 // CreateDocSegment
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		新增文档切片
 //	@Description	新增文档切片
 //	@Security		JWT
@@ -240,7 +240,7 @@ func CreateDocSegment(ctx *gin.Context) {
 
 // BatchCreateDocSegment
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		批量新增文档切片
 //	@Description	批量新增文档切片
 //	@Security		JWT
@@ -261,7 +261,7 @@ func BatchCreateDocSegment(ctx *gin.Context) {
 
 // DeleteDocSegment
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		删除文档切片
 //	@Description	删除文档切片
 //	@Security		JWT
@@ -282,7 +282,7 @@ func DeleteDocSegment(ctx *gin.Context) {
 
 // UpdateDocSegment
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		更新文档切片
 //	@Description	更新文档切片
 //	@Security		JWT
@@ -303,13 +303,13 @@ func UpdateDocSegment(ctx *gin.Context) {
 
 // GetDocChildSegmentList
 //
-//	@Tags			knowledge
+//	@Tags			knowledge.doc
 //	@Summary		获取子分段列表
 //	@Description	获取子分段列表
 //	@Security		JWT
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.DocChildListReq	true	"获取子分段列表查询请求参数"
+//	@Param			data	query		request.DocChildListReq	true	"获取子分段列表查询请求参数"
 //	@Success		200		{object}	response.Response{data=response.DocChildSegmentResp}
 //	@Router			/knowledge/doc/segment/child/list [get]
 func GetDocChildSegmentList(ctx *gin.Context) {
@@ -320,4 +320,67 @@ func GetDocChildSegmentList(ctx *gin.Context) {
 	}
 	resp, err := service.GetDocChildSegmentList(ctx, userId, orgId, &req)
 	gin_util.Response(ctx, resp, err)
+}
+
+// CreateDocChildSegment
+//
+//	@Tags			knowledge.doc
+//	@Summary		新增文档子分片
+//	@Description	新增文档子分片
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.CreateDocChildSegmentReq	true	"新增文档子切片请求参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/knowledge/doc/segment/child/create [post]
+func CreateDocChildSegment(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.CreateDocChildSegmentReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.CreateDocChildSegment(ctx, userId, orgId, &req)
+	gin_util.Response(ctx, nil, err)
+}
+
+// UpdateDocChildSegment
+//
+//	@Tags			knowledge.doc
+//	@Summary		更新文档子切片
+//	@Description	更新文档子切片
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.UpdateDocChildSegmentReq	true	"更新文档子切片请求参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/knowledge/doc/segment/child/update [post]
+func UpdateDocChildSegment(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.UpdateDocChildSegmentReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.UpdateDocChildSegment(ctx, userId, orgId, &req)
+	gin_util.Response(ctx, nil, err)
+}
+
+// DeleteDocChildSegment
+//
+//	@Tags			knowledge.doc
+//	@Summary		删除文档子切片
+//	@Description	删除文档子切片
+//	@Security		JWT
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.DeleteDocChildSegmentReq	true	"删除文档切片请求参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/knowledge/doc/segment/child/delete [delete]
+func DeleteDocChildSegment(ctx *gin.Context) {
+	userId, orgId := getUserID(ctx), getOrgID(ctx)
+	var req request.DeleteDocChildSegmentReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.DeleteDocChildSegment(ctx, userId, orgId, &req)
+	gin_util.Response(ctx, nil, err)
 }

@@ -33,14 +33,22 @@
               </div>
 
               <div class="content_title">
-                <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload">{{$t('common.gpuDialog.reload')}}</el-button>
-                <el-button size="mini" type="primary" @click="showMeta">元数据管理</el-button>
-                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/hitTest?knowledgeId=${docQuery.knowledgeId}&name=${knowledgeName}`)">命中测试</el-button>
+                <el-button size="mini" type="primary" icon="el-icon-refresh" @click="reload" >{{$t('common.gpuDialog.reload')}}</el-button>
+                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/graphMap/${docQuery.knowledgeId}?name=${knowledgeName}`)" v-if="showGraphReport">{{$t('knowledgeManage.hitTest.graph')}}</el-button>
+                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/communityReport?knowledgeId=${docQuery.knowledgeId} &name=${knowledgeName}`)" v-if="showGraphReport">
+                  <span>{{$t('knowledgeManage.hitTest.communityReport')}}</span>
+                  <el-tooltip class="item" effect="dark" :content="$t('knowledgeManage.docList.communityReportTips')" placement="top">
+                    <i class="el-icon-question" style="margin-left: 2px;"></i>
+                  </el-tooltip>
+                </el-button>
+                <el-button size="mini" type="primary" @click="showMeta" v-if="[10,20,30].includes(permissionType)">{{$t('knowledgeManage.docList.metaDataManagement')}}</el-button>
+                <el-button size="mini" type="primary" @click="$router.push(`/knowledge/hitTest?knowledgeId=${docQuery.knowledgeId}&graphSwitch=${graphSwitch}`)">{{$t('knowledgeManage.hitTest.name')}}</el-button>
                 <el-button
                   size="mini"
                   type="primary"
                   :underline="false"
                   @click="handleUpload"
+                  v-if="[10,20,30].includes(permissionType)"
                 >{{$t('knowledgeManage.fileUpload')}}</el-button>
               </div>
             </el-header>
@@ -56,10 +64,19 @@
                 v-if="showTips"
               ></el-alert>
               <el-table
+                ref="dataTable"
                 :data="tableData"
                 style="width: 100%"
+                :row-key="'docId'"
                 :header-cell-style="{ background: '#F9F9F9', color: '#999999' }"
+                @selection-change="handleSelectionChange"
               >
+                <el-table-column
+                  type="selection"
+                  reserve-selection
+                  v-if="[10,20,30].includes(permissionType)"
+                  width="55">
+                </el-table-column>
                 <el-table-column
                   prop="docName"
                   :label="$t('knowledgeManage.fileName')"
@@ -79,17 +96,20 @@
                 <el-table-column
                   prop="docType"
                   :label="$t('knowledgeManage.fileStyle')"
-                  width="200"
                 >
                 </el-table-column>
                 <el-table-column
                   prop="segmentMethod"
-                  label="分段模式"
-                  width="200"
+                  :label="$t('knowledgeManage.docList.segmentMode')"
                 >
                 <template slot-scope="scope">
                   <span>{{ getSegmentMethodText(scope.row.segmentMethod) }}</span>
                 </template>
+                </el-table-column>
+                <el-table-column
+                  prop="author"
+                  :label="$t('knowledgeManage.author')"
+                >
                 </el-table-column>
                 <el-table-column
                   prop="uploadTime"
@@ -120,6 +140,28 @@
                   </template>
                 </el-table-column>
                 <el-table-column
+                  v-if="graphSwitch"
+                  prop="graphStatus"
+                  :label="$t('knowledgeManage.graph.graphStatus')"
+                >
+                   <template slot-scope="scope">
+                      <span>{{knowledgeGraphStatus[scope.row.graphStatus]}}</span>
+                      <el-tooltip
+                      class="item"
+                      effect="light"
+                      :content="scope.row.graphErrMsg?scope.row.graphErrMsg:''"
+                      placement="top"
+                      v-if="scope.row.graphStatus === 3"
+                      popper-class="custom-tooltip"
+                    >
+                      <span
+                        class="el-icon-warning"
+                        style="margin-left:5px;color:#E6A23C;"
+                      ></span>
+                    </el-tooltip>
+                   </template>
+                </el-table-column>
+                <el-table-column
                   :label="$t('knowledgeManage.operate')"
                   width="260"
                 >
@@ -129,6 +171,7 @@
                       round
                       @click="handleDel(scope.row)"
                       :disabled="[2,3].includes(Number(scope.row.status))"
+                      v-if="[10,20,30].includes(permissionType)"
                       :type="[2,3].includes(Number(scope.row.status))?'info':''"
                     >{{$t('common.button.delete')}}</el-button>
                     <el-button
@@ -156,17 +199,22 @@
     </div>
     <!-- 元数据管理 -->
     <el-dialog
-      title="元数据管理"
+      :title="$t('knowledgeManage.docList.metaDataManagement')"
       :visible.sync="metaVisible"
       width="550px"
       :before-close="handleClose">
       <mataData ref="mataData" @updateMeata="updateMeata" type="create" :knowledgeId="docQuery.knowledgeId" class="mataData"/>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handleClose">取 消</el-button>
-        <el-button type="primary" @click="createMeta">创 建</el-button>
-        <el-button type="primary" @click="submitMeta" :disabled="isDisabled">确 定</el-button>
+        <el-button @click="handleClose">{{$t('common.button.cancel')}}</el-button>
+        <el-button type="primary" @click="createMeta">{{$t('common.button.create')}}</el-button>
+        <el-button type="primary" @click="submitMeta" :disabled="isDisabled">{{$t('common.button.confirm')}}</el-button>
       </span>
     </el-dialog>
+    
+    <!-- 批量编辑元数据值弹窗 -->
+    <batchMetaData ref="batchMetaData" :selectedDocIds="selectedDocIds" @reLoadDocList="reLoadDocList" />
+    <!-- 批量编辑元数据值操作框 -->
+    <BatchMetatButton ref="BatchMetatButton" :selectedCount="selectedTableData.length" @showBatchMeta="showBatchMeta" @handleMetaCancel="handleMetaCancel"/>
   </div>
 </template>
 
@@ -174,12 +222,16 @@
 import Pagination from "@/components/pagination.vue";
 import SearchInput from "@/components/searchInput.vue";
 import mataData from './metadata.vue'
+import batchMetaData from './meta/batchMetaData.vue'
+import BatchMetatButton from './meta/batchMetatButton.vue'
 import {getDocList,delDocItem,uploadFileTips,updateDocMeta} from "@/api/knowledge";
+import {mapGetters} from 'vuex';
+import { KNOWLEDGE_GRAPH_STATUS } from '../config';
 export default {
-  components: { Pagination,SearchInput,mataData},
+  components: { Pagination,SearchInput,mataData,batchMetaData,BatchMetatButton},
   data() {
     return {
-      knowledgeName:this.$route.query.name || '',
+      knowledgeName:'',
       loading:false,
       tableLoading:false,
       docQuery: {
@@ -200,7 +252,12 @@ export default {
       tagList:[],
       metaVisible:false,
       metaData:[],
-      isDisabled:false
+      isDisabled:false,
+      selectedTableData:[],
+      selectedDocIds:[],
+      graphSwitch:false,
+      showGraphReport:false,
+      knowledgeGraphStatus: KNOWLEDGE_GRAPH_STATUS
     };
   },
   watch:{
@@ -222,21 +279,77 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters('app', ['permissionType'])
+  },
   mounted(){
     this.getTableData(this.docQuery)
+    if (this.permissionType === -1 || this.permissionType === null || this.permissionType === undefined) {
+        const savedData = localStorage.getItem('permission_data')
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData)
+                const savedPermissionType = parsed && parsed.app && parsed.app.permissionType
+                if (savedPermissionType !== undefined && savedPermissionType !== -1) {
+                    this.$store.dispatch('app/setPermissionType', savedPermissionType)
+                }
+            } catch(e) {
+            }
+        }
+    }
   },
   beforeDestroy(){
     this.clearTimer()
   },
   methods: {
+    handleMetaCancel(){
+      this.selectedTableData = []
+      this.selectedDocIds = []
+      // 取消所有表格数据的选中状态
+      this.$nextTick(() => {
+        const table = this.$refs.dataTable
+        if (table) {
+          table.clearSelection()
+        }
+      })
+    },
+    reLoadDocList(){
+      this.getTableData(this.docQuery)
+      this.selectedTableData = []
+      this.selectedDocIds = []
+      
+      // 取消所有表格数据的选中状态
+      this.$nextTick(() => {
+        const table = this.$refs.dataTable
+        if (table) {
+          table.clearSelection()
+        }
+      })
+      
+    },
+    showBatchMeta(){
+      if(!this.selectedTableData || this.selectedTableData.length === 0){
+        this.$message.warning(this.$t('knowledgeManage.docList.pleaseSelectDocFirst'));
+        return;
+      }
+      this.$refs.batchMetaData.showDialog();
+    },
+    handleSelectionChange(val){ 
+      if (val.length > 100) {
+        this.$message.warning(this.$t('knowledgeManage.docList.maxSelect100Files'));
+        return;
+      }
+      this.selectedTableData = val
+      this.selectedDocIds = val.map(item => item.docId)
+    },
     getSegmentMethodText(value){
       switch (value) {
         case '0':
-          return '通用分段';
+          return this.$t('knowledgeManage.config.commonSegment');
         case '1':
-          return '父子分段';
+          return this.$t('knowledgeManage.config.parentSonSegment');
         default:
-          return '未知';
+          return this.$t('knowledgeManage.docList.unknown');
       }
     },
     createMeta(){
@@ -266,7 +379,7 @@ export default {
       }
       updateDocMeta(data).then(res =>{
         if(res.code === 0){
-          this.$message.success('操作成功');
+          this.$message.success(this.$t('common.message.success'));
           this.$refs.mataData.getList();
           this.metaVisible = false;
           this.isDisabled = false;
@@ -380,11 +493,11 @@ export default {
         }
       )
         .then(async () => {
-          let jsondata = {docIdList:[data.docId]}
+          let jsondata = {docIdList:[data.docId],knowledgeId:this.docQuery.knowledgeId,}
           this.loading = true;
           let res = await delDocItem(jsondata);
           if (res.code === 0) {
-            this.$message.success('删除成功');
+            this.$message.success(this.$t('common.info.delInfo'));
             this.getTableData(this.docQuery)//获取知识分类数据
           }
           this.loading = false;
@@ -472,8 +585,16 @@ export default {
     handleUpload() {
       this.$router.push({path:'/knowledge/fileUpload',query:{id:this.docQuery.knowledgeId,name:this.knowledgeName}})
     },
-    refreshData(data) {
+    refreshData(data,tableInfo) {
       this.tableData = data
+      if(tableInfo && tableInfo.docKnowledgeInfo){
+        this.graphSwitch = tableInfo.docKnowledgeInfo.graphSwitch === 1 ? true : false
+        this.showGraphReport = tableInfo.docKnowledgeInfo.showGraphReport
+        this.knowledgeName = tableInfo.docKnowledgeInfo.knowledgeName
+      }else{
+        this.graphSwitch = false
+        this.showGraphReport = false
+      }
     }
   }
 };
@@ -484,7 +605,7 @@ export default {
   overflow-y: auto;
 }
 .edit-icon{
-  color: #384BF7;
+  color: $color;
   cursor: pointer;
   font-size: 16px;
   margin-left: 5px;

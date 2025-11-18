@@ -166,16 +166,14 @@ func EndUpdatedAt(endUpdatedAt int64) SQLOption {
 	})
 }
 
-func WithSearchType(userID, searchType string) SQLOption {
+func WithSearchType(userID, orgID, searchType string) SQLOption {
 	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
 		var query string
 		var args []interface{}
 		switch searchType {
 		case "", "all":
-			query = "user_id = ? AND publish_type = ?"
-			args = append(args, userID, constant.AppPublishPrivate)
-			query = "(" + query + ") OR " + "publish_type = ?"
-			args = append(args, constant.AppPublishPublic)
+			query = "(user_id = ? AND publish_type = ?) OR (publish_type = ?) OR (publish_type = ? AND org_id = ?)"
+			args = append(args, userID, constant.AppPublishPrivate, constant.AppPublishPublic, constant.AppPublishOrganization, orgID)
 		case "private":
 			query = "user_id = ? AND publish_type = ?"
 			args = append(args, userID, constant.AppPublishPrivate)

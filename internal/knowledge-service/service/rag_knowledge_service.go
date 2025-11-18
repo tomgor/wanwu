@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/mq"
+
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/config"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/pkg/http"
 	http_client "github.com/UnicomAI/wanwu/pkg/http-client"
@@ -18,10 +20,11 @@ const (
 )
 
 type RagCreateParams struct {
-	UserId           string `json:"userId"`
-	Name             string `json:"knowledgeBase"`
-	KnowledgeBaseId  string `json:"kb_id"`
-	EmbeddingModelId string `json:"embedding_model_id"`
+	UserId               string `json:"userId"`
+	Name                 string `json:"knowledgeBase"`
+	KnowledgeBaseId      string `json:"kb_id"`
+	EmbeddingModelId     string `json:"embedding_model_id"`
+	EnableKnowledgeGraph bool   `json:"enable_knowledge_graph"`
 }
 
 type RagCommonResp struct {
@@ -49,12 +52,14 @@ type RagUpdateParams struct {
 type RagDeleteParams struct {
 	UserId            string `json:"userId"`
 	KnowledgeBaseName string `json:"knowledgeBase"`
+	KnowledgeId       string `json:"kb_id"`
 }
 
 type KnowledgeHitParams struct {
 	UserId               string                `json:"userId"`
 	Question             string                `json:"question" validate:"required"`
 	KnowledgeBase        []string              `json:"knowledgeBase" validate:"required"`
+	KnowledgeIdList      []string              `json:"knowledgeIdList" validate:"required"`
 	Threshold            float64               `json:"threshold"`
 	TopK                 int32                 `json:"topK"`
 	RerankModelId        string                `json:"rerank_model_id"`               // rerankId
@@ -64,6 +69,7 @@ type KnowledgeHitParams struct {
 	TermWeight           float32               `json:"term_weight_coefficient"`       // 关键词系数
 	MetaFilter           bool                  `json:"metadata_filtering"`            // 元数据过滤开关
 	MetaFilterConditions []*MetadataFilterItem `json:"metadata_filtering_conditions"` // 元数据过滤条件
+	UseGraph             bool                  `json:"use_graph"`                     // 是否使用知识图谱
 }
 
 type MetadataFilterItem struct {
@@ -94,6 +100,7 @@ type KnowledgeHitData struct {
 	Prompt     string             `json:"prompt"`
 	SearchList []*ChunkSearchList `json:"searchList"`
 	Score      []float64          `json:"score"`
+	UseGraph   bool               `json:"use_graph"`
 }
 
 type ChunkSearchList struct {
@@ -103,6 +110,7 @@ type ChunkSearchList struct {
 	MetaData         interface{}     `json:"meta_data"`
 	ChildContentList []*ChildContent `json:"child_content_list"`
 	ChildScore       []float64       `json:"child_score"`
+	ContentType      string          `json:"content_type"` // graph：知识图谱（文本）, text：文档分段（文本）, community_report：社区报告（markdown）
 }
 
 type ChildContent struct {
@@ -127,6 +135,18 @@ type RagBatchUpdateMetaKeyParams struct {
 type RagMetaMapKeys struct {
 	OldKey string `json:"old_key"`
 	NewKey string `json:"new_key"`
+}
+
+type RagKnowledgeGraphParams struct {
+	UserId        string `json:"userId"`        // 用户id
+	KnowledgeBase string `json:"knowledgeBase"` // 知识库名称
+	KnowledgeId   string `json:"kb_id"`         // 知识库id
+}
+
+type RagKnowledgeGraphResp struct {
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
 }
 
 // RagKnowledgeCreate rag创建知识库
@@ -157,6 +177,16 @@ func RagKnowledgeCreate(ctx context.Context, ragCreateParams *RagCreateParams) e
 		return errors.New(resp.Message)
 	}
 	return nil
+}
+
+// RagCreateKnowledgeReport 创建知识库社区报告
+func RagCreateKnowledgeReport(ctx context.Context, ragImportDocParams *RagImportDocParams) error {
+	ragImportDocParams.MessageType = RagCommunityReport
+	return mq.SendMessage(&RagOperationParams{
+		Operation: "add",
+		Type:      "doc",
+		Doc:       ragImportDocParams,
+	}, config.GetConfig().Kafka.KnowledgeGraphTopic)
 }
 
 // RagKnowledgeUpdate rag更新知识库
@@ -223,7 +253,7 @@ func RagKnowledgeDelete(ctx context.Context, ragDeleteParams *RagDeleteParams) e
 // RagKnowledgeHit rag命中测试
 func RagKnowledgeHit(ctx context.Context, knowledgeHitParams *KnowledgeHitParams) (*RagKnowledgeHitResp, error) {
 	ragServer := config.GetConfig().RagServer
-	url := ragServer.Endpoint + ragServer.KnowledgeHitUri
+	url := ragServer.ProxyPoint + ragServer.KnowledgeHitUri
 	paramsByte, err := json.Marshal(knowledgeHitParams)
 	if err != nil {
 		return nil, err
@@ -303,4 +333,33 @@ func RagBatchUpdateMeta(ctx context.Context, ragUpdateParams *RagBatchUpdateMeta
 		return errors.New(resp.Message)
 	}
 	return nil
+}
+
+// RagKnowledgeGraph rag知识图谱
+func RagKnowledgeGraph(ctx context.Context, knowledgeGraphParams *RagKnowledgeGraphParams) (*RagKnowledgeGraphResp, error) {
+	ragServer := config.GetConfig().RagServer
+	url := ragServer.Endpoint + ragServer.KnowledgeGraphUri
+	paramsByte, err := json.Marshal(knowledgeGraphParams)
+	if err != nil {
+		return nil, err
+	}
+	result, err := http.GetClient().PostJson(ctx, &http_client.HttpRequestParams{
+		Url:        url,
+		Body:       paramsByte,
+		Timeout:    time.Duration(ragServer.Timeout) * time.Second,
+		MonitorKey: "rag_knowledge_graph",
+		LogLevel:   http_client.LogAll,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var resp RagKnowledgeGraphResp
+	if err := json.Unmarshal(result, &resp); err != nil {
+		log.Errorf(err.Error())
+		return nil, err
+	}
+	if resp.Code != successCode {
+		return nil, errors.New(resp.Message)
+	}
+	return &resp, nil
 }

@@ -26,7 +26,7 @@ type IClient interface {
 	DeleteUser(ctx context.Context, userID uint32) *errs.Status
 	UpdateUserAvatar(ctx context.Context, userID uint32, key string) *errs.Status
 
-	ChangeUserStatus(ctx context.Context, userID uint32, status bool) *errs.Status
+	ChangeUserStatus(ctx context.Context, userID, orgID uint32, status bool) *errs.Status
 	UpdateUserPassword(ctx context.Context, userID uint32, pwd, newPwd string) *errs.Status
 	ResetUserPassword(ctx context.Context, userID uint32, pwd string) *errs.Status
 
@@ -40,6 +40,8 @@ type IClient interface {
 	GetOrg(ctx context.Context, orgID uint32) (*orm.OrgInfo, *errs.Status)
 	GetOrgs(ctx context.Context, parentID uint32, name string, offset, limit int32) ([]*orm.OrgInfo, int64, *errs.Status)
 	SelectOrgs(ctx context.Context, userID uint32) ([]orm.IDName, *errs.Status)
+	GetOrgByOrgIDs(ctx context.Context, orgIDs []uint32) ([]orm.IDName, *errs.Status)
+	GetOrgAndSubOrgSelectByUser(ctx context.Context, userID, orgID uint32) ([]orm.IDName, *errs.Status)
 
 	CreateOrg(ctx context.Context, org *model.Org) (uint32, *errs.Status)
 	UpdateOrg(ctx context.Context, org *model.Org) *errs.Status
@@ -76,6 +78,10 @@ type IClient interface {
 	// --- login ---
 
 	Login(ctx context.Context, username, password, language string) (*orm.UserInfo, *orm.Permission, *errs.Status)
+	LoginSendEmailCode(ctx context.Context, email string) *errs.Status
+	LoginByEmail(ctx context.Context, username, password string) (*orm.EmailLoginInfo, *errs.Status)
+	LoginEmailCheck(ctx context.Context, userID uint32, email, code, language string) (*orm.UserInfo, *orm.Permission, *errs.Status)
+	ChangeUserPasswordByEmail(ctx context.Context, userID uint32, OldPassword, NewPassword, email, code, language string) (*orm.UserInfo, *orm.Permission, *errs.Status)
 
 	// --- register ---
 
@@ -87,5 +93,16 @@ type IClient interface {
 	ResetPasswordSendEmailCode(ctx context.Context, email string) *errs.Status
 	ResetPasswordByEmail(ctx context.Context, email, password, code string) *errs.Status
 
+<<<<<<< HEAD
 	GetUserIDByOrgAndName(ctx context.Context, orgID string, name string) (uint32, *errs.Status)
+=======
+	// --- oauth app ---
+
+	CreateOauthApp(ctx context.Context, req *model.OauthApp) *errs.Status
+	DeleteOauthApp(ctx context.Context, clientID string) *errs.Status
+	UpdateOauthApp(ctx context.Context, req *model.OauthApp) *errs.Status
+	GetOauthAppList(ctx context.Context, userID uint32, name string, offset, limit int32) ([]*model.OauthApp, int64, *errs.Status)
+	UpdateOauthAppStatus(ctx context.Context, clientID string, status bool) *errs.Status
+	GetOauthApp(ctx context.Context, clientID string) (*model.OauthApp, *errs.Status)
+>>>>>>> upstream/main
 }

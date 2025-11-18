@@ -8,12 +8,14 @@ import (
 	"github.com/UnicomAI/wanwu/internal/assistant-service/client/orm/sqlopt"
 )
 
-func (c *Client) CreateAssistantMCP(ctx context.Context, assistantId uint32, mcpId string, userId, orgID string) *err_code.Status {
+func (c *Client) CreateAssistantMCP(ctx context.Context, assistantId uint32, mcpId, mcpType, actionName string, userId, orgID string) *err_code.Status {
 	// 检查是否已存在
 	var count int64
 	if err := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(assistantId),
 		sqlopt.WithMCPID(mcpId),
+		sqlopt.WithMCPType(mcpType),
+		sqlopt.WithActionName(actionName),
 	).Apply(c.db.WithContext(ctx)).Model(&model.AssistantMCP{}).
 		Count(&count).Error; err != nil {
 		return toErrStatus("assistant_mcp_create", err.Error())
@@ -24,6 +26,8 @@ func (c *Client) CreateAssistantMCP(ctx context.Context, assistantId uint32, mcp
 	err := c.db.WithContext(ctx).Create(&model.AssistantMCP{
 		AssistantId: assistantId,
 		MCPId:       mcpId,
+		MCPType:     mcpType,
+		ActionName:  actionName,
 		Enable:      true, // 默认开
 		UserId:      userId,
 		OrgId:       orgID,
@@ -34,30 +38,35 @@ func (c *Client) CreateAssistantMCP(ctx context.Context, assistantId uint32, mcp
 	return nil
 }
 
-func (c *Client) DeleteAssistantMCP(ctx context.Context, assistantId uint32, mcpId string) *err_code.Status {
+func (c *Client) DeleteAssistantMCP(ctx context.Context, assistantId uint32, mcpId, mcpType, actionName string) *err_code.Status {
 	if err := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(assistantId),
 		sqlopt.WithMCPID(mcpId),
+		sqlopt.WithMCPType(mcpType),
+		sqlopt.WithActionName(actionName),
 	).Apply(c.db.WithContext(ctx)).Delete(&model.AssistantMCP{}).Error; err != nil {
 		return toErrStatus("assistant_mcp_delete", err.Error())
 	}
 	return nil
 }
 
-func (c *Client) DeleteAssistantMCPByMCPId(ctx context.Context, mcpId string) *err_code.Status {
+func (c *Client) DeleteAssistantMCPByMCPId(ctx context.Context, mcpId, mcpType string) *err_code.Status {
 	if err := sqlopt.SQLOptions(
 		sqlopt.WithMCPID(mcpId),
+		sqlopt.WithMCPType(mcpType),
 	).Apply(c.db.WithContext(ctx)).Delete(&model.AssistantMCP{}).Error; err != nil {
 		return toErrStatus("assistant_mcp_delete", err.Error())
 	}
 	return nil
 }
 
-func (c *Client) GetAssistantMCP(ctx context.Context, assistantId uint32, mcpId string) (*model.AssistantMCP, *err_code.Status) {
+func (c *Client) GetAssistantMCP(ctx context.Context, assistantId uint32, mcpId, mcpType, actionName string) (*model.AssistantMCP, *err_code.Status) {
 	mcp := &model.AssistantMCP{}
 	if err := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(assistantId),
 		sqlopt.WithMCPID(mcpId),
+		sqlopt.WithMCPType(mcpType),
+		sqlopt.WithActionName(actionName),
 	).Apply(c.db.WithContext(ctx)).First(mcp).Error; err != nil {
 		return nil, toErrStatus("assistant_mcp_get", err.Error())
 	}
@@ -76,6 +85,8 @@ func (c *Client) UpdateAssistantMCP(ctx context.Context, mcp *model.AssistantMCP
 	result := sqlopt.SQLOptions(
 		sqlopt.WithAssistantID(mcp.AssistantId),
 		sqlopt.WithMCPID(mcp.MCPId),
+		sqlopt.WithMCPType(mcp.MCPType),
+		sqlopt.WithActionName(mcp.ActionName),
 	).Apply(c.db.WithContext(ctx)).Model(&model.AssistantMCP{}).Updates(map[string]interface{}{
 		"enable": mcp.Enable,
 	})

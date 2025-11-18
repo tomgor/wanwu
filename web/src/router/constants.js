@@ -14,4 +14,7 @@ export const PERMS = {
     WORKFLOW: 'workflow', // 工作流
     AGENT: 'agent', // 智能体
     SAFETY:'safety',//安全护栏
+
+    STATISTIC: 'statistic_client', // 统计看板
+    OAUTH: 'oauth', // oauth
 }

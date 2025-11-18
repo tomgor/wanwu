@@ -16,6 +16,7 @@ service AssistantService {
   rpc AssistantDelete(AssistantDeleteReq) returns (google.protobuf.Empty) {}
   rpc GetAssistantListMyAll(GetAssistantListMyAllReq) returns (AppBriefList) {}
   rpc GetAssistantInfo(GetAssistantInfoReq) returns (AssistantInfo) {}
+  rpc AssistantCopy(AssistantCopyReq) returns (AssistantCreateResp) {}
 
   // --- workFlow ---
   rpc AssistantWorkFlowCreate(AssistantWorkFlowCreateReq) returns (google.protobuf.Empty) {}
@@ -28,22 +29,30 @@ service AssistantService {
   rpc AssistantMCPDelete(AssistantMCPDeleteReq) returns (google.protobuf.Empty) {}
   rpc AssistantMCPEnableSwitch(AssistantMCPEnableSwitchReq) returns (google.protobuf.Empty) {}
   rpc AssistantMCPGetList(AssistantMCPGetListReq) returns (AssistantMCPList) {}
-
-  // --- custom ---
-  rpc AssistantCustomToolCreate(AssistantCustomToolCreateReq) returns (google.protobuf.Empty) {}
-  rpc AssistantCustomToolDelete(AssistantCustomToolDeleteReq) returns (google.protobuf.Empty) {}
   rpc AssistantMCPDeleteByMCPId(AssistantMCPDeleteByMCPIdReq) returns (google.protobuf.Empty) {}
-  rpc AssistantCustomToolEnableSwitch(AssistantCustomToolEnableSwitchReq) returns (google.protobuf.Empty) {}
-  rpc AssistantCustomToolGetList(AssistantCustomToolGetListReq) returns (AssistantCustomToolList) {}
+
+  // --- custom builtin tool ---
+  rpc AssistantToolCreate(AssistantToolCreateReq) returns (google.protobuf.Empty) {}
+  rpc AssistantToolDelete(AssistantToolDeleteReq) returns (google.protobuf.Empty) {}
+  rpc AssistantToolEnableSwitch(AssistantToolEnableSwitchReq) returns (google.protobuf.Empty) {}
+  rpc AssistantToolConfig(AssistantToolConfigReq) returns (google.protobuf.Empty) {}
+  rpc AssistantToolDeleteByToolId(AssistantToolDeleteByToolIdReq) returns (google.protobuf.Empty) {}
 
   // --- conversation ---
   rpc ConversationCreate(ConversationCreateReq) returns (ConversationCreateResp) {}
   rpc ConversationDelete(ConversationDeleteReq) returns (google.protobuf.Empty) {}
-  rpc AssistantCustomToolDeleteByCustomToolId(AssistantCustomToolDeleteByCustomToolIdReq) returns (google.protobuf.Empty) {}
   rpc GetConversationList(GetConversationListReq) returns (GetConversationListResp) {}
   rpc GetConversationDetailList(GetConversationDetailListReq) returns (GetConversationDetailListResp) {}
   rpc AssistantConversionStream(AssistantConversionStreamReq) returns (stream AssistantConversionStreamResp) {}
   rpc ConversationDeleteByAssistantId(ConversationDeleteByAssistantIdReq) returns (google.protobuf.Empty) {}
+
+  // --- custom prompt ---
+  rpc CustomPromptCreate(CustomPromptCreateReq) returns (CustomPromptIDResp) {}
+  rpc CustomPromptDelete(CustomPromptDeleteReq) returns (google.protobuf.Empty) {}
+  rpc CustomPromptUpdate(CustomPromptUpdateReq) returns (google.protobuf.Empty) {}
+  rpc CustomPromptGet(CustomPromptGetReq) returns (CustomPromptInfo) {}
+  rpc CustomPromptGetList(CustomPromptGetListReq) returns (CustomPromptList) {}
+  rpc CustomPromptCopy(CustomPromptCopyReq) returns (CustomPromptIDResp) {}
 }
 
 message AssistantConversionStreamResp {
@@ -87,9 +96,9 @@ message AssistantConfigUpdateReq {
   common.AppModelConfig modelConfig = 5;                  // 模型配置
   AssistantKnowledgeBaseConfig knowledgeBaseConfig = 6;         // 知识库
   common.AppModelConfig rerankConfig = 7;                         // Rerank模型
-  AssistantOnlineSearchConfig onlineSearchConfig = 8;             // 在线搜索配置
   Identity identity = 9;
   AssistantSafetyConfig safetyConfig = 10;
+  AssistantVisionConfig visionConfig = 11;
 }
 
 message AssistantSafetyConfig {
@@ -100,6 +109,11 @@ message AssistantSafetyConfig {
 message SensitiveTable {
   string tableId = 1;
   string tableName = 2;
+}
+
+message AssistantVisionConfig {
+  int32 maxPicNum = 1;
+  int32 picNum = 2;
 }
 
 message AssistantDeleteReq {
@@ -119,13 +133,14 @@ message AssistantKnowledgeBaseConfig {
   float termWeight = 9; // 关键词系数
   bool termWeightEnable = 10; // 关键词系数开关
   repeated AppKnowledgeBase appKnowledgeBaseList = 11;
-
+  bool useGraph = 12;
 }
 
 message AppKnowledgeBase {
   string knowledgeBaseId = 1;
   string knowledgeBaseName = 2;
-  MetaDataFilterParams metaDataFilterParams = 3;
+  int32 graphSwitch = 3; // 知识图谱开关
+  MetaDataFilterParams metaDataFilterParams = 4;
 }
 
 message MetaDataFilterParams {
@@ -162,15 +177,15 @@ message AssistantInfo {
   repeated string recommendQuestion = 6;
   common.AppModelConfig modelConfig = 7;                 // 模型配置
   AssistantKnowledgeBaseConfig knowledgeBaseConfig = 8;  // 知识库
-  common.AppModelConfig rerankConfig = 9;                // Rerank模型  
-  AssistantOnlineSearchConfig onlineSearchConfig = 10;   // 在线搜索配置
+  common.AppModelConfig rerankConfig = 9;                // Rerank模型
   int32 scope = 11;
   repeated AssistantWorkFlowInfos workFlowInfos = 12;
   repeated AssistantMCPInfos mcpInfos = 13;
-  repeated AssistantCustomToolInfos customToolInfos = 14;
-  int64 creatTime = 15;
-  int64 updateTime = 16;
-  AssistantSafetyConfig safetyConfig = 17;
+  repeated AssistantToolInfos toolInfos = 15;
+  int64 creatTime = 16;
+  int64 updateTime = 17;
+  AssistantSafetyConfig safetyConfig = 18;
+  AssistantVisionConfig visionConfig = 19;
 }
 
 
@@ -184,13 +199,18 @@ message AssistantWorkFlowInfos{
 message AssistantMCPInfos{
   string id = 1;
   string mcpId = 2;
-  bool enable = 3;
+  string mcpType = 3;
+  string actionName = 4;
+  bool enable = 5;
 }
 
-message AssistantCustomToolInfos{
+message AssistantToolInfos{
   string id = 1;
-  string customToolId = 2;
-  bool enable = 3;
+  string toolId = 2;
+  string toolType = 3;
+  string actionName = 4;
+  bool enable = 5;
+  string toolConfig = 6;
 }
 
 message GetAssistantInfoReq {
@@ -198,6 +218,10 @@ message GetAssistantInfoReq {
   Identity identity = 2;
 }
 
+message AssistantCopyReq {
+  string assistantId = 1;
+  Identity identity = 2;
+}
 
 message AssistantWorkFlowCreateReq {
   string assistantId = 1;
@@ -222,25 +246,32 @@ message AssistantWorkFlowEnableSwitchReq {
 message AssistantMCPCreateReq {
   string assistantId = 1;
   string mcpId = 2;
-  Identity identity = 3;
+  string mcpType = 3;
+  string actionName = 4;
+  Identity identity = 5;
 }
 
 message AssistantMCPDeleteReq {
   string assistantId = 1;
   string mcpId = 2;
-  Identity identity = 3;
+  string mcpType = 3;
+  string actionName = 4;
+  Identity identity = 5;
 }
 
 message AssistantMCPDeleteByMCPIdReq {
   string mcpId = 1;
-  Identity identity = 2;
+  string mcpType = 2;
+  Identity identity = 3;
 }
 
 message AssistantMCPEnableSwitchReq {
   string assistantId = 1;
   string mcpId = 2;
-  bool enable = 3;
-  Identity identity = 4;
+  string mcpType = 3;
+  string actionName = 4;
+  bool enable = 5;
+  Identity identity = 6;
 }
 
 message AssistantMCPGetListReq {
@@ -263,48 +294,41 @@ message AssistantMCPList {
   repeated AssistantMCPInfo assistantMCPInfos = 1;
 }
 
-message AssistantCustomToolCreateReq {
-  string assistantId = 1;
-  string customToolId = 2;
+message AssistantToolDeleteByToolIdReq {
+  string toolId = 1;
+  string toolType = 2;
   Identity identity = 3;
 }
 
-message AssistantCustomToolDeleteReq {
+message AssistantToolCreateReq {
   string assistantId = 1;
-  string customToolId = 2;
-  Identity identity = 3;
+  string toolId = 2;
+  string toolType = 3;
+  string actionName = 4;
+  Identity identity = 5;
 }
 
-message AssistantCustomToolDeleteByCustomToolIdReq {
-  string customToolId = 1;
-  Identity identity = 2;
+message AssistantToolDeleteReq {
+  string assistantId = 1;
+  string toolId = 2;
+  string toolType = 3;
+  string actionName = 4;
 }
 
-message AssistantCustomToolEnableSwitchReq {
+message AssistantToolEnableSwitchReq {
   string assistantId = 1;
-  string customToolId = 2;
-  bool enable = 3;
+  string toolId = 2;
+  string toolType = 3;
+  string actionName = 4;
+  bool enable = 5;
+  Identity identity = 6;
+}
+
+message AssistantToolConfigReq {
+  string assistantId = 1;
+  string toolId = 2;
+  string toolConfig = 3;
   Identity identity = 4;
-}
-
-message AssistantCustomToolGetListReq {
-  string assistantId = 1;
-  Identity identity = 2;
-}
-
-message AssistantCustomToolInfo {
-  uint32 id = 1;
-  uint32 assistantId = 2;
-  string customToolId = 3;
-  bool enable = 4;
-  string userId = 5;
-  string orgId = 6;
-  int64 createdAt = 7;
-  int64 updatedAt = 8;
-}
-
-message AssistantCustomToolList {
-  repeated AssistantCustomToolInfo assistantCustomToolInfos = 1;
 }
 
 message ConversationCreateReq {
@@ -364,7 +388,7 @@ message ConversionDetailInfo{
   string prompt = 4;
   string sysPrompt = 5;
   string algPrompt = 6;
-  repeated string requestFileUrls = 7;
+  repeated RequestFile requestFiles = 7;
   string response = 8;
   string searchList = 9;
   int32 qaType = 10;
@@ -376,10 +400,16 @@ message ConversionDetailInfo{
   int64 fileSize = 16;
 }
 
+message RequestFile {
+  string FileName = 1;
+  int64 FileSize = 2;
+  string FileUrl = 3;
+}
+
 message AssistantConversionStreamReq {
   string assistantId = 1;
   string conversationId = 2;
-  ConversionStreamFile fileInfo = 3;
+  repeated ConversionStreamFile fileInfo = 3;
   bool trial = 4;
   string prompt = 5;
   Identity identity = 6;
@@ -398,5 +428,61 @@ message ConversationDeleteByAssistantIdReq {
 
 message AssistantWorkFlowDeleteByWorkflowIdReq {
   string workflowId = 1;
+  Identity identity = 2;
+}
+
+message CustomPromptCreateReq {
+  string avatarPath = 1;
+  string name = 2;
+  string desc = 3;
+  string prompt = 4;
+  Identity identity = 5;
+}
+
+message CustomPromptIDResp {
+  string customPromptId = 1;
+}
+
+message CustomPromptDeleteReq {
+  string customPromptId = 1;
+  Identity identity = 2;
+}
+
+message CustomPromptUpdateReq {
+  string customPromptId = 1;
+  string avatarPath = 2;
+  string name = 3;
+  string desc = 4;
+  string prompt = 5;
+  Identity identity = 6;
+}
+
+message CustomPromptGetReq {
+  string customPromptId = 1;
+  Identity identity = 2;
+}
+
+message CustomPromptInfo {
+  string customPromptId = 1;
+  string avatarPath = 2;
+  string name = 3;
+  string desc = 4;
+  string prompt = 5;
+  int64 updatedAt = 6;
+  Identity identity = 7;
+}
+
+message CustomPromptGetListReq {
+  string name = 1;
+  Identity identity = 2;
+}
+
+message CustomPromptList {
+  repeated CustomPromptInfo customPromptInfos = 1;
+  int64 total = 2;
+}
+
+message CustomPromptCopyReq {
+  string customPromptId = 1;
   Identity identity = 2;
 }

@@ -1,9 +1,51 @@
+<<<<<<< HEAD
 import { login, sso, getPermission,getCommonInfo } from '@/api/user'
+=======
+import {login, getPermission, getCommonInfo, login2FA2new, login2FA2exist, login2FA1} from '@/api/user'
+>>>>>>> upstream/main
 import { fetchOrgs } from "@/api/permission/org"
-import { redirectUrl } from "@/utils/util"
+import {jumpOAuth, redirectUrl} from "@/utils/util"
 import { formatPerms } from "@/router/permission"
 import { replaceRouter } from "@/router"
 import router from '@/router/index'
+
+const processLogin = (res, commit, params) => {
+    const orgs = res.data.orgs || []
+    const orgPermission = res.data.orgPermission || {}
+    const orgId = orgPermission.org ? orgPermission.org.id : ''
+    const {isAdmin, isSystem} = orgPermission || {}
+
+    let permission = {}
+    permission.orgPermission = formatPerms(orgPermission.permissions)
+    permission.roles = orgPermission.roles || []
+
+    if (res.code === 0) {
+        commit('setUserInfo', {
+            uid:res.data.uid,
+            userName:res.data.username,
+            orgId,userCategory:
+            res.data.userCategory
+        })
+        commit('setOrgInfo', {orgs})
+        commit('setToken', res.data.token)
+        commit('setPermission', {...permission, isAdmin, isSystem, isUpdatePassword: res.data.isUpdatePassword})
+        //配置导航用户logo和名称以及欢迎文字
+        commit('setCommonInfo', {data: res.data.custom || {}})
+
+        commit('setIs2FA', false)
+
+        if (params.client_id) {
+            // 重定向到OAuth页面
+            jumpOAuth(params)
+            return
+        }
+
+        // 更新权限路由
+        replaceRouter(permission.orgPermission)
+        // 重定向到有权限的页面
+        redirectUrl()
+    }
+}
 
 export const user = {
   namespaced: true,
@@ -11,16 +53,21 @@ export const user = {
       userInfo:{uid: '',userName:'', orgId: ''},
       orgInfo: {orgs: []},
       token: '',
+      is2FA: false,
       permission:{},
       commonInfo:{},
       lang: '',
       defaultIcons: {
         agentIcon: '',
         ragIcon: ''
-      }
+      },
+      userAvatar: ''
   },
 
   mutations: {
+      setUserAvatar(state, userAvatar) {
+        state.userAvatar = userAvatar
+      },
       setDefaultIcons(state, defaultIcons) {
           state.defaultIcons = { ...state.defaultIcons, ...defaultIcons }
       },
@@ -32,6 +79,9 @@ export const user = {
       },
       setToken(state, token) {
           state.token = token
+      },
+      setIs2FA(state, is2FA) {
+          state.is2FA = is2FA
       },
       setLang(state, lang) {
           if (lang.code) {
@@ -54,6 +104,7 @@ export const user = {
       }
   },
   actions: {
+<<<<<<< HEAD
       async LoginIn({ dispatch, commit }, loginInfo) {
           const res = await login(loginInfo)
           await dispatch('fetchUserInfo', {res})
@@ -99,6 +150,28 @@ export const user = {
       async ssoLogin({ dispatch, commit }, loginInfo) { 
         const res = await sso(loginInfo)
         await dispatch('fetchUserInfo', {res, loginInfo})
+=======
+      async LoginIn({ commit }, { loginInfo, params }) {
+          const res = await login(loginInfo)
+          processLogin(res, commit, params)
+      },
+
+      async LoginIn2FA1({ commit }, loginInfo) {
+          const res = await login2FA1(loginInfo)
+          if (res.code === 0) {
+              commit('setToken', res.data.token)
+              return res.data
+          }
+>>>>>>> upstream/main
+      },
+
+      async LoginIn2FA2({ commit }, { loginInfo, params }) {
+          const res = await (
+              "newPassword" in loginInfo && "oldPassword" in loginInfo
+                  ? login2FA2new(loginInfo)
+                  : login2FA2exist(loginInfo)
+          )
+          processLogin(res, commit, params)
       },
 
       // 获取权限
@@ -113,6 +186,7 @@ export const user = {
 
               const permission = {...permissions, isAdmin, isSystem, isUpdatePassword: res.data.isUpdatePassword}
               if (res.code === 0) {
+                  commit('setUserAvatar', res.data.avatar.path)
                   commit('setPermission', permission)
                   if (res.data.language) commit('setLang', res.data.language)
                   replaceRouter(permission.orgPermission || [])
@@ -172,6 +246,9 @@ export const user = {
     },
     defaultIcons(state){
       return state.defaultIcons
+    },
+    userAvatar(state){
+      return state.userAvatar
     }
   }
 }

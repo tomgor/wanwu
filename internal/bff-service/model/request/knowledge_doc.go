@@ -30,8 +30,8 @@ type DocImportReq struct {
 	DocSegment    *DocSegment    `json:"docSegment" validate:"required"`  //文档分段配置
 	DocAnalyzer   []string       `json:"docAnalyzer" validate:"required"` //文档解析类型 text / ocr  / model
 	ParserModelId string         `json:"parserModelId"`                   //模型解析或ocr模型id
-	DocPreprocess []string       `json:"docPreprocess"`                   // 文本预处理规则 replaceSymbols / deleteLinks
-	DocMetaData   []*DocMetaData `json:"docMetaData"`                     // 元数据
+	DocPreprocess []string       `json:"docPreprocess"`                   //文本预处理规则 replaceSymbols / deleteLinks
+	DocMetaData   []*DocMetaData `json:"docMetaData"`                     //元数据
 }
 
 type DocMetaDataReq struct {
@@ -47,16 +47,16 @@ type BatchDocMetaDataReq struct {
 }
 
 type DocInfo struct {
-	DocId   string `json:"docId"`   //文档id
-	DocName string `json:"docName"` //文档名称
-	DocUrl  string `json:"docUrl"`  //文档url
+	DocId   string `json:"docId"`   // 文档id
+	DocName string `json:"docName"` // 文档名称
+	DocUrl  string `json:"docUrl"`  // 文档url
 	DocType string `json:"docType"` // 文档类型
 	DocSize int64  `json:"docSize"` // 文档类型
 }
 
 type DocSegment struct {
-	SegmentMethod  string   `json:"segmentMethod" validate:"required"` //分段方法 0：通用分段；1：父子分段
-	SegmentType    string   `json:"segmentType"`                       //分段方式，只有通用分段必填 0：自动分段；1：自定义分段
+	SegmentMethod  string   `json:"segmentMethod" validate:"required"` // 分段方法 0：通用分段；1：父子分段
+	SegmentType    string   `json:"segmentType"`                       // 分段方式，只有通用分段必填 0：自动分段；1：自定义分段
 	Splitter       []string `json:"splitter"`                          // 分隔符（只有自定义分段必填）
 	MaxSplitter    int      `json:"maxSplitter"`                       // 可分隔最大值（只有自定义分段必填）
 	Overlap        float32  `json:"overlap"`                           // 可重叠值（只有自定义分段必填）
@@ -70,7 +70,8 @@ type QueryKnowledgeReq struct {
 }
 
 type DeleteDocReq struct {
-	DocIdList []string `json:"docIdList"  validate:"required"`
+	DocIdList   []string `json:"docIdList"  validate:"required"`
+	KnowledgeId string   `json:"knowledgeId" form:"knowledgeId" validate:"required"`
 	CommonCheck
 }
 
@@ -130,6 +131,34 @@ type UpdateDocSegmentReq struct {
 type DocChildListReq struct {
 	DocId     string `json:"docId" form:"docId" validate:"required"`
 	ContentId string `json:"contentId"  form:"contentId" validate:"required"`
+	CommonCheck
+}
+
+type CreateDocChildSegmentReq struct {
+	DocId    string   `json:"docId"  validate:"required"`    // 文档id
+	ParentId string   `json:"parentId"  validate:"required"` // 父分段id
+	Content  []string `json:"content"  validate:"required"`  // 分段内容
+	CommonCheck
+}
+
+type UpdateDocChildSegmentReq struct {
+	DocId         string      `json:"docId"  validate:"required"`      // 文档id
+	ParentId      string      `json:"parentId"  validate:"required"`   // 父分段id
+	ParentChunkNo int32       `json:"parentChunkNo"`                   // 父分段序列号
+	ChildChunk    *ChildChunk `json:"childChunk"  validate:"required"` // 子分段序列号列表
+	CommonCheck
+}
+
+type ChildChunk struct {
+	ChildNo int32  `json:"chunkNo"` // 子分段序列号
+	Content string `json:"content"` // 子分段内容
+}
+
+type DeleteDocChildSegmentReq struct {
+	DocId            string  `json:"docId"  validate:"required"`            // 文档id
+	ParentId         string  `json:"parentId"  validate:"required"`         // 父分段id
+	ParentChunkNo    int32   `json:"parentChunkNo"`                         // 父分段序列号
+	ChildChunkNoList []int32 `json:"ChildChunkNoList"  validate:"required"` // 子分段序列号列表
 	CommonCheck
 }
 
@@ -195,6 +224,17 @@ func isValidKey(s string) bool {
 func (c *DocMetaDataReq) Check() error {
 	if len(c.KnowledgeId) == 0 && len(c.DocId) == 0 {
 		return errors.New("knowledgeId and docId can not all empty")
+	}
+	if len(c.MetaDataList) > 0 {
+		for _, meta := range c.MetaDataList {
+			if meta != nil {
+				if len(meta.MetaKey) > 0 {
+					if !isValidKey(meta.MetaKey) {
+						return grpc_util.ErrorStatus(errs.Code_BFFInvalidArg, "非法key")
+					}
+				}
+			}
+		}
 	}
 	return nil
 }

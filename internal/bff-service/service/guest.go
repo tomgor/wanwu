@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"strconv"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	iam_service "github.com/UnicomAI/wanwu/api/proto/iam-service"
@@ -13,7 +12,6 @@ import (
 	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	mid "github.com/UnicomAI/wanwu/pkg/gin-util/mid-wrap"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
-	jwt_util "github.com/UnicomAI/wanwu/pkg/jwt-util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -73,10 +71,13 @@ func GetLogoCustomInfo(ctx *gin.Context, mode string) (response.LogoCustomInfo, 
 			LinkList:      config.Cfg().DocCenter.GetDocs(),
 			Register:      response.CustomRegister{Email: response.CustomEmail{Status: config.Cfg().CustomInfo.RegisterByEmail != 0}},
 			ResetPassword: response.CustomResetPassword{Email: response.CustomEmail{Status: config.Cfg().CustomInfo.ResetPasswordByEmail != 0}},
+			LoginEmail:    response.CustomLoginEmail{Email: response.CustomEmail{Status: config.Cfg().CustomInfo.LoginByEmail != 0}},
 			DefaultIcon: response.CustomDefaultIcon{
 				RagIcon:      config.Cfg().DefaultIcon.RagIcon,
 				AgentIcon:    config.Cfg().DefaultIcon.AgentIcon,
 				WorkflowIcon: config.Cfg().DefaultIcon.WorkflowIcon,
+				PromptIcon:   config.Cfg().DefaultIcon.PromptIcon,
+				ChatflowIcon: config.Cfg().DefaultIcon.ChatflowIcon,
 			},
 		}
 		break
@@ -125,50 +126,6 @@ func GetCaptcha(ctx *gin.Context, key string) (*response.Captcha, error) {
 	return &response.Captcha{
 		Key: key,
 		B64: resp.B64,
-	}, nil
-}
-
-func Login(ctx *gin.Context, login *request.Login, language string) (*response.Login, error) {
-	password, err := decryptPD(login.Password)
-	if err != nil {
-		return nil, fmt.Errorf("decrypt password err: %v", err)
-	}
-	resp, err := iam.Login(ctx.Request.Context(), &iam_service.LoginReq{
-		UserName: login.Username,
-		Password: password,
-		Key:      login.Key,
-		Code:     login.Code,
-		Language: language,
-	})
-	if err != nil {
-		return nil, err
-	}
-	// orgs
-	orgs, err := iam.GetOrgSelect(ctx.Request.Context(), &iam_service.GetOrgSelectReq{UserId: resp.User.GetUserId()})
-	if err != nil {
-		return nil, err
-	}
-	// jwt token
-	claims, token, err := jwt_util.GenerateToken(
-		resp.User.GetUserId(),
-		jwt_util.UserTokenTimeout,
-	)
-	if err != nil {
-		return nil, err
-	}
-	ctx.Set(gin_util.CLAIMS, &claims)
-	// resp
-	return &response.Login{
-		UID:              resp.User.GetUserId(),
-		Username:         resp.User.GetUserName(),
-		Nickname:         resp.User.GetNickName(),
-		Token:            token,
-		ExpiresAt:        claims.StandardClaims.ExpiresAt * 1000, // 超时事件戳毫秒
-		ExpireIn:         strconv.FormatInt(jwt_util.UserTokenTimeout, 10),
-		Orgs:             toOrgIDNames(ctx, orgs.Selects, resp.User.GetUserId() == config.SystemAdminUserID),
-		OrgPermission:    toOrgPermission(ctx, resp.Permission),
-		Language:         getLanguageByCode(resp.User.Language),
-		IsUpdatePassword: resp.Permission.LastUpdatePasswordAt != 0,
 	}, nil
 }
 
@@ -256,6 +213,12 @@ func toPermissions(isAdmin, isSystem bool, perms []*iam_service.Perm) []response
 			if !isSystem && r.Tag == "setting" {
 				continue
 			}
+			if !isSystem && r.Tag == "statistic_client" || config.Cfg().WorkflowTemplate.ServerMode == "remote" {
+				continue
+			}
+			if !isSystem && r.Tag == "oauth" {
+				continue
+			}
 			ret = append(ret, response.Permission{
 				Perm: r.Tag,
 				Name: r.Name,
@@ -265,6 +228,12 @@ func toPermissions(isAdmin, isSystem bool, perms []*iam_service.Perm) []response
 	}
 	for _, r := range routes {
 		if r.Tag == "setting" {
+			continue
+		}
+		if r.Tag == "statistic_client" {
+			continue
+		}
+		if r.Tag == "oauth" {
 			continue
 		}
 		for _, perm := range perms {

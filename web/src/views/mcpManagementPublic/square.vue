@@ -2,7 +2,7 @@
   <div class="page-wrapper mcp-management">
     <div class="common_bg">
       <div class="page-title">
-        <img class="page-title-img" src="@/assets/imgs/mcp_menu.png" alt=""/>
+        <img class="page-title-img" src="@/assets/imgs/mcp_menu.svg" alt=""/>
         <span class="page-title-name">{{ $t('menu.mcp') }}</span>
       </div>
       <div class="mcp-content-box mcp-third">
@@ -20,7 +20,7 @@
                 {{ item.name }}
               </span>
                 </div>
-                <search-input style="margin-right: 2px" placeholder="请输入MCP名称进行搜索" ref="searchInput"
+                <search-input style="margin-right: 2px" :placeholder="$t('tool.square.searchHint')" ref="searchInput"
                               @handleSearch="doGetPublicMcpList"/>
               </div>
 
@@ -33,8 +33,7 @@
                       @click.stop="handleClick(item)"
                   >
                     <div class="card-title">
-                      <img class="card-logo" v-if="item.avatar && item.avatar.path"
-                           :src="basePath + '/user/api/' + item.avatar.path"/>
+                      <img class="card-logo" :src="(item.avatar && item.avatar.path) ? avatarSrc(item.avatar.path) : defaultAvatar" alt=""/>
                       <div class="mcp_detailBox">
                         <span class="mcp_name">{{ item.name }}</span>
                         <span class="mcp_from">
@@ -51,7 +50,7 @@
                 </div>
               </div>
               <div v-else class="empty">
-                <el-empty description="暂无数据"></el-empty>
+                <el-empty :description="$t('common.noData')"></el-empty>
               </div>
             </div>
           </div>
@@ -60,29 +59,30 @@
     </div>
   </div>
 </template>
+
 <script>
 import { getPublicMcpList } from "@/api/mcp"
 import SearchInput from "@/components/searchInput.vue"
+import {avatarSrc} from "@/utils/util";
 export default {
   components: { SearchInput },
   data() {
     return {
-      basePath: this.$basePath,
+      defaultAvatar: require("@/assets/imgs/mcp_active.svg"),
       mcpSquareId: "",
-      category: '全部',
-      menuList: [],
+      category: this.$t('tool.square.all'),
       list: [],
       loading:false,
       typeRadio: 'all',
       typeList: [
-        {name: '全部', key: 'all'},
-        {name: '政务', key: 'gov'},
-        {name: '工业', key: 'industry'},
-        {name: '文教', key: 'edu'},
-        {name: '医疗', key: 'medical'},
-        {name: '数据', key: 'data'},
-        {name: '创作', key: 'create'},
-        {name: '搜索', key: 'search'},
+        {name: this.$t('tool.square.all'), key: 'all'},
+        {name: this.$t('tool.square.gov'), key: 'gov'},
+        {name: this.$t('tool.square.industry'), key: 'industry'},
+        {name: this.$t('tool.square.edu'), key: 'edu'},
+        {name: this.$t('tool.square.medical'), key: 'medical'},
+        {name: this.$t('tool.square.data'), key: 'data'},
+        {name: this.$t('tool.square.creator'), key: 'create'},
+        {name: this.$t('tool.square.search'), key: 'search'},
       ]
     };
   },
@@ -90,6 +90,7 @@ export default {
     this.doGetPublicMcpList()
   },
   methods: {
+    avatarSrc,
     changeTab(key) {
       this.typeRadio = key
       this.$refs.searchInput.value = ''

@@ -119,3 +119,33 @@ func WithToolSquareIDEmpty() SQLOption {
 		return db.Where("tool_square_id = '' or tool_square_id IS NULL")
 	})
 }
+
+func WithToolSquareIDNotEmpty() SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("tool_square_id != '' and tool_square_id IS NOT NULL")
+	})
+}
+
+func WithMcpServerId(mcpServerId string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if mcpServerId != "" {
+			return db.Where("mcp_server_id = ?", mcpServerId)
+		}
+		return db
+	})
+}
+
+func WithMcpServerToolId(mcpServerToolId string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		if mcpServerToolId != "" {
+			return db.Where("mcp_server_tool_id = ?", mcpServerToolId)
+		}
+		return db
+	})
+}
+
+func WithMcpServerIdList(mcpServerIdList []string) SQLOption {
+	return funcSQLOption(func(db *gorm.DB) *gorm.DB {
+		return db.Where("mcp_server_id IN ?", mcpServerIdList)
+	})
+}

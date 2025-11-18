@@ -3,8 +3,10 @@
     <div class="rl">
         <div class="editable-box">
             <div  v-if="fileType === 'image/*'" class="echo-img-box">
-                <el-image class="echo-img" :src="imgUrl" @click="showBigImg(imgUrl)"  :preview-src-list="[imgUrl]"></el-image>
-                <i class="el-icon-close echo-close" @click="clearFile"></i>
+                <div v-for="(file,i) in fileList" class="echo-img-item" :key="'file'+i">
+                    <el-image class="echo-img" :src="file.fileUrl" @click="showBigImg(file.fileUrl)"  :preview-src-list="[file.imgUrl]"></el-image>
+                    <i class="el-icon-close echo-close" @click="clearFile"></i>
+                </div>
             </div>
             <div v-if="fileType === 'audio/*'" class="echo-audio-box">
                 <audio  id="audio" controls>
@@ -19,8 +21,9 @@
                 <img :src="require('@/assets/imgs/fileicon.png')" class="docIcon">
                 <div class="docInfo">
                     <p class="docInfo_name">文件名称：{{fileList[0]['name']}}</p>
-                    <p class="docInfo_size">文件大小：{{fileList[0]['size'] > 1024 ?(fileList[0]['size'] / (1024 * 1024 )).toFixed(2) + ' MB' : fileList[0]['size'] + ' bytes'}}</p>
+                    <p class="docInfo_size">文件大小：{{fileList[0]['size'] > 1024 ?(fileList[0]['size'] / (1024 * 1024 )).toFixed(5) + ' MB' : fileList[0]['size'] + ' bytes'}}</p>
                 </div>
+                <span class="el-icon-loading loading-icon" v-if="fileLoading"></span>
                 <i class="el-icon-close echo-close" @click="clearFile"></i>
             </div>
             <!-- 问答输入框 -->
@@ -30,7 +33,7 @@
                      <img class="upload-icon" :src="require('@/assets/imgs/uploadIcon.png')" @click="preUpload" v-if="type !== 'webChat'"/>
                 </div>
                 <div class="editable-wp-right rl">
-                    <div class="aibase-textarea editable--input" ref="editor"  @blur="onBlur" v-on:input="getPrompt"  @keydown="textareaKeydown($event)" contenteditable="true"></div>
+                    <div class="aibase-textarea editable--input" ref="editor"  @blur="onBlur" v-on:input="getPrompt"  @keydown="textareaKeydown($event)" @dragenter.prevent @dragover.prevent @drop.prevent.stop="handleDrop" contenteditable="true"></div>
                     <span class="editable--placeholder" v-if="!promptValue">{{placeholder}}</span>
                     <i v-if="promptValue" class="el-icon-close editable--close" @click.stop="clearInput"></i>
                     <div class="edtable--wrap">
@@ -45,7 +48,7 @@
         </div>
         <transition name="el-zoom-in-bottom">
             <div class="perfectReminder-item-box" v-show="randomReminderShow">
-                <div class="perfectReminder-item" v-for="(n,i) in randomReminderList" :key='n.id'  :style="`background-color:${colorArr[n.random]}`">
+                <div class="perfectReminder-item" v-for="(n) in randomReminderList" :key='n.id'  :style="`background-color:${colorArr[n.random]}`">
                     <el-popover
                             placement="top-start"
                             width="300"
@@ -66,6 +69,7 @@
 </template>
 
 <script>
+    import commonMixin from '@/mixins/common'
     import uploadDialog from './uploadBatchDialog'
     import { getModelList } from '@/api/cubm';
     import {mapGetters} from 'vuex'
@@ -78,6 +82,7 @@
             isModelDisable:{type:Boolean,default:false},
             type:{type:String}
         },
+        mixins: [commonMixin],
         components:{uploadDialog},
         data(){
             return{
@@ -103,7 +108,9 @@
                 fileList:[],
                 fileUrl:'',
                 imgUrl:'',
-                modelType:''
+                modelType:'',
+                fileLoading:false,
+                isDragging:false
             }
         },
         watch:{
@@ -124,13 +131,60 @@
             }
         },
         computed: {
-            // ...mapGetters('user', ['commonInfo']),
+            ...mapGetters("app", ["maxPicNum"]),
         },
         created(){
             // this.isLink = this.commonInfo.data.useModel.useInternet === 1 ? true : false;
             // this.getModelData()
         },
+        mounted(){
+            // this.$nextTick(() => {
+            // this.$setupDragAndDrop({
+            // containerSelector: '.editable--input',
+            // maxImageFiles: this.maxPicNum,
+            // onFiles: (files) => {
+            //     this.isDragging = true
+            //     this.processFiles(files)
+            //     }
+            // })
+            //  }) 
+        },
         methods:{
+            // 处理文件的方法，提取出来供 handleDrop 和 onFiles 使用
+            processFiles(files) {
+                if (!files || files.length === 0) return
+                
+                const picked = files
+                const fileObjs = picked.map(f => ({
+                    fileName: f.name, name: f.name, size: f.size, type: f.type,
+                    fileUrl: URL.createObjectURL(f), imgUrl: URL.createObjectURL(f)
+                }))
+                const ext = (picked[0].name.split('.').pop() || '').toLowerCase()
+                const mime = picked[0].type
+                let ftype = ''
+                if ((mime && mime.indexOf('image/') === 0) || ['jpg','jpeg','png','gif','webp','bmp','svg'].indexOf(ext) > -1) ftype = 'image/*'
+                else if ((mime && mime.indexOf('audio/') === 0) || ['mp3','wav','ogg'].indexOf(ext) > -1) ftype = 'audio/*'
+                else ftype = 'doc/*'
+                this.fileType = ftype
+                this.fileList = fileObjs
+                this.fileUrl = fileObjs[0].fileUrl
+                this.hasFile = true
+                this.fileLoading = true
+
+            },
+            // 处理拖拽到输入框的文件
+            handleDrop(event) {
+                /* const dt = event.dataTransfer
+                if (!dt || !dt.files) return
+                
+                const fileList = dt.files
+                const files = Array.prototype.slice.call(fileList)
+                if (files.length === 0) return
+                
+                // 调用文件处理方法
+                this.processFiles(files)
+                */
+            },
             linkSearch(){
                 this.isActive = !this.isActive;
             },
@@ -176,11 +230,9 @@
             },
             setFileId(fileIdList){
                 this.fileIdList = fileIdList;
-                // this.fileUrl = fileIdList[0].downloadUrl;
-                this.fileUrl = fileIdList.fileUrl;
-                this.imgUrl = fileIdList.imgUrl;
-
-                let fileType = this.fileUrl.split('.')[this.fileUrl.split('.').length-1]
+                this.fileUrl = this.fileIdList[this.fileIdList.length-1].fileUrl;
+                //this.imgUrl = fileIdList.imgUrl;
+                let fileType =  this.fileIdList[this.fileIdList.length-1]['fileName'].split('.').pop() || '';
                 if(["jpeg", "PNG", "png", "JPG", "jpg"].includes(fileType)){//'bmp','webp'
                     this.fileType = 'image/*'
                 }
@@ -229,7 +281,6 @@
               this.clearInput()
               this.promptValue = data
               this.$refs.editor.innerHTML = data.replaceAll('{','<div class="light-input" contenteditable="true">').replaceAll('}','</div>')
-              //  console.log(data,this.getContentInBraces(data))
               // let matchArr = this.getContentInBraces(data)
             },
             getPrompt(){
@@ -334,17 +385,30 @@
     }
     .editable-box{
         border:1px solid #d3d7dd ;
+        .loading-icon{
+            font-size:18px;
+            color:$color;
+            margin-left:10px;
+        }
         .echo-img-box{
             position: absolute;
-            width: 90px;
-            height: 90px;
-            top:-95px;
+            display:flex;
+            top:-70px;
+            justify-content: flex-start;
+            align-items: center;
+            gap:10px;
+            .echo-img-item{
+                height:60px;
+                width:60px;
+                display:flex;
+            }
             .echo-img{
                 width: 100%;
                 height: 100%;
                 object-fit: contain;
                 background: #ffff;
                 box-shadow: 1px 1px 10px #9b9a9a;
+                border-radius: 4px;
             }
             .echo-close{
                 position: absolute;
@@ -376,11 +440,10 @@
             display:flex;
             justify-content: space-between;
             align-items: center;
-            padding:2px 50px 5px 5px;
+            padding:10px 50px 10px 5px;
             .docIcon{
                 width:30px;
                 height:30px;
-                margin-right:10px;
             }
             .docInfo{
                .docInfo_name{
@@ -429,9 +492,9 @@
                 padding:3px;
                 border-radius: 4px;
                 cursor: pointer;
-                // border: 1px solid #384BF7;
+                // border: 1px solid $color;
                 // color: #fff;
-                // background: #384BF7;
+                // background: $color;
                 // font-size: 13px;
             }
         }

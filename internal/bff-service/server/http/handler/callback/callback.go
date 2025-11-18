@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
+
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/service"
@@ -188,6 +190,25 @@ func UpdateDocStatus(ctx *gin.Context) {
 	gin_util.Response(ctx, nil, err)
 }
 
+// UpdateKnowledgeStatus
+//
+//	@Tags			callback
+//	@Summary		更新知识库状态
+//	@Description	更新知识库状态
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.CallbackUpdateDocStatusReq	true	"更新知识库状态请求参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/api/knowledge/status [post]
+func UpdateKnowledgeStatus(ctx *gin.Context) {
+	var req request.CallbackUpdateKnowledgeStatusReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	err := service.UpdateKnowledgeStatus(ctx, &req)
+	gin_util.Response(ctx, nil, err)
+}
+
 // DocStatusInit
 //
 //	@Tags			callback
@@ -253,4 +274,80 @@ func GetWorkflowList(ctx *gin.Context) {
 	}
 	resp, err := service.GetAppList(ctx, req.UserId, req.OrgId, constant.AppTypeWorkflow)
 	gin_util.Response(ctx, resp, err)
+}
+
+// GetWorkflowCustomTool
+//
+//	@Tags			callback
+//	@Summary		获取自定义工具详情
+//	@Description	获取自定义工具详情
+//	@Accept			json
+//	@Produce		json
+//	@Param			customToolId	query		string	true	"customToolId"
+//	@Success		200				{object}	response.Response{data=response.CustomToolDetail}
+//	@Router			/workflow/tool/custom [get]
+func GetWorkflowCustomTool(ctx *gin.Context) {
+	resp, err := service.GetCustomTool(ctx, "", "", ctx.Query("customToolId"))
+	gin_util.Response(ctx, resp, err)
+}
+
+// GetWorkflowSquareTool
+//
+//	@Tags			callback
+//	@Summary		获取内置工具详情
+//	@Description	获取内置工具详情
+//	@Accept			json
+//	@Produce		json
+//	@Param			toolSquareId	query		string	true	"toolSquareId"
+//	@Param			userID			query		string	true	"用户ID"
+//	@Param			orgID			query		string	true	"组织ID"
+//	@Success		200				{object}	response.Response{data=response.ToolSquareDetail}
+//	@Router			/workflow/tool/square [get]
+func GetWorkflowSquareTool(ctx *gin.Context) {
+	resp, err := service.GetToolSquareDetail(ctx, "", "", ctx.Query("toolSquareId"))
+	gin_util.Response(ctx, resp, err)
+}
+
+// SearchKnowledgeBase
+//
+//	@Tags			callback
+//	@Summary		查询知识库列表（命中测试）
+//	@Description	查询知识库列表（命中测试）
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.RagSearchKnowledgeBaseReq	true	"查询知识库列表请求参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/rag/search-knowledge-base [post]
+func SearchKnowledgeBase(ctx *gin.Context) {
+	var req request.RagSearchKnowledgeBaseReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	resp, httpStatus := service.RagSearchKnowledgeBase(ctx, &req)
+	gin_util.ResponseRawByte(ctx, httpStatus, resp)
+}
+
+// KnowledgeStreamSearch
+//
+//	@Tags			callback
+//	@Summary		知识库流式问答
+//	@Description	知识库流式问答
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		request.RagKnowledgeChatReq	true	"知识库流式问答请求参数"
+//	@Success		200		{object}	response.Response
+//	@Router			/rag/knowledge/stream/search [post]
+func KnowledgeStreamSearch(ctx *gin.Context) {
+	userId := ctx.GetHeader("X-uid")
+	var req request.RagKnowledgeChatReq
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	req.UserId = userId
+	err := service.KnowledgeStreamSearch(ctx, &req)
+	if err != nil {
+		resp, httpStatus := response.CommonRagKnowledgeError(err)
+		gin_util.ResponseRawByte(ctx, httpStatus, resp)
+		return
+	}
 }

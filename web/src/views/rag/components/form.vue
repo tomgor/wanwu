@@ -3,8 +3,18 @@
     <div class="form-header">
       <div class="header-left">
         <span class="el-icon-arrow-left btn" @click="goBack"></span>
-        <span class="header-left-title">文本问答编辑</span>
-        <LinkIcon type="rag" />
+        <!-- <span class="header-left-title">文本问答编辑</span> -->
+        <div class="basicInfo">
+          <div class="img">
+            <img :src="editForm.avatar.path ? `/user/api`+ editForm.avatar.path : '@/assets/imgs/bg-logo.png'"  />
+          </div>
+          <div class="basicInfo-desc">
+            <span class="basicInfo-title">{{editForm.name || '无信息'}}</span>
+            <span class="el-icon-edit-outline editIcon" @click="editAgent"></span>
+            <LinkIcon type="rag" />
+            <p>{{editForm.desc || '无信息'}}</p>
+          </div>
+          </div>
       </div>
       <div class="header-right">
         <div class="header-api">
@@ -13,15 +23,18 @@
         </div>
         <el-button @click="openApiDialog" plain class="apikeyBtn" size="small" >
           <img :src="require('@/assets/imgs/apikey.png')" />
-          API秘钥
+          API密钥
         </el-button>
         <el-button size="small" type="primary" @click="handlePublish" style="padding:13px 12px;">发布<span class="el-icon-arrow-down" style="margin-left:5px;"></span></el-button>
         <div class="popover-operation" v-if="showOperation">
           <div>
-            <el-radio :label="'private'" v-model="scope">私密发布：仅自己可见</el-radio>
+            <el-radio :label="'private'" v-model="scope">私密发布为应用：仅自己可见</el-radio>
           </div>
           <div>
-            <el-radio :label="'public'" v-model="scope">公开发布：组织内可见</el-radio>
+            <el-radio :label="'organization'" v-model="scope">公开发布为应用：组织内可见</el-radio>
+          </div>
+          <div>
+            <el-radio :label="'public'" v-model="scope">公开发布为应用：全局可见</el-radio>
           </div>
           <div class="saveBtn">
             <el-button size="mini" type="primary" @click="savePublish">保 存</el-button>
@@ -31,18 +44,6 @@
     </div>
     <div class="agent_form">
       <div class="drawer-form">
-        <div class="block prompt-box">
-          <div class="basicInfo">
-            <div class="img">
-              <img :src="editForm.avatar.path ? `/user/api`+ editForm.avatar.path : '@/assets/imgs/bg-logo.png'"  />
-            </div>
-            <div class="basicInfo-desc">
-              <span class="basicInfo-title">{{editForm.name || '无信息'}}</span>
-              <span class="el-icon-edit-outline editIcon" @click="editAgent"></span>
-              <p>{{editForm.desc || '无信息'}}</p>
-            </div>
-          </div>
-        </div>
         <div class="model-box">
           <div class="block prompt-box">
             <p class="block-title common-set">
@@ -62,7 +63,6 @@
                 class="cover-input-icon model-select"
                 :disabled="isPublish"
                 :loading="modelLoading"
-                clearable
                 filterable
                 value-key="modelId"
               >
@@ -131,18 +131,23 @@
         </div>
         <div class="block prompt-box safety-box">
             <p class="block-title tool-title">
-            <span>
+            <span class="block-title-text">
               安全护栏配置
               <el-tooltip class="item" effect="dark" content="实时拦截高风险内容的输入和输出，保障内容安全合规。" placement="top">
                   <span class="el-icon-question question-tips"></span>
               </el-tooltip>
             </span>
             <span class="common-add">
-              <span class="el-icon-s-operation"></span>
-              <span class="handleBtn" style="margin-right:10px;" @click="showSafety">配置</span>
+              <span @click="showSafety">
+                <span class="el-icon-s-operation" ></span>
+                <span class="handleBtn" style="margin-right:10px;">配置</span>
+              </span>
               <el-switch v-model="editForm.safetyConfig.enable" :disabled="!(editForm.safetyConfig.tables || []).length"></el-switch>
             </span>
           </p>
+        </div>
+        <div class="block prompt-box safety-box" v-if="showGraphSwitch">
+          <graphSwitch ref="graphSwitch" @graphSwitchchange="graphSwitchchange" :label="'知识图谱'" :graphSwitch="editForm.knowledgeConfig.useGraph"/>
         </div>
       </div>
       <div class="drawer-test">
@@ -194,6 +199,7 @@ import { getRagInfo,updateRagConfig } from "@/api/rag";
 import Chat from "./chat";
 import searchConfig from '@/components/searchConfig.vue';
 import LinkIcon from "@/components/linkIcon.vue";
+import graphSwitch from "@/components/graphSwitch.vue"
 import knowledgeSelect from "@/components/knowledgeSelect.vue"
 export default {
   components: {
@@ -206,7 +212,8 @@ export default {
     setSafety,
     searchConfig,
     knowledgeSelect,
-    metaSet
+    metaSet,
+    graphSwitch
   },
   data() {
     return {
@@ -236,13 +243,14 @@ export default {
         knowledgebases:[],
         knowledgeConfig:{
           keywordPriority: 0.8, //关键词权重
-          matchType: "", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
+          matchType: "mix", //vector（向量检索）、text（文本检索）、mix（混合检索：向量+文本）
           priorityMatch: 1, //权重匹配，只有在混合检索模式下，选择权重设置后，这个才设置为1
           rerankModelId: "", //rerank模型id
           semanticsPriority: 0.2, //语义权重
           topK: 5, //topK 获取最高的几行
           threshold: 0.4, //过滤分数阈值
-          maxHistory:0//最长上下文
+          maxHistory:0,//
+          useGraph:false
         },
         safetyConfig:{
           enable: false,
@@ -269,7 +277,7 @@ export default {
       logoFileList: [],
       debounceTimer:null, //防抖计时器
       isUpdating: false, // 防止重复更新标记
-      isSettingFromDetail: false // 防止详情数据触发更新标记
+      isSettingFromDetail: false, // 防止详情数据触发更新标记
     };
   },
   watch:{
@@ -292,13 +300,18 @@ export default {
           });
           if (changed && !this.isUpdating) {
             const isMixPriorityMatch = newVal['knowledgeConfig']['matchType'] === 'mix' && newVal['knowledgeConfig']['priorityMatch'];
-            if(newVal['modelParams']!== '' &&  newVal['knowledgebases'].length > 0 || (isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
+            if(newVal['modelParams']!== '' || (isMixPriorityMatch && !newVal['knowledgeConfig']['rerankModelId'])){
               this.updateInfo();
             }
           }
       },500)
     },
     deep: true
+    },
+  },
+  computed:{
+      showGraphSwitch() {
+      return this.editForm.knowledgebases && this.editForm.knowledgebases.some(item => item.graphSwitch === 1)
     }
   },
   mounted() {
@@ -320,6 +333,9 @@ export default {
     }
   },
   methods: {
+    graphSwitchchange(val){
+      this.editForm.knowledgeConfig.useGraph = val;
+    },
     submitMeta(){
       const metaData  = this.$refs.metaSet.getMetaData();
       if(this.$refs.metaSet.validateRequiredFields(metaData['metaDataFilterParams']['metaFilterParams'])){
@@ -384,7 +400,18 @@ export default {
             if(knowledgeData && knowledgeData.length > 0){
               this.editForm.knowledgebases = knowledgeData;
             }
-            this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;//需要后端修改
+            if(res.data.knowledgeBaseConfig.config !== null){
+              this.editForm.knowledgeConfig = res.data.knowledgeBaseConfig.config;
+              const {matchType,priorityMatch} = res.data.knowledgeBaseConfig.config
+              if(matchType === ''){
+                this.editForm.knowledgeConfig = {
+                  ...this.editForm.knowledgeConfig,
+                  matchType:'mix',
+                  priorityMatch:1
+                }
+              }
+            }
+            
             this.editForm.knowledgeConfig.rerankModelId = res.data.rerankConfig.modelId;
             // 使用nextTick确保所有数据设置完成后再重置标志位
             this.$nextTick(() => {
@@ -549,7 +576,7 @@ export default {
     margin-top: 4px;
     .model-select-tag {
       background-color: #f0f2ff;
-      color: #384bf7;
+      color: $color;
       border-radius: 4px;
       padding: 2px 8px;
       font-size: 10px;
@@ -564,8 +591,8 @@ export default {
 /deep/{
   .apikeyBtn{
     padding: 12px 10px;
-    border:1px solid #384BF7;
-    color: #384BF7;
+    border:1px solid $btn_bg;
+    color: $btn_bg;
     display:flex;
     align-items: center;
     img{
@@ -622,7 +649,7 @@ export default {
   border-bottom:1px solid #dbdbdb;
   .popover-operation{
     position:absolute;
-    bottom:-100px;
+    bottom:-122px;
     right:20px;
     background:#fff;
     box-shadow: 0px 1px 7px rgba(0, 0, 0, 0.3);
@@ -636,6 +663,8 @@ export default {
     }
   }
   .header-left{
+    display: flex;
+    align-items: center;
     .btn{
       margin-right:10px;
       font-size:18px;
@@ -643,8 +672,44 @@ export default {
     }
     .header-left-title{
       font-size:18px;
-      color: #434C6C;
+      color: $color_title;
       font-weight: bold;
+    }
+    .basicInfo{
+      display: flex;
+      align-items:center;
+      border-radius:8px;
+      padding:10px 0;
+      .img{
+        padding:10px;
+        img{
+          border:1px solid #eee;
+          border-radius:6px;
+          width:32px;
+          height:32px;
+          object-fit: cover;
+        }
+      }
+      .basicInfo-desc{
+        flex:1;
+        .editIcon{
+          cursor: pointer;
+          margin-left: 5px;
+          font-size: 16px;
+          color: #6b7280;
+        }
+      }
+      .basicInfo-title{
+        display:inline-block;
+        font-weight:800;
+        font-size:14px;
+      }
+      p {
+        color: #6b7280;
+        font-size: 12px;
+        margin: 0;
+        line-height: 1.4;
+      }
     }
   }
   .header-right{
@@ -658,7 +723,7 @@ export default {
     border-radius:6px;
     .root-url{
       background-color:#ECEEFE;
-      color:#384BF7;
+      color:$color;
       border:none;
     }
   }
@@ -685,6 +750,7 @@ export default {
     overflow-y: auto;
     display:flex;
     flex-direction: column;
+    margin:10px 0;
     .editIcon{
       font-size: 16px;
       margin-left: 5px;
@@ -729,6 +795,9 @@ export default {
       font-weight: bold;
       display: flex;
       align-items: center;
+      .block-title-text{
+        font-size:15px;
+      }
       .handleBtn{
         cursor: pointer;
       }
@@ -750,33 +819,6 @@ export default {
   /*通用*/
   .block {
     margin-bottom: 24px;
-    .basicInfo{
-      display: flex;
-      align-items:center;
-      background:#F7F8FA;
-      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
-      border-radius:8px;
-      padding:10px 0;
-      margin-top:10px;
-      .img{
-        padding:10px;
-        img{
-          border:1px solid #eee;
-          border-radius:50%;
-          width:60px;
-          height:60px;
-          object-fit: cover;
-        }
-      }
-      .basicInfo-desc{
-        flex:1;
-      }
-      .basicInfo-title{
-        display:inline-block;
-        font-weight:800;
-        font-size:18px;
-      }
-    }
     .block-title {
       line-height: 30px;
       font-size: 15px;
@@ -827,7 +869,7 @@ export default {
       cursor: pointer;
     }
     .operation:hover{
-      color:#384BF7;
+      color:$color;
     }
     .tips {
       display: flex;
@@ -1030,56 +1072,10 @@ export default {
       box-sizing: border-box;
       cursor: pointer;
       .del {
-        color: #384bf7;
+        color: $btn_bg;
         font-size: 16px;
       }
     }
-  }
-}
-.workflow-dialog {
-  height: 700px;
-}
-.workflow-list {
-  height: calc(100% - 60px);
-  overflow: auto;
-  padding: 0 40px;
-  .workflow-item {
-    display: flex;
-    margin: 10px 0;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-    .workflow-item-icon {
-      width: 30px;
-      height: 30px;
-      object-fit: fill;
-    }
-    .workflow-item-info {
-      flex: 6;
-      margin-left: 20px;
-      .info-name {
-        font-size: 16px;
-        color: #111;
-      }
-      .info-desc {
-        margin-top: 10px;
-      }
-    }
-    .workflow-item-bt {
-      flex: 1;
-      margin-top: 7px;
-    }
-  }
-}
-.workflow-modal /deep/.el-dialog__body {
-  max-height: none;
-  padding: 10px 20px 30px 20px;
-}
-.workflow-list-checked {
-  .workflow-item {
-    display: flex;
-    margin: 10px 0;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
   }
 }
 </style>

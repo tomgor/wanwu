@@ -3,6 +3,7 @@ package rag
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
@@ -63,7 +64,7 @@ func (s *Service) ChatRag(req *rag_service.ChatRagReq, stream grpc.ServerStreami
 	}
 
 	//  请求rag
-	buildParams, errk := service.BuildChatConsultParams(req, rag, knowledgeInfoList)
+	buildParams, errk := service.BuildChatConsultParams(req, rag, knowledgeInfoList, knowledgeIds)
 	if errk != nil {
 		log.Errorf("errk = %s", errk.Error())
 		return grpc_util.ErrorStatusWithKey(errs.Code_RagChatErr, "rag_chat_err", errk.Error())
@@ -84,6 +85,11 @@ func (s *Service) ChatRag(req *rag_service.ChatRagReq, stream grpc.ServerStreami
 }
 
 func (s *Service) CreateRag(ctx context.Context, in *rag_service.CreateRagReq) (*rag_service.CreateRagResp, error) {
+	// 检查是否有重名应用
+	rag, _ := s.cli.FetchRagFirstByName(ctx, in.AppBrief.Name, in.Identity.UserId, in.Identity.OrgId)
+	if rag != nil {
+		return nil, grpc_util.ErrorStatus(errs.Code_RagDuplicateName)
+	}
 	ragId := generator.GetGenerator().NewID()
 	err := s.cli.CreateRag(ctx, &model.RagInfo{
 		RagID: ragId,
@@ -104,7 +110,18 @@ func (s *Service) CreateRag(ctx context.Context, in *rag_service.CreateRagReq) (
 }
 
 func (s *Service) UpdateRag(ctx context.Context, in *rag_service.UpdateRagReq) (*emptypb.Empty, error) {
-	if err := s.cli.UpdateRag(ctx, &model.RagInfo{
+	originalRag, err := s.cli.FetchRagFirst(ctx, in.RagId)
+	if err != nil {
+		return nil, errStatus(errs.Code_RagGetErr, err)
+	}
+	if originalRag.BriefConfig.Name != in.AppBrief.Name {
+		// 检查是否有重名应用
+		rag, _ := s.cli.FetchRagFirstByName(ctx, in.AppBrief.Name, in.Identity.UserId, in.Identity.OrgId)
+		if rag != nil {
+			return nil, grpc_util.ErrorStatus(errs.Code_RagDuplicateName)
+		}
+	}
+	if err = s.cli.UpdateRag(ctx, &model.RagInfo{
 		RagID: in.RagId,
 		BriefConfig: model.AppBriefConfig{
 			Name:       in.AppBrief.Name,
@@ -178,6 +195,7 @@ func (s *Service) UpdateRagConfig(ctx context.Context, in *rag_service.UpdateRag
 			TermWeight:        float64(kbGlobalConfig.TermWeight),
 			TermWeightEnable:  kbGlobalConfig.TermWeightEnable,
 			MetaParams:        metaParams,
+			UseGraph:          kbGlobalConfig.UseGraph,
 		},
 		SensitiveConfig: model.SensitiveConfig{
 			Enable:   in.SensitiveConfig.Enable,
@@ -221,4 +239,36 @@ func (s *Service) GetRagByIds(ctx context.Context, in *rag_service.GetRagByIdsRe
 		return nil, errStatus(errs.Code_RagListErr, err)
 	}
 	return ragList, nil
+}
+
+func (s *Service) CopyRag(ctx context.Context, in *rag_service.CopyRagReq) (*rag_service.CreateRagResp, error) {
+	info, err := s.cli.FetchRagFirst(ctx, in.RagId)
+	if err != nil {
+		return nil, errStatus(errs.Code_RagGetErr, err)
+	}
+	index, err := s.cli.FetchRagCopyIndex(ctx, info.BriefConfig.Name, in.Identity.UserId, in.Identity.OrgId)
+	if err != nil {
+		return nil, errStatus(errs.Code_RagGetErr, err)
+	}
+	replicaName := fmt.Sprintf("%s_%d", info.BriefConfig.Name, index)
+	replicaId := generator.GetGenerator().NewID()
+	err = s.cli.CreateRag(ctx, &model.RagInfo{
+		RagID: replicaId,
+		BriefConfig: model.AppBriefConfig{
+			Name:       replicaName,
+			Desc:       info.BriefConfig.Desc,
+			AvatarPath: info.BriefConfig.AvatarPath,
+		},
+		ModelConfig:         info.ModelConfig,
+		RerankConfig:        info.RerankConfig,
+		KnowledgeBaseConfig: info.KnowledgeBaseConfig,
+		SensitiveConfig:     info.SensitiveConfig,
+		PublicModel:         info.PublicModel,
+	})
+	if err != nil {
+		return nil, errStatus(errs.Code_RagCreateErr, err)
+	}
+	return &rag_service.CreateRagResp{
+		RagId: replicaId,
+	}, nil
 }

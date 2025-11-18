@@ -14,7 +14,7 @@ import time
 import re
 import uuid
 import copy
-import hashlib
+
 from easyofd.ofd import OFD
 from ofdparser import OfdParser
 import base64
@@ -39,11 +39,14 @@ from utils import file_utils
 from utils import rerank_utils
 from utils import minio_utils
 from utils import redis_utils
+from utils import graph_utils
+from utils import timing
 import time
 
 from logging_config import setup_logging
 from settings import REPLACE_MINIO_DOWNLOAD_URL
 from settings import USE_POST_FILTER
+from settings import GRAPH_SERVER_URL
 from utils.constant import USER_DATA_PATH
 
 logger_name = 'rag_kb_utils'
@@ -54,22 +57,10 @@ logger.info(logger_name + '---------LOG_FILE：' + repr(app_name))
 user_data_path = Path(USER_DATA_PATH)
 chunk_label_redis_client = redis_utils.get_redis_connection(redis_db=5)
 
-def generate_md5(content_str):
-    # 创建一个md5 hash对象
-    md5_obj = hashlib.md5()
-
-    # 对字符串进行编码，因为md5需要bytes类型的数据
-    md5_obj.update(content_str.encode('utf-8'))
-
-    # 获取十六进制的MD5值
-    md5_value = md5_obj.hexdigest()
-
-    return md5_value
-
 
 # -----------------
 # 初始化知识库
-def init_knowledge_base(user_id, kb_name, kb_id="", embedding_model_id=""):
+def init_knowledge_base(user_id, kb_name, kb_id="", embedding_model_id="", enable_knowledge_graph = False):
     response_info = {'code': 0, "message": "成功"}
     # ----------------1、检测向量库名称是否合法
     kb_is_legal = is_valid_string(user_id + kb_name)
@@ -92,7 +83,10 @@ def init_knowledge_base(user_id, kb_name, kb_id="", embedding_model_id=""):
         response_info['message'] = '已存在相同名字的向量知识库'
         return response_info
     # ----------------2、建立向量库
-    milvus_init_result = milvus_utils.init_knowledge_base(user_id, kb_name, kb_id, embedding_model_id)
+    milvus_init_result = milvus_utils.init_knowledge_base(user_id, kb_name,
+                                                          kb_id = kb_id,
+                                                          embedding_model_id = embedding_model_id,
+                                                          enable_knowledge_graph = enable_knowledge_graph)
     logger.info('向量库初始化结果：')
     logger.info(repr(milvus_init_result))
 
@@ -172,6 +166,19 @@ def del_konwledge_base(user_id, kb_name, kb_id=""):
         response_info['code'] = 1
         response_info['message'] = f'{kb_name},知识库不存在'
         return response_info
+
+     #删除 知识图谱
+    kb_info = milvus_utils.get_kb_info(user_id, kb_name)
+    if "enable_knowledge_graph" in kb_info and kb_info["enable_knowledge_graph"]:
+        try:
+            graph_utils.delete_kb_graph(user_id, kb_name)
+            logger.info(f"知识图谱删除成功, kb_name:{kb_name}")
+            graph_redis_client = redis_utils.get_redis_connection()
+            kb_id = kb_info["id"]
+            redis_utils.delete_graph_vocabulary_set(graph_redis_client, kb_id)
+        except Exception as e:
+            logger.error(f"知识图谱删除失败, error: {repr(e)}")
+
     # --------------1、删除es库 (必须先删除es库，否则会报错)
     del_es_result = es_utils.del_es_kb(user_id, kb_name, kb_id=kb_id)
     logger.info('用户es库删除结果：' + repr(del_es_result))
@@ -235,6 +242,17 @@ def del_knowledge_base_files(user_id, kb_name, file_names, kb_id=""):
             continue
         else:
             success_files.append(file_name)
+
+     #删除 知识图谱
+    kb_info = milvus_utils.get_kb_info(user_id, kb_name)
+    if "enable_knowledge_graph" in kb_info and kb_info["enable_knowledge_graph"]:
+        try:
+            for file_name in success_files:
+                graph_utils.delete_file_from_graph(user_id, kb_name, file_name)
+                logger.info(f"知识图谱删除成功, file_name:{file_name}")
+        except Exception as e:
+            failed_files.append([file_name, f"知识图谱删除文件失败, error: {repr(e)}"])
+            logger.error(f"知识图谱删除失败, file_name:{file_name}, error: {repr(e)}")
 
     # --------------2、路径文档
     for file_name in success_files:
@@ -459,18 +477,6 @@ def manage_kb_metadata(user_id: str, kb_name: str, operation: MetadataOperation,
     return response_info
 
 
-def update_chunk_labels(user_id: str, kb_name: str, file_name: str, chunk_id: str, labels: list[str], kb_id=""):
-    """
-    根据file name和chunk id更新标签
-    """
-    logger.info(f"========= update_chunk_labels start：user_id: {user_id}, kb_name: {kb_name}, kb_id: {kb_id}, "
-                f"file_name: {file_name}, chunk_id: {chunk_id}, labels: {labels}")
-    response_info = milvus_utils.update_chunk_labels(user_id, kb_name, file_name, chunk_id, labels, kb_id=kb_id)
-    logger.info(f"========= update_chunk_labels end：user_id: {user_id}, kb_name: {kb_name}, kb_id: {kb_id}, "
-                f"file_name: {file_name}, chunk_id: {chunk_id}, labels: {labels}")
-
-    return response_info
-
 def update_content_status(user_id: str, kb_name: str, file_name: str, content_id: str, status: bool,
                           on_off_switch=None, kb_id=""):
     """
@@ -486,184 +492,6 @@ def update_content_status(user_id: str, kb_name: str, file_name: str, content_id
         response_info))
     return response_info
 
-
-def batch_add_chunks(user_id: str, kb_name: str, file_name: str, max_sentence_size: int, chunk_infos: list[dict], kb_id=""):
-    """
-    根据file name 新增chunks
-    """
-    logger.info(f"========= batch_add_chunks start：user_id: {user_id}, kb_name: {kb_name}, kb_id: {kb_id}, "
-                f"file_name: {file_name}, max_sentence_size: {max_sentence_size}, chunks: {chunk_infos}")
-
-    chunks = []
-    for item in chunk_infos:
-        chunks.append({
-            "text": item["content"],
-            "labels": item["labels"],
-        })
-
-    response_info = {
-        "code": 1,
-        "message": "",
-        "data": {
-            "success_count": 0
-        }
-    }
-
-    allocate_chunk_result = es_utils.allocate_chunks(user_id, kb_name, file_name, len(chunks), kb_id=kb_id)
-    logger.info(repr(file_name) + '新增分段分配chunk结果：' + repr(allocate_chunk_result))
-    if allocate_chunk_result['code'] != 0:
-        logger.error('新增分段分配chunk失败'+ "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
-        response_info["message"] = allocate_chunk_result["message"]
-        return response_info
-    else:
-        chunk_total_num = allocate_chunk_result["data"]["chunk_total_num"]
-        meta_data = allocate_chunk_result["data"]["meta_data"]
-        current_chunk_num = chunk_total_num - len(chunks) + 1
-        if not kb_id:  # kb_id为空，则根据kb_name获取kb_id
-            kb_id = get_kb_name_id(user_id, kb_name)  # 获取kb_id
-        for chunk in chunks:
-            chunk["meta_data"] = copy.deepcopy(meta_data)
-            chunk["meta_data"]["chunk_current_num"] = current_chunk_num
-            if chunk["labels"]:
-                content_str = kb_id + chunk["text"] + file_name + str(current_chunk_num)
-                content_id = generate_md5(content_str)
-                redis_utils.update_chunk_labels(chunk_label_redis_client, kb_id, file_name, content_id, chunk["labels"])
-            current_chunk_num += 1
-        logger.info('新增分段分配chunk完成'+ "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
-
-    # -------------insert milvus
-    sub_chunk = file_utils.split_doc(chunks, max_sentence_size)
-    logger.info('新增分段插入milvus开始' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
-    insert_milvus_result = milvus_utils.add_milvus(user_id, kb_name, sub_chunk, file_name, "", kb_id=kb_id)
-    logger.info(repr(file_name) + '新增分段添加milvus结果：' + repr(insert_milvus_result))
-    if insert_milvus_result['code'] != 0:
-        logger.error('新增分段插入milvus失败'+ "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
-        response_info["message"] = insert_milvus_result["message"]
-        return response_info
-    else:
-        logger.info('新增分段插入milvus完成'+ "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
-
-    # --------------insert es
-    logger.info('文档插入es开始')
-    insert_es_result = es_utils.add_es(user_id, kb_name, chunks, file_name, kb_id=kb_id)
-    logger.info(repr(file_name) + '添加es结果：' + repr(insert_es_result))
-    if insert_es_result['code'] != 0:
-        logger.error('文档插入es失败' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
-        response_info["message"] = insert_es_result["message"]
-        return response_info
-    else:
-        logger.info('文档插入es完成' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
-
-    logger.info(f"========= batch_add_chunks end：user_id: {user_id}, kb_name: {kb_name}, kb_id: {kb_id}, "
-                f"file_name: {file_name}, max_sentence_size: {max_sentence_size}, chunks: {chunk_infos}")
-
-    response_info["code"] = 0
-    response_info["data"]["success_count"] = len(chunks)
-    return response_info
-
-def update_chunk(user_id: str, kb_name: str, file_name: str, max_sentence_size: int, chunk_info: dict, kb_id=""):
-    """
-    根据file name和chunk信息更新分段
-    """
-    logger.info(f"========= update_chunk start：user_id: {user_id}, kb_name: {kb_name}, kb_id: {kb_id}, "
-                f"file_name: {file_name}, chunk_info: {chunk_info}")
-
-    response_info = {
-        "code": 1,
-        "message": "",
-    }
-
-    old_content_id = chunk_info["chunk_id"]
-    chunk = {
-        "text": chunk_info["content"],
-    }
-
-    content_response = milvus_utils.get_content_by_ids(user_id, kb_name, [old_content_id], kb_id)
-    logger.info(f"content_id: {old_content_id}, 分段信息结果: {content_response}")
-    if content_response['code'] != 0:
-        logger.error(f"获取分段信息失败， user_id: {user_id},kb_name: {kb_name}, file_name: {file_name}, content_id: {old_content_id}")
-        response_info["message"] = content_response["message"]
-        return response_info
-
-    old_content = content_response["data"]["contents"][0]
-    chunk_current_num = old_content["meta_data"]["chunk_current_num"]
-    status = old_content["status"]
-
-    chunk["meta_data"] = copy.deepcopy(old_content["meta_data"])
-    if 'labels' in old_content:
-        chunk['labels'] = old_content['labels']
-
-    if not kb_id:  # kb_id为空，则根据kb_name获取kb_id
-        kb_id = get_kb_name_id(user_id, kb_name)  # 获取kb_id
-    content_str = kb_id + chunk["text"] + file_name + str(chunk_current_num)
-    new_content_id = generate_md5(content_str)
-    if new_content_id != old_content_id:
-        chunks = [chunk]
-
-        # -------------insert milvus
-        sub_chunk = file_utils.split_doc(chunks, max_sentence_size)
-        logger.info('新增分段插入milvus开始' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
-        insert_milvus_result = milvus_utils.add_milvus(user_id, kb_name, sub_chunk, file_name, "", kb_id=kb_id)
-        logger.info(f"file_name: {file_name}, content_id: {new_content_id}, 新增分段添加milvus结果:{insert_milvus_result}")
-        if insert_milvus_result['code'] != 0:
-            logger.error(
-                '新增分段插入milvus失败' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
-            response_info["message"] = insert_milvus_result["message"]
-            #新增数据回滚
-            milvus_utils.batch_delete_chunks(user_id, kb_name, file_name, [new_content_id], kb_id=kb_id)
-            return response_info
-        else:
-            logger.info('新增分段插入milvus完成' + "user_id=%s,kb_name=%s,file_name=%s" % (user_id, kb_name, file_name))
-
-        # --------------insert es
-        logger.info('文档插入es开始')
-        insert_es_result = es_utils.add_es(user_id, kb_name, chunks, file_name, kb_id=kb_id)
-        logger.info(f"file_name: {file_name}, content_id: {new_content_id}, 添加es结果: {insert_es_result}")
-        if insert_es_result['code'] != 0:
-            logger.error(f"文档插入es失败, user_id: {user_id}, kb_name={kb_name}, file_name: {file_name}, content_id: {new_content_id}")
-            response_info["message"] = insert_es_result["message"]
-            # 新增数据回滚
-            milvus_utils.batch_delete_chunks(user_id, kb_name, file_name, [new_content_id], kb_id=kb_id)
-            return response_info
-        else:
-            logger.info(f"文档插入es完成, user_id: {user_id}, kb_name={kb_name}, file_name: {file_name}, content_id: {new_content_id}")
-
-        #----------------update status
-        logger.info('更新分段status开始')
-        update_status_result = milvus_utils.update_milvus_content_status(user_id, kb_name, file_name, new_content_id, status,
-                                                                  on_off_switch=None, kb_id=kb_id)
-        logger.info(f"file_name: {file_name}, content_id: {new_content_id}, 更新分段status: {update_status_result}")
-        if update_status_result['code'] != 0:
-            logger.error(f"更新分段status失败, user_id: {user_id}, kb_name={kb_name}, file_name: {file_name}, content_id: {new_content_id}")
-            response_info["message"] = update_status_result["message"]
-            # 新增数据回滚
-            milvus_utils.batch_delete_chunks(user_id, kb_name, file_name, [new_content_id], kb_id=kb_id)
-            return response_info
-        else:
-            logger.info(f"更新分段status完成, user_id: {user_id}, kb_name: {kb_name}, file_name: {file_name}, content_id: {new_content_id}")
-
-        #清理旧数据
-        milvus_utils.batch_delete_chunks(user_id, kb_name, file_name, [old_content_id], kb_id=kb_id)
-        if "labels" in chunk and chunk["labels"]:
-            redis_utils.update_chunk_labels(chunk_label_redis_client, kb_id, file_name, new_content_id, chunk["labels"])
-    logger.info(f"========= update_chunk end：user_id: {user_id}, kb_name: {kb_name}, kb_id: {kb_id}, "
-                f"file_name: {file_name}, chunk: {chunk}")
-
-    response_info["code"] = 0
-    response_info["message"] = "success"
-    return response_info
-
-def batch_delete_chunks(user_id: str, kb_name: str, file_name: str, chunk_ids: list[str], kb_id=""):
-    """
-    根据file name和chunk ids删除分片chunk
-    """
-    logger.info(f"========= batch_delete_chunks start：user_id: {user_id}, kb_name: {kb_name}, kb_id: {kb_id}, "
-                f"file_name: {file_name}, chunk_ids: {chunk_ids}")
-    response_info = milvus_utils.batch_delete_chunks(user_id, kb_name, file_name, chunk_ids, kb_id=kb_id)
-    logger.info(f"========= batch_delete_chunks end：user_id: {user_id}, kb_name: {kb_name}, kb_id: {kb_id}, "
-                f"file_name: {file_name}, chunk_ids: {chunk_ids}")
-
-    return response_info
 
 def get_kb_name_id(user_id: str, kb_name: str):
     """
@@ -688,10 +516,11 @@ def update_kb_name(user_id: str, old_kb_name: str, new_kb_name: str):
 
 def get_knowledge_based_answer(user_id, kb_names, question, rate, top_k, chunk_conent, chunk_size, return_meta=False,
                                prompt_template='', search_field='content', default_answer='根据已知信息，无法回答您的问题。',
-                               auto_citation=False, retrieve_method = "hybrid_search", kb_ids=[],
-                               filter_file_name_list=[], rerank_model_id='', rerank_mod = "rerank_model",
-                               weights: Optional[dict] | None = None,
-                               term_weight_coefficient=1, metadata_filtering_conditions = []):
+                               auto_citation=False, retrieve_method="hybrid_search", kb_ids=[],
+                               filter_file_name_list=[], rerank_model_id='', rerank_mod="rerank_model",
+                               weights: Optional[dict] | None = None, term_weight_coefficient=1,
+                               metadata_filtering_conditions=[], knowledge_base_info={}, use_graph=False):
+    """ knowledge_base_info: {"user_id1": [{ "kb_id": "","kb_name": ""}, { "kb_id": "","kb_name": ""}]}"""
     try:
         if search_field == 'emc':
             search_field = 'embedding_content'
@@ -705,15 +534,22 @@ def get_knowledge_based_answer(user_id, kb_names, question, rate, top_k, chunk_c
             response_info['data']["prompt"] = question
             response_info['data']["searchList"] = []
             return response_info
-        knowledge_base_info = {user_id: kb_names}
+        if knowledge_base_info:  # 整理格式
+            for user_id, kb_info_list in knowledge_base_info.items():
+                knowledge_base_info[user_id] = [kb_info["kb_name"] for kb_info in kb_info_list]
+        else:
+            knowledge_base_info = {user_id: kb_names}
         milvus_useful_list = []  # 后过滤有效的知识片段
         es_useful_list = []  # 后过滤有效的知识片段
         label_useful_list = []  # 后过滤有效的知识片段
+        graph_search_list = []  # 知识图谱关联增强片段
+        graph_data_list = []  # SPO及社区报告置顶片段
+
         for user_id, kb_names in knowledge_base_info.items():
             if retrieve_method in {"semantic_search", "hybrid_search"}:
                 # 向量召回
                 search_result = milvus_utils.search_milvus(user_id, kb_names, top_k, question, threshold=rate,
-                                                           search_field=search_field, kb_ids=kb_ids,
+                                                           search_field=search_field, kb_ids=[],
                                                            filter_file_name_list=filter_file_name_list,
                                                            metadata_filtering_conditions = metadata_filtering_conditions)
 
@@ -739,8 +575,9 @@ def get_knowledge_based_answer(user_id, kb_names, question, rate, top_k, chunk_c
             if retrieve_method in {"full_text_search", "hybrid_search"}:
                 # es召回
                 es_search_list = []
-                es_search_list = es_utils.search_es(user_id, kb_names, question, top_k, kb_ids=kb_ids,
-                                                    filter_file_name_list=filter_file_name_list, metadata_filtering_conditions = metadata_filtering_conditions)
+                es_search_list = es_utils.search_es(user_id, kb_names, question, top_k, kb_ids=[],
+                                                    filter_file_name_list=filter_file_name_list,
+                                                    metadata_filtering_conditions=metadata_filtering_conditions)
                 logger.info(repr(user_id) + repr(kb_names) + repr(question) + '问题es库查询结果：' + json.dumps(repr(es_search_list), ensure_ascii=False))
                 if retrieve_method == "full_text_search" and search_field == "content":  # 只召回es库
                     tmp_content = []
@@ -769,7 +606,8 @@ def get_knowledge_based_answer(user_id, kb_names, question, rate, top_k, chunk_c
             if label_counts:
                 label_scores = []
                 # label_search_list = []
-                label_search_list = es_utils.search_keyword(user_id, kb_names, label_counts, top_k, metadata_filtering_conditions = metadata_filtering_conditions)
+                label_search_list = es_utils.search_keyword(user_id, kb_names, label_counts, top_k,
+                                                            metadata_filtering_conditions=metadata_filtering_conditions)
             else:
                 label_scores = []
                 label_search_list = []
@@ -814,6 +652,15 @@ def get_knowledge_based_answer(user_id, kb_names, question, rate, top_k, chunk_c
                 es_useful_list.extend(es_search_list)
                 label_useful_list.extend(label_search_list)
 
+            # ========= 图谱召回---增强关联片段以及三元组以及社区报告 start =========
+            if use_graph:  # 如果使用图检索
+                # ======== 将graph检索的结果 和 两路检索的结果进行融合，并重新再过一遍rerank ========
+                temp_graph_search_list, temp_graph_dat_list = graph_utils.get_graph_search_list(user_id, kb_names, question, top_k,
+                                                                             kb_ids=[],
+                                                                             filter_file_name_list=filter_file_name_list)
+                graph_search_list.extend(temp_graph_search_list)  # 直接放进去先
+                graph_data_list.extend(temp_graph_dat_list)  # 直接放进去先
+
         # 多路召回融合
         # reank重排
         if not milvus_useful_list and not es_useful_list:  # 都为空不走重排,直接返回
@@ -829,6 +676,8 @@ def get_knowledge_based_answer(user_id, kb_names, question, rate, top_k, chunk_c
                                                                              milvus_useful_list, es_useful_list, top_k)
         else:
             raise Exception("rerank_mod is not valid")
+
+
         # ========= 标签召回的结果需要置顶到最前面---去重并取topK start =========
         if label_useful_list:
             new_search_list = []
@@ -843,9 +692,10 @@ def get_knowledge_based_answer(user_id, kb_names, question, rate, top_k, chunk_c
                     new_search_list.append(item)
                     new_scores.append(1)
                     tmp_sl_content[item['content_id']] = item['snippet']
+
             for s, x in zip(sorted_scores, sorted_search_list):
                 if x['content_id'] not in tmp_sl_content:
-                    tmp_sl_content.append(x['snippet'])
+                    tmp_sl_content[x['content_id']] = x['snippet']
                     new_search_list.append(x)
                     new_scores.append(s)
 
@@ -858,6 +708,19 @@ def get_knowledge_based_answer(user_id, kb_names, question, rate, top_k, chunk_c
 
         sorted_scores, sorted_search_list, has_child = aggregate_chunks(user_id, sorted_scores, sorted_search_list)
         logger.info(f"aggregate_chunks result, has_child: {has_child}, sorted_scores: {sorted_scores}, sorted_search_list: {sorted_search_list}")
+        # ======= 将SPO及社区报告置顶 start =======
+        if graph_data_list:
+            new_search_list = []
+            new_scores = []
+            for item in graph_data_list:  # 将SPO及社区报告置顶
+                new_search_list.append(item)
+                new_scores.append(1)
+            for s, x in zip(sorted_scores, sorted_search_list):
+                new_search_list.append(x)
+                new_scores.append(s)
+            sorted_search_list = new_search_list[:top_k]
+            sorted_scores = new_scores[:top_k]
+
         rerank_result = rerank_utils.rerank_search(question, sorted_scores, sorted_search_list, rate, return_meta,
                                                    prompt_template, default_answer, auto_citation)
 
@@ -988,6 +851,7 @@ def replace_minio_ip(rerank_result):
 
 
     return rerank_result
+
 
 def convert_office_file(file_path, target_dir, target_format):
     # 检查文件夹是否存在，如果不存在则创建

@@ -12,6 +12,8 @@ export function guid() {
     });
 }
 
+export const getXClientId = () => localStorage.getItem('xClientId')
+
 // 用于登录切组织等找到有权限的第一个菜单路径 (除用模型：用模型为打开的新页面)
 export const fetchPermFirPath = (list = menuList) => {
     if (!list.length) return ''
@@ -30,7 +32,6 @@ export const fetchPermFirPath = (list = menuList) => {
             }
         }
     }
-    console.log(path, list,  '----------------------------fetchPermFirPath')
 
     // 若有权限，跳转左侧菜单第一个有权限的页面；否则跳转 /404
     return {path: path || '/404'}
@@ -60,6 +61,13 @@ export const jumpPermUrl = () => {
     const {path} = fetchPermFirPath()
 
     router.push({path: path || '/404'})
+}
+
+export const jumpOAuth = (params) => {
+    router.push({
+        path: "/oauth",
+        query: params
+    });
 }
 
 export const redirectUrl = () => {
@@ -100,10 +108,10 @@ export function isSub(data){
     return /\【([0-9]{0,2})\^\】/.test(data)
 }
 
-export function parseSub(data){
+export function parseSub(data,index){
     return data.replace(/\【([0-9]{0,2})\^\】/g,(item)=>{
         let result = item.match(/\【([0-9]{0,2})\^\】/)[1]
-        return `<sup class='citation'>${result}</sup>`
+        return `<sup class='citation' data-parents-index='${index}'>${result}</sup>`
     })
 }
 
@@ -154,6 +162,7 @@ export const formatTools = (tools) => {
     return newTools
 }
 
+<<<<<<< HEAD
 export function rawQuery() {
     const [, query = ""] = location.href.split("?");
     if (!query) return {};
@@ -172,3 +181,73 @@ export function rawQuery() {
     });
     return obj;
 }
+=======
+/**
+ * 格式化得分，保留5位小数
+ * @param {number|string} score - 得分值
+ * @returns {string} 格式化后的得分字符串
+ */
+export function formatScore(score) {
+    // 格式化得分，保留5位小数
+    if (typeof score !== 'number') {
+        return '0.00000';
+    }
+    return score.toFixed(5);
+}
+
+export function avatarSrc(path){
+    return basePath + '/user/api/' + path
+}
+
+// 换算单位万/亿/万亿，保留2位小数
+export const formatAmount = (num, returnType = 'string', preserveRange = false) => {
+    const units = i18n.t("statisticsEcharts.units");
+    const isHasDecimal = num.toString().includes('.');
+    let formatNum = num
+    let simplifiedNum = num.toString();
+
+    // 99999以内原样显示
+    if (preserveRange && num < 100000) {
+        if (returnType === 'object') {
+            return {
+                value: simplifiedNum,
+                type: ''
+            };
+        } else {
+            return simplifiedNum;
+        }
+    }
+
+    if (isHasDecimal) {
+        formatNum = Number(num.toString().slice(0, num.toString().indexOf('.')))
+    }
+    // 获取数字的数量级
+    let unitIndex = Math.floor((String(formatNum).length - 1) / 4);
+
+    if (unitIndex > 0) {
+        const unit = units[unitIndex];
+
+        const divisor = Math.pow(10, unitIndex * 4);
+        //缩小相应倍数，并保留2位小数
+        const formattedValue = (num / divisor).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+
+        if (returnType === 'object') {
+            return {
+                value: formattedValue,
+                type: unit
+            };
+        } else {
+            simplifiedNum = formattedValue + unit;
+        }
+    } else if (returnType === 'object') {
+        // 数量级为0时的对象格式返回
+        return {
+            value: simplifiedNum,
+            type: ''
+        };
+    }
+
+    return simplifiedNum;
+}
+
+>>>>>>> upstream/main

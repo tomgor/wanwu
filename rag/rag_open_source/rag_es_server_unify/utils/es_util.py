@@ -455,6 +455,61 @@ def bulk_add_cc_index_data(index_name, kb_name, data):
         logger.error(traceback.format_exc())
         return {"success": False, "uploaded": len(actions), "error": str(e)}
 
+def get_index_update_content_actions(index_name, kb_name, content_id, chunk_current_num, child_chunk_current_num, update_data):
+    """
+    主控表更新
+
+    参数:
+    index_name: 索引名称
+    kb_name: 知识库名称
+    file_name: 文件名
+    update_data: 更新的数据, list
+    chunk_id: 可选，指定特定chunk_id时使用
+    """
+    # 构建查询条件
+    must_conditions = [
+        {"term": {"kb_name": kb_name}},
+        {"term": {"content_id": content_id}},
+        {"term": {"meta_data.chunk_current_num": chunk_current_num}},
+        {"term": {"meta_data.child_chunk_current_num": child_chunk_current_num}}
+    ]
+
+    query = {
+        "query": {
+            "bool": {
+                "must": must_conditions
+            }
+        }
+    }
+
+    scan_kwargs = {
+        "index": index_name,
+        "query": query,
+        "scroll": "1m",
+        "size": 1
+    }
+
+    upsert_data = []
+    for doc in helpers.scan(es, **scan_kwargs):
+        data = {
+            "chunk_id": doc["_source"]["chunk_id"],
+        }
+        data.update(update_data)
+        upsert_data.append(data)
+
+    actions = []
+    for item in upsert_data:
+        doc_id = item["chunk_id"]
+        action = {
+            "_op_type": "update",
+            "_index": index_name,
+            "_id": doc_id,
+            "doc": item
+        }
+        actions.append(action)
+
+    return actions
+
 
 def bulk_add_uk_index_data(index_name, data):
     """(用于userid 的所有 kb_name映射表索引添加数据) 使用 helpers.bulk() 批量上传数据到指定的 Elasticsearch 索引，并返回操作状态"""
@@ -530,6 +585,9 @@ def snippet_bulk_add_index_data(index_name, kb_name, data):
                     content_str = kb_name + item["parent_snippet"] + item["meta_data"]["file_name"] + str(
                         item["meta_data"]["chunk_current_num"])
                     item.pop("parent_snippet")
+                elif "graph_data_text" in item:
+                    content_str = kb_name + item["graph_data_text"] + item["meta_data"]["file_name"] + str(
+                        item["meta_data"]["chunk_current_num"])
                 else:
                     content_str = kb_name + item["snippet"] + item["meta_data"]["file_name"] + str(
                         item["meta_data"]["chunk_current_num"])
@@ -574,8 +632,12 @@ def rescore_bm25_score(index_name, query, search_by="snippet", search_list = [])
             "bool": {
                 "filter": [
                     {
-                        "terms": {
-                            "content_id.keyword": content_ids
+                        "bool": {
+                            "should": [
+                                {"terms": {"content_id": content_ids}},
+                                {"terms": {"content_id.keyword": content_ids}}
+                            ],
+                            "minimum_should_match": 1
                         }
                     }
                 ],
@@ -1381,7 +1443,7 @@ def delete_index(index_name):
     return delete_status
 
 
-def get_cc_file_content_list(index_name: str, kb_name: str, file_name: str, page_size: int, search_after: int):
+def get_file_content_list(index_name: str, kb_name: str, file_name: str, page_size: int, search_after: int):
     """ 获取 主控表中 知识片段的分页展示 """
     # ======== 分页查询参数 =============
     query = {
@@ -1397,6 +1459,15 @@ def get_cc_file_content_list(index_name: str, kb_name: str, file_name: str, page
         "from": search_after,
         "size": page_size,
         "sort": {"meta_data.chunk_current_num": {"order": "asc"}},  # 确保按照文档ID升序排序
+        "_source": {
+            "excludes": [
+                "content_vector",
+                "q_768_content_vector",
+                "q_1024_content_vector",
+                "q_1536_content_vector",
+                "q_2048_content_vector"
+            ]
+        } #查询community report 索引时排除embedding数据
     }
     # 执行查询
     response = es.search(
@@ -1607,6 +1678,77 @@ def delete_chunks_by_content_ids(index_name, kb_name, content_ids):
     return delete_status
 
 
+
+def delete_child_chunks(index_name, kb_name, content_id, chunk_current_num, child_chunk_current_nums):
+    """
+    根据知识库名称和child_chunk_current_nums列表删除子分段
+
+    参数:
+    index_name: 索引名称
+    kb_name: 知识库名称,
+    child_chunk_current_nums: 子段列表
+    """
+    query = {
+        "query": {
+            "bool": {
+                "must": [
+                    {"term": {"kb_name": kb_name}},
+                    {
+                        "bool": {
+                            "should": [
+                                {"term": {"content_id": content_id}},
+                                {"term": {"content_id.keyword": content_id}}   #兼容老索引
+                            ],
+                            "minimum_should_match": 1
+                        }
+                    },
+                    {"term": {"meta_data.chunk_current_num": chunk_current_num}},
+                    {"terms": {"meta_data.child_chunk_current_num": child_chunk_current_nums}}
+                ]
+            }
+        }
+    }
+
+    try:
+        deleted_num = 0
+        scan_kwargs = {
+            "index": index_name,
+            "query": query,
+            "scroll": "1m",
+            "size": 100  # 每次返回的文档数量
+        }
+
+        delete_actions = []
+        for doc in helpers.scan(es, **scan_kwargs):
+            delete_actions.append({
+                "_op_type": "delete",
+                "_index": index_name,
+                "_id": doc['_id']
+            })
+            if len(delete_actions) >= DELETE_BACTH_SIZE:
+                logger.info(f"索引 '{index_name}' kb_name:{kb_name} , 删除文档数量: {deleted_num}")
+                # 使用 bulk API 批量删除
+                res = helpers.bulk(es, delete_actions)
+                deleted_num += res[0]
+                delete_actions = []  # 清空 delete_actions
+        if len(delete_actions) > 0:
+            logger.info(f"索引 '{index_name}' kb_name:{kb_name} , 删除文档数量: {deleted_num}")
+            # 最后的残留 bulk API 也批量删除
+            res = helpers.bulk(es, delete_actions)
+            deleted_num += res[0]
+        es.indices.refresh(index=index_name)
+        delete_status = {
+            "success": True,
+            "deleted": deleted_num
+        }
+    except Exception as e:
+        delete_status = {
+            "success": False,
+            "error": str(e),
+        }
+
+    return delete_status
+
 def add_file(file_index_name, kb_name, file_name, file_meta):
     try:
         file_id = generate_md5(kb_name + file_name)
@@ -1783,6 +1925,90 @@ def allocate_chunk_nums(file_index_name: str, cc_index_name: str, kb_name: str, 
         }
 
 
+
+def allocate_child_chunk_nums(cc_index_name: str, kb_name: str, file_name: str, chunk_id: str, count: int):
+    query = {
+        "query": {
+            "bool": {
+                "must": [
+                    {"term": {"chunk_id": chunk_id}},
+                    {"term": {"file_name": file_name}},
+                    {"term": {"kb_name": kb_name}}
+                ]
+            }
+        }
+    }
+
+    response = es.search(index=cc_index_name, body=query)
+
+    # 如果找到了记录，则使用script原子性地增加chunk_total_num
+    if response['hits']['hits']:
+        doc = response['hits']['hits'][0]
+        doc_id = doc['_id']
+
+        # 使用script原子性地增加child_chunk_total_num
+        script_body = {
+            "script": {
+                "source": """
+                    if (ctx._source.child_chunk_total_num == null) {
+                        ctx._source.child_chunk_total_num = params.count;
+                    } else {
+                        ctx._source.child_chunk_total_num += params.count;
+                    }
+                """,
+                "lang": "painless",
+                "params": {
+                    "count": count
+                }
+            }
+        }
+
+        try:
+            # 执行更新操作，注意 refresh 和 _source 作为参数传递
+            update_response = es.update(
+                index=cc_index_name,
+                id=doc_id,
+                body=script_body,
+                refresh=True,
+                source=True
+            )
+
+            # 获取更新后的值
+            doc_data = (update_response.get("get", {}).get("_source", {}))
+            meta_data = doc_data.get("meta_data", {})
+
+            # 计算起始编号
+            child_chunk_total_num = doc_data.get("child_chunk_total_num", 0)
+            content = doc_data.get("content")
+            response_data = {
+                    "content": content,
+                    "child_chunk_total_num": child_chunk_total_num,
+                    "allocated_count": count,
+                    "file_name": file_name,
+                    "kb_name": kb_name,
+                    "meta_data": meta_data
+                }
+            if "labels" in doc_data:
+                response_data["labels"] = doc_data["labels"]
+
+            return {
+                "code": 0,
+                "message": "",
+                "data": response_data
+            }
+        except Exception as e:
+            logger.error(f"分配child_chunk编号时出错: {e}")
+            return {
+                "code": 1,
+                "message": f"分配child_chunk编号失败: {str(e)}"
+            }
+    else:
+        return {
+            "code": 1,
+            "message": "未找到文件记录"
+        }
+
+
 def update_cc_content_status(index_name, kb_name, file_name, content_id, status, on_off_switch):
     """根据 on_off_switch 或 content_id更新知识库文件片段状态 """
     if on_off_switch in [True, False]:  # 一键启停
@@ -1881,14 +2107,13 @@ def get_child_contents(index_name, kb_name, content_id):
     }
 
 
-def get_cc_contents(index_name, kb_name, content_id_list):
+def get_contents_by_ids(index_name, kb_name, content_id_list):
     """ 获取文本分块状态用于进行检索后过滤。"""
     query = {
         "query": {
             "bool": {
                 "must": [
                     {"term": {"kb_name": kb_name}},
-                    # {"match": {"kb_name": kb_name}},
                     {
                         "bool": {
                             "should": [
@@ -1901,7 +2126,16 @@ def get_cc_contents(index_name, kb_name, content_id_list):
                 ]
             }
         },
-        "size": 500  # 增加返回的条数
+        "size": 500,  # 增加返回的条数
+        "_source": {
+            "excludes": [
+                "content_vector",
+                "q_768_content_vector",
+                "q_1024_content_vector",
+                "q_1536_content_vector",
+                "q_2048_content_vector"
+            ]
+        }  # 查询community report 索引时排除embedding数据
     }
     response = es.search(index=index_name, body=query)
     # 遍历搜索结果，填充列表
@@ -1913,7 +2147,7 @@ def get_cc_contents(index_name, kb_name, content_id_list):
 
 def get_cc_content_status(index_name, kb_name, content_id_list):
     """ 获取文本分块状态用于进行检索后过滤。"""
-    response = get_cc_contents(index_name, kb_name, content_id_list)
+    response = get_contents_by_ids(index_name, kb_name, content_id_list)
     useful_content_id_list = []
     # 遍历搜索结果，填充列表
     for hit in response:
@@ -1934,8 +2168,6 @@ def get_uk_kb_id(userId, kb_name):
                 "must": [
                     {"term": {"userId": userId}},
                     {"term": {"kb_name": kb_name}},
-                    # {"match": {"userId": userId}},
-                    # {"match": {"kb_name": kb_name}},
                 ]
             }
         }
@@ -1962,8 +2194,6 @@ def get_uk_kb_emb_model_id(userId, kb_name):
                 "must": [
                     {"term": {"userId": userId}},
                     {"term": {"kb_name": kb_name}},
-                    # {"match": {"userId": userId}},
-                    # {"match": {"kb_name": kb_name}},
                 ]
             }
         }
@@ -1974,6 +2204,36 @@ def get_uk_kb_emb_model_id(userId, kb_name):
         embedding_model_id = hit['_source']["embedding_model_id"]
     logger.info(f"userId:{userId},kb_name:{kb_name} 对应的 embedding_model_id 为:{embedding_model_id}")
     return embedding_model_id
+
+
+def get_uk_kb_info(userId, kb_name):
+    """ 获取知识库info  """
+    kb_info = {}
+    logger.info(f"userId:{userId},kb_name:{kb_name} ====== get_uk_kb_info")
+    # 查询条件
+    query = {
+        "query": {
+            "bool": {
+                "must": [
+                    {"term": {"userId": userId}},
+                    {"term": {"kb_name": kb_name}},
+                ]
+            }
+        }
+    }
+    response = es.search(index=KBNAME_MAPPING_INDEX, body=query)
+    if len(response["hits"]["hits"]) > 1:
+        raise ValueError("存在多条kb info 记录")
+    for hit in response["hits"]["hits"]:
+        kb_id = hit['_source']["kb_id"]
+        if not kb_id:
+            kb_id = get_maas_kb_id(userId, kb_name)  # 如果没有找到，则从 maas 知识库中获取
+        kb_info["kb_id"] = kb_id
+        kb_info["embedding_model_id"] = hit['_source']["embedding_model_id"]
+        if "enable_graph" in hit['_source']:
+            kb_info["enable_knowledge_graph"] = hit['_source']["enable_graph"]
+    logger.info(f"userId:{userId},kb_name:{kb_name} 对应的 kb_info 为:{kb_info}")
+    return kb_info
 
 
 def update_uk_kb_name(userId, old_kb_name, new_kb_name):

@@ -2,7 +2,7 @@
     <el-dialog
     title="新增敏感词"
     :visible.sync="dialogVisible"
-    width="40%"
+    width="50%"
     :before-close="handleClose">
         <el-form :model="ruleForm" ref="ruleForm"  class="demo-ruleForm">
             <el-form-item 

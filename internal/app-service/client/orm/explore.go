@@ -5,13 +5,15 @@ import (
 	"errors"
 	"time"
 
+	"github.com/UnicomAI/wanwu/pkg/constant"
+
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/app-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/app-service/client/orm/sqlopt"
 	"gorm.io/gorm"
 )
 
-func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appType, searchType string) ([]*ExplorationAppInfo, *errs.Status) {
+func (c *Client) GetExplorationAppList(ctx context.Context, userId, orgId, name, appType, searchType string) ([]*ExplorationAppInfo, *errs.Status) {
 	var apps []*model.App
 	var ret []*ExplorationAppInfo
 	var favoriteApps []*model.AppFavorite
@@ -25,7 +27,7 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 	case "", "all", "private":
 		query := sqlopt.SQLOptions(
 			sqlopt.WithAppType(appType),
-			sqlopt.WithSearchType(userId, searchType),
+			sqlopt.WithSearchType(userId, orgId, searchType),
 		).Apply(c.db.WithContext(ctx))
 		if err := query.Order("id DESC").Find(&apps).Error; err != nil {
 			return nil, toErrStatus("app_explore_apps_get", err.Error())
@@ -64,6 +66,7 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 			return nil, err
 		}
 		for _, app := range favoriteApps {
+			var isValidOrgPublish bool
 			appInfo := &ExplorationAppInfo{
 				UserID:      "",
 				AppId:       app.AppID,
@@ -74,10 +77,17 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 				PublishType: "",
 			}
 			for _, info := range apps {
+				if info.PublishType == constant.AppPublishOrganization && info.OrgID != orgId {
+					isValidOrgPublish = true
+					break
+				}
 				if app.AppID == info.AppID && app.AppType == info.AppType {
 					appInfo.UserID = info.UserID
 					break
 				}
+			}
+			if isValidOrgPublish {
+				continue
 			}
 			ret = append(ret, appInfo)
 		}
@@ -104,6 +114,7 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 			return nil, err
 		}
 		for _, historyApp := range historyApps {
+			var isValidOrgPublish bool
 			appInfo := &ExplorationAppInfo{
 				AppId:      historyApp.AppID,
 				AppType:    historyApp.AppType,
@@ -118,10 +129,17 @@ func (c *Client) GetExplorationAppList(ctx context.Context, userId, name, appTyp
 				}
 			}
 			for _, info := range apps {
+				if info.PublishType == constant.AppPublishOrganization && info.OrgID != orgId {
+					isValidOrgPublish = true
+					break
+				}
 				if historyApp.AppID == info.AppID && historyApp.AppType == info.AppType {
 					appInfo.UserID = info.UserID
 					break
 				}
+			}
+			if isValidOrgPublish {
+				continue
 			}
 			ret = append(ret, appInfo)
 		}

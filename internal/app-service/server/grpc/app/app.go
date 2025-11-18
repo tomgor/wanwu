@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Service) GetExplorationAppList(ctx context.Context, req *app_service.GetExplorationAppListReq) (*app_service.ExplorationAppList, error) {
-	appList, err := s.cli.GetExplorationAppList(ctx, req.UserId, req.Name, req.AppType, req.SearchType)
+	appList, err := s.cli.GetExplorationAppList(ctx, req.UserId, req.OrgId, req.Name, req.AppType, req.SearchType)
 	if err != nil {
 		return nil, errStatus(errs.Code_AppExploration, err)
 	}

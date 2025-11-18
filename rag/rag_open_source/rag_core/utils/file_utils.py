@@ -74,9 +74,9 @@ def split_parent_child_chunks(filepath: str,config: SplitConfig):
                     continue
                 meta_data = {
                     "file_name": file_name,
-                    "child_chunk_current_num": index,
+                    "child_chunk_current_num": index+1,
                     "child_chunk_total_num": len(child_list),
-                    "chunk_current_num": p_index,
+                    "chunk_current_num": p_index+1,
                     "chunk_total_num": len(docs)
                 }
                 sub_chunks.append({
@@ -94,6 +94,46 @@ def split_parent_child_chunks(filepath: str,config: SplitConfig):
                 })
 
     return chunks, sub_chunks
+
+
+def split_child_chunks(chunks: list, child_chunk_config: dict):
+    new_chunks = []
+    sub_chunks = []
+
+    child_sentence_size = max(int(child_chunk_config["chunk_size"]), MIN_SENTENCE_SIZE)
+    child_separators=child_chunk_config["separators"]
+    child_textsplitter = ChineseTextSplitter(
+        chunk_type = "split_by_design",
+        pdf=False,
+        sentence_size=child_sentence_size,
+        separators=child_separators
+    )
+
+    for chunk in chunks:
+        text = chunk["text"][:MAX_SENTENCE_SIZE]
+        if len(text) > 0:
+            child_list = child_textsplitter.split_text(text)
+            for index, child_text in enumerate(child_list):
+                if len(child_text.strip()) > 0:
+                    meta_data = copy.deepcopy(chunk["meta_data"])
+                    meta_data["child_chunk_current_num"] = index
+                    meta_data["child_chunk_total_num"] = len(child_list)
+
+                    sub_chunks.append({
+                        'content': text,
+                        'embedding_content': child_text,
+                        'meta_data': meta_data,
+                        "is_parent": False
+                    })
+
+                    new_chunks.append({
+                        "text": child_text,
+                        "parent_text": text,
+                        'meta_data': meta_data,
+                        "is_parent": False
+                    })
+
+    return new_chunks, sub_chunks
 
 
 def split_chunks(filepath: str,config: SplitConfig):

@@ -1,7 +1,9 @@
 package service
 
 import (
+	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"image"
 	"io"
@@ -14,13 +16,16 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/UnicomAI/wanwu/api/proto/common"
 	err_code "github.com/UnicomAI/wanwu/api/proto/err-code"
 	iam_service "github.com/UnicomAI/wanwu/api/proto/iam-service"
+	mcp_service "github.com/UnicomAI/wanwu/api/proto/mcp-service"
 	"github.com/UnicomAI/wanwu/internal/bff-service/config"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 	"github.com/UnicomAI/wanwu/internal/bff-service/model/response"
 	"github.com/UnicomAI/wanwu/internal/bff-service/pkg/imaging"
 	"github.com/UnicomAI/wanwu/pkg/constant"
+	gin_util "github.com/UnicomAI/wanwu/pkg/gin-util"
 	grpc_util "github.com/UnicomAI/wanwu/pkg/grpc-util"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/minio"
@@ -190,10 +195,105 @@ func cacheUserAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
 	return CacheAvatar(ctx, avatarObjectPath, true)
 }
 
-// cacheWorkflowAvatar 将avatar http请求地址转为前端统一访问的格式，同时在本地缓存avatar
-// 例如 http://api/static/abc/def.jpg => /v1/static/avatar/abc/def.png
-func cacheWorkflowAvatar(avatarURL string) request.Avatar {
+// tool builtin & custom
+func cacheToolAvatar(ctx *gin.Context, toolType string, avatarObjectPath string) request.Avatar {
 	avatar := request.Avatar{}
+	switch toolType {
+	case constant.ToolTypeCustom:
+		if avatarObjectPath == "" {
+			avatar.Path = config.Cfg().DefaultIcon.ToolIcon
+			return avatar
+		}
+		return CacheAvatar(ctx, avatarObjectPath, true)
+	case constant.ToolTypeBuiltIn:
+		return cacheMCPServiceAvatar(ctx, avatarObjectPath)
+	}
+	return avatar
+}
+
+// mcp square & custom
+func cacheMCPAvatar(ctx *gin.Context, squareObjectPath, customObjectPath string) request.Avatar {
+	if squareObjectPath == "" {
+		avatar := request.Avatar{}
+		if customObjectPath == "" {
+			avatar.Path = config.Cfg().DefaultIcon.McpCustomIcon
+			return avatar
+		}
+		return CacheAvatar(ctx, customObjectPath, true)
+	}
+	return cacheMCPServiceAvatar(ctx, squareObjectPath)
+}
+
+// mcp server
+func cacheMCPServerAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
+	avatar := request.Avatar{}
+	if avatarObjectPath == "" {
+		avatar.Path = config.Cfg().DefaultIcon.McpServerIcon
+		return avatar
+	}
+	return CacheAvatar(ctx, avatarObjectPath, true)
+}
+
+// 用于缓存 内置工具、MCP广场 的图片（来源于mcp-service）
+func cacheMCPServiceAvatar(ctx *gin.Context, avatarPath string) request.Avatar {
+	avatar := request.Avatar{}
+	if avatarPath == "" {
+		return avatar
+	}
+	avatarCacheMu.Lock()
+	defer avatarCacheMu.Unlock()
+
+	filePath := filepath.Join(mcpAvatarCacheLocalDir, avatarPath)
+
+	_, err := os.Stat(filePath)
+	// 1 文件存在
+	if err == nil {
+		avatar.Path = filepath.Join("/v1", filePath)
+		return avatar
+	}
+	// 2 系统错误
+	if !os.IsNotExist(err) {
+		log.Errorf("cache mcp avatar %v check %v exist err: %v", avatarPath, filePath, err)
+		return avatar
+	}
+	// 3. 文件不存在
+	// 3.1 创建目录
+	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+		log.Errorf("cache mcp avatar %v mkdir %v err: %v", avatarPath, filepath.Dir(filePath))
+		return avatar
+	}
+	// 3.2 下载文件
+	resp, err := mcp.GetMCPAvatar(ctx.Request.Context(), &mcp_service.GetMCPAvatarReq{AvatarPath: avatarPath})
+	if err != nil {
+		log.Errorf("cache mcp avatar %v download err: %v", avatarPath, err)
+		return avatar
+	}
+	// 3.3 写入文件
+	if err := os.WriteFile(filePath, resp.Data, 0644); err != nil {
+		log.Errorf("cache mcp avatar %v write file %v err: %v", avatarPath, filePath, err)
+		return avatar
+	}
+	avatar.Path = filepath.Join("/v1", filePath)
+	return avatar
+}
+
+// cacheWorkflowAvatar 将avatar http请求地址转为前端统一访问的格式，同时在本地缓存avatar
+// 例如 http://IP:port/api/static/abc/def.jpg => /v1/static/avatar/abc/def.png
+func cacheWorkflowAvatar(avatarURL, appType string) request.Avatar {
+	avatar := request.Avatar{}
+	switch appType {
+	case constant.AppTypeWorkflow:
+		if avatarURL == "" {
+			avatar.Path = config.Cfg().DefaultIcon.WorkflowIcon
+			return avatar
+		}
+	case constant.AppTypeChatflow:
+		if avatarURL == "" {
+			avatar.Path = config.Cfg().DefaultIcon.ChatflowIcon
+			return avatar
+		}
+	}
+
 	avatarCacheMu.Lock()
 	defer avatarCacheMu.Unlock()
 
@@ -236,7 +336,7 @@ func cacheWorkflowAvatar(avatarURL string) request.Avatar {
 			newAvatarURL += "?" + parsedURL.RawQuery
 		}
 	} else {
-		// 直接使用原始URL（如 http:localhost:8081/api/static/icon/icon-HTTP.png）
+		// 直接使用原始URL（如 http://localhost:8081/api/static/icon/icon-HTTP.png）
 		newAvatarURL = avatarURL
 	}
 	// 从HTTP URL下载文件
@@ -274,6 +374,15 @@ func cacheWorkflowAvatar(avatarURL string) request.Avatar {
 	}
 	avatar.Path = filepath.Join("/v1", filePath)
 	return avatar
+}
+
+func cachePromptAvatar(ctx *gin.Context, avatarObjectPath string) request.Avatar {
+	avatar := request.Avatar{}
+	if avatarObjectPath == "" {
+		avatar.Path = config.Cfg().DefaultIcon.PromptIcon
+		return avatar
+	}
+	return CacheAvatar(ctx, avatarObjectPath, true)
 }
 
 // resizeImage 压缩图像
@@ -322,4 +431,69 @@ func calculateResizeParameters(originalWidth, originalHeight, maxSize int) (int,
 		newHeight = 1
 	}
 	return newWidth, newHeight
+}
+
+func convertStatisticChart(ctx *gin.Context, pbChart *common.StatisticChart) response.StatisticChart {
+	if pbChart == nil {
+		return response.StatisticChart{}
+	}
+	respChart := response.StatisticChart{
+		TableName: gin_util.I18nKey(ctx, pbChart.TableName),
+		Lines:     make([]response.StatisticChartLine, 0, len(pbChart.ChartLines)),
+	}
+	for _, pbLine := range pbChart.ChartLines {
+		goLine := response.StatisticChartLine{
+			LineName: gin_util.I18nKey(ctx, pbLine.LineName),
+			Items:    make([]response.StatisticChartLineItem, 0, len(pbLine.Items)),
+		}
+
+		for _, pbItem := range pbLine.Items {
+			goLine.Items = append(goLine.Items, response.StatisticChartLineItem{
+				Key:   pbItem.Key,
+				Value: pbItem.Value,
+			})
+		}
+		respChart.Lines = append(respChart.Lines, goLine)
+	}
+	return respChart
+}
+
+func writeSSE(ctx *gin.Context, resp *http.Response) error {
+	// 设置 SSE 响应头
+	ctx.Header("Content-Type", "text/event-stream")
+	ctx.Header("Cache-Control", "no-cache")
+	ctx.Header("Connection", "keep-alive")
+	ctx.Header("Access-Control-Allow-Origin", "*")
+	ctx.Header("X-Accel-Buffering", "no") // 针对 Nginx 代理
+
+	// 使用固定缓冲区读取
+	buffer := make([]byte, 8192) // 8KB 缓冲区
+	reader := bufio.NewReader(resp.Body)
+
+	for {
+		select {
+		case <-ctx.Done():
+			// 客户端断开连接
+			return errors.New("writeSSE: ctx canceled")
+		default:
+			n, err := reader.Read(buffer)
+
+			if n > 0 {
+				if _, err := ctx.Writer.Write(buffer[:n]); err != nil {
+					// 客户端可能已断开
+					log.Errorf("writeSSE write err: %v", err)
+					return err
+				}
+				ctx.Writer.Flush()
+			}
+
+			if err != nil {
+				if err == io.EOF {
+					return nil // 正常结束
+				}
+				log.Errorf("writeSSE read err: %v", err)
+				return err
+			}
+		}
+	}
 }

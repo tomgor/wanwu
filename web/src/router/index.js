@@ -10,9 +10,14 @@ VueRouter.prototype.push = function(location){
 
 Vue.use(VueRouter)
 
-const orgPermission = localStorage.getItem('access_cert')
-    ? JSON.parse(localStorage.getItem('access_cert')).user.permission.orgPermission
-    : []
+let orgPermission = []
+
+try{
+    orgPermission = JSON.parse(localStorage.getItem('access_cert')).user.permission.orgPermission || []
+}catch(e){
+    // console.log(e)
+    orgPermission = []
+}
 
 const constantRoutes = [
     {
@@ -42,6 +47,15 @@ const constantRoutes = [
         path: '/webChat/:id',
         component:resolve =>require(['@/views/agent'],resolve),
     },
+    /* 暂时去掉模板广场公网的链接 */
+    /*{
+        path: '/public/templateSquare',
+        component:resolve =>require(['@/views/templateSquare'],resolve),
+    },
+    {
+        path: '/public/templateSquare/detail',
+        component: resolve => require(['@/views/templateSquare/tempDetail.vue'],resolve),
+    },*/
     {
         path: '/portal',
         name: 'portal',
@@ -76,8 +90,19 @@ const constantRoutes = [
                 meta:{perm: [PERMS.TOOL]},
             },
             {
-                path: '/tool/detail/:type',
-                component:resolve =>require(['@/views/tool/toolDetail'],resolve),
+                path: '/tool/detail/builtIn',
+                component:resolve =>require(['@/views/tool/tool/builtIn/detail'],resolve),
+                meta:{perm: [PERMS.TOOL]},
+            },
+            {
+                path: '/tool/detail/custom',
+                component:resolve =>require(['@/views/mcpManagementPublic/detail'],resolve),
+                meta:{perm: [PERMS.TOOL]},
+                props: { type: 'custom' }
+            },
+            {
+                path: '/tool/detail/server',
+                component:resolve =>require(['@/views/tool/mcp/server/detail'],resolve),
                 meta:{perm: [PERMS.TOOL]},
             },
             {
@@ -86,13 +111,14 @@ const constantRoutes = [
                 meta:{perm: [PERMS.MCP]},
             },
             {
-                path: '/mcp/detail/:type',
+                path: '/mcp/detail/square',
                 component:resolve =>require(['@/views/mcpManagementPublic/detail'],resolve),
                 meta:{perm: [PERMS.MCP]},
+                props: { type: 'square' }
             },
             {
                 path: '/explore',
-                component:resolve =>require(['@/views/ExploreSquare'],resolve),
+                component:resolve =>require(['@/views/exploreSquare'],resolve),
                 meta:{perm: [PERMS.EXPLORE]},
             },
             {
@@ -167,6 +193,16 @@ const constantRoutes = [
                 meta:{perm: [PERMS.KNOWLEDGE]},
             },
             {
+                path: '/knowledge/communityReport',
+                component:resolve =>require(['@/views/knowledge/component/communityReport'],resolve),
+                meta:{perm: [PERMS.KNOWLEDGE]},
+            },
+            {
+                path: '/knowledge/graphMap/:id',
+                component:resolve =>require(['@/views/knowledge/component/graph'],resolve),
+                meta:{perm: [PERMS.KNOWLEDGE]},
+            },
+            {
                 path:'/safety',
                 component:resolve =>require(['@/views/safety'],resolve),
                 meta:{perm: [PERMS.SAFETY]},
@@ -190,6 +226,14 @@ const constantRoutes = [
                 path:'/rag/publishSet',
                 component:resolve =>require(['@/views/agent/web-URL'],resolve),
                 meta:{perm: [PERMS.RAG]},
+            },
+            {
+                path: '/templateSquare',
+                component:resolve =>require(['@/views/templateSquare'],resolve),
+            },
+            {
+                path: '/templateSquare/detail',
+                component: resolve => require(['@/views/templateSquare/tempDetail.vue'],resolve),
             },
             {
                 path: '/userCenter/*',
@@ -223,6 +267,10 @@ const constantRoutes = [
     {
         path: '/reset',
         component: () => import('@/views/auth/reset'),
+    },
+    {
+        path: '/oauth',
+        component: () => import('@/views/auth/oauth'),
     },
     {
         path: '/:catchAll(.*)',

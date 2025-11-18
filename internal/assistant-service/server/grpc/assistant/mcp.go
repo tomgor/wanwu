@@ -13,7 +13,7 @@ import (
 func (s *Service) AssistantMCPCreate(ctx context.Context, req *assistant_service.AssistantMCPCreateReq) (*emptypb.Empty, error) {
 	assistantId := util.MustU32(req.AssistantId)
 
-	if status := s.cli.CreateAssistantMCP(ctx, assistantId, req.McpId, req.Identity.UserId, req.Identity.OrgId); status != nil {
+	if status := s.cli.CreateAssistantMCP(ctx, assistantId, req.McpId, req.McpType, req.ActionName, req.Identity.UserId, req.Identity.OrgId); status != nil {
 		return nil, errStatus(errs.Code_AssistantMCPErr, status)
 	}
 
@@ -24,7 +24,7 @@ func (s *Service) AssistantMCPCreate(ctx context.Context, req *assistant_service
 func (s *Service) AssistantMCPDelete(ctx context.Context, req *assistant_service.AssistantMCPDeleteReq) (*emptypb.Empty, error) {
 	assistantId := util.MustU32(req.AssistantId)
 
-	if status := s.cli.DeleteAssistantMCP(ctx, assistantId, req.McpId); status != nil {
+	if status := s.cli.DeleteAssistantMCP(ctx, assistantId, req.McpId, req.McpType, req.ActionName); status != nil {
 		return nil, errStatus(errs.Code_AssistantMCPErr, status)
 	}
 	return &emptypb.Empty{}, nil
@@ -32,7 +32,7 @@ func (s *Service) AssistantMCPDelete(ctx context.Context, req *assistant_service
 
 // AssistantMCPDeleteByMCPId 删除mcp
 func (s *Service) AssistantMCPDeleteByMCPId(ctx context.Context, req *assistant_service.AssistantMCPDeleteByMCPIdReq) (*emptypb.Empty, error) {
-	if status := s.cli.DeleteAssistantMCPByMCPId(ctx, req.McpId); status != nil {
+	if status := s.cli.DeleteAssistantMCPByMCPId(ctx, req.McpId, req.McpType); status != nil {
 		return nil, errStatus(errs.Code_AssistantMCPErr, status)
 	}
 	return &emptypb.Empty{}, nil
@@ -42,7 +42,7 @@ func (s *Service) AssistantMCPDeleteByMCPId(ctx context.Context, req *assistant_
 func (s *Service) AssistantMCPEnableSwitch(ctx context.Context, req *assistant_service.AssistantMCPEnableSwitchReq) (*emptypb.Empty, error) {
 	assistantId := util.MustU32(req.AssistantId)
 
-	existingMCP, status := s.cli.GetAssistantMCP(ctx, assistantId, req.McpId)
+	existingMCP, status := s.cli.GetAssistantMCP(ctx, assistantId, req.McpId, req.McpType, req.ActionName)
 	if status != nil {
 		return nil, errStatus(errs.Code_AssistantMCPErr, status)
 	}

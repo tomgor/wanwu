@@ -16,7 +16,7 @@ type IClient interface {
 	GetApiKeyByKey(ctx context.Context, apiKey string) (*model.ApiKey, *err_code.Status)
 
 	// --- explore ---
-	GetExplorationAppList(ctx context.Context, userId, name, appType, searchType string) ([]*orm.ExplorationAppInfo, *err_code.Status)
+	GetExplorationAppList(ctx context.Context, userId, orgId, name, appType, searchType string) ([]*orm.ExplorationAppInfo, *err_code.Status)
 	ChangeExplorationAppFavorite(ctx context.Context, userId, orgId, appId, appType string, isFavorite bool) *err_code.Status
 
 	// --- app ---

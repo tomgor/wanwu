@@ -78,7 +78,7 @@ func (c *Client) UpdateSensitiveWordTableReply(ctx context.Context, tableId uint
 		Updates(map[string]interface{}{
 			"reply":   reply,
 			"version": getSensitiveTableVersion(),
-		}).Update("reply", reply).Error; err != nil {
+		}).Error; err != nil {
 		return toErrStatus("app_safety_sensitive_table_reply_update", util.Int2Str(tableId), err.Error())
 	}
 	return nil

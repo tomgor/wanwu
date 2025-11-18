@@ -65,6 +65,7 @@ type AppKnowledgebaseConfig struct {
 type AppKnowledgeBase struct {
 	ID                   string                `json:"id" validate:"required"` // 知识库id
 	Name                 string                `json:"name"`
+	GraphSwitch          int32                 `json:"graphSwitch"` // 知识图谱开关
 	MetaDataFilterParams *MetaDataFilterParams `json:"metaDataFilterParams"`
 }
 
@@ -79,6 +80,7 @@ type AppKnowledgebaseParams struct {
 	KeywordPriority   float32 `json:"keywordPriority"`   // 关键词权重
 	TermWeight        float32 `json:"termWeight"`        // 关键词系数，默认为1
 	TermWeightEnable  bool    `json:"termWeightEnable"`  // 关键词系数开关
+	UseGraph          bool    `json:"useGraph"`          // 知识图谱开关
 }
 
 type MetaDataFilterParams struct {
@@ -102,4 +104,8 @@ type AppSafetyConfig struct {
 type SensitiveTable struct {
 	TableId   string `json:"tableId" validate:"required"` // 敏感词表id
 	TableName string `json:"tableName"`                   // 敏感词表名称(请求非必填)
+}
+
+type VisionConfig struct {
+	PicNum int32 `json:"picNum"` // 视觉配置图片数量
 }

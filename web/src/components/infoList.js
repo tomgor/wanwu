@@ -37,6 +37,7 @@ export default {
       const table = await this.listApi(params)
       const key =  resKey || 'list'
       const list = table.data ? (table.data[key] || []) : []
+      const tableInfo = table.data ? (table.data || {}) : {}
 
       if (table.code === 0) {
         this.tableData = list;
@@ -45,7 +46,7 @@ export default {
         this.pageSize = table.data.pageSize * 1;
       }
       this.justifyIsLastNo(list ? list.length : 0, params.pageNo)
-      this.$emit('refreshData', this.tableData)
+      this.$emit('refreshData', this.tableData,tableInfo)
       return this.tableData
     }
   }

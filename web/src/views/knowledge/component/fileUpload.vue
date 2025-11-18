@@ -155,7 +155,7 @@
                     :disable-transitions="false"
                     class="splitterTag"
                   >
-                    {{tag.splitterName}}
+                    {{tag.splitterName.replace(/\n/g, '\\n')}}
                   </el-tag>
                   <el-button
                     class="button-new-tag"
@@ -195,12 +195,12 @@
                 >
                   <el-input
                     :min="0"
-                    :max="1"
+                    :max="0.25"
                     :step="0.01"
                     type="number" 
                     v-model.number="ruleForm.docSegment.overlap" 
-                    placeholder="数值范围0-1" 
-                    @change="overlapChange"></el-input>
+                    placeholder="数值范围0-0.25" 
+                    ></el-input>
                 </el-form-item>
               </template>
               <template v-if="this.ruleForm.docSegment.segmentMethod === '1'">
@@ -231,7 +231,7 @@
                       :disable-transitions="false"
                       class="splitterTag"
                     >
-                      {{tag.splitterName}}
+                      {{tag.splitterName.replace(/\n/g, '\\n')}}
                     </el-tag>
                     <el-button
                       class="button-new-tag"
@@ -447,6 +447,7 @@ import { delfile } from "@/api/chunkFile";
 import LinkIcon from "@/components/linkIcon.vue";
 import splitterDialog from "./splitterDialog.vue";
 import mataData from "./metadata.vue";
+import {USER_API} from "@/utils/requestConstants"
 import {
   SEGMENT_COMMON_LIST,
   SEGMENT_LIST,
@@ -489,12 +490,14 @@ export default {
         docPreprocess: ["replaceSymbols"], //'deleteLinks','replaceSymbols'
         docSegment: {
           segmentType: "0",
-          splitter: ["！", "。", "？", "?", "!", ".", "......"],
+          // splitter: ["！", "。", "？", "?", "!", ".", "......"],
+          splitter:["\n\n"],
           maxSplitter: 1024,
           overlap: 0.2,
           segmentMethod:"0",//0是通用分段，1是父子分段
           subMaxSplitter:200,//父子分段必填
-          subSplitter:["！", "。", "？", "?", "!", ".", "......"]//父子分段必填
+          // subSplitter:["！", "。", "？", "?", "!", ".", "......"]//父子分段必填
+          subSplitter:["\n"]
         },
         docInfoList: [],
         docImportType: 0,
@@ -554,7 +557,7 @@ export default {
       if(val.length === 3){
         this.ruleForm.docAnalyzer = [val[0],val[2]]
       }
-      if (val.includes("ocr")) {
+      if (this.ruleForm.docAnalyzer.includes("ocr")) {
         this.getOcrList();
       } else if (val.includes("model")) {
         this.getParserList();
@@ -569,19 +572,18 @@ export default {
     analyzerDisabled(label) {
       if (label === "text") return true;
     },
-    overlapChange(val) {
-      if (val > 0.25) {
-        this.ruleForm.docSegment.overlap = 0.25;
-        return;
-      }
-    },
     custom() {
-      const splitter = this.ruleForm.docSegment.splitter;
-      const data = this.splitOptions.filter((item) => {
-        return splitter.includes(item.splitterValue) && item.type === "preset";
+      this.$nextTick(() => {
+        const { splitter, subSplitter } = this.ruleForm.docSegment;
+        const filterByType = (values) => 
+          this.splitOptions.filter(item => 
+            values.includes(item.splitterValue) && item.type === "preset"
+          );
+        this.checkSplitter = {
+          splitter: filterByType(splitter),
+          subSplitter: filterByType(subSplitter)
+        };
       });
-      this.checkSplitter['splitter'] = data;
-      this.checkSplitter['subSplitter'] = data;
     },
     updateMeata(data) {
       this.ruleForm.docMetaData = data;
@@ -694,7 +696,7 @@ export default {
       });
     },
     async downloadTemplate() {
-      const url = "/user/api/v1/static/docs/url_import_template.xlsx";
+      const url = `${USER_API}/static/docs/url_import_template.xlsx`;
       const fileName = "url_import_template.xlsx";
       try {
         const response = await fetch(url);
@@ -793,6 +795,14 @@ export default {
       return (size / Math.pow(num, 4)).toFixed(2) + "T"; //T
     },
     fileTypeChage() {
+      // 取消所有正在进行的上传请求
+      this.cancelAllRequests();
+      
+      // 重置上传相关状态
+      this.fileIndex = 0;
+      this.file = null;
+      this.resList = [];
+
       this.docInfoList = [];
       this.fileList = [];
     },
@@ -1083,7 +1093,7 @@ export default {
   width:100%;
 }
 .activeAnalyzer {
-  border-color: #384bf7 !important;
+  border-color: $color !important;
 }
 .question {
   cursor: pointer;
@@ -1093,8 +1103,8 @@ export default {
 .splitterTag {
   margin-right: 10px;
   border: none;
-  background: #f4f5ff;
-  color: #384bf7;
+  background: $color_opacity;
+  color: $color;
   border-radius: 3px;
 }
 .optionInput {
@@ -1143,7 +1153,7 @@ export default {
     }
     .upload-box {
       height: auto;
-      min-height: 190;
+      min-height: 190px;
       width: 100% !important;
       .upload-img {
         width: 56px;
@@ -1153,7 +1163,7 @@ export default {
       .click-text {
         margin-top: 10px;
         .clickUpload {
-          color: #384bf7;
+          color: $color;
           font-weight: bold;
         }
       }
@@ -1162,7 +1172,7 @@ export default {
           margin: 46px 0 10px 0 !important;
           font-size: 32px !important;
           line-height: 36px !important;
-          color: #384bf7;
+          color: $color;
         }
         .el-upload__text {
           margin-top: -10px;
@@ -1206,7 +1216,7 @@ export default {
       p {
         color: #9d8d8d !important;
         .template_downLoad {
-          color: #384bf7;
+          color: $color;
           cursor: pointer;
         }
       }
@@ -1227,7 +1237,7 @@ export default {
       padding: 20px;
     }
     .upload-url:hover {
-      border-color: #384bf7;
+      border-color: $color;
     }
   }
 }
@@ -1259,7 +1269,7 @@ export default {
           display:inline-block;
           width:4px;
           height:14px;
-          background: #384bf7;
+          background: $color;
           margin-right:5px;
         }
       }

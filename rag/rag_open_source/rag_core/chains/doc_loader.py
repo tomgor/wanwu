@@ -28,14 +28,9 @@ import tempfile
 
 # analyzer = build_default_analyzer(language="zh")
 
-# RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval
-cache_key = "9b5ad71b2ce5302211f9c61530b329a4922fc6a4"
-#我这里tiktoken_cache_dir是'/home/workspace'
 tiktoken_cache_dir = "/opt/tiktoken_cache"
-#将改名后的cl100k_base.tiktoken文件放到'/home/workspace'位置
-if os.path.exists(os.path.join(tiktoken_cache_dir, cache_key)):
-    os.environ["TIKTOKEN_CACHE_DIR"] = tiktoken_cache_dir
-encoding = tiktoken.encoding_for_model("gpt-4")  # cl100k_base
+os.environ["TIKTOKEN_CACHE_DIR"] = tiktoken_cache_dir
+encoding = tiktoken.encoding_for_model("gpt-4")
 
 
 def len_fun(text):

@@ -12,8 +12,63 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
+<<<<<<< HEAD
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
+=======
+// Requires gRPC-Go v1.64.0 or later.
+const _ = grpc.SupportPackageIsVersion9
+
+const (
+	IAMService_GetUserSelectNotInOrg_FullMethodName       = "/iam_service.IAMService/GetUserSelectNotInOrg"
+	IAMService_GetUserSelectByUserIDs_FullMethodName      = "/iam_service.IAMService/GetUserSelectByUserIDs"
+	IAMService_GetUserList_FullMethodName                 = "/iam_service.IAMService/GetUserList"
+	IAMService_GetUserInfo_FullMethodName                 = "/iam_service.IAMService/GetUserInfo"
+	IAMService_CreateUser_FullMethodName                  = "/iam_service.IAMService/CreateUser"
+	IAMService_UpdateUser_FullMethodName                  = "/iam_service.IAMService/UpdateUser"
+	IAMService_DeleteUser_FullMethodName                  = "/iam_service.IAMService/DeleteUser"
+	IAMService_ChangeUserStatus_FullMethodName            = "/iam_service.IAMService/ChangeUserStatus"
+	IAMService_UpdateUserPassword_FullMethodName          = "/iam_service.IAMService/UpdateUserPassword"
+	IAMService_ResetUserPassword_FullMethodName           = "/iam_service.IAMService/ResetUserPassword"
+	IAMService_GetUserPermission_FullMethodName           = "/iam_service.IAMService/GetUserPermission"
+	IAMService_ChangeUserLanguage_FullMethodName          = "/iam_service.IAMService/ChangeUserLanguage"
+	IAMService_UpdateUserAvatar_FullMethodName            = "/iam_service.IAMService/UpdateUserAvatar"
+	IAMService_GetOrgSelect_FullMethodName                = "/iam_service.IAMService/GetOrgSelect"
+	IAMService_GetOrgList_FullMethodName                  = "/iam_service.IAMService/GetOrgList"
+	IAMService_GetOrgInfo_FullMethodName                  = "/iam_service.IAMService/GetOrgInfo"
+	IAMService_GetOrgByOrgIDs_FullMethodName              = "/iam_service.IAMService/GetOrgByOrgIDs"
+	IAMService_GetOrgAndSubOrgSelectByUser_FullMethodName = "/iam_service.IAMService/GetOrgAndSubOrgSelectByUser"
+	IAMService_CreateOrg_FullMethodName                   = "/iam_service.IAMService/CreateOrg"
+	IAMService_UpdateOrg_FullMethodName                   = "/iam_service.IAMService/UpdateOrg"
+	IAMService_DeleteOrg_FullMethodName                   = "/iam_service.IAMService/DeleteOrg"
+	IAMService_ChangeOrgStatus_FullMethodName             = "/iam_service.IAMService/ChangeOrgStatus"
+	IAMService_AddOrgUser_FullMethodName                  = "/iam_service.IAMService/AddOrgUser"
+	IAMService_RemoveOrgUser_FullMethodName               = "/iam_service.IAMService/RemoveOrgUser"
+	IAMService_GetRoleSelect_FullMethodName               = "/iam_service.IAMService/GetRoleSelect"
+	IAMService_GetRoleList_FullMethodName                 = "/iam_service.IAMService/GetRoleList"
+	IAMService_GetRoleInfo_FullMethodName                 = "/iam_service.IAMService/GetRoleInfo"
+	IAMService_CreateRole_FullMethodName                  = "/iam_service.IAMService/CreateRole"
+	IAMService_UpdateRole_FullMethodName                  = "/iam_service.IAMService/UpdateRole"
+	IAMService_DeleteRole_FullMethodName                  = "/iam_service.IAMService/DeleteRole"
+	IAMService_ChangeRoleStatus_FullMethodName            = "/iam_service.IAMService/ChangeRoleStatus"
+	IAMService_GetCaptcha_FullMethodName                  = "/iam_service.IAMService/GetCaptcha"
+	IAMService_Login_FullMethodName                       = "/iam_service.IAMService/Login"
+	IAMService_LoginByEmail_FullMethodName                = "/iam_service.IAMService/LoginByEmail"
+	IAMService_LoginSendEmailCode_FullMethodName          = "/iam_service.IAMService/LoginSendEmailCode"
+	IAMService_LoginEmailCheck_FullMethodName             = "/iam_service.IAMService/LoginEmailCheck"
+	IAMService_ChangeUserPasswordByEmail_FullMethodName   = "/iam_service.IAMService/ChangeUserPasswordByEmail"
+	IAMService_RegisterByEmail_FullMethodName             = "/iam_service.IAMService/RegisterByEmail"
+	IAMService_RegisterSendEmailCode_FullMethodName       = "/iam_service.IAMService/RegisterSendEmailCode"
+	IAMService_ResetPasswordSendEmailCode_FullMethodName  = "/iam_service.IAMService/ResetPasswordSendEmailCode"
+	IAMService_ResetPasswordByEmail_FullMethodName        = "/iam_service.IAMService/ResetPasswordByEmail"
+	IAMService_CreateOauthApp_FullMethodName              = "/iam_service.IAMService/CreateOauthApp"
+	IAMService_DeleteOauthApp_FullMethodName              = "/iam_service.IAMService/DeleteOauthApp"
+	IAMService_UpdateOauthApp_FullMethodName              = "/iam_service.IAMService/UpdateOauthApp"
+	IAMService_GetOauthAppList_FullMethodName             = "/iam_service.IAMService/GetOauthAppList"
+	IAMService_UpdateOauthAppStatus_FullMethodName        = "/iam_service.IAMService/UpdateOauthAppStatus"
+	IAMService_GetOauthApp_FullMethodName                 = "/iam_service.IAMService/GetOauthApp"
+)
+>>>>>>> upstream/main
 
 // IAMServiceClient is the client API for IAMService service.
 //
@@ -51,6 +106,10 @@ type IAMServiceClient interface {
 	GetOrgList(ctx context.Context, in *GetOrgListReq, opts ...grpc.CallOption) (*GetOrgListResp, error)
 	// 获取组织
 	GetOrgInfo(ctx context.Context, in *GetOrgInfoReq, opts ...grpc.CallOption) (*OrgInfo, error)
+	// 通过orgIds获取组织信息
+	GetOrgByOrgIDs(ctx context.Context, in *GetOrgByOrgIDsReq, opts ...grpc.CallOption) (*GetOrgByOrgIDsResp, error)
+	// 获取子组织信息
+	GetOrgAndSubOrgSelectByUser(ctx context.Context, in *GetOrgAndSubOrgSelectByUserReq, opts ...grpc.CallOption) (*GetOrgAndSubOrgSelectByUserResp, error)
 	// 创建组织
 	CreateOrg(ctx context.Context, in *CreateOrgReq, opts ...grpc.CallOption) (*IDName, error)
 	// 编辑组织
@@ -81,18 +140,42 @@ type IAMServiceClient interface {
 	GetCaptcha(ctx context.Context, in *GetCaptchaReq, opts ...grpc.CallOption) (*GetCaptchaResp, error)
 	// 登录
 	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
+	// 一阶段登录
+	LoginByEmail(ctx context.Context, in *LoginByEmailReq, opts ...grpc.CallOption) (*LoginByEmailResp, error)
+	// 登录发送邮箱验证码
+	LoginSendEmailCode(ctx context.Context, in *LoginSendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 二阶段登录邮箱校验
+	LoginEmailCheck(ctx context.Context, in *LoginEmailCheckReq, opts ...grpc.CallOption) (*LoginResp, error)
+	// 二阶段登录重置密码与邮箱校验
+	ChangeUserPasswordByEmail(ctx context.Context, in *ChangeUserPasswordByEmailReq, opts ...grpc.CallOption) (*LoginResp, error)
 	// --- register ---
 	// 邮箱注册用户
 	RegisterByEmail(ctx context.Context, in *RegisterByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 邮箱注册发送邮件
 	RegisterSendEmailCode(ctx context.Context, in *RegisterSendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// --- reset password ---
-	// 邮箱注册用户
+	// 重置密码邮箱验证码发送
 	ResetPasswordSendEmailCode(ctx context.Context, in *ResetPasswordSendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// 邮箱注册发送邮件
+	// 邮箱重置密码
 	ResetPasswordByEmail(ctx context.Context, in *ResetPasswordByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+<<<<<<< HEAD
 	// 根据用户名检查是否存在组织中的用户，返回用户ID
 	GetUserIDByOrgAndName(ctx context.Context, in *GetUserIDByOrgAndNameReq, opts ...grpc.CallOption) (*GetUserIDByOrgAndNameResp, error)
+=======
+	// --- oauth ---
+	// 创建OAuth应用
+	CreateOauthApp(ctx context.Context, in *CreateOauthAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 删除OAuth应用
+	DeleteOauthApp(ctx context.Context, in *DeleteOauthAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 更新OAuth应用
+	UpdateOauthApp(ctx context.Context, in *UpdateOauthAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 获取OAuth应用列表
+	GetOauthAppList(ctx context.Context, in *GetOauthAppListReq, opts ...grpc.CallOption) (*OauthAppListResp, error)
+	// 更新OAuth应用状态
+	UpdateOauthAppStatus(ctx context.Context, in *UpdateOauthAppStatusReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 根据clientID获取oauth app信息
+	GetOauthApp(ctx context.Context, in *GetOauthAppReq, opts ...grpc.CallOption) (*OauthApp, error)
+>>>>>>> upstream/main
 }
 
 type iAMServiceClient struct {
@@ -247,6 +330,26 @@ func (c *iAMServiceClient) GetOrgInfo(ctx context.Context, in *GetOrgInfoReq, op
 	return out, nil
 }
 
+func (c *iAMServiceClient) GetOrgByOrgIDs(ctx context.Context, in *GetOrgByOrgIDsReq, opts ...grpc.CallOption) (*GetOrgByOrgIDsResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetOrgByOrgIDsResp)
+	err := c.cc.Invoke(ctx, IAMService_GetOrgByOrgIDs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) GetOrgAndSubOrgSelectByUser(ctx context.Context, in *GetOrgAndSubOrgSelectByUserReq, opts ...grpc.CallOption) (*GetOrgAndSubOrgSelectByUserResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetOrgAndSubOrgSelectByUserResp)
+	err := c.cc.Invoke(ctx, IAMService_GetOrgAndSubOrgSelectByUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *iAMServiceClient) CreateOrg(ctx context.Context, in *CreateOrgReq, opts ...grpc.CallOption) (*IDName, error) {
 	out := new(IDName)
 	err := c.cc.Invoke(ctx, "/iam_service.IAMService/CreateOrg", in, out, opts...)
@@ -382,6 +485,46 @@ func (c *iAMServiceClient) Login(ctx context.Context, in *LoginReq, opts ...grpc
 	return out, nil
 }
 
+func (c *iAMServiceClient) LoginByEmail(ctx context.Context, in *LoginByEmailReq, opts ...grpc.CallOption) (*LoginByEmailResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginByEmailResp)
+	err := c.cc.Invoke(ctx, IAMService_LoginByEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) LoginSendEmailCode(ctx context.Context, in *LoginSendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, IAMService_LoginSendEmailCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) LoginEmailCheck(ctx context.Context, in *LoginEmailCheckReq, opts ...grpc.CallOption) (*LoginResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginResp)
+	err := c.cc.Invoke(ctx, IAMService_LoginEmailCheck_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) ChangeUserPasswordByEmail(ctx context.Context, in *ChangeUserPasswordByEmailReq, opts ...grpc.CallOption) (*LoginResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginResp)
+	err := c.cc.Invoke(ctx, IAMService_ChangeUserPasswordByEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *iAMServiceClient) RegisterByEmail(ctx context.Context, in *RegisterByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/iam_service.IAMService/RegisterByEmail", in, out, opts...)
@@ -427,6 +570,66 @@ func (c *iAMServiceClient) GetUserIDByOrgAndName(ctx context.Context, in *GetUse
 	return out, nil
 }
 
+func (c *iAMServiceClient) CreateOauthApp(ctx context.Context, in *CreateOauthAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, IAMService_CreateOauthApp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) DeleteOauthApp(ctx context.Context, in *DeleteOauthAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, IAMService_DeleteOauthApp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) UpdateOauthApp(ctx context.Context, in *UpdateOauthAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, IAMService_UpdateOauthApp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) GetOauthAppList(ctx context.Context, in *GetOauthAppListReq, opts ...grpc.CallOption) (*OauthAppListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OauthAppListResp)
+	err := c.cc.Invoke(ctx, IAMService_GetOauthAppList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) UpdateOauthAppStatus(ctx context.Context, in *UpdateOauthAppStatusReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, IAMService_UpdateOauthAppStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iAMServiceClient) GetOauthApp(ctx context.Context, in *GetOauthAppReq, opts ...grpc.CallOption) (*OauthApp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OauthApp)
+	err := c.cc.Invoke(ctx, IAMService_GetOauthApp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IAMServiceServer is the server API for IAMService service.
 // All implementations must embed UnimplementedIAMServiceServer
 // for forward compatibility
@@ -463,6 +666,10 @@ type IAMServiceServer interface {
 	GetOrgList(context.Context, *GetOrgListReq) (*GetOrgListResp, error)
 	// 获取组织
 	GetOrgInfo(context.Context, *GetOrgInfoReq) (*OrgInfo, error)
+	// 通过orgIds获取组织信息
+	GetOrgByOrgIDs(context.Context, *GetOrgByOrgIDsReq) (*GetOrgByOrgIDsResp, error)
+	// 获取子组织信息
+	GetOrgAndSubOrgSelectByUser(context.Context, *GetOrgAndSubOrgSelectByUserReq) (*GetOrgAndSubOrgSelectByUserResp, error)
 	// 创建组织
 	CreateOrg(context.Context, *CreateOrgReq) (*IDName, error)
 	// 编辑组织
@@ -493,18 +700,42 @@ type IAMServiceServer interface {
 	GetCaptcha(context.Context, *GetCaptchaReq) (*GetCaptchaResp, error)
 	// 登录
 	Login(context.Context, *LoginReq) (*LoginResp, error)
+	// 一阶段登录
+	LoginByEmail(context.Context, *LoginByEmailReq) (*LoginByEmailResp, error)
+	// 登录发送邮箱验证码
+	LoginSendEmailCode(context.Context, *LoginSendEmailCodeReq) (*emptypb.Empty, error)
+	// 二阶段登录邮箱校验
+	LoginEmailCheck(context.Context, *LoginEmailCheckReq) (*LoginResp, error)
+	// 二阶段登录重置密码与邮箱校验
+	ChangeUserPasswordByEmail(context.Context, *ChangeUserPasswordByEmailReq) (*LoginResp, error)
 	// --- register ---
 	// 邮箱注册用户
 	RegisterByEmail(context.Context, *RegisterByEmailReq) (*emptypb.Empty, error)
 	// 邮箱注册发送邮件
 	RegisterSendEmailCode(context.Context, *RegisterSendEmailCodeReq) (*emptypb.Empty, error)
 	// --- reset password ---
-	// 邮箱注册用户
+	// 重置密码邮箱验证码发送
 	ResetPasswordSendEmailCode(context.Context, *ResetPasswordSendEmailCodeReq) (*emptypb.Empty, error)
-	// 邮箱注册发送邮件
+	// 邮箱重置密码
 	ResetPasswordByEmail(context.Context, *ResetPasswordByEmailReq) (*emptypb.Empty, error)
+<<<<<<< HEAD
 	// 根据用户名检查是否存在组织中的用户，返回用户ID
 	GetUserIDByOrgAndName(context.Context, *GetUserIDByOrgAndNameReq) (*GetUserIDByOrgAndNameResp, error)
+=======
+	// --- oauth ---
+	// 创建OAuth应用
+	CreateOauthApp(context.Context, *CreateOauthAppReq) (*emptypb.Empty, error)
+	// 删除OAuth应用
+	DeleteOauthApp(context.Context, *DeleteOauthAppReq) (*emptypb.Empty, error)
+	// 更新OAuth应用
+	UpdateOauthApp(context.Context, *UpdateOauthAppReq) (*emptypb.Empty, error)
+	// 获取OAuth应用列表
+	GetOauthAppList(context.Context, *GetOauthAppListReq) (*OauthAppListResp, error)
+	// 更新OAuth应用状态
+	UpdateOauthAppStatus(context.Context, *UpdateOauthAppStatusReq) (*emptypb.Empty, error)
+	// 根据clientID获取oauth app信息
+	GetOauthApp(context.Context, *GetOauthAppReq) (*OauthApp, error)
+>>>>>>> upstream/main
 	mustEmbedUnimplementedIAMServiceServer()
 }
 
@@ -560,6 +791,12 @@ func (UnimplementedIAMServiceServer) GetOrgList(context.Context, *GetOrgListReq)
 func (UnimplementedIAMServiceServer) GetOrgInfo(context.Context, *GetOrgInfoReq) (*OrgInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrgInfo not implemented")
 }
+func (UnimplementedIAMServiceServer) GetOrgByOrgIDs(context.Context, *GetOrgByOrgIDsReq) (*GetOrgByOrgIDsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOrgByOrgIDs not implemented")
+}
+func (UnimplementedIAMServiceServer) GetOrgAndSubOrgSelectByUser(context.Context, *GetOrgAndSubOrgSelectByUserReq) (*GetOrgAndSubOrgSelectByUserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOrgAndSubOrgSelectByUser not implemented")
+}
 func (UnimplementedIAMServiceServer) CreateOrg(context.Context, *CreateOrgReq) (*IDName, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateOrg not implemented")
 }
@@ -605,6 +842,18 @@ func (UnimplementedIAMServiceServer) GetCaptcha(context.Context, *GetCaptchaReq)
 func (UnimplementedIAMServiceServer) Login(context.Context, *LoginReq) (*LoginResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
+func (UnimplementedIAMServiceServer) LoginByEmail(context.Context, *LoginByEmailReq) (*LoginByEmailResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginByEmail not implemented")
+}
+func (UnimplementedIAMServiceServer) LoginSendEmailCode(context.Context, *LoginSendEmailCodeReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginSendEmailCode not implemented")
+}
+func (UnimplementedIAMServiceServer) LoginEmailCheck(context.Context, *LoginEmailCheckReq) (*LoginResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginEmailCheck not implemented")
+}
+func (UnimplementedIAMServiceServer) ChangeUserPasswordByEmail(context.Context, *ChangeUserPasswordByEmailReq) (*LoginResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChangeUserPasswordByEmail not implemented")
+}
 func (UnimplementedIAMServiceServer) RegisterByEmail(context.Context, *RegisterByEmailReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterByEmail not implemented")
 }
@@ -617,8 +866,28 @@ func (UnimplementedIAMServiceServer) ResetPasswordSendEmailCode(context.Context,
 func (UnimplementedIAMServiceServer) ResetPasswordByEmail(context.Context, *ResetPasswordByEmailReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResetPasswordByEmail not implemented")
 }
+<<<<<<< HEAD
 func (UnimplementedIAMServiceServer) GetUserIDByOrgAndName(context.Context, *GetUserIDByOrgAndNameReq) (*GetUserIDByOrgAndNameResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserIDByOrgAndName not implemented")
+=======
+func (UnimplementedIAMServiceServer) CreateOauthApp(context.Context, *CreateOauthAppReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateOauthApp not implemented")
+}
+func (UnimplementedIAMServiceServer) DeleteOauthApp(context.Context, *DeleteOauthAppReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteOauthApp not implemented")
+}
+func (UnimplementedIAMServiceServer) UpdateOauthApp(context.Context, *UpdateOauthAppReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateOauthApp not implemented")
+}
+func (UnimplementedIAMServiceServer) GetOauthAppList(context.Context, *GetOauthAppListReq) (*OauthAppListResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOauthAppList not implemented")
+}
+func (UnimplementedIAMServiceServer) UpdateOauthAppStatus(context.Context, *UpdateOauthAppStatusReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateOauthAppStatus not implemented")
+}
+func (UnimplementedIAMServiceServer) GetOauthApp(context.Context, *GetOauthAppReq) (*OauthApp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOauthApp not implemented")
+>>>>>>> upstream/main
 }
 func (UnimplementedIAMServiceServer) mustEmbedUnimplementedIAMServiceServer() {}
 
@@ -921,6 +1190,42 @@ func _IAMService_GetOrgInfo_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IAMService_GetOrgByOrgIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOrgByOrgIDsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).GetOrgByOrgIDs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_GetOrgByOrgIDs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).GetOrgByOrgIDs(ctx, req.(*GetOrgByOrgIDsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_GetOrgAndSubOrgSelectByUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOrgAndSubOrgSelectByUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).GetOrgAndSubOrgSelectByUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_GetOrgAndSubOrgSelectByUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).GetOrgAndSubOrgSelectByUser(ctx, req.(*GetOrgAndSubOrgSelectByUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _IAMService_CreateOrg_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateOrgReq)
 	if err := dec(in); err != nil {
@@ -1191,6 +1496,78 @@ func _IAMService_Login_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IAMService_LoginByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginByEmailReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).LoginByEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_LoginByEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).LoginByEmail(ctx, req.(*LoginByEmailReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_LoginSendEmailCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginSendEmailCodeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).LoginSendEmailCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_LoginSendEmailCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).LoginSendEmailCode(ctx, req.(*LoginSendEmailCodeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_LoginEmailCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginEmailCheckReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).LoginEmailCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_LoginEmailCheck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).LoginEmailCheck(ctx, req.(*LoginEmailCheckReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_ChangeUserPasswordByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangeUserPasswordByEmailReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).ChangeUserPasswordByEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_ChangeUserPasswordByEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).ChangeUserPasswordByEmail(ctx, req.(*ChangeUserPasswordByEmailReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _IAMService_RegisterByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RegisterByEmailReq)
 	if err := dec(in); err != nil {
@@ -1263,12 +1640,18 @@ func _IAMService_ResetPasswordByEmail_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+<<<<<<< HEAD
 func _IAMService_GetUserIDByOrgAndName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserIDByOrgAndNameReq)
+=======
+func _IAMService_CreateOauthApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateOauthAppReq)
+>>>>>>> upstream/main
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
+<<<<<<< HEAD
 		return srv.(IAMServiceServer).GetUserIDByOrgAndName(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
@@ -1277,6 +1660,106 @@ func _IAMService_GetUserIDByOrgAndName_Handler(srv interface{}, ctx context.Cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).GetUserIDByOrgAndName(ctx, req.(*GetUserIDByOrgAndNameReq))
+=======
+		return srv.(IAMServiceServer).CreateOauthApp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_CreateOauthApp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).CreateOauthApp(ctx, req.(*CreateOauthAppReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_DeleteOauthApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteOauthAppReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).DeleteOauthApp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_DeleteOauthApp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).DeleteOauthApp(ctx, req.(*DeleteOauthAppReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_UpdateOauthApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateOauthAppReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).UpdateOauthApp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_UpdateOauthApp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).UpdateOauthApp(ctx, req.(*UpdateOauthAppReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_GetOauthAppList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOauthAppListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).GetOauthAppList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_GetOauthAppList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).GetOauthAppList(ctx, req.(*GetOauthAppListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_UpdateOauthAppStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateOauthAppStatusReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).UpdateOauthAppStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_UpdateOauthAppStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).UpdateOauthAppStatus(ctx, req.(*UpdateOauthAppStatusReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IAMService_GetOauthApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOauthAppReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).GetOauthApp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IAMService_GetOauthApp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).GetOauthApp(ctx, req.(*GetOauthAppReq))
+>>>>>>> upstream/main
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1353,6 +1836,14 @@ var IAMService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _IAMService_GetOrgInfo_Handler,
 		},
 		{
+			MethodName: "GetOrgByOrgIDs",
+			Handler:    _IAMService_GetOrgByOrgIDs_Handler,
+		},
+		{
+			MethodName: "GetOrgAndSubOrgSelectByUser",
+			Handler:    _IAMService_GetOrgAndSubOrgSelectByUser_Handler,
+		},
+		{
 			MethodName: "CreateOrg",
 			Handler:    _IAMService_CreateOrg_Handler,
 		},
@@ -1413,6 +1904,22 @@ var IAMService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _IAMService_Login_Handler,
 		},
 		{
+			MethodName: "LoginByEmail",
+			Handler:    _IAMService_LoginByEmail_Handler,
+		},
+		{
+			MethodName: "LoginSendEmailCode",
+			Handler:    _IAMService_LoginSendEmailCode_Handler,
+		},
+		{
+			MethodName: "LoginEmailCheck",
+			Handler:    _IAMService_LoginEmailCheck_Handler,
+		},
+		{
+			MethodName: "ChangeUserPasswordByEmail",
+			Handler:    _IAMService_ChangeUserPasswordByEmail_Handler,
+		},
+		{
 			MethodName: "RegisterByEmail",
 			Handler:    _IAMService_RegisterByEmail_Handler,
 		},
@@ -1429,8 +1936,33 @@ var IAMService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _IAMService_ResetPasswordByEmail_Handler,
 		},
 		{
+<<<<<<< HEAD
 			MethodName: "GetUserIDByOrgAndName",
 			Handler:    _IAMService_GetUserIDByOrgAndName_Handler,
+=======
+			MethodName: "CreateOauthApp",
+			Handler:    _IAMService_CreateOauthApp_Handler,
+		},
+		{
+			MethodName: "DeleteOauthApp",
+			Handler:    _IAMService_DeleteOauthApp_Handler,
+		},
+		{
+			MethodName: "UpdateOauthApp",
+			Handler:    _IAMService_UpdateOauthApp_Handler,
+		},
+		{
+			MethodName: "GetOauthAppList",
+			Handler:    _IAMService_GetOauthAppList_Handler,
+		},
+		{
+			MethodName: "UpdateOauthAppStatus",
+			Handler:    _IAMService_UpdateOauthAppStatus_Handler,
+		},
+		{
+			MethodName: "GetOauthApp",
+			Handler:    _IAMService_GetOauthApp_Handler,
+>>>>>>> upstream/main
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

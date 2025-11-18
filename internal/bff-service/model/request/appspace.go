@@ -17,7 +17,7 @@ type GetAppSpaceAppListRequest struct {
 type PublishAppRequest struct {
 	AppId       string `json:"appId"`       // 应用ID
 	AppType     string `json:"appType"`     // 应用类型
-	PublishType string `json:"publishType"` // 发布类型(public:公开发布,private:私密发布)
+	PublishType string `json:"publishType"` // 发布类型(public:系统公开发布,organization:组织公开发布,private:私密发布)
 }
 
 func (req PublishAppRequest) Check() error {

@@ -46,6 +46,10 @@ service IAMService {
   rpc GetOrgList(GetOrgListReq) returns (GetOrgListResp) {}
   // 获取组织
   rpc GetOrgInfo(GetOrgInfoReq) returns (OrgInfo) {}
+  // 通过orgIds获取组织信息
+  rpc GetOrgByOrgIDs(GetOrgByOrgIDsReq) returns (GetOrgByOrgIDsResp) {}
+  // 获取子组织信息
+  rpc GetOrgAndSubOrgSelectByUser(GetOrgAndSubOrgSelectByUserReq) returns (GetOrgAndSubOrgSelectByUserResp) {}
   // 创建组织
   rpc CreateOrg(CreateOrgReq) returns (IDName) {}
   // 编辑组织
@@ -83,6 +87,14 @@ service IAMService {
   rpc GetCaptcha(GetCaptchaReq) returns (GetCaptchaResp) {}
   // 登录
   rpc Login(LoginReq) returns (LoginResp) {}
+  // 一阶段登录
+  rpc LoginByEmail(LoginByEmailReq) returns (LoginByEmailResp) {}
+  // 登录发送邮箱验证码
+  rpc LoginSendEmailCode(LoginSendEmailCodeReq)returns (google.protobuf.Empty) {}
+  // 二阶段登录邮箱校验
+  rpc LoginEmailCheck(LoginEmailCheckReq) returns (LoginResp) {}
+  // 二阶段登录重置密码与邮箱校验
+  rpc ChangeUserPasswordByEmail(ChangeUserPasswordByEmailReq) returns (LoginResp) {}
 
   // --- register ---
   // 邮箱注册用户
@@ -91,13 +103,29 @@ service IAMService {
   rpc RegisterSendEmailCode(RegisterSendEmailCodeReq) returns (google.protobuf.Empty) {}
 
   // --- reset password ---
-  // 邮箱注册用户
+  // 重置密码邮箱验证码发送
   rpc ResetPasswordSendEmailCode(ResetPasswordSendEmailCodeReq) returns (google.protobuf.Empty) {}
-  // 邮箱注册发送邮件
+  // 邮箱重置密码
   rpc ResetPasswordByEmail(ResetPasswordByEmailReq) returns (google.protobuf.Empty) {}
 
+<<<<<<< HEAD
   // 根据用户名检查是否存在组织中的用户，返回用户ID
   rpc GetUserIDByOrgAndName (GetUserIDByOrgAndNameReq) returns (GetUserIDByOrgAndNameResp);
+=======
+  // --- oauth ---
+  // 创建OAuth应用
+  rpc CreateOauthApp(CreateOauthAppReq) returns (google.protobuf.Empty);
+  // 删除OAuth应用
+  rpc DeleteOauthApp(DeleteOauthAppReq) returns (google.protobuf.Empty);
+  // 更新OAuth应用
+  rpc UpdateOauthApp(UpdateOauthAppReq) returns (google.protobuf.Empty);
+  // 获取OAuth应用列表
+  rpc GetOauthAppList(GetOauthAppListReq) returns (OauthAppListResp);
+  // 更新OAuth应用状态
+  rpc UpdateOauthAppStatus(UpdateOauthAppStatusReq) returns (google.protobuf.Empty);
+  // 根据clientID获取oauth app信息
+  rpc GetOauthApp(GetOauthAppReq) returns (OauthApp);
+>>>>>>> upstream/main
 }
 
 message Perm {
@@ -173,11 +201,10 @@ message CreateUserReq {
   string nickName = 4;
   string gender = 5;
   string phone = 6;
-  string email = 7;
-  string company = 8;
-  string remark = 9;
-  string password = 10;
-  repeated string roleIds = 11;
+  string company = 7;
+  string remark = 8;
+  string password = 9;
+  repeated string roleIds = 10;
 }
 
 message UpdateUserReq {
@@ -187,10 +214,9 @@ message UpdateUserReq {
   string nickName = 4;
   string gender = 5;
   string phone = 6;
-  string email = 7;
-  string company = 8;
-  string remark = 9;
-  repeated string roleIds = 10;
+  string company = 7;
+  string remark = 8;
+  repeated string roleIds = 9;
 }
 
 message DeleteUserReq {
@@ -199,7 +225,8 @@ message DeleteUserReq {
 
 message ChangeUserStatusReq {
   string userId = 1;
-  bool status = 2;
+  string orgId = 2;
+  bool status = 3;
 }
 
 message UpdateUserPasswordReq {
@@ -246,6 +273,23 @@ message OrgInfo {
   bool status = 4;
   int64 createdAt = 5;
   IDName creator = 6;
+}
+
+message GetOrgByOrgIDsReq {
+  repeated string orgIds = 1;
+}
+
+message GetOrgByOrgIDsResp {
+  repeated IDName orgs = 1;
+}
+
+message GetOrgAndSubOrgSelectByUserReq {
+  string userId = 1;
+  string orgId = 2;
+}
+
+message GetOrgAndSubOrgSelectByUserResp {
+  repeated IDName orgs = 1;
 }
 
 message GetOrgSelectReq {
@@ -408,6 +452,39 @@ message LoginResp {
   UserPermission permission = 2;
 }
 
+message LoginByEmailReq {
+  string userName = 1; // 用户名
+  string password = 2; // 密码
+  string key = 3; // 客户端key
+  string code = 4; // 验证码
+}
+
+message LoginByEmailResp {
+  string userId = 1;
+  bool isEmailCheck = 2;
+  int64 lastUpdatePasswordAt = 3;
+}
+
+message LoginSendEmailCodeReq{
+  string email = 1;
+}
+
+message LoginEmailCheckReq{
+  string userId = 1;
+  string email = 2;
+  string code = 3;
+  string language = 4; //用户语言
+}
+
+message ChangeUserPasswordByEmailReq{
+  string userId = 1;
+  string oldPassword = 2;
+  string newPassword = 3;
+  string email = 4;
+  string code = 5;
+  string language = 6; //用户语言
+}
+
 // --- register ---
 
 message RegisterByEmailReq{
@@ -432,6 +509,7 @@ message ResetPasswordByEmailReq{
   string code = 3;
 }
 
+<<<<<<< HEAD
 message GetUserIDByOrgAndNameReq {
   string org_id = 1;
   string name = 2; // 用户名
@@ -439,4 +517,57 @@ message GetUserIDByOrgAndNameReq {
 
 message GetUserIDByOrgAndNameResp {
   uint32 user_id = 1; // 找到的用户ID，未找到时为 0
+=======
+// --- oauth ---
+message CreateOauthAppReq{
+  string userId = 1;
+  string name = 2;
+  string desc = 3;
+  string redirectUri = 4;
+}
+
+message DeleteOauthAppReq{
+  string clientId = 1;
+}
+
+message UpdateOauthAppReq{
+  string clientId = 1;
+  string name = 2;
+  string desc = 3;
+  string redirectUri = 4;
+}
+
+message GetOauthAppListReq{
+  string userId = 1;
+  string name = 2;
+  int32 pageNo = 3;
+  int32 pageSize = 4;
+}
+
+message OauthAppListResp{
+  repeated OauthApp apps = 1;
+  int64 total = 2;
+  int32 pageNo = 3;
+  int32 pageSize = 4;
+}
+
+message OauthApp{
+  string clientId = 1;
+  string name = 2;
+  string desc = 3;
+  string redirectUri = 4;
+  string clientSecret = 5;
+  bool status = 6;
+  int64 createdAt = 7;
+  int64 updatedAt = 8;
+}
+
+message UpdateOauthAppStatusReq{
+  string clientId = 1;
+  bool status = 2;
+}
+
+message GetOauthAppReq{
+  string clientId = 1;
+>>>>>>> upstream/main
 }

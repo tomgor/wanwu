@@ -78,6 +78,35 @@ func (c *Client) SelectOrgs(ctx context.Context, userID uint32) ([]IDName, *errs
 
 }
 
+func (c *Client) GetOrgByOrgIDs(ctx context.Context, orgIDs []uint32) ([]IDName, *errs.Status) {
+	var orgs []*model.Org
+	if err := sqlopt.WithIDs(orgIDs).Apply(c.db.WithContext(ctx)).Find(&orgs).Error; err != nil {
+		return nil, toErrStatus("iam_orgs_get_by_ids", err.Error())
+	}
+	var ret []IDName
+	for _, org := range orgs {
+		ret = append(ret, IDName{ID: org.ID, Name: org.Name})
+	}
+	return ret, nil
+}
+
+func (c *Client) GetOrgAndSubOrgSelectByUser(ctx context.Context, userID, orgID uint32) ([]IDName, *errs.Status) {
+	var result []IDName
+	return result, c.transaction(ctx, func(tx *gorm.DB) *errs.Status {
+		// 获取组织树
+		orgTree, err := getOrgTree(tx)
+		if err != nil {
+			return toErrStatus("iam_orgs_select", err.Error())
+		}
+		crurentOrgTree := orgTree.GetOrg(orgID)
+		result, err = selectOrgs(tx, userID, crurentOrgTree)
+		if err != nil {
+			return toErrStatus("iam_orgs_select", err.Error())
+		}
+		return nil
+	})
+}
+
 func (c *Client) CreateOrg(ctx context.Context, org *model.Org) (uint32, *errs.Status) {
 	if org.ID != 0 {
 		return 0, toErrStatus("iam_org_create", "create org but id err")
@@ -415,7 +444,9 @@ func selectOrgs(tx *gorm.DB, userID uint32, orgTree *model.OrgNode) ([]IDName, e
 	}
 	// user org
 	var userOrgs []*model.OrgUser
-	if err := sqlopt.WithUserID(userID).Apply(tx).Find(&userOrgs).Error; err != nil {
+	if err := sqlopt.SQLOptions(
+		sqlopt.WithUserID(userID),
+	).Apply(tx).Find(&userOrgs).Error; err != nil {
 		return nil, fmt.Errorf("get org user err: %v", err)
 	}
 	// select org

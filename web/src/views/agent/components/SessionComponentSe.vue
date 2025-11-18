@@ -1,14 +1,5 @@
 <template>
   <div class="session rl">
-    <!-- <div class="session-setting">
-      <el-dropdown class="right-setting" @command="gropdownClick">
-        <i class="el-icon-more more"  trigger="click" ></i>
-        <el-dropdown-menu :append-to-body="false" placement="bottom-end" slot="dropdown">
-          <el-dropdown-item command="clear">{{$t('agent.clearHistory')}}</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
-    </div> -->
-
     <div
       class="history-box showScroll"
       id="timeScroll"
@@ -27,7 +18,7 @@
           <div :class="['session-item','rl']">
             <img
               class="logo"
-              :src="require('@/assets/imgs/robot-icon.png')"
+              :src="userAvatarSrc"
             />
             <div class="answer-content">
               <div class="answer-content-query">
@@ -55,24 +46,28 @@
                 </el-popover>
                 <div
                   class="echo-doc-box"
-                  v-if="n.fileName && n.fileName !== ''"
+                  v-if="hasFiles(n)"
                 >
-                  <img
-                    :src="n.fileUrl || n.filepath"
-                    class="docIcon"
-                    style="width:auto!important;height:30px!important;"
-                    v-if="(n.fileType && typeof n.fileType === 'string' && n.fileType.includes('image')) || (n.fileName && typeof n.fileName === 'string' && ['jpg','png','jpeg'].includes(n.fileName.split('.').pop().toLowerCase()))"
-                  />
+                <el-button v-show="canScroll(i,n.showScrollBtn)" icon="el-icon-arrow-left " @click="prev($event,i)" circle class="scroll-btn left" size="mini" type="primary"></el-button>
+                 <div class="imgList" :ref="`imgList-${i}`">
+                 <div v-for="(file,j) in n.fileList" :key="`${j}sdsl`" class="docInfo-img-container">
+                      <img v-if="hasImgs(n,file)"
+                        :src="file.fileUrl"
+                        class="docIcon imgIcon" />
+                  <div v-else class="docInfo-container">
                   <img
                     :src="require('@/assets/imgs/fileicon.png')"
                     class="docIcon"
                     style="width:30px!important;"
-                    v-else
                   />
                   <div class="docInfo">
-                    <p class="docInfo_name">文件名称：{{n.fileName||'...'}}</p>
-                    <p class="docInfo_size">文件大小:{{getFileSizeDisplay(n.fileSize)}}</p>
+                    <p class="docInfo_name">文件名称：{{file.name}}</p>
+                    <p class="docInfo_size">文件大小:{{getFileSizeDisplay(file.size)}}</p>
                   </div>
+                  </div>
+                 </div>
+                 </div>
+                 <el-button v-show="canScroll(i,n.showScrollBtn)" icon="el-icon-arrow-right" @click="next($event,i)" circle class="scroll-btn right" size="mini" type="primary"></el-button>
                 </div>
               </div>
 
@@ -87,7 +82,7 @@
           v-if="n.responseLoading"
           class="session-answer"
         >
-          <div :class="['session-item','rl']">
+          <div class="session-answer-wrapper">
             <img
               class="logo"
               :src="'/user/api/'+ defaultUrl"
@@ -100,14 +95,14 @@
           v-if="n.pendingResponse"
           class="session-answer"
         >
-          <div :class="['session-item','rl']">
+          <div class="session-answer-wrapper">
             <img
               class="logo"
               :src="'/user/api/'+ defaultUrl"
             />
             <div
               class="answer-content"
-              style="padding:0 10px;color:#E6A23C;"
+              style="padding:10px;color:#E6A23C;"
             >{{n.pendingResponse}}</div>
           </div>
         </div>
@@ -126,7 +121,7 @@
         >
           <div
             v-if="[0,1,2,3,4,6,20,21,10].includes(n.qa_type)"
-            :class="['session-item','rl']"
+            class="session-answer-wrapper"
           >
             <img
               class="logo"
@@ -164,7 +159,7 @@
           </div>
           <div
             v-else
-            :class="['session-item','rl']"
+            class="session-answer-wrapper"
           >
             <img
               class="logo"
@@ -211,6 +206,7 @@
                   v-if="m.link"
                   :href="m.link"
                   target="_blank"
+                  rel="noopener noreferrer"
                   class="link"
                 >{{m.link}}</a>
                 <span v-if="m.title">
@@ -271,10 +267,10 @@
           v-if="!n.response && n.gen_file_url_list && n.gen_file_url_list.length"
           class="session-answer"
         >
-          <div :class="['session-item','rl']">
+          <div class="session-answer-wrapper">
             <img
               class="logo"
-              :src="'/user/api/'+defaultUrl || basePath + '/img/b.png'"
+              :src="'/user/api/'+ defaultUrl"
             />
             <div class="answer-content">
               <div
@@ -314,6 +310,8 @@ import { md } from "@/mixins/marksown-it";
 import { marked } from "marked";
 var highlight = require("highlight.js");
 import "highlight.js/styles/atom-one-dark.css";
+import commonMixin from "@/mixins/common";
+import { mapGetters } from "vuex";
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -330,6 +328,7 @@ marked.setOptions({
 });
 
 export default {
+  mixins: [commonMixin],
   props: ["sessionStatus", "defaultUrl", "type"],
   data() {
     return {
@@ -372,19 +371,38 @@ export default {
       },
       imgConfig: ["jpeg", "PNG", "png", "JPG", "jpg", "bmp", "webp"],
       audioConfig: ["mp3", "wav"],
-      debounceTimer: null,
+      fileScrollStateMap: {},
+      resizeTimer: null,
     };
+  },
+  computed: {
+    ...mapGetters('user', ['userAvatar']),
+    userAvatarSrc(){
+      return this.userAvatar 
+      ? '/user/api/' + this.userAvatar 
+      : require('@/assets/imgs/robot-icon.png');
+    }
   },
   watch: {
     sessionStatus: {
       handler(val, oldVal) {},
       immediate: true,
     },
+    'session_data.history':{
+      handler(){
+        this.$nextTick(() => {
+          this.updateAllFileScrollStates();
+        });
+      },
+      deep:true
+    }
   },
   mounted() {
     this.setupScrollListener();
     smoothscroll.polyfill();
     document.addEventListener('click', this.handleCitationClick);
+    window.addEventListener('resize', this.handleWindowResize);
+    this.updateAllFileScrollStates();
   },
   beforeDestroy() {
     if(this.handleCitationClick) {
@@ -395,48 +413,98 @@ export default {
       container.removeEventListener("scroll", this.handleScroll);
     }
     clearTimeout(this.scrollTimeout);
+
+    window.removeEventListener('resize', this.handleWindowResize);
+    if (this.resizeTimer) {
+      clearTimeout(this.resizeTimer);
+    }
+    
     // 移除图片错误事件监听器
     if (this.imageErrorHandler) {
       document.body.removeEventListener("error", this.imageErrorHandler, true);
     }
   },
   methods: {
+    updateAllFileScrollStates() {
+      this.session_data.history.forEach((item, index) => {
+        if (item.fileList && item.fileList.length > 0) {
+          this.$nextTick(() => {
+            this.checkFileScrollState(index);
+          });
+        }
+      });
+    },
+    checkFileScrollState(index) {
+      const refKey = `imgList-${index}`;
+      const containerArray = this.$refs[refKey];
+      if (containerArray && containerArray.length > 0) {
+        const container = containerArray[0];
+        const canScroll = container.scrollWidth > container.clientWidth;
+        if (this.session_data.history[index]) {
+          this.$set(this.session_data.history[index], 'showScrollBtn', canScroll);
+        }
+        this.$set(this.fileScrollStateMap, index, canScroll);
+      }
+    },
+    handleWindowResize() {
+      if (this.resizeTimer) {
+        clearTimeout(this.resizeTimer);
+      }
+      this.resizeTimer = setTimeout(() => {
+        this.updateAllFileScrollStates();
+      }, 200);
+    },
+    canScroll(i,showScrollBtn) {
+      if (showScrollBtn !== null && showScrollBtn !== undefined) {
+        return showScrollBtn;
+      }
+      // 否则从 fileScrollStateMap 中获取
+      return this.fileScrollStateMap[i] || false;
+    },
+    prev(e,i){
+      e.stopPropagation()
+      const refKey = `imgList-${i}`;
+      const containerArray = this.$refs[refKey];
+      if (containerArray && containerArray.length > 0) {
+        const container = containerArray[0];
+        container.scrollBy({
+          left: -200,
+          behavior: "smooth",
+        });
+      }
+    },
+    next(e,i){
+      e.stopPropagation()
+      const refKey = `imgList-${i}`;
+      const containerArray = this.$refs[refKey];
+      if (containerArray && containerArray.length > 0) {
+        const container = containerArray[0];
+        container.scrollBy({
+          left: 200,
+          behavior: "smooth",
+        });
+      }
+    },
+    hasFiles(n){
+       return n.fileList && n.fileList.length > 0;
+    },
+    hasImgs(n,file){
+      if (!n.fileList || n.fileList.length === 0 || !file || !file.name) {
+        return false;
+      }
+      let type = file.name.split('.').pop().toLowerCase();
+      return this.imgConfig.map(t => t.toLowerCase()).includes(type);
+    },
     handleCitationClick(e) {
-      if (this.sessionStatus === 0) return;
-
-      const citationElement = e.target.closest(".citation");
-      if (!citationElement) return;
-
-      const tagIndex = parseInt(citationElement.textContent, 10);
-      if (isNaN(tagIndex) || tagIndex <= 0) return;
-
-      const allSubTag = document.querySelectorAll(".subTag");
-      if (allSubTag.length === 0) return;
-
-      if (tagIndex > allSubTag.length) return;
-
-      const targetElement = allSubTag[tagIndex - 1];
-      if (!targetElement) return;
-
-      const parentsIndex = targetElement.dataset.parentsIndex;
-      const collapse = targetElement.dataset.collapse;
-
-      // 第445行改为：
-      if (!this.session_data || !this.session_data.history || !this.session_data.history[parentsIndex] || !this.session_data.history[parentsIndex].searchList || !this.session_data.history[parentsIndex].searchList[tagIndex - 1]) return;
-
-      if (collapse === "false") {
-        this.$set(
-          this.session_data.history[parentsIndex].searchList[tagIndex - 1],
-          "collapse",
-          true
-        );
-      }
-
-      const timeScrollElement = document.getElementById("timeScroll");
-      if (timeScrollElement) {
-        timeScrollElement.scrollTop = timeScrollElement.scrollHeight;
-      }
-      e.stopPropagation();
+      this.$handleCitationClick(e, {
+        sessionStatus: this.sessionStatus,
+        sessionData: this.session_data,
+        citationSelector: '.citation',
+        scrollElementId: 'timeScroll',
+        onToggleCollapse: (item, collapse) => {
+          this.$set(item, 'collapse', collapse);
+        }
+      });
     },
     showSearchList(j, qa_type, citations) {
       return qa_type === 1 ? citations.includes(j + 1) : true;
@@ -495,7 +563,7 @@ export default {
         }
       }
       if (openUrl !== "") {
-        window.open(openUrl, "_blank");
+        window.open(openUrl, "_blank","noopener,noreferrer");
       } else {
         this.$message.warning("暂不支持此格式查看");
       }
@@ -860,20 +928,20 @@ export default {
 <style scoped lang="scss">
 .serach-list-item {
   .link:hover {
-    color: #384bf7 !important;
+    color: $color !important;
   }
   .search-doc {
     margin-left: 10px;
     cursor: pointer;
-    color: #384bf7 !important;
+    color: $color !important;
   }
   .subTag {
     display: inline-flex;
-    color: #384bf7;
+    color: $color;
     border-radius: 50%;
     width: 18px;
     height: 18px;
-    border: 1px solid #384bf7;
+    border: 1px solid $color;
     line-height: 18px;
     vertical-align: middle;
     margin-left: 2px;
@@ -911,19 +979,21 @@ export default {
     background: none !important;
   }
   .answer-content {
+    width: 100%;
     img {
       width: 80% !important;
     }
-    section li {
-      list-style-position: inside; /* 将标记符号放在内容框内 */
+    section li,li {
+      list-style-position: inside !important; /* 将标记符号放在内容框内 */
     }
+   
     .citation {
       display: inline-flex;
-      color: #384bf7;
+      color: $color;
       border-radius: 50%;
       width: 18px;
       height: 18px;
-      border: 1px solid #384bf7;
+      border: 1px solid $color;
       cursor: pointer;
       line-height: 18px;
       vertical-align: middle;
@@ -944,7 +1014,7 @@ export default {
   }
 }
 .more {
-  color: #384bf7;
+  color: $color;
 }
 .session {
   word-break: break-all;
@@ -965,19 +1035,22 @@ export default {
       border-radius: 6px;
     }
     .answer-content {
-      padding: 0 15px 10px 15px;
+      padding: 0 10px 10px 15px;
       position: relative;
       color: #333;
       .answer-content-query {
         display: flex;
         flex-wrap: wrap;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: flex-end;
+        width: 100%;
         .answer-text {
           background: #7288fa;
           color: #fff;
-          padding: 8px 20px 8px 10px;
-          border-radius: 0 10px 10px 10px;
+          padding: 8px 10px 8px 20px;
+          border-radius: 10px 0 10px 10px;
+          margin:0!important;
+          line-height:1.5;
         }
         .session-setting-id {
           color: rgba(98, 98, 98, 0.5);
@@ -986,18 +1059,59 @@ export default {
         }
         .echo-doc-box {
           margin-top: 10px;
-          background: #fff;
-          width: auto;
-          border: 1px solid #dcdfe6;
-          border-radius: 5px;
+          width: 100%;
+          max-width: 100%;
           display: flex;
+          gap:8px;
           justify-content: space-between;
           align-items: center;
-          padding: 2px 20px 5px 5px;
+          position: relative;
+          .scroll-btn{
+            position:absolute;
+            top:50%;
+            transform: translateY(-15px);
+            &.left{
+                left:5px;
+            }
+            &.right{
+                right:5px;
+            }
+          }
+          .imgList{
+            width:100%;
+            gap: 10px;
+            overflow-x:hidden;
+            scroll-behavior: smooth;
+            display:flex;
+            flex-wrap: nowrap;
+            flex-direction: row-reverse;
+          }
+          .docInfo-container{
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border: 1px solid rgb(235, 236, 238);
+            padding: 5px 10px 5px 5px;
+            border-radius: 5px;
+          }
+          .docInfo-img-container{
+            flex-shrink: 0;  /* 防止图片被压缩 */
+            width: auto;  /* 或固定宽度 */
+            p{
+              text-align: center;
+              color: $color;
+              font-size: 12px;
+            }
+          }
           .docIcon {
             width: 30px;
             height: 30px;
-            margin-right: 10px;
+          }
+          .imgIcon {
+            width:auto!important;
+            height:70px!important;
+            display:block;
+            border-radius:6px;
           }
           .docInfo {
             .docInfo_name {
@@ -1015,7 +1129,7 @@ export default {
     }
   }
   .session-answer {
-    background-color: #eceefe;
+    // background-color: #eceefe;
     border-radius: 10px;
     .answer-annotation {
       line-height: 0 !important;
@@ -1039,7 +1153,7 @@ export default {
     }
     /*出处*/
     .search-list {
-      padding: 0 20px 3px 54px;
+      padding: 10px 20px 3px 54px;
       .search-list-item {
         margin-bottom: 5px;
         line-height: 22px;
@@ -1069,7 +1183,7 @@ export default {
       display: flex;
       // justify-content: space-between;
       align-items: center;
-      padding: 15px 20px 15px 53px;
+      padding: 5px 20px 15px 63px;
       color: #777;
       .opera-left {
         // flex: 8;
@@ -1215,8 +1329,45 @@ export default {
     font-size: 13px;
     color: #8b8b8b;
     font-weight: bold;
-    margin-left: 6px;
+    margin:0 0 10px 6px;
     cursor: pointer;
+  }
+}
+
+/* 仅通过样式调整位置：
+   问题在右侧（内容在右、头像在最右），答案在左侧（默认） */
+.session-question {
+  .session-item {
+    flex-direction: row-reverse;
+    margin-left: auto;
+    width: auto;
+  }
+}
+.session-answer {
+  .session-answer-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px; /* 头像和内容之间10px距离 */
+    padding: 20px 20px 0 20px;
+    min-height: 80px;
+    background: none; /* 确保外层容器无背景色 */
+    
+    .logo {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0; /* 防止头像被压缩 */
+      background: none; /* 头像无背景色 */
+    }
+    
+    .answer-content {
+      flex: 1;
+      background-color: #eceefe; /* 只有内容区域有背景色 */
+      border-radius: 0 10px 10px 10px;
+      padding: 20px;
+      line-height:1.6;
+    }
   }
 }
 
@@ -1268,7 +1419,7 @@ img.failed::after {
 .text-loading {
   width: 54px;
   height: 18px;
-  margin: 0 0 0 55px;
+  margin: 6px 0 0 55px;
 }
 
 .text-loading > div {

@@ -1,5 +1,9 @@
 package config
 
+import (
+	openapi3_util "github.com/UnicomAI/wanwu/pkg/openapi3-util"
+)
+
 type AgentScopeWorkFlowSchemaResp struct {
 	Code int `json:"code"`
 	Data struct {
@@ -8,13 +12,14 @@ type AgentScopeWorkFlowSchemaResp struct {
 }
 
 type AssistantConversionHistory struct {
-	Query         string `json:"query"`
-	UploadFileUrl string `json:"upload_file_url,omitempty"`
-	Response      string `json:"response"`
+	Query         string   `json:"query"`
+	UploadFileUrl []string `json:"upload_file_url,omitempty"`
+	Response      string   `json:"response"`
 }
 
 type KnParams struct {
-	KnowledgeBase        []string               `json:"knowledgeBase"`
+	KnowledgeBase        []string               `json:"knowledgeBase"`   // 知识库名称列表
+	KnowledgeIdList      []string               `json:"knowledgeIdList"` // 知识库id列表
 	RerankId             interface{}            `json:"rerank_id"`
 	Model                interface{}            `json:"model"`
 	ModelUrl             interface{}            `json:"model_url"`
@@ -28,6 +33,7 @@ type KnParams struct {
 	TermWeight           float32                `json:"term_weight_coefficient"`       // 关键词系数, 默认为1
 	MetaFilter           bool                   `json:"metadata_filtering"`            // 元数据过滤开关
 	MetaFilterConditions []*MetadataFilterParam `json:"metadata_filtering_conditions"` // 元数据过滤条件
+	UseGraph             bool                   `json:"use_graph"`                     // 知识图谱开关
 }
 
 type MetadataFilterParam struct {
@@ -52,7 +58,7 @@ type AgentSSERequest struct {
 	Input          string                       `json:"input"`
 	Stream         bool                         `json:"stream"`
 	SystemRole     string                       `json:"system_role,omitempty"`
-	UploadFileUrl  string                       `json:"upload_file_url,omitempty"`
+	UploadFileUrl  []string                     `json:"upload_file_url,omitempty"`
 	FileName       string                       `json:"file_name,omitempty"`
 	PluginList     []PluginListAlgRequest       `json:"plugin_list,omitempty"`
 	Model          string                       `json:"model,omitempty"`
@@ -66,20 +72,14 @@ type AgentSSERequest struct {
 	ModelId        string                       `json:"model_id,omitempty"`
 	History        []AssistantConversionHistory `json:"history,omitempty"`
 	McpTools       map[string]MCPToolInfo       `json:"mcp_tools,omitempty"`
+	ToolsName      []string                     `json:"tools_name,omitempty"`
 	AutoCitation   bool                         `json:"auto_citation,omitempty"`
 	ModelParams    map[string]interface{}       `json:"-"` // 用于合并动态模型参数，不直接序列化到JSON
 }
 
 type PluginListAlgRequest struct {
 	APISchema map[string]interface{} `json:"api_schema"`
-	APIAuth   *APIAuth               `json:"api_auth,omitempty"`
-}
-
-type APIAuth struct {
-	Type  string `json:"type"`
-	In    string `json:"in"`
-	Name  string `json:"name"`
-	Value string `json:"value"`
+	APIAuth   *openapi3_util.Auth    `json:"api_auth,omitempty"`
 }
 
 type MCPToolInfo struct {

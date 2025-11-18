@@ -28,7 +28,7 @@
           <el-checkbox
             v-model="item.checked"
             v-if="!item.showIpt"
-          >{{item.splitterName}}</el-checkbox>
+          >{{item.splitterName.replace(/\n/g, '\\n')}}</el-checkbox>
           <el-input
             v-model="item.splitterName"
             v-if="item.showIpt"
@@ -72,11 +72,7 @@ export default {
         type:String,
         required:true,
         default:''
-    },
-    // selectData:{
-    //   typeof:Array,
-    //   default:[]
-    // }
+    }
   },
   watch:{
     dataList:{
@@ -93,7 +89,7 @@ export default {
         if(val){
           this.tagList = this.tagList.map(tag => ({
             ...tag,
-            checked: val.some(item => item.splitterId === tag.splitterId)
+            checked: val.some(item => item.splitterValue == tag.splitterValue)
           }));
         }
       }
@@ -185,7 +181,7 @@ export default {
   }
   .tag_item {
     cursor: pointer;
-    background: #f4f5ff;
+    background: $color_opacity;
     padding: 5px;
     margin: 10px 0;
     border-radius: 4px;
@@ -193,7 +189,7 @@ export default {
     justify-content: space-between;
     align-items: center;
     .del-icon {
-      color: #384bf7;
+      color: $color;
       cursor: pointer;
       font-size: 16px;
     }

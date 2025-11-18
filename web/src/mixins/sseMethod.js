@@ -1,6 +1,5 @@
 import {fetchEventSource} from "../sse/index.js";
 import { store } from '@/store/index'
-//import Print from '@/utils/print.min.js'
 import Print from '../utils/printPlus2.js'
 import {parseSub, convertLatexSyntax} from "@/utils/util.js"
 import {mapActions, mapGetters} from 'vuex'
@@ -11,7 +10,7 @@ var originalFetch = window.fetch;
 import {md} from './marksown-it'
 import $ from './jquery.min.js'
 import { file } from "jszip";
-
+import {OPENURL_API, USER_API} from "@/utils/requestConstants"
 
 export default {
     data() {
@@ -32,14 +31,15 @@ export default {
             origin:window.location.origin,
             reconnectCount:0,
             isEnd: true,
-            sseApi: "/user/api/v1/assistant/stream",
-            rag_sseApi:"/user/api/v1/rag/chat",
+            sseApi: `${USER_API}/assistant/stream`,
+            rag_sseApi:`${USER_API}/rag/chat`,
             token:store.getters['user/token'],
             lastIndex:0,
             query:'',
             isStoped : false,
             access_token:'',
             runResponse: "",
+            fileList: [],  // 文件列表
         };
     },
     created() {
@@ -69,7 +69,6 @@ export default {
                 }
                 return originalFetch(url, options).then(response => {
                     // 可以在这里修改响应或者添加额外的处理
-                    console.log('原始 fetch 响应:', response);
                     let query = this.query
 
                     if(response.status != 200){
@@ -192,7 +191,6 @@ export default {
             this.sendEventStream(this.inputVal,'', _history.length)
         },
         sendEventStream(prompt, msgStr, lastIndex){
-            console.log("####sendEventStream", '--------------------------')
             if (this.sessionStatus === 0) {
                 this.$message.warning('上个问题没有回答完！')
                 return
@@ -206,6 +204,7 @@ export default {
                 pending: true, 
                 responseLoading: true, 
                 requestFileUrls:[],
+                fileList:this.fileList,
                 pendingResponse:''
             }
             this.$refs['session-com'].pushHistory(params)
@@ -232,7 +231,7 @@ export default {
                 body: JSON.stringify({...this.sseParams,'history':history}),
                 openWhenHidden: true, //页面退至后台保持连接
                 onopen: async(e) => {
-                    console.log("已建立SSE连接~",new Date().getTime());
+                    //console.log("已建立SSE连接~",new Date().getTime());
                     if (e.status !== 200) {
                         try {
                             const errorData = await e.json();
@@ -260,16 +259,15 @@ export default {
                         let data;
                         try {
                             data = JSON.parse(e.data);
-                            console.log('===>',new Date().getTime(),'12345', data);
+                            console.log('===>',new Date().getTime(), data);
                         } catch (error) {
                             return; // 如果解析失败，直接返回，不处理这条消息
                         }
                         
                         this.sseResponse = data;
-                        
                         //待替换的数据，需要前端组装
                         let commonData = {
-                            ...data,
+                            ...this.sseResponse,
                             ...this.sseParams,
                             "query": prompt,
                             "fileName":'',
@@ -277,7 +275,7 @@ export default {
                             "response": '',
                             "filepath": '',
                             "requestFileUrls":'',
-                            "searchList": data.data && data.data.searchList ? data.data.searchList: [],
+                            "searchList": this.sseResponse.data && this.sseResponse.data.searchList ? this.sseResponse.data.searchList: [],
                             "gen_file_url_list": [],
                             "thinkText":'思考中',
                             "isOpen":true,
@@ -294,24 +292,25 @@ export default {
                                     commonData,
                                     (worldObj,search_list) => {
                                         this.setStoreSessionStatus(0)
-                                        endStr += worldObj.world
+                                        endStr += worldObj.world  
                                         endStr = convertLatexSyntax(endStr)
-                                        endStr = parseSub(endStr)
+                                        endStr = parseSub(endStr, lastIndex)     
                                         let fillData = {
                                             ...commonData,
-                                            "response": md.render(endStr),
+                                            "response":md.render(endStr),
                                             oriResponse:endStr,
+                                            finish:worldObj.finish,
                                             searchList:(search_list && search_list.length) ? search_list.map(n => ({
-                                                  ...n, // 复制原有的对象属性
-                                                  snippet: md.render(n.snippet) // 对snippet进行Markdown渲染
+                                                  ...n,
+                                                  snippet: md.render(n.snippet)
                                                 }))
                                             : []
-                                    }
-                                    this.$refs['session-com'].replaceLastData(lastIndex, fillData)
-                                    if(worldObj.isEnd && worldObj.finish === 1){
-                                        this.setStoreSessionStatus(-1)
-                                    }
-                                })
+                                        }
+                                        this.$refs['session-com'].replaceLastData(lastIndex, fillData)
+                                        if(worldObj.isEnd && worldObj.finish === 1){
+                                            this.setStoreSessionStatus(-1)
+                                        }
+                                    })
                             // this.$nextTick(()=>{
                             //     this.$refs['session-com'].scrollBottom()
                             // })
@@ -341,6 +340,7 @@ export default {
                     this.setStoreSessionStatus(-1)//关闭后改变状态
                 }
             });
+                      
         },
         doSend(params) {
             this.stopBtShow = true
@@ -367,17 +367,12 @@ export default {
                 pending: true, 
                 responseLoading: true, 
                 requestFileUrls: this.queryFilePath?[this.queryFilePath]:[],
-                fileName:this.fileList.length > 0 ? this.fileList[0]['name'] : '',
-                fileSize:this.fileList.length > 0 ? this.fileList[0]['size'] : '',
-                fileUrl:this.fileList.length > 0 
-                ? (this.fileList[0].fileUrl ? this.fileList[0].fileUrl:URL.createObjectURL(this.fileList[0].raw))
-                : '',
-                fileType:this.fileList.length > 0 ? this.fileList[0].name.split('.').pop().toLowerCase():'',
+                fileList:this.fileList,
                 pendingResponse:''
             }
             //正式环境传模型参数
             this.$refs['session-com'].pushHistory(params)
-
+            
             let endStr = ''
             this._print = new Print({
                 onPrintEnd: () => {
@@ -388,7 +383,7 @@ export default {
             let headers = null;
             //判断是是不是openurl对话
             if(this.type === 'agentChat'){
-                this.sseApi = "/user/api/v1/assistant/stream";
+                this.sseApi = `${USER_API}/assistant/stream`;
                 const trial = this.isTestChat ? true : false
                 data = {
                     ...this.sseParams,
@@ -402,7 +397,7 @@ export default {
                     "x-org-id": userInfo.orgId
                 }
             }else{
-                this.sseApi = `/service/url/openurl/v1/agent/${this.sseParams.assistantId}/stream`;
+                this.sseApi = `${OPENURL_API}/agent/${this.sseParams.assistantId}/stream`;
                 data = {
                    conversationId:this.sseParams.conversationId, 
                    prompt
@@ -419,7 +414,7 @@ export default {
                 signal: this.ctrlAbort.signal,
                 body: JSON.stringify(data),
                 openWhenHidden: true, //页面退至后台保持连接
-                ...(this.type === 'webChat' && { isOpeanUrl: true }),
+                ...(this.type === 'webChat' && { isOpenUrl: true }),
                 onopen: async(e) => {
                     console.log("已建立SSE连接~",new Date().getTime());
                     if (e.status !== 200) {
@@ -454,12 +449,7 @@ export default {
                             ...data,
                             ...this.sseParams,
                             "query": prompt,
-                            "fileName":this.fileList.length > 0 ? this.fileList[0]['name'] : '',
-                            "fileSize":this.fileList.length > 0 ? this.fileList[0]['size'] : '',
-                            fileUrl: this.fileList.length > 0 
-                            ? (this.fileList[0].fileUrl ? this.fileList[0].fileUrl:URL.createObjectURL(this.fileList[0].raw))
-                            : '',
-                            fileType:this.fileList.length > 0 ? this.fileList[0].name.split('.').pop().toLowerCase():'',
+                            "fileList":this.fileList,
                             "response": '',
                             "filepath": data.file_url || '',
                             "requestFileUrls": this.queryFilePath?[this.queryFilePath] : data.requestFileUrls,
@@ -468,6 +458,7 @@ export default {
                             "thinkText":i18n.t('agent.thinking'),
                             'toolText':'使用工具中...',
                             "isOpen":true,
+                            "showScrollBtn":null,
                             "citations":[]
                         }
 
@@ -484,16 +475,16 @@ export default {
                                         this.setStoreSessionStatus(0)
                                         endStr += worldObj.world
                                         endStr = convertLatexSyntax(endStr)
-                                        endStr = parseSub(endStr)
+                                        endStr = parseSub(endStr, lastIndex)
                                         const finalResponse = String(endStr)
                                         let fillData = {
                                             ...commonData,
                                             response: [0,1,2,3,4,6,20,21,10].includes(commonData.qa_type)?md.render(finalResponse):finalResponse.replaceAll('\n-','<br/>•').replaceAll('\n','<br/>'),
-                                            // response:finalResponse,
+                                            finish:worldObj.finish,
                                             oriResponse:endStr,
                                             searchList:(search_list && search_list.length) ? search_list.map(n => ({
-                                                  ...n, // 复制原有的对象属性
-                                                  snippet: md.render(n.snippet) // 对snippet进行Markdown渲染
+                                                  ...n,
+                                                  snippet: md.render(n.snippet)
                                                 }))
                                             : []
                                         }
@@ -511,7 +502,7 @@ export default {
                                         if(worldObj.isEnd && worldObj.finish === 1){
                                           this.setStoreSessionStatus(-1)
                                        }
-                                })
+                                    })
 
                             this.$nextTick(()=>{
                                 this.$refs['session-com'].scrollBottom()
@@ -573,13 +564,6 @@ export default {
                     // 如果返回有结果，则在结束时不展示“本次回答已终止”
                     this.runResponse = md.render(endStr)
                     this.runDisabled = false
-                    // this.$refs['session-com'].replaceLastData(lastIndex, {
-                    //     ...lastRQ,
-                    //     finish: 1,
-                    //     pending: false,
-                    //     responseLoading: false,
-                    //     response:  md.render(endStr) 
-                    // })
                     this.setStoreSessionStatus(-1)
                 }
             }
@@ -654,22 +638,9 @@ export default {
             let history_list = this.$refs['session-com'].getList();
             let _history = history_list[history_list.length - 1];
             let inputVal = _history.query;
-            let fileInfo = null;
-            let fileId = null;
-            if(_history.fileName && _history.fileSize){
-                fileId =  {
-                    fileName:_history.fileName,
-                    fileSize:_history.fileSize,
-                    fileUrl:_history.fileInfo ? _history.fileInfo['fileUrl'] : _history.requestFileUrls[0],
-                }
-                fileInfo = [
-                    { name:_history['fileName'],
-                      size:_history['fileSize'],
-                      fileUrl: _history['filepath'] || _history['fileUrl'] || (_history.requestFileUrls && _history.requestFileUrls[0]) || ''
-                    }
-                ]
-            }
-            this.preSend(inputVal,fileId,fileInfo);
+            let fileInfo = _history.fileInfo ? _history.fileInfo : [];
+            let fileList = _history.fileList ? _history.fileList : [];
+            this.preSend(inputVal,fileList,fileInfo);
         }
     }
 };

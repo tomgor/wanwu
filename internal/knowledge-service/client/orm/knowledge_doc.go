@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"strconv"
 
+	knowledgebase_service "github.com/UnicomAI/wanwu/api/proto/knowledgebase-service"
+
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/model"
 	"github.com/UnicomAI/wanwu/internal/knowledge-service/client/orm/sqlopt"
@@ -25,6 +27,13 @@ const (
 	PreprocessSymbol    = "replace_symbols"
 	PreprocessLink      = "delete_links"
 )
+
+type KnowledgeGraph struct {
+	KnowledgeGraphSwitch  bool   `json:"knowledgeGraphSwitch"`
+	GraphModelId          string `json:"graphModelId"`
+	GraphSchemaObjectName string `json:"graphSchemaObjectName"`
+	GraphSchemaFileName   string `json:"graphSchemaFileName"`
+}
 
 // GetDocList 查询知识库文件列表
 func GetDocList(ctx context.Context, userId, orgId, knowledgeId, name, tag string,
@@ -49,6 +58,18 @@ func GetDocList(ctx context.Context, userId, orgId, knowledgeId, name, tag strin
 		return nil, 0, err
 	}
 	return docList, total, nil
+}
+
+// GetDocDetail 查询知识库文件详情
+func GetDocDetail(ctx context.Context, userId, orgId, docId string) (*model.KnowledgeDoc, error) {
+	var doc = model.KnowledgeDoc{}
+	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId),
+		sqlopt.WithDocID(docId)).
+		Apply(db.GetHandle(ctx), &model.KnowledgeDoc{}).First(&doc).Error
+	if err != nil {
+		return nil, err
+	}
+	return &doc, nil
 }
 
 // GetDocListByKnowledgeIdNoDeleteCheck 根据知识库id查询知识库文件列表
@@ -95,7 +116,8 @@ func CheckKnowledgeDocSameName(ctx context.Context, userId string, knowledgeId s
 		sqlopt.WithKnowledgeID(knowledgeId),
 		sqlopt.WithName(docName),
 		sqlopt.WithFilePathMd5(docUrlMd5),
-		sqlopt.WithoutStatus(model.DocFail)).
+		sqlopt.WithoutStatus(model.DocFail),
+		sqlopt.WithDelete(0)).
 		Apply(db.GetHandle(ctx), &model.KnowledgeDoc{}).
 		Count(&count).Error
 	if err != nil {
@@ -140,7 +162,7 @@ func buildKnowledgeDocMeta(doc *model.KnowledgeDoc, importTask *model.KnowledgeI
 
 // CreateKnowledgeDoc 创建知识库文件
 func CreateKnowledgeDoc(ctx context.Context, doc *model.KnowledgeDoc, importTask *model.KnowledgeImportTask) error {
-	knowledge, err := SelectKnowledgeById(ctx, doc.KnowledgeId, doc.UserId, doc.OrgId)
+	knowledge, err := SelectKnowledgeById(ctx, doc.KnowledgeId, "", "")
 	if err != nil {
 		return err
 	}
@@ -182,27 +204,57 @@ func CreateKnowledgeDoc(ctx context.Context, doc *model.KnowledgeDoc, importTask
 		if doc.Status != model.DocInit {
 			return nil
 		}
+		//构造知识库图谱
+		knowledgeGraph := BuildKnowledgeGraph(knowledge.KnowledgeGraph)
 		//2.rag文档导入
 		return service.RagImportDoc(ctx, &service.RagImportDocParams{
-			DocId:               doc.DocId,
-			KnowledgeName:       knowledge.Name,
-			CategoryId:          knowledge.KnowledgeId,
-			UserId:              doc.UserId,
-			Overlap:             config.Overlap,
-			SegmentSize:         config.MaxSplitter,
-			SegmentType:         service.RebuildSegmentType(config.SegmentType, config.SegmentMethod),
-			SplitType:           service.RebuildSplitType(config.SegmentMethod),
-			Separators:          config.Splitter,
-			ParserChoices:       analyzer.AnalyzerList,
-			ObjectName:          objectName,
-			OriginalName:        doc.Name,
-			IsEnhanced:          "false",
-			OcrModelId:          importTask.OcrModelId,
-			PreProcess:          preProcess.PreProcessList,
-			RagMetaDataParams:   ragMetaList,
-			RagChildChunkConfig: buildSubRagChunkConfig(config),
+			DocId:                 doc.DocId,
+			KnowledgeName:         knowledge.RagName,
+			CategoryId:            knowledge.KnowledgeId,
+			UserId:                knowledge.UserId,
+			Overlap:               config.Overlap,
+			SegmentSize:           config.MaxSplitter,
+			SegmentType:           service.RebuildSegmentType(config.SegmentType, config.SegmentMethod),
+			SplitType:             service.RebuildSplitType(config.SegmentMethod),
+			Separators:            config.Splitter,
+			ParserChoices:         analyzer.AnalyzerList,
+			ObjectName:            objectName,
+			OriginalName:          doc.Name,
+			IsEnhanced:            "false",
+			OcrModelId:            importTask.OcrModelId,
+			PreProcess:            preProcess.PreProcessList,
+			RagMetaDataParams:     ragMetaList,
+			RagChildChunkConfig:   buildSubRagChunkConfig(config),
+			KnowledgeGraphSwitch:  knowledgeGraph.KnowledgeGraphSwitch,
+			GraphModelId:          knowledgeGraph.GraphModelId,
+			GraphSchemaObjectName: knowledgeGraph.GraphSchemaObjectName,
+			GraphSchemaFileName:   knowledgeGraph.GraphSchemaFileName,
 		})
 	})
+}
+
+// BuildKnowledgeGraph 知识图谱构造
+func BuildKnowledgeGraph(knowledgeGraph string) *KnowledgeGraph {
+	if len(knowledgeGraph) > 0 {
+		graph := knowledgebase_service.KnowledgeGraph{}
+		err := json.Unmarshal([]byte(knowledgeGraph), &graph)
+		if err != nil {
+			log.Errorf("knowledgeGraph process error %s", err.Error())
+		}
+		var graphSchemaObjectName, graphSchemaFileName string
+		if len(graph.SchemaUrl) > 0 {
+			_, graphSchemaObjectName, graphSchemaFileName = service.SplitFilePath(graph.SchemaUrl)
+		}
+		return &KnowledgeGraph{
+			KnowledgeGraphSwitch:  graph.Switch,
+			GraphModelId:          graph.LlmModelId,
+			GraphSchemaObjectName: graphSchemaObjectName,
+			GraphSchemaFileName:   graphSchemaFileName,
+		}
+	}
+	return &KnowledgeGraph{
+		KnowledgeGraphSwitch: false,
+	}
 }
 
 // 子rag chunk的配置
@@ -342,7 +394,7 @@ func CreateKnowledgeUrlDoc(ctx context.Context, doc *model.KnowledgeDoc, importT
 			SegmentType:       service.RebuildSegmentType(config.SegmentType, config.SegmentMethod),
 			SplitType:         service.RebuildSplitType(config.SegmentMethod),
 			Separators:        config.Splitter,
-			KnowledgeBaseName: knowledge.Name,
+			KnowledgeBaseName: knowledge.RagName,
 			OcrModelId:        importTask.OcrModelId,
 			PreProcess:        preProcess.PreProcessList,
 			RagMetaDataParams: ragMetaList,
@@ -352,24 +404,30 @@ func CreateKnowledgeUrlDoc(ctx context.Context, doc *model.KnowledgeDoc, importT
 		}
 		//3.rag 文档开始导入操作
 		var fileName = service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
+		//构造知识库图谱
+		knowledgeGraph := BuildKnowledgeGraph(knowledge.KnowledgeGraph)
 		return service.RagImportDoc(ctx, &service.RagImportDocParams{
-			DocId:               doc.DocId,
-			KnowledgeName:       knowledge.Name,
-			CategoryId:          knowledge.KnowledgeId,
-			UserId:              doc.UserId,
-			Overlap:             config.Overlap,
-			SegmentSize:         config.MaxSplitter,
-			SegmentType:         service.RebuildSegmentType(config.SegmentType, config.SegmentMethod),
-			SplitType:           service.RebuildSplitType(config.SegmentMethod),
-			Separators:          config.Splitter,
-			ParserChoices:       analyzer.AnalyzerList,
-			ObjectName:          fileName,
-			OriginalName:        fileName,
-			IsEnhanced:          "false",
-			OcrModelId:          importTask.OcrModelId,
-			PreProcess:          preProcess.PreProcessList,
-			RagMetaDataParams:   ragMetaList,
-			RagChildChunkConfig: buildSubRagChunkConfig(config),
+			DocId:                 doc.DocId,
+			KnowledgeName:         knowledge.RagName,
+			CategoryId:            knowledge.KnowledgeId,
+			UserId:                doc.UserId,
+			Overlap:               config.Overlap,
+			SegmentSize:           config.MaxSplitter,
+			SegmentType:           service.RebuildSegmentType(config.SegmentType, config.SegmentMethod),
+			SplitType:             service.RebuildSplitType(config.SegmentMethod),
+			Separators:            config.Splitter,
+			ParserChoices:         analyzer.AnalyzerList,
+			ObjectName:            fileName,
+			OriginalName:          fileName,
+			IsEnhanced:            "false",
+			OcrModelId:            importTask.OcrModelId,
+			PreProcess:            preProcess.PreProcessList,
+			RagMetaDataParams:     ragMetaList,
+			RagChildChunkConfig:   buildSubRagChunkConfig(config),
+			KnowledgeGraphSwitch:  knowledgeGraph.KnowledgeGraphSwitch,
+			GraphModelId:          knowledgeGraph.GraphModelId,
+			GraphSchemaObjectName: knowledgeGraph.GraphSchemaObjectName,
+			GraphSchemaFileName:   knowledgeGraph.GraphSchemaFileName,
 		})
 	})
 }
@@ -378,16 +436,13 @@ func CreateKnowledgeUrlDoc(ctx context.Context, doc *model.KnowledgeDoc, importT
 func UpdateDocStatusDocId(ctx context.Context, docId string, status int, metaList []*model.KnowledgeDocMeta) error {
 	return db.GetHandle(ctx).Transaction(func(tx *gorm.DB) error {
 		//更新文档状态
-		var updateParams = map[string]interface{}{
-			"status":    status,
-			"error_msg": util.BuildDocErrMessage(status),
-		}
+		var updateParams, metaUpdate = buildUpdateParams(status)
 		err := tx.Model(&model.KnowledgeDoc{}).Where("doc_id = ?", docId).Updates(updateParams).Error
 		if err != nil {
 			return err
 		}
 		//更新文档元数据
-		if len(metaList) > 0 {
+		if metaUpdate && len(metaList) > 0 {
 			err := UpdateDocStatusMetaData(ctx, metaList)
 			if err != nil {
 				return err
@@ -399,18 +454,21 @@ func UpdateDocStatusDocId(ctx context.Context, docId string, status int, metaLis
 
 // InitDocStatus 初始化文档状态
 func InitDocStatus(ctx context.Context, userId, orgId string) error {
-	// 获取所有分析中状态的文档并更新状态
-	updateDoc := map[string]interface{}{
-		"status":    5,
-		"error_msg": "know_doc_parsing_interrupted",
-	}
-	//会锁表风险极高
-	tx := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.WithStatusList(util.BuildAnalyzingStatus())).
-		Apply(db.GetHandle(ctx), &model.KnowledgeDoc{})
-	if err := tx.Updates(updateDoc).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.GetHandle(ctx).Transaction(func(tx *gorm.DB) error {
+		err := stopDocProcess(tx)
+		if err != nil {
+			return err
+		}
+		_ = stopDocGraphProcess(tx)
+		if err != nil {
+			return err
+		}
+		_ = stopKnowledgeReport(tx)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 // DeleteDocByIdList 删除文档
@@ -459,4 +517,63 @@ func logicDeleteDocByIdList(tx *gorm.DB, idList []uint32) error {
 // createKnowledgeDoc 插入数据
 func createKnowledgeDoc(tx *gorm.DB, knowledgeDoc *model.KnowledgeDoc) error {
 	return tx.Model(&model.KnowledgeDoc{}).Create(knowledgeDoc).Error
+}
+
+func buildUpdateParams(status int) (map[string]interface{}, bool) {
+	if model.InGraphStatus(status) { //图谱状态
+		return map[string]interface{}{
+			"graph_status": model.GraphStatus(status),
+		}, false
+	}
+	//更新文档状态
+	return map[string]interface{}{
+		"status":    status,
+		"error_msg": util.BuildDocErrMessage(status),
+	}, true
+}
+
+func stopDocProcess(tx *gorm.DB) error {
+	// 获取所有分析中状态的文档并更新状态
+	updateDoc := map[string]interface{}{
+		"status":    5,
+		"error_msg": "know_doc_parsing_interrupted",
+	}
+	//会锁表风险极高
+	return sqlopt.SQLOptions(sqlopt.WithStatusList(util.BuildAnalyzingStatus())).
+		Apply(tx, &model.KnowledgeDoc{}).Updates(updateDoc).Error
+}
+
+func stopDocGraphProcess(tx *gorm.DB) error {
+	// 获取所有分析中状态的文档并更新状态
+	updateDoc := map[string]interface{}{
+		"graph_status": model.GraphInterruptFail,
+	}
+	//会锁表风险极高
+	return tx.Model(&model.KnowledgeDoc{}).Where("graph_status = ?", model.GraphProcessing).Updates(updateDoc).Error
+}
+
+func stopKnowledgeReport(tx *gorm.DB) error {
+	// 获取所有分析中状态的文档并更新状态
+	updateKnowledgeMap := map[string]interface{}{
+		"report_status": model.ReportInterruptFail,
+	}
+	//会锁表风险极高
+	return tx.Model(&model.KnowledgeBase{}).Where("report_status = ?", model.ReportProcessing).Updates(updateKnowledgeMap).Error
+}
+
+// SelectGraphStatus 查询知识图谱状态
+func SelectGraphStatus(ctx context.Context, knowledgeId string, userId, orgId string) ([]*model.KnowledgeDoc, error) {
+	var docList []*model.KnowledgeDoc
+	err := sqlopt.SQLOptions(sqlopt.WithPermit(orgId, userId), sqlopt.WithKnowledgeID(knowledgeId)).
+		Apply(db.GetHandle(ctx), &model.KnowledgeDoc{}).Select("doc_id", "graph_status").
+		Find(&docList).Error
+	if err != nil {
+		log.Errorf("SelectDocByDocId userId %s err: %v", userId, err)
+		return nil, util.ErrCode(errs.Code_KnowledgeBaseAccessDenied)
+	}
+	if len(docList) == 0 {
+		log.Errorf("SelectDocByDocId userId %s doc list empty", userId)
+		return nil, util.ErrCode(errs.Code_KnowledgeBaseAccessDenied)
+	}
+	return docList, nil
 }

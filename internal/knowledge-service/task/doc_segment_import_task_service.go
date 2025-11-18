@@ -193,14 +193,23 @@ func buildLineProcessor(importTask *model.DocSegmentImportTask, importParams *mo
 		})
 
 		return orm.CreateOneDocSegment(ctx, importTask, &service.RagCreateDocSegmentParams{
-			UserId:          importTask.UserId,
-			KnowledgeBase:   importParams.KnowledgeName,
-			KnowledgeId:     importParams.KnowledgeId,
-			FileName:        importParams.FileName,
-			MaxSentenceSize: importParams.MaxSentenceSize,
-			Chunks:          chunks,
+			UserId:           importParams.KnowledgeCreatorId,
+			KnowledgeBase:    buildKnowledgeBase(importParams),
+			KnowledgeId:      importParams.KnowledgeId,
+			FileName:         importParams.FileName,
+			MaxSentenceSize:  importParams.MaxSentenceSize,
+			Chunks:           chunks,
+			SplitType:        service.RebuildSplitType(importParams.SegmentMethod),
+			ChildChunkConfig: service.RebuildChildChunkConfig(importParams.SegmentMethod, importParams.SubMaxSplitter, importParams.SubSplitter),
 		})
 	}
+}
+
+func buildKnowledgeBase(importParams *model.DocSegmentImportParams) string {
+	if len(importParams.KnowledgeRagName) > 0 {
+		return importParams.KnowledgeRagName
+	}
+	return importParams.KnowledgeName
 }
 
 func processCsvFileLine(ctx context.Context, csvUrl string,

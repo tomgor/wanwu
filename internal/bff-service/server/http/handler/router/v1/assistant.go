@@ -19,6 +19,8 @@ func registerAssistant(apiV1 *gin.RouterGroup) {
 	mid.Sub("agent").Reg(apiV1, "/assistant", http.MethodPut, v1.AssistantUpdate, "修改智能体基本信息")
 	mid.Sub("agent").Reg(apiV1, "/assistant/config", http.MethodPut, v1.AssistantConfigUpdate, "修改智能体配置信息")
 	mid.Sub("agent").Reg(apiV1, "/assistant", http.MethodGet, v1.GetAssistantInfo, "查看智能体详情")
+	mid.Sub("agent").Reg(apiV1, "/assistant/draft", http.MethodGet, v1.GetAssistantDraftInfo, "查看草稿智能体详情")
+	mid.Sub("agent").Reg(apiV1, "/assistant/copy", http.MethodPost, v1.AssistantCopy, "智能体复制")
 
 	mid.Sub("agent").Reg(apiV1, "/assistant/tool/workflow", http.MethodPost, v1.AssistantWorkFlowCreate, "添加工作流")
 	mid.Sub("agent").Reg(apiV1, "/assistant/tool/workflow", http.MethodDelete, v1.AssistantWorkFlowDelete, "删除工作流")
@@ -28,9 +30,10 @@ func registerAssistant(apiV1 *gin.RouterGroup) {
 	mid.Sub("agent").Reg(apiV1, "/assistant/tool/mcp", http.MethodDelete, v1.AssistantMCPDelete, "删除mcp工具")
 	mid.Sub("agent").Reg(apiV1, "/assistant/tool/mcp/switch", http.MethodPut, v1.AssistantMCPEnableSwitch, "启用/停用mcp")
 
-	mid.Sub("agent").Reg(apiV1, "/assistant/tool/custom", http.MethodPost, v1.AssistantCustomToolCreate, "智能体添加自定义工具")
-	mid.Sub("agent").Reg(apiV1, "/assistant/tool/custom", http.MethodDelete, v1.AssistantCustomToolDelete, "智能体删除自定义工具")
-	mid.Sub("agent").Reg(apiV1, "/assistant/tool/custom/switch", http.MethodPut, v1.AssistantCustomToolEnableSwitch, "智能体启用/停用自定义工具")
+	mid.Sub("agent").Reg(apiV1, "/assistant/tool", http.MethodPost, v1.AssistantToolCreate, "添加智能体工具，包括自定义工具和内置工具")
+	mid.Sub("agent").Reg(apiV1, "/assistant/tool", http.MethodDelete, v1.AssistantToolDelete, "删除智能体工具，包括自定义工具和内置工具")
+	mid.Sub("agent").Reg(apiV1, "/assistant/tool/switch", http.MethodPut, v1.AssistantToolEnableSwitch, "智能体启用/停用自定义内置工具")
+	mid.Sub("agent").Reg(apiV1, "/assistant/tool/config", http.MethodPut, v1.AssistantToolConfig, "配置智能体工具，包括自定义工具和内置工具")
 
 	mid.Sub("agent").Reg(apiV1, "/assistant/conversation", http.MethodPost, v1.ConversationCreate, "创建智能体对话")
 	mid.Sub("agent").Reg(apiV1, "/assistant/conversation", http.MethodDelete, v1.ConversationDelete, "删除智能体对话")

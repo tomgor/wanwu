@@ -3,6 +3,7 @@ syntax = "proto3";
 package mcp_service;
 
 import "google/protobuf/empty.proto";
+import "proto/common/common.proto";
 
 option go_package = "github.com/UnicomAI/wanwu/api/proto/mcp-service";
 
@@ -13,16 +14,16 @@ service MCPService {
     
     // --- custom mcp ---
     rpc CreateCustomMCP(CreateCustomMCPReq) returns (google.protobuf.Empty) {}
+    rpc UpdateCustomMCP(UpdateCustomMCPReq) returns (google.protobuf.Empty) {}
     rpc GetCustomMCP(GetCustomMCPReq) returns (CustomMCPDetail) {}
     rpc DeleteCustomMCP(DeleteCustomMCPReq) returns (google.protobuf.Empty) {}
     rpc GetCustomMCPList(GetCustomMCPListReq) returns (CustomMCPList) {}
-    rpc GetCustomMCPByMCPIdList(GetCustomMCPByMCPIdListReq) returns (CustomMCPList) {}
-    
-    // --- tool ---
+
+    // --- custom mcp action ---
     rpc GetMCPToolList(GetMCPToolListReq) returns (MCPToolList) {}
     rpc GetMCPAvatar(GetMCPAvatarReq) returns (MCPAvatar) {}
 
-    // --- CustomTool ---
+    // --- custom tool ---
     rpc CreateCustomTool(CreateCustomToolReq) returns (google.protobuf.Empty) {}
     rpc GetCustomToolInfo(GetCustomToolInfoReq) returns (GetCustomToolInfoResp) {}
     rpc GetCustomToolList(GetCustomToolListReq) returns (GetCustomToolListResp) {}
@@ -30,9 +31,29 @@ service MCPService {
     rpc UpdateCustomTool(UpdateCustomToolReq) returns (google.protobuf.Empty) {}
     rpc DeleteCustomTool(DeleteCustomToolReq) returns (google.protobuf.Empty) {}
 
-    // --- square tool ---
+    // --- builtin tool ---
     rpc GetSquareTool(GetSquareToolReq) returns (SquareToolDetail) {}
     rpc GetSquareToolList(GetSquareToolListReq) returns (SquareToolList) {}
+    rpc UpsertBuiltinToolAPIKey(UpsertBuiltinToolAPIKeyReq) returns (google.protobuf.Empty) {}
+
+    // --- mcp server ---
+    rpc CreateMCPServer(CreateMCPServerReq) returns (CreateMCPServerResp) {}
+    rpc DeleteMCPServer(DeleteMCPServerReq) returns (google.protobuf.Empty) {}
+    rpc UpdateMCPServer(UpdateMCPServerReq) returns (google.protobuf.Empty) {}
+    rpc GetMCPServer(GetMCPServerReq) returns (MCPServerInfo) {}
+    rpc GetMCPServerList(GetMCPServerListReq) returns (GetMCPServerListResp) {}
+    rpc CreateMCPServerTool(CreateMCPServerToolReq) returns (google.protobuf.Empty) {}
+    rpc UpdateMCPServerTool(UpdateMCPServerToolReq) returns (google.protobuf.Empty) {}
+    rpc DeleteMCPServerTool(DeleteMCPServerToolReq) returns (google.protobuf.Empty) {}
+    rpc GetMCPServerTool(GetMCPServerToolReq) returns (MCPServerToolInfo) {}
+    rpc GetMCPServerToolList(GetMCPServerToolListReq) returns (GetMCPServerToolListResp) {}
+
+    // --- custom builtin tool ---
+    rpc GetToolSelect(GetToolSelectReq) returns (GetToolListResp) {}
+    rpc GetToolByIdList(GetToolByToolIdListReq) returns (GetToolByToolIdListResp) {}
+
+    // --- mcp mcpserver tool ---
+    rpc GetMCPByMCPIdList(GetMCPByMCPIdListReq) returns (GetMCPByMCPIdListResp) {}
 }
 
 // --- req ---
@@ -62,6 +83,18 @@ message CreateCustomMCPReq {
     string desc = 5;
     string from = 6;
     string sseUrl = 7;
+    string avatarPath = 8;
+}
+
+message UpdateCustomMCPReq {
+    string orgId = 1;
+    string userId = 2;
+    string mcpId = 3;
+    string name = 4;
+    string desc = 5;
+    string from = 6;
+    string sseUrl = 7;
+    string avatarPath = 8;
 }
 
 message GetCustomMCPReq {
@@ -79,10 +112,6 @@ message GetCustomMCPListReq {
     string name = 3;
 }
 
-message GetCustomMCPByMCPIdListReq {
-    repeated string mcpIdList = 1;
-}
-
 message CustomMCPList {
     repeated CustomMCPInfo infos = 1;
 }
@@ -93,7 +122,7 @@ message GetMCPToolListReq {
 }
 
 message MCPToolList {
-    repeated MCPTool tools = 1;
+    repeated common.ToolAction tools = 1;
 }
 
 message GetMCPAvatarReq {
@@ -110,14 +139,16 @@ message MCPAvatar {
 message CustomMCPDetail {
     string mcpId = 1;
     string sseUrl = 2;
-    SquareMCPInfo info = 3;
-    SquareMCPIntro intro = 4;
+    string avatarPath = 3;
+    SquareMCPInfo info = 4;
+    SquareMCPIntro intro = 5;
 }
 
 message CustomMCPInfo {
     string mcpId = 1;
     string sseUrl = 2;
-    SquareMCPInfo info = 3;
+    string avatarPath = 3;
+    SquareMCPInfo info = 4;
 }
 
 message SquareMCPDetail {
@@ -146,25 +177,20 @@ message SquareMCPIntro {
 message MCPTools {
     string sseUrl = 1;
     bool hasCustom = 2;
-    repeated MCPTool tools = 3;
+    repeated common.ToolAction tools = 3;
 }
 
-message MCPTool {
-    string name = 1;
-    string description = 2;
-    MCPToolInputSchema inputSchema = 3;
+message GetMCPByMCPIdListReq {
+    repeated string mcpIdList = 1;
+    repeated string mcpServerIdList = 2;
+    Identity identity = 3;
 }
 
-message MCPToolInputSchema {
-    string type = 1; // 固定 object
-    map<string, MCPToolInputSchemaValue> properties = 2;
-    repeated string required = 3;
+message GetMCPByMCPIdListResp {
+    repeated CustomMCPInfo infos = 1;
+    repeated MCPServerInfo servers = 2;
 }
 
-message MCPToolInputSchemaValue {
-    string type = 1;
-    string description = 2;
-}
 
 // --- customTool ---
 
@@ -174,36 +200,28 @@ message Identity {
 }
 
 message CreateCustomToolReq {
-    string schema = 1;
-    ApiAuthWebRequest apiAuth = 2;
-    Identity identity = 3;
+    Identity identity = 1;
+    string schema = 2;
+    common.ApiAuthWebRequest apiAuth = 3;
     string name = 4;
     string description = 5;
     string privacyPolicy = 6;
-    string toolSquareId = 7;
-}
-
-message ApiAuthWebRequest{
-    string type = 1;
-    string apiKey = 2;
-    string customHeaderName = 3;
-    string authType = 4;
+    string avatarPath = 7;
 }
 
 message GetCustomToolInfoReq {
     string customToolId = 1;
-    string toolSquareId = 2;
-    Identity identity = 3;
+    Identity identity = 2;
 }
 
 message GetCustomToolInfoResp {
     string customToolId = 1;
     string schema = 2;
-    ApiAuthWebRequest apiAuth = 3;
+    common.ApiAuthWebRequest apiAuth = 3;
     string name = 4;
     string description = 5;
     string privacyPolicy = 6;
-    string toolSquareId = 7;
+    string avatarPath = 7;
 }
 
 message GetCustomToolListReq {
@@ -220,6 +238,7 @@ message GetCustomToolItem {
     string customToolId = 1;
     string name = 2;
     string description = 3;
+    string avatarPath = 4;
 }
 
 message GetCustomToolListResp {
@@ -229,11 +248,12 @@ message GetCustomToolListResp {
 message UpdateCustomToolReq {
     string customToolId = 1;
     string schema = 2;
-    ApiAuthWebRequest apiAuth = 3;
+    common.ApiAuthWebRequest apiAuth = 3;
     string name = 4;
     string description = 5;
     string privacyPolicy = 6;
     Identity identity = 7;
+    string avatarPath = 8;
 }
 
 message DeleteCustomToolReq {
@@ -248,6 +268,7 @@ message GetSquareToolReq {
 message SquareToolDetail {
     ToolSquareInfo info = 1;
     BuiltInTools builtInTools = 2;
+    string schema =3;
 }
 
 message ToolSquareInfo {
@@ -259,15 +280,142 @@ message ToolSquareInfo {
 }
 
 message BuiltInTools {
-    repeated MCPTool tools = 1;
-    string apiKey = 2;
+    repeated common.ToolAction tools = 1;
+    common.ApiAuthWebRequest apiAuth = 2;
     string detail = 3;
     int32 actionSum = 4;
     bool needApiKeyInput = 5;
 }
- message GetSquareToolListReq {
+
+message GetSquareToolListReq {
     string name = 1;
 }
+
 message SquareToolList {
     repeated ToolSquareInfo infos = 1;
+}
+
+message UpsertBuiltinToolAPIKeyReq {
+    string toolSquareId = 1;
+    string apiKey = 2;
+    Identity identity = 3;
+}
+
+message GetToolSelectReq {
+    string name = 1;
+    Identity identity = 2;
+}
+
+message GetToolItem {
+    string toolId = 1;
+    string toolName = 2;
+    string toolType = 3;
+    string desc = 4;
+    string apiKey = 5;
+    bool needApiKeyInput = 6;
+    string avatarPath = 7;
+}
+
+message GetToolListResp {
+    repeated GetToolItem list = 1;
+    int32 total = 2;
+}
+
+// mcp server
+
+message MCPServerInfo{
+  string mcpServerId = 1;
+  string name = 2;
+  string desc = 3;
+  int64  toolNum = 4;
+  string avatarPath = 5;
+  string sseUrl = 6;
+  string sseExample = 7;
+  string streamableUrl = 8;
+  string streamableExample = 9;
+}
+
+message CreateMCPServerReq {
+  string name = 1;
+  string desc = 2;
+  string avatarPath = 3;
+  Identity identity = 4;
+}
+
+message CreateMCPServerResp {
+  string mcpServerId = 1;
+}
+
+message UpdateMCPServerReq {
+  string mcpServerId = 1;
+  string name = 2;
+  string desc = 3;
+  string avatarPath = 4;
+}
+
+message GetMCPServerReq {
+  string mcpServerId = 1;
+}
+
+message DeleteMCPServerReq {
+  string mcpServerId = 1;
+}
+
+message GetMCPServerListReq {
+  string name = 1;
+  Identity identity  = 2;
+}
+
+message GetMCPServerListResp {
+  repeated MCPServerInfo list = 1;
+}
+
+message CreateMCPServerToolReq {
+  string mcpServerId = 1;
+  repeated MCPServerToolInfo mcpServiceToolInfos = 2;
+}
+
+message UpdateMCPServerToolReq {
+  string mcpServerToolId = 1;
+  string name = 2;
+  string desc = 3;
+  string schema = 4;
+}
+
+message DeleteMCPServerToolReq {
+  string mcpServerToolId = 1;
+}
+
+message GetMCPServerToolReq {
+  string mcpServerToolId = 1;
+}
+
+message GetMCPServerToolListReq {
+  string mcpServerId = 1;
+}
+
+message GetMCPServerToolListResp {
+  repeated MCPServerToolInfo list = 1;
+}
+
+message MCPServerToolInfo {
+  string mcpServerToolId = 1;
+  string mcpServerId = 2;
+  string name = 3;
+  string desc = 4;
+  string Type = 5;
+  string appToolId = 6;
+  string appToolName = 7;
+  string schema = 8;
+  common.ApiAuth apiAuth = 9;
+}
+message GetToolByToolIdListReq {
+    repeated string builtInToolIdList = 1;
+    repeated string customToolIdList = 2;
+    Identity identity = 3;
+}
+
+message GetToolByToolIdListResp {
+    repeated GetCustomToolItem list = 1;
+    repeated ToolSquareInfo toolSquareInfoList = 2;
 }

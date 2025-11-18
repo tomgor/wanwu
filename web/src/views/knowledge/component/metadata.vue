@@ -7,7 +7,7 @@
       @click="createMetaData"
       v-if="type !== 'create'"
     >创建</el-button>
-    <div class="docMetaData">
+    <div class="docMetaData" v-loading="loading">
       <div
         v-for="(item,index) in docMetaData"
         class="docItem"
@@ -153,7 +153,7 @@ export default {
           ...item,
           metaValue:
             item && item.metaValueType === 'time'
-              ? item.metaValue
+              ? String(item.metaValue)
               : (item && item.metaValue != null ? String(item.metaValue) : ''),
         }))
 
@@ -167,6 +167,7 @@ export default {
   },
   data() {
     return {
+      loading:false,
       debounceTimer: null,
       docMetaData: [],
       typeOptions: [
@@ -201,19 +202,24 @@ export default {
   },
   methods: {
     getList(){
+      this.loading = true;
       metaSelect({knowledgeId:this.knowledgeId}).then(res =>{
           if(res.code === 0){
-              this.keyOptions = res.data.knowledgeMetaList || []
+            this.loading = false;
+            this.keyOptions = res.data.knowledgeMetaList || []
               if(this.type === 'create'){
                 this.docMetaData = (res.data.knowledgeMetaList || []).map(item => ({
                   ...item,
+                  metaValueType:item.metaValueType || 'string',
                   showEdit:false,
                   option: ''
                 }));
               }
               
           }
-      }).catch(() =>{})
+      }).catch(() =>{
+        this.loading = false;
+      })
     },
     keyChange(val,item){
       item.metaValue = ''
@@ -392,7 +398,7 @@ export default {
         min-width: fit-content;
       }
       .metaValueType{
-        color:#384BF7 ;
+        color:$color ;
       }
       .docItem_data_label {
         margin-right: 5px;
@@ -407,7 +413,7 @@ export default {
       .setBtn {
         font-size: 16px;
         cursor: pointer;
-        color: #384bf7;
+        color: $btn_bg;
       }
     }
     .docItem_data_btn {

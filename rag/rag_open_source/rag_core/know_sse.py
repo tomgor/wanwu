@@ -336,8 +336,9 @@ async def search(request: Request):
 
 
     json_request = await request.json()
-    user_id = request.headers.get("X-uid")
-    kb_name = json_request["knowledgeBase"]
+    # user_id = request.headers.get("X-uid")
+    # kb_name = json_request["knowledgeBase"]
+    knowledge_base_info = json_request.get("knowledge_base_info", {})
     question = json_request["question"]
     rate = float(json_request["threshold"])
     top_k = int(json_request["topK"])
@@ -375,6 +376,7 @@ async def search(request: Request):
     rerank_model_id = json_request.get("rerank_model_id", '')
     weights = json_request.get("weights", None)
     retrieve_method = json_request.get("retrieve_method", "hybrid_search")
+    use_graph = json_request.get("use_graph", False)
 
     # metadata filtering params
     metadata_filtering = json_request.get("metadata_filtering", False)
@@ -383,7 +385,7 @@ async def search(request: Request):
         metadata_filtering_conditions = []
 
     logger.info('---------------流式查询---------------')
-    logger.info('user_id:'+repr(user_id)+'\t'+repr(json_request))
+    logger.info('knowledge_base_info:'+repr(knowledge_base_info)+'\t'+repr(json_request))
 
     def params_check_failed(err_msg: str):
         response_info = {
@@ -397,6 +399,11 @@ async def search(request: Request):
             return EventSourceResponse(no_search_list(default_answer, history, question, 1, error_msg, -1, ''))
         else:
             return JSONResponse(content=response_info)
+
+    # 检查 knowledge_base_info 是否为空
+    if not knowledge_base_info:
+        error_msg = "knowledge_base_info cannot be empty"
+        return params_check_failed(error_msg)
     # 检查 custom_model_info['llm_model_id'] 是否为空
     if 'llm_model_id' not in custom_model_info or not custom_model_info.get('llm_model_id'):
         error_msg = "custom_model_info['llm_model_id'] 不能为空"
@@ -419,33 +426,29 @@ async def search(request: Request):
         return params_check_failed(error_msg)
 
     sRandom = str(uuid.uuid1()).replace("-", "")
-    u_id = "{}_{}_{}_{}".format(user_id, kb_name, question, sRandom)
+    u_id = "{}_{}_{}".format(knowledge_base_info, question, sRandom)
     msg_id = hashlib.md5(u_id.encode("utf8")).hexdigest()
     chunk_conent=0
     chunk_size=CHUNK_SIZE
     use_cache_flag = False
-    if isinstance(kb_name, str):
-        kb_names=[kb_name]
-    else:
-        kb_names=kb_name
-    kb_ids = []  # kb_id 的 list
-    for kb_n in kb_names:
-        kb_ids.append(get_kb_name_id(user_id, kb_n))  # 获取kb_id
 
     if max_history > 0:
         history = history[-max_history:]
     else:
         history = []
-    if rewrite_query:
-        query_dict_list = get_query_dict_cache(redis_client,user_id, kb_ids)
-        if query_dict_list:
-            rewritten_queries = query_rewrite(question, query_dict_list)
-            logger.info("对query进行改写,原问题:%s 改写后问题:%s" % (question, ",".join(rewritten_queries)))
-            if len(rewritten_queries) > 0:
-                question = rewritten_queries[0]
-                logger.info("按新问题:%s 进行召回" % question)
-        else:
-            logger.info("未启用或维护转名词表,query未改写,按原问题:%s 进行召回" % question)
+    for user_id, kb_info_list in knowledge_base_info.items():
+        kb_names = [kb_info['kb_name'] for kb_info in kb_info_list]
+        kb_ids = [kb_info['kb_id'] if kb_info.get('kb_id') else get_kb_name_id(user_id, kb_info['kb_name']) for kb_info in kb_info_list]
+        if rewrite_query:
+            query_dict_list = get_query_dict_cache(redis_client,user_id, kb_ids)
+            if query_dict_list:
+                rewritten_queries = query_rewrite(question, query_dict_list)
+                logger.info("对query进行改写,原问题:%s 改写后问题:%s" % (question, ",".join(rewritten_queries)))
+                if len(rewritten_queries) > 0:
+                    question = rewritten_queries[0]
+                    logger.info("按新问题:%s 进行召回" % question)
+            else:
+                logger.info("未启用或维护转名词表,query未改写,按原问题:%s 进行召回" % question)
     if top_k<=0:
         # top_k必须大于0
         return EventSourceResponse(no_search_list(default_answer,history,question,1,'top_k必须大于0'))
@@ -457,7 +460,7 @@ async def search(request: Request):
             temp_start_time = time.time()
             if data_flywheel:
                 # 要存储的数据
-                cache_key = "%s^%s^%s^%s" % (user_id, kb_name, top_k, question)
+                cache_key = "%s^%s^%s" % (knowledge_base_info, top_k, question)
                 exists = redis_client.exists(cache_key)
                 if exists:
                     use_cache_flag = True
@@ -472,19 +475,23 @@ async def search(request: Request):
                 if has_effective_cache:
                     rerank_result = cache_result_json
                 else:
-                    rerank_result = get_knowledge_based_answer(user_id, kb_names, question, rate, top_k, chunk_conent,
+                    rerank_result = get_knowledge_based_answer("", "", question, rate, top_k, chunk_conent,
                                                                chunk_size, return_meta, prompt_template, search_field,
                                                                default_answer, auto_citation, retrieve_method,
                                                                rerank_model_id=rerank_model_id, rerank_mod=rerank_mod,
                                                                weights=weights,
-                                                               metadata_filtering_conditions=metadata_filtering_conditions)
+                                                               metadata_filtering_conditions=metadata_filtering_conditions,
+                                                               knowledge_base_info=knowledge_base_info, use_graph=use_graph
+                                                               )
             else:
-                rerank_result = get_knowledge_based_answer(user_id, kb_names, question, rate, top_k, chunk_conent,
+                rerank_result = get_knowledge_based_answer("", "", question, rate, top_k, chunk_conent,
                                                            chunk_size, return_meta, prompt_template, search_field,
                                                            default_answer, auto_citation, retrieve_method,
                                                            rerank_model_id=rerank_model_id, rerank_mod=rerank_mod,
                                                            weights=weights,
-                                                           metadata_filtering_conditions=metadata_filtering_conditions)
+                                                           metadata_filtering_conditions=metadata_filtering_conditions,
+                                                           knowledge_base_info=knowledge_base_info, use_graph=use_graph
+                                                           )
 
             logger.info("===>data_flywheel=%s,has_effective_cache=%s,rerank_result=%s" % (data_flywheel,has_effective_cache,json.dumps(rerank_result, ensure_ascii=False)))
             response_info['code'] = int(rerank_result['code'])
@@ -519,8 +526,9 @@ async def search(request: Request):
                 u_condition = {'id': msg_id}
                 message = {
                     "id": msg_id,
-                    "user_id": user_id,
-                    "kb_name": kb_name,
+                    "user_id": "",
+                    "kb_name": "",
+                    "knowledge_base_info": knowledge_base_info,
                     "question": question,
                     "rate": rate,
                     "top_k": top_k,

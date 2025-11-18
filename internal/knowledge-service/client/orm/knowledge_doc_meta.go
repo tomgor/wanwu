@@ -26,6 +26,34 @@ func SelectDocMetaList(ctx context.Context, userId, orgId, docId string) ([]*mod
 	return docMetaList, nil
 }
 
+// SelectMetaByDocIds 获取多个文档的元数据列表
+func SelectMetaByDocIds(ctx context.Context, userId, orgId string, docIds []string) ([]*model.KnowledgeDocMeta, error) {
+	var docMetaList []*model.KnowledgeDocMeta
+	err := sqlopt.SQLOptions(sqlopt.WithDocIDs(docIds), sqlopt.WithPermit(orgId, userId)).
+		Apply(db.GetHandle(ctx), &model.KnowledgeDocMeta{}).
+		Order("create_at desc").
+		Find(&docMetaList).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return docMetaList, nil
+}
+
+// SelectDocMetaListByKey 根据key,docId获取文档元数据值列表
+func SelectDocMetaListByKey(ctx context.Context, userId, orgId, docId, metaKey string) ([]*model.KnowledgeDocMeta, error) {
+	var docMetaList []*model.KnowledgeDocMeta
+	err := sqlopt.SQLOptions(sqlopt.WithDocID(docId), sqlopt.WithPermit(orgId, userId), sqlopt.WithKey(metaKey), sqlopt.WithNonEmptyValue()).
+		Apply(db.GetHandle(ctx), &model.KnowledgeDocMeta{}).
+		Order("create_at desc").
+		Find(&docMetaList).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return docMetaList, nil
+}
+
 // SelectMetaByKnowledgeId 获取单个知识库的元数据列表
 func SelectMetaByKnowledgeId(ctx context.Context, userId, orgId string, knowledgeId string) ([]*model.KnowledgeDocMeta, error) {
 	var docMetaList []*model.KnowledgeDocMeta
@@ -78,6 +106,70 @@ func UpdateDocStatusDocMeta(ctx context.Context, docId string, addList []*model.
 	})
 }
 
+func BatchUpdateDocMetaValue(ctx context.Context, addList, updateList []*model.KnowledgeDocMeta, deleteDataIdList []string, knowledge *model.KnowledgeBase, docList []*model.KnowledgeDoc, userId string, docIds []string) error {
+	return db.GetHandle(ctx).Transaction(func(tx *gorm.DB) error {
+		if len(addList) > 0 {
+			//插入数据
+			err := tx.Model(&model.KnowledgeDocMeta{}).CreateInBatches(addList, len(addList)).Error
+			if err != nil {
+				return err
+			}
+		}
+		if len(updateList) > 0 {
+			for _, meta := range updateList {
+				//更新数据
+				updateMap := map[string]interface{}{
+					"value": meta.Value,
+				}
+				err := tx.Model(&model.KnowledgeDocMeta{}).Where("meta_id = ?", meta.MetaId).Updates(updateMap).Error
+				if err != nil {
+					return err
+				}
+			}
+		}
+		if len(deleteDataIdList) > 0 {
+			err := tx.Unscoped().Model(&model.KnowledgeDocMeta{}).Where("meta_id IN ?", deleteDataIdList).Delete(&model.KnowledgeDocMeta{}).Error
+			if err != nil {
+				return err
+			}
+		}
+		ragParams, err := buildBatchUpdateMetaRAGParams(tx, knowledge, docList, userId, docIds)
+		if err != nil {
+			return err
+		}
+		err = service.BatchRagDocMeta(ctx, ragParams)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+func buildBatchUpdateMetaRAGParams(tx *gorm.DB, knowledge *model.KnowledgeBase, docList []*model.KnowledgeDoc, userId string, docIds []string) (*service.BatchRagDocMetaParams, error) {
+	docNameMap := make(map[string]string)
+	for _, doc := range docList {
+		docNameMap[doc.DocId] = service.RebuildFileName(doc.DocId, doc.FileType, doc.Name)
+	}
+	docMetaList := make([]*model.KnowledgeDocMeta, 0)
+	err := tx.Where("doc_id in ?", docIds).Find(&docMetaList).Error
+	if err != nil {
+		log.Errorf("docId %v select meta fail %v", docIds, err)
+		return nil, err
+	}
+	metaList, err := buildBatchMetaParamsList(docMetaList, docNameMap, docIds)
+	if err != nil {
+		log.Errorf("docId %v build meta params fail %v", docIds, err)
+		return nil, err
+	}
+	ragParams := &service.BatchRagDocMetaParams{
+		UserId:        userId,
+		KnowledgeBase: knowledge.RagName,
+		KnowledgeId:   knowledge.KnowledgeId,
+		MetaList:      metaList,
+	}
+	return ragParams, nil
+}
+
 // UpdateBatchStatusDocMeta 批量更新文档tag
 func UpdateBatchStatusDocMeta(ctx context.Context, knowledgeId string, docNameMap map[string]string, addList []*model.KnowledgeDocMeta,
 	updateList []*model.KnowledgeDocMeta, ragDocMetaParams *service.BatchRagDocMetaParams) error {
@@ -121,6 +213,53 @@ func UpdateBatchStatusDocMeta(ctx context.Context, knowledgeId string, docNameMa
 	})
 }
 
+// buildBatchMetaParamsList 构建rag元数据参数
+func buildBatchMetaParamsList(docMetaList []*model.KnowledgeDocMeta, docNameMap map[string]string, docIds []string) ([]*service.DocMetaInfo, error) {
+	var docMetaMap = make(map[string][]*model.KnowledgeDocMeta)
+	for _, meta := range docMetaList {
+		metas := docMetaMap[meta.DocId]
+		if len(metas) == 0 {
+			metas = make([]*model.KnowledgeDocMeta, 0)
+		}
+		metas = append(metas, meta)
+		docMetaMap[meta.DocId] = metas
+	}
+	var docTrueMap = make(map[string]bool)
+	for _, docId := range docIds {
+		docTrueMap[docId] = false
+	}
+	dataList := make([]*service.DocMetaInfo, 0)
+	for docId, metas := range docMetaMap {
+		var retList = make([]*service.MetaData, 0)
+		for _, meta := range metas {
+			valueData, err := buildValueData(meta.ValueType, meta.Value)
+			if err != nil {
+				log.Errorf("buildValueData error %s", err.Error())
+				return nil, err
+			}
+			retList = append(retList, &service.MetaData{
+				Key:       meta.Key,
+				Value:     valueData,
+				ValueType: meta.ValueType,
+			})
+		}
+		dataList = append(dataList, &service.DocMetaInfo{
+			FileName:     docNameMap[docId],
+			MetaDataList: retList,
+		})
+		docTrueMap[docId] = true
+	}
+	for docId, isTrue := range docTrueMap {
+		if !isTrue {
+			dataList = append(dataList, &service.DocMetaInfo{
+				FileName:     docNameMap[docId],
+				MetaDataList: []*service.MetaData{},
+			})
+		}
+	}
+	return dataList, nil
+}
+
 // buildMetaParamsList 构建rag元数据参数
 func buildMetaParamsList(docMetaList []*model.KnowledgeDocMeta, docNameMap map[string]string) ([]*service.DocMetaInfo, error) {
 	var docMetaMap = make(map[string][]*model.KnowledgeDocMeta)
@@ -132,7 +271,7 @@ func buildMetaParamsList(docMetaList []*model.KnowledgeDocMeta, docNameMap map[s
 		metas = append(metas, meta)
 		docMetaMap[meta.DocId] = metas
 	}
-	var dataList []*service.DocMetaInfo
+	dataList := make([]*service.DocMetaInfo, 0)
 	for docId, metas := range docMetaMap {
 		var retList = make([]*service.MetaData, 0)
 		for _, meta := range metas {
@@ -182,7 +321,7 @@ func UpdateDocStatusMetaData(ctx context.Context, metaDataList []*model.Knowledg
 
 // DeleteMetaDataByDocIdList 根据docIdList删除元数据
 func DeleteMetaDataByDocIdList(tx *gorm.DB, knowledgeId string, docIdList []string) error {
-	return tx.Unscoped().Model(&model.KnowledgeDocMeta{}).Where("doc_id IN ?", docIdList).Or("knowledge_id = ?", knowledgeId).Delete(&model.KnowledgeDocMeta{}).Error
+	return tx.Unscoped().Model(&model.KnowledgeDocMeta{}).Where("doc_id IN ?", docIdList).Where("knowledge_id = ?", knowledgeId).Delete(&model.KnowledgeDocMeta{}).Error
 }
 
 // createBatchKnowledgeDocMeta 插入数据

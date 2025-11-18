@@ -75,7 +75,7 @@ func ChatAgent(ctx *gin.Context) {
 			AssistantId:    appID,
 			ConversationId: req.ConversationID,
 			Prompt:         req.Query,
-			FileInfo:       request.ConversionStreamFile{},
+			FileInfo:       []request.ConversionStreamFile{},
 			Trial:          false,
 		}); err != nil {
 			gin_util.Response(ctx, nil, err)
@@ -87,7 +87,7 @@ func ChatAgent(ctx *gin.Context) {
 		AssistantId:    appID,
 		ConversationId: req.ConversationID,
 		Prompt:         req.Query,
-		FileInfo:       request.ConversionStreamFile{},
+		FileInfo:       []request.ConversionStreamFile{},
 		Trial:          false,
 	})
 	if err != nil {
@@ -139,13 +139,13 @@ func ChatRag(ctx *gin.Context) {
 
 	// 流式
 	if req.Stream {
-		if err := service.ChatRagStream(ctx, userID, orgID, request.ChatRagRequest{RagID: appID, Question: req.Query}); err != nil {
+		if err := service.ChatRagStream(ctx, userID, orgID, request.ChatRagRequest{RagID: appID, Question: req.Query, History: req.History}); err != nil {
 			gin_util.Response(ctx, nil, err)
 		}
 		return
 	}
 	// 非流式
-	chatCh, err := service.CallRagChatStream(ctx, userID, orgID, request.ChatRagRequest{RagID: appID, Question: req.Query})
+	chatCh, err := service.CallRagChatStream(ctx, userID, orgID, request.ChatRagRequest{RagID: appID, Question: req.Query, History: req.History})
 	if err != nil {
 		gin_util.Response(ctx, nil, err)
 		return
@@ -220,6 +220,60 @@ func WorkflowFileUpload(ctx *gin.Context) {
 		return
 	}
 	ctx.String(http.StatusOK, resp)
+}
+
+// GetMCPServerSSE
+//
+//	@Tags			openapi
+//	@Summary		获取MCPServer SSE
+//	@Description	获取MCPServer SSE
+//	@Accept			json
+//	@Produce		json
+//	@Param			key	query		string	true	"key"
+//	@Success		200	{object}	response.Response{}
+//	@Router			/mcp/server/sse [get]
+func GetMCPServerSSE(ctx *gin.Context) {
+	err := service.GetMCPServerSSE(ctx, getAppID(ctx), ctx.Query("key"))
+	if err != nil {
+		gin_util.Response(ctx, nil, err)
+		return
+	}
+}
+
+// GetMCPServerMessage
+//
+//	@Tags			openapi
+//	@Summary		获取MCPServer Message
+//	@Description	获取MCPServer Message
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	query		string	true	"mcpServerId"
+//	@Success		200	{object}	response.Response{}
+//	@Router			/mcp/server/message [post]
+func GetMCPServerMessage(ctx *gin.Context) {
+	err := service.GetMCPServerMessage(ctx, getAppID(ctx))
+	if err != nil {
+		gin_util.Response(ctx, nil, err)
+		return
+	}
+}
+
+// GetMCPServerStreamable
+//
+//	@Tags			openapi
+//	@Summary		获取MCPServer streamable 类型消息
+//	@Description	获取MCPServer streamable 类型消息
+//	@Accept			json
+//	@Produce		json
+//	@Param			key	query		string	true	"key"
+//	@Success		200	{object}	response.Response{}
+//	@Router			/mcp/server/streamable [post]
+func GetMCPServerStreamable(ctx *gin.Context) {
+	err := service.GetMCPServerStreamable(ctx, getAppID(ctx))
+	if err != nil {
+		gin_util.Response(ctx, nil, err)
+		return
+	}
 }
 
 // --- internal ---

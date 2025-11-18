@@ -261,6 +261,9 @@ definitions:
     type: object
   request.AppKnowledgeBase:
     properties:
+      graphSwitch:
+        description: 知识图谱开关
+        type: integer
       id:
         description: 知识库id
         type: string
@@ -312,6 +315,9 @@ definitions:
       topK:
         description: 知识条数
         type: integer
+      useGraph:
+        description: 知识图谱开关
+        type: boolean
     type: object
   request.AppModelConfig:
     properties:
@@ -346,6 +352,11 @@ definitions:
         items:
           $ref: '#/definitions/request.SensitiveTable'
         type: array
+    type: object
+  request.AssistantToolConfig:
+    properties:
+      rerankId:
+        type: string
     type: object
   request.Avatar:
     properties:
@@ -390,17 +401,6 @@ definitions:
         type: string
       value:
         description: value
-        type: string
-    type: object
-  request.OnlineSearchConfig:
-    properties:
-      enable:
-        type: boolean
-      searchKey:
-        type: string
-      searchRerankId:
-        type: string
-      searchUrl:
         type: string
     type: object
   request.SensitiveTable:
@@ -458,6 +458,9 @@ definitions:
       createdAt:
         description: 创建时间
         type: string
+      description:
+        description: 应用描述
+        type: string
       disclaimer:
         description: 免责声明
         type: string
@@ -503,11 +506,6 @@ definitions:
       createdAt:
         description: 创建时间
         type: string
-      customInfos:
-        description: 自定义工具信息
-        items:
-          $ref: '#/definitions/response.CustomInfos'
-        type: array
       desc:
         description: 描述
         type: string
@@ -521,7 +519,7 @@ definitions:
       mcpInfos:
         description: MCP信息
         items:
-          $ref: '#/definitions/response.MCPInfos'
+          $ref: '#/definitions/response.AssistantMCPInfo'
         type: array
       modelConfig:
         allOf:
@@ -530,10 +528,6 @@ definitions:
       name:
         description: 名称
         type: string
-      onlineSearchConfig:
-        allOf:
-        - $ref: '#/definitions/request.OnlineSearchConfig'
-        description: 在线搜索配置
       prologue:
         description: 开场白
         type: string
@@ -553,17 +547,102 @@ definitions:
       scope:
         description: 作用域
         type: integer
+      toolInfos:
+        description: 自定义工具、内置工具
+        items:
+          $ref: '#/definitions/response.AssistantToolInfo'
+        type: array
       updatedAt:
         description: 更新时间
         type: string
+      visionConfig:
+        allOf:
+        - $ref: '#/definitions/response.VisionConfig'
+        description: 视觉配置
       workFlowInfos:
         description: 工作流信息
         items:
-          $ref: '#/definitions/response.WorkFlowInfos'
+          $ref: '#/definitions/response.AssistantWorkFlowInfo'
         type: array
     required:
     - assistantId
     - name
+    type: object
+  response.AssistantMCPInfo:
+    properties:
+      actionName:
+        type: string
+      avatar:
+        $ref: '#/definitions/request.Avatar'
+      enable:
+        type: boolean
+      mcpId:
+        type: string
+      mcpName:
+        type: string
+      mcpType:
+        enum:
+        - mcp
+        - mcpserver
+        type: string
+      uniqueId:
+        type: string
+      valid:
+        type: boolean
+    required:
+    - mcpType
+    type: object
+  response.AssistantRequestFile:
+    properties:
+      fileUrl:
+        type: string
+      name:
+        type: string
+      size:
+        type: integer
+    type: object
+  response.AssistantToolInfo:
+    properties:
+      actionName:
+        type: string
+      avatar:
+        $ref: '#/definitions/request.Avatar'
+      enable:
+        type: boolean
+      toolConfig:
+        $ref: '#/definitions/request.AssistantToolConfig'
+      toolId:
+        type: string
+      toolName:
+        type: string
+      toolType:
+        enum:
+        - builtin
+        - custom
+        type: string
+      uniqueId:
+        type: string
+      valid:
+        type: boolean
+    required:
+    - toolType
+    type: object
+  response.AssistantWorkFlowInfo:
+    properties:
+      apiName:
+        type: string
+      avatar:
+        $ref: '#/definitions/request.Avatar'
+      enable:
+        type: boolean
+      name:
+        type: string
+      uniqueId:
+        type: string
+      workFlowDesc:
+        type: string
+      workFlowId:
+        type: string
     type: object
   response.ConversationCreateResp:
     properties:
@@ -590,9 +669,9 @@ definitions:
         type: string
       qa_type:
         type: integer
-      requestFileUrls:
+      requestFiles:
         items:
-          type: string
+          $ref: '#/definitions/response.AssistantRequestFile'
         type: array
       response:
         type: string
@@ -613,47 +692,11 @@ definitions:
       title:
         type: string
     type: object
-  response.CustomInfos:
-    properties:
-      customDesc:
-        type: string
-      customId:
-        type: string
-      enable:
-        type: boolean
-      name:
-        type: string
-      uniqueId:
-        type: string
-      valid:
-        type: boolean
-    type: object
   response.ListResult:
     properties:
       list: {}
       total:
         type: integer
-    type: object
-  response.MCPInfos:
-    properties:
-      enable:
-        type: boolean
-      mcpDesc:
-        type: string
-      mcpId:
-        type: string
-      mcpServerFrom:
-        type: string
-      mcpServerUrl:
-        type: string
-      mcpSquareId:
-        type: string
-      name:
-        type: string
-      uniqueId:
-        type: string
-      valid:
-        type: boolean
     type: object
   response.Response:
     properties:
@@ -663,20 +706,14 @@ definitions:
       msg:
         type: string
     type: object
-  response.WorkFlowInfos:
+  response.VisionConfig:
     properties:
-      apiName:
-        type: string
-      enable:
-        type: boolean
-      name:
-        type: string
-      uniqueId:
-        type: string
-      workFlowDesc:
-        type: string
-      workFlowId:
-        type: string
+      maxPicNum:
+        description: 最大图片数量
+        type: integer
+      picNum:
+        description: 视觉配置图片数量
+        type: integer
     type: object
 info:
   contact: {}

@@ -3,8 +3,8 @@ package response
 import "github.com/UnicomAI/wanwu/internal/bff-service/model/request"
 
 type AppBriefInfo struct {
+	UniqueId    string         `json:"uniqueId"`    // 随机unique id(每次动态生成)
 	AppId       string         `json:"appId"`       // 应用id
-	UniqueId    string         `json:"uniqueId"`    // 唯一标识
 	AppType     string         `json:"appType"`     // 应用类型
 	Avatar      request.Avatar `json:"avatar"`      // 应用图标
 	Name        string         `json:"name"`        // 应用名称
@@ -31,9 +31,15 @@ type AppUrlInfo struct {
 	Status              bool   `json:"status"`              // 应用Url开关
 	UserId              string `json:"userId"`              // 用户ID
 	OrgId               string `json:"orgId"`               // 组织ID
+	Description         string `json:"description"`         // 应用描述
 }
 
 type AppUrlConfig struct {
 	Assistant  *Assistant  `json:"assistant"`  // 基本信息
 	AppUrlInfo *AppUrlInfo `json:"appUrlInfo"` // 应用Url信息
+}
+
+type VisionConfig struct {
+	MaxPicNum int32 `json:"maxPicNum"` // 最大图片数量
+	PicNum    int32 `json:"picNum"`    // 视觉配置图片数量
 }

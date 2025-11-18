@@ -9,6 +9,8 @@ option go_package = "gitlab.ai-yuanjing.cn/ai-platform-private/backend-used-bff/
 service KnowledgeBaseDocService {
   // 获取文档列表
   rpc GetDocList(GetDocListReq) returns (GetDocListResp) {}
+  // 获取文档详情
+  rpc GetDocDetail(GetDocDetailReq) returns (DocInfo) {}
   // 上传文档
   rpc ImportDoc(ImportDocReq) returns (google.protobuf.Empty) {}
   // 更新文档状态
@@ -41,6 +43,12 @@ service KnowledgeBaseDocService {
   rpc UpdateDocSegment(UpdateDocSegmentReq) returns (google.protobuf.Empty) {}
   // 获取文档子分段列表
   rpc GetDocChildSegmentList(GetDocChildSegmentListReq) returns (GetDocChildSegmentListResp){}
+  // 新增文档子分片
+  rpc CreateDocChildSegment(CreateDocChildSegmentReq) returns (google.protobuf.Empty) {}
+  // 删除文档子分片
+  rpc DeleteDocChildSegment(DeleteDocChildSegmentReq) returns (google.protobuf.Empty) {}
+  // 更新文档子分片
+  rpc UpdateDocChildSegment(UpdateDocChildSegmentReq) returns (google.protobuf.Empty) {}
 }
 
 message GetDocListReq{
@@ -54,11 +62,25 @@ message GetDocListReq{
   string docTag = 8; //文档标签
 }
 
+message GetDocDetailReq{
+  string docId = 1;
+  string userId = 2;
+  string orgId = 3;
+}
+
 message GetDocListResp {
   repeated DocInfo docs = 1;
   int64 total = 2;
   int32 pageNum = 3;
   int32 pageSize = 4;
+  KnowledgeInfo knowledgeInfo = 5;
+}
+
+message KnowledgeInfo {
+  string knowledgeId = 1;//知识库id
+  string knowledgeName = 2;//知识库名称
+  int32 graphSwitch = 3; //知识库图谱开关
+  bool showGraphReport = 4; //是否展示知识图谱和社区报告
 }
 
 message ImportDocReq {
@@ -191,6 +213,9 @@ message DocInfo{
   int32 status = 7;
   string errorMsg = 8;
   string segmentMethod = 9;//分段方式 0：通用分段，1：父子分段
+  string userId = 10;
+  int32 graphStatus = 11;//0:待处理，1.解析中，2.解析成功，3.解析失败
+  string graphErrMsg = 12;//错误信息
 }
 
 message DocSegmentListReq{
@@ -281,4 +306,35 @@ message ChildSegmentInfo{
   string childId = 2;
   int32 childNum = 3;
   string parentId = 4;
+}
+
+message CreateDocChildSegmentReq{
+  string userId = 1;
+  string orgId = 2;
+  string docId = 3;
+  string parentChunkId = 4;
+  repeated string content = 5;
+}
+
+message DeleteDocChildSegmentReq{
+  string userId = 1;
+  string orgId = 2;
+  string docId = 3;
+  string parentChunkId = 4;//父分段id
+  int32 parentChunkNo = 5;//父分段编号
+  repeated int32 childChunkNo = 6; //子分段编号列表
+}
+
+message UpdateDocChildSegmentReq{
+  string userId = 1;
+  string orgId = 2;
+  string docId = 3;
+  string parentChunkId = 4;//父分段id
+  int32 parentChunkNo = 5;//父分段编号
+  ChildChunk childChunk = 6; //子分段编号
+}
+
+message ChildChunk{
+  string content = 1;
+  int32 chunkNo = 2;
 }

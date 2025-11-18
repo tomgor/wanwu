@@ -63,15 +63,12 @@ func AssistantConfigUpdate(ctx *gin.Context, userId, orgId string, req request.A
 		ModelConfig:         modelConfig,
 		KnowledgeBaseConfig: transKnowledgebases2Proto(req.KnowledgeBaseConfig),
 		RerankConfig:        rerankConfig,
-		OnlineSearchConfig: &assistant_service.AssistantOnlineSearchConfig{
-			SearchUrl:      req.OnlineSearchConfig.SearchUrl,
-			SearchKey:      req.OnlineSearchConfig.SearchKey,
-			Enable:         req.OnlineSearchConfig.Enable,
-			SearchRerankId: req.OnlineSearchConfig.SearchRerankId,
-		},
 		SafetyConfig: &assistant_service.AssistantSafetyConfig{
 			Enable:         req.SafetyConfig.Enable,
 			SensitiveTable: transSafetyConfig2Proto(req.SafetyConfig.Tables),
+		},
+		VisionConfig: &assistant_service.AssistantVisionConfig{
+			PicNum: req.VisionConfig.PicNum,
 		},
 		Identity: &assistant_service.Identity{
 			UserId: userId,
@@ -85,7 +82,17 @@ func AssistantConfigUpdate(ctx *gin.Context, userId, orgId string, req request.A
 func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.AssistantIdRequest) (*response.Assistant, error) {
 	resp, err := assistant.GetAssistantInfo(ctx.Request.Context(), &assistant_service.GetAssistantInfoReq{
 		AssistantId: req.AssistantId,
-		Identity: &assistant_service.Identity{
+	})
+	if err != nil {
+		return nil, err
+	}
+	return transAssistantResp2Model(ctx, resp)
+}
+
+func GetAssistantDraftInfo(ctx *gin.Context, userId, orgId string, req request.AssistantIdRequest) (*response.Assistant, error) {
+	resp, err := assistant.GetAssistantInfo(ctx.Request.Context(), &assistant_service.GetAssistantInfoReq{
+		AssistantId: req.AssistantId,
+		Identity: &assistant_service.Identity{ //草稿只能看自己的
 			UserId: userId,
 			OrgId:  orgId,
 		},
@@ -94,6 +101,22 @@ func GetAssistantInfo(ctx *gin.Context, userId, orgId string, req request.Assist
 		return nil, err
 	}
 	return transAssistantResp2Model(ctx, resp)
+}
+
+func AssistantCopy(ctx *gin.Context, userId, orgId string, req request.AssistantIdRequest) (*response.AssistantCreateResp, error) {
+	resp, err := assistant.AssistantCopy(ctx.Request.Context(), &assistant_service.AssistantCopyReq{
+		AssistantId: req.AssistantId,
+		Identity: &assistant_service.Identity{
+			UserId: userId,
+			OrgId:  orgId,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &response.AssistantCreateResp{
+		AssistantId: resp.AssistantId,
+	}, nil
 }
 
 func AssistantWorkFlowCreate(ctx *gin.Context, userId, orgId string, req request.AssistantWorkFlowAddRequest) error {
@@ -137,6 +160,8 @@ func AssistantMCPCreate(ctx *gin.Context, userId, orgId string, req request.Assi
 	_, err := assistant.AssistantMCPCreate(ctx.Request.Context(), &assistant_service.AssistantMCPCreateReq{
 		AssistantId: req.AssistantId,
 		McpId:       req.MCPId,
+		McpType:     req.MCPType,
+		ActionName:  req.ActionName,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
@@ -149,6 +174,8 @@ func AssistantMCPDelete(ctx *gin.Context, userId, orgId string, req request.Assi
 	_, err := assistant.AssistantMCPDelete(ctx.Request.Context(), &assistant_service.AssistantMCPDeleteReq{
 		AssistantId: req.AssistantId,
 		McpId:       req.MCPId,
+		McpType:     req.MCPType,
+		ActionName:  req.ActionName,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
@@ -161,6 +188,8 @@ func AssistantMCPEnableSwitch(ctx *gin.Context, userId, orgId string, req reques
 	_, err := assistant.AssistantMCPEnableSwitch(ctx.Request.Context(), &assistant_service.AssistantMCPEnableSwitchReq{
 		AssistantId: req.AssistantId,
 		McpId:       req.MCPId,
+		McpType:     req.MCPType,
+		ActionName:  req.ActionName,
 		Enable:      req.Enable,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
@@ -170,10 +199,12 @@ func AssistantMCPEnableSwitch(ctx *gin.Context, userId, orgId string, req reques
 	return err
 }
 
-func AssistantCustomToolCreate(ctx *gin.Context, userId, orgId string, req request.AssistantCustomToolAddRequest) error {
-	_, err := assistant.AssistantCustomToolCreate(ctx.Request.Context(), &assistant_service.AssistantCustomToolCreateReq{
-		AssistantId:  req.AssistantId,
-		CustomToolId: req.CustomToolId,
+func AssistantToolCreate(ctx *gin.Context, userId, orgId string, req request.AssistantToolAddRequest) error {
+	_, err := assistant.AssistantToolCreate(ctx.Request.Context(), &assistant_service.AssistantToolCreateReq{
+		AssistantId: req.AssistantId,
+		ToolId:      req.ToolId,
+		ToolType:    req.ToolType,
+		ActionName:  req.ActionName,
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
@@ -182,10 +213,36 @@ func AssistantCustomToolCreate(ctx *gin.Context, userId, orgId string, req reque
 	return err
 }
 
-func AssistantCustomToolDelete(ctx *gin.Context, userId, orgId string, req request.AssistantCustomToolDelRequest) error {
-	_, err := assistant.AssistantCustomToolDelete(ctx.Request.Context(), &assistant_service.AssistantCustomToolDeleteReq{
-		AssistantId:  req.AssistantId,
-		CustomToolId: req.CustomToolId,
+func AssistantToolDelete(ctx *gin.Context, userId, orgId string, req request.AssistantToolDelRequest) error {
+	_, err := assistant.AssistantToolDelete(ctx.Request.Context(), &assistant_service.AssistantToolDeleteReq{
+		AssistantId: req.AssistantId,
+		ToolId:      req.ToolId,
+		ToolType:    req.ToolType,
+		ActionName:  req.ActionName,
+	})
+	return err
+}
+
+func AssistantToolEnableSwitch(ctx *gin.Context, userId, orgId string, req request.AssistantToolEnableRequest) error {
+	_, err := assistant.AssistantToolEnableSwitch(ctx.Request.Context(), &assistant_service.AssistantToolEnableSwitchReq{
+		AssistantId: req.AssistantId,
+		ToolId:      req.ToolId,
+		ToolType:    req.ToolType,
+		ActionName:  req.ActionName,
+		Enable:      req.Enable,
+	})
+	return err
+}
+
+func AssistantToolConfig(ctx *gin.Context, userId, orgId string, req request.AssistantToolConfigRequest) error {
+	toolConfigJSON, err := json.Marshal(req.ToolConfig)
+	if err != nil {
+		return err
+	}
+	_, err = assistant.AssistantToolConfig(ctx.Request.Context(), &assistant_service.AssistantToolConfigReq{
+		AssistantId: req.AssistantId,
+		ToolId:      req.ToolId,
+		ToolConfig:  string(toolConfigJSON),
 		Identity: &assistant_service.Identity{
 			UserId: userId,
 			OrgId:  orgId,
@@ -194,34 +251,26 @@ func AssistantCustomToolDelete(ctx *gin.Context, userId, orgId string, req reque
 	return err
 }
 
-func AssistantCustomToolEnableSwitch(ctx *gin.Context, userId, orgId string, req request.AssistantCustomToolEnableRequest) error {
-	_, err := assistant.AssistantCustomToolEnableSwitch(ctx.Request.Context(), &assistant_service.AssistantCustomToolEnableSwitchReq{
-		AssistantId:  req.AssistantId,
-		CustomToolId: req.CustomToolId,
-		Enable:       req.Enable,
-		Identity: &assistant_service.Identity{
-			UserId: userId,
-			OrgId:  orgId,
-		},
-	})
-	return err
-}
-
-func assistantMCPConvert(ctx *gin.Context, assistantMCPInfos []*assistant_service.AssistantMCPInfos) ([]*response.MCPInfos, error) {
+func assistantMCPConvert(ctx *gin.Context, assistantMCPInfos []*assistant_service.AssistantMCPInfos) ([]*response.AssistantMCPInfo, error) {
 	// 若查询结果为空，返回空列表
 	if len(assistantMCPInfos) == 0 {
 		return nil, nil
 	}
 
 	// 提取MCP ID列表
-	var mcpIds []string
+	var MCPCustomIds, MCPServerIds []string
 	for _, m := range assistantMCPInfos {
-		mcpIds = append(mcpIds, m.McpId)
+		if m.McpType == constant.MCPTypeMCP {
+			MCPCustomIds = append(MCPCustomIds, m.McpId)
+		} else if m.McpType == constant.MCPTypeMCPServer {
+			MCPServerIds = append(MCPServerIds, m.McpId)
+		}
 	}
 
 	// 批量查询MCP详情
-	mcpResp, err := mcp.GetCustomMCPByMCPIdList(ctx.Request.Context(), &mcp_service.GetCustomMCPByMCPIdListReq{
-		McpIdList: mcpIds,
+	mcpResp, err := mcp.GetMCPByMCPIdList(ctx.Request.Context(), &mcp_service.GetMCPByMCPIdListReq{
+		McpIdList:       MCPCustomIds,
+		McpServerIdList: MCPServerIds,
 	})
 
 	// 构建MCP详情映射
@@ -231,72 +280,134 @@ func assistantMCPConvert(ctx *gin.Context, assistantMCPInfos []*assistant_servic
 			mcpDetailMap[item.McpId] = item
 		}
 	}
+	// 构建MCPServer详情映射
+	mcpserverDetailMap := make(map[string]*mcp_service.MCPServerInfo)
+	if err == nil && mcpResp != nil { // 仅当查询成功且响应有效时才构建映射
+		for _, item := range mcpResp.Servers {
+			mcpserverDetailMap[item.McpServerId] = item
+		}
+	}
 
 	// 构建返回结果
-	var retMCPInfos []*response.MCPInfos
-	for _, m := range assistantMCPInfos {
-		item, exists := mcpDetailMap[m.McpId]
+	var retMCPInfos []*response.AssistantMCPInfo
+	for _, info := range assistantMCPInfos {
+		var exists bool
+		var mcpName string
+		var avatar request.Avatar
+
+		switch info.McpType {
+		case constant.MCPTypeMCP:
+			if item, ok := mcpDetailMap[info.McpId]; ok {
+				exists = true
+				mcpName = item.Info.Name
+				avatar = cacheMCPAvatar(ctx, item.Info.AvatarPath, item.AvatarPath)
+			}
+		case constant.MCPTypeMCPServer:
+			if item, ok := mcpserverDetailMap[info.McpId]; ok {
+				exists = true
+				mcpName = item.Name
+				avatar = cacheMCPServerAvatar(ctx, item.AvatarPath)
+			}
+		}
+
 		if exists {
-			// 有效MCP
-			retMCPInfos = append(retMCPInfos, &response.MCPInfos{
-				MCPId:         m.McpId,
-				UniqueId:      bff_util.ConcatAssistantToolUniqueId("mcp", m.McpId),
-				MCPSquareId:   item.Info.McpSquareId,
-				Enable:        m.Enable,
-				MCPName:       item.Info.Name,
-				MCPDesc:       item.Info.Desc,
-				MCPServerFrom: item.Info.From,
-				MCPServerUrl:  item.SseUrl,
+			retMCPInfos = append(retMCPInfos, &response.AssistantMCPInfo{
+				UniqueId:   bff_util.ConcatAssistantToolUniqueId(info.McpType, info.McpId),
+				MCPId:      info.McpId,
+				MCPType:    info.McpType,
+				MCPName:    mcpName,
+				ActionName: info.ActionName,
+				Enable:     info.Enable,
+				Valid:      true,
+				Avatar:     avatar,
 			})
 		}
 	}
 
-	// 即使详情查询失败，也返回组装后的结果
 	return retMCPInfos, nil
 }
 
-func assistantCustomConvert(ctx *gin.Context, assistantCustomInfos []*assistant_service.AssistantCustomToolInfos) ([]*response.CustomInfos, error) {
+func assistantToolsConvert(ctx *gin.Context, assistantToolInfos []*assistant_service.AssistantToolInfos) ([]*response.AssistantToolInfo, error) {
 	// 若查询为空，返回空列表
-	if len(assistantCustomInfos) == 0 {
+	if len(assistantToolInfos) == 0 {
 		return nil, nil
 	}
 
-	// 提取自定义工具ID列表
-	var customToolIds []string
-	for _, c := range assistantCustomInfos {
-		customToolIds = append(customToolIds, c.CustomToolId)
+	// 提取工具ID列表
+	var customToolIds, builtinToolIds []string
+	for _, tool := range assistantToolInfos {
+		switch tool.ToolType {
+		case constant.ToolTypeCustom:
+			customToolIds = append(customToolIds, tool.ToolId)
+		case constant.ToolTypeBuiltIn:
+			builtinToolIds = append(builtinToolIds, tool.ToolId)
+		}
 	}
 
-	// 批量查询自定义工具详情
-	mcpResp, err := mcp.GetCustomToolByCustomToolIdList(ctx.Request.Context(), &mcp_service.GetCustomToolByCustomToolIdListReq{
-		CustomToolIdList: customToolIds,
+	// 批量查询
+	toolInfoResp, err := mcp.GetToolByIdList(ctx.Request.Context(), &mcp_service.GetToolByToolIdListReq{
+		BuiltInToolIdList: builtinToolIds,
+		CustomToolIdList:  customToolIds,
 	})
 
 	// 构建ID到工具信息的映射
 	customToolMap := make(map[string]*mcp_service.GetCustomToolItem)
-	if err == nil && mcpResp != nil { // 仅当查询成功且响应有效时才构建映射
-		for _, item := range mcpResp.List {
+	if err == nil && toolInfoResp != nil { // 仅当查询成功且响应有效时才构建映射
+		for _, item := range toolInfoResp.List {
 			customToolMap[item.CustomToolId] = item
+		}
+	}
+	builtinToolMap := make(map[string]*mcp_service.ToolSquareInfo)
+	if err == nil && toolInfoResp != nil { // 仅当查询成功且响应有效时才构建映射
+		for _, item := range toolInfoResp.ToolSquareInfoList {
+			builtinToolMap[item.ToolSquareId] = item
 		}
 	}
 
 	// 组装返回结果
-	var retCustomInfos []*response.CustomInfos
-	for _, c := range assistantCustomInfos {
-		item, exists := customToolMap[c.CustomToolId]
+	var retToolInfos []*response.AssistantToolInfo
+	for _, info := range assistantToolInfos {
+		var exists bool
+		var toolName string
+		var avatar request.Avatar
+
+		switch info.ToolType {
+		case constant.ToolTypeCustom:
+			if item, ok := customToolMap[info.ToolId]; ok {
+				exists = true
+				toolName = item.Name
+				avatar = cacheToolAvatar(ctx, constant.ToolTypeCustom, item.AvatarPath)
+			}
+		case constant.ToolTypeBuiltIn:
+			if item, ok := builtinToolMap[info.ToolId]; ok {
+				exists = true
+				toolName = item.Name
+				avatar = cacheToolAvatar(ctx, constant.ToolTypeBuiltIn, item.AvatarPath)
+			}
+		}
+
 		if exists {
-			// 有效工具
-			retCustomInfos = append(retCustomInfos, &response.CustomInfos{
-				CustomId:   c.CustomToolId,
-				UniqueId:   bff_util.ConcatAssistantToolUniqueId("custom", c.CustomToolId),
-				Enable:     c.Enable,
-				CustomName: item.Name,
-				CustomDesc: item.Description,
+			var toolConfig request.AssistantToolConfig
+			if info.ToolConfig != "" {
+				if err := json.Unmarshal([]byte(info.ToolConfig), &toolConfig); err != nil {
+					log.Warnf("解析ToolConfig失败，使用空配置，error: %v, toolConfig: %s", err, info.ToolConfig)
+				}
+			}
+			retToolInfos = append(retToolInfos, &response.AssistantToolInfo{
+				UniqueId:   bff_util.ConcatAssistantToolUniqueId(info.ToolType, info.ToolId),
+				ToolId:     info.ToolId,
+				ToolType:   info.ToolType,
+				ToolName:   toolName,
+				ActionName: info.ActionName,
+				Enable:     info.Enable,
+				Valid:      true,
+				ToolConfig: toolConfig,
+				Avatar:     avatar,
 			})
 		}
 	}
+	return retToolInfos, nil
 
-	return retCustomInfos, nil
 }
 
 func ConversationCreate(ctx *gin.Context, userId, orgId string, req request.ConversationCreateRequest) (response.ConversationCreateResp, error) {
@@ -363,19 +474,19 @@ func GetConversationDetailList(ctx *gin.Context, userId, orgId string, req reque
 	var convertedList []response.ConversationDetailInfo
 	for _, item := range resp.Data {
 		convertedItem := response.ConversationDetailInfo{
-			Id:              item.Id,
-			AssistantId:     item.AssistantId,
-			ConversationId:  item.ConversationId,
-			Prompt:          item.Prompt,
-			SysPrompt:       item.SysPrompt,
-			Response:        item.Response,
-			QaType:          item.QaType,
-			CreatedBy:       item.CreatedBy,
-			CreatedAt:       item.CreatedAt,
-			UpdatedAt:       item.UpdatedAt,
-			RequestFileUrls: item.RequestFileUrls,
-			FileSize:        item.FileSize,
-			FileName:        item.FileName,
+			Id:             item.Id,
+			AssistantId:    item.AssistantId,
+			ConversationId: item.ConversationId,
+			Prompt:         item.Prompt,
+			SysPrompt:      item.SysPrompt,
+			Response:       item.Response,
+			QaType:         item.QaType,
+			CreatedBy:      item.CreatedBy,
+			CreatedAt:      item.CreatedAt,
+			UpdatedAt:      item.UpdatedAt,
+			RequestFiles:   transRequestFiles(item.RequestFiles),
+			FileSize:       item.FileSize,
+			FileName:       item.FileName,
 		}
 
 		// 将SearchList从string转换为interface{}
@@ -419,6 +530,9 @@ func transKnowledgebases2Proto(kbConfig request.AppKnowledgebaseConfig) *assista
 		KeywordPriority:      kbConfig.Config.KeywordPriority,
 		PriorityMatch:        kbConfig.Config.PriorityMatch,
 		SemanticsPriority:    kbConfig.Config.SemanticsPriority,
+		TermWeight:           kbConfig.Config.TermWeight,
+		TermWeightEnable:     kbConfig.Config.TermWeightEnable,
+		UseGraph:             kbConfig.Config.UseGraph,
 		AppKnowledgeBaseList: transKnowledgeParams(kbConfig.Knowledgebases),
 	}
 }
@@ -432,6 +546,7 @@ func transKnowledgeParams(paramsList []request.AppKnowledgeBase) []*assistant_se
 		retList = append(retList, &assistant_service.AppKnowledgeBase{
 			KnowledgeBaseId:      base.ID,
 			KnowledgeBaseName:    base.Name,
+			GraphSwitch:          base.GraphSwitch,
 			MetaDataFilterParams: transKnowledgeMetaParams(base.MetaDataFilterParams),
 		})
 	}
@@ -520,7 +635,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		log.Debugf("Rerank配置为空或模型ID为空")
 	}
 
-	var assistantWorkFlowInfos []*response.WorkFlowInfos
+	var assistantWorkFlowInfos []*response.AssistantWorkFlowInfo
 	if len(resp.WorkFlowInfos) > 0 {
 		var workflowIds []string
 		for _, wf := range resp.WorkFlowInfos {
@@ -531,7 +646,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 			return nil, err
 		}
 		for _, wf := range resp.WorkFlowInfos {
-			workFlowInfo := &response.WorkFlowInfos{
+			workFlowInfo := &response.AssistantWorkFlowInfo{
 				WorkFlowId: wf.WorkFlowId,
 				ApiName:    wf.ApiName,
 				Enable:     wf.Enable,
@@ -543,6 +658,7 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 					// 找到匹配的工作流，设置名称和描述
 					workFlowInfo.WorkFlowName = info.Name
 					workFlowInfo.WorkFlowDesc = info.Desc
+					workFlowInfo.AvatarPath = cacheWorkflowAvatar(info.URL, constant.AppTypeWorkflow)
 				}
 			}
 
@@ -559,21 +675,12 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	if err != nil {
 		return nil, err
 	}
-	// 查询该用户所有权限的 Custom
-	assistantCustomInfos, err := assistantCustomConvert(ctx, resp.CustomToolInfos)
+	// 查询该用户所有权限的 custom、builtin 工具
+	assistantToolInfos, err := assistantToolsConvert(ctx, resp.ToolInfos)
 	if err != nil {
 		return nil, err
 	}
 
-	var onlineSearchConfig request.OnlineSearchConfig
-	if resp.OnlineSearchConfig != nil {
-		onlineSearchConfig = request.OnlineSearchConfig{
-			SearchUrl:      resp.OnlineSearchConfig.SearchUrl,
-			SearchKey:      resp.OnlineSearchConfig.SearchKey,
-			Enable:         resp.OnlineSearchConfig.Enable,
-			SearchRerankId: resp.OnlineSearchConfig.SearchRerankId,
-		}
-	}
 	var sensitiveWordTable *safety_service.SensitiveWordTables
 	if len(resp.SafetyConfig.GetSensitiveTable()) != 0 {
 		var tableIds []string
@@ -586,6 +693,13 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 	if err != nil {
 		return nil, err
 	}
+	var visionConfig response.VisionConfig
+	if resp.VisionConfig != nil {
+		visionConfig = response.VisionConfig{
+			MaxPicNum: resp.VisionConfig.MaxPicNum,
+			PicNum:    resp.VisionConfig.PicNum,
+		}
+	}
 	assistantModel := response.Assistant{
 		AssistantId:         resp.AssistantId,
 		AppBriefConfig:      appBriefConfigProto2Model(ctx, resp.AssistantBrief, constant.AppTypeAgent),
@@ -595,12 +709,12 @@ func transAssistantResp2Model(ctx *gin.Context, resp *assistant_service.Assistan
 		KnowledgeBaseConfig: knowledgeBaseConfig,
 		ModelConfig:         modelConfig,
 		RerankConfig:        rerankConfig,
-		OnlineSearchConfig:  onlineSearchConfig,
 		SafetyConfig:        request.AppSafetyConfig{Enable: resp.SafetyConfig.GetEnable()},
+		VisionConfig:        visionConfig,
 		Scope:               resp.Scope,
 		WorkFlowInfos:       assistantWorkFlowInfos,
 		MCPInfos:            assistantMCPInfos,
-		CustomInfos:         assistantCustomInfos,
+		ToolInfos:           assistantToolInfos,
 		CreatedAt:           util.Time2Str(resp.CreatTime),
 		UpdatedAt:           util.Time2Str(resp.UpdateTime),
 	}
@@ -654,6 +768,9 @@ func transKnowledgeBases2Model(ctx *gin.Context, kbConfig *assistant_service.Ass
 			PriorityMatch:     kbConfig.PriorityMatch,
 			SemanticsPriority: kbConfig.SemanticsPriority,
 			KeywordPriority:   kbConfig.KeywordPriority,
+			TermWeight:        kbConfig.TermWeight,
+			TermWeightEnable:  kbConfig.TermWeightEnable,
+			UseGraph:          kbConfig.UseGraph,
 		},
 	}, nil
 
@@ -678,6 +795,7 @@ func buildKnowledgeBases(kbInfoList *knowledgeBase_service.KnowledgeDetailSelect
 			knowledgeBases = append(knowledgeBases, request.AppKnowledgeBase{
 				ID:                   kbConfig.KnowledgeBaseId,
 				Name:                 info.Name,
+				GraphSwitch:          info.GraphSwitch,
 				MetaDataFilterParams: params,
 			})
 		}
@@ -723,4 +841,19 @@ func buildAssistantMetaFilterParams(metaFilterList []*assistant_service.MetaFilt
 		})
 	}
 	return metaList
+}
+
+func transRequestFiles(files []*assistant_service.RequestFile) []response.AssistantRequestFile {
+	if files == nil {
+		return nil
+	}
+	var result []response.AssistantRequestFile
+	for _, file := range files {
+		result = append(result, response.AssistantRequestFile{
+			FileName: file.FileName,
+			FileSize: file.FileSize,
+			FileUrl:  file.FileUrl,
+		})
+	}
+	return result
 }

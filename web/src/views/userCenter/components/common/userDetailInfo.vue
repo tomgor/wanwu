@@ -50,6 +50,7 @@
 <script>
 import Pwd from "../pwd/index.vue"
 import {uploadAvatar, restAvatar} from "@/api/user";
+import {avatarSrc} from "@/utils/util";
 export default {
   components: {Pwd},
   data(){
@@ -90,7 +91,7 @@ export default {
         this.isLoading = true;
         uploadAvatar(formData, config).then(res => {
           if (res.code === 0) {
-            const avatar = this.$basePath + '/user/api' + res.data.path || {}
+            const avatar = avatarSrc(res.data.path)
             restAvatar({avatar: res.data}).then(res => {
               if (res.code === 0) {
                 this.form.avatar = avatar
@@ -113,7 +114,7 @@ export default {
     setData(data){
       const {avatar, userId, username, company, phone, email, remark} = data || {}
       this.form = {userId, username, company, phone, email, remark, password: '***'}
-      this.form.avatar = this.$basePath + '/user/api' + avatar.path || {}
+      this.form.avatar = avatarSrc(avatar.path)
     },
     showPwd() {
       this.pwdVisible = true
@@ -185,8 +186,8 @@ export default {
             position: absolute;
             width: 100%;
             bottom: 0;
-            background: #E8EAFD;
-            color: #384BF7  !important;
+            background: $color_opacity;
+            color: $color  !important;
             font-size: 12px;
             line-height: 26px;
             z-index: 10;

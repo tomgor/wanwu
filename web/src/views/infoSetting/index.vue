@@ -177,6 +177,7 @@
 import { setPlatformInfo } from "@/api/setInfo"
 import { uploadAvatar } from "@/api/user"
 import { mapActions, mapGetters } from "vuex"
+import {avatarSrc} from "@/utils/util";
 
 export default {
   data() {
@@ -232,7 +233,6 @@ export default {
     commonInfo:{
       handler(val) {
         const { home = {}, tab = {}, login = {} } = val ? val.data || {} : {}
-        console.log(val, '----------------info')
 
         this.tabForm.tabTitle = tab.title
         this.tabForm.tabLogo = tab.logo || {}
@@ -257,7 +257,7 @@ export default {
   methods: {
     ...mapActions('user', ['getCommonInfo']),
     getLogoPath(path) {
-      return path ? this.$basePath + '/user/api' + path : ''
+      return path ? avatarSrc(path) : ''
     },
     uploadAvatar(file) {
       const formData = new FormData()

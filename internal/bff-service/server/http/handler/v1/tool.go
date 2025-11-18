@@ -9,7 +9,7 @@ import (
 
 // CreateCustomTool
 //
-//	@Tags			tool
+//	@Tags			tool.custom
 //	@Summary		创建自定义工具
 //	@Description	创建自定义工具
 //	@Accept			json
@@ -27,7 +27,7 @@ func CreateCustomTool(ctx *gin.Context) {
 
 // GetCustomTool
 //
-//	@Tags			tool
+//	@Tags			tool.custom
 //	@Summary		获取自定义工具详情
 //	@Description	获取自定义工具详情
 //	@Accept			json
@@ -36,13 +36,13 @@ func CreateCustomTool(ctx *gin.Context) {
 //	@Success		200				{object}	response.Response{data=response.CustomToolDetail}
 //	@Router			/tool/custom [get]
 func GetCustomTool(ctx *gin.Context) {
-	resp, err := service.GetCustomToolInfo(ctx, getUserID(ctx), getOrgID(ctx), ctx.Query("customToolId"))
+	resp, err := service.GetCustomTool(ctx, getUserID(ctx), getOrgID(ctx), ctx.Query("customToolId"))
 	gin_util.Response(ctx, resp, err)
 }
 
 // DeleteCustomTool
 //
-//	@Tags			tool
+//	@Tags			tool.custom
 //	@Summary		删除自定义工具
 //	@Description	删除自定义工具
 //	@Accept			json
@@ -60,7 +60,7 @@ func DeleteCustomTool(ctx *gin.Context) {
 
 // UpdateCustomTool
 //
-//	@Tags			tool
+//	@Tags			tool.custom
 //	@Summary		修改自定义工具
 //	@Description	修改自定义工具
 //	@Accept			json
@@ -78,50 +78,35 @@ func UpdateCustomTool(ctx *gin.Context) {
 
 // GetCustomToolList
 //
-//	@Tags			tool
+//	@Tags			tool.custom
 //	@Summary		获取自定义工具列表
 //	@Description	获取自定义工具列表
 //	@Accept			json
 //	@Produce		json
 //	@Param			name	query		string	false	"CustomTool名称"
-//	@Success		200		{object}	response.Response{data=response.ListResult{list=[]response.CustomToolCell}}
+//	@Success		200		{object}	response.Response{data=response.ListResult{list=[]response.CustomToolInfo}}
 //	@Router			/tool/custom/list [get]
 func GetCustomToolList(ctx *gin.Context) {
 	resp, err := service.GetCustomToolList(ctx, getUserID(ctx), getOrgID(ctx), ctx.Query("name"))
 	gin_util.Response(ctx, resp, err)
 }
 
-// GetCustomToolSelect
+// GetCustomToolActions
 //
-//	@Tags			tool
-//	@Summary		获取自定义工具列表（用于下拉选择）
-//	@Description	获取自定义工具列表（用于下拉选择）
-//	@Accept			json
-//	@Produce		json
-//	@Param			name	query		string	false	"CustomTool名称"
-//	@Success		200		{object}	response.Response{data=response.ListResult{list=[]response.CustomToolSelect}}
-//	@Router			/tool/custom/select [get]
-func GetCustomToolSelect(ctx *gin.Context) {
-	resp, err := service.GetCustomToolSelect(ctx, getUserID(ctx), getOrgID(ctx), ctx.Query("name"))
-	gin_util.Response(ctx, resp, err)
-}
-
-// GetCustomToolSchemaAPI
-//
-//	@Tags			tool
+//	@Tags			tool.custom
 //	@Summary		获取可用API列表（根据Schema）
 //	@Description	解析自定义工具的Schema转换为API相关数据
 //	@Accept			json
 //	@Produce		json
 //	@Param			data	body		request.CustomToolSchemaReq	true	"Schema格式数据"
-//	@Success		200		{object}	response.Response{data=response.ListResult{list=[]response.CustomToolApiResponse}}
+//	@Success		200		{object}	response.Response{data=response.ListResult{list=[]response.CustomToolActionInfo}}
 //	@Router			/tool/custom/schema [post]
-func GetCustomToolSchemaAPI(ctx *gin.Context) {
+func GetCustomToolActions(ctx *gin.Context) {
 	var req request.CustomToolSchemaReq
 	if !gin_util.Bind(ctx, &req) {
 		return
 	}
-	resp, err := service.GetCustomToolSchemaAPI(ctx, getUserID(ctx), getOrgID(ctx), req)
+	resp, err := service.GetCustomToolActions(ctx, getUserID(ctx), getOrgID(ctx), req)
 	gin_util.Response(ctx, resp, err)
 }
 
@@ -142,7 +127,7 @@ func GetToolSquareDetail(ctx *gin.Context) {
 
 // GetToolSquareList
 //
-//	@Tags			tool.square
+//	@Tags			tool.builtin
 //	@Summary		获取内置工具列表
 //	@Description	获取内置工具列表
 //	@Accept			json
@@ -155,20 +140,73 @@ func GetToolSquareList(ctx *gin.Context) {
 	gin_util.Response(ctx, resp, err)
 }
 
-// UpdateBuiltInTool
+// UpdateToolSquareAPIKey
 //
-//	@Tags			tool
+//	@Tags			tool.builtin
 //	@Summary		修改内置工具
 //	@Description	修改内置工具
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	body		request.BuiltInToolReq	true	"内置工具信息"
+//	@Param			data	body		request.ToolSquareAPIKeyReq	true	"内置工具信息"
 //	@Success		200		{object}	response.Response{}
 //	@Router			/tool/builtin [post]
-func UpdateBuiltInTool(ctx *gin.Context) {
-	var req request.BuiltInToolReq
+func UpdateToolSquareAPIKey(ctx *gin.Context) {
+	var req request.ToolSquareAPIKeyReq
 	if !gin_util.Bind(ctx, &req) {
 		return
 	}
-	gin_util.Response(ctx, nil, service.UpdateBuiltInTool(ctx, getUserID(ctx), getOrgID(ctx), req))
+	gin_util.Response(ctx, nil, service.UpsertBuiltinToolAPIKey(ctx, getUserID(ctx), getOrgID(ctx), req))
+}
+
+// GetToolSelect
+//
+//	@Tags			tool
+//	@Summary		获取工具列表（用于下拉选择）
+//	@Description	获取工具列表（用于下拉选择）
+//	@Accept			json
+//	@Produce		json
+//	@Param			name	query		string	true	"工具名"
+//	@Success		200		{object}	response.Response{data=response.ListResult{list=[]response.ToolSelect}}
+//	@Router			/tool/select [get]
+func GetToolSelect(ctx *gin.Context) {
+	resp, err := service.GetToolSelect(ctx, getUserID(ctx), getOrgID(ctx), ctx.Query("name"))
+	gin_util.Response(ctx, resp, err)
+}
+
+// GetToolActionList
+//
+//	@Tags			tool
+//	@Summary		获取工具列表
+//	@Description	获取工具列表
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	query		request.ToolActionListReq	true	"工具信息"
+//	@Success		200		{object}	response.Response{data=response.ToolActionList}
+//	@Router			/tool/action/list [get]
+func GetToolActionList(ctx *gin.Context) {
+	var req request.ToolActionListReq
+	if !gin_util.BindQuery(ctx, &req) {
+		return
+	}
+	resp, err := service.GetToolActionList(ctx, getUserID(ctx), getOrgID(ctx), req)
+	gin_util.Response(ctx, resp, err)
+}
+
+// GetToolActionDetail
+//
+//	@Tags			tool
+//	@Summary		获取工具详情
+//	@Description	获取工具详情
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	query		request.ToolActionReq	true	"工具信息"
+//	@Success		200		{object}	response.Response{data=response.ToolActionDetail}
+//	@Router			/tool/action/detail [get]
+func GetToolActionDetail(ctx *gin.Context) {
+	var req request.ToolActionReq
+	if !gin_util.BindQuery(ctx, &req) {
+		return
+	}
+	resp, err := service.GetToolActionDetail(ctx, getUserID(ctx), getOrgID(ctx), req)
+	gin_util.Response(ctx, resp, err)
 }

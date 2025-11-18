@@ -1,11 +1,14 @@
 package config
 
 import (
+	"fmt"
 	"net/url"
 
+	oauth2_util "github.com/UnicomAI/wanwu/internal/bff-service/pkg/oauth2-util"
 	"github.com/UnicomAI/wanwu/pkg/i18n"
 	"github.com/UnicomAI/wanwu/pkg/log"
 	"github.com/UnicomAI/wanwu/pkg/minio"
+	"github.com/UnicomAI/wanwu/pkg/redis"
 	"github.com/UnicomAI/wanwu/pkg/util"
 )
 
@@ -14,28 +17,35 @@ var (
 )
 
 type Config struct {
-	Server            ServerConfig            `json:"server" mapstructure:"server"`
-	Log               LogConfig               `json:"log" mapstructure:"log"`
-	JWT               JWTConfig               `json:"jwt" mapstructure:"jwt"`
-	Decrypt           DecryptPasswd           `json:"decrypt-passwd" mapstructure:"decrypt-passwd"`
-	I18n              i18n.Config             `json:"i18n" mapstructure:"i18n"`
-	AssistantTemplate AssistantTemplateConfig `json:"assistant-template" mapstructure:"assistant-template"`
-	CustomInfo        CustomInfoConfig        `json:"custom-info" mapstructure:"custom-info"`
-	DocCenter         DocCenterConfig         `json:"doc-center" mapstructure:"doc-center"`
-	DefaultIcon       DefaultIconConfig       `json:"default-icon" mapstructure:"default-icon"`
+	Server            ServerConfig               `json:"server" mapstructure:"server"`
+	Log               LogConfig                  `json:"log" mapstructure:"log"`
+	JWT               JWTConfig                  `json:"jwt" mapstructure:"jwt"`
+	OAuth             OAuthConfig                `json:"oauth" mapstructure:"oauth"`
+	Decrypt           DecryptPasswd              `json:"decrypt-passwd" mapstructure:"decrypt-passwd"`
+	I18n              i18n.Config                `json:"i18n" mapstructure:"i18n"`
+	AssistantTemplate AssistantTemplateConfig    `json:"assistant-template" mapstructure:"assistant-template"`
+	CustomInfo        CustomInfoConfig           `json:"custom-info" mapstructure:"custom-info"`
+	DocCenter         DocCenterConfig            `json:"doc-center" mapstructure:"doc-center"`
+	DefaultIcon       DefaultIconConfig          `json:"default-icon" mapstructure:"default-icon"`
+	WorkflowTemplate  WorkflowTemplatePathConfig `json:"workflow-template" mapstructure:"workflow-template"`
+	PromptTemplate    PromptTemplatePathConfig   `json:"prompt-template" mapstructure:"prompt-template"`
+	WorkflowTemplates []*WorkflowTemplateConfig  `json:"workflows" mapstructure:"workflows"`
+	PromptTemplates   []*PromptTempConfig        `json:"prompts" mapstructure:"prompts"`
+	PromptEngineering PromptEngineeringConfig    `json:"prompt-engineering" mapstructure:"prompt-engineering"`
 	// middleware
 	Minio minio.Config `json:"minio" mapstructure:"minio"`
+	Redis redis.Config `json:"redis" mapstructure:"redis"`
 	// microservice
-	Iam       ServiceConfig      `json:"iam" mapstructure:"iam"`
-	Model     ModelConfig        `json:"model" mapstructure:"model"`
-	MCP       ServiceConfig      `json:"mcp" mapstructure:"mcp"`
-	App       ServiceConfig      `json:"app" mapstructure:"app"`
-	Knowledge ServiceConfig      `json:"knowledge" mapstructure:"knowledge"`
-	Rag       ServiceConfig      `json:"rag" mapstructure:"rag"`
-	Assistant ServiceConfig      `json:"assistant" mapstructure:"assistant"`
-	Operate   ServiceConfig      `json:"operate" mapstructure:"operate"`
-	Agent     AgentServiceConfig `json:"agent" mapstructure:"agent"`
-
+	Iam                ServiceConfig                   `json:"iam" mapstructure:"iam"`
+	Model              ModelConfig                     `json:"model" mapstructure:"model"`
+	MCP                ServiceConfig                   `json:"mcp" mapstructure:"mcp"`
+	App                ServiceConfig                   `json:"app" mapstructure:"app"`
+	Knowledge          ServiceConfig                   `json:"knowledge" mapstructure:"knowledge"`
+	Rag                ServiceConfig                   `json:"rag" mapstructure:"rag"`
+	Assistant          ServiceConfig                   `json:"assistant" mapstructure:"assistant"`
+	Operate            ServiceConfig                   `json:"operate" mapstructure:"operate"`
+	Agent              AgentServiceConfig              `json:"agent" mapstructure:"agent"`
+	RagKnowledgeConfig RagKnowledgeConfig              `json:"rag-knowledge" mapstructure:"rag-knowledge"`
 	Workflow           WorkflowServiceConfig           `json:"workflow" mapstructure:"workflow"`
 	AgentScopeWorkFlow AgentScopeWorkFlowServiceConfig `json:"agentscope-workflow" mapstructure:"agentscope-workflow"`
 	SimpleSSO          []SimpleSSOConfig               `json:"simple_sso" mapstructure:"simple_sso"`
@@ -66,6 +76,20 @@ type JWTConfig struct {
 	SigningKey string `json:"signing-key" mapstructure:"signing-key"`
 }
 
+type OAuthSwitch struct {
+	OAuthSwitch int `json:"switch" mapstructure:"switch"`
+}
+
+type OAuthJWTConfig struct {
+	RSAPrivateKeyPath string `json:"private_key_path" mapstructure:"private_key_path"`
+	RSAPublicKeyPath  string `json:"public_key_path" mapstructure:"public_key_path"`
+}
+
+type OAuthConfig struct {
+	Switch int                   `json:"switch" mapstructure:"switch"`
+	RSA    oauth2_util.RSAConfig `json:"rsa" mapstructure:"rsa"`
+}
+
 type DecryptPasswd struct {
 	IV  string `json:"iv" mapstructure:"iv"`
 	Key string `json:"key" mapstructure:"key"`
@@ -73,6 +97,43 @@ type DecryptPasswd struct {
 
 type ServiceConfig struct {
 	Host string `json:"host" mapstructure:"host"`
+}
+
+type RagKnowledgeConfig struct {
+	Endpoint               string `json:"endpoint" mapstructure:"endpoint"`
+	ChatEndpoint           string `json:"chat-endpoint" mapstructure:"chat-endpoint"`
+	SearchKnowledgeBaseUri string `json:"search-knowledge-base-uri" mapstructure:"search-knowledge-base-uri"`
+	KnowledgeChatUri       string `json:"knowledge-chat-uri" mapstructure:"knowledge-chat-uri"`
+}
+
+type WorkflowTemplatePathConfig struct {
+	ServerMode string `json:"server_mode" mapstructure:"server_mode"`
+	ConfigPath string `json:"configPath" mapstructure:"configPath"`
+
+	GlobalWebListUrl string `json:"global_web_list_url" mapstructure:"global_web_list_url"`
+
+	ListUrl      string `json:"list_url" mapstructure:"list_url"`
+	DownloadUrl  string `json:"download_url" mapstructure:"download_url"`
+	DetailUrl    string `json:"detail_url" mapstructure:"detail_url"`
+	RecommendUrl string `json:"recommend_url" mapstructure:"recommend_url"`
+}
+
+type PromptTemplatePathConfig struct {
+	ConfigPath string `json:"configPath" mapstructure:"configPath"`
+}
+
+type PromptTempConfig struct {
+	TemplateId string `json:"templateId" mapstructure:"templateId"`
+	Category   string `json:"category" mapstructure:"category"`
+	Avatar     string `json:"avatar"`
+	Name       string `json:"name"`
+	Desc       string `json:"desc" mapstructure:"desc"`
+	Author     string `json:"author" mapstructure:"author"`
+	Prompt     string `json:"prompt" mapstructure:"prompt"`
+}
+
+type PromptEngineeringConfig struct {
+	Optimization string `json:"optimization" mapstructure:"optimization"`
 }
 
 type WorkflowServiceConfig struct {
@@ -157,6 +218,7 @@ type CustomInfoConfig struct {
 	Version              string        `json:"version" mapstructure:"version"`
 	RegisterByEmail      int           `json:"register_by_email" mapstructure:"register_by_email"`
 	ResetPasswordByEmail int           `json:"reset_password_by_email" mapstructure:"reset_password_by_email"`
+	LoginByEmail         int           `json:"login_by_email" mapstructure:"login_by_email"`
 }
 
 type CustomTheme struct {
@@ -192,10 +254,15 @@ type CustomAbout struct {
 }
 
 type DefaultIconConfig struct {
-	UserIcon     string `json:"user" mapstructure:"user"`
-	RagIcon      string `json:"rag" mapstructure:"rag"`
-	AgentIcon    string `json:"agent" mapstructure:"agent"`
-	WorkflowIcon string `json:"workflow" mapstructure:"workflow"`
+	UserIcon      string `json:"user" mapstructure:"user"`
+	RagIcon       string `json:"rag" mapstructure:"rag"`
+	AgentIcon     string `json:"agent" mapstructure:"agent"`
+	WorkflowIcon  string `json:"workflow" mapstructure:"workflow"`
+	ChatflowIcon  string `json:"chatflow" mapstructure:"chatflow"`
+	McpCustomIcon string `json:"mcpCustom" mapstructure:"mcpCustom"`
+	McpServerIcon string `json:"mcpServer" mapstructure:"mcpServer"`
+	ToolIcon      string `json:"tool" mapstructure:"tool"`
+	PromptIcon    string `json:"prompt" mapstructure:"prompt"`
 }
 
 type SimpleSSOConfig struct {
@@ -216,6 +283,20 @@ func LoadConfig(in string) error {
 	for _, link := range _c.DocCenter.Links {
 		url, _ := url.JoinPath(_c.Server.WebBaseUrl, _c.DocCenter.FrontendPrefix, url.PathEscape(link.Val))
 		_c.DocCenter.docs[link.Key] = url
+	}
+	// 加载工作流模板配置
+	if err := util.LoadConfig(_c.WorkflowTemplate.ConfigPath, _c); err != nil {
+		return fmt.Errorf("load workflow template config err: %v", err)
+	}
+	for _, wt := range _c.WorkflowTemplates {
+		if err := wt.load(); err != nil {
+			return err
+		}
+	}
+	// 加载提示词模板配置
+	promptIn := _c.PromptTemplate.ConfigPath
+	if err := util.LoadConfig(promptIn, _c); err != nil {
+		return fmt.Errorf("load prompt template config err: %v", err)
 	}
 	return nil
 }
@@ -238,4 +319,22 @@ func (d *DocCenterConfig) GetDocs() map[string]string {
 		result[k] = v
 	}
 	return result
+}
+
+func (c *Config) WorkflowTemp(templateId string) (WorkflowTemplateConfig, bool) {
+	for _, wtf := range c.WorkflowTemplates {
+		if wtf.TemplateId == templateId {
+			return *wtf, true
+		}
+	}
+	return WorkflowTemplateConfig{}, false
+}
+
+func (c *Config) PromptTemp(templateId string) (PromptTempConfig, bool) {
+	for _, ptf := range c.PromptTemplates {
+		if ptf.TemplateId == templateId {
+			return *ptf, true
+		}
+	}
+	return PromptTempConfig{}, false
 }
