@@ -4,11 +4,7 @@ import { fetchPermFirPath } from '@/utils/util'
 import { PERMS as menuPerms } from "./constants"
 import { basePath } from "@/utils/config"
 
-<<<<<<< HEAD
-const white_list = [basePath + '/aibase','/sso', '/login','/webChat','/register','/reset']
-=======
 const white_list = [basePath + '/aibase', '/oauth', '/login', '/webChat', '/register', '/reset', '/templateSquare']
->>>>>>> upstream/main
 export const PERMS = menuPerms
 
 export const checkPerm = (perm) => {

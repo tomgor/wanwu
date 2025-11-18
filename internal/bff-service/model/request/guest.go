@@ -59,10 +59,6 @@ func (r *ResetPasswordByEmail) Check() error {
 	return nil
 }
 
-<<<<<<< HEAD
-func (l *SimpleSSO) Check() error {
-=======
 func (l *LoginSendEmailCode) Check() error {
->>>>>>> upstream/main
 	return nil
 }

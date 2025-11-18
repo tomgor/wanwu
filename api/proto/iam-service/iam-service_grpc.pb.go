@@ -4,6 +4,7 @@ package iam_service
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -12,10 +13,6 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-<<<<<<< HEAD
-// Requires gRPC-Go v1.32.0 or later.
-const _ = grpc.SupportPackageIsVersion7
-=======
 // Requires gRPC-Go v1.64.0 or later.
 const _ = grpc.SupportPackageIsVersion9
 
@@ -68,7 +65,6 @@ const (
 	IAMService_UpdateOauthAppStatus_FullMethodName        = "/iam_service.IAMService/UpdateOauthAppStatus"
 	IAMService_GetOauthApp_FullMethodName                 = "/iam_service.IAMService/GetOauthApp"
 )
->>>>>>> upstream/main
 
 // IAMServiceClient is the client API for IAMService service.
 //
@@ -158,10 +154,6 @@ type IAMServiceClient interface {
 	ResetPasswordSendEmailCode(ctx context.Context, in *ResetPasswordSendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 邮箱重置密码
 	ResetPasswordByEmail(ctx context.Context, in *ResetPasswordByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
-<<<<<<< HEAD
-	// 根据用户名检查是否存在组织中的用户，返回用户ID
-	GetUserIDByOrgAndName(ctx context.Context, in *GetUserIDByOrgAndNameReq, opts ...grpc.CallOption) (*GetUserIDByOrgAndNameResp, error)
-=======
 	// --- oauth ---
 	// 创建OAuth应用
 	CreateOauthApp(ctx context.Context, in *CreateOauthAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -175,7 +167,6 @@ type IAMServiceClient interface {
 	UpdateOauthAppStatus(ctx context.Context, in *UpdateOauthAppStatusReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 根据clientID获取oauth app信息
 	GetOauthApp(ctx context.Context, in *GetOauthAppReq, opts ...grpc.CallOption) (*OauthApp, error)
->>>>>>> upstream/main
 }
 
 type iAMServiceClient struct {
@@ -718,10 +709,6 @@ type IAMServiceServer interface {
 	ResetPasswordSendEmailCode(context.Context, *ResetPasswordSendEmailCodeReq) (*emptypb.Empty, error)
 	// 邮箱重置密码
 	ResetPasswordByEmail(context.Context, *ResetPasswordByEmailReq) (*emptypb.Empty, error)
-<<<<<<< HEAD
-	// 根据用户名检查是否存在组织中的用户，返回用户ID
-	GetUserIDByOrgAndName(context.Context, *GetUserIDByOrgAndNameReq) (*GetUserIDByOrgAndNameResp, error)
-=======
 	// --- oauth ---
 	// 创建OAuth应用
 	CreateOauthApp(context.Context, *CreateOauthAppReq) (*emptypb.Empty, error)
@@ -735,7 +722,6 @@ type IAMServiceServer interface {
 	UpdateOauthAppStatus(context.Context, *UpdateOauthAppStatusReq) (*emptypb.Empty, error)
 	// 根据clientID获取oauth app信息
 	GetOauthApp(context.Context, *GetOauthAppReq) (*OauthApp, error)
->>>>>>> upstream/main
 	mustEmbedUnimplementedIAMServiceServer()
 }
 
@@ -866,10 +852,6 @@ func (UnimplementedIAMServiceServer) ResetPasswordSendEmailCode(context.Context,
 func (UnimplementedIAMServiceServer) ResetPasswordByEmail(context.Context, *ResetPasswordByEmailReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResetPasswordByEmail not implemented")
 }
-<<<<<<< HEAD
-func (UnimplementedIAMServiceServer) GetUserIDByOrgAndName(context.Context, *GetUserIDByOrgAndNameReq) (*GetUserIDByOrgAndNameResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserIDByOrgAndName not implemented")
-=======
 func (UnimplementedIAMServiceServer) CreateOauthApp(context.Context, *CreateOauthAppReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateOauthApp not implemented")
 }
@@ -887,7 +869,6 @@ func (UnimplementedIAMServiceServer) UpdateOauthAppStatus(context.Context, *Upda
 }
 func (UnimplementedIAMServiceServer) GetOauthApp(context.Context, *GetOauthAppReq) (*OauthApp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOauthApp not implemented")
->>>>>>> upstream/main
 }
 func (UnimplementedIAMServiceServer) mustEmbedUnimplementedIAMServiceServer() {}
 
@@ -1640,27 +1621,12 @@ func _IAMService_ResetPasswordByEmail_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-<<<<<<< HEAD
-func _IAMService_GetUserIDByOrgAndName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUserIDByOrgAndNameReq)
-=======
 func _IAMService_CreateOauthApp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateOauthAppReq)
->>>>>>> upstream/main
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-<<<<<<< HEAD
-		return srv.(IAMServiceServer).GetUserIDByOrgAndName(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/iam_service.IAMService/GetUserIDByOrgAndName",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IAMServiceServer).GetUserIDByOrgAndName(ctx, req.(*GetUserIDByOrgAndNameReq))
-=======
 		return srv.(IAMServiceServer).CreateOauthApp(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
@@ -1759,7 +1725,6 @@ func _IAMService_GetOauthApp_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).GetOauthApp(ctx, req.(*GetOauthAppReq))
->>>>>>> upstream/main
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1936,10 +1901,6 @@ var IAMService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _IAMService_ResetPasswordByEmail_Handler,
 		},
 		{
-<<<<<<< HEAD
-			MethodName: "GetUserIDByOrgAndName",
-			Handler:    _IAMService_GetUserIDByOrgAndName_Handler,
-=======
 			MethodName: "CreateOauthApp",
 			Handler:    _IAMService_CreateOauthApp_Handler,
 		},
@@ -1962,7 +1923,6 @@ var IAMService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOauthApp",
 			Handler:    _IAMService_GetOauthApp_Handler,
->>>>>>> upstream/main
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

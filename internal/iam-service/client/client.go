@@ -93,9 +93,6 @@ type IClient interface {
 	ResetPasswordSendEmailCode(ctx context.Context, email string) *errs.Status
 	ResetPasswordByEmail(ctx context.Context, email, password, code string) *errs.Status
 
-<<<<<<< HEAD
-	GetUserIDByOrgAndName(ctx context.Context, orgID string, name string) (uint32, *errs.Status)
-=======
 	// --- oauth app ---
 
 	CreateOauthApp(ctx context.Context, req *model.OauthApp) *errs.Status
@@ -104,5 +101,4 @@ type IClient interface {
 	GetOauthAppList(ctx context.Context, userID uint32, name string, offset, limit int32) ([]*model.OauthApp, int64, *errs.Status)
 	UpdateOauthAppStatus(ctx context.Context, clientID string, status bool) *errs.Status
 	GetOauthApp(ctx context.Context, clientID string) (*model.OauthApp, *errs.Status)
->>>>>>> upstream/main
 }

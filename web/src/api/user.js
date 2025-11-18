@@ -12,16 +12,6 @@ export const login = (data) => {
     });
 };
 
-<<<<<<< HEAD
-export const sso = (data) => {
-    return service({
-        url: `${BASE_URL}/base/simple-sso`,
-        method: "post",
-        data,
-        hasLang
-    });
-};
-=======
 // 2FA登录
 // 第一级验证：密码
 export const login2FA1 = (data) => {
@@ -56,7 +46,6 @@ export const login2FA2exist = (data) => {
         data
     });
 }
->>>>>>> upstream/main
 
 // 获取图形验证码
 export const getImgVerCode = () => {

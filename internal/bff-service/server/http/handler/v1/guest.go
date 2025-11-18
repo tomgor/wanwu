@@ -41,14 +41,6 @@ func Login(ctx *gin.Context) {
 	gin_util.Response(ctx, resp, err)
 }
 
-<<<<<<< HEAD
-func SimpleSSO(ctx *gin.Context) {
-	var req request.SimpleSSO
-	if !gin_util.Bind(ctx, &req) {
-		return
-	}
-	resp, err := service.SimpleSSO(ctx, &req, getLanguage(ctx))
-=======
 // LoginByEmail
 //
 //	@Tags		guest
@@ -64,7 +56,6 @@ func LoginByEmail(ctx *gin.Context) {
 		return
 	}
 	resp, err := service.LoginByEmail(ctx, &req)
->>>>>>> upstream/main
 	gin_util.Response(ctx, resp, err)
 }
 

@@ -108,10 +108,6 @@ service IAMService {
   // 邮箱重置密码
   rpc ResetPasswordByEmail(ResetPasswordByEmailReq) returns (google.protobuf.Empty) {}
 
-<<<<<<< HEAD
-  // 根据用户名检查是否存在组织中的用户，返回用户ID
-  rpc GetUserIDByOrgAndName (GetUserIDByOrgAndNameReq) returns (GetUserIDByOrgAndNameResp);
-=======
   // --- oauth ---
   // 创建OAuth应用
   rpc CreateOauthApp(CreateOauthAppReq) returns (google.protobuf.Empty);
@@ -125,7 +121,6 @@ service IAMService {
   rpc UpdateOauthAppStatus(UpdateOauthAppStatusReq) returns (google.protobuf.Empty);
   // 根据clientID获取oauth app信息
   rpc GetOauthApp(GetOauthAppReq) returns (OauthApp);
->>>>>>> upstream/main
 }
 
 message Perm {
@@ -509,15 +504,6 @@ message ResetPasswordByEmailReq{
   string code = 3;
 }
 
-<<<<<<< HEAD
-message GetUserIDByOrgAndNameReq {
-  string org_id = 1;
-  string name = 2; // 用户名
-}
-
-message GetUserIDByOrgAndNameResp {
-  uint32 user_id = 1; // 找到的用户ID，未找到时为 0
-=======
 // --- oauth ---
 message CreateOauthAppReq{
   string userId = 1;
@@ -569,5 +555,4 @@ message UpdateOauthAppStatusReq{
 
 message GetOauthAppReq{
   string clientId = 1;
->>>>>>> upstream/main
 }

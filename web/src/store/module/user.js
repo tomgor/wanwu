@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { login, sso, getPermission,getCommonInfo } from '@/api/user'
-=======
 import {login, getPermission, getCommonInfo, login2FA2new, login2FA2exist, login2FA1} from '@/api/user'
->>>>>>> upstream/main
 import { fetchOrgs } from "@/api/permission/org"
 import {jumpOAuth, redirectUrl} from "@/utils/util"
 import { formatPerms } from "@/router/permission"
@@ -104,53 +100,6 @@ export const user = {
       }
   },
   actions: {
-<<<<<<< HEAD
-      async LoginIn({ dispatch, commit }, loginInfo) {
-          const res = await login(loginInfo)
-          await dispatch('fetchUserInfo', {res})
-      },
-
-      async fetchUserInfo({ commit }, {res, loginInfo}) {
-        const orgs = res.data.orgs || []
-        const orgPermission = res.data.orgPermission || {}
-        const orgId = orgPermission.org ? orgPermission.org.id : ''
-        const {isAdmin, isSystem} = orgPermission || {}
-
-        let permission = {}
-        permission.orgPermission = formatPerms(orgPermission.permissions)
-        permission.roles = orgPermission.roles || []
-
-        if (res.code === 0) {
-            commit('setUserInfo', {
-                uid:res.data.uid,
-                userName:res.data.username,
-                orgId,userCategory:
-                res.data.userCategory
-            })
-            commit('setOrgInfo', {orgs})
-            commit('setToken', res.data.token)
-            commit('setPermission', {...permission, isAdmin, isSystem, isUpdatePassword: res.data.isUpdatePassword})
-            //配置导航用户logo和名称以及欢迎文字
-            commit('setCommonInfo', {data: res.data.custom || {}})
-
-            // 更新权限路由
-            replaceRouter(permission.orgPermission)
-            // 重定向到有权限的页面
-            
-            console.log('loginInfologinInfo', loginInfo)
-            if(loginInfo && loginInfo.redirect) {
-              localStorage.setItem('redirect', loginInfo.redirect)
-              router.push({path: loginInfo.redirect || '/404'})
-              return;
-            }
-            redirectUrl()
-        }
-      },
-
-      async ssoLogin({ dispatch, commit }, loginInfo) { 
-        const res = await sso(loginInfo)
-        await dispatch('fetchUserInfo', {res, loginInfo})
-=======
       async LoginIn({ commit }, { loginInfo, params }) {
           const res = await login(loginInfo)
           processLogin(res, commit, params)
@@ -162,7 +111,6 @@ export const user = {
               commit('setToken', res.data.token)
               return res.data
           }
->>>>>>> upstream/main
       },
 
       async LoginIn2FA2({ commit }, { loginInfo, params }) {

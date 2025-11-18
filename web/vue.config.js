@@ -18,9 +18,6 @@ module.exports = {
   assetsDir: "static",
   lintOnSave: process.env.NODE_ENV === "development",
   productionSourceMap: false,//源码映射
-<<<<<<< HEAD
-  chainWebpack(config) {
-=======
   transpileDependencies: [
     'ml-matrix',
     '@antv/layout',
@@ -29,7 +26,6 @@ module.exports = {
   ],
   parallel: false,
   chainWebpack(config){
->>>>>>> upstream/main
     config.module
       .rule('md')
       .test(/\.md$/)
@@ -237,10 +233,7 @@ module.exports = {
         'vue$': 'vue/dist/vue.esm.js',
         "@": resolve("src"),
         "@common": resolve("common"),
-<<<<<<< HEAD
-=======
         "@antv/g6": path.resolve(__dirname, 'node_modules/@antv/g6'),
->>>>>>> upstream/main
       },
     },
     output: {
