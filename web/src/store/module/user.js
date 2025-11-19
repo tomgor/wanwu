@@ -1,4 +1,4 @@
-import {login, getPermission, getCommonInfo, login2FA2new, login2FA2exist, login2FA1} from '@/api/user'
+import { login, sso, sso_xietong, getPermission,getCommonInfo, login2FA2new, login2FA2exist, login2FA1 } from '@/api/user'
 import { fetchOrgs } from "@/api/permission/org"
 import {jumpOAuth, redirectUrl} from "@/utils/util"
 import { formatPerms } from "@/router/permission"
@@ -120,6 +120,13 @@ export const user = {
                   : login2FA2exist(loginInfo)
           )
           processLogin(res, commit, params)
+      },
+
+      async ssoLogin({ dispatch, commit }, loginInfo) { 
+        console.log('ssoLogin', loginInfo)
+        let api = loginInfo.platform === 'xietong' ? sso_xietong : sso
+        const res = await api(loginInfo)
+        await dispatch('fetchUserInfo', {res, loginInfo})
       },
 
       // 获取权限

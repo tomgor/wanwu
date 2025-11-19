@@ -47,6 +47,16 @@ export const login2FA2exist = (data) => {
     });
 }
 
+export const sso_xietong = (data) => {
+    return service({
+        url: `${BASE_URL}/base/login/sso`,
+        method: "post",
+        data,
+        hasLang
+    });
+};
+
+
 // 获取图形验证码
 export const getImgVerCode = () => {
     return service({
