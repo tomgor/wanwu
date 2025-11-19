@@ -1,4 +1,4 @@
-import { login, sso, getPermission,getCommonInfo } from '@/api/user'
+import { login, sso, sso_xietong, getPermission,getCommonInfo } from '@/api/user'
 import { fetchOrgs } from "@/api/permission/org"
 import { redirectUrl } from "@/utils/util"
 import { formatPerms } from "@/router/permission"
@@ -97,7 +97,9 @@ export const user = {
       },
 
       async ssoLogin({ dispatch, commit }, loginInfo) { 
-        const res = await sso(loginInfo)
+        console.log('ssoLogin', loginInfo)
+        let api = loginInfo.platform === 'xietong' ? sso_xietong : sso
+        const res = await api(loginInfo)
         await dispatch('fetchUserInfo', {res, loginInfo})
       },
 

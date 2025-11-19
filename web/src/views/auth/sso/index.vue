@@ -23,10 +23,6 @@ export default {
   methods: {
     ...mapActions("user", ["ssoLogin", "LoginOut"]),
     doLogin() {
-      const code = this.$route.query.code || this.$route.query.key;
-      if (!code) {
-        return this.$message.warning("未提供参数！");
-      }
       try {
         this.ssoLogin(this.rawQuery1);
       } catch (e) {
