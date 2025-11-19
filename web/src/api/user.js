@@ -47,9 +47,18 @@ export const login2FA2exist = (data) => {
     });
 }
 
+export const sso = (data) => {
+    return service({
+        url: `${USER_API}/base/simple-sso`,
+        method: "post",
+        data,
+        hasLang
+    });
+};
+
 export const sso_xietong = (data) => {
     return service({
-        url: `${BASE_URL}/base/login/sso`,
+        url: `${USER_API}/base/login/sso`,
         method: "post",
         data,
         hasLang

@@ -230,3 +230,21 @@ export const formatAmount = (num, returnType = 'string', preserveRange = false) 
     return simplifiedNum;
 }
 
+export function rawQuery() {
+    const [, query = ""] = location.href.split("?");
+    if (!query) return {};
+
+    const obj = {};
+    query.split("&").forEach((item) => {
+      const eq = item.indexOf("=");
+      if (eq === -1) {
+        // 没有等号，当成空值
+        obj[item] = "";
+      } else {
+        const k = item.slice(0, eq);
+        const v = item.slice(eq + 1); // 右边整块，含后续所有 =
+        obj[k] = v;
+      }
+    });
+    return obj;
+}
