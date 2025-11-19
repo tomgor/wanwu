@@ -55,6 +55,38 @@ func (c *Client) Login(ctx context.Context, username, password, language string)
 	})
 }
 
+func (c *Client) LoginBySso(ctx context.Context, entity *model.User, language string) (*UserInfo, *Permission, *errs.Status) {
+	var userInfo *UserInfo
+	var permission *Permission
+
+	return userInfo, permission, c.transaction(ctx, func(tx *gorm.DB) *errs.Status {
+
+		// find sso config by platform
+
+		// user
+		user := &model.User{}
+		if err := sqlopt.WithName(entity.Name).Apply(tx).First(user).Error; err != nil {
+			if err != gorm.ErrRecordNotFound {
+				return toErrStatus("iam_login_err", err.Error())
+			}
+		}
+
+		nowTS := time.Now().UnixMilli()
+		var (
+			get_err *errs.Status
+			update  map[string]interface{}
+		)
+		userInfo, permission, update, get_err = getUserInfoAndPermission(tx, user, language, nowTS)
+		if get_err != nil {
+			return get_err
+		}
+		if err := tx.Model(user).Updates(update).Error; err != nil {
+			return toErrStatus("iam_login_err", err.Error())
+		}
+		return nil
+	})
+}
+
 func (c *Client) LoginByEmail(ctx context.Context, username, password string) (*EmailLoginInfo, *errs.Status) {
 	var emailLoginInfo *EmailLoginInfo
 	// user

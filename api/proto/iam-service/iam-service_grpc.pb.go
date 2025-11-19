@@ -4,7 +4,6 @@ package iam_service
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -13,58 +12,8 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-// Requires gRPC-Go v1.64.0 or later.
-const _ = grpc.SupportPackageIsVersion9
-
-const (
-	IAMService_GetUserSelectNotInOrg_FullMethodName       = "/iam_service.IAMService/GetUserSelectNotInOrg"
-	IAMService_GetUserSelectByUserIDs_FullMethodName      = "/iam_service.IAMService/GetUserSelectByUserIDs"
-	IAMService_GetUserList_FullMethodName                 = "/iam_service.IAMService/GetUserList"
-	IAMService_GetUserInfo_FullMethodName                 = "/iam_service.IAMService/GetUserInfo"
-	IAMService_CreateUser_FullMethodName                  = "/iam_service.IAMService/CreateUser"
-	IAMService_UpdateUser_FullMethodName                  = "/iam_service.IAMService/UpdateUser"
-	IAMService_DeleteUser_FullMethodName                  = "/iam_service.IAMService/DeleteUser"
-	IAMService_ChangeUserStatus_FullMethodName            = "/iam_service.IAMService/ChangeUserStatus"
-	IAMService_UpdateUserPassword_FullMethodName          = "/iam_service.IAMService/UpdateUserPassword"
-	IAMService_ResetUserPassword_FullMethodName           = "/iam_service.IAMService/ResetUserPassword"
-	IAMService_GetUserPermission_FullMethodName           = "/iam_service.IAMService/GetUserPermission"
-	IAMService_ChangeUserLanguage_FullMethodName          = "/iam_service.IAMService/ChangeUserLanguage"
-	IAMService_UpdateUserAvatar_FullMethodName            = "/iam_service.IAMService/UpdateUserAvatar"
-	IAMService_GetOrgSelect_FullMethodName                = "/iam_service.IAMService/GetOrgSelect"
-	IAMService_GetOrgList_FullMethodName                  = "/iam_service.IAMService/GetOrgList"
-	IAMService_GetOrgInfo_FullMethodName                  = "/iam_service.IAMService/GetOrgInfo"
-	IAMService_GetOrgByOrgIDs_FullMethodName              = "/iam_service.IAMService/GetOrgByOrgIDs"
-	IAMService_GetOrgAndSubOrgSelectByUser_FullMethodName = "/iam_service.IAMService/GetOrgAndSubOrgSelectByUser"
-	IAMService_CreateOrg_FullMethodName                   = "/iam_service.IAMService/CreateOrg"
-	IAMService_UpdateOrg_FullMethodName                   = "/iam_service.IAMService/UpdateOrg"
-	IAMService_DeleteOrg_FullMethodName                   = "/iam_service.IAMService/DeleteOrg"
-	IAMService_ChangeOrgStatus_FullMethodName             = "/iam_service.IAMService/ChangeOrgStatus"
-	IAMService_AddOrgUser_FullMethodName                  = "/iam_service.IAMService/AddOrgUser"
-	IAMService_RemoveOrgUser_FullMethodName               = "/iam_service.IAMService/RemoveOrgUser"
-	IAMService_GetRoleSelect_FullMethodName               = "/iam_service.IAMService/GetRoleSelect"
-	IAMService_GetRoleList_FullMethodName                 = "/iam_service.IAMService/GetRoleList"
-	IAMService_GetRoleInfo_FullMethodName                 = "/iam_service.IAMService/GetRoleInfo"
-	IAMService_CreateRole_FullMethodName                  = "/iam_service.IAMService/CreateRole"
-	IAMService_UpdateRole_FullMethodName                  = "/iam_service.IAMService/UpdateRole"
-	IAMService_DeleteRole_FullMethodName                  = "/iam_service.IAMService/DeleteRole"
-	IAMService_ChangeRoleStatus_FullMethodName            = "/iam_service.IAMService/ChangeRoleStatus"
-	IAMService_GetCaptcha_FullMethodName                  = "/iam_service.IAMService/GetCaptcha"
-	IAMService_Login_FullMethodName                       = "/iam_service.IAMService/Login"
-	IAMService_LoginByEmail_FullMethodName                = "/iam_service.IAMService/LoginByEmail"
-	IAMService_LoginSendEmailCode_FullMethodName          = "/iam_service.IAMService/LoginSendEmailCode"
-	IAMService_LoginEmailCheck_FullMethodName             = "/iam_service.IAMService/LoginEmailCheck"
-	IAMService_ChangeUserPasswordByEmail_FullMethodName   = "/iam_service.IAMService/ChangeUserPasswordByEmail"
-	IAMService_RegisterByEmail_FullMethodName             = "/iam_service.IAMService/RegisterByEmail"
-	IAMService_RegisterSendEmailCode_FullMethodName       = "/iam_service.IAMService/RegisterSendEmailCode"
-	IAMService_ResetPasswordSendEmailCode_FullMethodName  = "/iam_service.IAMService/ResetPasswordSendEmailCode"
-	IAMService_ResetPasswordByEmail_FullMethodName        = "/iam_service.IAMService/ResetPasswordByEmail"
-	IAMService_CreateOauthApp_FullMethodName              = "/iam_service.IAMService/CreateOauthApp"
-	IAMService_DeleteOauthApp_FullMethodName              = "/iam_service.IAMService/DeleteOauthApp"
-	IAMService_UpdateOauthApp_FullMethodName              = "/iam_service.IAMService/UpdateOauthApp"
-	IAMService_GetOauthAppList_FullMethodName             = "/iam_service.IAMService/GetOauthAppList"
-	IAMService_UpdateOauthAppStatus_FullMethodName        = "/iam_service.IAMService/UpdateOauthAppStatus"
-	IAMService_GetOauthApp_FullMethodName                 = "/iam_service.IAMService/GetOauthApp"
-)
+// Requires gRPC-Go v1.32.0 or later.
+const _ = grpc.SupportPackageIsVersion7
 
 // IAMServiceClient is the client API for IAMService service.
 //
@@ -136,6 +85,8 @@ type IAMServiceClient interface {
 	GetCaptcha(ctx context.Context, in *GetCaptchaReq, opts ...grpc.CallOption) (*GetCaptchaResp, error)
 	// 登录
 	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
+	// 单点登陆
+	LoginBySso(ctx context.Context, in *LoginSsoReq, opts ...grpc.CallOption) (*LoginResp, error)
 	// 一阶段登录
 	LoginByEmail(ctx context.Context, in *LoginByEmailReq, opts ...grpc.CallOption) (*LoginByEmailResp, error)
 	// 登录发送邮箱验证码
@@ -322,9 +273,8 @@ func (c *iAMServiceClient) GetOrgInfo(ctx context.Context, in *GetOrgInfoReq, op
 }
 
 func (c *iAMServiceClient) GetOrgByOrgIDs(ctx context.Context, in *GetOrgByOrgIDsReq, opts ...grpc.CallOption) (*GetOrgByOrgIDsResp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetOrgByOrgIDsResp)
-	err := c.cc.Invoke(ctx, IAMService_GetOrgByOrgIDs_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/GetOrgByOrgIDs", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -332,9 +282,8 @@ func (c *iAMServiceClient) GetOrgByOrgIDs(ctx context.Context, in *GetOrgByOrgID
 }
 
 func (c *iAMServiceClient) GetOrgAndSubOrgSelectByUser(ctx context.Context, in *GetOrgAndSubOrgSelectByUserReq, opts ...grpc.CallOption) (*GetOrgAndSubOrgSelectByUserResp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetOrgAndSubOrgSelectByUserResp)
-	err := c.cc.Invoke(ctx, IAMService_GetOrgAndSubOrgSelectByUser_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/GetOrgAndSubOrgSelectByUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -476,10 +425,18 @@ func (c *iAMServiceClient) Login(ctx context.Context, in *LoginReq, opts ...grpc
 	return out, nil
 }
 
+func (c *iAMServiceClient) LoginBySso(ctx context.Context, in *LoginSsoReq, opts ...grpc.CallOption) (*LoginResp, error) {
+	out := new(LoginResp)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/LoginBySso", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *iAMServiceClient) LoginByEmail(ctx context.Context, in *LoginByEmailReq, opts ...grpc.CallOption) (*LoginByEmailResp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LoginByEmailResp)
-	err := c.cc.Invoke(ctx, IAMService_LoginByEmail_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/LoginByEmail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -487,9 +444,8 @@ func (c *iAMServiceClient) LoginByEmail(ctx context.Context, in *LoginByEmailReq
 }
 
 func (c *iAMServiceClient) LoginSendEmailCode(ctx context.Context, in *LoginSendEmailCodeReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, IAMService_LoginSendEmailCode_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/LoginSendEmailCode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -497,9 +453,8 @@ func (c *iAMServiceClient) LoginSendEmailCode(ctx context.Context, in *LoginSend
 }
 
 func (c *iAMServiceClient) LoginEmailCheck(ctx context.Context, in *LoginEmailCheckReq, opts ...grpc.CallOption) (*LoginResp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LoginResp)
-	err := c.cc.Invoke(ctx, IAMService_LoginEmailCheck_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/LoginEmailCheck", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -507,9 +462,8 @@ func (c *iAMServiceClient) LoginEmailCheck(ctx context.Context, in *LoginEmailCh
 }
 
 func (c *iAMServiceClient) ChangeUserPasswordByEmail(ctx context.Context, in *ChangeUserPasswordByEmailReq, opts ...grpc.CallOption) (*LoginResp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LoginResp)
-	err := c.cc.Invoke(ctx, IAMService_ChangeUserPasswordByEmail_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/ChangeUserPasswordByEmail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -552,19 +506,9 @@ func (c *iAMServiceClient) ResetPasswordByEmail(ctx context.Context, in *ResetPa
 	return out, nil
 }
 
-func (c *iAMServiceClient) GetUserIDByOrgAndName(ctx context.Context, in *GetUserIDByOrgAndNameReq, opts ...grpc.CallOption) (*GetUserIDByOrgAndNameResp, error) {
-	out := new(GetUserIDByOrgAndNameResp)
-	err := c.cc.Invoke(ctx, "/iam_service.IAMService/GetUserIDByOrgAndName", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *iAMServiceClient) CreateOauthApp(ctx context.Context, in *CreateOauthAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, IAMService_CreateOauthApp_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/CreateOauthApp", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -572,9 +516,8 @@ func (c *iAMServiceClient) CreateOauthApp(ctx context.Context, in *CreateOauthAp
 }
 
 func (c *iAMServiceClient) DeleteOauthApp(ctx context.Context, in *DeleteOauthAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, IAMService_DeleteOauthApp_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/DeleteOauthApp", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -582,9 +525,8 @@ func (c *iAMServiceClient) DeleteOauthApp(ctx context.Context, in *DeleteOauthAp
 }
 
 func (c *iAMServiceClient) UpdateOauthApp(ctx context.Context, in *UpdateOauthAppReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, IAMService_UpdateOauthApp_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/UpdateOauthApp", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -592,9 +534,8 @@ func (c *iAMServiceClient) UpdateOauthApp(ctx context.Context, in *UpdateOauthAp
 }
 
 func (c *iAMServiceClient) GetOauthAppList(ctx context.Context, in *GetOauthAppListReq, opts ...grpc.CallOption) (*OauthAppListResp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(OauthAppListResp)
-	err := c.cc.Invoke(ctx, IAMService_GetOauthAppList_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/GetOauthAppList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -602,9 +543,8 @@ func (c *iAMServiceClient) GetOauthAppList(ctx context.Context, in *GetOauthAppL
 }
 
 func (c *iAMServiceClient) UpdateOauthAppStatus(ctx context.Context, in *UpdateOauthAppStatusReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, IAMService_UpdateOauthAppStatus_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/UpdateOauthAppStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -612,9 +552,8 @@ func (c *iAMServiceClient) UpdateOauthAppStatus(ctx context.Context, in *UpdateO
 }
 
 func (c *iAMServiceClient) GetOauthApp(ctx context.Context, in *GetOauthAppReq, opts ...grpc.CallOption) (*OauthApp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(OauthApp)
-	err := c.cc.Invoke(ctx, IAMService_GetOauthApp_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/GetOauthApp", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -691,6 +630,8 @@ type IAMServiceServer interface {
 	GetCaptcha(context.Context, *GetCaptchaReq) (*GetCaptchaResp, error)
 	// 登录
 	Login(context.Context, *LoginReq) (*LoginResp, error)
+	// 单点登陆
+	LoginBySso(context.Context, *LoginSsoReq) (*LoginResp, error)
 	// 一阶段登录
 	LoginByEmail(context.Context, *LoginByEmailReq) (*LoginByEmailResp, error)
 	// 登录发送邮箱验证码
@@ -827,6 +768,9 @@ func (UnimplementedIAMServiceServer) GetCaptcha(context.Context, *GetCaptchaReq)
 }
 func (UnimplementedIAMServiceServer) Login(context.Context, *LoginReq) (*LoginResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedIAMServiceServer) LoginBySso(context.Context, *LoginSsoReq) (*LoginResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginBySso not implemented")
 }
 func (UnimplementedIAMServiceServer) LoginByEmail(context.Context, *LoginByEmailReq) (*LoginByEmailResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginByEmail not implemented")
@@ -1181,7 +1125,7 @@ func _IAMService_GetOrgByOrgIDs_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: IAMService_GetOrgByOrgIDs_FullMethodName,
+		FullMethod: "/iam_service.IAMService/GetOrgByOrgIDs",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).GetOrgByOrgIDs(ctx, req.(*GetOrgByOrgIDsReq))
@@ -1199,7 +1143,7 @@ func _IAMService_GetOrgAndSubOrgSelectByUser_Handler(srv interface{}, ctx contex
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: IAMService_GetOrgAndSubOrgSelectByUser_FullMethodName,
+		FullMethod: "/iam_service.IAMService/GetOrgAndSubOrgSelectByUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).GetOrgAndSubOrgSelectByUser(ctx, req.(*GetOrgAndSubOrgSelectByUserReq))
@@ -1477,6 +1421,24 @@ func _IAMService_Login_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IAMService_LoginBySso_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginSsoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).LoginBySso(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/iam_service.IAMService/LoginBySso",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).LoginBySso(ctx, req.(*LoginSsoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _IAMService_LoginByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LoginByEmailReq)
 	if err := dec(in); err != nil {
@@ -1487,7 +1449,7 @@ func _IAMService_LoginByEmail_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: IAMService_LoginByEmail_FullMethodName,
+		FullMethod: "/iam_service.IAMService/LoginByEmail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).LoginByEmail(ctx, req.(*LoginByEmailReq))
@@ -1505,7 +1467,7 @@ func _IAMService_LoginSendEmailCode_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: IAMService_LoginSendEmailCode_FullMethodName,
+		FullMethod: "/iam_service.IAMService/LoginSendEmailCode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).LoginSendEmailCode(ctx, req.(*LoginSendEmailCodeReq))
@@ -1523,7 +1485,7 @@ func _IAMService_LoginEmailCheck_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: IAMService_LoginEmailCheck_FullMethodName,
+		FullMethod: "/iam_service.IAMService/LoginEmailCheck",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).LoginEmailCheck(ctx, req.(*LoginEmailCheckReq))
@@ -1541,7 +1503,7 @@ func _IAMService_ChangeUserPasswordByEmail_Handler(srv interface{}, ctx context.
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: IAMService_ChangeUserPasswordByEmail_FullMethodName,
+		FullMethod: "/iam_service.IAMService/ChangeUserPasswordByEmail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).ChangeUserPasswordByEmail(ctx, req.(*ChangeUserPasswordByEmailReq))
@@ -1631,7 +1593,7 @@ func _IAMService_CreateOauthApp_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: IAMService_CreateOauthApp_FullMethodName,
+		FullMethod: "/iam_service.IAMService/CreateOauthApp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).CreateOauthApp(ctx, req.(*CreateOauthAppReq))
@@ -1649,7 +1611,7 @@ func _IAMService_DeleteOauthApp_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: IAMService_DeleteOauthApp_FullMethodName,
+		FullMethod: "/iam_service.IAMService/DeleteOauthApp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).DeleteOauthApp(ctx, req.(*DeleteOauthAppReq))
@@ -1667,7 +1629,7 @@ func _IAMService_UpdateOauthApp_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: IAMService_UpdateOauthApp_FullMethodName,
+		FullMethod: "/iam_service.IAMService/UpdateOauthApp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).UpdateOauthApp(ctx, req.(*UpdateOauthAppReq))
@@ -1685,7 +1647,7 @@ func _IAMService_GetOauthAppList_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: IAMService_GetOauthAppList_FullMethodName,
+		FullMethod: "/iam_service.IAMService/GetOauthAppList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).GetOauthAppList(ctx, req.(*GetOauthAppListReq))
@@ -1703,7 +1665,7 @@ func _IAMService_UpdateOauthAppStatus_Handler(srv interface{}, ctx context.Conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: IAMService_UpdateOauthAppStatus_FullMethodName,
+		FullMethod: "/iam_service.IAMService/UpdateOauthAppStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).UpdateOauthAppStatus(ctx, req.(*UpdateOauthAppStatusReq))
@@ -1721,7 +1683,7 @@ func _IAMService_GetOauthApp_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: IAMService_GetOauthApp_FullMethodName,
+		FullMethod: "/iam_service.IAMService/GetOauthApp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IAMServiceServer).GetOauthApp(ctx, req.(*GetOauthAppReq))
@@ -1867,6 +1829,10 @@ var IAMService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _IAMService_Login_Handler,
+		},
+		{
+			MethodName: "LoginBySso",
+			Handler:    _IAMService_LoginBySso_Handler,
 		},
 		{
 			MethodName: "LoginByEmail",

@@ -36,6 +36,18 @@ func Login(ctx *gin.Context, login *request.Login, language string) (*response.L
 	return getLoginResp(ctx, resp)
 }
 
+func LoginBySso(ctx *gin.Context, req *request.SsoRequest, language string) (*response.Login, error) {
+	resp, err := iam.LoginBySso(ctx.Request.Context(), &iam_service.LoginSsoReq{
+		Platform: req.Platform,
+		Token:    req.Token,
+		Language: language,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return getLoginResp(ctx, resp)
+}
+
 func LoginByEmail(ctx *gin.Context, login *request.Login) (*response.LoginByEmail, error) {
 	if config.Cfg().CustomInfo.LoginByEmail == 0 {
 		return nil, grpc_util.ErrorStatus(err_code.Code_BFFLoginDisable)

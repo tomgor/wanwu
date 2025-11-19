@@ -102,3 +102,13 @@ password:
         如有任何问题欢迎加入QQ群：490071123<br /><br />
         感谢您的使用！<br />
         元景万悟团队
+
+sso:
+  - name: "xietong"
+    enabled: true
+    fixed-dept: 0
+    fixed-role: 1990246599018229762
+    other-properties:
+      base_url: "https://14.18.81.247:8000"
+      app_id: "agentPlatform"
+      secret_key: "1d4f2f687c13b2bd0587c72e99094efe100562f7"

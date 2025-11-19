@@ -42,6 +42,36 @@ func (s *Service) Login(ctx context.Context, req *iam_service.LoginReq) (*iam_se
 	}, nil
 }
 
+func (s *Service) LoginBySso(ctx context.Context, req *iam_service.LoginSsoReq) (*iam_service.LoginResp, error) {
+	// sso login
+	entity, ssoConfig, err := FetchUserInfoBySso(req.Platform, req.Token)
+	if err != nil {
+		return nil, err
+	}
+
+	//检查用户是否已入库
+	userInfos, _, err2 := s.cli.GetUsers(ctx, uint32(ssoConfig.FixedDept), entity.Name, 0, 10)
+	if err2 != nil {
+		return nil, errStatus(errs.Code_IAMUser, err2)
+	}
+	if len(userInfos) == 0 {
+		entity.Password = ssoConfig.InitPassword
+		_, err2 := s.cli.CreateUser(ctx, entity, uint32(ssoConfig.FixedDept), []uint32{uint32(ssoConfig.FixedRole)})
+		if err2 != nil {
+			return nil, errStatus(errs.Code_IAMUser, err2)
+		}
+	}
+
+	user, permission, err2 := s.cli.LoginBySso(ctx, entity, req.Language)
+	if err2 != nil {
+		return nil, errStatus(errs.Code_IAMLogin, err2)
+	}
+	return &iam_service.LoginResp{
+		User:       toUserInfo(user),
+		Permission: toPermission(permission),
+	}, nil
+}
+
 func (s *Service) LoginByEmail(ctx context.Context, req *iam_service.LoginByEmailReq) (*iam_service.LoginByEmailResp, error) {
 	// captcha
 	if err := s.cli.CheckCaptcha(ctx, req.Key, req.Code); err != nil {

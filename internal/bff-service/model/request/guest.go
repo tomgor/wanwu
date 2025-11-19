@@ -14,6 +14,12 @@ type SimpleSSO struct {
 	Payload  string `json:"payload" validate:"required"`  // aes加密的内容
 }
 
+// 单点登陆请求
+type SsoRequest struct {
+	Platform string `json:"platform" validate:"required"` // 平台
+	Token    string `json:"token" validate:"required"`    // 用户token
+}
+
 type RegisterByEmail struct {
 	Username string `json:"username" validate:"required"` // 用户名
 	Email    string `json:"email" validate:"required"`    // 邮箱
@@ -40,6 +46,9 @@ type LoginSendEmailCode struct {
 }
 
 func (l *Login) Check() error {
+	return nil
+}
+func (l *SsoRequest) Check() error {
 	return nil
 }
 
