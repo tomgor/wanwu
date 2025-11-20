@@ -87,6 +87,8 @@ service IAMService {
   rpc GetCaptcha(GetCaptchaReq) returns (GetCaptchaResp) {}
   // 登录
   rpc Login(LoginReq) returns (LoginResp) {}
+  // 单点登陆
+  rpc LoginBySso(LoginSsoReq) returns (LoginResp) {}
   // 一阶段登录
   rpc LoginByEmail(LoginByEmailReq) returns (LoginByEmailResp) {}
   // 登录发送邮箱验证码
@@ -440,6 +442,12 @@ message LoginReq {
   string key = 3; // 客户端key
   string code = 4; // 验证码
   string language = 5; //用户语言
+}
+
+message LoginSsoReq {
+  string platform = 1; // 平台
+  string token = 2; // 用户token
+  string language = 3; //用户语言
 }
 
 message LoginResp {

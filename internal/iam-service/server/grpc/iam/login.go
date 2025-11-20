@@ -42,6 +42,42 @@ func (s *Service) Login(ctx context.Context, req *iam_service.LoginReq) (*iam_se
 	}, nil
 }
 
+func (s *Service) LoginBySso(ctx context.Context, req *iam_service.LoginSsoReq) (*iam_service.LoginResp, error) {
+	// sso login
+	entity, ssoConfig, err := FetchUserInfoBySso(req.Platform, req.Token)
+	if err != nil {
+		// log.Printf("获取token用户失败: %+v\n", err)
+		return nil, err
+	}
+
+	//检查用户是否已入库
+	// log.Printf("检查用户是否已入库: %s", entity.Name)
+	userInfos, _, err2 := s.cli.GetUsers(ctx, uint32(ssoConfig.FixedDept), entity.Name, 0, 10)
+	if err2 != nil {
+		// log.Printf("获取用户信息失败: %+v\n", err2)
+		return nil, errStatus(errs.Code_IAMUser, err2)
+	}
+	if len(userInfos) == 0 {
+		// log.Printf("用户未入库，创建用户: %s", entity.Name)
+		entity.Password = ssoConfig.InitPassword
+		_, err2 := s.cli.CreateUser(ctx, entity, uint32(ssoConfig.FixedDept), []uint32{uint32(ssoConfig.FixedRole)})
+		if err2 != nil {
+			// log.Printf("创建用户信息失败: %+v\n", err2)
+			return nil, errStatus(errs.Code_IAMUser, err2)
+		}
+	}
+
+	user, permission, err2 := s.cli.LoginBySso(ctx, entity, req.Language)
+	if err2 != nil {
+		// log.Printf("登录失败: %+v\n", err2)
+		return nil, errStatus(errs.Code_IAMLogin, err2)
+	}
+	return &iam_service.LoginResp{
+		User:       toUserInfo(user),
+		Permission: toPermission(permission),
+	}, nil
+}
+
 func (s *Service) LoginByEmail(ctx context.Context, req *iam_service.LoginByEmailReq) (*iam_service.LoginByEmailResp, error) {
 	// captcha
 	if err := s.cli.CheckCaptcha(ctx, req.Key, req.Code); err != nil {

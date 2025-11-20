@@ -20,6 +20,7 @@ type Config struct {
 	SMTP     smtp_util.Config `json:"smtp" mapstructure:"smtp"`
 	Register RegisterConfig   `json:"register" mapstructure:"register"`
 	Password PasswordConfig   `json:"password" mapstructure:"password"`
+	SSO      []SSOConfig      `json:"sso" mapstructure:"sso"`
 }
 
 type ServerConfig struct {
@@ -60,6 +61,15 @@ type RegisterByEmailTemplate struct {
 	Subject     string `json:"subject" mapstructure:"subject"`
 	ContentType string `json:"content_type" mapstructure:"content_type"`
 	Body        string `json:"body" mapstructure:"body"`
+}
+
+type SSOConfig struct {
+	Name            string                 `json:"name" mapstructure:"name"`
+	Enabled         bool                   `json:"enabled" mapstructure:"enabled"`
+	FixedDept       int32                  `json:"fixed-dept" mapstructure:"fixed-dept"`
+	FixedRole       int64                  `json:"fixed-role" mapstructure:"fixed-role"`
+	InitPassword    string                 `json:"init-password" mapstructure:"init-password"`
+	OtherProperties map[string]interface{} `json:"other-properties" mapstructure:"other-properties"`
 }
 
 func LoadConfig(in string) error {

@@ -41,6 +41,25 @@ func Login(ctx *gin.Context) {
 	gin_util.Response(ctx, resp, err)
 }
 
+// LoginBySso
+//
+//	@Tags		guest
+//	@Summary	用户单点登录
+//	@Accept		json
+//	@Produce	json
+//	@Param		X-Language	header		string				false	"语言"
+//	@Param		data		body		request.SsoRequest	true	"单点登录信息"
+//	@Success	200			{object}	response.Response{data=response.Login}
+//	@Router		/base/login/sso [post]
+func LoginBySso(ctx *gin.Context) {
+	var req request.SsoRequest
+	if !gin_util.Bind(ctx, &req) {
+		return
+	}
+	resp, err := service.LoginBySso(ctx, &req, getLanguage(ctx))
+	gin_util.Response(ctx, resp, err)
+}
+
 // LoginByEmail
 //
 //	@Tags		guest
