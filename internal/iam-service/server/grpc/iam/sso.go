@@ -18,7 +18,6 @@ func FetchUserInfoBySso(platform, token string) (*model.User, *config.SSOConfig,
 				}
 				return user, &ssoConfig, nil
 			}
-
 		}
 	}
 	return nil, nil, fmt.Errorf("unsupported or disabled platform: %s", platform)

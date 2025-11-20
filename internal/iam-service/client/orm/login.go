@@ -61,8 +61,6 @@ func (c *Client) LoginBySso(ctx context.Context, entity *model.User, language st
 
 	return userInfo, permission, c.transaction(ctx, func(tx *gorm.DB) *errs.Status {
 
-		// find sso config by platform
-
 		// user
 		user := &model.User{}
 		if err := sqlopt.WithName(entity.Name).Apply(tx).First(user).Error; err != nil {

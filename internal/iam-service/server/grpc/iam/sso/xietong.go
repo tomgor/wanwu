@@ -72,7 +72,9 @@ func FetchXieTongUserInfo(token string, ssoConfig *config.SSOConfig) (*model.Use
 		IsAdmin:   false,
 	}
 
-	return user, errors.New("not implemented")
+	// log.Printf("构建用户信息成功：%s", user.Nick)
+
+	return user, nil
 }
 
 // apiWithToken 构造带有 clientId 和 Authorization 头的 http.Client
