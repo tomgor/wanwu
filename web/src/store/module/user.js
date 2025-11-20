@@ -35,6 +35,11 @@ const processLogin = (res, commit, params) => {
             jumpOAuth(params)
             return
         }
+        if(params && params.redirect) {
+          localStorage.setItem('redirect', loginInfo.redirect)
+          router.push({path: loginInfo.redirect || '/404'})
+          return;
+        }
 
         // 更新权限路由
         replaceRouter(permission.orgPermission)
@@ -123,10 +128,9 @@ export const user = {
       },
 
       async ssoLogin({ dispatch, commit }, loginInfo) { 
-        console.log('ssoLogin', loginInfo)
         let api = loginInfo.platform === 'xietong' ? sso_xietong : sso
         const res = await api(loginInfo)
-        await dispatch('fetchUserInfo', {res, loginInfo})
+        processLogin(res, commit, loginInfo)
       },
 
       // 获取权限
