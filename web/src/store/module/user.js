@@ -128,8 +128,7 @@ export const user = {
       },
 
       async ssoLogin({ dispatch, commit }, loginInfo) { 
-        let api = loginInfo.platform === 'xietong' ? sso_xietong : sso
-        const res = await api(loginInfo)
+        const res = await sso(loginInfo)
         processLogin(res, commit, loginInfo)
       },
 
