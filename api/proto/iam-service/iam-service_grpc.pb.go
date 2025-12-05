@@ -95,6 +95,8 @@ type IAMServiceClient interface {
 	LoginEmailCheck(ctx context.Context, in *LoginEmailCheckReq, opts ...grpc.CallOption) (*LoginResp, error)
 	// 二阶段登录重置密码与邮箱校验
 	ChangeUserPasswordByEmail(ctx context.Context, in *ChangeUserPasswordByEmailReq, opts ...grpc.CallOption) (*LoginResp, error)
+	// 根据用户名检查是否存在组织中的用户，返回用户ID
+	GetUserIDByOrgAndName(ctx context.Context, in *GetUserIDByOrgAndNameReq, opts ...grpc.CallOption) (*GetUserIDByOrgAndNameResp, error)
 	// --- register ---
 	// 邮箱注册用户
 	RegisterByEmail(ctx context.Context, in *RegisterByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -470,6 +472,15 @@ func (c *iAMServiceClient) ChangeUserPasswordByEmail(ctx context.Context, in *Ch
 	return out, nil
 }
 
+func (c *iAMServiceClient) GetUserIDByOrgAndName(ctx context.Context, in *GetUserIDByOrgAndNameReq, opts ...grpc.CallOption) (*GetUserIDByOrgAndNameResp, error) {
+	out := new(GetUserIDByOrgAndNameResp)
+	err := c.cc.Invoke(ctx, "/iam_service.IAMService/GetUserIDByOrgAndName", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *iAMServiceClient) RegisterByEmail(ctx context.Context, in *RegisterByEmailReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/iam_service.IAMService/RegisterByEmail", in, out, opts...)
@@ -640,6 +651,8 @@ type IAMServiceServer interface {
 	LoginEmailCheck(context.Context, *LoginEmailCheckReq) (*LoginResp, error)
 	// 二阶段登录重置密码与邮箱校验
 	ChangeUserPasswordByEmail(context.Context, *ChangeUserPasswordByEmailReq) (*LoginResp, error)
+	// 根据用户名检查是否存在组织中的用户，返回用户ID
+	GetUserIDByOrgAndName(context.Context, *GetUserIDByOrgAndNameReq) (*GetUserIDByOrgAndNameResp, error)
 	// --- register ---
 	// 邮箱注册用户
 	RegisterByEmail(context.Context, *RegisterByEmailReq) (*emptypb.Empty, error)
@@ -783,6 +796,9 @@ func (UnimplementedIAMServiceServer) LoginEmailCheck(context.Context, *LoginEmai
 }
 func (UnimplementedIAMServiceServer) ChangeUserPasswordByEmail(context.Context, *ChangeUserPasswordByEmailReq) (*LoginResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangeUserPasswordByEmail not implemented")
+}
+func (UnimplementedIAMServiceServer) GetUserIDByOrgAndName(context.Context, *GetUserIDByOrgAndNameReq) (*GetUserIDByOrgAndNameResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserIDByOrgAndName not implemented")
 }
 func (UnimplementedIAMServiceServer) RegisterByEmail(context.Context, *RegisterByEmailReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterByEmail not implemented")
@@ -1511,6 +1527,24 @@ func _IAMService_ChangeUserPasswordByEmail_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IAMService_GetUserIDByOrgAndName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserIDByOrgAndNameReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IAMServiceServer).GetUserIDByOrgAndName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/iam_service.IAMService/GetUserIDByOrgAndName",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IAMServiceServer).GetUserIDByOrgAndName(ctx, req.(*GetUserIDByOrgAndNameReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _IAMService_RegisterByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RegisterByEmailReq)
 	if err := dec(in); err != nil {
@@ -1849,6 +1883,10 @@ var IAMService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ChangeUserPasswordByEmail",
 			Handler:    _IAMService_ChangeUserPasswordByEmail_Handler,
+		},
+		{
+			MethodName: "GetUserIDByOrgAndName",
+			Handler:    _IAMService_GetUserIDByOrgAndName_Handler,
 		},
 		{
 			MethodName: "RegisterByEmail",

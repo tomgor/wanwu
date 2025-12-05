@@ -37,6 +37,22 @@ func Login(ctx *gin.Context, login *request.Login, language string) (*response.L
 }
 
 func LoginBySso(ctx *gin.Context, req *request.SsoRequest, language string) (*response.Login, error) {
+
+	_, err := GetSimpleSSOConfigByPlatform(req.Platform)
+	if err == nil {
+		fmt.Printf("%s存在simple sso配置，走 simple sso登陆\n", req.Platform)
+		//是简单登陆
+		return SimpleSSO(ctx, &request.SimpleSSO{
+			Platform: req.Platform,
+			Key:      req.Key,
+			Payload:  req.Payload,
+		}, language)
+	} else {
+		fmt.Printf("找不到simple sso配置，错误: %v\n", err)
+	}
+
+	fmt.Printf("%s不存在simple sso配置，走 iam的sso登陆\n", req.Platform)
+
 	resp, err := iam.LoginBySso(ctx.Request.Context(), &iam_service.LoginSsoReq{
 		Platform: req.Platform,
 		Token:    req.Token,

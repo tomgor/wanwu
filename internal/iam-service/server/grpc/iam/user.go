@@ -193,3 +193,21 @@ func toPerm(perm orm.Perm) *iam_service.Perm {
 		Perm: perm.Perm,
 	}
 }
+
+func (s *Service) GetUserIDByOrgAndName(ctx context.Context, req *iam_service.GetUserIDByOrgAndNameReq) (*iam_service.GetUserIDByOrgAndNameResp, error) {
+
+	// 1. 调用 ORM/业务逻辑层的方法
+	// 假设您的 ORM 方法已经集成到了 s.svc 中
+	userID, err := s.cli.GetUserIDByOrgAndName(ctx, req.GetOrgId(), req.GetName())
+
+	if err != nil {
+		// 2. 错误处理：将自定义的 *errs.Status 转换为 gRPC 错误
+		// (您项目中可能使用了 grpc_util.ErrorStatus 或类似的方法)
+		return nil, errStatus(errs.Code_IAMUser, err)
+	}
+
+	// 3. 构造并返回响应
+	return &iam_service.GetUserIDByOrgAndNameResp{
+		UserId: userID,
+	}, nil
+}

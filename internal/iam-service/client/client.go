@@ -32,6 +32,7 @@ type IClient interface {
 
 	GetUserPermission(ctx context.Context, userID, orgID uint32) (*orm.Permission, *errs.Status)
 	ChangeUserLanguage(ctx context.Context, userID uint32, language string) *errs.Status
+	GetUserIDByOrgAndName(ctx context.Context, orgID string, name string) (uint32, *errs.Status)
 
 	// --- org ---
 

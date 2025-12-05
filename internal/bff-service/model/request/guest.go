@@ -17,7 +17,9 @@ type SimpleSSO struct {
 // 单点登陆请求
 type SsoRequest struct {
 	Platform string `json:"platform" validate:"required"` // 平台
-	Token    string `json:"token" validate:"required"`    // 用户token
+	Token    string `json:"token"`                        // 用户 token
+	Key      string `json:"key"`                          // aes加密的key simple-sso use
+	Payload  string `json:"payload" `                     // aes加密的内容 simple-sso use
 }
 
 type RegisterByEmail struct {
@@ -69,5 +71,9 @@ func (r *ResetPasswordByEmail) Check() error {
 }
 
 func (l *LoginSendEmailCode) Check() error {
+	return nil
+}
+
+func (l *SimpleSSO) Check() error {
 	return nil
 }

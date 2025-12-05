@@ -98,6 +98,9 @@ service IAMService {
   // 二阶段登录重置密码与邮箱校验
   rpc ChangeUserPasswordByEmail(ChangeUserPasswordByEmailReq) returns (LoginResp) {}
 
+  // 根据用户名检查是否存在组织中的用户，返回用户ID
+  rpc GetUserIDByOrgAndName (GetUserIDByOrgAndNameReq) returns (GetUserIDByOrgAndNameResp);
+
   // --- register ---
   // 邮箱注册用户
   rpc RegisterByEmail(RegisterByEmailReq) returns (google.protobuf.Empty) {}
@@ -563,4 +566,13 @@ message UpdateOauthAppStatusReq{
 
 message GetOauthAppReq{
   string clientId = 1;
+}
+
+message GetUserIDByOrgAndNameReq {
+  string org_id = 1;
+  string name = 2; // 用户名
+}
+
+message GetUserIDByOrgAndNameResp {
+  uint32 user_id = 1; // 找到的用户ID，未找到时为 0
 }
