@@ -36,8 +36,8 @@ const processLogin = (res, commit, params) => {
             return
         }
         if(params && params.redirect) {
-          localStorage.setItem('redirect', loginInfo.redirect)
-          router.push({path: loginInfo.redirect || '/404'})
+          localStorage.setItem('redirect', params.redirect)
+          router.push({path: params.redirect || '/404'})
           return;
         }
 
