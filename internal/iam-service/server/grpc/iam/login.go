@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	errs "github.com/UnicomAI/wanwu/api/proto/err-code"
 	iam_service "github.com/UnicomAI/wanwu/api/proto/iam-service"
@@ -60,11 +61,14 @@ func (s *Service) LoginBySso(ctx context.Context, req *iam_service.LoginSsoReq) 
 	if len(userInfos) == 0 {
 		// log.Printf("用户未入库，创建用户: %s", entity.Name)
 		entity.Password = ssoConfig.InitPassword
+		entity.LastUpdatePasswordAt = time.Now().UnixMilli()
 		_, err2 := s.cli.CreateUser(ctx, entity, uint32(ssoConfig.FixedDept), []uint32{uint32(ssoConfig.FixedRole)})
 		if err2 != nil {
 			// log.Printf("创建用户信息失败: %+v\n", err2)
 			return nil, errStatus(errs.Code_IAMUser, err2)
 		}
+
+		// 主动修改密码，防止用户需要修改密码
 	}
 
 	user, permission, err2 := s.cli.LoginBySso(ctx, entity, req.Language)
