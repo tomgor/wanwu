@@ -1,4 +1,4 @@
-import { login, sso, sso_xietong, getPermission,getCommonInfo, login2FA2new, login2FA2exist, login2FA1 } from '@/api/user'
+import { login, sso, getPermission,getCommonInfo, login2FA2new, login2FA2exist, login2FA1 } from '@/api/user'
 import { fetchOrgs } from "@/api/permission/org"
 import {jumpOAuth, redirectUrl} from "@/utils/util"
 import { formatPerms } from "@/router/permission"
