@@ -56,7 +56,7 @@
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="edit" v-if="[30].includes(n.permissionType)">{{$t('common.button.edit')}}</el-dropdown-item>
                 <el-dropdown-item command="delete" v-if="[30].includes(n.permissionType)">{{$t('common.button.delete')}}</el-dropdown-item>
-                <el-dropdown-item command="power" >权限</el-dropdown-item>
+                <el-dropdown-item command="power" v-if="isSystem || isAdmin">权限</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
@@ -98,8 +98,20 @@ export default {
       apptype:AppType,
       basePath: this.$basePath,
       listData:[],
-      title:'创建标签'
+      title:'创建标签',
+      permission: JSON.parse(localStorage.getItem("access_cert"))
+        ? JSON.parse(localStorage.getItem("access_cert")).user.permission
+        : {}, //权限类型
     }
+  },
+
+  computed:{
+    isSystem() {
+      return this.permission.isSystem
+    },
+    isAdmin() {
+      return this.permission.isAdmin
+    },
   },
   
   methods:{

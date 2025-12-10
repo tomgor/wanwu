@@ -55,12 +55,14 @@
           </div>
           <div>
             <el-radio
+              v-if="isAdmin"
               :label="'organization'"
               v-model="scope"
             >{{ $t('agent.form.publishType1') }}</el-radio>
           </div>
           <div>
             <el-radio
+              v-if="isSystem"
               :label="'public'"
               v-model="scope"
             >{{ $t('agent.form.publishType2') }}</el-radio>
@@ -661,12 +663,22 @@ export default {
           propName: "name", // 默认属性名
         },
       },
+      permission: JSON.parse(localStorage.getItem("access_cert"))
+        ? JSON.parse(localStorage.getItem("access_cert")).user.permission
+        : {},
+      
     };
   },
   computed:{
     showGraphSwitch() {
       return this.editForm.knowledgebases && this.editForm.knowledgebases.some(item => item.graphSwitch === 1)
-    }
+    },
+    isSystem() {
+      return this.permission.isSystem
+    },
+    isAdmin() {
+      return this.permission.isAdmin
+    },
   },
   mounted() {
     this.initialEditForm = JSON.parse(JSON.stringify(this.editForm));
