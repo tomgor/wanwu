@@ -269,9 +269,9 @@ export default {
             // window.open('https://github.com/UnicomAI/wanwu/tree/main/docs/manual')
             window.open( window.location.origin + `${this.$basePath}/aibase/docCenter/pages/${DOC_FIRST_KEY}`)
           }},
-          {name: 'Github', img: require('@/assets/imgs/github_icon.svg'), icon: require('@/assets/imgs/link_icon.png'), redirect: () => {
-            window.open('https://github.com/UnicomAI/wanwu')
-          }},
+          // {name: 'Github', img: require('@/assets/imgs/github_icon.svg'), icon: require('@/assets/imgs/link_icon.png'), redirect: () => {
+          //   window.open('https://github.com/UnicomAI/wanwu')
+          // }},
           {name: this.$t('menu.about'), img: require('@/assets/imgs/about_icon.svg'), version: 'version', redirect: () => {
             // 不展示关于弹窗
             // this.showAboutDialog()
